@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:replace="~{my-thanks/layout :: page(~{::div.send-thanks-container}, 'send', 'Send Thanks')}">
+<div class="send-thanks-container">
+    <style>
+        .send-form-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .greeting-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .form-card {
+            background-color: #f1f5f9;
+            border-radius: 16px;
+            border: 1px solid #cbd5e1;
+            padding: 35px 40px;
+        }
+        .form-label {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 1.05rem;
+            margin-bottom: 8px;
+        }
+        .required-star {
+            color: #ef4444;
+        }
+        .form-control, .form-select {
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 0.95rem;
+            background-color: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .search-input-group {
+            position: relative;
+        }
+        .search-input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+        .search-input-group .form-control {
+            padding-left: 45px;
+        }
+        
+        .wallet-balance-text {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        
+        .char-counter {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 5px;
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: none;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .btn-reset {
+            flex: 1;
+            background-color: #e0e7ff;
+            color: #3b82f6;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: all 0.2s;
+        }
+        .btn-reset:hover {
+            background-color: #dbeafe;
+        }
+        .btn-submit {
+            flex: 1;
+            background-color: #2962ff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: all 0.2s;
+        }
+        .btn-submit:hover {
+            background-color: #1e40af;
+            transform: translateY(-1px);
+        }
+    </style>
+
+    <div class="send-form-wrapper">
+        <h2 class="greeting-title">Send Thanks, Rohit!</h2>
+        
+        <div class="form-card">
+            <form action="#" method="post">
+                <!-- Select Employee -->
+                <div class="mb-4">
+                    <label class="form-label">Select Employee <span class="required-star">*</span></label>
+                    <div class="search-input-group">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" placeholder="Search Employee by Name or Email" required>
+                    </div>
+                </div>
+
+                <!-- Category -->
+                <div class="mb-4">
+                    <label class="form-label">Category <span class="required-star">*</span></label>
+                    <select class="form-select" required>
+                        <option value="" disabled selected>Select Category</option>
+                        <option value="teamwork">Teamwork</option>
+                        <option value="innovation">Innovation</option>
+                        <option value="leadership">Leadership</option>
+                        <option value="performance">Outstanding Performance</option>
+                    </select>
+                </div>
+
+                <!-- Points -->
+                <div class="mb-4">
+                    <label class="form-label">Points <span class="required-star">*</span></label>
+                    <input type="number" class="form-control" placeholder="Enter Points" min="1" max="1000" required>
+                    <div class="wallet-balance-text">Available Wallet Balance: 1000 Pts</div>
+                </div>
+
+                <!-- Message -->
+                <div class="mb-4">
+                    <label class="form-label">Message <span class="required-star">*</span></label>
+                    <textarea class="form-control" placeholder="Write your appreciation message here." maxlength="300" id="messageInput" required></textarea>
+                    <div class="char-counter" id="charCounter">0/300</div>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button type="reset" class="btn btn-reset">Reset</button>
+                    <button type="submit" class="btn btn-submit">Send Thanks</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('messageInput').addEventListener('input', function() {
+            const currentLength = this.value.length;
+            document.getElementById('charCounter').textContent = currentLength + '/300';
+        });
+    </script>
+</div>
+</th:block>
+</body>
+</html>
