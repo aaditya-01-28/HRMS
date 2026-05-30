@@ -10,4 +10,9 @@
     background:var(--background);
     min-height:100vh;
     overflow-x:hidden;
+    transition: margin-left var(--transition), width var(--transition);
+}
+
+.app-layout.sidebar-collapsed {
+    --sidebar-width: 88px;
 }

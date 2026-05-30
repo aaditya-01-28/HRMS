@@ -21,59 +21,124 @@
 <body>
 
 <div class="app-layout">
-    <div th:replace="fragments/sidebar :: sidebar"></div>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <main class="main-content">
-        <div class="dashboard-header-logo">
-            <img th:src="@{/images/white-logo.png}" alt="Logo" class="top-logo">
+        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 30px;">
+            <img th:src="@{/images/white-logo.png}" alt="Logo" class="top-logo" style="margin: 0;">
+            <h1 class="welcome-title" style="margin: 0;">Welcome back!</h1>
         </div>
-        
-        <h1 class="welcome-title">Welcome back, <span th:text="${user != null ? #strings.arraySplit(user.fullName, ' ')[0] : 'User'}">Rohit</span>!</h1>
 
-        <div class="dashboard-profile-card">
-            <div class="profile-avatar-large">
-                <i class="fa-solid fa-user"></i>
+        <!-- PREMIUM COMPACT PROFILE CARD -->
+        <style>
+            .premium-mini-profile {
+                background: linear-gradient(145deg, #ffffff, #f8fafc);
+                border-radius: 16px;
+                padding: 24px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+                display: flex;
+                align-items: center;
+                gap: 24px;
+                border: 1px solid rgba(226, 232, 240, 0.8);
+                position: relative;
+                overflow: hidden;
+                width: max-content;
+                max-width: 100%;
+                padding-right: 48px;
+                cursor: pointer;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                margin-bottom: 30px;
+            }
+            .premium-mini-profile:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06), 0 3px 10px rgba(0, 0, 0, 0.03);
+            }
+            .premium-mini-profile::before {
+                content: '';
+                position: absolute;
+                top: 0; left: 0; width: 6px; height: 100%;
+                background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+                border-radius: 16px 0 0 16px;
+            }
+            .pmp-avatar-container {
+                width: 80px; height: 80px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+                display: flex; align-items: center; justify-content: center;
+                color: #3b82f6;
+                font-size: 2.2rem;
+                flex-shrink: 0;
+                box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.8), 0 4px 10px rgba(59, 130, 246, 0.15);
+                border: 2px solid #ffffff;
+            }
+            .pmp-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+            .pmp-header {
+                display: flex; flex-direction: column; gap: 4px;
+            }
+            .pmp-name {
+                font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.5px;
+            }
+            .pmp-designation {
+                font-size: 0.85rem; font-weight: 600; color: #64748b; margin: 0;
+                display: flex; align-items: center; gap: 6px;
+            }
+            .pmp-designation i { color: #8b5cf6; }
+            .pmp-meta-grid {
+                display: flex;
+                gap: 32px;
+                grid-column: 1 / -1;
+                border-top: 1px solid #f1f5f9;
+                padding-top: 16px;
+            }
+            .pmp-meta-item {
+                display: flex; flex-direction: column; gap: 4px;
+            }
+            .pmp-meta-label {
+                font-size: 0.7rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;
+            }
+            .pmp-meta-value {
+            @media (max-width: 768px) {
+                .premium-mini-profile { flex-direction: column; align-items: flex-start; text-align: left; gap: 16px; }
+                .pmp-content { width: 100%; }
+                .pmp-meta-grid { flex-direction: column; gap: 12px; }
+            }
+        </style>
+
+        <div class="premium-mini-profile" onclick="window.location.href='/payroll/my-profile'">
+            <div class="pmp-avatar-container">
+                <i class="fa-solid fa-user-tie"></i>
             </div>
-            
-            <div class="profile-main-info">
-                <div class="profile-name-row">
-                    <h2 class="profile-name" th:text="${user != null ? user.fullName : 'Rohit Sharma'}">Rohit Sharma</h2>
-                    <span class="badge full-time">Full-time</span>
+            <div class="pmp-content">
+                <div class="pmp-header">
+                    <h2 class="pmp-name" th:text="${user != null ? user.fullName : 'Rohit Sharma'}">Rohit Sharma</h2>
+                    <div style="display: flex; gap: 16px; align-items: center; margin-top: 2px;">
+                        <p class="pmp-designation">
+                            <i class="fa-solid fa-briefcase"></i> 
+                            <span th:text="${profile != null ? profile.designation : 'Trainee-Tester'}">Trainee-Tester</span>
+                        </p>
+                        <p style="font-size: 0.85rem; font-weight: 600; color: #64748b; margin: 0; display: flex; align-items: center; gap: 6px; padding-left: 16px; border-left: 1px solid #cbd5e1;">
+                            <i class="fa-regular fa-calendar-check" style="color: #10b981;"></i>
+                            Joined <span th:text="${profile != null ? profile.joiningDate : '07/05/2026'}">07/05/2026</span>
+                        </p>
+                    </div>
                 </div>
-                <p class="profile-designation" th:text="${profile != null ? profile.designation : 'Trainee-Tester'}">Trainee-Tester</p>
-                
-                <div class="profile-details-grid">
-                    <div class="info-group">
-                        <span class="info-label">Employee ID</span>
-                        <span class="info-value" th:text="${user != null ? user.username : '100025'}">100025</span>
+                <div class="pmp-meta-grid">
+                    <div class="pmp-meta-item">
+                        <span class="pmp-meta-label">Employee ID</span>
+                        <span class="pmp-meta-value" th:text="${user != null ? user.username : '100025'}">100025</span>
                     </div>
-                    <div class="info-group">
-                        <span class="info-label">Email Address</span>
-                        <span class="info-value" th:text="${user != null ? user.email : 'email@gmail.com'}">email@gmail.com</span>
-                    </div>
-                    <div class="info-group">
-                        <span class="info-label">Joined On</span>
-                        <span class="info-value" th:text="${profile != null ? profile.joiningDate : '07/05/2026'}">07/05/2026</span>
+                    <div class="pmp-meta-item">
+                        <span class="pmp-meta-label">Email Address</span>
+                        <span class="pmp-meta-value" th:text="${user != null ? user.email : 'email@gmail.com'}">email@gmail.com</span>
                     </div>
                 </div>
             </div>
-            
-            <div class="profile-action">
-                <a href="/payroll/my-profile" class="primary-btn view-profile-btn">View Profile</a>
-            </div>
         </div>
-
-        <hr class="dashboard-divider"/>
-
-        <div class="dashboard-section">
-            <h2 class="section-title">My Team</h2>
-            <div class="empty-state">
-                <i class="fa-solid fa-user-group"></i>
-                <p>(No data found)</p>
-            </div>
-        </div>
-
-        <hr class="dashboard-divider"/>
 
         <div class="dashboard-section">
             <h2 class="section-title">Query Status</h2>
@@ -105,6 +170,16 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <hr class="dashboard-divider"/>
+
+        <div class="dashboard-section">
+            <h2 class="section-title">My Team</h2>
+            <div class="empty-state">
+                <i class="fa-solid fa-user-group"></i>
+                <p>(No data found)</p>
             </div>
         </div>
     </main>
