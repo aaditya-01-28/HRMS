@@ -115,7 +115,26 @@ public class AdminLeaveController {
 
             LeaveTypeMaster leaveTypeMaster =
                     leaveTypeRepository.findByLeaveCode(leaveCode)
-                            .orElseThrow(() -> new RuntimeException("Leave type not found for code: " + leaveCode));
+                            .orElse(null);
+
+            if (leaveTypeMaster == null) {
+                // Special leave not tracked in database wallets (e.g., Maternity, Paternity)
+                Map<String, Object> emailData = new HashMap<>();
+                emailData.put("empName", leave.getUser().getFullName());
+                emailData.put("specificType", leave.getLeaveType());
+                emailData.put("submittedOn", leave.getCreatedAt());
+                emailData.put("duration", leave.getFromDate() + " to " + leave.getToDate() + " (" + leave.getTotalDays() + " Days)");
+
+                emailService.sendRequestStatusUpdateToEmployee(
+                        leave.getUser().getEmail(),
+                        leave.getUser().getFullName(),
+                        "Leave",
+                        "Approved",
+                        emailData
+                );
+                
+                return ResponseEntity.ok("Leave Approved successfully (No wallet deduction for " + leave.getLeaveType() + ")");
+            }
 
             EmployeeLeaveWallet wallet =
                     walletRepository.findByUserAndLeaveType(leave.getUser(), leaveTypeMaster)
