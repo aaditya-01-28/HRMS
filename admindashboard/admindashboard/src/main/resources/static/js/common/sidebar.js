@@ -16,4 +16,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    /* ==========================================
+       Sidebar Toggle Logic
+       ========================================== */
+    var toggleBtn = document.getElementById('sidebarToggle');
+    var appLayout = document.querySelector('.app-layout');
+    
+    // Check localStorage for saved state
+    if (localStorage.getItem('sidebar-collapsed') === 'true') {
+        if (appLayout) appLayout.classList.add('sidebar-collapsed');
+    }
+    
+    if (toggleBtn && appLayout) {
+        toggleBtn.addEventListener('click', function() {
+            appLayout.classList.toggle('sidebar-collapsed');
+            localStorage.setItem('sidebar-collapsed', appLayout.classList.contains('sidebar-collapsed'));
+        });
+    }
+
 });

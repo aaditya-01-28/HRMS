@@ -170,15 +170,24 @@
     <main class="main-content">
         
         <div class="tax-header">
-            <img th:src="@{/images/white-logo.png}" alt="Logo" class="tax-logo">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <img th:src="@{/images/white-logo.png}" alt="Logo" class="tax-logo" style="margin: 0;">
+                <h1 class="page-title-large" style="margin: 0;">Payroll & Tax</h1>
+            </div>
             
-            <a href="/payroll/my-profile" class="tax-user-profile" style="text-decoration: none; cursor: pointer;">
-                <div class="tax-user-icon"><i class="fa-solid fa-user"></i></div>
-                <div class="tax-user-name" th:text="${user != null ? user.fullName : 'Rohit Sharma'}">Rohit Sharma</div>
+                        <a href="/payroll/my-profile" class="premium-header-profile" style="display: flex; align-items: center; gap: 16px; text-decoration: none; background: linear-gradient(145deg, #ffffff, #f8fafc); padding: 8px 24px 8px 8px; border-radius: 50px; border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: all 0.3s ease;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); display: flex; align-items: center; justify-content: center; color: #3b82f6; font-size: 1.2rem; flex-shrink: 0; border: 2px solid #ffffff; box-shadow: 0 2px 5px rgba(59, 130, 246, 0.15);">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                    <span style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.2;" th:text="${user != null ? user.fullName : 'Rohit Sharma'}">Rohit Sharma</span>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span style="font-size: 0.75rem; font-weight: 600; color: #64748b; margin: 0; line-height: 1.2;" th:text="${profile != null && profile.designation != null ? profile.designation : 'Trainee-Tester'}">Trainee-Tester</span>
+                        <span style="font-size: 0.75rem; font-weight: 600; color: #94a3b8; margin: 0; line-height: 1.2; border-left: 1px solid #cbd5e1; padding-left: 8px;"><i class="fa-regular fa-calendar-check" style="color: #10b981; margin-right: 4px;"></i>Joined <span th:text="${profile != null && profile.joiningDate != null ? #temporals.format(profile.joiningDate, 'yyyy-MM-dd') : '2026-05-07'}">2026-05-07</span></span>
+                    </div>
+                </div>
             </a>
         </div>
-        
-        <h1 class="page-title-large">Payroll & Tax</h1>
 
         <div class="payroll-items-grid">
             
