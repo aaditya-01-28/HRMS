@@ -73,10 +73,10 @@
             background-color: #f1f5f9;
             border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 24px;
+            padding: 20px;
             display: flex;
             align-items: flex-end;
-            gap: 24px;
+            gap: 12px;
             margin-bottom: 32px;
         }
         
@@ -97,7 +97,7 @@
             height: 44px;
             border: 1px solid #a0aec0;
             border-radius: 22px; /* pill shape */
-            padding: 0 20px;
+            padding: 0 16px;
             font-size: 14px;
             color: #4a5568;
             outline: none;
@@ -107,9 +107,10 @@
         
         .filter-select {
             appearance: none;
+            padding-right: 32px;
             background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
             background-repeat: no-repeat;
-            background-position: right 16px center;
+            background-position: right 12px center;
             background-size: 10px;
         }
         
@@ -141,8 +142,8 @@
             color: white;
             border: none;
             border-radius: 22px;
-            padding: 0 32px;
-            font-size: 15px;
+            padding: 0 20px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s;
@@ -155,8 +156,8 @@
             color: #2b5dff;
             border: 1px solid #2b5dff;
             border-radius: 22px;
-            padding: 0 32px;
-            font-size: 15px;
+            padding: 0 20px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -206,9 +207,46 @@
             font-size: 16px;
         }
         
+        /* FAQs List */
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .faq-item {
+            background-color: #fff;
+            border: 1px solid #c2c9d6;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .faq-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transform: translateY(-2px);
+            border-color: #2b5dff;
+        }
+        
+        .faq-question {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        
+        .faq-icon {
+            font-size: 18px;
+            color: #64748b;
+        }
+        
         @media (max-width: 900px) {
             .filter-bar { flex-direction: column; align-items: stretch; }
             .filter-actions { justify-content: flex-end; }
+            .queries-faq-layout { grid-template-columns: 1fr !important; }
         }
     </style>
 </head>
@@ -220,17 +258,29 @@
     <main class="main-content">
         
         <div class="page-header">
-            <img th:src="@{/images/white-logo.png}" alt="Logo" class="header-logo">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <img th:src="@{/images/white-logo.png}" alt="Logo" class="header-logo" style="margin: 0;">
+                <h1 class="page-title-large" style="margin: 0;">Helpdesk & FAQ</h1>
+            </div>
             
-            <a href="/payroll/my-profile" class="user-profile-link">
-                <div class="user-avatar-icon"><i class="fa-solid fa-user"></i></div>
-                <div class="user-name-text" th:text="${user != null ? user.fullName : 'Rohit Sharma'}">Rohit Sharma</div>
+                        <a href="/payroll/my-profile" class="premium-header-profile" style="display: flex; align-items: center; gap: 16px; text-decoration: none; background: linear-gradient(145deg, #ffffff, #f8fafc); padding: 8px 24px 8px 8px; border-radius: 50px; border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: all 0.3s ease;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); display: flex; align-items: center; justify-content: center; color: #3b82f6; font-size: 1.2rem; flex-shrink: 0; border: 2px solid #ffffff; box-shadow: 0 2px 5px rgba(59, 130, 246, 0.15);">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                    <span style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.2;" th:text="${user != null ? user.fullName : 'Rohit Sharma'}">Rohit Sharma</span>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span style="font-size: 0.75rem; font-weight: 600; color: #64748b; margin: 0; line-height: 1.2;" th:text="${profile != null && profile.designation != null ? profile.designation : 'Trainee-Tester'}">Trainee-Tester</span>
+                        <span style="font-size: 0.75rem; font-weight: 600; color: #94a3b8; margin: 0; line-height: 1.2; border-left: 1px solid #cbd5e1; padding-left: 8px;"><i class="fa-regular fa-calendar-check" style="color: #10b981; margin-right: 4px;"></i>Joined <span th:text="${profile != null && profile.joiningDate != null ? #temporals.format(profile.joiningDate, 'yyyy-MM-dd') : '2026-05-07'}">2026-05-07</span></span>
+                    </div>
+                </div>
             </a>
         </div>
-        
-        <h1 class="page-title-large">My Queries</h1>
 
-        <div class="filter-bar">
+        <div class="queries-faq-layout" style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px; align-items: start;">
+            <!-- Left Column: Queries -->
+            <div>
+                <div class="filter-bar">
             <div class="filter-group">
                 <label class="filter-label">Query Type</label>
                 <select class="filter-select">
@@ -280,6 +330,31 @@
             <div class="empty-state">
                 <i class="fa-solid fa-user-group"></i>
                 <p>(No data found)</p>
+            </div>
+        </div>
+            </div>
+            
+            <!-- Right Column: FAQs -->
+            <div>
+                <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid #e2e8f0;">Frequently Asked Questions</h2>
+                <div class="faq-list">
+                    <div class="faq-item" onclick="alert('FAQ details coming soon.')">
+                        <div class="faq-question">When do I need to submit my Investment Proofs?</div>
+                        <div class="faq-icon"><i class="fa-solid fa-plus"></i></div>
+                    </div>
+                    <div class="faq-item" onclick="alert('FAQ details coming soon.')">
+                        <div class="faq-question">What is the cut off date for Investment Declaration?</div>
+                        <div class="faq-icon"><i class="fa-solid fa-plus"></i></div>
+                    </div>
+                    <div class="faq-item" onclick="alert('FAQ details coming soon.')">
+                        <div class="faq-question">My colleague did not receive login credentials yet</div>
+                        <div class="faq-icon"><i class="fa-solid fa-plus"></i></div>
+                    </div>
+                    <div class="faq-item" onclick="alert('FAQ details coming soon.')">
+                        <div class="faq-question">My Profile details need to be updated/corrected</div>
+                        <div class="faq-icon"><i class="fa-solid fa-plus"></i></div>
+                    </div>
+                </div>
             </div>
         </div>
 
