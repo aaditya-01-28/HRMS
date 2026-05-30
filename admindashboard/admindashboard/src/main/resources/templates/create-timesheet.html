@@ -382,7 +382,7 @@
             if (currentStatus === 'APPROVED') {
                 editBtn = `<button class="btn btn-link p-0 text-dark" disabled style="opacity: 0.4; cursor: not-allowed;" title="Approved timesheets cannot be edited"><i class="fas fa-pencil-alt"></i></button>`;
             } else {
-                editBtn = `<button class="btn btn-link p-0 text-dark" title="Edit Timesheet" onclick="window.location.href='/employee/timecard-entry?start=${ts.weekStartDate}&end=${ts.weekEndDate}'"><i class="fas fa-pencil-alt"></i></button>`;
+                editBtn = `<button class="btn btn-link p-0 text-dark" title="Edit Timesheet" onclick="window.location.href='/employee/weekly-timecard?start=${ts.weekStartDate}&end=${ts.weekEndDate}'"><i class="fas fa-pencil-alt"></i></button>`;
             }
 
             const row = `
@@ -435,7 +435,7 @@
     function triggerTimecard() {
         const startDate = document.getElementById('weekStart').value;
         const endDate = document.getElementById('weekEnd').value;
-        window.location.href = `/employee/timecard-entry?start=${startDate}&end=${endDate}`;
+        window.location.href = `/employee/weekly-timecard?start=${startDate}&end=${endDate}`;
     }
 </script>
 </body>

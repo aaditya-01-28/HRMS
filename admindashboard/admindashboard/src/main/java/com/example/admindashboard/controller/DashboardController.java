@@ -425,8 +425,14 @@ public class DashboardController {
     @GetMapping("/employee/create-timesheet")
     public String showCreateTimesheet() { return "create-timesheet"; }
 
-    @GetMapping("/employee/timecard-entry")
-    public String showTimecardEntry() { return "timecard-entry"; }
+    @GetMapping("/employee/daily-timecard")
+    public String showDailyTimecard() { return "daily-timecard"; }
+
+    @GetMapping("/employee/weekly-timecard")
+    public String showWeeklyTimecard() { return "weekly-timecard"; }
+
+    @GetMapping("/employee/monthly-timecard")
+    public String showMonthlyTimecard() { return "monthly-timecard"; }
 
     @GetMapping("/employee/timesheet-report")
     public String showTimesheetReport() { return "timesheet-report"; }
