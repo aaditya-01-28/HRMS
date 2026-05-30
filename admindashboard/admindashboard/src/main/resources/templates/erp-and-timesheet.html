@@ -220,19 +220,23 @@
 <!-- HERO BANNER WRAPPER WITH RAW TOP LEFT CORNER TITLE -->
 <div class="erp-hero-banner">
     <h1 class="erp-banner-raw-title">ERP & Timesheet</h1>
-    <a href="/employee/dashboard" class="btn-back-home-floating">
-        <i class="fas fa-arrow-left me-1"></i> Back to Home
-    </a>
 </div>
 
 <div class="central-workspace-container">
 
     <!-- RECENT MATRIX ENGINE -->
-    <div class="matrix-section-header">
+    <div class="matrix-section-header" style="justify-content: space-between;">
         <h2 class="matrix-section-title">Recent Timesheets</h2>
-        <a href="/employee/create-timesheet" class="btn-plus-square" title="Add Log">
-            <i class="fas fa-plus"></i>
-        </a>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <select id="templateSelect" class="form-select" style="width: auto; min-width: 180px; font-size: 0.85rem; border-radius: 6px; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.05); color: #334155;">
+                <option value="" disabled selected>Select Template</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+            </select>
+            <button class="btn-timecard-action-solid" style="margin: 0; padding: 8px 18px;" onclick="openSelectedTimecard()">Create Timecard</button>
+            <button class="btn-timecard-action-solid" style="margin: 0; padding: 8px 18px;" onclick="window.location.href='/employee/create-timesheet'">Create Timesheet</button>
+        </div>
     </div>
 
     <table class="timesheet-matrix-table">
@@ -253,16 +257,14 @@
         </tbody>
     </table>
 
-    <button class="btn-timecard-action-solid" onclick="window.location.href='#">Create Timecard</button>
-
     <!-- CALENDAR CORE MODULE -->
-    <div class="calendar-card-wrapper" style="width: 100%; max-width: 480px; margin: 0 auto 30px auto;">
+    <div class="calendar-card-wrapper" style="width: 100%; max-width: 480px; margin: 30px auto 30px auto;">
         <div th:replace="~{fragments/spiral-calendar :: spiralCalendar}"></div>
     </div>
 
     <!-- OPERATIONS STRIP MOUNTED BENEATH THE CALENDAR FRAMEWORK -->
-    <div class="calendar-action-button-group">
-        <button onclick="window.location.href='/employee/create-timesheet'" class="btn-action-hub-solid">Create Timesheet</button>
+    <div class="calendar-action-button-group" style="justify-content: flex-start; margin-top: 40px;">
+        <button onclick="window.location.href='#'" class="btn-action-hub-solid">Use Template</button>
         <a href="/employee/timesheet-report" class="btn-action-hub-solid">Timesheet Report</a>
     </div>
 
@@ -446,7 +448,7 @@
             if (currentStatus === 'APPROVED') {
                 editBtn = `<button class="table-action-icon-btn" disabled style="opacity: 0.4; cursor: not-allowed;" title="Approved timesheets cannot be edited"><i class="fas fa-pencil-alt"></i></button>`;
             } else {
-                editBtn = `<button class="table-action-icon-btn" title="Edit Timesheet" onclick="window.location.href='/employee/timecard-entry?start=${ts.weekStartDate}&end=${ts.weekEndDate}'"><i class="fas fa-pencil-alt"></i></button>`;
+                editBtn = `<button class="table-action-icon-btn" title="Edit Timesheet" onclick="window.location.href='/employee/weekly-timecard?start=${ts.weekStartDate}&end=${ts.weekEndDate}'"><i class="fas fa-pencil-alt"></i></button>`;
             }
 
             const row = `
@@ -467,6 +469,25 @@
     function navigateMonth(step) {
         currentDate.setMonth(currentDate.getMonth() + step);
         renderCalendar();
+    }
+
+    function openSelectedTimecard() {
+        const select = document.getElementById('templateSelect');
+        const template = select.value;
+        if (template === 'daily') {
+            window.location.href = '/employee/daily-timecard';
+        } else if (template === 'weekly') {
+            window.location.href = '/employee/weekly-timecard';
+        } else if (template === 'monthly') {
+            window.location.href = '/employee/monthly-timecard';
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Please Select a Template',
+                text: 'You must select Daily, Weekly, or Monthly before creating a timecard.',
+                confirmButtonColor: '#1e3a8a'
+            });
+        }
     }
 </script>
 </body>
