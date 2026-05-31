@@ -217,7 +217,7 @@
 <body>
 
 <div class="form-hero-banner">
-    <a th:href="@{/ticket-dashboard(dept=${currentDept})}" class="btn-back-dashboard">Back to Helpdesk</a>
+    <a  th:href="${backUrl}" class="btn-back-dashboard">Back to Helpdesk</a>
     <h1>Report Issue Form</h1>
 </div>
 
@@ -239,8 +239,8 @@
                     </div>
 
                     <div class="custom-form-group">
-                        <label class="custom-form-label">Severity Level*</label>
-                        <select class="form-select input-box-field" id="incidentSeverity">
+                        <label class="custom-form-label">priority*</label>
+                        <select class="form-select input-box-field" id="incidentpriority">
                             <option value="" selected disabled hidden>Select</option>
                             <option value="Low">Low (Can still work)</option>
                             <option value="Medium">Medium (Hindering work)</option>
@@ -294,7 +294,7 @@
                     <label class="form-label-custom pt-1">Description</label>
                 </div>
                 <div class="col-md-11 ps-0">
-                    <textarea class="form-control form-control-custom" id="incidentDescription" rows="5" required></textarea>
+                    <textarea class="form-control form-control-custom" id="incidentDescription" rows="5"></textarea>
                 </div>
             </div>
         </div>
@@ -341,7 +341,7 @@
         const category = document.getElementById('incidentCategory').value;
         const subject = document.getElementById('incidentSubject').value.trim();
         const description = document.getElementById('incidentDescription').value.trim();
-        const severity = document.getElementById('incidentSeverity').value || 'Medium';
+        const priority = document.getElementById('incidentpriority').value || 'Medium';
         const mobile = document.getElementById('incidentMobile').value.trim();
         const email = document.getElementById('incidentEmail').value.trim();
         const locationVal = document.getElementById('incLocation').value;
@@ -350,7 +350,7 @@
         const itemVal = document.getElementById('incItemField').value.trim();
         const subcategoryVal = document.getElementById('incSubcategoryField').value.trim();
 
-        if (!category || !subject || !description || !mobile || !email || !locationVal) {
+        if (!category || !mobile || !email || !locationVal || !priority) {
             Swal.fire({ icon: 'info', title: 'Missing Info', text: 'Please fill in all required fields.', confirmButtonColor: '#2563eb' });
             return;
         }
@@ -381,7 +381,7 @@
             durationOrLevel: itemVal || "N/A",
             operatingSystem: subcategoryVal || "N/A",
             
-            priority: severity,
+            priority: priority,
             justification: description,
             location: locationVal,
             status: "Open",
@@ -391,7 +391,7 @@
 
         const confirmResult = await Swal.fire({
             title: 'Report Incident?',
-            html: `Logging a <b>${severity} Priority</b> ticket for:<br><br><b>${subject}</b>`,
+            html: `Logging a <b>${priority} Priority</b> ticket for:<br><br><b>${subject}</b>`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Submit Ticket',
@@ -432,7 +432,13 @@
                     timer: 4000,
                     timerProgressBar: true
                 });
-                window.location.href = '/ticket-dashboard?dept=' + typeContext;
+				if (isRoleUser) {
+				    window.location.href =
+				        '/role-ticket-dashboard?dept=' + typeContext;
+				} else {
+				    window.location.href =
+				        '/ticket-dashboard?dept=' + typeContext;
+				}
             } else {
                 throw new Error("Log failed");
             }
