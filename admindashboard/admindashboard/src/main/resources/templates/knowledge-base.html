@@ -218,7 +218,7 @@
 <body>
 
 <div class="hero-banner-container">
-    <a th:href="@{/ticket-dashboard(dept=${currentDept})}" class="btn-back-dashboard">Back to Dashboard</a>
+    <a  th:href="${backUrl}" class="btn-back-dashboard">Back to Dashboard</a>
     <h1><h1>Solutions Form</h1></h1>
 </div>
 
@@ -243,9 +243,9 @@
                     </div>
 
                     <div class="row mb-3 align-items-center">
-                        <div class="col-sm-3"><label class="form-label-custom">Severity Level*</label></div>
+                        <div class="col-sm-3"><label class="form-label-custom">Priority*</label></div>
                         <div class="col-sm-9">
-                            <select class="form-select form-control-custom" id="solSeverity" required>
+                            <select class="form-select form-control-custom" id="solPriority" required>
 								<option value="" selected disabled hidden>Select</option>
                                 <option value="Low">Low</option>
                                 <option value="Medium">Medium</option>
@@ -256,7 +256,7 @@
 
                     <div class="row mb-3 align-items-center">
                         <div class="col-sm-3"><label class="form-label-custom">Subject</label></div>
-                        <div class="col-sm-9"><input type="text" class="form-control form-control-custom" id="solSubject" placeholder="" required></div>
+                        <div class="col-sm-9"><input type="text" class="form-control form-control-custom" id="solSubject" placeholder=""></div>
                     </div>
 
                     <div class="row mb-3 align-items-center">
@@ -313,7 +313,7 @@
 			        </div>
 			        <div class="col-md-11 ps-0">
 			            
-			            <textarea class="form-control form-control-custom" id="solDescription" rows="5" required></textarea>
+			            <textarea class="form-control form-control-custom" id="solDescription" rows="5" ></textarea>
 			        </div>
 			    </div>
 			</div>
@@ -362,7 +362,7 @@
 	async function executeSolutionsSubmission() {
         const typeContext = document.getElementById('solDeptType').value;
         const category = document.getElementById('solCategory').value;
-        const severity = document.getElementById('solSeverity').value;
+        const Priority = document.getElementById('solPriority').value;
         const locationVal = document.getElementById('solLocation').value;
         const mobile = document.getElementById('solMobile').value.trim();
         const email = document.getElementById('solEmail').value.trim();
@@ -372,7 +372,7 @@
         const itemVal = document.getElementById('solItemField').value.trim();
         const subcategoryVal = document.getElementById('solSubcategoryField').value.trim();
 
-        if (!category || !severity || !locationVal || !mobile || !email || !subject || !description) {
+        if (!category || !Priority || !locationVal || !mobile || !email ) {
             Swal.fire({ 
                 icon: 'warning', 
                 title: 'Required Fields Missing', 
@@ -405,7 +405,7 @@
             detailItem: subject,
             durationOrLevel: itemVal || "N/A", 
             operatingSystem: subcategoryVal || "N/A", 
-            priority: severity,
+            priority: Priority,
             justification: description,
             location: locationVal,
             status: "Open",
@@ -435,7 +435,13 @@
                     text: 'Your solutions ticket has been recorded successfully.',
                     confirmButtonColor: '#2563eb'
                 });
-                window.location.href = '/ticket-dashboard?dept=' + typeContext;
+				if (isRoleUser) {
+				    window.location.href =
+				        '/role-ticket-dashboard?dept=' + typeContext;
+				} else {
+				    window.location.href =
+				        '/ticket-dashboard?dept=' + typeContext;
+				}
             } else {
                 throw new Error("Server Response Error");
             }
