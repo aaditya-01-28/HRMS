@@ -16,6 +16,8 @@ public class TimesheetRowDTO {
 
     private Double rowTotal;
     private String details;
+    private String attachmentName;
+    private String attachmentBase64;
 
     // --- Getters and Setters ---
     public Long getProjectId() { return projectId; }
@@ -53,4 +55,10 @@ public class TimesheetRowDTO {
 
     public String getDetails() { return details; }
     public void setDetails(String details) { this.details = details; }
+
+    public String getAttachmentName() { return attachmentName; }
+    public void setAttachmentName(String attachmentName) { this.attachmentName = attachmentName; }
+
+    public String getAttachmentBase64() { return attachmentBase64; }
+    public void setAttachmentBase64(String attachmentBase64) { this.attachmentBase64 = attachmentBase64; }
 }

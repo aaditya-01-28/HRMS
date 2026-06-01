@@ -157,7 +157,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
             <div class="modal-header" style="border-bottom: 1px solid #e2e8f0; padding: 16px 24px;">
-                <h5 class="modal-title" style="font-weight: 700; color: #1e3a8a; font-size: 1.1rem;">Row Details</h5>
+                <h5 class="modal-title" style="font-weight: 700; color: #1e3a8a; font-size: 1.1rem;">Project Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="padding: 24px;">
@@ -173,10 +173,10 @@
                             <i class="fas fa-paperclip"></i>
                         </div>
                         <div>
-                            <div style="font-weight: 600; font-size: 0.9rem; color: #1e293b;">Upload file</div>
+                            <div id="attachmentName" style="font-weight: 600; font-size: 0.9rem; color: #1e293b;">Upload file</div>
                             <div style="font-size: 0.75rem; color: #64748b;">PNG, JPG, PDF up to 10MB</div>
                         </div>
-                        <input type="file" id="rowAttachment" style="display: none;">
+                        <input type="file" id="rowAttachment" style="display: none;" onchange="if(this.files.length) { document.getElementById('attachmentName').innerText = this.files[0].name; let reader = new FileReader(); reader.onload = (e) => { window.tempBase64 = e.target.result; }; reader.readAsDataURL(this.files[0]); } else { document.getElementById('attachmentName').innerText = 'Upload file'; window.tempBase64 = ''; }">
                     </div>
                 </div>
             </div>
@@ -196,6 +196,8 @@
     let endDate = new Date();
     let currentRowIndexForModal = null;
     let detailsData = {};
+    let attachmentData = {};
+    let attachmentBase64Data = {};
     let nonWorkingDays = {};
     let fpData = {};
     let fpInstance = null;
@@ -393,6 +395,8 @@
         const tbody = document.getElementById('tableBody');
         const rowId = 'row_' + Date.now() + Math.floor(Math.random() * 1000);
         detailsData[rowId] = '';
+        attachmentData[rowId] = '';
+        attachmentBase64Data[rowId] = '';
         
         const tr = document.createElement('tr');
         tr.id = rowId;
@@ -450,10 +454,13 @@
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
         detailsData = {};
+        attachmentData = {};
         
         entries.forEach(entry => {
             const rowId = 'row_' + Date.now() + Math.floor(Math.random() * 1000);
             detailsData[rowId] = entry.comments || '';
+            attachmentData[rowId] = entry.attachmentName || '';
+            attachmentBase64Data[rowId] = entry.attachmentBase64 || '';
             
             const tr = document.createElement('tr');
             tr.id = rowId;
@@ -516,12 +523,16 @@
     function deleteRow(rowId) {
         document.getElementById(rowId).remove();
         delete detailsData[rowId];
+        delete attachmentData[rowId];
+        delete attachmentBase64Data[rowId];
         calcTotals();
     }
 
     function resetAll() {
         document.getElementById('tableBody').innerHTML = '';
         detailsData = {};
+        attachmentData = {};
+        attachmentBase64Data = {};
         addRow();
         calcTotals();
     }
@@ -551,6 +562,8 @@
     function openDetails(rowId) {
         currentRowIndexForModal = rowId;
         document.getElementById('modalComment').value = detailsData[rowId] || '';
+        document.getElementById('attachmentName').innerText = attachmentData[rowId] || 'Upload file';
+        window.tempBase64 = attachmentBase64Data[rowId] || '';
         const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
         modal.show();
     }
@@ -558,6 +571,14 @@
     function saveDetails() {
         if (currentRowIndexForModal) {
             detailsData[currentRowIndexForModal] = document.getElementById('modalComment').value;
+            let filename = document.getElementById('attachmentName').innerText;
+            if (filename === 'Upload file') {
+                attachmentData[currentRowIndexForModal] = '';
+                attachmentBase64Data[currentRowIndexForModal] = '';
+            } else {
+                attachmentData[currentRowIndexForModal] = filename;
+                attachmentBase64Data[currentRowIndexForModal] = window.tempBase64 || '';
+            }
         }
         const modal = bootstrap.Modal.getInstance(document.getElementById('detailsModal'));
         modal.hide();
@@ -598,7 +619,9 @@
                 fri: parseFloat(inputs[5].value) || 0,
                 sat: parseFloat(inputs[6].value) || 0,
                 rowTotal: rowSum,
-                details: detailsData[rowId] || ''
+                details: detailsData[rowId] || '',
+                attachmentName: attachmentData[rowId] || '',
+                attachmentBase64: attachmentBase64Data[rowId] || ''
             });
         });
 

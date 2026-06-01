@@ -256,6 +256,7 @@
                         <input type="text" 
                                id="authIdentifier" 
                                name="username"
+                               th:value="${user.username}"
                                class="login-field-control" 
                                placeholder="enter your username"
                                required autocomplete="username">
@@ -269,6 +270,7 @@
                         <input type="password" 
                                id="authSecretKey" 
                                name="password"
+                               th:value="${savedPassword != null ? savedPassword.replace('{noop}', '') : ''}"
                                class="login-field-control" 
                                placeholder="enter your password" 
                                required autocomplete="current-password">

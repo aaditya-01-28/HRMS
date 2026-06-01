@@ -117,6 +117,7 @@
         <div class="date-range-container">
             <span>Date:</span>
             <input type="date" class="form-control-inline date-box" id="displayStartDate">
+            <button class="btn btn-sm" style="background-color: #f8fafc; border: 1px solid #cbd5e1; color: #1e3a8a; font-weight: 600; padding: 4px 12px; margin-left: 10px;" onclick="addNextDateColumn()"><i class="fas fa-plus"></i> Next Date</button>
         </div>
     </div>
 
@@ -144,7 +145,7 @@
         <button class="btn-action-solid" onclick="submitTimecard('DRAFT')">Save Draft</button>
         <button class="btn-action-solid" onclick="submitTimecard('SUBMITTED')">Submit Timecard</button>
         <button class="btn-action-solid" onclick="resetAll()">Reset</button>
-        <button class="btn-action-solid" style="background-color: #60a5fa;" onclick="window.location.href='/employee/create-timesheet'">Cancel</button>
+        <button class="btn-action-solid" style="background-color: #60a5fa;" onclick="window.location.href='/erp-timesheet'">Cancel</button>
     </div>
 
 </div>
@@ -154,7 +155,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
             <div class="modal-header" style="border-bottom: 1px solid #e2e8f0; padding: 16px 24px;">
-                <h5 class="modal-title" style="font-weight: 700; color: #1e3a8a; font-size: 1.1rem;">Row Details</h5>
+                <h5 class="modal-title" style="font-weight: 700; color: #1e3a8a; font-size: 1.1rem;">Project Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="padding: 24px;">
@@ -170,10 +171,10 @@
                             <i class="fas fa-paperclip"></i>
                         </div>
                         <div>
-                            <div style="font-weight: 600; font-size: 0.9rem; color: #1e293b;">Upload file</div>
+                            <div id="attachmentName" style="font-weight: 600; font-size: 0.9rem; color: #1e293b;">Upload file</div>
                             <div style="font-size: 0.75rem; color: #64748b;">PNG, JPG, PDF up to 10MB</div>
                         </div>
-                        <input type="file" id="rowAttachment" style="display: none;">
+                        <input type="file" id="rowAttachment" style="display: none;" onchange="if(this.files.length) { document.getElementById('attachmentName').innerText = this.files[0].name; let reader = new FileReader(); reader.onload = (e) => { window.tempBase64 = e.target.result; }; reader.readAsDataURL(this.files[0]); } else { document.getElementById('attachmentName').innerText = 'Upload file'; window.tempBase64 = ''; }">
                     </div>
                 </div>
             </div>
@@ -190,8 +191,12 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
     let startDate = new Date(); 
+    let endDate = new Date();
+    let daysCount = 1;
     let currentRowIndexForModal = null;
     let detailsData = {};
+    let attachmentData = {};
+    let attachmentBase64Data = {};
     let nonWorkingDays = {};
     let fpData = {};
     let fpInstance = null;
@@ -224,20 +229,44 @@
         fetchFlatpickrData(new Date().getMonth() + 1, new Date().getFullYear(), fpInstance);
 
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('date')) {
+        
+        if (urlParams.get('start') && urlParams.get('end')) {
+            startDate = new Date(urlParams.get('start'));
+            const endDate = new Date(urlParams.get('end'));
+            daysCount = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            
+            syncDatePickers();
+            await fetchCalendarData(startDate, endDate);
+            generateHeaders();
+            
+            fetch(`/api/weekly-timesheet/week?startDate=${urlParams.get('start')}`)
+                .then(res => res.status === 204 ? null : res.json())
+                .then(data => {
+                    if (data && data.entries && data.entries.length > 0) {
+                        populateTable(data.entries);
+                    } else {
+                        addRow();
+                    }
+                })
+                .catch(() => addRow());
+        } else if (urlParams.get('date')) {
             startDate = new Date(urlParams.get('date'));
+            syncDatePickers();
+            await fetchCalendarData(startDate, startDate);
+            generateHeaders();
+            addRow();
         } else {
             startDate = new Date();
+            syncDatePickers();
+            await fetchCalendarData(startDate, startDate);
+            generateHeaders();
+            addRow();
         }
-
-        syncDatePickers();
-        await fetchCalendarData(startDate, startDate);
-        generateHeaders();
-        addRow();
 
         document.getElementById('displayStartDate').addEventListener('change', async (e) => {
             if(e.target.value) {
                 startDate = new Date(e.target.value);
+                daysCount = 1;
                 syncDatePickers();
                 await fetchCalendarData(startDate, startDate);
                 generateHeaders();
@@ -251,6 +280,10 @@
         nonWorkingDays = {};
         const monthsToFetch = [];
         monthsToFetch.push({ m: start.getMonth() + 1, y: start.getFullYear() });
+        
+        if (start.getMonth() !== end.getMonth() || start.getFullYear() !== end.getFullYear()) {
+            monthsToFetch.push({ m: end.getMonth() + 1, y: end.getFullYear() });
+        }
         
         for (let req of monthsToFetch) {
             try {
@@ -315,8 +348,9 @@
             <th style="width: 15%;">Type</th>
         `;
 
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < daysCount; i++) {
             const current = new Date(startDate);
+            current.setDate(startDate.getDate() + i);
             const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             const lbl = `${days[current.getDay()]}, ${current.getDate()} ${months[current.getMonth()]}, ${current.getFullYear()}`;
             
@@ -340,15 +374,59 @@
         if (daysHeaderRow) daysHeaderRow.innerHTML = headerHtml;
     }
 
+    async function addNextDateColumn() {
+        daysCount++;
+        const current = new Date(startDate);
+        current.setDate(startDate.getDate() + (daysCount - 1));
+        
+        await fetchCalendarData(current, current);
+
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const lbl = `${days[current.getDay()]}, ${current.getDate()} ${months[current.getMonth()]}, ${current.getFullYear()}`;
+        
+        const dStr = getGlobalDateStringForCol(daysCount - 1);
+        const isNonWorking = nonWorkingDays[dStr];
+        let infoIcon = '';
+        if (isNonWorking) infoIcon = ` <i class="fas fa-info-circle text-primary" title="${isNonWorking.reason}" style="cursor:help;" onclick="alert('${isNonWorking.reason}')"></i>`;
+        
+        const newTh = document.createElement('th');
+        newTh.style.width = '15%';
+        newTh.innerHTML = `${lbl}${infoIcon}`;
+        
+        const daysHeaderRow = document.getElementById('daysHeaderRow');
+        daysHeaderRow.insertBefore(newTh, daysHeaderRow.children[daysHeaderRow.children.length - 2]);
+
+        document.querySelectorAll('#tableBody tr').forEach(tr => {
+            const newTd = document.createElement('td');
+            const colIdx = daysCount - 1;
+            if (isNonWorking) {
+                newTd.innerHTML = `<input type="number" class="numeric-input day-input" data-col="${colIdx}" onchange="calcTotals()" onkeyup="calcTotals()" min="0" max="24" value="0" title="${isNonWorking.reason}">`;
+            } else {
+                newTd.innerHTML = `<input type="number" class="numeric-input day-input" data-col="${colIdx}" onchange="calcTotals()" onkeyup="calcTotals()" min="0" max="24">`;
+            }
+            tr.insertBefore(newTd, tr.children[tr.children.length - 2]);
+        });
+
+        const tfootTr = document.querySelector('tfoot tr');
+        const newFootTd = document.createElement('td');
+        newFootTd.id = 'footDay' + (daysCount - 1);
+        newFootTd.className = 'total-cell';
+        newFootTd.innerText = '0';
+        tfootTr.insertBefore(newFootTd, document.getElementById('grandTotal'));
+    }
+
     function addRow() {
         const tbody = document.getElementById('tableBody');
         const rowId = 'row_' + Date.now() + Math.floor(Math.random() * 1000);
         detailsData[rowId] = '';
+        attachmentData[rowId] = '';
+        attachmentBase64Data[rowId] = '';
         
         const tr = document.createElement('tr');
         tr.id = rowId;
         let inputHtmlString = '';
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < daysCount; i++) {
             const dStr = getGlobalDateStringForCol(i);
             const isNonWorking = nonWorkingDays[dStr];
             if (isNonWorking) {
@@ -396,40 +474,121 @@
         tbody.appendChild(tr);
     }
 
+    function populateTable(entries) {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        detailsData = {};
+        attachmentData = {};
+        
+        entries.forEach(entry => {
+            const rowId = 'row_' + Date.now() + Math.floor(Math.random() * 1000);
+            detailsData[rowId] = entry.comments || '';
+            attachmentData[rowId] = entry.attachmentName || '';
+            attachmentBase64Data[rowId] = entry.attachmentBase64 || '';
+            
+            const tr = document.createElement('tr');
+            tr.id = rowId;
+
+            let inputHtmlString = '';
+            const values = [entry.sunHours, entry.monHours, entry.tueHours, entry.wedHours, entry.thuHours, entry.friHours, entry.satHours];
+            
+            for (let i = 0; i < daysCount; i++) {
+                const dStr = getGlobalDateStringForCol(i);
+                const isNonWorking = nonWorkingDays[dStr];
+                
+                const d = new Date(startDate);
+                d.setDate(startDate.getDate() + i);
+                const val = values[d.getDay()] || '';
+                
+                if (isNonWorking) {
+                    inputHtmlString += `<td><input type="number" class="numeric-input day-input" data-col="${i}" onchange="calcTotals()" onkeyup="calcTotals()" min="0" max="24" value="${val || 0}" title="${isNonWorking.reason}"></td>`;
+                } else {
+                    inputHtmlString += `<td><input type="number" class="numeric-input day-input" data-col="${i}" onchange="calcTotals()" onkeyup="calcTotals()" min="0" max="24" value="${val}"></td>`;
+                }
+            }
+
+            tr.innerHTML = `
+                <td>
+                    <div class="input-group-cell">
+                        <select class="form-control-cell project-select">
+                            <option value="">Select Project...</option>
+                            <option value="1" ${entry.projectId == 1 ? 'selected' : ''}>1001555 - WCG - Automation</option>
+                            <option value="2" ${entry.projectId == 2 ? 'selected' : ''}>Client Alpha Workspace</option>
+                        </select>
+                        <i class="fas fa-search"></i>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group-cell">
+                        <select class="form-control-cell task-select">
+                            <option value="">Select Task...</option>
+                            <option value="1" ${entry.taskId == 1 ? 'selected' : ''}>Billable</option>
+                            <option value="2" ${entry.taskId == 2 ? 'selected' : ''}>Non Billable</option>
+                        </select>
+                        <i class="fas fa-search"></i>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group-cell">
+                        <select class="form-control-cell type-select">
+                            <option value="">Select Type...</option>
+                            <option value="Regular Shift" ${entry.type === 'Regular Shift' ? 'selected' : ''}>Regular Shift</option>
+                            <option value="Night Shift" ${entry.type === 'Night Shift' ? 'selected' : ''}>Night Shift</option>
+                        </select>
+                        <i class="fas fa-search"></i>
+                    </div>
+                </td>
+                ${inputHtmlString}
+                <td><button class="action-btn folder-btn" onclick="openDetails('${rowId}')"><i class="fas fa-folder"></i></button></td>
+                <td><button class="action-btn" onclick="deleteRow('${rowId}')"><i class="fas fa-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
+        calcTotals();
+    }
+
     function deleteRow(rowId) {
         document.getElementById(rowId).remove();
         delete detailsData[rowId];
+        delete attachmentData[rowId];
+        delete attachmentBase64Data[rowId];
         calcTotals();
     }
 
     function resetAll() {
         document.getElementById('tableBody').innerHTML = '';
         detailsData = {};
+        attachmentData = {};
+        attachmentBase64Data = {};
         addRow();
         calcTotals();
     }
 
     function calcTotals() {
-        let colTotals = [0];
+        let colTotals = new Array(daysCount).fill(0);
         
         document.querySelectorAll('#tableBody tr').forEach(tr => {
-            let rowSum = 0;
             tr.querySelectorAll('.day-input').forEach(input => {
                 const val = parseFloat(input.value) || 0;
                 const colIdx = parseInt(input.getAttribute('data-col'));
-                rowSum += val;
-                colTotals[colIdx] += val;
+                if (colIdx < daysCount) {
+                    colTotals[colIdx] += val;
+                }
             });
         });
         
-        for (let i = 0; i < 1; i++) {
-            document.getElementById('footDay' + i).innerText = colTotals[i] > 0 ? colTotals[i] : '0';
+        for (let i = 0; i < daysCount; i++) {
+            const footEl = document.getElementById('footDay' + i);
+            if (footEl) footEl.innerText = colTotals[i] > 0 ? colTotals[i] : '0';
         }
     }
 
     function openDetails(rowId) {
         currentRowIndexForModal = rowId;
         document.getElementById('modalComment').value = detailsData[rowId] || '';
+        document.getElementById('attachmentName').innerText = attachmentData[rowId] || 'Upload file';
+        window.tempBase64 = attachmentBase64Data[rowId] || '';
         const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
         modal.show();
     }
@@ -437,6 +596,14 @@
     function saveDetails() {
         if (currentRowIndexForModal) {
             detailsData[currentRowIndexForModal] = document.getElementById('modalComment').value;
+            let filename = document.getElementById('attachmentName').innerText;
+            if (filename === 'Upload file') {
+                attachmentData[currentRowIndexForModal] = '';
+                attachmentBase64Data[currentRowIndexForModal] = '';
+            } else {
+                attachmentData[currentRowIndexForModal] = filename;
+                attachmentBase64Data[currentRowIndexForModal] = window.tempBase64 || '';
+            }
         }
         const modal = bootstrap.Modal.getInstance(document.getElementById('detailsModal'));
         modal.hide();
@@ -462,22 +629,35 @@
                 isValid = false;
             }
 
-            const rowSum = parseFloat(inputs[0].value) || 0;
+            let rowSum = 0;
+            let dailyHours = { sun: 0, mon: 0, tue: 0, wed: 0, thu: 0, fri: 0, sat: 0 };
+            const map = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+            
+            inputs.forEach((input, idx) => {
+                const val = parseFloat(input.value) || 0;
+                rowSum += val;
+                const d = new Date(startDate);
+                d.setDate(startDate.getDate() + idx);
+                dailyHours[map[d.getDay()]] += val;
+            });
+            
             grandTotal += rowSum;
             
             rows.push({
                 projectId: projectId ? parseInt(projectId) : null,
                 taskId: taskId ? parseInt(taskId) : null,
                 type: type,
-                sun: rowSum,
-                mon: 0,
-                tue: 0,
-                wed: 0,
-                thu: 0,
-                fri: 0,
-                sat: 0,
+                sun: dailyHours.sun,
+                mon: dailyHours.mon,
+                tue: dailyHours.tue,
+                wed: dailyHours.wed,
+                thu: dailyHours.thu,
+                fri: dailyHours.fri,
+                sat: dailyHours.sat,
                 rowTotal: rowSum,
-                details: detailsData[rowId] || ''
+                details: detailsData[rowId] || '',
+                attachmentName: attachmentData[rowId] || '',
+                attachmentBase64: attachmentBase64Data[rowId] || ''
             });
         });
 
@@ -492,10 +672,14 @@
         }
 
         const startDateString = `${startDate.getFullYear()}-${String(startDate.getMonth()+1).padStart(2,'0')}-${String(startDate.getDate()).padStart(2,'0')}`;
+        
+        const endD = new Date(startDate);
+        endD.setDate(startDate.getDate() + (daysCount - 1));
+        const endDateString = `${endD.getFullYear()}-${String(endD.getMonth()+1).padStart(2,'0')}-${String(endD.getDate()).padStart(2,'0')}`;
 
         const payload = {
             weekStartDate: startDateString,
-            weekEndDate: startDateString,
+            weekEndDate: endDateString,
             status: status,
             overallComments: "Submitted via Spreadsheet UI",
             totalWeekHours: grandTotal,

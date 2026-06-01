@@ -37,6 +37,9 @@ public class DashboardController {
     private UserService userService;
 
     @Autowired
+    private com.example.admindashboard.service.CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
     private com.example.admindashboard.repository.MeetingRepository meetingRepository;
 
     @Autowired
@@ -375,6 +378,14 @@ public class DashboardController {
         // Always force the split login page view first
         return "erp-login"; 
     }
+
+    @GetMapping("/erp/logout")
+    public String erpLogout(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, org.springframework.security.core.Authentication auth) {
+        if (auth != null) {
+            new org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        return "redirect:/erp/authenticate";
+    }
     @GetMapping("/erp-timesheet") 
     public String erpTimesheetHub() {
         return "erp-and-timesheet"; // This should match your main dashboard HTML filename exactly!
@@ -386,40 +397,46 @@ public class DashboardController {
             @RequestParam("password") String typedPassword,
             Model model, 
             Principal principal,
+            jakarta.servlet.http.HttpServletRequest request,
             RedirectAttributes redirectAttributes) {
+
+        Optional<User> optionalUser = userRepository.findByUsername(typedUsername);
+        if (optionalUser.isPresent()) {
+            User targetUser = optionalUser.get();
+            String dbPassword = targetUser.getPassword() != null ? targetUser.getPassword().replace("{noop}", "") : "";
+            
+            if (dbPassword.equals(typedPassword)) {
+                System.out.println("[ERP-PORTAL] Verification successful for user: " + typedUsername);
+                
+                // Swap the security context globally so the user is actually changed
+                org.springframework.security.core.userdetails.UserDetails userDetails = customUserDetailsService.loadUserByUsername(typedUsername);
+                org.springframework.security.authentication.UsernamePasswordAuthenticationToken newAuth = 
+                    new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(newAuth);
+                
+                // Save context in session
+                request.getSession().setAttribute(
+                    org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, 
+                    org.springframework.security.core.context.SecurityContextHolder.getContext()
+                );
+                
+                model.addAttribute("user", targetUser);
+                model.addAttribute("activeProjects", new ArrayList<>());
+                model.addAttribute("submittedTimesheets", new ArrayList<>());
+                
+                return "erp-and-timesheet"; 
+            }
+        }
+
+        System.out.println("[ERP-PORTAL] FAILED verification attempt for user: " + typedUsername);
         
-        if (principal == null) {
-            return "redirect:/login";
-        }
-
-        String loginId = principal.getName();
-        User currentUser = userRepository.findByUsername(loginId).orElse(new User());
-
-        // Get the real password hash/string stored in your DB
-        String dbPassword = currentUser.getPassword(); 
-
-        // Clean up prefixes like {noop} if your security config uses them for raw matching
-        String cleanDbPassword = dbPassword != null ? dbPassword.replace("{noop}", "") : "";
-
-        // STRICT CREDENTIAL VERIFICATION MATCH:
-        if (typedUsername != null && typedUsername.trim().equalsIgnoreCase(loginId) && 
-            dbPassword != null && typedPassword.trim().equals(cleanDbPassword.trim())) {
-            System.out.println("[ERP-PORTAL] Verification successful for user: " + loginId);
-            
-            model.addAttribute("user", currentUser);
-            model.addAttribute("activeProjects", new ArrayList<>());
-            model.addAttribute("submittedTimesheets", new ArrayList<>());
-            
-            return "erp-and-timesheet"; 
-        } else {
-            System.out.println("[ERP-PORTAL] FAILED verification attempt for user: " + loginId);
-            
-            // Send back an error signal to the frontend login view
-            model.addAttribute("user", currentUser);
-            model.addAttribute("authError", "Invalid credentials. Access Denied.");
-            
-            return "erp-login"; 
-        }
+        // Send back an error signal to the frontend login view
+        User currentUser = principal != null ? userRepository.findByUsername(principal.getName()).orElse(new User()) : new User();
+        model.addAttribute("user", currentUser);
+        model.addAttribute("authError", "Invalid credentials. Access Denied.");
+        
+        return "erp-login"; 
     }
 
     @GetMapping("/employee/create-timesheet")
