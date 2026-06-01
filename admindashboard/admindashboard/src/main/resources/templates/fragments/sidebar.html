@@ -4,6 +4,12 @@
 
         <div class="sidebar-top">
 
+            <div style="text-align: right; padding-right: 10px; margin-bottom: -10px;">
+                <button id="sidebarToggle" style="background:none; border:none; color:white; font-size:20px; cursor:pointer; padding: 4px;">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
             <div class="logo-box">
                 <img th:src="@{/images/wcg-logo.jpg}" alt="WhiteCircle Group">
             </div>
@@ -39,13 +45,6 @@
                 </li>
 
                 <li>
-                    <a href="/payroll/my-queries" class="sidebar-link" data-page="/payroll/my-queries">
-                        <i class="fa-solid fa-circle-question"></i>
-                        <span>Helpdesk</span>
-                    </a>
-                </li>
-
-                <li>
                     <a href="/payroll/travel-expenses" class="sidebar-link" data-page="/payroll/travel-expenses">
                         <i class="fa-solid fa-plane"></i>
                         <span>Travel & Expenses</span>
@@ -53,9 +52,9 @@
                 </li>
 
                 <li>
-                    <a href="/payroll/faqs" class="sidebar-link" data-page="/payroll/faqs">
-                        <i class="fa-solid fa-book-open"></i>
-                        <span>FAQs</span>
+                    <a href="/payroll/my-queries" class="sidebar-link" data-page="/payroll/my-queries">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <span>Helpdesk & FAQ</span>
                     </a>
                 </li>
 

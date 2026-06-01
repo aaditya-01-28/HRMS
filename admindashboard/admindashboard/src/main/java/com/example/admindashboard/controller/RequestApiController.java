@@ -76,7 +76,13 @@ public class RequestApiController {
                 }
             }
         }
+        
+        if (authentication != null &&
+        	    authentication.isAuthenticated() &&
+        	    !"anonymousUser".equals(authentication.getPrincipal())) {
 
+        	    request.setEmployeeId(authentication.getName());
+        	}
         // 2. Set the date and save the ticket to the database
         request.setSubmissionDate(LocalDate.now());
         ServiceRequest savedRequest = repository.save(request);
@@ -141,7 +147,7 @@ public class RequestApiController {
     }
 
     // LOCK: Only Admins can update the status of a ticket.
-    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'ROLE_HR_ADMIN', 'ROLE_IT_ADMIN')")
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @PostMapping("/update-status")
     public ResponseEntity<?> updateStatus(@RequestParam Long id, @RequestParam String status) {
         ServiceRequest request = repository.findById(id).orElseThrow();
@@ -199,21 +205,26 @@ public class RequestApiController {
 
         // Find the currently logged-in user to check their roles
         User currentUser = userRepository.findByUsername(currentUsername).orElse(null);
-        boolean isAdmin = false;
+        boolean canViewTicket = false;
 
-        if (currentUser != null && currentUser.getRole() != null) {
-            String roleName = currentUser.getRole().getRoleName();
-            isAdmin = roleName.equals("SUPER_ADMIN") ||
-                    roleName.equals("HR_ADMIN") ||
-                    roleName.equals("IT_ADMIN");
+        if (currentUser != null &&
+            currentUser.getRole() != null) {
+
+            canViewTicket =
+                currentUser.getRole()
+                    .getPermissions()
+                    .stream()
+                    .anyMatch(p ->
+                        "admin_dashboard_view"
+                            .equals(p.getPermissionName()));
         }
 
         // OWNERSHIP CHECK: Are you an admin? OR Are you the creator of this ticket?
-        if (isAdmin || request.getEmployeeId().equals(currentUsername)) {
-            return ResponseEntity.ok(request);
-        } else {
-            // If they are neither, explicitly block them.
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+        if (canViewTicket || request.getEmployeeId().equals(currentUsername)) {
+
+        	    return ResponseEntity.ok(request);
+        	}
+
+        	return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 }

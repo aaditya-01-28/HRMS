@@ -70,6 +70,12 @@ public class DatabaseSeeder implements CommandLineRunner {
         Role managerRole = getOrCreateRole("MANAGER");
         Role financeRole = getOrCreateRole("FINANCE");
         Role recruiterRole = getOrCreateRole("RECRUITER");
+        Role itSupportRole = getOrCreateRole("IT_SUPPORT");
+        Role hrManagerRole = getOrCreateRole("HR_MANAGER");
+        Role projectManagerRole = getOrCreateRole("PROJECT_MANAGER");
+        Role auditorRole = getOrCreateRole("AUDITOR");
+        Role transportRole = getOrCreateRole("TRANSPORT");
+        Role lndRole = getOrCreateRole("LND");
 
         // ==========================================
         // THE MATRIX MAPPING (Strict 1:1 with BRD)
@@ -175,6 +181,81 @@ public class DatabaseSeeder implements CommandLineRunner {
                 adminDashView, empView, leaveApply, payslipView, payslipDownload, assetAdd, assetAssign, assetView, docUpload, docView
         )));
         roleRepository.save(itAdminRole);
+        
+     // AUDITOR (Read Only)
+        auditorRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                attView,
+                leaveView,
+                payrollView,
+                payslipView,
+                appView,
+                assetView,
+                docView
+        )));
+        roleRepository.save(auditorRole);
+
+        // IT SUPPORT
+        itSupportRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                assetView,
+                assetAssign,
+                docView,
+                docUpload
+        )));
+        roleRepository.save(itSupportRole);
+
+        // HR MANAGER
+        hrManagerRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                empCreate,
+                empEdit,
+                attView,
+                attApprove,
+                leaveView,
+                leaveApprove,
+                recPost,
+                recManage,
+                recInterview,
+                recOffer,
+                appCreate,
+                appRate,
+                appView,
+                docView,
+                docUpload
+        )));
+        roleRepository.save(hrManagerRole);
+
+        // PROJECT MANAGER
+        projectManagerRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                attView,
+                leaveView,
+                leaveApprove,
+                appView
+        )));
+        roleRepository.save(projectManagerRole);
+
+        // TRANSPORT
+        transportRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView
+        )));
+        roleRepository.save(transportRole);
+
+        // LND
+        lndRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                appView,
+                docView,
+                docUpload
+        )));
+        roleRepository.save(lndRole);
 
         // 8. STANDARD EMPLOYEE (Self-Service only, NO adminDashView)
         employeeRole.setPermissions(new HashSet<>(Arrays.asList(
@@ -419,6 +500,120 @@ public class DatabaseSeeder implements CommandLineRunner {
             recUser.setEmployeeProfile(recProfile);
             userRepository.save(recUser);
             System.out.println("✅ Created Recruiter -> ID: EMP401");
+        }
+        
+     // Test Account 4: IT Support
+        if (userRepository.findByUsername("EMP501").isEmpty()) {
+            User user = new User();
+            user.setUsername("EMP501");
+            user.setPassword("{noop}Welcome123");
+            user.setRole(itSupportRole);
+            user.setFullName("Ravi IT");
+            user.setEmail("it.support@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("IT Support");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+        }
+
+        // Test Account 5: HR Manager
+        if (userRepository.findByUsername("EMP601").isEmpty()) {
+            User user = new User();
+            user.setUsername("EMP601");
+            user.setPassword("{noop}Welcome123");
+            user.setRole(hrManagerRole);
+            user.setFullName("Neha Verma");
+            user.setEmail("hr.manager@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("HR Manager");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+        }
+
+        // Test Account 6: Project Manager
+        if (userRepository.findByUsername("EMP701").isEmpty()) {
+            User user = new User();
+            user.setPassword("{noop}Welcome123");
+            user.setUsername("EMP701");
+            user.setRole(projectManagerRole);
+            user.setFullName("Amit Project");
+            user.setEmail("pm@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("Project Manager");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+        }
+
+        // Test Account 7: Auditor
+        if (userRepository.findByUsername("EMP801").isEmpty()) {
+            User user = new User();
+            user.setPassword("{noop}Welcome123");
+            user.setUsername("EMP801");
+            user.setRole(auditorRole);
+            user.setFullName("Audit Officer");
+            user.setEmail("auditor@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("Auditor");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+        }
+
+        // Test Account 8: Transport Manager
+        if (userRepository.findByUsername("EMP901").isEmpty()) {
+            User user = new User();
+            user.setPassword("{noop}Welcome123");
+            user.setUsername("EMP901");
+            user.setRole(transportRole);
+            user.setFullName("Transport Head");
+            user.setEmail("transport@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("Transport Manager");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+        }
+
+        // Test Account 9: Learning & Development
+        if (userRepository.findByUsername("EMP1001").isEmpty()) {
+            User user = new User();
+            user.setPassword("{noop}Welcome123");
+            user.setUsername("EMP1001");
+            user.setRole(lndRole);
+            user.setFullName("Learning Head");
+            user.setEmail("learning@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("L&D Head");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
         }
 
         // ==========================================

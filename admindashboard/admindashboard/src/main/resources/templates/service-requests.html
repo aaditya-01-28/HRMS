@@ -291,7 +291,7 @@
 <body>
 
 <div class="hero-banner-container">
-    <a th:href="@{/ticket-dashboard(dept=${currentDept})}" class="btn-back-dashboard">
+    <a  th:href="${backUrl}" class="btn-back-dashboard">
         Back to Dashboard
     </a>
 
@@ -333,11 +333,11 @@
 
 				    <div class="form-row-custom">
 				        <div class="form-label-wrapper">
-				            <label class="form-label-custom">Severity Level*</label>
+				            <label class="form-label-custom">Priority*</label>
 				        </div>
 
 				        <div class="form-input-wrapper">
-				            <select class="form-select form-control-custom" id="solSeverity" required>
+				            <select class="form-select form-control-custom" id="solPriority" required>
 				                <option value="" selected disabled hidden>Select</option>
 				                <option value="Low">Low</option>
 				                <option value="Medium">Medium</option>
@@ -354,8 +354,7 @@
 				        <div class="form-input-wrapper">
 				            <input type="text"
 				                   class="form-control form-control-custom"
-				                   id="solSubject"
-				                   required>
+				                   id="solSubject">
 				        </div>
 				    </div>
 
@@ -454,8 +453,7 @@
                     <div class="col-md-11 ps-0">
                         <textarea class="form-control form-control-custom"
                                   id="srvDescription"
-                                  rows="5"
-                                  required></textarea>
+                                  rows="5"></textarea>
                     </div>
 
                 </div>
@@ -509,6 +507,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script th:inline="javascript">
+	
     const sessionUser = {
         id: /*[[${user != null ? user.username : 'EMP-0000'}]]*/ 'EMP-0000',
         name: /*[[${user != null ? user.fullName : 'Unknown User'}]]*/ 'Unknown User',
@@ -539,11 +538,11 @@
         const email = document.getElementById('solEmail').value.trim();
         const subject = document.getElementById('solSubject').value.trim();
         const description = document.getElementById('srvDescription').value.trim();
-        const priority = document.getElementById('solSeverity').value || 'Medium';
+        const priority = document.getElementById('solPriority').value || 'Medium';
         
         const itemVal = document.getElementById('solItemField').value.trim();
 
-        if (!category || !locationVal || !mobile || !email || !subject || !description) {
+        if (!category || !locationVal || !mobile || !email ) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Required Fields Missing',
@@ -616,7 +615,13 @@
                     text: 'Your service ticket request has been logged successfully.',
                     confirmButtonColor: '#2563eb'
                 });
-                window.location.href = '/ticket-dashboard?dept=' + typeContext;
+				if (isRoleUser) {
+				    window.location.href =
+				        '/role-ticket-dashboard?dept=' + typeContext;
+				} else {
+				    window.location.href =
+				        '/ticket-dashboard?dept=' + typeContext;
+				}
             } else {
                 throw new Error("Server Response Error");
             }

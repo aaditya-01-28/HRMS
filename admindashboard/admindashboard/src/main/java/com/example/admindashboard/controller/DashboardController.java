@@ -425,8 +425,14 @@ public class DashboardController {
     @GetMapping("/employee/create-timesheet")
     public String showCreateTimesheet() { return "create-timesheet"; }
 
-    @GetMapping("/employee/timecard-entry")
-    public String showTimecardEntry() { return "timecard-entry"; }
+    @GetMapping("/employee/daily-timecard")
+    public String showDailyTimecard() { return "daily-timecard"; }
+
+    @GetMapping("/employee/weekly-timecard")
+    public String showWeeklyTimecard() { return "weekly-timecard"; }
+
+    @GetMapping("/employee/monthly-timecard")
+    public String showMonthlyTimecard() { return "monthly-timecard"; }
 
     @GetMapping("/employee/timesheet-report")
     public String showTimesheetReport() { return "timesheet-report"; }
@@ -465,13 +471,23 @@ public class DashboardController {
             String loginId = principal.getName();
             User currentUser = userRepository.findByUsername(loginId).orElse(new User());
             model.addAttribute("user", currentUser);
-            
-            List<ServiceRequest> userRequests = serviceRequestRepository.findByEmployeeIdOrderBySubmissionDateDesc(loginId);
+
+            boolean isRoleUser =
+                    currentUser.getRole() != null &&
+                    currentUser.getRole().getPermissions().stream()
+                            .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()));
+
+            if (isRoleUser) {
+                return "role-tickets";
+            }
+
+            List<ServiceRequest> userRequests =
+                    serviceRequestRepository.findByEmployeeIdOrderBySubmissionDateDesc(loginId);
             model.addAttribute("myRequests", userRequests);
         }
-        return "tickets"; 
-    }
 
+        return "tickets";
+    }
     // 3. NEW STEP: A SPECIFIC ROUTE FOR THE BACK BUTTON TO BYPASS THE GATE SECURELY
     @GetMapping("/tickets/hub")
     public String backToTicketsHub(Model model, Principal principal) {
@@ -529,19 +545,213 @@ public class DashboardController {
         model.addAttribute("currentDept", dept.toUpperCase());
         return "ticket-dashboard";
     }
-    @GetMapping("/service-requests")
-    public String showServiceRequests(@RequestParam(name = "dept", required = false, defaultValue = "IT") String dept, 
-                                     Model model, Principal principal) {
+    
+    @GetMapping("/role-ticket-dashboard")
+    public String showRoleTicketDashboard(
+            @RequestParam(name = "dept", required = false, defaultValue = "IT") String dept,
+            Model model,
+            Principal principal) {
+
+        String loginId = principal.getName();
+
+        List<ServiceRequest> allUserRequests =
+                serviceRequestRepository
+                        .findByEmployeeIdOrderBySubmissionDateDesc(loginId);
+
+        List<ServiceRequest> filteredRequests = allUserRequests.stream()
+                .filter(req -> {
+                    if (req.getType() == null) return false;
+
+                    switch (dept.toUpperCase()) {
+                        case "HR":
+                            return "HR".equalsIgnoreCase(req.getType());
+
+                        case "FACILITIES":
+                            return "FACILITIES".equalsIgnoreCase(req.getType())
+                                    || "HARDWARE".equalsIgnoreCase(req.getType());
+
+                        case "PAYROLL":
+                            return "PAYROLL".equalsIgnoreCase(req.getType())
+                                    || "FINANCE".equalsIgnoreCase(req.getType());
+
+                        case "ALUMNI":
+                            return "ALUMNI".equalsIgnoreCase(req.getType());
+
+                        case "ENTERPRISE":
+                            return "ENTERPRISE".equalsIgnoreCase(req.getType())
+                                    || "ACCESS".equalsIgnoreCase(req.getType());
+
+                        case "LEARNING":
+                            return "LEARNING".equalsIgnoreCase(req.getType())
+                                    || "TRAINING".equalsIgnoreCase(req.getType());
+
+                        case "IT":
+                        default:
+                            return "IT".equalsIgnoreCase(req.getType())
+                                    || "SOFTWARE".equalsIgnoreCase(req.getType());
+                    }
+                })
+                .collect(Collectors.toList());
+
+        model.addAttribute("myRequests", filteredRequests);
+        model.addAttribute("currentDept", dept.toUpperCase());
+
+        return "role-ticket-dashboard";
+    }
+    
+    @GetMapping("/role-tickets")
+    public String roleTicketsHub(Model model, Principal principal) {
+
         if (principal != null) {
             String loginId = principal.getName();
             User currentUser = userRepository.findByUsername(loginId).orElse(new User());
             model.addAttribute("user", currentUser);
-            
-            List<ServiceRequest> userRequests = serviceRequestRepository.findByEmployeeIdOrderBySubmissionDateDesc(loginId);
-            model.addAttribute("myRequests", userRequests);
-        } else {
-            model.addAttribute("user", new User());
         }
+
+        return "role-tickets";
+    }
+    @GetMapping("/role-tickets/hub")
+    public String roleTicketsHubPage(Model model, Principal principal) {
+
+        if (principal != null) {
+            String loginId = principal.getName();
+            User currentUser = userRepository.findByUsername(loginId)
+                    .orElse(new User());
+
+            model.addAttribute("user", currentUser);
+        }
+
+        return "role-tickets";
+    }
+    
+    @GetMapping("/role-ticket-management")
+    public String showRoleTicketManagement(Model model,
+                                           Principal principal) {
+
+        String loginId = principal.getName();
+
+        User currentUser =
+                userRepository.findByUsername(loginId)
+                        .orElse(new User());
+
+        String roleName =
+                currentUser.getRole() != null
+                        ? currentUser.getRole().getRoleName()
+                        : "";
+
+        List<ServiceRequest> tickets;
+
+        if ("IT_SUPPORT".equalsIgnoreCase(roleName)) {
+
+            tickets = serviceRequestRepository
+                    .findByTypeOrderByIdDesc("IT");
+
+        } else if ("FINANCE".equalsIgnoreCase(roleName)) {
+
+            tickets = serviceRequestRepository
+                    .findByTypeOrderByIdDesc("PAYROLL");
+
+        } else if ("LND".equalsIgnoreCase(roleName)) {
+
+            tickets = serviceRequestRepository
+                    .findByTypeOrderByIdDesc("LEARNING");
+
+        } else if ("IT_SUPPORT".equalsIgnoreCase(roleName)) {
+
+            tickets = serviceRequestRepository
+                    .findByTypeOrderByIdDesc("ENTERPRISE");
+
+        } else if ("HR_MANAGER".equalsIgnoreCase(roleName)) {
+
+            tickets = new ArrayList<>();
+
+            tickets.addAll(
+                    serviceRequestRepository
+                            .findByTypeOrderByIdDesc("HR")
+            );
+
+            tickets.addAll(
+                    serviceRequestRepository
+                            .findByTypeOrderByIdDesc("FACILITIES")
+            );
+
+            tickets.addAll(
+                    serviceRequestRepository
+                            .findByTypeOrderByIdDesc("ALUMNI")
+            );
+
+        }else {
+
+            tickets = new ArrayList<>();
+        }
+
+        tickets = tickets.stream()
+                .filter(t -> !loginId.equalsIgnoreCase(t.getEmployeeId()))
+                .collect(Collectors.toList());
+
+        long openCount = tickets.stream()
+                .filter(t -> "Open".equalsIgnoreCase(t.getStatus()))
+                .count();
+
+        long progressCount = tickets.stream()
+                .filter(t -> "In Progress".equalsIgnoreCase(t.getStatus()))
+                .count();
+
+        long closedCount = tickets.stream()
+                .filter(t -> "Closed".equalsIgnoreCase(t.getStatus()))
+                .count();
+
+        model.addAttribute("tickets", tickets);
+        model.addAttribute("openCount", openCount);
+        model.addAttribute("progressCount", progressCount);
+        model.addAttribute("closedCount", closedCount);
+        System.out.println("LOGIN USER = " + loginId);
+        System.out.println("ROLE = " + roleName);
+
+        tickets.forEach(t ->
+            System.out.println(
+                t.getTicketId() + " | " +
+                t.getDepartment() + " | " +
+                t.getEmployeeId()
+            )
+        );
+
+        return "role-ticket-management";
+    }
+    @GetMapping("/service-requests")
+    public String showServiceRequests(@RequestParam(name = "dept", required = false, defaultValue = "IT") String dept, 
+                                     Model model, Principal principal) {
+    	if (principal != null) {
+    	    String loginId = principal.getName();
+    	    User currentUser = userRepository.findByUsername(loginId).orElse(new User());
+
+    	    String backUrl = "/ticket-dashboard?dept=" + dept;
+
+    	    if (currentUser.getRole() != null &&
+    	        currentUser.getRole().getPermissions().stream()
+    	            .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()))) {
+
+    	        backUrl = "/role-ticket-dashboard?dept=" + dept;
+    	    }
+
+    	    model.addAttribute("backUrl", backUrl);
+
+    	    model.addAttribute("user", currentUser);
+
+    	    boolean isRoleUser =
+    	            currentUser.getRole() != null &&
+    	            currentUser.getRole().getPermissions().stream()
+    	                    .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()));
+
+    	    model.addAttribute("isRoleUser", isRoleUser);
+
+    	    List<ServiceRequest> userRequests =
+    	            serviceRequestRepository.findByEmployeeIdOrderBySubmissionDateDesc(loginId);
+
+    	    model.addAttribute("myRequests", userRequests);
+    	} else {
+    	    model.addAttribute("user", new User());
+    	}
 
         // Initialize our dynamic array data nodes
         List<String> dynamicCategories = new ArrayList<>();
@@ -594,16 +804,37 @@ public class DashboardController {
     @GetMapping("/my-assets")
     public String showMyAssets(@RequestParam(name = "dept", required = false, defaultValue = "IT") String dept, 
                                Model model, Principal principal) {
-        if (principal != null) {
-            String loginId = principal.getName();
-            User currentUser = userRepository.findByUsername(loginId).orElse(new User());
-            model.addAttribute("user", currentUser);
-            
-            List<ServiceRequest> userRequests = serviceRequestRepository.findByEmployeeIdOrderBySubmissionDateDesc(loginId);
-            model.addAttribute("myRequests", userRequests);
-        } else {
-            model.addAttribute("user", new User());
-        }
+    	if (principal != null) {
+    	    String loginId = principal.getName();
+    	    User currentUser = userRepository.findByUsername(loginId).orElse(new User());
+
+    	    String backUrl = "/ticket-dashboard?dept=" + dept;
+
+    	    if (currentUser.getRole() != null &&
+    	        currentUser.getRole().getPermissions().stream()
+    	            .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()))) {
+
+    	        backUrl = "/role-ticket-dashboard?dept=" + dept;
+    	    }
+
+    	    model.addAttribute("backUrl", backUrl);
+
+    	    model.addAttribute("user", currentUser);
+
+    	    boolean isRoleUser =
+    	            currentUser.getRole() != null &&
+    	            currentUser.getRole().getPermissions().stream()
+    	                    .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()));
+
+    	    model.addAttribute("isRoleUser", isRoleUser);
+
+    	    List<ServiceRequest> userRequests =
+    	            serviceRequestRepository.findByEmployeeIdOrderBySubmissionDateDesc(loginId);
+
+    	    model.addAttribute("myRequests", userRequests);
+    	} else {
+    	    model.addAttribute("user", new User());
+    	}
 
         List<String> dynamicCategories = new ArrayList<>();
         List<String> dynamicItems = new ArrayList<>();
@@ -653,17 +884,37 @@ public class DashboardController {
     @GetMapping("/report-incident")
     public String showReportIncident(@RequestParam(name = "dept", required = false, defaultValue = "IT") String dept, 
                                      Model model, Principal principal) {
-        if (principal != null) {
-            String loginId = principal.getName();
-            User currentUser = userRepository.findByUsername(loginId).orElse(new User());
-            model.addAttribute("user", currentUser);
-            
-            // Keeps your original table feed tracking intact
-            List<ServiceRequest> userRequests = serviceRequestRepository.findByEmployeeIdOrderBySubmissionDateDesc(loginId);
-            model.addAttribute("myRequests", userRequests);
-        } else {
-            model.addAttribute("user", new User());
-        }
+    	if (principal != null) {
+    	    String loginId = principal.getName();
+    	    User currentUser = userRepository.findByUsername(loginId).orElse(new User());
+
+    	    String backUrl = "/ticket-dashboard?dept=" + dept;
+
+    	    if (currentUser.getRole() != null &&
+    	        currentUser.getRole().getPermissions().stream()
+    	            .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()))) {
+
+    	        backUrl = "/role-ticket-dashboard?dept=" + dept;
+    	    }
+
+    	    model.addAttribute("backUrl", backUrl);
+
+    	    model.addAttribute("user", currentUser);
+
+    	    boolean isRoleUser =
+    	            currentUser.getRole() != null &&
+    	            currentUser.getRole().getPermissions().stream()
+    	                    .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()));
+
+    	    model.addAttribute("isRoleUser", isRoleUser);
+
+    	    List<ServiceRequest> userRequests =
+    	            serviceRequestRepository.findByEmployeeIdOrderBySubmissionDateDesc(loginId);
+
+    	    model.addAttribute("myRequests", userRequests);
+    	} else {
+    	    model.addAttribute("user", new User());
+    	}
 
         // Initialize lists for the dropdown menus
         List<String> dynamicCategories = new ArrayList<>();
@@ -715,16 +966,37 @@ public class DashboardController {
     @GetMapping("/knowledge-base")
     public String showKnowledgeBase(@RequestParam(name = "dept", required = false, defaultValue = "IT") String dept, 
                                    Model model, Principal principal) {
-        if (principal != null) {
-            String loginId = principal.getName();
-            User currentUser = userRepository.findByUsername(loginId).orElse(new User());
-            model.addAttribute("user", currentUser);
-            
-            List<ServiceRequest> userRequests = serviceRequestRepository.findByEmployeeIdOrderBySubmissionDateDesc(loginId);
-            model.addAttribute("myRequests", userRequests);
-        } else {
-            model.addAttribute("user", new User());
-        }
+    	if (principal != null) {
+    	    String loginId = principal.getName();
+    	    User currentUser = userRepository.findByUsername(loginId).orElse(new User());
+
+    	    String backUrl = "/ticket-dashboard?dept=" + dept;
+
+    	    if (currentUser.getRole() != null &&
+    	        currentUser.getRole().getPermissions().stream()
+    	            .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()))) {
+
+    	        backUrl = "/role-ticket-dashboard?dept=" + dept;
+    	    }
+
+    	    model.addAttribute("backUrl", backUrl);
+
+    	    model.addAttribute("user", currentUser);
+
+    	    boolean isRoleUser =
+    	            currentUser.getRole() != null &&
+    	            currentUser.getRole().getPermissions().stream()
+    	                    .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()));
+
+    	    model.addAttribute("isRoleUser", isRoleUser);
+
+    	    List<ServiceRequest> userRequests =
+    	            serviceRequestRepository.findByEmployeeIdOrderBySubmissionDateDesc(loginId);
+
+    	    model.addAttribute("myRequests", userRequests);
+    	} else {
+    	    model.addAttribute("user", new User());
+    	}
 
         List<String> dynamicCategories = new ArrayList<>();
         List<String> dynamicItems = new ArrayList<>();

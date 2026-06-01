@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:replace="~{my-thanks/layout :: page(~{::div.faqs-container}, 'faqs', 'FAQs')}">
+<div class="faqs-container">
+    <style>
+        .faq-accordion .accordion-item {
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .faq-accordion .accordion-button {
+            padding: 25px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a202c;
+            background-color: transparent;
+            box-shadow: none;
+            display: flex;
+            justify-content: space-between;
+        }
+        .faq-accordion .accordion-button:not(.collapsed) {
+            color: #2962ff;
+            background-color: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .faq-accordion .accordion-button::after {
+            content: "\f067"; /* FontAwesome plus */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            background-image: none;
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+            color: #718096;
+        }
+        .faq-accordion .accordion-button:not(.collapsed)::after {
+            content: "\f068"; /* FontAwesome minus */
+            transform: rotate(180deg);
+            color: #2962ff;
+        }
+        .faq-accordion .accordion-body {
+            padding: 25px 30px;
+            color: #4a5568;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+    </style>
+
+    <div class="accordion faq-accordion" id="faqsAccordion">
+        
+        <!-- FAQ 1 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                    What is Send Thanks ?
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqsAccordion">
+                <div class="accordion-body">
+                    Send Thanks is a peer-to-peer recognition program that allows you to express your appreciation for your colleagues' hard work, support, or outstanding contributions. By sending thanks, you can reward them with points that they can later redeem for various items in our Redemption Store.
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    How can I redeem points ?
+                </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqsAccordion">
+                <div class="accordion-body">
+                    You can redeem your earned points by visiting the "Redemption Store" section from the left sidebar. Browse through our available items, such as company merchandise, gift cards, and vouchers. Once you find an item you like, click the "Redeem Now" button, confirm your selection, and your points will be deducted automatically.
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    What is redemption store ?
+                </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqsAccordion">
+                <div class="accordion-body">
+                    The Redemption Store is our internal marketplace where you can exchange the points you've earned through the "Send Thanks" program for tangible rewards. We offer a variety of rewards including White Circle Group branded T-shirts, bottles, cups, and popular gift cards from Amazon, Flipkart, Zomato, and Swiggy.
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFour">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                    How can I see my past transactions ?
+                </button>
+            </h2>
+            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqsAccordion">
+                <div class="accordion-body">
+                    To view your complete history of points earned and redeemed, navigate to the "Transaction History" page using the left sidebar menu. There you will find a detailed table listing all your point credits and debits, including dates, descriptions, and current status. You can also filter these records by specific date ranges.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</th:block>
+</body>
+</html>

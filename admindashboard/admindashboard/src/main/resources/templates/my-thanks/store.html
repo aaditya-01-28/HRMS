@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:replace="~{my-thanks/layout :: page(~{::div.store-container}, 'store', 'Redemption Store')}">
+<div class="store-container">
+    <style>
+        .store-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .store-filters {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex: 1;
+        }
+        .search-input-group {
+            position: relative;
+            flex: 1;
+            max-width: 300px;
+        }
+        .search-input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+        .search-input-group .form-control {
+            padding-left: 45px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            height: 42px;
+        }
+        .category-select {
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            padding: 8px 15px;
+            height: 42px;
+            color: #4a5568;
+            min-width: 150px;
+        }
+        .store-tabs {
+            display: flex;
+            gap: 30px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+        }
+        .store-tab {
+            padding: 10px 5px;
+            color: #718096;
+            font-weight: 500;
+            text-decoration: none;
+            position: relative;
+        }
+        .store-tab.active {
+            color: #2962ff;
+            font-weight: 600;
+        }
+        .store-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #2962ff;
+        }
+
+        /* --- PRODUCT GRID --- */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+        .product-card {
+            background: #fff;
+            border: 1px solid #edf2f7;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .product-card:hover {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transform: translateY(-3px);
+            border-color: #e2e8f0;
+        }
+        .product-img-wrapper {
+            background-color: #e2e8f0;
+            border-radius: 8px;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .product-img-wrapper img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+        }
+        .product-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1a202c;
+            margin-bottom: 5px;
+        }
+        .product-pts {
+            color: #2962ff;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+        .btn-redeem {
+            background-color: transparent;
+            color: #2962ff;
+            border: 1px solid #2962ff;
+            border-radius: 6px;
+            padding: 8px 15px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .btn-redeem:hover {
+            background-color: #2962ff;
+            color: #fff;
+        }
+        
+        /* MODAL STYLES */
+        .modal-title-custom {
+            font-weight: 700;
+            color: #1a202c;
+            font-size: 1.25rem;
+            margin-bottom: 5px;
+        }
+        .modal-subtitle {
+            color: #718096;
+            font-size: 0.85rem;
+            margin-bottom: 0;
+        }
+        .confirm-modal-body {
+            display: flex;
+            gap: 20px;
+            padding: 20px 0;
+        }
+        .confirm-img-box {
+            background-color: #e2e8f0;
+            border-radius: 12px;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .confirm-img-box img {
+            max-width: 80%;
+            max-height: 80%;
+        }
+        .confirm-details {
+            flex: 1;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+        .detail-label {
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .detail-value {
+            font-weight: 700;
+            color: #1a202c;
+        }
+        .val-pts { color: #2962ff; }
+        .val-balance { color: #16a34a; }
+        
+        .delivery-text {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #4a5568;
+            margin-top: 15px;
+            padding-top: 15px;
+        }
+        
+        .btn-cancel {
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            background: transparent;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 20px;
+            width: 48%;
+        }
+        .btn-cancel:hover { background: #fef2f2; }
+        
+        .btn-confirm-redeem {
+            background: #2962ff;
+            color: white;
+            border: none;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 20px;
+            width: 48%;
+        }
+        .btn-confirm-redeem:hover { background: #1e40af; }
+
+        /* SUCCESS MODAL */
+        .success-icon-wrapper {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid #22c55e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .success-icon-wrapper i {
+            color: #22c55e;
+            font-size: 2rem;
+        }
+        .success-delivery {
+            background: transparent;
+            color: #16a34a;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 20px 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+    </style>
+
+    <!-- Top Filters -->
+    <div class="store-header-bar">
+        <div class="store-filters">
+            <div class="search-input-group">
+                <i class="fas fa-search"></i>
+                <input type="text" class="form-control" placeholder="Search rewards...">
+            </div>
+            
+            <select class="category-select">
+                <option value="all">All Categories</option>
+                <option value="merch">Merchandise</option>
+                <option value="giftcards">Gift Cards</option>
+                <option value="vouchers">Vouchers</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="store-tabs">
+        <a href="#" class="store-tab active">All</a>
+        <a href="#" class="store-tab">Merchandise</a>
+        <a href="#" class="store-tab">Gift Cards</a>
+        <a href="#" class="store-tab">Vouchers</a>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="product-grid">
+        
+        <!-- Product 1 -->
+        <div class="product-card">
+            <div class="product-img-wrapper">
+                <i class="fas fa-tshirt fa-4x text-muted"></i>
+            </div>
+            <div class="product-title">White Circle T-shirt</div>
+            <div class="product-pts">600 PTS</div>
+            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle T-shirt', 600)">Redeem Now</button>
+        </div>
+
+        <!-- Product 2 -->
+        <div class="product-card">
+            <div class="product-img-wrapper">
+                <i class="fas fa-coffee fa-4x text-muted"></i>
+            </div>
+            <div class="product-title">White Circle Cup</div>
+            <div class="product-pts">200 PTS</div>
+            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Cup', 200)">Redeem Now</button>
+        </div>
+
+        <!-- Product 3 -->
+        <div class="product-card">
+            <div class="product-img-wrapper">
+                <i class="fas fa-wine-bottle fa-4x text-muted"></i>
+            </div>
+            <div class="product-title">White Circle Bottle</div>
+            <div class="product-pts">150 PTS</div>
+            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Bottle', 150)">Redeem Now</button>
+        </div>
+
+        <!-- Product 4 -->
+        <div class="product-card">
+            <div class="product-img-wrapper">
+                <i class="fas fa-key fa-4x text-muted"></i>
+            </div>
+            <div class="product-title">White Circle Key Chain</div>
+            <div class="product-pts">100 PTS</div>
+            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Key Chain', 100)">Redeem Now</button>
+        </div>
+
+        <!-- Product 5 -->
+        <div class="product-card">
+            <div class="product-img-wrapper" style="background-color: #000;">
+                <span class="text-white fw-bold fs-5">amazon.in</span>
+            </div>
+            <div class="product-title">Amazon Gift Card</div>
+            <div class="product-pts">500 PTS</div>
+            <button class="btn btn-redeem" onclick="openConfirmModal('Amazon Gift Card', 500)">Redeem Now</button>
+        </div>
+
+        <!-- Product 6 -->
+        <div class="product-card">
+            <div class="product-img-wrapper" style="background-color: #2874f0;">
+                <span class="text-white fw-bold fs-5">Flipkart</span>
+            </div>
+            <div class="product-title">Flipkart Gift Card</div>
+            <div class="product-pts">500 PTS</div>
+            <button class="btn btn-redeem" onclick="openConfirmModal('Flipkart Gift Card', 500)">Redeem Now</button>
+        </div>
+
+        <!-- Product 7 -->
+        <div class="product-card">
+            <div class="product-img-wrapper" style="background-color: #cb202d;">
+                <span class="text-white fw-bold fs-5">zomato</span>
+            </div>
+            <div class="product-title">Zomato Gift Card</div>
+            <div class="product-pts">500 PTS</div>
+            <button class="btn btn-redeem" onclick="openConfirmModal('Zomato Gift Card', 500)">Redeem Now</button>
+        </div>
+
+        <!-- Product 8 -->
+        <div class="product-card">
+            <div class="product-img-wrapper" style="background-color: #fc8019;">
+                <span class="text-white fw-bold fs-5">SWIGGY</span>
+            </div>
+            <div class="product-title">Swiggy Gift Voucher</div>
+            <div class="product-pts">500 PTS</div>
+            <button class="btn btn-redeem" onclick="openConfirmModal('Swiggy Gift Voucher', 500)">Redeem Now</button>
+        </div>
+
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-3">
+                <div class="modal-header border-0 pb-0">
+                    <div>
+                        <h5 class="modal-title-custom">Confirm Redemption</h5>
+                        <p class="modal-subtitle">Please review your order once</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <div class="confirm-modal-body border-bottom mb-3">
+                        <div class="confirm-img-box">
+                            <i class="fas fa-gift fa-3x text-muted" id="modalProdIcon"></i>
+                        </div>
+                        <div class="confirm-details pt-2">
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-gift"></i> Product</span>
+                                <span class="detail-value" id="modalProdName">WCG T-Shirt</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-tag"></i> Points Required</span>
+                                <span class="detail-value val-pts" id="modalProdPts">600 PTS</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-wallet"></i> Wallet Balance</span>
+                                <span class="detail-value val-balance">1000 PTS</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="delivery-text fw-bold">
+                        <span style="color: #2962ff;">Delivery Time:</span> Within 5 Business Days After Confirmation.
+                    </div>
+                </div>
+                <div class="modal-footer border-0 d-flex justify-content-between pt-0">
+                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-confirm-redeem" onclick="confirmRedemption()">Confirm & Redeem</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content p-4 text-center">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                
+                <div class="success-icon-wrapper">
+                    <i class="fas fa-check"></i>
+                </div>
+                
+                <h4 class="fw-bold" style="color: #1a202c; font-size: 1.2rem;">Redemption Successful!</h4>
+                <p class="text-muted small mb-0">Your Request has been placed successfully</p>
+                
+                <div class="success-delivery">
+                    <i class="fas fa-truck"></i> Your order will be delivered within 5 business day.
+                </div>
+                
+                <p class="text-muted" style="font-size: 0.75rem;">You will receive a confirmation email soon</p>
+                
+                <button type="button" class="btn btn-primary w-100 mt-2" style="background-color: #2962ff; border-radius: 8px;" data-bs-dismiss="modal">Continue Shopping</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let confirmModalInstance;
+        let successModalInstance;
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            confirmModalInstance = new bootstrap.Modal(document.getElementById('confirmModal'));
+            successModalInstance = new bootstrap.Modal(document.getElementById('successModal'));
+        });
+
+        function openConfirmModal(productName, points) {
+            document.getElementById('modalProdName').innerText = productName;
+            document.getElementById('modalProdPts').innerText = points + ' PTS';
+            confirmModalInstance.show();
+        }
+
+        function confirmRedemption() {
+            confirmModalInstance.hide();
+            // In a real application, make an AJAX request here to deduct points.
+            setTimeout(() => {
+                successModalInstance.show();
+            }, 400); // Small delay to allow the first modal to hide smoothly
+        }
+    </script>
+</div>
+</th:block>
+</body>
+</html>
