@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:replace="~{my-thanks/layout :: page(~{::div.history-container}, 'history', 'Transaction History')}">
+<div class="history-container">
+    <style>
+        .page-header {
+            margin-bottom: 25px;
+        }
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            align-items: center;
+        }
+        .filter-input-group {
+            position: relative;
+            flex: 1;
+        }
+        .filter-input-group i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            pointer-events: none;
+        }
+        .search-input-group {
+            position: relative;
+            flex: 2;
+        }
+        .search-input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+        .form-control {
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 0.95rem;
+            color: #4a5568;
+        }
+        .search-input-group .form-control {
+            padding-left: 45px;
+        }
+        .btn-search {
+            background-color: #2962ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 30px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-search:hover {
+            background-color: #1e40af;
+        }
+
+        /* --- TABLE STYLES --- */
+        .table-responsive {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        .custom-table {
+            width: 100%;
+            margin-bottom: 0;
+        }
+        .custom-table th {
+            background-color: #e2e8f0;
+            color: #2962ff;
+            font-weight: 700;
+            padding: 15px 20px;
+            font-size: 0.95rem;
+            text-align: center;
+            border: none;
+        }
+        .custom-table td {
+            padding: 16px 20px;
+            vertical-align: middle;
+            border-bottom: 1px solid #edf2f7;
+            color: #1a202c;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        .custom-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .pts-credit { color: #16a34a; font-weight: 700; }
+        .pts-debit { color: #ef4444; font-weight: 700; }
+        
+        .status-badge {
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-completed {
+            background-color: transparent;
+            color: #22c55e;
+            border: 1.5px solid #22c55e;
+        }
+    </style>
+
+    <div class="page-header">
+        <h2 style="color: #2962ff; font-weight: 700; font-size: 1.3rem;">Transaction History</h2>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-input-group">
+            <input type="date" class="form-control" placeholder="From Date">
+            <!-- Note: Native date inputs have their own calendar icon on most modern browsers, 
+                 but keeping the structure consistent with the mockup -->
+        </div>
+        
+        <div class="filter-input-group">
+            <input type="date" class="form-control" placeholder="To Date">
+        </div>
+        
+        <div class="search-input-group">
+            <i class="fas fa-search"></i>
+            <input type="text" class="form-control" placeholder="Search History...">
+        </div>
+        
+        <button class="btn btn-search">Search</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+        <table class="table custom-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Points</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>29/05/2026</td>
+                    <td>Credit</td>
+                    <td class="pts-credit">+150</td>
+                    <td>Appreciation from Virat</td>
+                    <td><span class="status-badge status-completed">Completed</span></td>
+                </tr>
+                <tr>
+                    <td>30/05/2026</td>
+                    <td>Credit</td>
+                    <td class="pts-credit">+200</td>
+                    <td>Appreciation from Virat</td>
+                    <td><span class="status-badge status-completed">Completed</span></td>
+                </tr>
+                <tr>
+                    <td>28/05/2026</td>
+                    <td>Debit</td>
+                    <td class="pts-debit">-500</td>
+                    <td>Redeemed Amazon Voucher</td>
+                    <td><span class="status-badge status-completed">Completed</span></td>
+                </tr>
+                <tr>
+                    <td>25/05/2026</td>
+                    <td>Credit</td>
+                    <td class="pts-credit">+150</td>
+                    <td>Appreciation from Virat</td>
+                    <td><span class="status-badge status-completed">Completed</span></td>
+                </tr>
+                <tr>
+                    <td>29/05/2026</td>
+                    <td>Credit</td>
+                    <td class="pts-credit">+150</td>
+                    <td>Appreciation from Virat</td>
+                    <td><span class="status-badge status-completed">Completed</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</th:block>
+</body>
+</html>

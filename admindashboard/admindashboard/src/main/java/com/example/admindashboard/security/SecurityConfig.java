@@ -23,7 +23,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Note: In production, consider enabling CSRF for form endpoints
                 .authorizeHttpRequests(auth -> auth
                         // Publicly accessible assets and login
-                        .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/login", "/my-thanks/login", "/my-thanks/authenticate", "/css/**", "/js/**", "/images/**").permitAll()
 
                         // All other requests MUST be authenticated.
                         // The actual granular permission checks will now happen inside the Controllers!
@@ -70,7 +70,11 @@ public class SecurityConfig {
                             }
 
                             // NORMAL ROLE-BASED ROUTING
-                            if (authorities.contains("admin_dashboard_view")) {
+                            String customRedirectUrl = request.getParameter("redirectUrl");
+                            if (customRedirectUrl != null && !customRedirectUrl.isEmpty()) {
+                                response.sendRedirect(customRedirectUrl);
+                            }
+                            else if (authorities.contains("admin_dashboard_view")) {
                                 response.sendRedirect("/admin/dashboard");
                             }
                             else if (isClient) {

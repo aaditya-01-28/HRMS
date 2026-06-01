@@ -31,6 +31,12 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Autowired
     private ClientRepository clientRepository;
 
+    @Autowired
+    private com.example.admindashboard.repository.HospitalRepository hospitalRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.InsurancePolicyRepository insurancePolicyRepository;
+
     // NEW: Injecting JdbcTemplate to fix the database constraint
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -64,6 +70,12 @@ public class DatabaseSeeder implements CommandLineRunner {
         Role managerRole = getOrCreateRole("MANAGER");
         Role financeRole = getOrCreateRole("FINANCE");
         Role recruiterRole = getOrCreateRole("RECRUITER");
+        Role itSupportRole = getOrCreateRole("IT_SUPPORT");
+        Role hrManagerRole = getOrCreateRole("HR_MANAGER");
+        Role projectManagerRole = getOrCreateRole("PROJECT_MANAGER");
+        Role auditorRole = getOrCreateRole("AUDITOR");
+        Role transportRole = getOrCreateRole("TRANSPORT");
+        Role lndRole = getOrCreateRole("LND");
 
         // ==========================================
         // THE MATRIX MAPPING (Strict 1:1 with BRD)
@@ -169,6 +181,81 @@ public class DatabaseSeeder implements CommandLineRunner {
                 adminDashView, empView, leaveApply, payslipView, payslipDownload, assetAdd, assetAssign, assetView, docUpload, docView
         )));
         roleRepository.save(itAdminRole);
+        
+     // AUDITOR (Read Only)
+        auditorRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                attView,
+                leaveView,
+                payrollView,
+                payslipView,
+                appView,
+                assetView,
+                docView
+        )));
+        roleRepository.save(auditorRole);
+
+        // IT SUPPORT
+        itSupportRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                assetView,
+                assetAssign,
+                docView,
+                docUpload
+        )));
+        roleRepository.save(itSupportRole);
+
+        // HR MANAGER
+        hrManagerRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                empCreate,
+                empEdit,
+                attView,
+                attApprove,
+                leaveView,
+                leaveApprove,
+                recPost,
+                recManage,
+                recInterview,
+                recOffer,
+                appCreate,
+                appRate,
+                appView,
+                docView,
+                docUpload
+        )));
+        roleRepository.save(hrManagerRole);
+
+        // PROJECT MANAGER
+        projectManagerRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                attView,
+                leaveView,
+                leaveApprove,
+                appView
+        )));
+        roleRepository.save(projectManagerRole);
+
+        // TRANSPORT
+        transportRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView
+        )));
+        roleRepository.save(transportRole);
+
+        // LND
+        lndRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                appView,
+                docView,
+                docUpload
+        )));
+        roleRepository.save(lndRole);
 
         // 8. STANDARD EMPLOYEE (Self-Service only, NO adminDashView)
         employeeRole.setPermissions(new HashSet<>(Arrays.asList(
@@ -414,6 +501,220 @@ public class DatabaseSeeder implements CommandLineRunner {
             userRepository.save(recUser);
             System.out.println("✅ Created Recruiter -> ID: EMP401");
         }
+        
+     // Test Account 4: IT Support
+        if (userRepository.findByUsername("EMP501").isEmpty()) {
+            User user = new User();
+            user.setUsername("EMP501");
+            user.setPassword("{noop}Welcome123");
+            user.setRole(itSupportRole);
+            user.setFullName("Ravi IT");
+            user.setEmail("it.support@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("IT Support");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+        }
+
+        // Test Account 5: HR Manager
+        if (userRepository.findByUsername("EMP601").isEmpty()) {
+            User user = new User();
+            user.setUsername("EMP601");
+            user.setPassword("{noop}Welcome123");
+            user.setRole(hrManagerRole);
+            user.setFullName("Neha Verma");
+            user.setEmail("hr.manager@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("HR Manager");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+        }
+
+        // Test Account 6: Project Manager
+        if (userRepository.findByUsername("EMP701").isEmpty()) {
+            User user = new User();
+            user.setPassword("{noop}Welcome123");
+            user.setUsername("EMP701");
+            user.setRole(projectManagerRole);
+            user.setFullName("Amit Project");
+            user.setEmail("pm@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("Project Manager");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+        }
+
+        // Test Account 7: Auditor
+        if (userRepository.findByUsername("EMP801").isEmpty()) {
+            User user = new User();
+            user.setPassword("{noop}Welcome123");
+            user.setUsername("EMP801");
+            user.setRole(auditorRole);
+            user.setFullName("Audit Officer");
+            user.setEmail("auditor@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("Auditor");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+        }
+
+        // Test Account 8: Transport Manager
+        if (userRepository.findByUsername("EMP901").isEmpty()) {
+            User user = new User();
+            user.setPassword("{noop}Welcome123");
+            user.setUsername("EMP901");
+            user.setRole(transportRole);
+            user.setFullName("Transport Head");
+            user.setEmail("transport@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("Transport Manager");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+        }
+
+        // Test Account 9: Learning & Development
+        if (userRepository.findByUsername("EMP1001").isEmpty()) {
+            User user = new User();
+            user.setPassword("{noop}Welcome123");
+            user.setUsername("EMP1001");
+            user.setRole(lndRole);
+            user.setFullName("Learning Head");
+            user.setEmail("learning@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("L&D Head");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+        }
+
+        // ==========================================
+        // NETWORK HOSPITALS SEEDING
+        // ==========================================
+        System.out.println("🏥 Checking for Network Hospitals...");
+        if (hospitalRepository.count() == 0) {
+            System.out.println("⚙️ Seeding dummy network hospitals for testing...");
+
+            Hospital h1 = new Hospital();
+            h1.setName("Apollo Hospitals");
+            h1.setLocation("Saket, New Delhi");
+            h1.setContactNumber("+91-11-29871090");
+            h1.setCashless(true);
+            h1.setEmergency24x7(true);
+
+            Hospital h2 = new Hospital();
+            h2.setName("Fortis Escorts Heart Institute");
+            h2.setLocation("Okhla, New Delhi");
+            h2.setContactNumber("+91-11-47135000");
+            h2.setCashless(true);
+            h2.setEmergency24x7(false);
+
+            Hospital h3 = new Hospital();
+            h3.setName("Max Super Speciality Hospital");
+            h3.setLocation("Vaishali, Ghaziabad");
+            h3.setContactNumber("+91-120-4188000");
+            h3.setCashless(false);
+            h3.setEmergency24x7(true);
+
+            Hospital h4 = new Hospital();
+            h4.setName("Orange City Hospital & Research Institute");
+            h4.setLocation("Nagpur, Maharashtra");
+            h4.setContactNumber("+91-712-6634800");
+            h4.setCashless(true);
+            h4.setEmergency24x7(true);
+
+            Hospital h5 = new Hospital();
+            h5.setName("Bansal Hospital");
+            h5.setLocation("Bhopal, Madhya Pradesh");
+            h5.setContactNumber("+91-755-4086000");
+            h5.setCashless(true);
+            h5.setEmergency24x7(false);
+
+            Hospital h6 = new Hospital();
+            h6.setName("Care CHL Hospital");
+            h6.setLocation("Indore, Madhya Pradesh");
+            h6.setContactNumber("+91-731-4774444");
+            h6.setCashless(false);
+            h6.setEmergency24x7(false);
+
+            hospitalRepository.saveAll(Arrays.asList(h1, h2, h3, h4, h5, h6));
+            System.out.println("✅ Successfully seeded 6 Network Hospitals.");
+        } else {
+            System.out.println("⚡ Network Hospitals already exist. Skipping seed.");
+        }
+
+        // ==========================================
+        // INSURANCE POLICIES SEEDING (EMP114 & EMP187)
+        // ==========================================
+        System.out.println("🛡️ Checking for Employee Insurance Policies...");
+        if (insurancePolicyRepository.count() == 0) {
+            System.out.println("⚙️ Seeding dummy insurance policies...");
+
+            // Seed for EMP114 (Om Tripathi)
+            Optional<User> emp114Opt = userRepository.findByUsername("EMP114");
+            if (emp114Opt.isPresent()) {
+                InsurancePolicy policy1 = new InsurancePolicy();
+                policy1.setUser(emp114Opt.get());
+                policy1.setPolicyNumber("WCG-2026-MED-114");
+                policy1.setProviderName("Star Health & Allied Insurance");
+                policy1.setTotalCoverage(500000.0);
+                policy1.setAmountUsed(120000.0);
+                policy1.setValidFrom(LocalDate.of(2026, 1, 1));
+                policy1.setValidUntil(LocalDate.of(2027, 12, 31));
+                policy1.setStatus("Active");
+
+                insurancePolicyRepository.save(policy1);
+                System.out.println("✅ Assigned Health Policy to EMP114");
+            }
+
+            // Seed for EMP187 (Om Singrore)
+            Optional<User> emp187Opt = userRepository.findByUsername("EMP187");
+            if (emp187Opt.isPresent()) {
+                InsurancePolicy policy2 = new InsurancePolicy();
+                policy2.setUser(emp187Opt.get());
+                policy2.setPolicyNumber("WCG-2026-MED-187");
+                policy2.setProviderName("HDFC ERGO General Insurance");
+                policy2.setTotalCoverage(750000.0);
+                policy2.setAmountUsed(0.0);
+                policy2.setValidFrom(LocalDate.of(2026, 4, 1));
+                policy2.setValidUntil(LocalDate.of(2027, 3, 31));
+                policy2.setStatus("Active");
+
+                insurancePolicyRepository.save(policy2);
+                System.out.println("✅ Assigned Health Policy to EMP187");
+            }
+        } else {
+            System.out.println("⚡ Insurance Policies already exist. Skipping seed.");
+        }
+
 
         System.out.println("=========================================================");
     }

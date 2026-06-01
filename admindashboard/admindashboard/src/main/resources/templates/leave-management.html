@@ -456,27 +456,48 @@
     <div class="row g-4 mb-0">
         <!-- Applicant Details -->
         <div class="col-lg-5">
-            <div class="app-card">
+            <div class="app-card identity-card-bg">
                 <div class="app-card-header">
                     <i class="fas fa-user-circle"></i> Applicant Details
                 </div>
-                <div class="app-card-body">
-                    <div class="row g-3">
+                <div class="app-card-body d-flex flex-column flex-md-row align-items-center gap-3">
+                    <div class="text-center">
+                        <a href="/employee/profile" title="View Full Profile" style="display: block; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            <div class="profile-photo-wrapper">
+                                <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.fullName} + '&background=1e3a8a&color=fff&size=150'}"
+                                     class="profile-img" alt="User">
+                            </div>
+                        </a>
+                        <div class="badge bg-primary text-white rounded-pill px-3 py-1 shadow-sm" style="font-size:0.7rem;">Active</div>
+                    </div>
+                    <div class="row g-2 w-100">
                         <div class="col-md-6">
-                            <label class="form-label">Employee Name</label>
-                            <input type="text" class="form-control fw-bold" th:value="${user.fullName}" readonly>
+                            <div class="form-floating">
+                                <input type="text" class="form-control fw-bold text-primary" id="empName"
+                                       th:value="${user.fullName}" readonly>
+                                <label for="empName">Employee Name</label>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Employee Code</label>
-                            <input type="text" class="form-control" th:value="${user.username}" readonly>
+                            <div class="form-floating">
+                                <input type="text" class="form-control fw-bold" id="empCode"
+                                       th:value="${user.username}" readonly>
+                                <label for="empCode">Employee Code</label>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Department</label>
-                            <input type="text" class="form-control" th:value="${user.employeeProfile?.businessUnit ?: 'General'}" readonly>
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="empDept"
+                                       th:value="${user.employeeProfile?.businessUnit ?: 'General'}" readonly>
+                                <label for="empDept">Department</label>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Reporting Manager</label>
-                            <input type="text" class="form-control" th:value="${user.employeeProfile?.reportingManager ?: 'N/A'}" readonly>
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="empManager"
+                                       th:value="${user.employeeProfile?.reportingManager ?: 'N/A'}" readonly>
+                                <label for="empManager">Reporting Manager</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -502,53 +523,11 @@
         </div>
     </div>
 
-    <!-- ═══════════════════════ ROW 2: LEAVE WALLET + TRANSACTIONS (Combined) ═══════════════════════ -->
+    <!-- ═══════════════════════ ROW 2: APPLY LEAVE + LEAVE WALLET ═══════════════════════ -->
     <div class="row g-4 mb-0">
-        <div class="col-12">
-            <div class="app-card">
-                <div class="app-card-header justify-content-between">
-                    <div><i class="fas fa-wallet"></i> Leave Wallet</div>
-                    <a class="view-all-link" onclick="showWalletDetailsModal()">View Details <i class="fas fa-chevron-right ms-1" style="font-size:0.6rem;"></i></a>
-                </div>
-                <div class="app-card-body" style="padding: 20px;">
-                    <!-- Wallet Cards Grid -->
-                    <div id="walletCardsGrid" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:10px;">
-                        <div class="loading-state" style="grid-column: 1/-1;">
-                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-                            <small class="ms-2 fw-bold text-muted">Loading wallet...</small>
-                        </div>
-                    </div>
-
-                    <!-- Transaction History (inline) -->
-                    <div style="margin-top:20px; padding-top:18px; border-top:1px solid #e2e8f0;">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div style="font-size:0.85rem; font-weight:700; color:#1e293b;">
-                                <i class="fas fa-history text-primary me-2"></i>Recent Transactions
-                            </div>
-                            <a class="view-all-link" style="color:#1e3a8a; opacity:1; font-size:0.75rem;" onclick="showLedgerModal()">View All <i class="fas fa-chevron-right ms-1" style="font-size:0.55rem;"></i></a>
-                        </div>
-                        <div id="ledgerSummaryContainer">
-                            <div class="loading-state">
-                                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-                                <small class="ms-2 fw-bold text-muted">Loading...</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ═══════════════════════ ROW 4: CALENDAR + APPLY FORM ═══════════════════════ -->
-    <div class="row g-4 mb-0">
-        <!-- Working Calendar -->
-        <div class="col-lg-5">
-            <div th:replace="~{fragments/spiral-calendar :: spiralCalendar}"></div>
-        </div>
-
         <!-- Apply Leave Form -->
         <div class="col-lg-7">
-            <div class="app-card">
+            <div class="app-card" style="height: 100%;">
                 <div class="app-card-header">
                     <i class="fas fa-calendar-plus"></i> Apply for Leave
                 </div>
@@ -563,6 +542,11 @@
                                     <option value="Sick">Sick Leave (SL)</option>
                                     <option value="Earned">Earned Leave (EL)</option>
                                     <option value="CompOff">Comp Off</option>
+                                    <option value="Maternity">Maternity Leave</option>
+                                    <option value="Paternity">Paternity Leave</option>
+                                    <option value="Marriage">Marriage Leave</option>
+                                    <option value="Bereavement">Bereavement Leave</option>
+                                    <option value="LOP">Loss of Pay (LOP)</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
@@ -619,12 +603,53 @@
                 </div>
             </div>
         </div>
+
+        <!-- Leave Wallet -->
+        <div class="col-lg-5">
+            <div class="app-card" style="height: 100%;">
+                <div class="app-card-header justify-content-between">
+                    <div><i class="fas fa-wallet"></i> Leave Wallet</div>
+                    <a class="view-all-link" onclick="showWalletDetailsModal()">View Details <i class="fas fa-chevron-right ms-1" style="font-size:0.6rem;"></i></a>
+                </div>
+                <div class="app-card-body" style="padding: 20px;">
+                    <!-- Total Leave Available -->
+                    <div id="walletCardsGrid" style="display:grid; grid-template-columns: 1fr; gap:10px;">
+                        <div class="loading-state">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                            <small class="ms-2 fw-bold text-muted">Loading wallet...</small>
+                        </div>
+                    </div>
+
+                    <!-- Transaction History (inline) -->
+                    <div style="margin-top:20px; padding-top:18px; border-top:1px solid #e2e8f0;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div style="font-size:0.85rem; font-weight:700; color:#1e293b;">
+                                <i class="fas fa-history text-primary me-2"></i>Recent Transactions
+                            </div>
+                            <a class="view-all-link" style="color:#1e3a8a; opacity:1; font-size:0.75rem;" onclick="showLedgerModal()">View All <i class="fas fa-chevron-right ms-1" style="font-size:0.55rem;"></i></a>
+                        </div>
+                        <div id="ledgerSummaryContainer">
+                            <div class="loading-state">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                <small class="ms-2 fw-bold text-muted">Loading...</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- ═══════════════════════ ROW 5: ABSENCE REQUESTS ═══════════════════════ -->
-    <div class="row g-4">
-        <div class="col-12">
-            <div class="app-card">
+    <!-- ═══════════════════════ ROW 3: CALENDAR + ABSENCE REQUESTS ═══════════════════════ -->
+    <div class="row g-4 mb-4">
+        <!-- Working Calendar -->
+        <div class="col-lg-5">
+            <div th:replace="~{fragments/spiral-calendar :: spiralCalendar}"></div>
+        </div>
+
+        <!-- Absence Requests -->
+        <div class="col-lg-7">
+            <div class="app-card" style="height: 100%; margin-bottom: 0;">
                 <div class="app-card-header justify-content-between">
                     <div><i class="fas fa-clipboard-list"></i> Absence Requests</div>
                     <a href="/my-timeoff" class="view-all-link">View All <i class="fas fa-chevron-right ms-1" style="font-size:0.6rem;"></i></a>
@@ -771,59 +796,22 @@
                 'LOP':      { gradient: 'linear-gradient(135deg, #ef4444, #b91c1c)', icon: 'fa-circle-exclamation', iconBg: 'rgba(255,255,255,0.2)' }
             };
 
-          const displayTypes = ['CL', 'SL', 'EL', 'COMP_OFF', 'LOP'];  
-          let html = '';
+          const displayTypes = ['CL', 'SL', 'EL', 'COMP_OFF'];  
+          let totalAvailable = 0;
             walletData.forEach(w => {
-              if (!displayTypes.includes(w.leaveCode)) return;
-                const t = themes[w.leaveCode] || { gradient: 'linear-gradient(135deg, #64748b, #475569)', icon: 'fa-calendar', iconBg: 'rgba(255,255,255,0.2)' };
-              const isLOP = w.leaveCode === 'LOP';
-                const total = w.openingBalance || 0;
-                const used = w.used || 0;
-                const available = w.balance || 0;
-
-                // Progress bar calculation
-                let pct = 0;
-                if (isLOP) {
-                    pct = used > 0 ? 100 : 0;
-                } else if (total > 0) {
-                    pct = Math.round(((total - available) / total) * 100);
-                }
-
-                html += '<div style="background:' + t.gradient + '; border-radius:12px; padding:12px 14px; color:white; position:relative; overflow:hidden; transition:all 0.25s ease; cursor:default;" ' +
-                    'onmouseenter="this.style.transform=\'translateY(-3px)\'; this.style.boxShadow=\'0 8px 20px rgba(0,0,0,0.15)\'" ' +
-                    'onmouseleave="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'none\'">'+
-
-                    // Header: icon + name inline
-                    '<div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">' +
-                        '<div style="width:28px; height:28px; border-radius:8px; background:' + t.iconBg + '; display:flex; align-items:center; justify-content:center; flex-shrink:0;">' +
-                            '<i class="fas ' + t.icon + '" style="font-size:0.7rem;"></i>' +
-                        '</div>' +
-                        '<div style="font-size:0.72rem; font-weight:700; line-height:1.2;">' + w.leaveType + '</div>' +
-                    '</div>';
-
-                if (isLOP) {
-                    html += '<div style="font-size:1.4rem; font-weight:800; line-height:1;">' + used + '</div>' +
-                        '<div style="font-size:0.62rem; font-weight:600; opacity:0.8; margin-top:2px;">Days on LOP</div>';
-                } else {
-                    html += '<div style="font-size:1.4rem; font-weight:800; line-height:1;">' + available + '<span style="font-size:0.65rem; font-weight:600; opacity:0.7;"> / ' + total + '</span></div>' +
-                        '<div style="font-size:0.62rem; font-weight:600; opacity:0.8; margin-top:2px;">Available</div>';
-                }
-
-                // Progress bar
-                html += '<div style="margin-top:8px; background:rgba(255,255,255,0.2); border-radius:4px; height:4px; overflow:hidden;">' +
-                    '<div style="width:' + pct + '%; height:100%; background:rgba(255,255,255,0.7); border-radius:4px;"></div>' +
-                '</div>';
-
-                // Bottom stat - single line
-                if (!isLOP) {
-                    html += '<div style="margin-top:4px; font-size:0.58rem; font-weight:600; opacity:0.7;">Used: ' + used + ' &bull; ' + pct + '%</div>';
-                } else {
-                    html += '<div style="margin-top:4px; font-size:0.58rem; font-weight:600; opacity:0.7;">' +
-                        (used > 0 ? '⚠ Deduction applies' : '✓ No LOP') + '</div>';
-                }
-
-                html += '</div>';
+              if (displayTypes.includes(w.leaveCode)) {
+                  totalAvailable += (w.balance || 0);
+              }
             });
+
+            let html = '<div style="background:linear-gradient(135deg, #1e3a8a, #3b82f6); border-radius:12px; padding:24px 20px; color:white; text-align:center; box-shadow:0 8px 20px rgba(30,58,138,0.15); grid-column: 1 / -1; cursor:pointer; transition:all 0.3s ease;" ' +
+                'onmouseenter="this.style.transform=\'translateY(-3px)\'; this.style.boxShadow=\'0 12px 24px rgba(30,58,138,0.25)\'" ' +
+                'onmouseleave="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'0 8px 20px rgba(30,58,138,0.15)\'" ' +
+                'onclick="showWalletDetailsModal()">' +
+                '<div style="font-size:0.9rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; opacity:0.9; margin-bottom:10px;"><i class="fas fa-star me-2"></i>Total Leaves Available</div>' +
+                '<div style="font-size:4rem; font-weight:800; line-height:1; margin:15px 0;">' + totalAvailable + '</div>' +
+                '<div style="font-size:0.8rem; font-weight:500; opacity:0.85; margin-top:10px;">Click here to view detailed breakdown</div>' +
+                '</div>';
 
             grid.innerHTML = html;
         } catch (e) {
