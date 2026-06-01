@@ -5,11 +5,14 @@ FROM eclipse-temurin:21-jdk-alpine
 WORKDIR /app
 
 # Fixed paths: Copy directly from the current folder
-COPY .mvn .mvn
-COPY mvnw ./
-COPY pom.xml ./
-COPY src ./src
-
+# COPY .mvn .mvn
+# COPY mvnw ./
+# COPY pom.xml ./
+# COPY src ./src
+COPY admindashboard/admindashboard/.mvn .mvn
+COPY admindashboard/admindashboard/mvnw ./
+COPY admindashboard/admindashboard/pom.xml ./
+COPY admindashboard/admindashboard/src ./src
 # Give permission
 RUN chmod +x mvnw
 
