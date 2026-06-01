@@ -535,6 +535,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+	let viewRequestLoading = false;
 	function switchStatus(status, element) {
 
 	    document.querySelectorAll('.status-box')
@@ -637,8 +638,15 @@
 	    applyFilters();
 	}
 	async function viewRequestDetails(id) {
-	       try {
-	           const response = await fetch('/api/requests/' + id);
+
+	    if (viewRequestLoading) {
+	        return;
+	    }
+
+	    viewRequestLoading = true;
+
+	    try {
+		        const response = await fetch('/api/requests/' + id);
 
 	           if (response.ok) {
 	               const data = await response.json();
@@ -690,6 +698,11 @@
 	       } catch (error) {
 	           alert("Network connection error.");
 	       }
+		   finally {
+
+	           viewRequestLoading = false;
+
+	       }
 	   }
 	   async function updateStatus(id, status) {
 
@@ -721,6 +734,23 @@
 
 	       }
 	   }
+	   let lastFocusedButton = null;
+
+	   document.addEventListener('click', function (e) {
+	       if (e.target.closest('.btn-view')) {
+	           lastFocusedButton = e.target.closest('.btn-view');
+	       }
+	   });
+
+	   document
+	       .getElementById('viewRequestModal')
+	       .addEventListener('hidden.bs.modal', function () {
+
+	           if (lastFocusedButton) {
+	               lastFocusedButton.focus();
+	           }
+
+	       });
 
 </script>
 </body>

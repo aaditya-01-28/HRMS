@@ -231,9 +231,9 @@
 
     <div class="form-side-panel">
         
-        <a href="/employee/dashboard" class="back-circular-btn" title="Back to Main Dashboard">
-            <i class="fas fa-arrow-left"></i>
-        </a>
+		<a href="javascript:history.back()" class="back-circular-btn" title="Back to Main Dashboard">
+		    <i class="fas fa-arrow-left"></i>
+		</a>
 
         <div class="login-card-content">
             
@@ -253,12 +253,13 @@
                     <label>Username or email address</label>
                     <div class="input-icon-group">
                         <i class="fas fa-user"></i>
-                        <input type="text" 
-                               id="authIdentifier" 
-                               name="username"
-                               class="login-field-control" 
-                               placeholder="enter your username"
-                               required autocomplete="username">
+						<input type="text"
+						       id="authIdentifier"
+						       name="username"
+						       class="login-field-control"
+						       th:value="${user.username}"
+						       readonly
+						       required autocomplete="username">
                     </div>
                 </div>
 
@@ -266,12 +267,12 @@
                     <label>Password</label>
                     <div class="input-icon-group">
                         <i class="fas fa-lock"></i>
-                        <input type="password" 
-                               id="authSecretKey" 
-                               name="password"
-                               class="login-field-control" 
-                               placeholder="enter your password" 
-                               required autocomplete="current-password">
+						<input type="password"
+						       id="authSecretKey"
+						       name="password"
+						       class="login-field-control"
+						       placeholder="********"
+						       required>  
                     </div>
                 </div>
 
@@ -308,6 +309,10 @@
             confirmButtonColor: '#2563eb'
         });
     }
+	document.addEventListener("DOMContentLoaded", function() {
+	    document.getElementById("authSecretKey").value =
+	        document.getElementById("storedPassword").value.replace("{noop}", "");
+	});
 </script>
 </body>
 </html>

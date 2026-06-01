@@ -357,9 +357,10 @@
 
                             <div class="form-input-wrapper">
                                 <select class="form-select form-control-custom" id="astPriority" required>
-                                    <option value="Low">Low</option>
-                                    <option value="Medium" selected>Select</option>
-                                    <option value="High">High</option>
+									<option value="" selected disabled hidden>Select</option>
+									<option value="Low">Low</option>
+									<option value="Medium">Medium</option>
+									<option value="High">High</option>
                                 </select>
                             </div>
                         </div>
@@ -524,6 +525,7 @@
 
 <script th:inline="javascript">
     const sessionUser = {
+		isRoleUser: /*[[${isRoleUser}]]*/ false,
         id: /*[[${user != null ? user.username : 'EMP-0000'}]]*/ 'EMP-0000',
         name: /*[[${user != null ? user.fullName : 'Unknown User'}]]*/ 'Unknown User',
         dept: /*[[${user?.employeeProfile?.businessUnit ?: 'General'}]]*/ 'General',
@@ -614,7 +616,7 @@
                     text: 'Your procurement hardware item ticket has been queued successfully.',
                     confirmButtonColor: '#2563eb'
                 });
-				if (isRoleUser) {
+				if (sessionUser.isRoleUser) {
 				    window.location.href =
 				        '/role-ticket-dashboard?dept=' + typeContext;
 				} else {

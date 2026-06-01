@@ -533,7 +533,7 @@
                     <a href="/admin/leave-approvals" class="feature-btn" sec:authorize="hasAuthority('leave_approve')">
                         <i class="fas fa-calendar-check"></i><span>Approve Leave</span>
                     </a>
-                    <a href="/admin/timesheet-approval" class="feature-btn" sec:authorize="hasAuthority('attendance_approve')">
+                    <a  href="/admin/timesheet-approval" class="feature-btn" sec:authorize="hasAuthority('attendance_approve')">
                         <i class="fas fa-business-time"></i><span>Approve Timesheet</span>
                     </a>
                     <a href="/admin/attendance-regularization" class="feature-btn" sec:authorize="hasAuthority('attendance_approve')">
@@ -549,6 +549,16 @@
 					   class="feature-btn text-decoration-none text-dark">
 					    <i class="fas fa-ticket-alt"></i>
 					    <span>Log Tickets</span>
+					</a>
+					<a href="/erp/authenticate" class="admin-item text-decoration-none text-dark action-row">
+					    <div class="admin-info w-100">
+					        <div class="admin-icon">
+					            <i class="fas fa-business-time"></i>
+					        </div>
+					        <div class="admin-text">
+					            <h6 class="m-0 small fw-bold">ERP & Timesheet</h6>
+					        </div>
+					    </div>
 					</a>
                 </div>
             </div>

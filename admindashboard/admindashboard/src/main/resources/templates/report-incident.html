@@ -318,6 +318,7 @@
 
 <script th:inline="javascript">
     const sessionUser = {
+		isRoleUser: /*[[${isRoleUser}]]*/ false,
         id: /*[[${user != null ? user.username : 'EMP-0000'}]]*/ 'EMP-0000',
         name: /*[[${user != null ? user.fullName : 'Unknown User'}]]*/ 'Unknown User',
         dept: /*[[${user != null && user.employeeProfile != null ? user.employeeProfile.businessUnit : 'General'}]]*/ 'General',
@@ -432,7 +433,7 @@
                     timer: 4000,
                     timerProgressBar: true
                 });
-				if (isRoleUser) {
+				if (sessionUser.isRoleUser) {
 				    window.location.href =
 				        '/role-ticket-dashboard?dept=' + typeContext;
 				} else {
