@@ -507,8 +507,10 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script th:inline="javascript">
+	let viewRequestLoading = false;
 	
     const sessionUser = {
+		isRoleUser: /*[[${isRoleUser}]]*/ false,
         id: /*[[${user != null ? user.username : 'EMP-0000'}]]*/ 'EMP-0000',
         name: /*[[${user != null ? user.fullName : 'Unknown User'}]]*/ 'Unknown User',
         dept: /*[[${user?.employeeProfile?.businessUnit ?: 'General'}]]*/ 'General',
@@ -615,7 +617,7 @@
                     text: 'Your service ticket request has been logged successfully.',
                     confirmButtonColor: '#2563eb'
                 });
-				if (isRoleUser) {
+				if (sessionUser.isRoleUser) {
 				    window.location.href =
 				        '/role-ticket-dashboard?dept=' + typeContext;
 				} else {
@@ -624,8 +626,9 @@
 				}
             } else {
                 throw new Error("Server Response Error");
-            }
-        } catch (error) {
+            
+			} catch (error) {
+			    console.error("ASSET FORM ERROR:", error);
             Swal.fire({
                 icon: 'error',
                 title: 'Submission Failed',

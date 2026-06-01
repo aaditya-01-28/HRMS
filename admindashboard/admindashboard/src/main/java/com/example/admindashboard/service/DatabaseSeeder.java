@@ -506,7 +506,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         if (userRepository.findByUsername("EMP501").isEmpty()) {
             User user = new User();
             user.setUsername("EMP501");
-            user.setPassword("{noop}Welcome123");
+            user.setPassword("{noop}welcome123");
             user.setRole(itSupportRole);
             user.setFullName("Ravi IT");
             user.setEmail("it.support@wcg.com");
@@ -525,7 +525,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         if (userRepository.findByUsername("EMP601").isEmpty()) {
             User user = new User();
             user.setUsername("EMP601");
-            user.setPassword("{noop}Welcome123");
+            user.setPassword("{noop}welcome123");
             user.setRole(hrManagerRole);
             user.setFullName("Neha Verma");
             user.setEmail("hr.manager@wcg.com");
@@ -543,7 +543,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         // Test Account 6: Project Manager
         if (userRepository.findByUsername("EMP701").isEmpty()) {
             User user = new User();
-            user.setPassword("{noop}Welcome123");
+            user.setPassword("{noop}welcome123");
             user.setUsername("EMP701");
             user.setRole(projectManagerRole);
             user.setFullName("Amit Project");
@@ -562,7 +562,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         // Test Account 7: Auditor
         if (userRepository.findByUsername("EMP801").isEmpty()) {
             User user = new User();
-            user.setPassword("{noop}Welcome123");
+            user.setPassword("{noop}welcome123");
             user.setUsername("EMP801");
             user.setRole(auditorRole);
             user.setFullName("Audit Officer");
@@ -581,7 +581,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         // Test Account 8: Transport Manager
         if (userRepository.findByUsername("EMP901").isEmpty()) {
             User user = new User();
-            user.setPassword("{noop}Welcome123");
+            user.setPassword("{noop}welcome123");
             user.setUsername("EMP901");
             user.setRole(transportRole);
             user.setFullName("Transport Head");
@@ -600,7 +600,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         // Test Account 9: Learning & Development
         if (userRepository.findByUsername("EMP1001").isEmpty()) {
             User user = new User();
-            user.setPassword("{noop}Welcome123");
+            user.setPassword("{noop}welcome123");
             user.setUsername("EMP1001");
             user.setRole(lndRole);
             user.setFullName("Learning Head");
