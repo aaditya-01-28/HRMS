@@ -483,11 +483,25 @@ public class DashboardController {
 
     // 2. THE POST ROUTE TARGETS TICKETS.HTML ONCE THEY CLICK CONTINUE
     @PostMapping("/tickets")
-    public String processTicketAuthentication(Model model, Principal principal) {
+    public String processTicketAuthentication(@RequestParam("username") String typedUsername, @RequestParam("password") String typedPassword, Model model, Principal principal) {
         if (principal != null) {
             String loginId = principal.getName();
             User currentUser = userRepository.findByUsername(loginId).orElse(new User());
             model.addAttribute("user", currentUser);
+            String dbPassword = currentUser.getPassword();
+
+            String cleanDbPassword =
+                    dbPassword != null ? dbPassword.replace("{noop}", "") : "";
+
+            if (!typedUsername.equalsIgnoreCase(loginId)
+                    || !typedPassword.equals(cleanDbPassword)) {
+
+                model.addAttribute("user", currentUser);
+                model.addAttribute("savedPassword", cleanDbPassword);
+                model.addAttribute("authError", "Invalid credentials");
+
+                return "ticket-login";
+            }
 
             boolean isRoleUser =
                     currentUser.getRole() != null &&
@@ -1112,7 +1126,7 @@ public class DashboardController {
     }
 
     // FIXED LOCK: Approvals are strictly for leadership roles via permissions
-    @PreAuthorize("hasAnyAuthority('attendance_approve', 'attendance_edit')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN','ROLE_ADMIN','ROLE_HR_ADMIN','ROLE_HR_EXECUTIVE','ROLE_HR_MANAGER')")
     @GetMapping("/admin/timesheet-approval")
     public String showTimesheetApprovalPage() { return "admin-timesheet-approval"; }
 

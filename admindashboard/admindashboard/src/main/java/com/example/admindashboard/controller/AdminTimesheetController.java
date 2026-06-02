@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import java.util.Set;
+
 @RestController
 @RequestMapping("/api/admin/timesheet")
 public class AdminTimesheetController {
@@ -29,33 +31,75 @@ public class AdminTimesheetController {
 
     @Autowired
     private EmailService emailService;
+    
+    
+    private static final Set<String> ROLE_BASED_USERS = Set.of(
+            "IT_ADMIN",
+            "HR_ADMIN",
+            "HR_EXECUTIVE",
+            "MANAGER",
+            "FINANCE",
+            "RECRUITER",
+            "HR_MANAGER",
+            "IT_SUPPORT",
+            "PROJECT_MANAGER",
+            "AUDITOR",
+            "TRANSPORT",
+            "LND"
+    );
 
     // 1. Fetch timesheets by status
     // FIXED LOCK: Added ROLE_HR_EXECUTIVE to the permitted roles
-    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'ROLE_HR_ADMIN', 'ROLE_HR_EXECUTIVE', 'ROLE_MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR_MANAGER','ROLE_ADMIN','ROLE_SUPER_ADMIN')")
     @GetMapping("/list")
+    
     public ResponseEntity<List<WeeklyTimesheet>> getTimesheets(@RequestParam String status, Principal principal) {
+    	User currentUser =
+    	        userRepository.findByUsername(principal.getName()).orElseThrow();
 
-        User currentUser = userRepository.findByUsername(principal.getName()).orElse(null);
-        boolean isManager = currentUser != null && currentUser.getRole() != null && "MANAGER".equalsIgnoreCase(currentUser.getRole().getRoleName());
+    	String currentRole =
+    	        currentUser.getRole().getRoleName();
+    	System.out.println("TIMESHEET ROLE = " + currentRole);
 
-        List<WeeklyTimesheet> allTimesheets = timesheetRepository.findByStatus(status);
+    	List<WeeklyTimesheet> allTimesheets =
+    	        timesheetRepository.findByStatus(status);
 
-        // DATA VISIBILITY FILTER: Managers only see timesheets submitted by their team
-        if (isManager && currentUser != null) {
-            allTimesheets = allTimesheets.stream()
-                    .filter(ts -> ts.getUser() != null
-                            && ts.getUser().getManager() != null
-                            && ts.getUser().getManager().getId().equals(currentUser.getId()))
-                    .collect(Collectors.toList());
-        }
+    	if ("HR_MANAGER".equalsIgnoreCase(currentRole)) {
 
-        return ResponseEntity.ok(allTimesheets);
+    	    allTimesheets = allTimesheets.stream()
+    	            .filter(ts ->
+    	                    ts.getUser() != null &&
+    	                    ts.getUser().getRole() != null &&
+    	                    !ROLE_BASED_USERS.contains(
+    	                            ts.getUser().getRole().getRoleName()
+    	                    )
+    	            )
+    	            .collect(Collectors.toList());
+
+    	}
+
+    	if ("ADMIN".equalsIgnoreCase(currentRole)
+    	        || "SUPER_ADMIN".equalsIgnoreCase(currentRole)) {
+
+    	    allTimesheets = allTimesheets.stream()
+    	            .filter(ts ->
+    	                    ts.getUser() != null &&
+    	                    ts.getUser().getRole() != null &&
+    	                    ROLE_BASED_USERS.contains(
+    	                            ts.getUser().getRole().getRoleName()
+    	                    )
+    	            )
+    	            .collect(Collectors.toList());
+
+    	}
+
+    	return ResponseEntity.ok(allTimesheets);
+    	
     }
 
     // 2. Approve or Reject
     // FIXED LOCK: Added ROLE_HR_EXECUTIVE to the permitted roles
-    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'ROLE_HR_ADMIN', 'ROLE_HR_EXECUTIVE', 'ROLE_MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR_MANAGER','ROLE_ADMIN','ROLE_SUPER_ADMIN')")
     @PostMapping("/{id}/{status}")
     public ResponseEntity<?> updateStatus(
             @PathVariable Long id,
@@ -64,17 +108,35 @@ public class AdminTimesheetController {
             Principal principal) {
 
         User currentUser = userRepository.findByUsername(principal.getName()).orElseThrow();
-        boolean isManager = currentUser.getRole() != null && "MANAGER".equalsIgnoreCase(currentUser.getRole().getRoleName());
-
         Optional<WeeklyTimesheet> tsOpt = timesheetRepository.findById(id);
-
         if (tsOpt.isPresent()) {
             WeeklyTimesheet ts = tsOpt.get();
+            String approverRole =
+                    currentUser.getRole().getRoleName();
+
+            String submitterRole =
+                    ts.getUser().getRole().getRoleName();
+            boolean isAdminApprovedRole =
+                    ROLE_BASED_USERS.contains(submitterRole);
+
+            if ("HR_MANAGER".equalsIgnoreCase(approverRole)
+                    && isAdminApprovedRole) {
+
+                return ResponseEntity
+                        .status(403)
+                        .body("HR Manager cannot approve role-user timesheets.");
+            }
+
+            if (("ADMIN".equalsIgnoreCase(approverRole)
+                    || "SUPER_ADMIN".equalsIgnoreCase(approverRole))
+                    && !isAdminApprovedRole) {
+
+                return ResponseEntity
+                        .status(403)
+                        .body("Admin cannot approve employee timesheets.");
+            }
 
             // CRITICAL SECURITY BLOCK: Prevent Manager from modifying out-of-team timesheets via API bypass
-            if (isManager && (ts.getUser().getManager() == null || !ts.getUser().getManager().getId().equals(currentUser.getId()))) {
-                return ResponseEntity.status(403).body("Error: 403 Forbidden. You are not authorized to evaluate timesheets for employees outside your reporting hierarchy.");
-            }
 
             ts.setStatus(status);
 

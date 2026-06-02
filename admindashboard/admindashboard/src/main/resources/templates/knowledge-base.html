@@ -219,7 +219,7 @@
 
 <div class="hero-banner-container">
     <a  th:href="${backUrl}" class="btn-back-dashboard">Back to Dashboard</a>
-    <h1><h1>Solutions Form</h1></h1>
+    <h1>Solutions Form</h1>
 </div>
 
 <div class="form-content-area">
@@ -344,6 +344,7 @@
 
 <script th:inline="javascript">
     const sessionUser = {
+		isRoleUser: /*[[${isRoleUser}]]*/ false,
         id: /*[[${user != null ? user.username : 'EMP-0000'}]]*/ 'EMP-0000',
         name: /*[[${user != null ? user.fullName : 'Unknown User'}]]*/ 'Unknown User',
         dept: /*[[${user != null && user.employeeProfile != null ? user.employeeProfile.businessUnit : 'General'}]]*/ 'General',
@@ -435,7 +436,7 @@
                     text: 'Your solutions ticket has been recorded successfully.',
                     confirmButtonColor: '#2563eb'
                 });
-				if (isRoleUser) {
+				if (sessionUser.isRoleUser) {
 				    window.location.href =
 				        '/role-ticket-dashboard?dept=' + typeContext;
 				} else {

@@ -73,7 +73,9 @@
     <div class="left-banner-side"></div>
 
     <div class="right-login-side">
-        <a href="/employee/dashboard" class="btn-circular-back"><i class="fa-solid fa-arrow-left"></i></a>
+		<a href="javascript:history.back()" class="btn-circular-back">
+		    <i class="fa-solid fa-arrow-left"></i>
+		</a>
 
         <div class="brand-logo-card">
             <div class="custom-logo-vector">W</div>
@@ -88,15 +90,22 @@
                 <div class="input-wrapper-group">
                     <label class="input-label-caption">Username or email address</label>
                     <i class="fa-solid fa-user input-icon-decor"></i>
-                    <input type="text" class="sso-input-field" name="username" 
-                           th:value="${user != null ? user.username : ''}" placeholder="eg. abc123@gmail.com" required>
+					<input type="text"
+					       class="sso-input-field"
+					       name="username"
+					       th:value="${user != null ? user.username : ''}"
+					       readonly
+					       required>
                 </div>
 
                 <div class="input-wrapper-group">
                     <label class="input-label-caption">Password</label>
                     <i class="fa-solid fa-lock input-icon-decor"></i>
-                    <input type="password" class="sso-input-field" name="password" 
-                           th:value="${savedPassword != null ? savedPassword : ''}" placeholder="enter your password" required>
+                    <input type="password"
+					       class="sso-input-field"
+					       name="password"
+					       placeholder="*****"
+					       required>
                 </div>
 
                 <a href="#" class="link-forgot-password">Forgot Password?</a>

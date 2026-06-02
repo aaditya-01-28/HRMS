@@ -358,7 +358,7 @@
                                   th:text="${req.status}">Approved</span>
                         </td>
                         <td style="text-align: center;">
-                            <button class="view-action-btn" th:onclick="'viewMyRequestDetails(' + ${req.id} + ')'">
+                            <button class="view-action-btn" th:onclick="'viewMyRequestDetails(' + ${req.id} + ', this)'">
                                 <i class="far fa-eye"></i>
                             </button>
                         </td>
@@ -446,7 +446,9 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script th:inline="javascript">
-    async function viewMyRequestDetails(id) {
+	let lastFocusedEyeButton = null;
+    async function viewMyRequestDetails(id, btn) {
+		lastFocusedEyeButton = btn;
         try {
             const response = await fetch('/api/requests/' + id);
             if (response.ok) {
@@ -488,6 +490,17 @@
             alert("Network connection error.");
         }
     }
+	
+	const myRequestModal =
+	    document.getElementById('viewMyRequestModal');
+
+	myRequestModal.addEventListener('hidden.bs.modal', function () {
+
+	    if (lastFocusedEyeButton) {
+	        lastFocusedEyeButton.focus();
+	    }
+
+	});
 
     function filterMyRequests() {
         const filterValue = document.getElementById('statusFilter').value;

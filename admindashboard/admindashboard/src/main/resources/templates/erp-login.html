@@ -231,9 +231,9 @@
 
     <div class="form-side-panel">
         
-        <a href="/employee/dashboard" class="back-circular-btn" title="Back to Main Dashboard">
-            <i class="fas fa-arrow-left"></i>
-        </a>
+		<a href="javascript:history.back()" class="back-circular-btn" title="Back to Main Dashboard">
+		    <i class="fas fa-arrow-left"></i>
+		</a>
 
         <div class="login-card-content">
             
@@ -262,7 +262,6 @@
                                required autocomplete="username">
                     </div>
                 </div>
-
                 <div class="custom-input-container">
                     <label>Password</label>
                     <div class="input-icon-group">
@@ -310,6 +309,10 @@
             confirmButtonColor: '#2563eb'
         });
     }
+	document.addEventListener("DOMContentLoaded", function() {
+	    document.getElementById("authSecretKey").value =
+	        document.getElementById("storedPassword").value.replace("{noop}", "");
+	});
 </script>
 </body>
 </html>
