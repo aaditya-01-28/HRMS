@@ -468,8 +468,8 @@ public class DatabaseSeeder implements CommandLineRunner {
             finUser.setUsername("EMP301");
             finUser.setPassword("{noop}welcome123");
             finUser.setRole(financeRole);
-            finUser.setFullName("Rahul Verma");
-            finUser.setEmail("rahul.finance@whitecirclegroup.com");
+            finUser.setFullName("Kavita Finance");
+            finUser.setEmail("accounts@wcg.com");
 
             EmployeeProfile finProfile = new EmployeeProfile();
             finProfile.setDesignation("Payroll Manager");
@@ -608,6 +608,43 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             EmployeeProfile profile = new EmployeeProfile();
             profile.setDesignation("L&D Head");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+        }
+        
+     // Test Account 10: HR Executive
+        if (userRepository.findByUsername("EMP1101").isEmpty()) {
+            User user = new User();
+            user.setUsername("EMP1101");
+            user.setPassword("{noop}Admin@123");
+            user.setRole(hrExecutiveRole);
+            user.setFullName("Pooja Singh");
+            user.setEmail("hr.exec@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("HR Executive");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+        }
+     // Test Account 12: Finance
+        if (userRepository.findByUsername("EMP1301").isEmpty()) {
+            User user = new User();
+            user.setUsername("EMP1301");
+            user.setPassword("{noop}Admin@123");
+            user.setRole(financeRole);
+            user.setFullName("Kavita Finance");
+            user.setEmail("accounts@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("Finance Manager");
             profile.setJoiningDate(LocalDate.now());
 
             profile.setUser(user);

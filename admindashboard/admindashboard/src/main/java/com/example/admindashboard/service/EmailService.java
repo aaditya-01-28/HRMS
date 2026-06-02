@@ -1,6 +1,8 @@
 package com.example.admindashboard.service;
 
 import jakarta.mail.MessagingException;
+import com.example.admindashboard.model.User;
+import com.example.admindashboard.repository.UserRepository;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +25,9 @@ public class EmailService {
 
     @Autowired
     private SpringTemplateEngine templateEngine;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     // Pulls the email address from your application.properties
     @Value("${spring.mail.username}")
@@ -235,9 +240,42 @@ public class EmailService {
             String cleanDept = (departmentCode != null) ? departmentCode.trim().toUpperCase() : "IT";
 
             // 1. Resolve Department Head Email via dynamic environment system variables (Render / System OS)
-            String deptHeadEmail = System.getenv("DEPT_HEAD_" + cleanDept);
-            if (deptHeadEmail == null || deptHeadEmail.trim().isEmpty()) {
-                deptHeadEmail = "support@whitecircle.com"; // Smart fallback
+            String deptHeadEmail = null;
+
+            switch (cleanDept) {
+
+                case "IT":
+                    deptHeadEmail = userRepository.findAll().stream()
+                            .filter(u -> u.getRole() != null)
+                            .filter(u -> "IT_SUPPORT".equalsIgnoreCase(u.getRole().getRoleName()))
+                            .filter(u -> "ACTIVE".equalsIgnoreCase(u.getStatus()))
+                            .map(User::getEmail)
+                            .findFirst()
+                            .orElse(null);
+                    break;
+
+                case "HR":
+                    deptHeadEmail = userRepository.findAll().stream()
+                            .filter(u -> u.getRole() != null)
+                            .filter(u -> "HR_MANAGER".equalsIgnoreCase(u.getRole().getRoleName()))
+                            .filter(u -> "ACTIVE".equalsIgnoreCase(u.getStatus()))
+                            .map(User::getEmail)
+                            .findFirst()
+                            .orElse(null);
+                    break;
+
+                case "PROJECT":
+                    deptHeadEmail = userRepository.findAll().stream()
+                            .filter(u -> u.getRole() != null)
+                            .filter(u -> "PROJECT_MANAGER".equalsIgnoreCase(u.getRole().getRoleName()))
+                            .filter(u -> "ACTIVE".equalsIgnoreCase(u.getStatus()))
+                            .map(User::getEmail)
+                            .findFirst()
+                            .orElse(null);
+                    break;
+            }
+            if (deptHeadEmail == null || deptHeadEmail.isBlank()) {
+                deptHeadEmail = systemEmail;
             }
 
             // 2. Resolve Admin Target utilizing company's active properties registration variable
@@ -256,13 +294,29 @@ public class EmailService {
             String htmlBody = templateEngine.process("emails/ticket-submission-email", thymeleafContext);
             helper.setText(htmlBody, true);
 
-            // 4. Send to Department Head
-            helper.setTo(deptHeadEmail);
-            mailSender.send(message);
+         // Send to Department Head
+            MimeMessage deptMessage = mailSender.createMimeMessage();
+            MimeMessageHelper deptHelper = new MimeMessageHelper(deptMessage, true, "UTF-8");
 
-            // 5. Send to Admin
-            helper.setTo(adminEmail);
-            mailSender.send(message);
+            deptHelper.setFrom(systemEmail, "WhiteCircle Helpdesk");
+            deptHelper.setReplyTo(employeeEmail, employeeName);
+            deptHelper.setTo(deptHeadEmail);
+            deptHelper.setSubject("New Helpdesk Submission [" + cleanDept + "]: " + formSubject);
+            deptHelper.setText(htmlBody, true);
+
+            mailSender.send(deptMessage);
+
+            // Send to Admin
+            MimeMessage adminMessage = mailSender.createMimeMessage();
+            MimeMessageHelper adminHelper = new MimeMessageHelper(adminMessage, true, "UTF-8");
+
+            adminHelper.setFrom(systemEmail, "WhiteCircle Helpdesk");
+            adminHelper.setReplyTo(employeeEmail, employeeName);
+            adminHelper.setTo(adminEmail);
+            adminHelper.setSubject("New Helpdesk Submission [" + cleanDept + "]: " + formSubject);
+            adminHelper.setText(htmlBody, true);
+
+            mailSender.send(adminMessage);
 
             System.out.println("✅ Helpdesk Notification successfully pushed to Admin & Head of " + cleanDept);
 

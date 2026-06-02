@@ -603,40 +603,46 @@
             didOpen: () => { Swal.showLoading(); }
         });
 
-        try {
-            const response = await fetch('/api/requests/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+		try {
+		    const response = await fetch('/api/requests/submit', {
+		        method: 'POST',
+		        headers: { 'Content-Type': 'application/json' },
+		        body: JSON.stringify(payload)
+		    });
 
-            if (response.ok) {
-                await Swal.fire({
-                    icon: 'success',
-                    title: 'Ticket Saved!',
-                    text: 'Your service ticket request has been logged successfully.',
-                    confirmButtonColor: '#2563eb'
-                });
-				if (sessionUser.isRoleUser) {
-				    window.location.href =
-				        '/role-ticket-dashboard?dept=' + typeContext;
-				} else {
-				    window.location.href =
-				        '/ticket-dashboard?dept=' + typeContext;
-				}
-            } else {
-                throw new Error("Server Response Error");
-            
-			} catch (error) {
-			    console.error("ASSET FORM ERROR:", error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Submission Failed',
-                text: 'Could not communicate with server database adapter pipelines.',
-                confirmButtonColor: '#2563eb'
-            });
-        }
-    }
+		    if (response.ok) {
+
+		        await Swal.fire({
+		            icon: 'success',
+		            title: 'Ticket Saved!',
+		            text: 'Your service ticket request has been logged successfully.',
+		            confirmButtonColor: '#2563eb'
+		        });
+
+		        if (sessionUser.isRoleUser) {
+		            window.location.href =
+		                '/role-ticket-dashboard?dept=' + typeContext;
+		        } else {
+		            window.location.href =
+		                '/ticket-dashboard?dept=' + typeContext;
+		        }
+
+		    } else {
+		        throw new Error("Server Response Error");
+		    }
+
+		} catch (error) {
+
+		    console.error("SERVICE FORM ERROR:", error);
+
+		    Swal.fire({
+		        icon: 'error',
+		        title: 'Submission Failed',
+		        text: 'Could not  communicate with server database adapter pipelines.',
+		        confirmButtonColor: '#2563eb'
+		    });
+		}
+	}
 
 	function displaySelectedFile(input) {
 	    const textWrapper = document.getElementById('dropzoneText');
