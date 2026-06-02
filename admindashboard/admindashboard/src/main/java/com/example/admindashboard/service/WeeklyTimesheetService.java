@@ -112,6 +112,8 @@ public class WeeklyTimesheetService {
                 entry.setSatHours(rowDto.getSat());
                 entry.setRowTotalHours(rowDto.getRowTotal());
                 entry.setComments(rowDto.getDetails());
+                entry.setAttachmentName(rowDto.getAttachmentName());
+                entry.setAttachmentBase64(rowDto.getAttachmentBase64());
 
                 // Crucial Step: Link the child to the parent
                 entry.setWeeklyTimesheet(timesheet);

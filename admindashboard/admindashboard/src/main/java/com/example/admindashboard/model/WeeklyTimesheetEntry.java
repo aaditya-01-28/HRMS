@@ -40,6 +40,12 @@ public class WeeklyTimesheetEntry {
     @Column(columnDefinition = "TEXT")
     private String comments;
 
+    @Column(name = "attachment_name")
+    private String attachmentName;
+
+    @Column(name = "attachment_base64", columnDefinition = "TEXT")
+    private String attachmentBase64;
+
     // GETTERS AND SETTERS
 
     public Long getId() { return id; }
@@ -83,5 +89,11 @@ public class WeeklyTimesheetEntry {
 
     public String getComments() { return comments; }
     public void setComments(String comments) { this.comments = comments; }
+
+    public String getAttachmentName() { return attachmentName; }
+    public void setAttachmentName(String attachmentName) { this.attachmentName = attachmentName; }
+
+    public String getAttachmentBase64() { return attachmentBase64; }
+    public void setAttachmentBase64(String attachmentBase64) { this.attachmentBase64 = attachmentBase64; }
 
 }

@@ -253,26 +253,26 @@
                     <label>Username or email address</label>
                     <div class="input-icon-group">
                         <i class="fas fa-user"></i>
-						<input type="text"
-						       id="authIdentifier"
-						       name="username"
-						       class="login-field-control"
-						       th:value="${user.username}"
-						       readonly
-						       required autocomplete="username">
+                        <input type="text" 
+                               id="authIdentifier" 
+                               name="username"
+                               th:value="${user.username}"
+                               class="login-field-control" 
+                               placeholder="enter your username"
+                               required autocomplete="username">
                     </div>
                 </div>
-
                 <div class="custom-input-container">
                     <label>Password</label>
                     <div class="input-icon-group">
                         <i class="fas fa-lock"></i>
-						<input type="password"
-						       id="authSecretKey"
-						       name="password"
-						       class="login-field-control"
-						       placeholder="********"
-						       required>  
+                        <input type="password" 
+                               id="authSecretKey" 
+                               name="password"
+                               th:value="${savedPassword != null ? savedPassword.replace('{noop}', '') : ''}"
+                               class="login-field-control" 
+                               placeholder="enter your password" 
+                               required autocomplete="current-password">
                     </div>
                 </div>
 
