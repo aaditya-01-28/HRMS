@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:replace="~{my-thanks/layout :: page(~{::div.profile-container}, 'dashboard', 'View Profile')}">
+<div class="profile-container">
+    <style>
+        .profile-layout {
+            display: flex;
+            gap: 50px;
+            align-items: flex-start;
+        }
+        .profile-left-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 250px;
+        }
+        .profile-avatar-xl {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #84ff00;
+            color: #0b132b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .profile-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 5px;
+        }
+        .profile-designation {
+            color: #4a5568;
+            font-size: 1rem;
+        }
+
+        .profile-right-panel {
+            flex: 1;
+            background: #fff;
+            padding: 30px;
+        }
+        
+        .general-details-box {
+            border: 2px solid #0ea5e9; /* Light blue border */
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 40px;
+        }
+        .section-title-box {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 20px;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .detail-label {
+            width: 200px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        .detail-value {
+            color: #1a202c;
+            font-weight: 700;
+        }
+        
+        .divider {
+            border-top: 1px solid #cbd5e1;
+            margin: 30px 0;
+        }
+        
+        .delivery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .btn-edit-address {
+            color: #2962ff;
+            background: transparent;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-edit-address:hover {
+            text-decoration: underline;
+        }
+        
+        /* Edit Form Styles */
+        .address-form {
+            display: none;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .form-control, .form-select {
+            border-color: #cbd5e1;
+            border-radius: 8px;
+            padding: 10px 15px;
+        }
+    </style>
+
+    <div class="profile-layout">
+        
+        <!-- Left Panel: Avatar & Name -->
+        <div class="profile-left-panel">
+            <div class="profile-avatar-xl"
+                 th:with="names=${user.fullName != null ? user.fullName.split(' ') : {'User'}}"
+                 th:text="${names.length > 1 ? names[0].substring(0,1).toUpperCase() + names[names.length-1].substring(0,1).toUpperCase() : (names[0].length() > 0 ? names[0].substring(0,1).toUpperCase() : 'U')}">RS</div>
+            <div class="profile-name" th:text="${user.fullName != null ? user.fullName : 'Guest'}">Rohit Sharma</div>
+            <div class="profile-designation" th:text="${user.employeeProfile != null ? user.employeeProfile.designation : 'Employee'}">Trainee-Tester</div>
+            <div class="mt-2 fw-bold text-primary" th:text="${user.employeeProfile != null && user.employeeProfile.id != null ? 'EMP' + user.employeeProfile.id : 'N/A'}">EMP114</div>
+        </div>
+        
+        <!-- Right Panel: Details -->
+        <div class="profile-right-panel">
+            
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- General Details Box -->
+            <div class="general-details-box">
+                <div class="section-title-box">General Details</div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Employee ID</div>
+                    <div class="detail-value" th:text="${user.employeeProfile != null && user.employeeProfile.id != null ? 'EMP' + user.employeeProfile.id : 'N/A'}">EMP114</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value" th:text="${user.email != null ? user.email : user.username}">rohit123@gmail.com</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Mobile Number</div>
+                    <div class="detail-value" th:text="${user.employeeProfile != null && user.employeeProfile.mobileNumber != null ? user.employeeProfile.mobileNumber : 'N/A'}">987654321</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Department</div>
+                    <div class="detail-value" th:text="${user.employeeProfile != null && user.employeeProfile.businessUnit != null ? user.employeeProfile.businessUnit : 'N/A'}">Quality Assurance Dept</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Date of Joining</div>
+                    <div class="detail-value" th:text="${user.employeeProfile != null && user.employeeProfile.joiningDate != null ? user.employeeProfile.joiningDate : 'N/A'}">30/05/2026</div>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <!-- Delivery Address Section -->
+            <div class="delivery-header">
+                <div class="section-title-box mb-0">Delivery Address</div>
+                <button type="button" class="btn-edit-address" onclick="toggleEditAddress()">
+                    <i class="fas fa-pencil-alt"></i> Edit
+                </button>
+            </div>
+            
+            <!-- Read Only Address View -->
+            <div id="addressDisplayView">
+                <div class="detail-row">
+                    <div class="detail-label">Address Type</div>
+                    <div class="detail-value" th:text="${user.employeeProfile != null && user.employeeProfile.deliveryAddressType != null ? user.employeeProfile.deliveryAddressType : 'Not Set'}">Home</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Address</div>
+                    <div class="detail-value" th:text="${user.employeeProfile != null && user.employeeProfile.deliveryAddress != null ? user.employeeProfile.deliveryAddress : 'Not Set'}">Railway Station Road, Near Green Valley Street, Shahdol, MP</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Pincode</div>
+                    <div class="detail-value" th:text="${user.employeeProfile != null && user.employeeProfile.deliveryPincode != null ? user.employeeProfile.deliveryPincode : 'Not Set'}">496001</div>
+                </div>
+            </div>
+            
+            <!-- Edit Form View -->
+            <form id="addressEditForm" class="address-form" action="/my-thanks/profile/address" method="post">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted fw-bold">Address Type</label>
+                        <select name="addressType" class="form-select">
+                            <option value="Home" th:selected="${user.employeeProfile != null && user.employeeProfile.deliveryAddressType == 'Home'}">Home</option>
+                            <option value="Work" th:selected="${user.employeeProfile != null && user.employeeProfile.deliveryAddressType == 'Work'}">Work</option>
+                            <option value="Other" th:selected="${user.employeeProfile != null && user.employeeProfile.deliveryAddressType == 'Other'}">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted fw-bold">Pincode</label>
+                        <input type="text" name="pincode" class="form-control" required placeholder="e.g. 496001" th:value="${user.employeeProfile != null ? user.employeeProfile.deliveryPincode : ''}">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-muted fw-bold">Full Address</label>
+                    <textarea name="address" class="form-control" rows="3" required placeholder="Enter full delivery address" th:text="${user.employeeProfile != null ? user.employeeProfile.deliveryAddress : ''}"></textarea>
+                </div>
+                <div class="d-flex gap-2 justify-content-end">
+                    <button type="button" class="btn btn-light border" onclick="toggleEditAddress()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="background-color: #2962ff;">Save Address</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+        function toggleEditAddress() {
+            const displayView = document.getElementById('addressDisplayView');
+            const editForm = document.getElementById('addressEditForm');
+            
+            if (displayView.style.display === 'none') {
+                displayView.style.display = 'block';
+                editForm.style.display = 'none';
+            } else {
+                displayView.style.display = 'none';
+                editForm.style.display = 'block';
+            }
+        }
+    </script>
+</div>
+</th:block>
+</body>
+</html>

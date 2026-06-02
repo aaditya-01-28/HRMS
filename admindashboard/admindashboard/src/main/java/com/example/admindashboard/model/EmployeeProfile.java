@@ -15,6 +15,9 @@ public class EmployeeProfile {
     private User user;
 
     // SECTION 1: IDENTITY & JOB (Moved from User)
+    @Column(name = "employee_code")
+    private String employeeCode;
+    
     private String designation;
     private String experience;
     @Column(name = "joining_date")
@@ -39,6 +42,9 @@ public class EmployeeProfile {
     private String country;
     private String permanentAddress;
     private String workingAddress;
+    private String deliveryAddressType;
+    private String deliveryAddress;
+    private String deliveryPincode;
 
     // SECTION 4: REPORTING LINES (Moved from User)
     // Note: The actual security hierarchy is User.manager, but these are kept for display/HR records
@@ -145,6 +151,9 @@ public class EmployeeProfile {
     public String getBuHrContact() { return buHrContact; }
     public void setBuHrContact(String buHrContact) { this.buHrContact = buHrContact; }
 
+    public String getEmployeeCode() { return employeeCode; }
+    public void setEmployeeCode(String employeeCode) { this.employeeCode = employeeCode; }
+
     public LocalDate getDob() { return dob; }
     public void setDob(LocalDate dob) { this.dob = dob; }
 
@@ -201,4 +210,13 @@ public class EmployeeProfile {
 
     public String getBankAccountType() { return bankAccountType; }
     public void setBankAccountType(String bankAccountType) { this.bankAccountType = bankAccountType; }
+
+    public String getDeliveryAddressType() { return deliveryAddressType; }
+    public void setDeliveryAddressType(String deliveryAddressType) { this.deliveryAddressType = deliveryAddressType; }
+
+    public String getDeliveryAddress() { return deliveryAddress; }
+    public void setDeliveryAddress(String deliveryAddress) { this.deliveryAddress = deliveryAddress; }
+
+    public String getDeliveryPincode() { return deliveryPincode; }
+    public void setDeliveryPincode(String deliveryPincode) { this.deliveryPincode = deliveryPincode; }
 }

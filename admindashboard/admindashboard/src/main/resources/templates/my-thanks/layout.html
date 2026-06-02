@@ -251,7 +251,7 @@
         </div>
         
         <div class="logout-container">
-            <a href="/employee/dashboard" class="logout-btn">
+            <a href="/my-thanks/logout-thanks" class="logout-btn">
                 <i class="fas fa-sign-out-alt"></i> <span>Log Out</span>
             </a>
         </div>
@@ -261,47 +261,33 @@
     <div class="main-content">
         <!-- Top Bar -->
         <div class="top-bar">
-            <div class="d-flex align-items-center gap-3">
+            <div th:if="${pageTitle != 'View Profile'}" class="d-flex align-items-center gap-3">
                 <button id="sidebarToggle" class="btn btn-light border text-muted">
                     <i class="fas fa-bars"></i>
                 </button>
                 <h1 class="page-title" th:text="${pageTitle}">Dashboard</h1>
             </div>
+
+            <div th:if="${pageTitle == 'View Profile'}" class="d-flex align-items-center gap-3">
+                <a href="/my-thanks/dashboard" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: #2962ff; border: none;">
+                    <i class="fas fa-arrow-left text-white"></i>
+                </a>
+                <div class="d-flex align-items-center fw-bold" style="font-size: 1.1rem; color: #2962ff;">
+                    <a href="/my-thanks/dashboard" class="text-decoration-none" style="color: #2962ff;">Dashboard</a>
+                    <i class="fas fa-chevron-right mx-3 text-muted" style="font-size: 0.8rem;"></i>
+                    <span>View Profile</span>
+                </div>
+            </div>
             
             <div class="top-bar-right">
-                <div class="user-profile me-4 dropdown">
-                    <div class="d-flex align-items-center gap-2 cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer; padding: 5px; border-radius: 50px; transition: background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
-                        <!-- Dynamic Avatar Circle -->
-                        <div class="user-avatar-circle shadow-sm" 
-                             th:with="names=${user.fullName != null ? user.fullName.split(' ') : {'User'}}"
-                             th:text="${names.length > 1 ? names[0].substring(0,1).toUpperCase() + names[names.length-1].substring(0,1).toUpperCase() : (names[0].length() > 0 ? names[0].substring(0,1).toUpperCase() : 'U')}">RS</div>
-                        <div class="user-info d-none d-md-block ms-1">
-                            <h6 th:text="${user.fullName != null ? user.fullName : 'Guest'}">Rohit Sharma</h6>
-                            <span th:text="${user.employeeProfile != null ? user.employeeProfile.designation : 'Employee'}">Trainee-Tester</span>
-                        </div>
-                        <i class="fas fa-chevron-down text-muted ms-1" style="font-size: 0.8rem;"></i>
-                    </div>
-                    
-                    <!-- Premium Dropdown Menu -->
-                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="border-radius: 12px; margin-top: 10px; min-width: 200px;">
-                        <li class="px-3 py-2 border-bottom mb-2 bg-light rounded-top">
-                            <strong th:text="${user.fullName != null ? user.fullName : 'Guest'}">Rohit Sharma</strong><br>
-                            <small class="text-muted" th:text="${user.username != null ? user.username : ''}">user@example.com</small>
-                        </li>
-                        <li><a class="dropdown-item py-2" href="/employee/profile"><i class="fas fa-user-circle me-3 text-primary"></i>My Profile</a></li>
-                        <li><a class="dropdown-item py-2" href="/my-thanks/dashboard"><i class="fas fa-gift me-3 text-success"></i>My Thanks</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item py-2 text-danger" href="/logout"><i class="fas fa-sign-out-alt me-3"></i>Log Out</a></li>
-                    </ul>
-                </div>
-                
+                <!-- Profile moved to individual pages -->
                 <a href="#" class="action-btn px-3">
                     <i class="far fa-bell"></i>
                 </a>
                 
                 <div class="action-btn px-3">
                     <i class="fas fa-wallet text-success"></i>
-                    <span class="pts-text">1,000 PTS</span>
+                    <span class="pts-text" th:text="${wallet != null ? wallet.walletBalance + ' PTS' : '0 PTS'}">0 PTS</span>
                 </div>
                 
                 <a href="/my-thanks/store" class="action-btn px-3 text-primary">
@@ -320,9 +306,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Sidebar Toggle Logic
-        document.getElementById('sidebarToggle').addEventListener('click', function() {
-            document.body.classList.toggle('sidebar-collapsed');
-        });
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function() {
+                document.body.classList.toggle('sidebar-collapsed');
+            });
+        }
     </script>
 </body>
 </html>
