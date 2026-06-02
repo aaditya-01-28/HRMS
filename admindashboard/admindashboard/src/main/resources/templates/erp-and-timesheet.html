@@ -237,7 +237,7 @@
 <div class="erp-hero-banner">
     <h1 class="erp-banner-raw-title">ERP & Timesheet</h1>
     <div style="position: absolute; top: 40px; right: 55px; z-index: 10; display: flex; gap: 15px;">
-        <a href="/employee/dashboard" class="btn-back-home-floating" style="position: static; background-color: #ffffff; color: #1e3a8a !important; font-weight: 700; font-size: 0.85rem; padding: 10px 24px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); border: none;">
+        <a href="/erp/back" class="btn-back-home-floating" style="position: static; background-color: #ffffff; color: #1e3a8a !important; font-weight: 700; font-size: 0.85rem; padding: 10px 24px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); border: none;">
             <i class="fas fa-home"></i> Back to Dashboard
         </a>
         <a href="/erp/authenticate" class="btn-logout-floating" style="position: static; background-color: #ef4444; color: #ffffff !important; font-weight: 700; font-size: 0.85rem; padding: 10px 24px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); border: none; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#dc2626'" onmouseout="this.style.backgroundColor='#ef4444'">
@@ -297,7 +297,7 @@
                         <div class="text-center" style="min-width: 150px;">
                             <a href="/employee/profile" title="View Full Profile" style="display: block; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                                 <div class="profile-photo-wrapper">
-                                    <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.fullName} + '&background=1e3a8a&color=fff&size=150'}"
+                                    <img th:if="${user != null}" th:src="@{'https://ui-avatars.com/api/?name=' + ${user.fullName} + '&background=1e3a8a&color=fff&size=150'}"
                                          class="profile-img" alt="User" style="width: 125px; height: 125px; border-radius: 50%; box-shadow: 0 6px 15px rgba(0,0,0,0.1); border: 4px solid #e2e8f0;">
                                 </div>
                             </a>
@@ -306,13 +306,13 @@
                         <div class="row g-4 w-100">
                             <div class="col-md-6">
                                 <div class="form-floating shadow-sm" style="border-radius: 8px; overflow: hidden;">
-                                    <input type="text" class="form-control fw-bold text-primary" id="empName" th:value="${user.fullName}" readonly style="background-color: #f8fafc; font-size:1.05rem; padding-top:1.75rem; padding-bottom:0.75rem; border:1px solid #e2e8f0;">
+                                    <input type="text" class="form-control fw-bold text-primary" id="empName" th:value="${user != null ? user.fullName : ''}" readonly style="background-color: #f8fafc; font-size:1.05rem; padding-top:1.75rem; padding-bottom:0.75rem; border:1px solid #e2e8f0;">
                                     <label for="empName" style="font-size:0.85rem; font-weight:600; color:#64748b;">Employee Name</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating shadow-sm" style="border-radius: 8px; overflow: hidden;">
-                                    <input type="text" class="form-control fw-bold" id="empCode" th:value="${user.username}" readonly style="background-color: #f8fafc; font-size:1.05rem; padding-top:1.75rem; padding-bottom:0.75rem; border:1px solid #e2e8f0;">
+                                    <input type="text" class="form-control fw-bold" id="empCode" th:value="${user != null ? user.username : ''}" readonly style="background-color: #f8fafc; font-size:1.05rem; padding-top:1.75rem; padding-bottom:0.75rem; border:1px solid #e2e8f0;">
                                     <label for="empCode" style="font-size:0.85rem; font-weight:600; color:#64748b;">Employee Code</label>
                                 </div>
                             </div>

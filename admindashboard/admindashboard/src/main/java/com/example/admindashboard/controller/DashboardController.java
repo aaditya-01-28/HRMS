@@ -336,7 +336,7 @@ public class DashboardController {
     @GetMapping("/password-reset")
     public String showPasswordResetPage() { return "password-reset"; }
 
-    @GetMapping("/my-whitecircle")
+    @GetMapping("/my-whitecircle/login")
     public String showMyWhiteCircle(Model model, Principal principal) { 
         if (principal != null) {
             String username = principal.getName();
@@ -351,11 +351,15 @@ public class DashboardController {
         // 1. Shows your crisp split login screen first when clicked from the dashboard
         return "my-whitecircle-login"; 
     }
+    @GetMapping("/my-whitecircle")
+    public String showMyWhiteCircleDashboard() {
+        return "my-whitecircle";
+    }
 
     @PostMapping("/my-whitecircle/login")
     public String processMyWhiteCircleLogin() {
         // 2. When they click "Continue with My WhiteCircle", they instantly land on your Quick Actions hub
-        return "my-whitecircle"; 
+    	return "redirect:/my-whitecircle"; 
     }
 
     @GetMapping("/coming-soon")
@@ -386,9 +390,44 @@ public class DashboardController {
         }
         return "redirect:/erp/authenticate";
     }
-    @GetMapping("/erp-timesheet") 
-    public String erpTimesheetHub() {
-        return "erp-and-timesheet"; // This should match your main dashboard HTML filename exactly!
+    @GetMapping("/erp-timesheet")
+    public String erpTimesheetHub(
+            Model model,
+            Authentication authentication) {
+
+        String backUrl = "/employee/dashboard";
+
+        if (authentication != null &&
+                authentication.getAuthorities().stream()
+                        .anyMatch(a ->
+                                a.getAuthority().equals("admin_dashboard_view"))) {
+
+            backUrl = "/admin/dashboard";
+        }
+
+        model.addAttribute("backUrl", backUrl);
+
+        if (authentication != null) {
+            userRepository.findByUsername(authentication.getName())
+                    .ifPresent(user -> model.addAttribute("user", user));
+        }
+
+        model.addAttribute("activeProjects", new ArrayList<>());
+        model.addAttribute("submittedTimesheets", new ArrayList<>());
+
+        return "erp-and-timesheet";
+    }
+    @GetMapping("/erp/back")
+    public String erpBack(Authentication authentication) {
+
+        if (authentication != null &&
+            authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("admin_dashboard_view"))) {
+
+            return "redirect:/admin/dashboard";
+        }
+
+        return "redirect:/employee/dashboard";
     }
     
     @PostMapping("/erp-timesheet")
@@ -424,6 +463,16 @@ public class DashboardController {
                 model.addAttribute("user", targetUser);
                 model.addAttribute("activeProjects", new ArrayList<>());
                 model.addAttribute("submittedTimesheets", new ArrayList<>());
+                
+                String backUrl = "/employee/dashboard";
+
+                if (userDetails.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("admin_dashboard_view"))) {
+
+                    backUrl = "/admin/dashboard";
+                }
+
+                model.addAttribute("backUrl", backUrl);
                 
                 return "erp-and-timesheet"; 
             }

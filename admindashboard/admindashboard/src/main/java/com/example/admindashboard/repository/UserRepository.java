@@ -49,5 +49,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "EXTRACT(MONTH FROM ep.dob) = EXTRACT(MONTH FROM CURRENT_DATE) AND " +
             "EXTRACT(DAY FROM ep.dob) = EXTRACT(DAY FROM CURRENT_DATE)")
     List<User> findByBirthdayToday();
+    
+    Optional<User> findFirstByRole_RoleNameAndStatus(
+            String roleName,
+            String status
+    );
 
 }
