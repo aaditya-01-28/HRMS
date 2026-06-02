@@ -48,39 +48,13 @@ public class MyThanksController {
     /* ---------- LOGIN ---------- */
     @GetMapping("/login")
     public String showLogin() {
-        return "mythanks/thanks-login";
-    }
-
-    @PostMapping("/login")
-    public String login(
-            @RequestParam String loginId,
-            @RequestParam String password,
-            HttpSession session,
-            Model model
-    ) {
-        Optional<User> userOpt = userRepository.findByUsername(loginId);
-
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-
-            String dbPassword = user.getPassword().replace("{noop}", "");
-
-            if (dbPassword.equals(password)) {
-                session.setAttribute("thanksAuthenticated", true);
-                session.setAttribute("thanksUser", loginId);
-                return "redirect:/my-thanks/dashboard";
-            }
-        }
-
-        model.addAttribute("error", "Invalid credentials");
-        return "mythanks/thanks-login";
+        return "my-thanks/login";
     }
 
     /* ---------- DASHBOARD ---------- */
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model, Principal principal) {
-
-        if (!isThanksAuthenticated(session)) {
+        if (principal == null) {
             return "redirect:/my-thanks/login";
         }
 
@@ -90,14 +64,44 @@ public class MyThanksController {
         model.addAttribute("wallet", thanksService.getOrCreateWallet(user));
         model.addAttribute("transactions", thanksService.getTransactionHistory(user));
 
-        return "mythanks/thanks-dashboard";
+        // Let layout know which menu is active
+        model.addAttribute("activeMenu", "dashboard");
+
+        return "my-thanks/dashboard";
+    }
+
+    /* ---------- STORE ---------- */
+    @GetMapping("/store")
+    public String store(HttpSession session, Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/my-thanks/login";
+        }
+        User user = getAuthenticatedUser(session, principal);
+        model.addAttribute("user", user);
+        model.addAttribute("wallet", thanksService.getOrCreateWallet(user));
+        model.addAttribute("activeMenu", "store");
+        return "my-thanks/store";
     }
 
     /* ---------- SEND THANKS ---------- */
+    @GetMapping("/send")
+    public String sendThanksView(HttpSession session, Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/my-thanks/login";
+        }
+        User user = getAuthenticatedUser(session, principal);
+        model.addAttribute("user", user);
+        model.addAttribute("wallet", thanksService.getOrCreateWallet(user));
+        model.addAttribute("activeMenu", "send");
+        model.addAttribute("users", userRepository.findAll()); // for the dropdown
+        return "my-thanks/send";
+    }
+
     @PostMapping("/send")
     public String sendThanks(
             @RequestParam String receiverUsername,
             @RequestParam Integer points,
+            @RequestParam(required = false) String message,
             HttpSession session,
             Principal principal,
             RedirectAttributes redirectAttributes
@@ -108,7 +112,7 @@ public class MyThanksController {
 
         if (sender != null && receiver.isPresent()) {
             try {
-                thanksService.sendThanks(sender, receiver.get(), points, "APPRECIATION", "Great work!");
+                thanksService.sendThanks(sender, receiver.get(), points, "APPRECIATION", message != null ? message : "Great work!");
                 redirectAttributes.addFlashAttribute("success", "Sent successfully");
             } catch (Exception e) {
                 redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -118,8 +122,73 @@ public class MyThanksController {
         return "redirect:/my-thanks/dashboard";
     }
 
+    /* ---------- HISTORY ---------- */
+    @GetMapping("/history")
+    public String history(HttpSession session, Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/my-thanks/login";
+        }
+        User user = getAuthenticatedUser(session, principal);
+        model.addAttribute("user", user);
+        model.addAttribute("wallet", thanksService.getOrCreateWallet(user));
+        model.addAttribute("transactions", thanksService.getTransactionHistory(user));
+        model.addAttribute("activeMenu", "history");
+        return "my-thanks/history";
+    }
+
+    /* ---------- FAQS ---------- */
+    @GetMapping("/faqs")
+    public String faqs(HttpSession session, Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/my-thanks/login";
+        }
+        User user = getAuthenticatedUser(session, principal);
+        model.addAttribute("user", user);
+        model.addAttribute("wallet", thanksService.getOrCreateWallet(user));
+        model.addAttribute("activeMenu", "faqs");
+        return "my-thanks/faqs";
+    }
+
+    /* ---------- PROFILE ---------- */
+    @GetMapping("/profile")
+    public String viewProfile(HttpSession session, Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/my-thanks/login";
+        }
+        User user = getAuthenticatedUser(session, principal);
+        model.addAttribute("user", user);
+        model.addAttribute("wallet", thanksService.getOrCreateWallet(user));
+        model.addAttribute("activeMenu", "dashboard"); // keep dashboard menu active
+        return "my-thanks/profile";
+    }
+
+    @PostMapping("/profile/address")
+    public String updateDeliveryAddress(
+            @RequestParam String addressType,
+            @RequestParam String address,
+            @RequestParam String pincode,
+            HttpSession session,
+            Principal principal,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (principal == null) {
+            return "redirect:/my-thanks/login";
+        }
+        User user = getAuthenticatedUser(session, principal);
+        if (user != null && user.getEmployeeProfile() != null) {
+            user.getEmployeeProfile().setDeliveryAddressType(addressType);
+            user.getEmployeeProfile().setDeliveryAddress(address);
+            user.getEmployeeProfile().setDeliveryPincode(pincode);
+            userRepository.save(user);
+            redirectAttributes.addFlashAttribute("success", "Delivery Address Updated Successfully");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Unable to update profile. User or profile not found.");
+        }
+        return "redirect:/my-thanks/profile";
+    }
+
     /* ---------- LOGOUT ---------- */
-    @GetMapping("/logout")
+    @GetMapping("/logout-thanks")
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/my-thanks/login";

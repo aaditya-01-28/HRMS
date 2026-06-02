@@ -115,23 +115,23 @@
     </style>
 
     <div class="send-form-wrapper">
-        <h2 class="greeting-title">Send Thanks, Rohit!</h2>
+        <h2 class="greeting-title">Send Thanks, <span th:text="${user.fullName != null ? user.fullName.split(' ')[0] : 'User'}">User</span>!</h2>
         
         <div class="form-card">
-            <form action="#" method="post">
+            <form th:action="@{/my-thanks/send}" method="post">
                 <!-- Select Employee -->
                 <div class="mb-4">
                     <label class="form-label">Select Employee <span class="required-star">*</span></label>
-                    <div class="search-input-group">
-                        <i class="fas fa-search"></i>
-                        <input type="text" class="form-control" placeholder="Search Employee by Name or Email" required>
-                    </div>
+                    <select name="receiverUsername" class="form-select" required>
+                        <option value="" disabled selected>Select Employee</option>
+                        <option th:each="u : ${users}" th:if="${u.username != user.username}" th:value="${u.username}" th:text="${u.fullName != null ? u.fullName + ' (' + u.username + ')' : u.username}">Employee</option>
+                    </select>
                 </div>
 
                 <!-- Category -->
                 <div class="mb-4">
                     <label class="form-label">Category <span class="required-star">*</span></label>
-                    <select class="form-select" required>
+                    <select name="category" class="form-select" required>
                         <option value="" disabled selected>Select Category</option>
                         <option value="teamwork">Teamwork</option>
                         <option value="innovation">Innovation</option>
@@ -143,14 +143,14 @@
                 <!-- Points -->
                 <div class="mb-4">
                     <label class="form-label">Points <span class="required-star">*</span></label>
-                    <input type="number" class="form-control" placeholder="Enter Points" min="1" max="1000" required>
-                    <div class="wallet-balance-text">Available Wallet Balance: 1000 Pts</div>
+                    <input type="number" name="points" class="form-control" placeholder="Enter Points" min="1" max="1000" required>
+                    <div class="wallet-balance-text">Available Wallet Balance: <span th:text="${wallet != null ? wallet.walletBalance : 0}">0</span> Pts</div>
                 </div>
 
                 <!-- Message -->
                 <div class="mb-4">
                     <label class="form-label">Message <span class="required-star">*</span></label>
-                    <textarea class="form-control" placeholder="Write your appreciation message here." maxlength="300" id="messageInput" required></textarea>
+                    <textarea name="message" class="form-control" placeholder="Write your appreciation message here." maxlength="300" id="messageInput" required></textarea>
                     <div class="char-counter" id="charCounter">0/300</div>
                 </div>
 

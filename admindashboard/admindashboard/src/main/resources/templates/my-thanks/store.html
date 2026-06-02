@@ -270,72 +270,72 @@
         
         <!-- Product 1 -->
         <div class="product-card">
-            <div class="product-img-wrapper">
-                <i class="fas fa-tshirt fa-4x text-muted"></i>
+            <div class="product-img-wrapper" style="background-color: transparent;">
+                <img src="/images/tshirt.png" alt="White Circle T-shirt">
             </div>
             <div class="product-title">White Circle T-shirt</div>
             <div class="product-pts">600 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle T-shirt', 600)">Redeem Now</button>
+            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle T-shirt', 600, 'merch', '/images/tshirt.png')">Redeem Now</button>
         </div>
 
         <!-- Product 2 -->
         <div class="product-card">
-            <div class="product-img-wrapper">
-                <i class="fas fa-coffee fa-4x text-muted"></i>
+            <div class="product-img-wrapper" style="background-color: transparent;">
+                <img src="/images/mug.png" alt="White Circle Cup">
             </div>
             <div class="product-title">White Circle Cup</div>
             <div class="product-pts">200 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Cup', 200)">Redeem Now</button>
+            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Cup', 200, 'merch', '/images/mug.png')">Redeem Now</button>
         </div>
 
         <!-- Product 3 -->
         <div class="product-card">
-            <div class="product-img-wrapper">
-                <i class="fas fa-wine-bottle fa-4x text-muted"></i>
+            <div class="product-img-wrapper" style="background-color: transparent;">
+                <img src="/images/bottle.png" alt="White Circle Bottle">
             </div>
             <div class="product-title">White Circle Bottle</div>
             <div class="product-pts">150 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Bottle', 150)">Redeem Now</button>
+            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Bottle', 150, 'merch', '/images/bottle.png')">Redeem Now</button>
         </div>
 
         <!-- Product 4 -->
         <div class="product-card">
-            <div class="product-img-wrapper">
-                <i class="fas fa-key fa-4x text-muted"></i>
+            <div class="product-img-wrapper" style="background-color: transparent;">
+                <img src="/images/keychain.png" alt="White Circle Key Chain">
             </div>
             <div class="product-title">White Circle Key Chain</div>
             <div class="product-pts">100 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Key Chain', 100)">Redeem Now</button>
+            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Key Chain', 100, 'merch', '/images/keychain.png')">Redeem Now</button>
         </div>
 
         <!-- Product 5 -->
         <div class="product-card">
-            <div class="product-img-wrapper" style="background-color: #000;">
-                <span class="text-white fw-bold fs-5">amazon.in</span>
+            <div class="product-img-wrapper" style="background-color: transparent;">
+                <img src="/images/amazon.png" alt="Amazon Gift Card">
             </div>
             <div class="product-title">Amazon Gift Card</div>
             <div class="product-pts">500 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('Amazon Gift Card', 500)">Redeem Now</button>
+            <button class="btn btn-redeem" onclick="openConfirmModal('AMAZON Gift Card', 500, 'voucher', '/images/amazon.png', 'Amazon')">Redeem Now</button>
         </div>
 
         <!-- Product 6 -->
         <div class="product-card">
-            <div class="product-img-wrapper" style="background-color: #2874f0;">
-                <span class="text-white fw-bold fs-5">Flipkart</span>
+            <div class="product-img-wrapper" style="background-color: transparent;">
+                <img src="/images/flipkart.png" alt="Flipkart Gift Card">
             </div>
             <div class="product-title">Flipkart Gift Card</div>
             <div class="product-pts">500 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('Flipkart Gift Card', 500)">Redeem Now</button>
+            <button class="btn btn-redeem" onclick="openConfirmModal('FLIPKART Gift Card', 500, 'voucher', '/images/flipkart.png', 'Flipkart')">Redeem Now</button>
         </div>
 
         <!-- Product 7 -->
         <div class="product-card">
-            <div class="product-img-wrapper" style="background-color: #cb202d;">
-                <span class="text-white fw-bold fs-5">zomato</span>
+            <div class="product-img-wrapper" style="background-color: transparent;">
+                <img src="/images/zomato.png" alt="Zomato Gift Card">
             </div>
             <div class="product-title">Zomato Gift Card</div>
             <div class="product-pts">500 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('Zomato Gift Card', 500)">Redeem Now</button>
+            <button class="btn btn-redeem" onclick="openConfirmModal('ZOMATO Gift Card', 500, 'voucher', '/images/zomato.png', 'Zomato')">Redeem Now</button>
         </div>
 
         <!-- Product 8 -->
@@ -345,7 +345,7 @@
             </div>
             <div class="product-title">Swiggy Gift Voucher</div>
             <div class="product-pts">500 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('Swiggy Gift Voucher', 500)">Redeem Now</button>
+            <button class="btn btn-redeem" onclick="openConfirmModal('SWIGGY Gift Voucher', 500, 'voucher', null, 'Swiggy')">Redeem Now</button>
         </div>
 
     </div>
@@ -356,14 +356,15 @@
             <div class="modal-content p-3">
                 <div class="modal-header border-0 pb-0">
                     <div>
-                        <h5 class="modal-title-custom">Confirm Redemption</h5>
-                        <p class="modal-subtitle">Please review your order once</p>
+                        <h5 class="modal-title-custom" id="confirmModalTitle">Confirm Redemption</h5>
+                        <p class="modal-subtitle" id="confirmModalSubtitle">Please review your order once</p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body pt-0">
                     <div class="confirm-modal-body border-bottom mb-3">
-                        <div class="confirm-img-box">
+                        <div class="confirm-img-box" style="background-color: #e2e8f0;">
+                            <img id="modalProdImg" src="" style="max-width: 80%; max-height: 80%; display:none; object-fit: contain;">
                             <i class="fas fa-gift fa-3x text-muted" id="modalProdIcon"></i>
                         </div>
                         <div class="confirm-details pt-2">
@@ -377,18 +378,39 @@
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label"><i class="fas fa-wallet"></i> Wallet Balance</span>
-                                <span class="detail-value val-balance">1000 PTS</span>
+                                <span class="detail-value val-balance" th:text="${wallet != null ? wallet.walletBalance + ' PTS' : '0 PTS'}">1000 PTS</span>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="delivery-text fw-bold">
-                        <span style="color: #2962ff;">Delivery Time:</span> Within 5 Business Days After Confirmation.
+                    <!-- Merch Delivery Address Section -->
+                    <div id="merchDeliverySection" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold" style="color: #1a202c;"><i class="fas fa-map-marker-alt text-muted"></i> Delivery Address:</span>
+                            <a href="/my-thanks/profile" class="text-primary text-decoration-none" style="font-size: 0.85rem;"><i class="fas fa-pencil-alt"></i> Update</a>
+                        </div>
+                        
+                        <div id="merchAddressDisplay" class="text-muted mb-0" style="font-size: 0.85rem; line-height: 1.4; display: none;">
+                            <span id="merchAddressText"></span>
+                        </div>
+                        
+                        <p id="merchAddressWarning" class="text-danger mb-0 mt-2" style="font-size: 0.8rem; line-height: 1.4; display: none;">
+                            <em>Please ensure your delivery address in your <a href="/my-thanks/profile" style="color: #3b82f6;">Profile</a> is up to date before redeeming merchandise.</em>
+                        </p>
+                    </div>
+
+                    <!-- Voucher Important Info Section -->
+                    <div id="voucherInfoSection" style="display: none;">
+                        <div class="fw-bold mb-2" style="color: #1a202c;"><i class="fas fa-info-circle text-primary"></i> Important Information:</div>
+                        <ul class="text-muted mb-0" style="font-size: 0.8rem; padding-left: 20px; line-height: 1.6;">
+                            <li>Gift Card will be sent to your registered email.</li>
+                            <li>Points credit after 5 business days after redemption.</li>
+                        </ul>
                     </div>
                 </div>
-                <div class="modal-footer border-0 d-flex justify-content-between pt-0">
+                <div class="modal-footer border-0 d-flex justify-content-between pt-0 mt-2">
                     <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-confirm-redeem" onclick="confirmRedemption()">Confirm & Redeem</button>
+                    <button type="button" id="btnConfirmRedeem" class="btn btn-confirm-redeem" onclick="confirmRedemption()">Confirm & Redeem</button>
                 </div>
             </div>
         </div>
@@ -400,41 +422,122 @@
             <div class="modal-content p-4 text-center">
                 <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
                 
-                <div class="success-icon-wrapper">
-                    <i class="fas fa-check"></i>
+                <div class="success-icon-wrapper" style="border-color: #22c55e; margin: 0 auto 15px;">
+                    <i class="fas fa-envelope-open-text" style="color: #22c55e; font-size: 1.8rem;"></i>
                 </div>
                 
-                <h4 class="fw-bold" style="color: #1a202c; font-size: 1.2rem;">Redemption Successful!</h4>
-                <p class="text-muted small mb-0">Your Request has been placed successfully</p>
+                <h4 class="fw-bold" style="color: #1a202c; font-size: 1.15rem;">Redemption Successful!</h4>
+                <p class="text-muted mb-3" style="font-size: 0.8rem;">Your redemption request has been placed successfully</p>
                 
-                <div class="success-delivery">
-                    <i class="fas fa-truck"></i> Your order will be delivered within 5 business day.
+                <div class="text-start p-3 rounded" style="background-color: #f8fafc; font-size: 0.8rem; margin-bottom: 20px;">
+                    <div class="d-flex align-items-start mb-2">
+                        <i class="fas fa-envelope text-primary mt-1 me-2" style="font-size: 1rem;"></i>
+                        <span class="text-muted">A confirmation mail will be sent to your registered email.</span>
+                    </div>
+                    
+                    <!-- Success Merch Text -->
+                    <div id="successMerchText" class="d-flex align-items-start" style="display: none;">
+                        <i class="far fa-calendar-check text-success mt-1 me-2" style="font-size: 1rem;"></i>
+                        <span class="text-muted">Your order will be delivered within <strong class="text-success">5 business days</strong>.</span>
+                    </div>
+
+                    <!-- Success Voucher Text -->
+                    <div id="successVoucherText" class="d-flex align-items-start" style="display: none;">
+                        <i class="fas fa-wallet text-primary mt-1 me-2" style="font-size: 1rem;"></i>
+                        <span class="text-muted">Your <span id="successVoucherName"></span> will be credited to your <a href="#" class="text-primary text-decoration-none"><span id="successVoucherBrand"></span> Wallet</a>.</span>
+                    </div>
                 </div>
                 
-                <p class="text-muted" style="font-size: 0.75rem;">You will receive a confirmation email soon</p>
-                
-                <button type="button" class="btn btn-primary w-100 mt-2" style="background-color: #2962ff; border-radius: 8px;" data-bs-dismiss="modal">Continue Shopping</button>
+                <button type="button" class="btn btn-primary w-100" style="background-color: #2962ff; border-radius: 8px; font-weight: 600;" data-bs-dismiss="modal">Continue Shopping</button>
             </div>
         </div>
     </div>
 
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        let userAddressText = /*[[${user.employeeProfile != null && user.employeeProfile.deliveryAddress != null && !user.employeeProfile.deliveryAddress.isEmpty() ? user.employeeProfile.deliveryAddress + ', ' + user.employeeProfile.deliveryPincode : null}]]*/ null;
+        /*]]>*/
+
         let confirmModalInstance;
         let successModalInstance;
+        let currentProductType = 'merch';
+        let currentProductName = '';
+        let currentBrand = '';
         
         document.addEventListener("DOMContentLoaded", function() {
             confirmModalInstance = new bootstrap.Modal(document.getElementById('confirmModal'));
             successModalInstance = new bootstrap.Modal(document.getElementById('successModal'));
         });
 
-        function openConfirmModal(productName, points) {
+        function openConfirmModal(productName, points, type, imgSrc, brand) {
+            currentProductType = type;
+            currentProductName = productName;
+            currentBrand = brand;
+
             document.getElementById('modalProdName').innerText = productName;
             document.getElementById('modalProdPts').innerText = points + ' PTS';
+            
+            if (type === 'voucher') {
+                document.getElementById('confirmModalTitle').innerText = 'Confirm Redemption';
+                document.getElementById('confirmModalSubtitle').innerText = productName;
+            } else {
+                document.getElementById('confirmModalTitle').innerText = 'Confirm Redemption';
+                document.getElementById('confirmModalSubtitle').innerText = 'Please review your order once';
+            }
+
+            // Image handling
+            const imgEl = document.getElementById('modalProdImg');
+            const iconEl = document.getElementById('modalProdIcon');
+            if (imgSrc) {
+                imgEl.src = imgSrc;
+                imgEl.style.display = 'block';
+                iconEl.style.display = 'none';
+            } else {
+                imgEl.style.display = 'none';
+                iconEl.style.display = 'block';
+            }
+
+            // Section toggling
+            if (type === 'merch') {
+                document.getElementById('merchDeliverySection').style.display = 'block';
+                document.getElementById('voucherInfoSection').style.display = 'none';
+                
+                if (userAddressText) {
+                    document.getElementById('merchAddressText').innerText = userAddressText;
+                    document.getElementById('merchAddressDisplay').style.display = 'block';
+                    document.getElementById('merchAddressWarning').style.display = 'none';
+                    document.getElementById('btnConfirmRedeem').disabled = false;
+                    document.getElementById('btnConfirmRedeem').style.opacity = "1";
+                } else {
+                    document.getElementById('merchAddressDisplay').style.display = 'none';
+                    document.getElementById('merchAddressWarning').style.display = 'block';
+                    document.getElementById('btnConfirmRedeem').disabled = true;
+                    document.getElementById('btnConfirmRedeem').style.opacity = "0.5";
+                }
+            } else {
+                document.getElementById('merchDeliverySection').style.display = 'none';
+                document.getElementById('voucherInfoSection').style.display = 'block';
+                document.getElementById('btnConfirmRedeem').disabled = false;
+                document.getElementById('btnConfirmRedeem').style.opacity = "1";
+            }
+
             confirmModalInstance.show();
         }
 
         function confirmRedemption() {
             confirmModalInstance.hide();
+            
+            // Set success modal text based on type
+            if (currentProductType === 'merch') {
+                document.getElementById('successMerchText').style.display = 'flex';
+                document.getElementById('successVoucherText').style.display = 'none';
+            } else {
+                document.getElementById('successMerchText').style.display = 'none';
+                document.getElementById('successVoucherText').style.display = 'flex';
+                document.getElementById('successVoucherName').innerText = currentProductName;
+                document.getElementById('successVoucherBrand').innerText = currentBrand;
+            }
+
             // In a real application, make an AJAX request here to deduct points.
             setTimeout(() => {
                 successModalInstance.show();

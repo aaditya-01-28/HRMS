@@ -125,6 +125,55 @@
             border: 1px solid #16a34a;
         }
     </style>
+    <style>
+        .dashboard-profile-header {
+            margin-bottom: 30px;
+        }
+        .profile-avatar-lg {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #84ff00;
+            color: #0b132b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 600;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        .btn-view-profile {
+            border: 2px solid #2962ff;
+            color: #2962ff;
+            background: transparent;
+            border-radius: 50px;
+            padding: 5px 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .btn-view-profile:hover {
+            background: #2962ff;
+            color: #fff;
+        }
+    </style>
+
+    <div class="dashboard-profile-header">
+        <div class="d-flex align-items-center gap-4">
+            <div class="profile-avatar-lg"
+                 th:with="names=${user.fullName != null ? user.fullName.split(' ') : {'User'}}"
+                 th:text="${names.length > 1 ? names[0].substring(0,1).toUpperCase() + names[names.length-1].substring(0,1).toUpperCase() : (names[0].length() > 0 ? names[0].substring(0,1).toUpperCase() : 'U')}">RS</div>
+            <div>
+                <h4 class="fw-bold mb-0" style="color: #1a202c;" th:text="${user.fullName != null ? user.fullName : 'Guest'}">Rohit Sharma</h4>
+                <div class="text-muted mb-2" style="font-size: 0.9rem;" th:text="${user.employeeProfile != null && user.employeeProfile.id != null ? 'EMP' + user.employeeProfile.id : ''}">EMP114</div>
+                <a href="/my-thanks/profile" class="btn-view-profile">View Profile</a>
+            </div>
+        </div>
+    </div>
 
     <div class="stats-container">
         <!-- Card 1 -->
@@ -132,7 +181,7 @@
             <div class="stat-title">Total Points Earned</div>
             <div class="stat-value-container">
                 <div class="stat-icon icon-blue"><i class="fas fa-award"></i></div>
-                <h2 class="stat-number">2500 <span class="stat-unit">PTS</span></h2>
+                <h2 class="stat-number"><span th:text="${wallet != null ? wallet.totalPointsEarned : 0}">0</span> <span class="stat-unit">PTS</span></h2>
             </div>
             <div class="stat-footer">Lifetime</div>
         </div>
@@ -142,7 +191,7 @@
             <div class="stat-title">Wallet Balance</div>
             <div class="stat-value-container">
                 <div class="stat-icon icon-green"><i class="fas fa-wallet"></i></div>
-                <h2 class="stat-number">1000 <span class="stat-unit">PTS</span></h2>
+                <h2 class="stat-number"><span th:text="${wallet != null ? wallet.walletBalance : 0}">0</span> <span class="stat-unit">PTS</span></h2>
             </div>
             <div class="stat-footer">Available To Redeem</div>
         </div>
@@ -152,7 +201,7 @@
             <div class="stat-title">Rewards Received</div>
             <div class="stat-value-container">
                 <div class="stat-icon icon-yellow"><i class="fas fa-gift"></i></div>
-                <h2 class="stat-number">12</h2>
+                <h2 class="stat-number" th:text="${wallet != null ? wallet.rewardsReceived : 0}">0</h2>
             </div>
             <div class="stat-footer">Appreciations</div>
         </div>
@@ -171,40 +220,15 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>29/05/2026</td>
-                    <td>Credit</td>
-                    <td class="pts-credit">+150</td>
-                    <td>Appreciation from Virat</td>
-                    <td><span class="status-badge status-completed">Completed</span></td>
+                <tr th:each="tx : ${transactions}">
+                    <td th:text="${tx.transactionDate}">-</td>
+                    <td th:text="${tx.transactionType}">-</td>
+                    <td th:classappend="${tx.transactionType == 'CREDIT' ? 'pts-credit' : 'pts-debit'}" th:text="${(tx.transactionType == 'CREDIT' ? '+' : '-') + tx.points}">0</td>
+                    <td th:text="${tx.description}">-</td>
+                    <td><span class="status-badge status-completed" th:text="${tx.status}">Completed</span></td>
                 </tr>
-                <tr>
-                    <td>30/05/2026</td>
-                    <td>Credit</td>
-                    <td class="pts-credit">+200</td>
-                    <td>Appreciation from Virat</td>
-                    <td><span class="status-badge status-completed">Completed</span></td>
-                </tr>
-                <tr>
-                    <td>28/05/2026</td>
-                    <td>Debit</td>
-                    <td class="pts-debit">-500</td>
-                    <td>Redeemed Amazon Voucher</td>
-                    <td><span class="status-badge status-completed">Completed</span></td>
-                </tr>
-                <tr>
-                    <td>25/05/2026</td>
-                    <td>Credit</td>
-                    <td class="pts-credit">+150</td>
-                    <td>Appreciation from Virat</td>
-                    <td><span class="status-badge status-completed">Completed</span></td>
-                </tr>
-                <tr>
-                    <td>29/05/2026</td>
-                    <td>Credit</td>
-                    <td class="pts-credit">+150</td>
-                    <td>Appreciation from Virat</td>
-                    <td><span class="status-badge status-completed">Completed</span></td>
+                <tr th:if="${transactions == null || transactions.isEmpty()}">
+                    <td colspan="5" class="text-center text-muted py-4">No transactions yet</td>
                 </tr>
             </tbody>
         </table>

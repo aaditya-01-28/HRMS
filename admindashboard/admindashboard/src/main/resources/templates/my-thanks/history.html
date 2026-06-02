@@ -146,40 +146,15 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>29/05/2026</td>
-                    <td>Credit</td>
-                    <td class="pts-credit">+150</td>
-                    <td>Appreciation from Virat</td>
-                    <td><span class="status-badge status-completed">Completed</span></td>
+                <tr th:each="tx : ${transactions}">
+                    <td th:text="${tx.transactionDate}">-</td>
+                    <td th:text="${tx.transactionType}">-</td>
+                    <td th:classappend="${tx.transactionType == 'CREDIT' ? 'pts-credit' : 'pts-debit'}" th:text="${(tx.transactionType == 'CREDIT' ? '+' : '-') + tx.points}">0</td>
+                    <td th:text="${tx.description}">-</td>
+                    <td><span class="status-badge status-completed" th:text="${tx.status}">Completed</span></td>
                 </tr>
-                <tr>
-                    <td>30/05/2026</td>
-                    <td>Credit</td>
-                    <td class="pts-credit">+200</td>
-                    <td>Appreciation from Virat</td>
-                    <td><span class="status-badge status-completed">Completed</span></td>
-                </tr>
-                <tr>
-                    <td>28/05/2026</td>
-                    <td>Debit</td>
-                    <td class="pts-debit">-500</td>
-                    <td>Redeemed Amazon Voucher</td>
-                    <td><span class="status-badge status-completed">Completed</span></td>
-                </tr>
-                <tr>
-                    <td>25/05/2026</td>
-                    <td>Credit</td>
-                    <td class="pts-credit">+150</td>
-                    <td>Appreciation from Virat</td>
-                    <td><span class="status-badge status-completed">Completed</span></td>
-                </tr>
-                <tr>
-                    <td>29/05/2026</td>
-                    <td>Credit</td>
-                    <td class="pts-credit">+150</td>
-                    <td>Appreciation from Virat</td>
-                    <td><span class="status-badge status-completed">Completed</span></td>
+                <tr th:if="${transactions == null || transactions.isEmpty()}">
+                    <td colspan="5" class="text-center text-muted py-4">No transactions yet</td>
                 </tr>
             </tbody>
         </table>

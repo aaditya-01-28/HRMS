@@ -31,6 +31,7 @@
             justify-content: center;
             padding: 40px 8%;
             background-color: #e4e4e4;
+            position: relative;
         }
         .logo-container {
             text-align: center;
@@ -142,6 +143,24 @@
                 padding: 40px 5%;
             }
         }
+        
+        .btn-back {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            color: #333;
+            font-size: 1.2rem;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .btn-back:hover {
+            color: #2962ff;
+            transform: translateX(-5px);
+        }
     </style>
 </head>
 <body>
@@ -153,6 +172,9 @@
 
     <!-- Right side form -->
     <div class="login-form-section">
+        <a href="/employee/dashboard" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
         
         <div class="logo-container">
             <img src="/images/wcg-logo.jpg" alt="White Circle Group">
