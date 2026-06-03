@@ -49,7 +49,7 @@
 
         /* PREVIEW CONTAINER (Updated Size)  */
         .preview-container {
-            max-width: 800px;
+            max-width: 1100px;
             margin: 50px auto;
             text-align: center;
         }
@@ -58,7 +58,7 @@
         .preview-card {
             background: white;
             border-radius: 16px;
-            padding: 60px; /* Increased padding */
+            padding: 50px 70px; /* Increased padding */
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 
             /* UPDATED: Navy Blue Border */
@@ -77,13 +77,89 @@
             text-align: left;
         }
 
-        .sig-content {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            border-left: 4px solid #1e3a8a;
-            padding-left: 20px;
-        }
+		.sig-content{
+		    display:flex;
+		    align-items:center;
+		    gap:30px;
+		}
+		.signature-left{
+		    width:180px;
+		    display:flex;
+		    justify-content:center;
+		    align-items:center;
+		}
+
+		.signature-left img{
+		    width:120px;
+		    height:120px;
+		    object-fit:contain;
+		}
+
+		.signature-right{
+		    flex:1;
+		    border-left:3px solid #2563eb;
+		    padding-left:25px;
+		    text-align:left;
+		}
+
+		.signature-right h3{
+		    font-size:32px;
+		    font-weight:700;
+		    margin-bottom:10px;
+		    color:#222;
+		}
+
+		.designation{
+		    color:#2563eb;
+		    font-size:24px;
+		    font-weight:700;
+		    margin-bottom:10px;
+		}
+
+		.department{
+		    color:#333;
+		    font-size:20px;
+		    margin-bottom:12px;
+		}
+
+		.contact-row{
+		    display:flex;
+		    align-items:center;
+		    gap:10px;
+		    margin-bottom:10px;
+		    font-size:18px;
+		}
+
+		.contact-row i{
+		    color:#2563eb;
+		}
+
+		.contact-row a{
+		    color:#2563eb;
+		    text-decoration:none;
+		}
+
+		.company-row{
+		    display:flex;
+		    align-items:center;
+		    gap:12px;
+		}
+
+		.company-row img{
+		    width:55px;
+		    height:55px;
+		    border-radius:8px;
+		}
+
+		.company-name{
+		    font-size:22px;
+		    font-weight:700;
+		}
+
+		.company-tagline{
+		    font-size:14px;
+		    color:#555;
+		}
 
         .sig-details h3 { margin: 0; color: #1e3a8a; font-size: 1.4rem; font-weight: 700; }
         .sig-details p { margin: 2px 0 10px; color: #64748b; font-size: 0.9rem; }
@@ -263,27 +339,73 @@
             <div id="signature-capture-area" class="signature-box">
                 <div class="sig-content">
 
-                    <div id="signature-box" th:object="${user}" style="font-family: Arial, sans-serif; color: #333;">
-                        <h3 style="color: #1e3a8a; margin-bottom: 5px;" th:text="*{fullName}">[Employee Name Will appear here]</h3>
-                        <p style="margin: 2px 0; font-weight: bold;" th:text="*{employeeProfile?.designation?.toUpperCase() ?: 'EMPLOYEE'}">[Designation]</p>
-                        <p style="margin: 2px 0;" th:text="*{employeeProfile?.businessUnit ?: 'General'}">[Department]</p>
+					<div class="sig-content">
 
-                        <div style="margin-top: 10px; font-size: 0.9rem;">
-                            <p style="margin: 2px 0;">
-                                <strong>Mob:</strong> <span th:text="*{employeeProfile?.mobileNumber ?: 'Not Provided'}">[Phone]</span>
-                            </p>
-                            <p style="margin: 2px 0;">
-                                <strong>Email:</strong> <a th:href="'mailto:' + *{email}" th:text="*{email}" style="color: #1e3a8a; text-decoration: none;">[Email]</a>
-                            </p>
-                        </div>
-                        <div class="d-flex align-items-center mt-3 pt-2 border-top">
-                            <img src="/images/wcg-logo.jpg" alt="Logo" height="40" class="me-2" style="border-radius: 4px;">
-                            <div>
-                                <span class="fw-bold text-dark d-block" style="line-height: 1;">WhiteCircle Group</span>
-                                <small class="text-muted italic" style="font-size: 0.8rem;">"Innovating the Future"</small>
-                            </div>
-                        </div>
-                    </div>
+					    <div class="signature-left">
+
+					        <img src="/images/wcg-logo.jpg"
+					             alt="WhiteCircle Logo">
+
+					    </div>
+
+					    <div class="signature-right">
+
+					        <div id="signature-box"
+					             th:object="${user}">
+
+					            <h3 th:text="*{fullName}">
+					                Employee Name
+					            </h3>
+
+					            <div class="designation"
+					                 th:text="*{employeeProfile?.designation ?: 'Employee'}">
+					            </div>
+
+					            <div class="department"
+					                 th:text="*{employeeProfile?.businessUnit ?: 'General'}">
+					            </div>
+
+					            <hr>
+
+					            <div class="contact-row">
+					                <i class="fas fa-phone-alt"></i>
+					                <span>Mob:</span>
+					                <span th:text="*{employeeProfile?.mobileNumber ?: 'Not Provided'}"></span>
+					            </div>
+
+					            <div class="contact-row">
+					                <i class="fas fa-envelope"></i>
+					                <span>Email:</span>
+
+					                <a th:href="'mailto:' + *{email}"
+					                   th:text="*{email}">
+					                </a>
+					            </div>
+
+					            <hr>
+
+					            <div class="company-row">
+
+					                <img src="/images/wcg-logo.jpg"
+					                     alt="WhiteCircle">
+
+					                <div>
+					                    <div class="company-name">
+					                        WhiteCircle Group
+					                    </div>
+
+					                    <div class="company-tagline">
+					                        "Innovating the future"
+					                    </div>
+					                </div>
+
+					            </div>
+
+					        </div>
+
+					    </div>
+
+					</div>
 
                 </div>
             </div>

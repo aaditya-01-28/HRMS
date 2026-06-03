@@ -21,6 +21,9 @@ public class AttendanceRegularization {
 
     @Column(nullable = false)
     private String type; // Late Mark, Forgot ID, Work From Home
+    
+    @Column(name = "duration")
+    private String duration;
 
     @Column(columnDefinition = "TEXT")
     private String reason;
@@ -48,6 +51,10 @@ public class AttendanceRegularization {
 
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
+    
+    public String getDuration() { return duration;}
+
+    public void setDuration(String duration) {this.duration = duration;}
 
     public String getReason() { return reason; }
     public void setReason(String reason) { this.reason = reason; }

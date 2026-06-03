@@ -1,6 +1,7 @@
 package com.example.admindashboard.controller;
 
 import com.example.admindashboard.service.AttendanceService;
+
 import com.example.admindashboard.service.EmailService;
 import com.example.admindashboard.model.User;
 import com.example.admindashboard.repository.UserRepository;
@@ -13,7 +14,11 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
+import java.util.List;
+import com.example.admindashboard.dto.AttendanceRegularizationRequestDTO;
+import com.example.admindashboard.model.AttendanceRegularization;
+import com.example.admindashboard.dto.AttendanceDayDTO;
+import org.springframework.security.core.Authentication;
 @RestController
 @RequestMapping("/api/attendance")
 public class AttendanceController {
@@ -92,6 +97,36 @@ public class AttendanceController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error submitting record: " + e.getMessage());
         }
+    }
+    @GetMapping("/week")
+    @ResponseBody
+    public List<AttendanceDayDTO> getCurrentWeekAttendance(
+            Authentication authentication) {
+
+        User user = userRepository
+                .findByUsername(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return attendanceService.getCurrentWeekAttendance(user);
+    }
+    @PostMapping("/day-record")
+    public ResponseEntity<?> saveAttendanceDayRecord(
+            @RequestBody AttendanceRegularizationRequestDTO request,
+            Principal principal) {
+
+        User user = userRepository
+                .findByUsername(principal.getName())
+                .orElseThrow(
+                        () -> new RuntimeException("User not found")
+                );
+
+        AttendanceRegularization saved =
+                attendanceService.saveAttendanceRegularization(
+                        user,
+                        request
+                );
+
+        return ResponseEntity.ok(saved);
     }
 
     //  Get My Attendance History

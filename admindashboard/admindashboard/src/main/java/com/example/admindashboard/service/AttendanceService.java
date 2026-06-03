@@ -1,13 +1,20 @@
 package com.example.admindashboard.service;
 
 import com.example.admindashboard.model.Attendance;
+import com.example.admindashboard.repository.AttendanceRegularizationRepository;
+import java.time.DayOfWeek;
+import java.util.ArrayList;
+import com.example.admindashboard.dto.AttendanceDayDTO;
 import com.example.admindashboard.model.User;
 import com.example.admindashboard.repository.AttendanceRepository;
 import com.example.admindashboard.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.example.admindashboard.dto.AttendanceRegularizationRequestDTO;
+import com.example.admindashboard.model.AttendanceRegularization;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -21,6 +28,9 @@ public class AttendanceService {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private AttendanceRegularizationRepository attendanceRegularizationRepository;
 
     // Logic: Employee Check-In
     public String checkIn(String username) {
@@ -175,6 +185,7 @@ public class AttendanceService {
 
         return attendanceRepository.save(attendance);
     }
+    
 
     public void submitWeeklyAttendance(Long id, String username) {
         // 1. Find the saved draft
@@ -200,5 +211,131 @@ public class AttendanceService {
             return attendanceRepository.findByUserOrderByIdDesc(userOpt.get());
         }
         return java.util.List.of(); // Return empty list if user not found
+    }
+    public List<AttendanceDayDTO> getCurrentWeekAttendance(User user) {
+
+        List<AttendanceDayDTO> result = new ArrayList<>();
+
+        LocalDate monday =
+                LocalDate.now()
+                         .with(DayOfWeek.MONDAY);
+
+        for (int i = 0; i < 7; i++) {
+
+            LocalDate currentDate = monday.plusDays(i);
+
+            Optional<Attendance> attendanceOpt =
+                    attendanceRepository.findByUserAndDate(
+                            user,
+                            currentDate
+                    );
+
+            String recordedHours = "0hr 00min";
+
+            List<AttendanceRegularization>
+            dayRecords =
+            attendanceRegularizationRepository
+                    .findByUserAndDate(
+                            user,
+                            currentDate
+                    );
+
+            if (!dayRecords.isEmpty()) {
+
+                AttendanceRegularization
+                        latestRecord =
+                        dayRecords.get(
+                                dayRecords.size() - 1
+                        );
+
+                if (latestRecord.getDuration() != null &&
+                        !latestRecord.getDuration().isBlank()) {
+
+                    recordedHours =
+                            latestRecord.getDuration();
+                }
+            }
+
+            if (attendanceOpt.isPresent()
+                    && attendanceOpt.get().getTotalHours() != null) {
+
+                recordedHours =
+                        attendanceOpt.get().getTotalHours();
+            }
+
+            int recordings =
+                    attendanceRegularizationRepository
+                            .findByUserAndDate(
+                                    user,
+                                    currentDate
+                            )
+                            .size();
+
+            result.add(
+            		new AttendanceDayDTO(
+            			    currentDate.toString(),
+
+            			    currentDate.format(
+            			        DateTimeFormatter.ofPattern(
+            			            "EEEE, MMM dd, yyyy"
+            			        )
+            			    ),
+
+            			    currentDate.getDayOfWeek() == DayOfWeek.SUNDAY
+            			            ? "0hr 00min"
+            			            : "9hr 00min",
+
+            			    recordedHours,
+
+            			    recordings
+            			)
+            );
+        }
+
+        return result;
+    }
+    public AttendanceRegularization saveAttendanceRegularization(
+            User user,
+            AttendanceRegularizationRequestDTO request) {
+
+        AttendanceRegularization regularization =
+                new AttendanceRegularization();
+
+        regularization.setUser(user);
+
+        regularization.setDate(
+                LocalDate.parse(
+                        request.getAttendanceDate()
+                )
+        );
+
+        regularization.setType(
+                request.getTimeType()
+        );
+        
+        String duration =
+                request.getDuration();
+
+        if (duration != null &&
+            !duration.contains("hr")) {
+
+            duration =
+                duration + "hr 00min";
+        }
+
+        regularization.setDuration(duration);
+
+        String combinedReason =
+                "Record: " + request.getRecord()
+                + "\n\nComment: " + request.getComment();
+
+        regularization.setReason(
+                combinedReason
+        );
+
+        regularization.setStatus("Pending");
+
+        return attendanceRegularizationRepository
+                .save(regularization);
     }
 }

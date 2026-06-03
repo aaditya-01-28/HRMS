@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization Structure</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+
+		*{
+		    margin:0;
+		    padding:0;
+		    box-sizing:border-box;
+		    font-family:'Poppins',sans-serif;
+		}
+
+		body{
+		    background:#f4f5f9;
+		    min-height:100vh;
+		    overflow-x:auto;
+		}
+
+		/* ========================================
+		   HEADER
+		======================================== */
+
+		.page-header{
+
+		    height:200px;
+
+		    padding:40px 60px;
+
+		    display:flex;
+		    justify-content:space-between;
+		    align-items:flex-start;
+
+		    background:
+		        linear-gradient(
+		            rgba(255,255,255,0.75),
+		            rgba(255,255,255,0.75)
+		        ),
+		        url('https://images.unsplash.com/photo-1558494949-ef010cbdcc31');
+
+		    background-size:cover;
+		    background-position:center;
+		}
+
+		.page-title{
+
+		    font-size:52px;
+		    font-weight:700;
+
+		    color:#0b2f84;
+		}
+
+		.dashboard-btn{
+
+		    text-decoration:none;
+
+		    background:#356df3;
+		    color:#fff;
+
+		    padding:12px 25px;
+
+		    border-radius:10px;
+
+		    font-weight:600;
+
+		    transition:.3s;
+		}
+
+		.dashboard-btn:hover{
+
+		    background:#2457d3;
+		}
+
+		/* ========================================
+		   TREE CONTAINER
+		======================================== */
+
+		.org-container{
+
+		    padding:40px 50px 100px;
+
+		    min-width:1600px;
+		}
+
+		#orgTreeSection{
+
+		    width:100%;
+		}
+
+		#orgTree{
+
+		    width:100%;
+
+		    overflow-x:auto;
+		    overflow-y:hidden;
+
+		    display:flex;
+		    justify-content:center;
+
+		    padding:20px;
+		}
+
+		/* ========================================
+		   TREE
+		======================================== */
+
+		.tree{
+
+		    display:inline-block;
+		}
+
+		.tree ul{
+
+		    padding-top:30px;
+
+		    position:relative;
+		}
+
+		.tree li{
+
+		    float:left;
+
+		    text-align:center;
+
+		    list-style:none;
+
+		    position:relative;
+
+		    padding:30px 15px 0 15px;
+		}
+
+		.tree::after{
+
+		    content:"";
+
+		    display:block;
+
+		    clear:both;
+		}
+
+		/* Horizontal Lines */
+
+		.tree li::before,
+		.tree li::after{
+
+		    content:'';
+
+		    position:absolute;
+
+		    top:0;
+
+		    right:50%;
+
+		    width:50%;
+
+		    height:30px;
+
+		    border-top:2px solid #8c8c8c;
+		}
+
+		.tree li::after{
+
+		    right:auto;
+
+		    left:50%;
+
+		    border-left:2px solid #8c8c8c;
+		}
+
+		/* Remove lines if only child */
+
+		.tree li:only-child::after,
+		.tree li:only-child::before{
+
+		    display:none;
+		}
+
+		.tree li:only-child{
+
+		    padding-top:0;
+		}
+
+		/* Remove unnecessary connectors */
+
+		.tree li:first-child::before{
+
+		    border:none;
+		}
+
+		.tree li:last-child::after{
+
+		    border:none;
+		}
+
+		/* Vertical Line */
+
+		.tree ul ul::before{
+
+		    content:'';
+
+		    position:absolute;
+
+		    top:0;
+
+		    left:50%;
+
+		    width:0;
+
+		    height:30px;
+
+		    border-left:2px solid #8c8c8c;
+		}
+
+		/* ========================================
+		   EMPLOYEE CARD
+		======================================== */
+
+		.employee-card{
+
+		    background:#fff;
+
+		    min-width:260px;
+
+		    border-radius:10px;
+
+		    padding:15px 18px;
+
+		    display:flex;
+		    align-items:center;
+		    gap:14px;
+
+		    cursor:pointer;
+
+		    box-shadow:
+		        0 2px 8px rgba(0,0,0,.08);
+
+		    transition:.25s ease;
+		}
+
+		.employee-card:hover{
+
+		    transform:translateY(-4px);
+
+		    box-shadow:
+		        0 6px 16px rgba(0,0,0,.15);
+		}
+
+		.employee-icon{
+
+		    font-size:36px;
+
+		    color:#000;
+		}
+
+		.employee-info{
+
+		    text-align:left;
+		}
+
+		.employee-name{
+
+		    font-size:18px;
+
+		    font-weight:700;
+
+		    color:#111;
+		}
+
+		.employee-role{
+
+		    font-size:14px;
+
+		    color:#666;
+
+		    margin-top:3px;
+		}
+
+		/* ========================================
+		   SCROLLBAR
+		======================================== */
+
+		::-webkit-scrollbar{
+
+		    height:10px;
+		}
+
+		::-webkit-scrollbar-track{
+
+		    background:#e5e5e5;
+		}
+
+		::-webkit-scrollbar-thumb{
+
+		    background:#9a9a9a;
+
+		    border-radius:10px;
+		}
+
+		::-webkit-scrollbar-thumb:hover{
+
+		    background:#7c7c7c;
+		}
+
+		/* ========================================
+		   RESPONSIVE
+		======================================== */
+
+		@media(max-width:1200px){
+
+		    .page-header{
+
+		        padding:30px;
+		    }
+
+		    .page-title{
+
+		        font-size:40px;
+		    }
+
+		    .org-container{
+
+		        padding:30px;
+		    }
+		}
+
+		@media(max-width:768px){
+
+		    .page-header{
+
+		        flex-direction:column;
+
+		        gap:20px;
+
+		        height:auto;
+		    }
+
+		    .page-title{
+
+		        font-size:32px;
+		    }
+		}
+	</style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div class="page-header">
+
+        <h1 class="page-title">
+            Organization Structure
+        </h1>
+
+        <a href="/admin/dashboard"
+           class="dashboard-btn">
+            Back to Dashboard
+        </a>
+
+    </div>
+
+    <!-- ORGANIZATION TREE -->
+    <div class="org-container">
+
+        <div id="orgTreeSection">
+
+            <div id="orgTree"></div>
+
+        </div>
+
+    </div>
+
+    <script src="/js/organization-structure.js"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+		    loadOrganizationChart();
+		});
+
+		/* =========================================
+		   LOAD ORGANIZATION TREE
+		========================================= */
+
+		async function loadOrganizationChart() {
+
+		    try {
+
+		        const response =
+		            await fetch("/api/organization-structure");
+
+		        if (!response.ok) {
+		            throw new Error(
+		                "Failed to load organization structure"
+		            );
+		        }
+
+		        const data =
+		            await response.json();
+
+		        console.log(
+		            "Organization Structure:",
+		            data
+		        );
+
+		        buildTree(data);
+
+		    } catch (error) {
+
+		        console.error(
+		            "Error loading organization chart:",
+		            error
+		        );
+
+		        document.getElementById("orgTree").innerHTML = `
+		            <div style="
+		                padding:30px;
+		                color:red;
+		                font-weight:600;
+		            ">
+		                Unable to load organization structure.
+		            </div>
+		        `;
+		    }
+		}
+
+		/* =========================================
+		   BUILD TREE
+		========================================= */
+
+		function buildTree(rootNode) {
+
+		    const container =
+		        document.getElementById("orgTree");
+
+		    container.innerHTML = "";
+
+		    if (!rootNode) {
+
+		        container.innerHTML = `
+		            <div style="
+		                padding:30px;
+		                color:#666;
+		                font-weight:600;
+		            ">
+		                No organization data found.
+		            </div>
+		        `;
+
+		        return;
+		    }
+
+		    const tree =
+		        document.createElement("div");
+
+		    tree.className = "tree";
+
+		    const rootUl =
+		        document.createElement("ul");
+
+		    rootUl.appendChild(
+		        createNode(
+		            rootNode,
+		            null
+		        )
+		    );
+
+		    tree.appendChild(rootUl);
+
+		    container.appendChild(tree);
+		}
+
+		/* =========================================
+		   CREATE NODE
+		========================================= */
+
+		function createNode(
+		    node,
+		    manager
+		) {
+
+		    const li =
+		        document.createElement("li");
+
+		    const card =
+		        document.createElement("div");
+
+		    card.className = "employee-card";
+
+		    card.innerHTML = `
+		        <div class="employee-icon">
+		            <i class="fa-solid fa-circle-user"></i>
+		        </div>
+
+		        <div class="employee-info">
+
+		            <div class="employee-name">
+		                ${node.fullName || "-"}
+		            </div>
+
+		            <div class="employee-role">
+		                ${node.designation || node.role || "-"}
+		            </div>
+
+		        </div>
+		    `;
+
+		    /* =====================================
+		       OPEN EMPLOYEE RELATIONSHIP PAGE
+		    ===================================== */
+
+		    card.addEventListener("click", () => {
+
+		        window.location.href =
+		            "/employee-relationship/" + node.id;
+
+		    });
+
+		    li.appendChild(card);
+
+		    if (
+		        node.children &&
+		        node.children.length > 0
+		    ) {
+
+		        const ul =
+		            document.createElement("ul");
+
+		        node.children.forEach(child => {
+
+		            ul.appendChild(
+		                createNode(
+		                    child,
+		                    node
+		                )
+		            );
+
+		        });
+
+		        li.appendChild(ul);
+		    }
+
+		    return li;
+		}
+	</script>
+
+
+</body>
+</html>
