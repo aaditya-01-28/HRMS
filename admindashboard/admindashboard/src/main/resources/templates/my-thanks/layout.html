@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Thanks - <span th:text="${pageTitle}">Page</span> | WhiteCircle Group</title>
+    <title>My Thanks - [[${pageTitle}]] | WhiteCircle Group</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
@@ -290,8 +290,11 @@
                     <span class="pts-text" th:text="${wallet != null ? wallet.walletBalance + ' PTS' : '0 PTS'}">0 PTS</span>
                 </div>
                 
-                <a href="/my-thanks/store" class="action-btn px-3 text-primary">
+                <a href="/my-thanks/cart" class="action-btn px-3 text-primary position-relative">
                     <i class="fas fa-shopping-cart"></i> Cart
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartBadgeCount" th:text="${session.cart != null ? session.cart.size() : 0}" style="font-size: 0.65rem;">
+                        0
+                    </span>
                 </a>
             </div>
         </div>

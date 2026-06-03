@@ -122,12 +122,33 @@
             border-radius: 6px;
             padding: 8px 15px;
             font-weight: 600;
-            width: 100%;
+            flex: 1;
             transition: all 0.2s;
+            white-space: nowrap;
         }
         .btn-redeem:hover {
             background-color: #2962ff;
             color: #fff;
+        }
+        .btn-cart {
+            background-color: transparent;
+            color: #f97316;
+            border: 1px solid #f97316;
+            border-radius: 6px;
+            padding: 8px 15px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-cart:hover {
+            background-color: #f97316;
+            color: #fff;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            width: 100%;
         }
         
         /* MODAL STYLES */
@@ -275,7 +296,10 @@
             </div>
             <div class="product-title">White Circle T-shirt</div>
             <div class="product-pts">600 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle T-shirt', 600, 'merch', '/images/tshirt.png')">Redeem Now</button>
+            <div class="action-buttons">
+                <button class="btn btn-redeem" onclick="openConfirmModal('White Circle T-shirt', 600, 'merch', '/images/tshirt.png')">Redeem Now</button>
+                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'White Circle T-shirt', 600, 'merch', '/images/tshirt.png')"><i class="fas fa-cart-plus"></i></button>
+            </div>
         </div>
 
         <!-- Product 2 -->
@@ -285,7 +309,10 @@
             </div>
             <div class="product-title">White Circle Cup</div>
             <div class="product-pts">200 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Cup', 200, 'merch', '/images/mug.png')">Redeem Now</button>
+            <div class="action-buttons">
+                <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Cup', 200, 'merch', '/images/mug.png')">Redeem Now</button>
+                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'White Circle Cup', 200, 'merch', '/images/mug.png')"><i class="fas fa-cart-plus"></i></button>
+            </div>
         </div>
 
         <!-- Product 3 -->
@@ -295,7 +322,10 @@
             </div>
             <div class="product-title">White Circle Bottle</div>
             <div class="product-pts">150 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Bottle', 150, 'merch', '/images/bottle.png')">Redeem Now</button>
+            <div class="action-buttons">
+                <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Bottle', 150, 'merch', '/images/bottle.png')">Redeem Now</button>
+                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'White Circle Bottle', 150, 'merch', '/images/bottle.png')"><i class="fas fa-cart-plus"></i></button>
+            </div>
         </div>
 
         <!-- Product 4 -->
@@ -305,7 +335,10 @@
             </div>
             <div class="product-title">White Circle Key Chain</div>
             <div class="product-pts">100 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Key Chain', 100, 'merch', '/images/keychain.png')">Redeem Now</button>
+            <div class="action-buttons">
+                <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Key Chain', 100, 'merch', '/images/keychain.png')">Redeem Now</button>
+                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'White Circle Key Chain', 100, 'merch', '/images/keychain.png')"><i class="fas fa-cart-plus"></i></button>
+            </div>
         </div>
 
         <!-- Product 5 -->
@@ -315,7 +348,10 @@
             </div>
             <div class="product-title">Amazon Gift Card</div>
             <div class="product-pts">500 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('AMAZON Gift Card', 500, 'voucher', '/images/amazon.png', 'Amazon')">Redeem Now</button>
+            <div class="action-buttons">
+                <button class="btn btn-redeem" onclick="openConfirmModal('AMAZON Gift Card', 500, 'voucher', '/images/amazon.png', 'Amazon')">Redeem Now</button>
+                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'AMAZON Gift Card', 500, 'voucher', '/images/amazon.png')"><i class="fas fa-cart-plus"></i></button>
+            </div>
         </div>
 
         <!-- Product 6 -->
@@ -325,7 +361,10 @@
             </div>
             <div class="product-title">Flipkart Gift Card</div>
             <div class="product-pts">500 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('FLIPKART Gift Card', 500, 'voucher', '/images/flipkart.png', 'Flipkart')">Redeem Now</button>
+            <div class="action-buttons">
+                <button class="btn btn-redeem" onclick="openConfirmModal('FLIPKART Gift Card', 500, 'voucher', '/images/flipkart.png', 'Flipkart')">Redeem Now</button>
+                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'FLIPKART Gift Card', 500, 'voucher', '/images/flipkart.png')"><i class="fas fa-cart-plus"></i></button>
+            </div>
         </div>
 
         <!-- Product 7 -->
@@ -335,7 +374,10 @@
             </div>
             <div class="product-title">Zomato Gift Card</div>
             <div class="product-pts">500 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('ZOMATO Gift Card', 500, 'voucher', '/images/zomato.png', 'Zomato')">Redeem Now</button>
+            <div class="action-buttons">
+                <button class="btn btn-redeem" onclick="openConfirmModal('ZOMATO Gift Card', 500, 'voucher', '/images/zomato.png', 'Zomato')">Redeem Now</button>
+                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'ZOMATO Gift Card', 500, 'voucher', '/images/zomato.png')"><i class="fas fa-cart-plus"></i></button>
+            </div>
         </div>
 
         <!-- Product 8 -->
@@ -345,7 +387,10 @@
             </div>
             <div class="product-title">Swiggy Gift Voucher</div>
             <div class="product-pts">500 PTS</div>
-            <button class="btn btn-redeem" onclick="openConfirmModal('SWIGGY Gift Voucher', 500, 'voucher', null, 'Swiggy')">Redeem Now</button>
+            <div class="action-buttons">
+                <button class="btn btn-redeem" onclick="openConfirmModal('SWIGGY Gift Voucher', 500, 'voucher', null, 'Swiggy')">Redeem Now</button>
+                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'SWIGGY Gift Voucher', 500, 'voucher', null)"><i class="fas fa-cart-plus"></i></button>
+            </div>
         </div>
 
     </div>
@@ -463,6 +508,7 @@
         let currentProductType = 'merch';
         let currentProductName = '';
         let currentBrand = '';
+        let currentPoints = 0;
         
         document.addEventListener("DOMContentLoaded", function() {
             confirmModalInstance = new bootstrap.Modal(document.getElementById('confirmModal'));
@@ -473,6 +519,7 @@
             currentProductType = type;
             currentProductName = productName;
             currentBrand = brand;
+            currentPoints = points;
 
             document.getElementById('modalProdName').innerText = productName;
             document.getElementById('modalProdPts').innerText = points + ' PTS';
@@ -525,23 +572,94 @@
         }
 
         function confirmRedemption() {
-            confirmModalInstance.hide();
-            
-            // Set success modal text based on type
-            if (currentProductType === 'merch') {
-                document.getElementById('successMerchText').style.display = 'flex';
-                document.getElementById('successVoucherText').style.display = 'none';
-            } else {
-                document.getElementById('successMerchText').style.display = 'none';
-                document.getElementById('successVoucherText').style.display = 'flex';
-                document.getElementById('successVoucherName').innerText = currentProductName;
-                document.getElementById('successVoucherBrand').innerText = currentBrand;
-            }
+            document.getElementById('btnConfirmRedeem').disabled = true;
+            document.getElementById('btnConfirmRedeem').innerText = 'Processing...';
 
-            // In a real application, make an AJAX request here to deduct points.
-            setTimeout(() => {
-                successModalInstance.show();
-            }, 400); // Small delay to allow the first modal to hide smoothly
+            const formData = new URLSearchParams();
+            formData.append('itemName', currentProductName);
+            formData.append('points', currentPoints);
+            formData.append('productType', currentProductType);
+
+            fetch('/my-thanks/redeem', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData.toString()
+            })
+            .then(response => response.json())
+            .then(data => {
+                confirmModalInstance.hide();
+                document.getElementById('btnConfirmRedeem').disabled = false;
+                document.getElementById('btnConfirmRedeem').innerText = 'Confirm & Redeem';
+
+                if (data.status === 'success') {
+                    // Set success modal text based on type
+                    if (currentProductType === 'merch') {
+                        document.getElementById('successMerchText').style.display = 'flex';
+                        document.getElementById('successVoucherText').style.display = 'none';
+                    } else {
+                        document.getElementById('successMerchText').style.display = 'none';
+                        document.getElementById('successVoucherText').style.display = 'flex';
+                        document.getElementById('successVoucherName').innerText = currentProductName;
+                        document.getElementById('successVoucherBrand').innerText = currentBrand;
+                    }
+                    setTimeout(() => {
+                        successModalInstance.show();
+                    }, 400);
+                } else {
+                    alert('Redemption Failed: ' + data.error);
+                }
+            })
+            .catch(error => {
+                confirmModalInstance.hide();
+                document.getElementById('btnConfirmRedeem').disabled = false;
+                document.getElementById('btnConfirmRedeem').innerText = 'Confirm & Redeem';
+                alert('An error occurred during redemption.');
+            });
+        }
+        function addToCart(event, productName, points, type, imgSrc) {
+            const btn = event.currentTarget;
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            const formData = new URLSearchParams();
+            formData.append('itemName', productName);
+            formData.append('points', points);
+            formData.append('productType', type);
+            if (imgSrc) formData.append('imageSrc', imgSrc);
+
+            fetch('/my-thanks/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData.toString()
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const badge = document.getElementById('cartBadgeCount');
+                    if (badge) {
+                        badge.innerText = data.cartSize;
+                    }
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        btn.innerHTML = originalIcon;
+                        btn.disabled = false;
+                    }, 1500);
+                } else {
+                    alert('Error adding to cart');
+                    btn.innerHTML = originalIcon;
+                    btn.disabled = false;
+                }
+            })
+            .catch(error => {
+                alert('An error occurred');
+                btn.innerHTML = originalIcon;
+                btn.disabled = false;
+            });
         }
     </script>
 </div>

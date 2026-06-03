@@ -135,6 +135,34 @@
         .spiral-grid .cal-rejected { background: #ef4444 !important; color: white !important; border-color: #dc2626 !important; }
         .spiral-grid .cal-empty { background: transparent !important; border: none !important; cursor: default; }
 
+        .cal-tooltip {
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: #ffffff;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+            z-index: 100;
+            pointer-events: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+        
+        .cal-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1e293b transparent transparent transparent;
+        }
+
         .spiral-legend {
             display: flex; flex-wrap: wrap; gap: 12px; padding: 15px 20px 20px;
             border-top: 1px solid #e2e8f0; margin-top: 10px; justify-content: center;

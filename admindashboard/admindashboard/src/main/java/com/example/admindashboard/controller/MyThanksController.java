@@ -1,8 +1,13 @@
 package com.example.admindashboard.controller;
 
+import com.example.admindashboard.model.CartItem;
 import com.example.admindashboard.model.User;
 import com.example.admindashboard.repository.UserRepository;
 import com.example.admindashboard.service.ThanksService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -134,6 +139,115 @@ public class MyThanksController {
         model.addAttribute("transactions", thanksService.getTransactionHistory(user));
         model.addAttribute("activeMenu", "history");
         return "my-thanks/history";
+    }
+
+    /* ---------- REDEEM ---------- */
+    @PostMapping("/redeem")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<?> redeemItem(
+            @RequestParam String itemName,
+            @RequestParam Integer points,
+            @RequestParam String productType,
+            HttpSession session,
+            Principal principal) {
+        
+        User user = getAuthenticatedUser(session, principal);
+        if (user == null) {
+            return org.springframework.http.ResponseEntity.status(401).body("Unauthorized");
+        }
+        
+        try {
+            thanksService.redeemItem(user, itemName, points, productType);
+            return org.springframework.http.ResponseEntity.ok().body("{\"status\":\"success\"}");
+        } catch (Exception e) {
+            return org.springframework.http.ResponseEntity.badRequest().body("{\"error\":\"" + e.getMessage() + "\"}");
+        }
+    }
+
+    /* ---------- CART ---------- */
+    @GetMapping("/cart")
+    public String viewCart(HttpSession session, Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/my-thanks/login";
+        }
+        User user = getAuthenticatedUser(session, principal);
+        model.addAttribute("user", user);
+        model.addAttribute("wallet", thanksService.getOrCreateWallet(user));
+        model.addAttribute("activeMenu", "cart");
+
+        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+        if (cart == null) {
+            cart = new ArrayList<>();
+        }
+        model.addAttribute("cartItems", cart);
+
+        int totalPoints = cart.stream().mapToInt(CartItem::getPoints).sum();
+        model.addAttribute("cartTotal", totalPoints);
+
+        return "my-thanks/cart";
+    }
+
+    @PostMapping("/cart/add")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<?> addToCart(
+            @RequestParam String itemName,
+            @RequestParam Integer points,
+            @RequestParam String productType,
+            @RequestParam(required = false) String imageSrc,
+            HttpSession session) {
+        
+        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+        if (cart == null) {
+            cart = new ArrayList<>();
+        }
+        cart.add(new CartItem(itemName, points, productType, imageSrc));
+        session.setAttribute("cart", cart);
+
+        return org.springframework.http.ResponseEntity.ok().body("{\"status\":\"success\", \"cartSize\":" + cart.size() + "}");
+    }
+
+    @PostMapping("/cart/remove")
+    public String removeFromCart(@RequestParam int index, HttpSession session) {
+        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+        if (cart != null && index >= 0 && index < cart.size()) {
+            cart.remove(index);
+            session.setAttribute("cart", cart);
+        }
+        return "redirect:/my-thanks/cart";
+    }
+
+    @PostMapping("/cart/checkout")
+    public String checkoutCart(HttpSession session, Principal principal, RedirectAttributes redirectAttributes) {
+        if (principal == null) {
+            return "redirect:/my-thanks/login";
+        }
+        User user = getAuthenticatedUser(session, principal);
+        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+
+        if (cart == null || cart.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Your cart is empty.");
+            return "redirect:/my-thanks/cart";
+        }
+
+        int totalPoints = cart.stream().mapToInt(CartItem::getPoints).sum();
+        com.example.admindashboard.model.ThanksWallet wallet = thanksService.getOrCreateWallet(user);
+
+        if (wallet.getWalletBalance() < totalPoints) {
+            redirectAttributes.addFlashAttribute("error", "Insufficient points to complete this checkout.");
+            return "redirect:/my-thanks/cart";
+        }
+
+        try {
+            for (CartItem item : cart) {
+                thanksService.redeemItem(user, item.getItemName(), item.getPoints(), item.getProductType());
+            }
+            session.removeAttribute("cart");
+            redirectAttributes.addFlashAttribute("success", "Checkout completed successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Checkout failed: " + e.getMessage());
+        }
+
+        return "redirect:/my-thanks/cart";
     }
 
     /* ---------- FAQS ---------- */

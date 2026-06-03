@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Shopping Cart</title>
+</head>
+<body>
+<th:block th:replace="~{my-thanks/layout :: page(~{::div}, 'cart', 'Shopping Cart')}">
+<div>
+    <style>
+        .cart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .cart-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+        .cart-table th {
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        .cart-item-img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 5px;
+        }
+        .cart-item-name {
+            font-weight: 600;
+            color: #334155;
+            font-size: 1.05rem;
+        }
+        .cart-item-type {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        .cart-item-points {
+            font-weight: 700;
+            color: #2962ff;
+        }
+        .btn-remove {
+            color: #ef4444;
+            background: transparent;
+            border: none;
+            transition: color 0.2s;
+        }
+        .btn-remove:hover {
+            color: #dc2626;
+        }
+        .cart-summary {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 25px;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        .summary-total {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            border-top: 2px dashed #cbd5e1;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        .summary-total span.pts {
+            color: #2962ff;
+        }
+        .btn-checkout {
+            background: #2962ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+        .btn-checkout:hover {
+            background: #1d4ed8;
+        }
+        .empty-cart {
+            text-align: center;
+            padding: 50px 0;
+            color: #64748b;
+        }
+        .empty-cart i {
+            font-size: 4rem;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+        .empty-cart h3 {
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <div class="row">
+        <!-- Main Cart Items Area -->
+        <div class="col-lg-8">
+            <div class="cart-container">
+                <div class="cart-header">
+                    <h2>Your Cart</h2>
+                    <span class="badge bg-primary rounded-pill px-3 py-2" th:text="${cartItems.size()} + ' Items'"></span>
+                </div>
+
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <div th:if="${cartItems.isEmpty()}" class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Your cart is empty</h3>
+                    <p>Looks like you haven't added anything to your cart yet.</p>
+                    <a href="/my-thanks/store" class="btn btn-primary mt-3 px-4">Continue Shopping</a>
+                </div>
+
+                <div th:if="${!cartItems.isEmpty()}" class="table-responsive">
+                    <table class="table table-hover cart-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Points</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="item, stat : ${cartItems}">
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img th:if="${item.imageSrc != null}" th:src="${item.imageSrc}" class="cart-item-img" alt="Product Image">
+                                        <div th:if="${item.imageSrc == null}" class="cart-item-img d-flex align-items-center justify-content-center bg-warning text-white fw-bold">
+                                            VOUCHER
+                                        </div>
+                                        <div>
+                                            <div class="cart-item-name" th:text="${item.itemName}">Item Name</div>
+                                            <div class="cart-item-type" th:text="${item.productType == 'merch' ? 'Merchandise' : 'Digital Voucher'}">Type</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="cart-item-points" th:text="${item.points} + ' PTS'">0 PTS</span>
+                                </td>
+                                <td class="text-end">
+                                    <form th:action="@{/my-thanks/cart/remove}" method="post" class="d-inline">
+                                        <input type="hidden" name="index" th:value="${stat.index}" />
+                                        <button type="submit" class="btn-remove" title="Remove Item">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary Area -->
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <div class="cart-summary">
+                <h4 class="fw-bold text-dark mb-4">Order Summary</h4>
+                
+                <div class="summary-row text-muted">
+                    <span>Items (<span th:text="${cartItems.size()}">0</span>)</span>
+                    <span th:text="${cartTotal} + ' PTS'">0 PTS</span>
+                </div>
+                
+                <div class="summary-row text-muted">
+                    <span>Delivery</span>
+                    <span class="text-success fw-bold">FREE</span>
+                </div>
+                
+                <div class="summary-total d-flex justify-content-between align-items-center">
+                    <span>Total Cost</span>
+                    <span class="pts" th:text="${cartTotal} + ' PTS'">0 PTS</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-3 text-sm" style="font-size: 0.9rem;">
+                    <span class="text-muted">Available Balance:</span>
+                    <span th:classappend="${wallet.walletBalance >= cartTotal ? 'text-success fw-bold' : 'text-danger fw-bold'}" th:text="${wallet.walletBalance} + ' PTS'">0 PTS</span>
+                </div>
+
+                <form th:action="@{/my-thanks/cart/checkout}" method="post" th:if="${!cartItems.isEmpty()}">
+                    <button type="submit" class="btn-checkout" th:disabled="${wallet.walletBalance < cartTotal}">
+                        Confirm & Checkout
+                    </button>
+                </form>
+                
+                <div th:if="${wallet.walletBalance < cartTotal && !cartItems.isEmpty()}" class="alert alert-danger mt-3 p-2 text-center" style="font-size: 0.85rem;">
+                    <i class="fas fa-exclamation-circle me-1"></i> Not enough points
+                </div>
+
+                <a href="/my-thanks/store" class="d-block text-center mt-3 text-decoration-none text-primary" style="font-weight: 500;">
+                    <i class="fas fa-arrow-left me-1"></i> Continue Shopping
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</th:block>
+</body>
+</html>
