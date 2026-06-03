@@ -334,7 +334,15 @@ public class DashboardController {
     }
 
     @GetMapping("/password-reset")
-    public String showPasswordResetPage() { return "password-reset"; }
+    public String showPasswordResetPage(jakarta.servlet.http.HttpServletRequest request, org.springframework.ui.Model model) {
+        String referer = request.getHeader("Referer");
+        if (referer != null && !referer.isEmpty()) {
+            model.addAttribute("backUrl", referer);
+        } else {
+            model.addAttribute("backUrl", "/employee/dashboard");
+        }
+        return "password-reset";
+    }
 
     @GetMapping("/my-whitecircle/login")
     public String showMyWhiteCircle(Model model, Principal principal) { 
