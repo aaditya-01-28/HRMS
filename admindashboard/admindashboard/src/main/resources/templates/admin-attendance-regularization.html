@@ -150,8 +150,8 @@
             <button class="nav-link" id="tab-approved" onclick="loadRequests('Approved')">
                 <i class="fas fa-check-circle me-2"></i>Approved
             </button>
-            <button class="nav-link" id="tab-rejected" onclick="loadRequests('Denied')">
-                <i class="fas fa-times-circle me-2"></i>Denied
+            <button class="nav-link" id="tab-rejected" onclick="loadRequests('Rejected')">
+                <i class="fas fa-times-circle me-2"></i>Rejected
             </button>
         </div>
     </div>
@@ -192,9 +192,13 @@
         document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
         if(status === 'Pending') document.getElementById('tab-pending').classList.add('active');
         if(status === 'Approved') document.getElementById('tab-approved').classList.add('active');
-        if(status === 'Denied') document.getElementById('tab-rejected').classList.add('active');
+        if(status === 'Rejected') document.getElementById('tab-rejected').classList.add('active');
 
-        const titles = { 'Pending': 'Pending Approvals', 'Approved': 'Approved History', 'Denied': 'Denied History' };
+		const titles = {
+		    'Pending': 'Pending Approvals',
+		    'Approved': 'Approved History',
+		    'Rejected': 'Rejected History'
+		};
         document.getElementById('listHeaderTitle').innerText = titles[status];
 
         const container = document.getElementById('requestList');
@@ -257,7 +261,7 @@
                                 <button class="btn-view me-3" onclick="viewDetails(${ts.id})" title="View Details"><i class="fas fa-eye"></i></button>
                                 ${status === 'Pending' ? `
                                     <button class="btn-action btn-approve" onclick="updateStatus(${ts.id}, 'Approved')"><i class="fas fa-check me-1"></i></button>
-                                    <button class="btn-action btn-reject" onclick="updateStatus(${ts.id}, 'Denied')"><i class="fas fa-times me-1"></i></button>
+                                    <button class="btn-action btn-reject" onclick="updateStatus(${ts.id}, 'Rejected')"><i class="fas fa-times me-1"></i></button>
                                 ` : `<span class="badge ${status==='Approved'?'bg-success':'bg-danger'} rounded-pill px-4 py-2 shadow-sm">${status}</span>`}
                             </div>
                         </div>
@@ -300,7 +304,8 @@
             { name: "Tuesday", hours: ts.tuesdayHours || 0, details: formatDetails(ts.tuesdayStatus, ts.tuesdayMode, ts.tuesdayReason) },
             { name: "Wednesday", hours: ts.wednesdayHours || 0, details: formatDetails(ts.wednesdayStatus, ts.wednesdayMode, ts.wednesdayReason) },
             { name: "Thursday", hours: ts.thursdayHours || 0, details: formatDetails(ts.thursdayStatus, ts.thursdayMode, ts.thursdayReason) },
-            { name: "Friday", hours: ts.fridayHours || 0, details: formatDetails(ts.fridayStatus, ts.fridayMode, ts.fridayReason) }
+            { name: "Friday", hours: ts.fridayHours || 0, details: formatDetails(ts.fridayStatus, ts.fridayMode, ts.fridayReason) },
+			{ name: "Saturday", hours: ts.saturdayHours || 0, details: formatDetails(ts.saturdayStatus, ts.saturdayMode, ts.saturdayReason) }
         ];
 
         let rows = '';
@@ -406,14 +411,14 @@
         }
 
         // FLOW 2: DENY ATTENDANCE (With Interactive Input)
-        else if (newStatus === 'Denied') {
+        else if (newStatus === 'Rejected') {
             const { value: adminNote, isConfirmed } = await Swal.fire({
                 title: 'Deny Attendance',
                 input: 'textarea',
                 inputLabel: 'Reason for Denial (Required)',
-                inputPlaceholder: 'Explain why the attendance record is being denied (e.g., "Missing clock-out time on Friday")...',
+                inputPlaceholder: 'Explain why the attendance record is being Rejected (e.g., "Missing clock-out time on Friday")...',
                 icon: 'warning',
-                iconColor: '#dc2626', // Alert Red
+                iconColor: 'red', // Alert Red
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
                 cancelButtonText: 'Cancel',
@@ -445,7 +450,7 @@
                 if (response.ok) {
                     await Swal.fire({
                         icon: 'success',
-                        title: 'Attendance Denied',
+                        title: 'Attendance Rejected',
                         text: 'The employee has been notified to make corrections.',
                         confirmButtonColor: '#1e3a8a',
                         timer: 2000,

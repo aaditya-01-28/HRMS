@@ -56,6 +56,11 @@ public class Attendance {
     private String fridayStatus;
     private String fridayMode;
     private String fridayReason;
+    
+    private Double saturdayHours;
+    private String saturdayStatus;
+    private String saturdayMode;
+    private String saturdayReason;
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -138,6 +143,36 @@ public class Attendance {
     public void setFridayMode(String fridayMode) { this.fridayMode = fridayMode; }
     public String getFridayReason() { return fridayReason; }
     public void setFridayReason(String fridayReason) { this.fridayReason = fridayReason; }
+    
+    public Double getSaturdayHours() {
+        return saturdayHours;
+    }
 
+    public void setSaturdayHours(Double saturdayHours) {
+        this.saturdayHours = saturdayHours;
+    }
 
+    public String getSaturdayStatus() {
+        return saturdayStatus;
+    }
+
+    public void setSaturdayStatus(String saturdayStatus) {
+        this.saturdayStatus = saturdayStatus;
+    }
+
+    public String getSaturdayMode() {
+        return saturdayMode;
+    }
+
+    public void setSaturdayMode(String saturdayMode) {
+        this.saturdayMode = saturdayMode;
+    }
+
+    public String getSaturdayReason() {
+        return saturdayReason;
+    }
+
+    public void setSaturdayReason(String saturdayReason) {
+        this.saturdayReason = saturdayReason;
+    }
 }

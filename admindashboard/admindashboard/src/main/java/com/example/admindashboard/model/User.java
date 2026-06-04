@@ -3,6 +3,12 @@ package com.example.admindashboard.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties({
+    "hibernateLazyInitializer",
+    "handler"
+})
 @Entity
 @Table(name = "users")
 public class User {

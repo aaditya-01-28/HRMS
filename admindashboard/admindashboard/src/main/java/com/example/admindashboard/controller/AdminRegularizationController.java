@@ -76,8 +76,17 @@ public class AdminRegularizationController {
                 return ResponseEntity.status(403).body("Error: 403 Forbidden. You are not authorized to modify attendance for employees outside your reporting hierarchy.");
             }
 
-            // Format cleanly to "Approved" or "Denied"
-            String formattedStatus = status.substring(0, 1).toUpperCase() + status.substring(1).toLowerCase();
+            // Format cleanly to "Approved" or "Rejected"
+            String formattedStatus;
+
+            if ("Rejected".equalsIgnoreCase(status)) {
+
+                formattedStatus = "Rejected";
+
+            } else {
+
+                formattedStatus = "Approved";
+            }
 
             // Save it back to the correct ApprovalStatus column
             req.setApprovalStatus(formattedStatus);

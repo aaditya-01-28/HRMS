@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.List;
+import java.time.LocalDate;
 import com.example.admindashboard.dto.AttendanceRegularizationRequestDTO;
 import com.example.admindashboard.model.AttendanceRegularization;
 import com.example.admindashboard.dto.AttendanceDayDTO;
@@ -99,15 +100,18 @@ public class AttendanceController {
         }
     }
     @GetMapping("/week")
-    @ResponseBody
     public List<AttendanceDayDTO> getCurrentWeekAttendance(
+            @RequestParam String weekStart,
             Authentication authentication) {
 
         User user = userRepository
                 .findByUsername(authentication.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return attendanceService.getCurrentWeekAttendance(user);
+        return attendanceService.getCurrentWeekAttendance(
+                user,
+                LocalDate.parse(weekStart)
+        );
     }
     @PostMapping("/day-record")
     public ResponseEntity<?> saveAttendanceDayRecord(
@@ -129,6 +133,28 @@ public class AttendanceController {
         return ResponseEntity.ok(saved);
     }
 
+    @PostMapping("/submit-current-week")
+    public ResponseEntity<?> submitCurrentWeek(
+            Principal principal) {
+
+        attendanceService.submitCurrentWeekAttendance(
+                principal.getName()
+        );
+
+        return ResponseEntity.ok("Submitted");
+    }
+
+    @PostMapping("/discard-current-week")
+    public ResponseEntity<?> discardCurrentWeek(
+            Principal principal) {
+
+        attendanceService.discardCurrentWeekAttendance(
+                principal.getName()
+        );
+
+        return ResponseEntity.ok("Discarded");
+    }
+    
     //  Get My Attendance History
     @GetMapping("/my-history")
     public ResponseEntity<?> getMyHistory(Principal principal) {

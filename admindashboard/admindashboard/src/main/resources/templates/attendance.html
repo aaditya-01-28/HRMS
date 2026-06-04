@@ -504,15 +504,13 @@
 
     <div class="week-navigation">
 
-        <button id="previousWeekBtn">
+        <button id="previousWeekBtn"  onclick="previousWeek()">
             <i class="fas fa-chevron-left"></i>
         </button>
 
-        <span id="weekRangeText">
-            Timesheet for Jun 01 - Jun 07, 2026
-        </span>
+        <span id="weekRange"></span>
 
-        <button id="nextWeekBtn">
+        <button id="nextWeekBtn"  onclick="nextWeek()" >
             <i class="fas fa-chevron-right"></i>
         </button>
 
@@ -816,24 +814,36 @@
 	                        <select class="form-select attendance-input"
 	                                id="timeType">
 
-									<option value="">
+									<option value="selected disabled hidden">
 									    Select Time Type
 									</option>
 
-									<option value="Missing Check In">
-									    Missing Check In
+									<option value="WFH">
+										WFH
 									</option>
 
-									<option value="Missing Check Out">
-									    Missing Check Out
+									<option value="New Joinee">
+										New Joinee
 									</option>
 
-									<option value="Late Arrival">
-									    Late Arrival
+									<option value="Access card swap but data not captured">
+									    Access card swap but data not captured
 									</option>
 
-									<option value="Early Departure">
-									    Early Departure
+									<option value="Out of office duty">
+									    Out of office duty
+									</option>
+									
+									<option value="On-site employee">
+									    On-site employee
+									</option>
+									
+									<option value="Was on training">
+									    Was on training
+									</option>
+									
+									<option value="On call from home">
+									    On call from home
 									</option>
 
 	                        </select>
@@ -878,45 +888,7 @@
 
 						</div>
 
-	                    <!-- Record -->
-
-	                    <div class="col-12">
-
-	                        <label class="form-label attendance-label">
-
-	                            Record
-
-	                        </label>
-
-	                        <input type="text"
-	                               class="form-control attendance-input"
-	                               id="recordField"
-	                               placeholder="Enter attendance record">
-
-	                    </div>
-
-	                    <!-- Comment -->
-
-	                    <div class="col-12">
-
-	                        <label class="form-label attendance-label">
-
-	                            Comment
-
-	                        </label>
-
-	                        <textarea
-	                                class="form-control attendance-input"
-	                                id="commentField"
-	                                rows="5"
-	                                placeholder="Enter comment">
-	                        </textarea>
-
-	                    </div>
-
-	                </div>
-
-	            </div>
+	                    
 
 	            <!-- Footer -->
 
@@ -961,7 +933,7 @@
 	document.addEventListener(
 	    'DOMContentLoaded',
 	    function () {
-
+			updateWeekRange();
 	        loadAttendanceWeek();
 
 	        document
@@ -970,6 +942,19 @@
 	                'click',
 	                submitAttendanceRecord
 	            );
+			document
+			    .getElementById('submitAttendanceBtn')
+			    .addEventListener(
+			        'click',
+			        submitWeeklyAttendance
+			    );
+
+			document
+			    .getElementById('discardAttendanceBtn')
+			    .addEventListener(
+			        'click',
+			        discardAttendance
+			    );
 	    }
 	);
 	
@@ -995,11 +980,25 @@
 
 	    try {
 
-	        const response =
-	            await fetch('/api/attendance/week');
+			const weekStart =
+			    currentMonday.toISOString()
+			                 .split('T')[0];
+
+			const response =
+			    await fetch(
+			        `/api/attendance/week?weekStart=${weekStart}`
+			    );
 
 	        const data =
 	            await response.json();
+				
+			if (data.length > 0) {
+
+			    document.getElementById(
+			        'weeklyStatus'
+			    ).innerText =
+			        data[0].approvalStatus || 'Draft';
+			}
 
 	        const tbody =
 	            document.getElementById(
@@ -1058,17 +1057,18 @@
 	                        ${day.recordings}
 
 	                        ${
-	                            day.plannedHours === '0hr 00min'
-	                                ? ''
-	                                : `
-	                                <button
-	                                    class="record-btn"
-										onclick="openAttendanceModal('${day.actualDate}','${day.date}')">
+								day.plannedHours === '0hr 00min'
+								    ? ''
+								    : `
+								    <button
+								        class="record-btn"
+								        ${!isCurrentWeek() ? 'disabled' : ''}
+								        onclick="openAttendanceModal('${day.actualDate}','${day.date}')">
 
-	                                    <i class="fas fa-chevron-right"></i>
+								        <i class="fas fa-chevron-right"></i>
 
-	                                </button>
-	                                `
+								    </button>
+								`
 	                        }
 
 	                    </td>
@@ -1081,6 +1081,16 @@
 	                row
 	            );
 	        });
+			const canEdit = isCurrentWeek();
+			
+
+			document.getElementById(
+			    'submitAttendanceBtn'
+			).disabled = !canEdit;
+
+			document.getElementById(
+			    'discardAttendanceBtn'
+			).disabled = !canEdit;
 
 			document.getElementById(
 			    'plannedWorkingHours'
@@ -1124,6 +1134,30 @@
 	        'selectedDateText'
 	    ).innerText = displayDate;
 
+	    const rows =
+	        document.querySelectorAll(
+	            '#attendanceTableBody tr'
+	        );
+
+	    rows.forEach(row => {
+
+	        const dateText =
+	            row.cells[0].innerText.trim();
+
+	        if (dateText === displayDate) {
+
+	            document.getElementById(
+	                'modalPlannedHours'
+	            ).innerText =
+	                row.cells[1].innerText.trim();
+
+	            document.getElementById(
+	                'modalRecordedHours'
+	            ).innerText =
+	                row.cells[2].innerText.trim();
+	        }
+	    });
+
 	    const modal =
 	        new bootstrap.Modal(
 	            document.getElementById(
@@ -1158,16 +1192,6 @@
 
 			    duration:
 			        `${hours}hr ${minutes}min`,
-
-			    record:
-			        document.getElementById(
-			            'recordField'
-			        ).value,
-
-			    comment:
-			        document.getElementById(
-			            'commentField'
-			        ).value
 			};
 
 	        const response =
@@ -1186,6 +1210,7 @@
 	            );
 
 	        if (!response.ok) {
+				await loadAttendanceWeek();
 
 	            throw new Error(
 	                'Submission Failed'
@@ -1220,6 +1245,169 @@
 	                'Unable to save attendance request.'
 	        });
 	    }
+	}
+	async function submitWeeklyAttendance() {
+
+	    Swal.fire({
+	        icon: 'info',
+	        title: 'Submitting...',
+	        allowOutsideClick: false,
+	        didOpen: () => Swal.showLoading()
+	    });
+
+	    try {
+
+	        const response =
+	            await fetch(
+	                '/api/attendance/submit-current-week',
+	                {
+	                    method: 'POST'
+	                }
+	            );
+
+	        if (!response.ok) {
+	            throw new Error();
+	        }
+
+	        Swal.fire(
+	            'Success',
+	            'Attendance submitted successfully.',
+	            'success'
+	        );
+
+	        loadAttendanceWeek();
+
+	    } catch (e) {
+
+	        Swal.fire(
+	            'Error',
+	            'Unable to submit attendance.',
+	            'error'
+	        );
+	    }
+	}
+	async function discardAttendance() {
+
+	    const result =
+	        await Swal.fire({
+	            title: 'Discard Attendance?',
+	            text: 'This will reset recorded hours.',
+	            icon: 'warning',
+	            showCancelButton: true
+	        });
+
+	    if (!result.isConfirmed) {
+	        return;
+	    }
+
+	    try {
+
+	        const response =
+	            await fetch(
+	                '/api/attendance/discard-current-week',
+	                {
+	                    method: 'POST'
+	                }
+	            );
+
+	        if (!response.ok) {
+	            throw new Error();
+	        }
+
+	        Swal.fire(
+	            'Success',
+	            'Attendance discarded.',
+	            'success'
+	        );
+
+	        loadAttendanceWeek();
+
+	    } catch (e) {
+
+	        Swal.fire(
+	            'Error',
+	            'Unable to discard attendance.',
+	            'error'
+	        );
+	    }
+	}
+	let currentMonday =
+	    getMonday(new Date());
+
+	function getMonday(date) {
+
+	    const d = new Date(date);
+
+	    const day = d.getDay();
+
+	    const diff =
+	        d.getDate() -
+	        day +
+	        (day === 0 ? -6 : 1);
+
+	    return new Date(
+	        d.setDate(diff)
+	    );
+	}
+	function isCurrentWeek() {
+
+	    const today = new Date();
+
+	    const thisWeekMonday =
+	        getMonday(today);
+
+	    return thisWeekMonday.toDateString() ===
+	           currentMonday.toDateString();
+	}
+
+	function previousWeek() {
+
+	    currentMonday.setDate(
+	        currentMonday.getDate() - 7
+	    );
+
+	    loadAttendanceWeek();
+		updateWeekRange();
+	}
+
+	function nextWeek() {
+
+	    currentMonday.setDate(
+	        currentMonday.getDate() + 7
+	    );
+
+	    loadAttendanceWeek();
+		updateWeekRange();
+	}
+	function updateWeekRange() {
+
+	    const monday =
+	        new Date(currentMonday);
+
+	    const sunday =
+	        new Date(currentMonday);
+
+	    sunday.setDate(
+	        sunday.getDate() + 6
+	    );
+
+	    document.getElementById(
+	        'weekRange'
+	    ).innerText =
+	        formatDate(monday) +
+	        ' - ' +
+	        formatDate(sunday);
+	}
+	function formatDate(date) {
+
+	    return date.toLocaleDateString(
+	        'en-US',
+	        {
+	            month: 'short',
+	            day: '2-digit',
+	            year: 'numeric'
+	        }
+	    );
 	}
 
 </script>

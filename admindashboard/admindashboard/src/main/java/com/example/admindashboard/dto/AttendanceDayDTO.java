@@ -7,19 +7,22 @@ public class AttendanceDayDTO {
     private String recordedHours;
     private Integer recordings;
     private String actualDate;
+    private String approvalStatus;
 
     public AttendanceDayDTO(
             String actualDate,
             String date,
             String plannedHours,
             String recordedHours,
-            Integer recordings){
+            Integer recordings,
+            String approvalStatus){
 
     	this.actualDate = actualDate;
     	this.date = date;
     	this.plannedHours = plannedHours;
     	this.recordedHours = recordedHours;
     	this.recordings = recordings;
+    	this.approvalStatus = approvalStatus;
     }
 
     public String getActualDate() {
@@ -60,5 +63,12 @@ public class AttendanceDayDTO {
 
     public void setRecordings(Integer recordings) {
         this.recordings = recordings;
+    }
+    public String getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(String approvalStatus) {
+        this.approvalStatus = approvalStatus;
     }
 }
