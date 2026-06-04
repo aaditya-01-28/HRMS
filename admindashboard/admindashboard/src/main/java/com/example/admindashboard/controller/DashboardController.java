@@ -7,6 +7,7 @@ import com.example.admindashboard.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import com.example.admindashboard.repository.LeaveRequestRepository;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -60,6 +61,9 @@ public class DashboardController {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    private LeaveRequestRepository leaveRequestRepository;
+
     // --- 1. LOGIN PAGE MAPPINGS ---
 
     @GetMapping("/")
@@ -76,8 +80,15 @@ public class DashboardController {
 
     @GetMapping("/default-redirect")
     public String defaultRedirect(HttpServletRequest request) {
-        if (request.isUserInRole("SUPER_ADMIN") || request.isUserInRole("HR_ADMIN")) {
+        if (request.isUserInRole("SUPER_ADMIN") || request.isUserInRole("HR_ADMIN") ||
+            request.isUserInRole("IT_ADMIN") || request.isUserInRole("HR_MANAGER") ||
+            request.isUserInRole("PROJECT_MANAGER") || request.isUserInRole("FINANCE")) {
             return "redirect:/admin/dashboard";
+        } else if (request.isUserInRole("MANAGER") || request.isUserInRole("HR_EXECUTIVE") ||
+                   request.isUserInRole("RECRUITER") || request.isUserInRole("LND") ||
+                   request.isUserInRole("TRANSPORT") || request.isUserInRole("AUDITOR") ||
+                   request.isUserInRole("IT_SUPPORT")) {
+            return "redirect:/manager/dashboard";
         } else if (request.isUserInRole("CLIENT")) {
             return "redirect:/client/dashboard";
         } else {
@@ -136,19 +147,79 @@ public class DashboardController {
         return "client-dashboard";
     }
 
+    @GetMapping("/manager/dashboard")
+    public String showManagerDashboard(org.springframework.ui.Model model, java.security.Principal principal) {
+        String currentUserId = principal.getName();
+        User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
+        String myName = currentUser.getFullName();
+
+        List<User> myTeam = userRepository.findAll().stream()
+                .filter(u -> u.getEmployeeProfile() != null && myName.equalsIgnoreCase(u.getEmployeeProfile().getReportingManager()))
+                .collect(Collectors.toList());
+
+        List<String> teamUsernames = myTeam.stream().map(User::getUsername).collect(Collectors.toList());
+
+        List<Map<String, Object>> unifiedRequests = new ArrayList<>();
+
+        if (!teamUsernames.isEmpty()) {
+            List<ServiceRequest> teamTickets = serviceRequestRepository.findAll().stream()
+                    .filter(t -> teamUsernames.contains(t.getEmployeeId()) && "Open".equalsIgnoreCase(t.getStatus()))
+                    .collect(Collectors.toList());
+            for (ServiceRequest t : teamTickets) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("type", "Service Request");
+                map.put("employee", t.getEmployeeName());
+                map.put("date", t.getSubmissionDate() != null ? t.getSubmissionDate().toString() : "");
+                map.put("status", t.getStatus());
+                map.put("description", t.getCategory() != null ? t.getCategory() : t.getType());
+                map.put("reviewUrl", "/admin-helpdesk-requests");
+                unifiedRequests.add(map);
+            }
+
+            List<Timesheet> teamTimesheets = timesheetRepository.findAll().stream()
+                    .filter(t -> t.getUser() != null && teamUsernames.contains(t.getUser().getUsername())
+                            && ("Pending".equalsIgnoreCase(t.getStatus()) || "Submitted".equalsIgnoreCase(t.getStatus())))
+                    .collect(Collectors.toList());
+            for (Timesheet t : teamTimesheets) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("type", "Timesheet");
+                map.put("employee", t.getUser().getFullName());
+                map.put("date", t.getSubmissionDate() != null ? t.getSubmissionDate().toString() : "");
+                map.put("status", t.getStatus());
+                map.put("description", "Week: " + t.getWeekStartDate() + " to " + t.getWeekEndDate());
+                map.put("reviewUrl", "/admin/timesheet-approval");
+                unifiedRequests.add(map);
+            }
+
+            List<LeaveRequest> teamLeaves = leaveRequestRepository.findAll().stream()
+                    .filter(l -> l.getUser() != null && teamUsernames.contains(l.getUser().getUsername()) && "PENDING".equalsIgnoreCase(l.getStatus()))
+                    .collect(Collectors.toList());
+            for (LeaveRequest l : teamLeaves) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("type", "Leave");
+                map.put("employee", l.getUser().getFullName());
+                map.put("date", l.getCreatedAt() != null ? l.getCreatedAt().toString() : "");
+                map.put("status", l.getStatus());
+                map.put("description", l.getLeaveType() + " from " + l.getFromDate() + " to " + l.getToDate());
+                map.put("reviewUrl", "/admin/leave-approvals");
+                unifiedRequests.add(map);
+            }
+        }
+
+        unifiedRequests.sort((m1, m2) -> ((String)m2.getOrDefault("date", "")).compareTo((String)m1.getOrDefault("date", "")));
+
+        model.addAttribute("recentTickets", serviceRequestRepository.findTop3ByEmployeeIdOrderByIdDesc(currentUserId));
+        model.addAttribute("teamRequests", unifiedRequests);
+
+        return "manager-dashboard";
+    }
+
     @GetMapping("/employee/dashboard")
     public String showEmployeeDashboard(org.springframework.ui.Model model, java.security.Principal principal) {
-
-        // Fetch the current user's ID (Assuming the username serves as the employeeId)
         String currentUserId = principal.getName();
-
-        // Fetch their 3 most recent tickets
         java.util.List<com.example.admindashboard.model.ServiceRequest> recentTickets =
                 serviceRequestRepository.findTop3ByEmployeeIdOrderByIdDesc(currentUserId);
-
-        // Send the tickets to the HTML page
         model.addAttribute("recentTickets", recentTickets);
-
         return "employee-dashboard";
     }
 

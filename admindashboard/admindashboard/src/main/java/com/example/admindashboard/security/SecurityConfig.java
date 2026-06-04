@@ -74,14 +74,11 @@ public class SecurityConfig {
                             if (customRedirectUrl != null && !customRedirectUrl.isEmpty()) {
                                 response.sendRedirect(customRedirectUrl);
                             }
-                            else if (authorities.contains("admin_dashboard_view")) {
-                                response.sendRedirect("/admin/dashboard");
-                            }
-                            else if (isClient) {
-                                response.sendRedirect("/client/dashboard");
+                            else if (authorities.contains("admin_dashboard_view") || !isClient) {
+                                response.sendRedirect("/default-redirect");
                             }
                             else {
-                                response.sendRedirect("/employee/dashboard");
+                                response.sendRedirect("/client/dashboard");
                             }
                         })
                         .failureUrl("/login?error=true")
