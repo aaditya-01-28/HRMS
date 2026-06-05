@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helpdesk & FAQ</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/pages/learning.css}">
+</head>
+<body data-page-id="helpdesk">
+
+    <!-- Sidebar -->
+    <div th:replace="fragments/learning-sidebar :: learning-sidebar"></div>
+
+    <!-- Main Content -->
+    <div class="learning-main-content">
+        <!-- Header -->
+        <div th:replace="fragments/learning-header :: learning-header"></div>
+        
+        <div class="page-container">
+            
+            <p style="color:#60a5fa; font-weight:600; font-size:16px; margin-bottom:30px;">You can clear your doubts on Helpdesk!</p>
+
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-header" onclick="toggleFaq(this)">
+                        <span>How do I continue a course from where I left off?</span>
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <div class="faq-body">
+                        <p>To continue a course, navigate to "My Learnings" from the sidebar and check the "Ongoing" tab. Click the "Continue" button next to your course.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header" onclick="toggleFaq(this)">
+                        <span>How can I download my course certificate?</span>
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <div class="faq-body">
+                        <p>Certificates can be downloaded from the "Certificates" tab under the "My Learnings" section once a course is 100% completed.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header" onclick="toggleFaq(this)">
+                        <span>Why is my course not showing in My Learning?</span>
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <div class="faq-body">
+                        <p>It may take a few minutes for new enrollments to sync. If it still doesn't appear, try logging out and back in.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- API Integration -->
+    <script th:src="@{/js/learning-api.js}"></script>
+</body>
+</html>
