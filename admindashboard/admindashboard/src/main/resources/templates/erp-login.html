@@ -272,7 +272,9 @@
                                th:value="${savedPassword != null ? savedPassword.replace('{noop}', '') : ''}"
                                class="login-field-control" 
                                placeholder="enter your password" 
+                               style="padding-right: 40px;"
                                required autocomplete="current-password">
+                        <i class="fas fa-eye" style="position: absolute; right: 14px; left: auto !important; top: 50%; transform: translateY(-50%); cursor: pointer; color: #777777; z-index: 10;" onclick="const p = document.getElementById('authSecretKey'); if(p.type==='password'){p.type='text'; this.classList.replace('fa-eye', 'fa-eye-slash');}else{p.type='password'; this.classList.replace('fa-eye-slash', 'fa-eye');}"></i>
                     </div>
                 </div>
 
