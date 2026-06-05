@@ -333,6 +333,7 @@ public class DashboardController {
             @RequestParam(value = "country", required = false) String country,
             @RequestParam(value = "experience", required = false) String experience,
             @RequestParam(value = "joiningDate", required = false) LocalDate joiningDate,
+            @RequestParam(value = "returnUrl", defaultValue = "/employee/full-profile") String returnUrl,
             Principal principal,
             RedirectAttributes redirectAttributes) {
 
@@ -372,11 +373,19 @@ public class DashboardController {
         existingProfile.setEmergencyPhone(formProfile.getEmergencyPhone());
         existingProfile.setAltMobile(formProfile.getAltMobile());
 
+        // Bank Details
+        existingProfile.setBankAccountHolder(formProfile.getBankAccountHolder());
+        existingProfile.setBankAccountNumber(formProfile.getBankAccountNumber());
+        existingProfile.setBankIfscCode(formProfile.getBankIfscCode());
+        existingProfile.setBankName(formProfile.getBankName());
+        existingProfile.setBankBranch(formProfile.getBankBranch());
+        existingProfile.setBankAccountType(formProfile.getBankAccountType());
+
         user.setEmployeeProfile(existingProfile);
         userRepository.save(user);
 
-        redirectAttributes.addFlashAttribute("successMessage", "Master Profile updated successfully!");
-        return "redirect:/employee/full-profile";
+        redirectAttributes.addFlashAttribute("successMessage", "Profile updated successfully!");
+        return "redirect:" + returnUrl;
     }
 
     @GetMapping("/employee/profile/edit")
