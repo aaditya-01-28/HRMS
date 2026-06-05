@@ -64,6 +64,9 @@ public class DashboardController {
     @Autowired
     private LeaveRequestRepository leaveRequestRepository;
 
+    @Autowired
+    private com.example.admindashboard.repository.AttendanceRepository attendanceRepository;
+
     // --- 1. LOGIN PAGE MAPPINGS ---
 
     @GetMapping("/")
@@ -212,6 +215,79 @@ public class DashboardController {
         model.addAttribute("teamRequests", unifiedRequests);
 
         return "manager-dashboard";
+    }
+
+    @GetMapping("/manager/workflow")
+    public String showManagerWorkflow(org.springframework.ui.Model model, java.security.Principal principal) {
+        String currentUserId = principal.getName();
+        User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
+        String myName = currentUser.getFullName();
+
+        List<User> myTeam = userRepository.findAll().stream()
+                .filter(u -> u.getEmployeeProfile() != null && myName.equalsIgnoreCase(u.getEmployeeProfile().getReportingManager()))
+                .collect(Collectors.toList());
+
+        List<String> teamUsernames = myTeam.stream().map(User::getUsername).collect(Collectors.toList());
+
+        // --- PENDING ---
+        List<LeaveRequest> pendingLeaves = new ArrayList<>();
+        List<Timesheet> pendingTimesheets = new ArrayList<>();
+        List<ServiceRequest> pendingTickets = new ArrayList<>();
+
+        // --- APPROVED ---
+        List<LeaveRequest> approvedLeaves = new ArrayList<>();
+        List<Timesheet> approvedTimesheets = new ArrayList<>();
+
+        // --- REJECTED ---
+        List<LeaveRequest> rejectedLeaves = new ArrayList<>();
+        List<Timesheet> rejectedTimesheets = new ArrayList<>();
+
+        if (!teamUsernames.isEmpty()) {
+            // Leaves
+            pendingLeaves = leaveRequestRepository.findAll().stream()
+                    .filter(l -> l.getUser() != null && teamUsernames.contains(l.getUser().getUsername()) && "Pending".equalsIgnoreCase(l.getStatus()))
+                    .collect(Collectors.toList());
+            approvedLeaves = leaveRequestRepository.findAll().stream()
+                    .filter(l -> l.getUser() != null && teamUsernames.contains(l.getUser().getUsername()) && "Approved".equalsIgnoreCase(l.getStatus()))
+                    .collect(Collectors.toList());
+            rejectedLeaves = leaveRequestRepository.findAll().stream()
+                    .filter(l -> l.getUser() != null && teamUsernames.contains(l.getUser().getUsername()) && "Rejected".equalsIgnoreCase(l.getStatus()))
+                    .collect(Collectors.toList());
+
+            // Timesheets
+            pendingTimesheets = timesheetRepository.findAll().stream()
+                    .filter(t -> t.getUser() != null && teamUsernames.contains(t.getUser().getUsername())
+                            && ("Pending".equalsIgnoreCase(t.getStatus()) || "Submitted".equalsIgnoreCase(t.getStatus())))
+                    .collect(Collectors.toList());
+            approvedTimesheets = timesheetRepository.findAll().stream()
+                    .filter(t -> t.getUser() != null && teamUsernames.contains(t.getUser().getUsername()) && "Approved".equalsIgnoreCase(t.getStatus()))
+                    .collect(Collectors.toList());
+            rejectedTimesheets = timesheetRepository.findAll().stream()
+                    .filter(t -> t.getUser() != null && teamUsernames.contains(t.getUser().getUsername()) && "Rejected".equalsIgnoreCase(t.getStatus()))
+                    .collect(Collectors.toList());
+
+            // Service Requests
+            pendingTickets = serviceRequestRepository.findAll().stream()
+                    .filter(t -> teamUsernames.contains(t.getEmployeeId()) && "Open".equalsIgnoreCase(t.getStatus()))
+                    .collect(Collectors.toList());
+        }
+
+        int totalPending = pendingLeaves.size() + pendingTimesheets.size() + pendingTickets.size();
+        int totalApproved = approvedLeaves.size() + approvedTimesheets.size();
+        int totalRejected = rejectedLeaves.size() + rejectedTimesheets.size();
+
+        model.addAttribute("pendingLeaves", pendingLeaves);
+        model.addAttribute("pendingTimesheets", pendingTimesheets);
+        model.addAttribute("pendingTickets", pendingTickets);
+        model.addAttribute("approvedLeaves", approvedLeaves);
+        model.addAttribute("approvedTimesheets", approvedTimesheets);
+        model.addAttribute("rejectedLeaves", rejectedLeaves);
+        model.addAttribute("rejectedTimesheets", rejectedTimesheets);
+        model.addAttribute("totalPending", totalPending);
+        model.addAttribute("totalApproved", totalApproved);
+        model.addAttribute("totalRejected", totalRejected);
+
+        return "manager-workflow";
     }
 
     @GetMapping("/employee/dashboard")
