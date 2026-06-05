@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Courses</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/pages/learning.css}">
+</head>
+<body data-page-id="explore-courses">
+
+    <!-- Sidebar -->
+    <div th:replace="fragments/learning-sidebar :: learning-sidebar"></div>
+
+    <!-- Main Content -->
+    <div class="learning-main-content">
+        <!-- Header -->
+        <div th:replace="fragments/learning-header :: learning-header"></div>
+        
+        <div class="page-container">
+            <div class="filter-bar">
+                <span id="resultsCount" style="color:var(--text-muted); font-size:14px;">Showing 0 results</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:14px; color:var(--text-muted);">Sort By:</span>
+                    <select>
+                        <option>Most Popular</option>
+                        <option>Newest</option>
+                        <option>Highest Rated</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="explore-list" id="exploreList">
+                <!-- Populated by JS -->
+                <p style="color:gray; text-align:center;">Loading courses...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Integration -->
+    <script th:src="@{/js/learning-api.js}"></script>
+</body>
+</html>

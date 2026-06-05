@@ -1,0 +1,25 @@
+<div th:fragment="learning-header">
+    <header class="learning-header">
+        <div class="header-left-actions" style="display:flex; align-items:center; gap: 15px;">
+            <div class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-collapsed')" style="cursor:pointer; color:#64748b;">
+                <i class="fa-solid fa-bars fa-lg"></i>
+            </div>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search for courses, topics or modules...">
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="notification-bell">
+                <i class="fa-regular fa-bell"></i>
+            </div>
+            <div class="profile-snippet">
+                <div class="profile-initials" style="width: 40px; height: 40px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-weight: 500; color: #1f2937; font-size: 16px;" th:text="${user != null and user.fullName != null ? #strings.substring(user.fullName, 0, 1).toUpperCase() : 'U'}">RS</div>
+                <div class="user-info">
+                    <span class="name" th:text="${user != null ? user.fullName : 'Demo User'}">Rohit Sharma</span>
+                    <span class="role" th:text="${user != null and user.employeeProfile != null ? user.employeeProfile.designation : (user != null and user.role != null ? user.role.name : 'Employee')}">Trainee-Tester</span>
+                </div>
+            </div>
+        </div>
+    </header>
+</div>

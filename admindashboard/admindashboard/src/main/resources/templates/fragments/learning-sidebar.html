@@ -1,0 +1,49 @@
+<div th:fragment="learning-sidebar">
+    <aside class="learning-sidebar">
+        <div class="logo-box">
+            <img src="/images/wcg-logo.jpg" alt="White Circle" onerror="this.src='https://via.placeholder.com/80x80.png?text=WCG'">
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/learning/dashboard" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="/learning/explore-courses" th:classappend="${activeTab == 'explore-courses' ? 'active' : ''}">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>Explore Courses</span>
+                </a>
+            </li>
+            <li>
+                <a href="/learning/my-learnings" th:classappend="${activeTab == 'my-learnings' ? 'active' : ''}">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>My Learnings</span>
+                </a>
+            </li>
+            <li>
+                <a href="/learning/live-training" th:classappend="${activeTab == 'live-training' ? 'active' : ''}">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <span>Live Training</span>
+                </a>
+            </li>
+            <li>
+                <a href="/learning/leaderboard" th:classappend="${activeTab == 'leaderboard' ? 'active' : ''}">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span>Leaderboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="/learning/helpdesk" th:classappend="${activeTab == 'helpdesk' ? 'active' : ''}">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>Helpdesk</span>
+                </a>
+            </li>
+        </ul>
+        <a href="/logout" class="logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Log Out</span>
+        </a>
+    </aside>
+</div>

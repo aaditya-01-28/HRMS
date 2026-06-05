@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/pages/learning.css}">
+</head>
+<body data-page-id="leaderboard">
+
+    <!-- Sidebar -->
+    <div th:replace="fragments/learning-sidebar :: learning-sidebar"></div>
+
+    <!-- Main Content -->
+    <div class="learning-main-content">
+        <!-- Header -->
+        <div th:replace="fragments/learning-header :: learning-header"></div>
+        
+        <div class="page-container">
+            
+            <div class="card" style="padding:40px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:30px;">
+                    <h2 style="margin:0; color:var(--primary-blue); font-size:20px;">Top Learners of this Month</h2>
+                </div>
+
+                <div style="display:flex; padding:0 15px 15px 15px; border-bottom:1px solid var(--border-color); color:var(--primary-blue); font-weight:600;">
+                    <div style="width:20%;">Rank</div>
+                    <div style="width:60%; text-align:center;">Employee Name</div>
+                    <div style="width:20%; text-align:right;">Points</div>
+                </div>
+
+                <div class="leaderboard-list" id="leaderboardList" style="margin-top:20px;">
+                    <!-- JS -->
+                    <p style="text-align:center; color:gray;">Loading...</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- API Integration -->
+    <script th:src="@{/js/learning-api.js}"></script>
+</body>
+</html>

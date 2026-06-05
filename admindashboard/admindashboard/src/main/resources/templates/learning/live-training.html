@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Training</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/pages/learning.css}">
+</head>
+<body data-page-id="live-training">
+
+    <!-- Sidebar -->
+    <div th:replace="fragments/learning-sidebar :: learning-sidebar"></div>
+
+    <!-- Main Content -->
+    <div class="learning-main-content">
+        <!-- Header -->
+        <div th:replace="fragments/learning-header :: learning-header"></div>
+        
+        <div class="page-container">
+            
+            <h1 style="color:var(--primary-blue); font-size:24px; margin-bottom:5px;">Live Training</h1>
+            <p style="color:#60a5fa; font-weight:600; font-size:16px; margin-bottom:20px;">Join Live Sessions, Workshops & Webinars</p>
+
+            <div class="search-box" style="width:100%; max-width:500px; margin-bottom:40px;">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search for live Trainings & Workshops...">
+            </div>
+
+            <div class="live-training-list" id="liveTrainingContainer">
+                <!-- Hardcoded for now per mockup layout -->
+                <div class="training-row">
+                    <div class="date-badge">
+                        <span class="day">10</span>
+                        <span class="month">JUNE</span>
+                    </div>
+                    <div class="training-info">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <h3 style="margin:0; font-size:18px;">Security Awareness</h3>
+                            <span class="badge upcoming" style="font-size:10px; background:#3b82f6; color:white; padding:2px 8px; border-radius:10px;">UPCOMING</span>
+                        </div>
+                        <p style="margin:5px 0 10px 0; color:var(--text-muted); font-size:13px;">Wed, 10 June, 10:00 AM</p>
+                        <div style="display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-muted);">
+                            <img src="/images/avatar.png" style="width:24px; height:24px; border-radius:50%;" onerror="this.src='https://ui-avatars.com/api/?name=Neha+Sharma'">
+                            <span>Neha Sharma • Cyber Expert</span>
+                        </div>
+                    </div>
+                    <div class="training-actions">
+                        <button class="btn-outline-blue">Join Now</button>
+                        <a href="#" class="remind-link">Remind Me</a>
+                    </div>
+                </div>
+
+                <div class="training-row">
+                    <div class="date-badge">
+                        <span class="day">11</span>
+                        <span class="month">JUNE</span>
+                    </div>
+                    <div class="training-info">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <h3 style="margin:0; font-size:18px;">Public Speaking</h3>
+                            <span class="badge upcoming" style="font-size:10px; background:#3b82f6; color:white; padding:2px 8px; border-radius:10px;">UPCOMING</span>
+                        </div>
+                        <p style="margin:5px 0 10px 0; color:var(--text-muted); font-size:13px;">Wed, 10 June, 10:00 AM</p>
+                        <div style="display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-muted);">
+                            <img src="/images/avatar.png" style="width:24px; height:24px; border-radius:50%;" onerror="this.src='https://ui-avatars.com/api/?name=Amit+Sharma'">
+                            <span>Amit Sharma • PD Expert</span>
+                        </div>
+                    </div>
+                    <div class="training-actions">
+                        <button class="btn-outline-blue">Join Now</button>
+                        <a href="#" class="remind-link">Remind Me</a>
+                    </div>
+                </div>
+
+                <div class="training-row">
+                    <div class="date-badge">
+                        <span class="day">12</span>
+                        <span class="month">JUNE</span>
+                    </div>
+                    <div class="training-info">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <h3 style="margin:0; font-size:18px;">Team Collaboration</h3>
+                        </div>
+                        <p style="margin:5px 0 10px 0; color:var(--text-muted); font-size:13px;">Wed, 10 June, 10:00 AM</p>
+                        <div style="display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-muted);">
+                            <img src="/images/avatar.png" style="width:24px; height:24px; border-radius:50%;" onerror="this.src='https://ui-avatars.com/api/?name=Amit+Sharma'">
+                            <span>Amit Sharma • PD Expert</span>
+                        </div>
+                    </div>
+                    <div class="training-actions">
+                        <button class="btn-outline-blue">Join Now</button>
+                        <a href="#" class="remind-link">Remind Me</a>
+                    </div>
+                </div>
+
+                <div class="training-row">
+                    <div class="date-badge">
+                        <span class="day">13</span>
+                        <span class="month">JUNE</span>
+                    </div>
+                    <div class="training-info">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <h3 style="margin:0; font-size:18px;">Company Policy Awareness</h3>
+                        </div>
+                        <p style="margin:5px 0 10px 0; color:var(--text-muted); font-size:13px;">Wed, 10 June, 10:00 AM</p>
+                        <div style="display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-muted);">
+                            <img src="/images/avatar.png" style="width:24px; height:24px; border-radius:50%;" onerror="this.src='https://ui-avatars.com/api/?name=Neha+Sharma'">
+                            <span>Neha Sharma • Cyber Expert</span>
+                        </div>
+                    </div>
+                    <div class="training-actions">
+                        <button class="btn-outline-blue">Join Now</button>
+                        <a href="#" class="remind-link">Remind Me</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- API Integration -->
+    <script th:src="@{/js/learning-api.js}"></script>
+</body>
+</html>
