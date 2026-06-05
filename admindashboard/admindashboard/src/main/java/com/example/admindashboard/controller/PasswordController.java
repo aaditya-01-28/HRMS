@@ -26,6 +26,13 @@ public class PasswordController {
         String currentPassword = payload.get("currentPassword");
         String newPassword = payload.get("newPassword");
 
+        if (newPassword == null || newPassword.trim().isEmpty() || newPassword.contains(" ")) {
+            return ResponseEntity.badRequest().body("Password cannot be empty or contain spaces.");
+        }
+        if (newPassword.length() < 6) {
+            return ResponseEntity.badRequest().body("Password must be at least 6 characters long.");
+        }
+
         Optional<User> userOpt = userRepository.findByUsername(principal.getName());
 
         if (userOpt.isPresent()) {
@@ -37,6 +44,10 @@ public class PasswordController {
 
             if (!actualDbPassword.equals(currentPassword)) {
                 return ResponseEntity.badRequest().body("The current password you entered is incorrect.");
+            }
+
+            if (actualDbPassword.equals(newPassword)) {
+                return ResponseEntity.badRequest().body("New password cannot be the same as your current password.");
             }
 
             // Save the new password with the {noop} prefix so Spring Security still accepts it!
