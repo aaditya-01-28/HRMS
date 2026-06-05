@@ -40,7 +40,31 @@ public class MeetingController {
             // 2. Attach the organizer to the meeting
             meeting.setOrganizer(organizer);
 
-         // 3. Validate specific employee IDs before saving meeting
+            // 3. Validate Date (Max 1 Year in advance & Not in the past)
+            java.time.LocalDate today = java.time.LocalDate.now();
+            if (meeting.getMeetingDate().isBefore(today)) {
+                return ResponseEntity.badRequest().body("Cannot book meetings in the past.");
+            }
+            if (meeting.getMeetingDate().isAfter(today.plusYears(1))) {
+                return ResponseEntity.badRequest().body("Cannot book meetings more than 1 year in advance.");
+            }
+
+            // 4. Overlapping meetings check
+            List<Meeting> existingMeetings = meetingRepository.findByOrganizerAndMeetingDate(organizer, meeting.getMeetingDate());
+            for (Meeting existing : existingMeetings) {
+                // Check if times overlap: new_start < existing_end AND new_end > existing_start
+                if (meeting.getStartTime().isBefore(existing.getEndTime()) && meeting.getEndTime().isAfter(existing.getStartTime())) {
+                    return ResponseEntity.badRequest().body("You already have an overlapping meeting scheduled at this time.");
+                }
+            }
+
+            // 5. Validate specific employee IDs before saving meeting
+            if ("SPECIFIC_EMP".equalsIgnoreCase(meeting.getParticipantType()) || "SPECIFIC_ADM".equalsIgnoreCase(meeting.getParticipantType())) {
+                if (meeting.getSpecificEmployeeIds() == null || meeting.getSpecificEmployeeIds().trim().isEmpty()) {
+                    return ResponseEntity.badRequest().body("Employee/Admin IDs are required when booking for specific participants.");
+                }
+            }
+
             if (meeting.getSpecificEmployeeIds() != null && !meeting.getSpecificEmployeeIds().trim().isEmpty()) {
 
                 String[] invitedIds = meeting.getSpecificEmployeeIds().split(",");
@@ -51,6 +75,11 @@ public class MeetingController {
 
                     if (cleanedEmpId.isEmpty()) {
                         continue;
+                    }
+
+                    // Self-booking check
+                    if (cleanedEmpId.equalsIgnoreCase(username)) {
+                        return ResponseEntity.badRequest().body("You cannot book a meeting with yourself.");
                     }
 
                     boolean employeeExists = userRepository.findByUsername(cleanedEmpId).isPresent();

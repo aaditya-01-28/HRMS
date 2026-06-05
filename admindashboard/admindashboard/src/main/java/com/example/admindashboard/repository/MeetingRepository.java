@@ -12,4 +12,7 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 
     // Fetches all meetings scheduled for today or in the future, sorted by date and time
     List<Meeting> findByMeetingDateGreaterThanEqualOrderByMeetingDateAscStartTimeAsc(LocalDate date);
+
+    // Fetches meetings by organizer and date for overlapping validation
+    List<Meeting> findByOrganizerAndMeetingDate(com.example.admindashboard.model.User organizer, LocalDate meetingDate);
 }
