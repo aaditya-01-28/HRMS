@@ -41,6 +41,13 @@ public class ChatController {
     public String viewChatPage(Principal principal, Model model) {
         String username = principal.getName();
         User currentUser = userRepository.findByUsername(username).orElseThrow();
+        
+        System.out.println("USER = " + currentUser.getFullName());
+
+        if(currentUser.getEmployeeProfile() != null){
+            System.out.println("PROFILE DESIGNATION = " +
+                    currentUser.getEmployeeProfile().getDesignation());
+        }
 
         // Fetch EMP only colleagues
         List<User> empUsers = userRepository.findAll().stream()
@@ -150,7 +157,20 @@ public class ChatController {
         List<User> searchResults = userRepository.findAll().stream()
                 .filter(u -> !u.getId().equals(currentUser.getId()))
                 .filter(u -> u.getUsername() != null && u.getUsername().startsWith("EMP"))
-                .filter(u -> u.getUsername().toLowerCase().contains(query.toLowerCase()))
+                .filter(u -> {
+
+                    String searchText = query.toLowerCase();
+
+                    boolean usernameMatch =
+                            u.getUsername() != null &&
+                            u.getUsername().toLowerCase().contains(searchText);
+
+                    boolean fullNameMatch =
+                            u.getFullName() != null &&
+                            u.getFullName().toLowerCase().contains(searchText);
+
+                    return usernameMatch || fullNameMatch;
+                })                
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(searchResults);

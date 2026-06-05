@@ -93,6 +93,15 @@ public class User {
     // --- NEW: CLIENT PROFILE GETTERS/SETTERS ---
     public Client getClientProfile() { return clientProfile; }
     public void setClientProfile(Client clientProfile) { this.clientProfile = clientProfile;}
+    
+ // DESIGNATION FIELD AND METHODS HERE
+    private String designation;
 
-
+    public String getDesignation() { return designation; }
+    public void setDesignation(String designation) { this.designation = designation; }
+    
+ 
+    private String profileImage;
+    public String getProfileImage() { return profileImage; }
+    public void setProfileImage(String profileImage) { this.profileImage = profileImage; }
 }
