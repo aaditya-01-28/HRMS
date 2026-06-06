@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Details</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/pages/learning.css}">
+</head>
+<body data-page-id="course-details">
+
+    <!-- Sidebar -->
+    <div th:replace="fragments/learning-sidebar :: learning-sidebar"></div>
+
+    <!-- Main Content -->
+    <div class="learning-main-content">
+        <!-- Header -->
+        <div th:replace="fragments/learning-header :: learning-header"></div>
+        
+        <div class="page-container">
+            
+            <div class="breadcrumb">
+                Explore Courses <span>></span> <span style="color:var(--text-main)">Course Details</span>
+            </div>
+
+            <div class="card" style="padding:40px;">
+                <div class="course-detail-header">
+                    <div class="course-title-section">
+                        <div class="icon-large"><i class="fa-brands fa-envira"></i></div>
+                        <div class="course-title-info">
+                            <h1 id="courseTitle">Loading...</h1>
+                            <p id="courseAuthor" style="color:var(--text-muted); margin:0 0 10px 0;">By ...</p>
+                            <div class="course-meta" style="margin-bottom:0;" id="courseRating">
+                                <!-- JS -->
+                            </div>
+                            <div class="tag-list">
+                                <span class="tag" id="courseLevel">...</span>
+                                <span class="tag" id="courseCategory">...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-primary" style="padding: 10px 30px;">Start Learning</button>
+                </div>
+
+                <p style="font-size:16px; margin-bottom: 30px;" id="courseDesc">
+                    <!-- JS -->
+                </p>
+
+                <div class="modules-list">
+                    <h3>MODULES</h3>
+                    <div id="modulesList">
+                        <!-- JS -->
+                    </div>
+                </div>
+
+                <div class="action-footer">
+                    <button class="btn-cancel" onclick="location.href='/learning/explore-courses'">Cancel</button>
+                    <button class="btn-primary" style="padding: 10px 40px; font-weight:600;">Start Course</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- API Integration -->
+    <script th:src="@{/js/learning-api.js}"></script>
+</body>
+</html>

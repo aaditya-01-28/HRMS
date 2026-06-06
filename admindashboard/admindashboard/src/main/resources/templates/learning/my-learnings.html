@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Learnings</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/pages/learning.css}">
+</head>
+<body data-page-id="my-learnings">
+
+    <!-- Sidebar -->
+    <div th:replace="fragments/learning-sidebar :: learning-sidebar"></div>
+
+    <!-- Main Content -->
+    <div class="learning-main-content">
+        <!-- Header -->
+        <div th:replace="fragments/learning-header :: learning-header"></div>
+        
+        <div class="page-container">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('ongoing')">Ongoing</div>
+                <div class="tab" onclick="switchTab('completed')">Completed</div>
+                <div class="tab" onclick="switchTab('certificates')">Certificates</div>
+            </div>
+
+            <!-- Ongoing Tab Content -->
+            <div id="ongoing" class="tab-content">
+                <h2 id="ongoingCount" style="margin-top:0; font-size:16px;">Ongoing Courses (0)</h2>
+                <div id="ongoingContainer">
+                    <!-- JS -->
+                    <p style="color:gray;">Loading...</p>
+                </div>
+            </div>
+
+            <!-- Completed Tab Content -->
+            <div id="completed" class="tab-content" style="display:none;">
+                <h2 id="completedCount" style="margin-top:0; font-size:16px;">Completed Courses (0)</h2>
+                <div id="completedContainer">
+                    <!-- JS -->
+                </div>
+            </div>
+
+            <!-- Certificates Tab Content -->
+            <div id="certificates" class="tab-content" style="display:none;">
+                <p style="color:var(--text-muted);">No certificates earned yet.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- API Integration -->
+    <script th:src="@{/js/learning-api.js}"></script>
+</body>
+</html>

@@ -447,7 +447,12 @@
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem;" th:text="${meeting.meetingTitle}">Meeting Title</h6>
-                                <span class="badge rounded-pill" th:style="${meeting.platform == 'Google Meet' ? 'background-color: #d1fae5; color: #059669; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;' : 'background-color: #e0e7ff; color: #4338ca; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;'}">Upcoming</span>
+                                <span th:with="now=${T(java.time.LocalDateTime).now()},
+                                               meetingStart=${meeting.meetingDate.atTime(meeting.startTime)},
+                                               meetingEnd=${meeting.meetingDate.atTime(meeting.endTime)}"
+                                      th:text="${now.isAfter(meetingEnd) ? 'Completed' : (now.isAfter(meetingStart) ? 'Ongoing' : 'Upcoming')}"
+                                      th:style="${now.isAfter(meetingEnd) ? 'background-color: #f1f5f9; color: #64748b; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;' : (now.isAfter(meetingStart) ? 'background-color: #fef3c7; color: #d97706; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;' : (meeting.platform == 'Google Meet' ? 'background-color: #d1fae5; color: #059669; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;' : 'background-color: #e0e7ff; color: #4338ca; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;'))}"
+                                      class="badge rounded-pill"></span>
                             </div>
                             <div class="text-muted mb-2" style="font-size: 0.9rem; font-weight: 500;">
                                 <span th:text="${meeting.platform}">Platform</span> • 
@@ -683,11 +688,13 @@
         }
     }
 
-    // Force all date inputs to have a maximum year of 9999 (4 digits)
+    // Force all date inputs to have a maximum year of 1 year from now
+    const maxDate = new Date();
+    maxDate.setFullYear(maxDate.getFullYear() + 1);
+    const maxDateString = maxDate.toISOString().split('T')[0];
+
     document.querySelectorAll('input[type="date"]').forEach(function(dateInput) {
-        if (!dateInput.getAttribute('max')) {
-            dateInput.setAttribute('max', '9999-12-31');
-        }
+        dateInput.setAttribute('max', maxDateString);
     });
 
     // NEW: Prevent booking past dates by setting the minimum date to today

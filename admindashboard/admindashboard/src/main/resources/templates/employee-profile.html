@@ -1,429 +1,368 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - WhiteCircle</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bs-primary: #1e3a8a; /* Navy Blue Main Theme */
-            --bs-accent: #3b82f6;  /* Brighter Blue */
-            --bg-color: #f1f5f9;   /* Background */
+            --sidebar-bg: #0b1120;
+            --sidebar-hover: #1e293b;
+            --sidebar-active: #2563eb;
+            --text-main: #0f172a;
+            --bg-body: #f8fafc;
+            --border-color: #e2e8f0;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: #334155;
+            background-color: var(--bg-body);
+            margin: 0; padding: 0;
+            color: var(--text-main);
+            overflow-x: hidden;
         }
 
-        .top-header {
-            background: white; border-bottom: 1px solid #e2e8f0;
-            padding: 22px 40px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
-        }
-        .page-title {
-            font-size: 1.25rem; font-weight: 700; color: var(--bs-primary);
-            display: flex; align-items: center; gap: 12px;
-        }
-        .btn-back-home {
-            background-color: var(--bs-primary); color: white;
-            border-radius: 10px; padding: 10px 24px; font-weight: 600;
-            font-size: 0.9rem; text-decoration: none; display: flex; align-items: center;
-            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2); transition: all 0.3s ease;
-        }
-        .btn-back-home:hover {
-            background-color: #172554; transform: translateY(-2px); color: white;
+        .profile-layout {
+            display: flex;
+            min-height: 100vh;
         }
 
-        .profile-container {
-            max-width: 1300px; /* Increased width slightly for better fit */
-            margin: 120px auto 40px; padding: 0 20px;
-        }
-
-        .pro-card {
-            background: white; border: 1px solid #e2e8f0;
-            border-radius: 16px; overflow: hidden; margin-bottom: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            /* This ensures right side cards stretch to fill space */
+        /* SIDEBAR (TAB MENU) */
+        .profile-sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            color: #fff;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
             display: flex; flex-direction: column;
+            padding-top: 30px;
+            z-index: 1000;
         }
 
-        .pro-card-header {
-            background: var(--bs-primary); color: white;
-            padding: 15px 25px; font-weight: 700; text-transform: uppercase;
-            font-size: 0.85rem; letter-spacing: 0.5px; display: flex; align-items: center;
-        }
-        .pro-card-header i { color: #bfdbfe; margin-right: 10px; font-size: 1.1rem; }
-        .pro-card-body { padding: 25px; flex-grow: 1; } /* Body grows to fill height */
-
-        .identity-card-bg {
-            background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%);
-            border-color: #c7d2fe;
+        .user-summary {
+            text-align: center;
+            padding: 0 20px 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
         }
 
-        /* FLOATING LABELS FIX */
-        /* Note: Bootstrap requires 'placeholder' on input for this to work */
-        .form-floating > .form-control {
-            border: 1px solid #cbd5e1; border-radius: 8px; background-color: #fff;
-            height: calc(3.5rem + 2px); line-height: 1.25;
-        }
-        .form-floating > .form-control:focus {
-            border-color: var(--bs-primary); box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.05);
-        }
-        .form-floating > label {
-            color: #64748b; padding: 1rem 0.75rem;
-        }
-        .form-control:read-only { background-color: #f1f5f9; color: #475569; }
-
-        /* PHOTO & RESUME  */
-        .profile-photo-wrapper {
-            position: relative; width: 120px; height: 120px; margin: 0 auto 20px;
-        }
-        .profile-img {
-            width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
-            border: 4px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-        .edit-photo-btn {
-            position: absolute; bottom: 5px; right: 0; background: var(--bs-primary);
-            color: white; border-radius: 50%; width: 32px; height: 32px;
+        .avatar-circle {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, #2563eb 0%, #38bdf8 100%);
+            color: white; font-size: 2rem; font-weight: 700;
             display: flex; align-items: center; justify-content: center;
-            border: 2px solid white; cursor: pointer;
+            border-radius: 50%; border: 3px solid #fff;
+            margin: 0 auto 15px;
         }
-        .resume-box {
-            border: 2px dashed #cbd5e1; padding: 30px; text-align: center;
-            background: #f8fafc; border-radius: 12px; cursor: pointer; transition: all 0.3s;
-        }
-        .resume-box:hover { border-color: var(--bs-primary); background: #eff6ff; }
 
-        /* 1. CARD HOVER EFFECTS  */
-        .pro-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            overflow: hidden;
-            margin-bottom: 24px;
+        .user-name { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+        .user-desig { font-size: 0.85rem; color: #94a3b8; margin-bottom: 0; }
+
+        .nav-pills { padding: 0 15px; }
+        .nav-pills .nav-link {
+            color: #cbd5e1; border-radius: 8px;
+            padding: 12px 16px; margin-bottom: 8px;
+            font-weight: 500; font-size: 0.95rem;
+            display: flex; align-items: center; transition: all 0.2s;
+            text-align: left;
+        }
+        .nav-pills .nav-link i { width: 24px; text-align: center; margin-right: 12px; font-size: 1.1rem; }
+        .nav-pills .nav-link:hover { background-color: var(--sidebar-hover); color: #fff; }
+        .nav-pills .nav-link.active { background-color: var(--sidebar-active); color: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+
+        /* MAIN CONTENT AREA */
+        .profile-main {
+            margin-left: 280px;
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
-
-            /* ADD THESE LINES for smooth animation */
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            position: relative;
         }
 
-        /* The Hover Action */
-        .pro-card:hover {
-            transform: translateY(-7px); /* Lifts the card up */
-            box-shadow: 0 15px 30px rgba(30, 58, 138, 0.12); /* Soft, deep blue shadow */
-            border-color: #cbd5e1; /* Slightly darker border */
-            z-index: 10; /* Brings it on top of other elements */
+        .top-nav {
+            background: #fff; padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
         }
 
-        /* 2. INPUT FIELD FOCUS EFFECT */
-        /* Makes inputs feel alive when clicked */
-        .form-floating > .form-control {
-            transition: all 0.2s ease;
-        }
-        .form-floating > .form-control:focus {
-            transform: scale(1.01); /* Tiny zoom effect */
-            background-color: #fff;
-            border-color: var(--bs-primary);
-            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.08);
-        }
+        .top-nav-title { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+        
+        .progress-wrapper { display: flex; align-items: center; gap: 15px; }
+        .progress-text { font-size: 0.85rem; font-weight: 600; color: #64748b; }
+        .progress { width: 150px; height: 8px; border-radius: 10px; background-color: #e2e8f0; }
+        .progress-bar { background: linear-gradient(90deg, #2563eb 0%, #38bdf8 100%); border-radius: 10px; }
 
-        /* 3. RESUME BOX HOVER  */
-        .resume-box {
-            border: 2px dashed #cbd5e1;
-            padding: 30px; text-align: center;
-            background: #f8fafc;
-            border-radius: 12px;
-            cursor: pointer;
+        .content-area { padding: 40px; max-width: 1000px; margin: 0 auto; width: 100%; flex-grow: 1; }
 
-            /* Smooth transition */
-            transition: all 0.3s ease;
-        }
-        .resume-box:hover {
-            border-color: var(--bs-primary);
-            background: #eff6ff;
-            transform: translateY(-4px); /* Bounce up */
-            box-shadow: 0 8px 15px rgba(30, 58, 138, 0.15);
+        .tab-pane-card {
+            background: #fff; border-radius: 16px; border: 1px solid var(--border-color);
+            padding: 35px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
 
-        /* UPDATE: IDENTITY CARD BORDER  */
-        .identity-card-bg {
-            background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%);
-            /* CHANGED: Navy Blue Border (2px for visibility) */
-            border: 2px solid var(--bs-primary) !important;
+        .tab-header {
+            font-size: 1.3rem; font-weight: 700; color: #1e293b;
+            margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #f1f5f9;
         }
 
-        /* RESUME ACTION BUTTONS */
-        .action-icon-btn {
-            width: 32px; height: 32px;
-            border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s; border: 1px solid transparent;
+        /* FORM FIELDS */
+        .info-box { margin-bottom: 24px; position: relative; }
+        .info-label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+        .info-value-text { font-size: 0.95rem; font-weight: 500; color: #0f172a; word-break: break-word; min-height: 24px; display: block; }
+        
+        .editable-field {
+            width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px;
+            font-size: 0.95rem; color: #0f172a; transition: all 0.2s; display: none; background: #fff;
         }
-        .action-icon-btn:hover { background: #f1f5f9; transform: scale(1.1); }
-        .text-replace { color: var(--bs-primary); }
-        .text-delete { color: #dc2626; }
+        .editable-field:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        .editable-field:read-only { background-color: #f8fafc; color: #475569; border-color: #e2e8f0; cursor: not-allowed; }
 
-    </style>
-    <link href="/css/style.css" rel="stylesheet">
+        /* Edit Mode Toggle */
+        body.editing .info-value-text { display: none !important; }
+        body.editing .editable-field { display: block !important; }
+        
+        .empty-field { color: #94a3b8; font-style: italic; }
 
-    <style>
+        /* FOOTER ACTIONS */
+        .action-footer {
+            margin-top: 40px; padding-top: 25px; border-top: 1px solid #e2e8f0;
+            display: flex; justify-content: flex-end; gap: 15px;
+        }
+        .btn-action { padding: 10px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; transition: all 0.2s; }
+        .btn-primary { background-color: #2563eb; border: none; box-shadow: 0 4px 6px rgba(37,99,235,0.2); color: #fff; }
+        .btn-primary:hover { background-color: #1d4ed8; transform: translateY(-1px); color: #fff; }
+        .btn-outline { background: white; border: 1px solid #2563eb; color: #2563eb; text-decoration: none; display: flex; align-items: center; }
+        .btn-outline:hover { background: #eff6ff; color: #2563eb; }
+
         @media (max-width: 991px) {
-
-            /* 1. COMPACT GLOBAL LAYOUT */
-            html, body {
-                padding-top: 0 !important;
-                margin-top: 0 !important;
-                padding-left: 0 !important;
-                padding-right: 0 !important;
-                overflow-x: hidden !important;
-                width: 100% !important;
-            }
-            body { padding-top: 80px !important; }
-
-            /* 2. REORGANIZE HEADER & SHORTEN BUTTONS */
-            .top-header {
-                height: auto !important; padding: 12px 15px !important; display: flex !important;
-                flex-direction: row !important; justify-content: space-between !important; align-items: center !important;
-            }
-            .page-title { min-width: 0 !important; width: auto !important; flex: 1 !important; }
-            .page-title i { font-size: 1.3rem !important; }
-            .page-title span {
-                font-size: 1.1rem !important; margin-left: 8px !important;
-                padding-left: 8px !important; line-height: 1.1 !important; white-space: nowrap !important;
-            }
-
-            .top-header > .d-flex { gap: 6px !important; }
-
-            /* Shorten "Edit Details" to "Edit" and "Back to Home" to "Back" */
-            .btn-outline-primary, .btn-back-home {
-                padding: 6px 10px !important; font-size: 0px !important; /* Hide original text */
-                border-radius: 8px !important; display: flex !important; align-items: center !important;
-            }
-            .btn-outline-primary i, .btn-back-home i { font-size: 0.75rem !important; margin: 0 !important; }
-
-            .btn-outline-primary::after { content: "Edit"; font-size: 0.75rem; margin-left: 4px; font-weight: 700; }
-            .btn-back-home::after { content: "Back"; font-size: 0.75rem; margin-left: 4px; font-weight: 700; }
-
-            /* 3. PROFILE CONTAINER & CARD RE-ORDERING */
-            .profile-container { margin-top: 15px !important; padding: 0 12px !important; }
-
-            /* Force the main row to be a flex column so we can order all cards */
-            .profile-container .row.g-4 { display: flex !important; flex-direction: column !important; }
-
-            /* Treat the columns as 'transparent' containers so cards are siblings */
-            .col-lg-8, .col-lg-4 { display: contents !important; }
-
-            /* Set default order for all cards */
-            .pro-card { order: 2; margin-bottom: 15px !important; border-radius: 12px !important; }
-
-            /* Keep Identity Card at the top */
-            .identity-card-bg { order: 1 !important; }
-
-            /* FORCE RESUME CARD TO THE VERY BOTTOM */
-            .pro-card:has(.fa-file-pdf),
-            .pro-card:nth-child(3) { order: 10 !important; margin-bottom: 40px !important; }
-
-            /* 4. IDENTITY CARD (TOP SECTION) */
-            .pro-card.identity-card-bg .pro-card-body {
-                flex-direction: column !important; padding: 20px 15px !important; gap: 15px !important;
-            }
-            .profile-photo-wrapper { width: 90px !important; height: 90px !important; margin-bottom: 10px !important; }
-
-            /* 5. INPUT FIELD TIGHTENING */
-            .form-floating > .form-control {
-                height: 3rem !important; font-size: 0.85rem !important;
-                padding-top: 1.2rem !important; padding-bottom: 0.4rem !important;
-            }
-            .form-floating > label { padding: 0.8rem 0.75rem !important; font-size: 0.75rem !important; }
-
-            .row.g-3 > .col-md-6 { width: 100% !important; margin-bottom: 10px !important; }
-            .row.g-2 > .col-6 { width: 50% !important; }
-
-            /* 6. CARD HEADERS & RESUME BOX */
-            .pro-card-header { padding: 10px 15px !important; font-size: 0.75rem !important; }
-            .pro-card-body { padding: 15px !important; }
-
-            .resume-box { padding: 20px 15px !important; }
-            .resume-box i.fa-3x { font-size: 2rem !important; }
-            .resume-box h6 { font-size: 0.85rem !important; }
-
-            .resume-box .mt-4.pt-3 {
-                flex-direction: column !important; gap: 10px !important; text-align: center !important;
-            }
-            .resume-box .d-flex.gap-1 { width: 100% !important; justify-content: center !important; }
+            .profile-sidebar { width: 80px; }
+            .user-summary { padding: 20px 0; }
+            .avatar-circle { width: 50px; height: 50px; font-size: 1.2rem; }
+            .user-name, .user-desig { display: none; }
+            .nav-pills .nav-link span { display: none; }
+            .nav-pills .nav-link i { margin-right: 0; margin: 0 auto; font-size: 1.3rem; }
+            .profile-main { margin-left: 80px; }
+            .top-nav { padding: 15px 20px; }
+            .content-area { padding: 20px; }
         }
     </style>
-
-    <link href="/css/dark-mode.css" rel="stylesheet">
-    <script src="/js/theme-engine.js"></script>
 </head>
 <body>
 
-<header class="top-header">
-    <div class="page-title d-flex align-items-center">
-        <i class="fas fa-user text-dark" style="font-size: 2.5rem;"></i>
-        <span class="fw-bold text-dark" style="border-left: 2px solid #cbd5e1; padding-left: 17px; margin-left: 15px; font-size: 1.5rem; letter-spacing: 0.5px;">
-            MY PROFILE SECTION
-        </span>
+<div class="profile-layout">
+    <!-- LEFT SIDEBAR -->
+    <div class="profile-sidebar">
+        <div class="user-summary">
+            <div class="avatar-circle" th:text="${user.fullName != null ? user.fullName.substring(0,1) : 'U'}">U</div>
+            <div class="user-name" th:text="${user.fullName}">Employee Name</div>
+            <div class="user-desig" th:text="${user.employeeProfile?.designation ?: 'Designation'}">Designation</div>
+        </div>
+        
+        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <button class="nav-link active" id="v-pills-personal-tab" data-bs-toggle="pill" data-bs-target="#v-pills-personal" type="button" role="tab"><i class="fas fa-user"></i> <span>Personal Details</span></button>
+            <button class="nav-link" id="v-pills-edu-tab" data-bs-toggle="pill" data-bs-target="#v-pills-edu" type="button" role="tab"><i class="fas fa-graduation-cap"></i> <span>Educational Details</span></button>
+            <button class="nav-link" id="v-pills-work-tab" data-bs-toggle="pill" data-bs-target="#v-pills-work" type="button" role="tab"><i class="fas fa-briefcase"></i> <span>Work Details</span></button>
+            <button class="nav-link" id="v-pills-project-tab" data-bs-toggle="pill" data-bs-target="#v-pills-project" type="button" role="tab"><i class="fas fa-network-wired"></i> <span>Project & Allocation</span></button>
+            <button class="nav-link" id="v-pills-reporting-tab" data-bs-toggle="pill" data-bs-target="#v-pills-reporting" type="button" role="tab"><i class="fas fa-sitemap"></i> <span>Reporting Lines</span></button>
+            <button class="nav-link" id="v-pills-emergency-tab" data-bs-toggle="pill" data-bs-target="#v-pills-emergency" type="button" role="tab"><i class="fas fa-phone-alt"></i> <span>Emergency Contact</span></button>
+        </div>
     </div>
 
-    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show shadow-sm mt-3" role="alert">
-        <i class="fas fa-check-circle me-2"></i>
-        <span th:text="${successMessage}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-
-    <div class="d-flex align-items-center gap-3">
-        <a href="/employee/full-profile" class="btn btn-outline-primary fw-bold me-2" style="border-color: var(--bs-primary); color: var(--bs-primary);">
-            <i class="fas fa-user-edit me-2"></i> Edit Details
-        </a>
-        <a href="/employee/dashboard" class="btn-back-home">
-            <i class="fas fa-arrow-left me-2"></i> Back to Home
-        </a>
-    </div>
-</header>
-
-<div class="profile-container">
-    <form>
-        <div class="row g-4 align-items-stretch">
-            <div class="col-lg-8 d-flex flex-column">
-
-                <div class="pro-card identity-card-bg">
-                    <div class="pro-card-body d-flex flex-column flex-md-row align-items-center gap-4">
-                        <div class="text-center">
-                            <div class="profile-photo-wrapper">
-                                <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.fullName} + '&background=1e3a8a&color=fff&size=200'}"
-                                     class="profile-img" alt="User">
-                                <div class="edit-photo-btn"><i class="fas fa-camera fa-xs"></i></div>
-                            </div>
-                            <div class="badge bg-primary text-white rounded-pill px-3 py-2 shadow-sm">Active</div>
-                        </div>
-                        <div class="row g-3 w-100">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control fw-bold text-primary" id="empName"
-                                           th:value="${user.fullName}" readonly>
-                                    <label for="empName">Employee Name</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control fw-bold" id="empDesig"
-                                           th:value="${user.employeeProfile?.designation}" readonly>
-                                    <label for="empDesig">Designation</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="empId"
-                                           th:value="${user.username}" readonly>
-                                    <label for="empId">Employee ID</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="empExp"
-                                           th:value="${user.employeeProfile?.experience}" readonly>
-                                    <label for="empExp">Experience</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pro-card">
-                    <div class="pro-card-header"><i class="fas fa-laptop-code"></i> Project & Allocation</div>
-                    <div class="pro-card-body">
-                        <div class="row g-3">
-                            <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.businessUnit}" readonly><label>Business Unit</label></div></div>
-                            <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.accountName}" readonly><label>Account Name</label></div></div>
-                            <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.projectName}" readonly><label>Project Name</label></div></div>
-                            <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.projectCode}" readonly><label>Project Code</label></div></div>
-                            <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.teamGroup}" readonly><label>Team / Group</label></div></div>
-                            <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.customerName}" readonly><label>Customer Name</label></div></div>
-                            <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.verticalName}" readonly><label>Vertical Name</label></div></div>
-                            <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.domainIndustry}" readonly><label>Domain/Industry</label></div></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pro-card">
-                    <div class="pro-card-header"><i class="fas fa-file-pdf"></i> Resume / CV Upload</div>
-                    <div class="pro-card-body">
-                        <div class="resume-box">
-                            <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
-                            <h6 class="fw-bold mb-1">Upload New Resume</h6>
-                            <p class="text-muted small mb-3">Drag & drop or click to upload</p>
-                            <input type="file" class="form-control form-control-sm visually-hidden" id="resumeUpload">
-                            <label for="resumeUpload" class="btn btn-outline-primary btn-sm px-4">Choose File</label>
-
-                            <div class="mt-4 pt-3 border-top d-flex align-items-center justify-content-between bg-white p-2 rounded border">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-file-alt text-danger me-2 fa-lg"></i>
-                                    <div>
-                                        <span class="d-block small text-muted" style="line-height: 1;">Current File:</span>
-                                        <a href="#" class="fw-bold text-dark text-decoration-none small">resume_v1.pdf</a>
-                                    </div>
-                                </div>
-                                <div class="d-flex gap-1">
-                                    <button type="button" class="btn action-icon-btn text-replace" title="Replace File"><i class="fas fa-sync-alt"></i></button>
-                                    <button type="button" class="btn action-icon-btn text-delete" title="Delete File"><i class="fas fa-trash-alt"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+    <!-- MAIN CONTENT -->
+    <div class="profile-main">
+        <div class="top-nav">
+            <div class="top-nav-title text-primary">
+                <i class="fas fa-user-circle"></i> My Profile
             </div>
-
-            <div class="col-lg-4 d-flex flex-column">
-
-                <div class="pro-card flex-grow-1">
-                    <div class="pro-card-header"><i class="fas fa-address-card"></i> Contact Details</div>
-                    <div class="pro-card-body d-flex flex-column justify-content-center">
-                        <div class="d-flex flex-column gap-3">
-                            <div class="form-floating">
-                                <input type="email" class="form-control" th:value="${user.email}" readonly>
-                                <label>Official Email</label>
-                            </div>
-                            <div class="form-floating"><input type="tel" class="form-control" th:value="${user.employeeProfile?.mobileNumber}" readonly><label>Mobile Number</label></div>
-                            <div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.workLocation}" readonly><label>Work Location</label></div>
-                            <div class="row g-2">
-                                <div class="col-6"><div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.city}" readonly><label>City</label></div></div>
-                                <div class="col-6"><div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.country}" readonly><label>Country</label></div></div>
-                            </div>
-                            <div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.joiningDate}" readonly><label>Date of Joining</label></div>
-                        </div>
-                    </div>
+            <div class="progress-wrapper">
+                <span class="progress-text">Profile <span id="percentLabel" class="text-primary">0%</span> completed</span>
+                <div class="progress">
+                    <div class="progress-bar" id="completionBar" role="progressbar" style="width: 0%"></div>
                 </div>
-
-                <div class="pro-card flex-grow-1">
-                    <div class="pro-card-header"><i class="fas fa-sitemap"></i> Reporting Lines</div>
-                    <div class="pro-card-body d-flex flex-column justify-content-center">
-                        <div class="d-flex flex-column gap-3">
-                            <div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.reportingManager}" readonly><label>Reporting Manager</label></div>
-                            <div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.projectManager}" readonly><label>Project Manager</label></div>
-                            <div class="form-floating"><input type="text" class="form-control" th:value="${user.employeeProfile?.buHrContact}" readonly><label>BU-HR Contact</label></div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
-    </form>
+
+        <div class="content-area">
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show fw-bold shadow-sm mb-4" role="alert">
+                <i class="fas fa-check-circle me-2"></i> <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="tab-pane-card">
+                <form id="masterProfileForm" th:action="@{/employee/profile/save-detailed}" method="POST">
+                    <!-- HIDDEN FIELD FOR REDIRECT -->
+                    <input type="hidden" name="returnUrl" value="/employee/profile">
+                    
+                    <div class="tab-content" id="v-pills-tabContent">
+                        
+                        <!-- 1. PERSONAL DETAILS -->
+                        <div class="tab-pane fade show active" id="v-pills-personal" role="tabpanel">
+                            <h4 class="tab-header">Personal Details</h4>
+                            <div class="row">
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Employee Name</label><span class="info-value-text" th:text="${user.fullName}"></span><input type="text" class="editable-field" th:value="${user.fullName}" readonly></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Phone Number</label><span class="info-value-text" th:text="${user.employeeProfile?.mobileNumber}"></span><input type="text" name="mobileNumber" class="editable-field tracked-field" th:value="${user.employeeProfile?.mobileNumber}" pattern="\d{10}" title="10 digits"></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Employee ID</label><span class="info-value-text" th:text="${user.username}"></span><input type="text" class="editable-field" th:value="${user.username}" readonly></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Gender</label><span class="info-value-text" th:text="${user.employeeProfile?.gender}"></span><select name="gender" class="editable-field tracked-field"><option value="">Select</option><option value="Male" th:selected="${user.employeeProfile?.gender == 'Male'}">Male</option><option value="Female" th:selected="${user.employeeProfile?.gender == 'Female'}">Female</option></select></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Designation</label><span class="info-value-text" th:text="${user.employeeProfile?.designation}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.designation}" readonly></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Date of Birth</label><span class="info-value-text" th:text="${user.employeeProfile?.dob}"></span><input type="date" name="dob" class="editable-field tracked-field" th:value="${user.employeeProfile?.dob}" max="9999-12-31"></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Official Email</label><span class="info-value-text" th:text="${user.email}"></span><input type="email" class="editable-field" th:value="${user.email}" readonly></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">PAN Card No.</label><span class="info-value-text text-uppercase" th:text="${user.employeeProfile?.panNo}"></span><input type="text" name="panNo" class="editable-field tracked-field text-uppercase" th:value="${user.employeeProfile?.panNo}" pattern="[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}"></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Personal Email</label><span class="info-value-text" th:text="${user.employeeProfile?.personalEmail}"></span><input type="email" name="personalEmail" class="editable-field tracked-field" th:value="${user.employeeProfile?.personalEmail}"></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Aadhaar Card No.</label><span class="info-value-text" th:text="${user.employeeProfile?.aadharNo}"></span><input type="text" name="aadharNo" class="editable-field tracked-field" th:value="${user.employeeProfile?.aadharNo}" pattern="\d{12}"></div></div>
+                                <div class="col-12"><div class="info-box"><label class="info-label">Permanent Address</label><span class="info-value-text" th:text="${user.employeeProfile?.permanentAddress}"></span><textarea name="permanentAddress" class="editable-field tracked-field" rows="2" th:text="${user.employeeProfile?.permanentAddress}"></textarea></div></div>
+                            </div>
+                        </div>
+
+                        <!-- 2. EDUCATIONAL DETAILS -->
+                        <div class="tab-pane fade" id="v-pills-edu" role="tabpanel">
+                            <h4 class="tab-header">Educational Details</h4>
+                            <h6 class="text-primary fw-bold mb-3">Highest Qualification</h6>
+                            <div class="row mb-4 border-bottom pb-2">
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Degree / Course</label><span class="info-value-text" th:text="${user.employeeProfile?.qual1Title}"></span><input type="text" name="qual1Title" class="editable-field tracked-field" th:value="${user.employeeProfile?.qual1Title}"></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">University / Board</label><span class="info-value-text" th:text="${user.employeeProfile?.qual1Inst}"></span><input type="text" name="qual1Inst" class="editable-field tracked-field" th:value="${user.employeeProfile?.qual1Inst}"></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Passing Year</label><span class="info-value-text" th:text="${user.employeeProfile?.qual1Year}"></span><input type="text" name="qual1Year" class="editable-field tracked-field" th:value="${user.employeeProfile?.qual1Year}" pattern="^(19|20)\d{2}$"></div></div>
+                            </div>
+                            <h6 class="text-primary fw-bold mb-3">Secondary Qualification</h6>
+                            <div class="row">
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Degree / Course</label><span class="info-value-text" th:text="${user.employeeProfile?.qual2Title}"></span><input type="text" name="qual2Title" class="editable-field tracked-field" th:value="${user.employeeProfile?.qual2Title}"></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">University / Board</label><span class="info-value-text" th:text="${user.employeeProfile?.qual2Inst}"></span><input type="text" name="qual2Inst" class="editable-field tracked-field" th:value="${user.employeeProfile?.qual2Inst}"></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Passing Year</label><span class="info-value-text" th:text="${user.employeeProfile?.qual2Year}"></span><input type="text" name="qual2Year" class="editable-field tracked-field" th:value="${user.employeeProfile?.qual2Year}" pattern="^(19|20)\d{2}$"></div></div>
+                            </div>
+                        </div>
+
+                        <!-- 3. WORK DETAILS -->
+                        <div class="tab-pane fade" id="v-pills-work" role="tabpanel">
+                            <h4 class="tab-header">Work Details</h4>
+                            <div class="row">
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Date of Joining</label><span class="info-value-text" th:text="${user.employeeProfile?.joiningDate}"></span><input type="date" name="joiningDate" class="editable-field tracked-field" th:value="${user.employeeProfile?.joiningDate}" max="9999-12-31"></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Experience</label><span class="info-value-text" th:text="${user.employeeProfile?.experience}"></span><input type="text" name="experience" class="editable-field tracked-field" th:value="${user.employeeProfile?.experience}"></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">City</label><span class="info-value-text" th:text="${user.employeeProfile?.city}"></span><input type="text" name="city" class="editable-field tracked-field" th:value="${user.employeeProfile?.city}"></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Work Location / Address</label><span class="info-value-text" th:text="${user.employeeProfile?.workingAddress}"></span><textarea name="workingAddress" class="editable-field tracked-field" rows="2" th:text="${user.employeeProfile?.workingAddress}"></textarea></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">State / Country</label><span class="info-value-text" th:text="${user.employeeProfile?.country}"></span><input type="text" name="country" class="editable-field tracked-field" th:value="${user.employeeProfile?.country}"></div></div>
+                            </div>
+                        </div>
+
+                        <!-- 4. PROJECT & ALLOCATION -->
+                        <div class="tab-pane fade" id="v-pills-project" role="tabpanel">
+                            <h4 class="tab-header">Project & Allocation</h4>
+                            <div class="row">
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Business Unit</label><span class="info-value-text" th:text="${user.employeeProfile?.businessUnit}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.businessUnit}" readonly></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Account Name</label><span class="info-value-text" th:text="${user.employeeProfile?.accountName}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.accountName}" readonly></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Project Name</label><span class="info-value-text" th:text="${user.employeeProfile?.projectName}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.projectName}" readonly></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Project Code</label><span class="info-value-text" th:text="${user.employeeProfile?.projectCode}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.projectCode}" readonly></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Team / Group</label><span class="info-value-text" th:text="${user.employeeProfile?.teamGroup}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.teamGroup}" readonly></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Vertical Name</label><span class="info-value-text" th:text="${user.employeeProfile?.verticalName}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.verticalName}" readonly></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Customer Name</label><span class="info-value-text" th:text="${user.employeeProfile?.customerName}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.customerName}" readonly></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Domain / Industry</label><span class="info-value-text" th:text="${user.employeeProfile?.domainIndustry}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.domainIndustry}" readonly></div></div>
+                            </div>
+                        </div>
+
+                        <!-- 5. REPORTING LINES -->
+                        <div class="tab-pane fade" id="v-pills-reporting" role="tabpanel">
+                            <h4 class="tab-header">Reporting Lines</h4>
+                            <div class="row">
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Reporting Manager</label><span class="info-value-text" th:text="${user.employeeProfile?.reportingManager}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.reportingManager}" readonly></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Project Manager</label><span class="info-value-text" th:text="${user.employeeProfile?.projectManager}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.projectManager}" readonly></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">BU-HR Contact</label><span class="info-value-text" th:text="${user.employeeProfile?.buHrContact}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.buHrContact}" readonly></div></div>
+                            </div>
+                        </div>
+
+                        <!-- 6. EMERGENCY CONTACT -->
+                        <div class="tab-pane fade" id="v-pills-emergency" role="tabpanel">
+                            <h4 class="tab-header">Emergency Contact Details</h4>
+                            <div class="row">
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Emergency Contact Person</label><span class="info-value-text" th:text="${user.employeeProfile?.emergencyContactName}"></span><input type="text" name="emergencyContactName" class="editable-field tracked-field" th:value="${user.employeeProfile?.emergencyContactName}"></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Relation with employee</label><span class="info-value-text" th:text="${user.employeeProfile?.relationWithEmployee}"></span><input type="text" name="relationWithEmployee" class="editable-field tracked-field" th:value="${user.employeeProfile?.relationWithEmployee}"></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Emergency Phone No.</label><span class="info-value-text" th:text="${user.employeeProfile?.emergencyPhone}"></span><input type="text" name="emergencyPhone" class="editable-field tracked-field" th:value="${user.employeeProfile?.emergencyPhone}" pattern="\d{10}"></div></div>
+                                <div class="col-md-6"><div class="info-box"><label class="info-label">Alternate Mobile No.</label><span class="info-value-text" th:text="${user.employeeProfile?.altMobile}"></span><input type="text" name="altMobile" class="editable-field tracked-field" th:value="${user.employeeProfile?.altMobile}" pattern="\d{10}"></div></div>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <div class="action-footer">
+                        <button type="button" class="btn btn-action btn-primary" id="editToggleBtn" onclick="toggleEditMode()">Complete Profile</button>
+                        <a th:href="@{/default-redirect}" class="btn btn-action btn-outline">Back to Home</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Initialization
+    window.onload = function() {
+        // Format empty info boxes
+        document.querySelectorAll('.info-value-text').forEach(span => {
+            if (!span.innerText || span.innerText.trim() === "") {
+                span.innerText = "-";
+                span.classList.add('empty-field');
+            }
+        });
+        calculateCompletion();
+    };
+
+    function calculateCompletion() {
+        const trackedFields = document.querySelectorAll('.tracked-field');
+        if (trackedFields.length === 0) return;
+
+        let filled = 0;
+        trackedFields.forEach(f => {
+            if(f.value && f.value.trim() !== "") filled++;
+        });
+
+        let percent = Math.round((filled / trackedFields.length) * 100);
+        document.getElementById('completionBar').style.width = percent + '%';
+        document.getElementById('percentLabel').innerText = percent + '%';
+    }
+
+    function toggleEditMode() {
+        const body = document.body;
+        const btn = document.getElementById('editToggleBtn');
+        const form = document.getElementById('masterProfileForm');
+
+        if (!body.classList.contains('editing')) {
+            // ENTER EDIT MODE
+            body.classList.add('editing');
+            btn.innerHTML = '<i class="fas fa-save me-2"></i> Save Profile';
+            btn.classList.replace('btn-primary', 'btn-success');
+            btn.style.backgroundColor = '#16a34a';
+            btn.style.color = '#fff';
+            
+            // Clean up placeholders
+            document.querySelectorAll('.info-value-text.empty-field').forEach(span => {
+                span.innerText = "";
+            });
+        } else {
+            // SAVE LOGIC - Check validation across all tabs
+            if (form.checkValidity()) {
+                form.submit();
+            } else {
+                // Find first invalid element
+                const invalidElement = form.querySelector(':invalid');
+                if (invalidElement) {
+                    // Find which tabpane it belongs to
+                    const tabPane = invalidElement.closest('.tab-pane');
+                    if (tabPane) {
+                        // Activate that tab using Bootstrap Tab API
+                        const tabId = tabPane.getAttribute('id');
+                        const tabTrigger = document.querySelector(`[data-bs-target="#${tabId}"]`);
+                        if(tabTrigger) {
+                            const tab = new bootstrap.Tab(tabTrigger);
+                            tab.show();
+                        }
+                    }
+                    // Trigger browser's native validation UI
+                    form.reportValidity();
+                }
+            }
+        }
+    }
+</script>
 </body>
 </html>
