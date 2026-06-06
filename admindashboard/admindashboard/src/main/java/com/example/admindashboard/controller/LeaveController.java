@@ -62,7 +62,65 @@ public class LeaveController {
                     .orElseThrow(() -> new RuntimeException("User not found"));
             employeeLeaveWalletService.initializeEmployeeWallet(currentUser);
 
-            // 2. Attach the employee to the request and set status to "Pending"
+            // --- START BACKEND VALIDATIONS ---
+            if (leaveRequest.getReason() == null || leaveRequest.getReason().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Please provide a reason/comment for your leave request.");
+            }
+            if (!leaveRequest.getReason().matches("^[a-zA-Z0-9\\s.,!?\\'-]+$")) {
+                return ResponseEntity.badRequest().body("Comments contain restricted special characters.");
+            }
+            if (leaveRequest.getFromDate() == null || leaveRequest.getToDate() == null) {
+                return ResponseEntity.badRequest().body("Dates are required.");
+            }
+            
+            // 2. Recalculate totalDays by subtracting holidays (LMS-001)
+            long rawDays = java.time.temporal.ChronoUnit.DAYS.between(leaveRequest.getFromDate(), leaveRequest.getToDate()) + 1;
+            List<Holiday> holidays = holidayRepository.findByHolidayDateBetweenAndActiveTrue(leaveRequest.getFromDate(), leaveRequest.getToDate());
+            double finalDays = (double) (rawDays - holidays.size());
+            
+            if (finalDays <= 0) {
+                return ResponseEntity.badRequest().body("Total days must be at least 1 after subtracting holidays.");
+            }
+            if (finalDays > 30) {
+                return ResponseEntity.badRequest().body("Maximum leave duration per request is 30 days.");
+            }
+            leaveRequest.setTotalDays(finalDays);
+            
+            // 3. Duplicate Overlap Check (LMS-005)
+            List<LeaveRequest> existingLeaves = leaveRequestRepository.findByUserOrderByIdDesc(currentUser);
+            boolean isDuplicate = existingLeaves.stream()
+                .filter(l -> !"REJECTED".equalsIgnoreCase(l.getStatus()))
+                .filter(l -> l.getFromDate() != null && l.getToDate() != null)
+                .anyMatch(l -> 
+                    !leaveRequest.getFromDate().isAfter(l.getToDate()) && 
+                    !leaveRequest.getToDate().isBefore(l.getFromDate())
+                );
+            if (isDuplicate) {
+                return ResponseEntity.badRequest().body("You already have an overlapping leave request.");
+            }
+            
+            // 4. Leave Balance Check (LMS-002)
+            String requestedType = leaveRequest.getLeaveType();
+            String balKey = requestedType;
+            if ("Casual".equalsIgnoreCase(requestedType)) balKey = "CL";
+            else if ("Sick".equalsIgnoreCase(requestedType)) balKey = "SL";
+            else if ("Earned".equalsIgnoreCase(requestedType)) balKey = "EL";
+            
+            if (!"LOP".equalsIgnoreCase(balKey)) {
+                List<EmployeeLeaveWallet> wallets = walletRepository.findByUser(currentUser);
+                String finalBalKey = balKey;
+                EmployeeLeaveWallet matchedWallet = wallets.stream()
+                    .filter(w -> w.getLeaveType() != null && w.getLeaveType().getLeaveCode().equalsIgnoreCase(finalBalKey))
+                    .findFirst()
+                    .orElse(null);
+                    
+                if (matchedWallet == null || matchedWallet.getAvailableBalance() < finalDays) {
+                    return ResponseEntity.badRequest().body("Insufficient leave balance for " + requestedType + ".");
+                }
+            }
+            // --- END BACKEND VALIDATIONS ---
+
+            // Attach the employee to the request and set status to "Pending"
             leaveRequest.setUser(currentUser);
             leaveRequest.setStatus("Pending");
 

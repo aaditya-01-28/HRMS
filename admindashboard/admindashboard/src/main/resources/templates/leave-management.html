@@ -727,7 +727,7 @@
             const res = await fetch('/api/holidays/upcoming');
             if (!res.ok) throw new Error('Failed');
             const holidays = await res.json();
-
+            window.upcomingHolidays = holidays || [];
             if (!holidays || holidays.length === 0) {
                 container.innerHTML = '<div class="empty-state"><i class="fas fa-umbrella-beach d-block"></i><p>No upcoming holidays</p></div>';
                 return;
@@ -1102,7 +1102,19 @@
         warning.style.display = 'none';
 
         if (startInput.value && endInput.value && end >= start) {
-            const diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)) + 1;
+            let diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)) + 1;
+
+            if (window.upcomingHolidays && window.upcomingHolidays.length > 0) {
+                let holidayCount = 0;
+                window.upcomingHolidays.forEach(h => {
+                    const hDate = new Date(h.date);
+                    if (hDate >= start && hDate <= end) {
+                        holidayCount++;
+                    }
+                });
+                diffDays -= holidayCount;
+                if (diffDays < 0) diffDays = 0;
+            }
 
             if (absenceData && absenceData.length > 0) {
                 const isDuplicate = absenceData.some(leave => {
@@ -1235,10 +1247,40 @@
             return;
         }
 
+        if (!comments || comments.trim() === '') {
+            Swal.fire({ icon: 'warning', title: 'Missing Comment', text: 'Please provide a reason/comment for your leave request.', confirmButtonColor: '#1e3a8a' });
+            return;
+        }
+
+        if (/[^a-zA-Z0-9\s.,!?'-]/.test(comments)) {
+            Swal.fire({ icon: 'warning', title: 'Invalid Characters', text: 'Comments contain restricted special characters. Please use only alphanumeric characters and basic punctuation.', confirmButtonColor: '#1e3a8a' });
+            return;
+        }
+
         const requestedDays = parseFloat(totalDays) || 0;
         if (requestedDays <= 0) {
             Swal.fire({ icon: 'warning', title: 'Invalid Dates', text: 'Total days must be at least 1.', confirmButtonColor: '#1e3a8a' });
             return;
+        }
+
+        if (requestedDays > 30) {
+            Swal.fire({ icon: 'warning', title: 'Duration Exceeded', text: 'Maximum leave duration per request is 30 days.', confirmButtonColor: '#1e3a8a' });
+            return;
+        }
+
+        if (leaveType && window.availableLeaveBalances) {
+            let balKey = leaveType;
+            if (leaveType === 'Casual') balKey = 'CL';
+            else if (leaveType === 'Sick') balKey = 'SL';
+            else if (leaveType === 'Earned') balKey = 'EL';
+            
+            if (balKey !== 'LOP') {
+                const available = window.availableLeaveBalances[balKey] || 0;
+                if (requestedDays > available) {
+                    Swal.fire({ icon: 'error', title: 'Insufficient Balance', text: 'You only have ' + available + ' ' + leaveType + ' leave(s) available. Please adjust your request or select LOP.', confirmButtonColor: '#1e3a8a' });
+                    return;
+                }
+            }
         }
 
         if (absenceData && absenceData.length > 0) {
