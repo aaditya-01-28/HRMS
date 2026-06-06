@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Relationship</title>
+
+    <link rel="stylesheet" href="/css/employee-relationship.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	 <link rel="stylesheet"
+	        href="/css/employee-relationship.css">
+	<style>
+		/* ========================================
+		   GLOBAL
+		======================================== */
+
+		* {
+		    margin: 0;
+		    padding: 0;
+		    box-sizing: border-box;
+		}
+
+		body {
+		    font-family: "Poppins", sans-serif;
+		    background: #f4f5fb;
+		    min-height: 100vh;
+		    overflow-x: hidden;
+		}
+
+		/* ========================================
+		   PAGE CONTAINER
+		======================================== */
+
+		.page-container {
+		    width: 100%;
+		    min-height: 100vh;
+		}
+
+		/* ========================================
+		   HEADER
+		======================================== */
+
+		.page-header {
+		    height: 130px;
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    padding: 0 40px;
+		    background: white;
+		}
+
+		.page-header h1 {
+		    font-size: 52px;
+		    font-weight: 700;
+		    color: #0d378d;
+		}
+
+		.back-btn {
+		    text-decoration: none;
+		    background: #2f66ff;
+		    color: white;
+		    padding: 12px 24px;
+		    border-radius: 8px;
+		    font-size: 15px;
+		    font-weight: 600;
+		    transition: 0.3s;
+		}
+
+		.back-btn:hover {
+		    background: #1f4fd6;
+		}
+
+		/* ========================================
+		   MAIN CONTENT
+		======================================== */
+
+		.content-wrapper {
+		    display: flex;
+		    min-height: calc(100vh - 130px);
+		}
+
+		/* ========================================
+		   RELATIONSHIP AREA
+		======================================== */
+
+		.relationship-area {
+		    flex: 1;
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    padding: 40px;
+		}
+
+		/* ========================================
+		   RELATIONSHIP CHART
+		======================================== */
+
+		.relationship-chart {
+		    display: flex;
+		    flex-direction: column;
+		    align-items: center;
+		}
+
+		/* ========================================
+		   RELATIONSHIP CARD
+		======================================== */
+
+		.relationship-card {
+		    width: 330px;
+		    min-height: 80px;
+		    background: white;
+		    border-radius: 8px;
+		    display: flex;
+		    align-items: center;
+		    padding: 15px 20px;
+		    gap: 15px;
+		    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+		}
+
+		.card-icon i {
+		    font-size: 34px;
+		    color: #000;
+		}
+
+		.card-content {
+		    display: flex;
+		    flex-direction: column;
+		}
+
+		.card-content h4 {
+		    font-size: 22px;
+		    font-weight: 600;
+		    color: #111;
+		    margin-bottom: 4px;
+		}
+
+		.card-content p {
+		    font-size: 13px;
+		    color: #777;
+		}
+
+		/* ========================================
+		   ARROW
+		======================================== */
+
+		.arrow-container {
+		    margin: 20px 0;
+		}
+
+		.arrow-container i {
+		    font-size: 70px;
+		    color: #8b8b8b;
+		}
+
+		/* ========================================
+		   PROFILE PANEL
+		======================================== */
+
+		.profile-panel {
+		    width: 340px;
+		    min-width: 340px;
+		    background: #eef1ff;
+		    border-left: 1px solid #dde2f5;
+		    padding: 35px 30px;
+		    display: flex;
+		    flex-direction: column;
+		    align-items: center;
+		}
+
+		/* ========================================
+		   PROFILE IMAGE
+		======================================== */
+
+		.profile-avatar {
+		    margin-top: 10px;
+		    margin-bottom: 20px;
+		}
+
+		.profile-avatar i {
+		    font-size: 95px;
+		    color: black;
+		}
+
+		/* ========================================
+		   PROFILE NAME
+		======================================== */
+
+		.profile-panel h2 {
+		    font-size: 32px;
+		    font-weight: 700;
+		    color: #111;
+		    text-align: center;
+		    margin-bottom: 30px;
+		}
+
+		/* ========================================
+		   PROFILE INFO
+		======================================== */
+
+		.profile-info {
+		    width: 100%;
+		}
+
+		.info-row {
+		    margin-bottom: 18px;
+		    font-size: 18px;
+		    line-height: 1.5;
+		}
+
+		.label {
+		    font-weight: 700;
+		    color: #555;
+		    margin-right: 5px;
+		}
+
+		/* ========================================
+		   RESPONSIVE
+		======================================== */
+
+		@media (max-width: 1100px) {
+
+		    .content-wrapper {
+		        flex-direction: column;
+		    }
+
+		    .profile-panel {
+		        width: 100%;
+		        min-width: 100%;
+		        border-left: none;
+		        border-top: 1px solid #dde2f5;
+		    }
+
+		    .relationship-area {
+		        padding: 40px 20px;
+		    }
+		}
+
+		@media (max-width: 768px) {
+
+		    .page-header {
+		        flex-direction: column;
+		        justify-content: center;
+		        gap: 15px;
+		        height: auto;
+		        padding: 25px;
+		    }
+
+		    .page-header h1 {
+		        font-size: 36px;
+		        text-align: center;
+		    }
+
+		    .relationship-card {
+		        width: 100%;
+		        max-width: 320px;
+		    }
+
+		    .profile-panel h2 {
+		        font-size: 26px;
+		    }
+		}
+	</style>
+</head>
+<body>
+
+<div class="page-container">
+
+    <!-- HEADER -->
+
+    <div class="page-header">
+
+        <h1>Organization Structure</h1>
+
+        <a href="/organization-structure" class="back-btn">
+            Back To Tree
+        </a>
+
+    </div>
+
+    <!-- MAIN CONTENT -->
+
+    <div class="content-wrapper">
+
+        <!-- RELATIONSHIP AREA -->
+
+        <div class="relationship-area">
+
+            <div id="relationshipChart" class="relationship-chart">
+
+                <!-- MANAGER CARD -->
+
+                <div class="relationship-card manager-card">
+
+                    <div class="card-icon">
+                        <i class="fa-solid fa-circle-user"></i>
+                    </div>
+
+                    <div class="card-content">
+                        <h4 id="managerName">
+                            Manager Name
+                        </h4>
+
+                        <p id="managerDesignation">
+                            Manager Designation
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- ARROW -->
+
+                <div class="arrow-container">
+
+                    <i class="fa-solid fa-arrow-up-long"></i>
+
+                </div>
+
+                <!-- EMPLOYEE CARD -->
+
+                <div class="relationship-card employee-card">
+
+                    <div class="card-icon">
+                        <i class="fa-solid fa-circle-user"></i>
+                    </div>
+
+                    <div class="card-content">
+
+                        <h4 id="employeeCardName">
+                            Employee Name
+                        </h4>
+
+                        <p id="employeeCardDesignation">
+                            Employee Designation
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- PROFILE PANEL -->
+
+        <div class="profile-panel">
+
+            <div class="profile-avatar">
+
+                <i class="fa-solid fa-circle-user"></i>
+
+            </div>
+
+            <h2 id="employeeName">
+                Employee Name
+            </h2>
+
+            <div class="profile-info">
+
+                <div class="info-row">
+                    <span class="label">Role:</span>
+                    <span id="employeeRole">-</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Designation:</span>
+                    <span id="employeeDesignation">-</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Reporting Manager:</span>
+                    <span id="reportingManager">-</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Email:</span>
+                    <span id="employeeEmail">-</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Department:</span>
+                    <span id="employeeDepartment">-</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Joining Date:</span>
+                    <span id="employeeJoiningDate">-</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/js/employee-relationship.js"></script>
+<script>
+	document.addEventListener("DOMContentLoaded", async () => {
+
+	    try {
+
+	        const pathParts = window.location.pathname.split("/");
+
+	        const employeeId = pathParts[pathParts.length - 1];
+
+	        const response = await fetch(
+	            `/api/employee-relationship/${employeeId}`
+	        );
+
+	        if (!response.ok) {
+	            throw new Error("Unable to load employee relationship");
+	        }
+
+	        const data = await response.json();
+
+	        console.log("Relationship Data:", data);
+
+	        loadEmployeeProfile(data);
+	        loadRelationship(data);
+
+	    } catch (error) {
+
+	        console.error(error);
+
+	        document.getElementById("employeeName").textContent =
+	            "Employee Not Found";
+	    }
+
+	});
+
+	function loadEmployeeProfile(data) {
+
+	    document.getElementById("employeeName").textContent =
+	        data.employeeName || "-";
+
+	    document.getElementById("employeeRole").textContent =
+	        formatRole(data.employeeRole);
+
+	    document.getElementById("employeeDesignation").textContent =
+	        data.employeeDesignation || "-";
+
+	    document.getElementById("reportingManager").textContent =
+	        data.managerName || "System Administrator";
+
+	    document.getElementById("employeeEmail").textContent = "-";
+	    document.getElementById("employeeDepartment").textContent = "-";
+	    document.getElementById("employeeJoiningDate").textContent = "-";
+	}
+
+	function loadRelationship(data) {
+
+	    document.getElementById("employeeCardName").textContent =
+	        data.employeeName || "-";
+
+	    document.getElementById("employeeCardDesignation").textContent =
+	        data.employeeDesignation || data.employeeRole || "-";
+
+	    document.getElementById("managerName").textContent =
+	        data.managerName || "System Administrator";
+
+	    document.getElementById("managerDesignation").textContent =
+	        data.managerDesignation || data.managerRole || "SUPER ADMIN";
+	}
+	function formatRole(role) {
+
+	    if (!role) {
+	        return "-";
+	    }
+
+	    return String(role)
+	            .replace(/_/g, " ");
+	}
+</script>
+
+</body>
+</html>

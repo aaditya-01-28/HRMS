@@ -17,283 +17,321 @@
             --bg-color: #f3f4f6;
         }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: #334155;
-            padding-top: 70px;
-            min-height: 100vh;
-        }
+		body{
+		    font-family:'Inter',sans-serif;
+		    background:#f5f5f5;
+		    margin:0;
+		    padding:0;
+		}
 
-        .top-nav-bar {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            background: white;
-            height: 80px;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 30px;
-            border-bottom: 1px solid #e2e8f0;
-            box-shadow: 0 8px 25px  rgba(0, 0, 0, 0.06);
-        }
+		.signature-page{
+		    max-width:1100px;
+		    margin:auto;
+		    text-align:center;
+		    padding:20px 20px 40px;
+		}
 
-        .brand-section {
-            display: flex; align-items: center;
-            color: #1e3a8a; font-weight: 700; font-size: 1.6rem;
-        }
+		.page-header{
+		    position:relative;
+		    width:100%;
+		    padding:20px 40px;
+		}
 
-        .btn-back {
-            background: #1e3a8a; color: white;
-            padding: 10px 24px; border-radius: 10px; font-size: 0.95rem; text-decoration: none;
-            border: none; transition: all 0.2s;
-        }
-        .btn-back:hover { background: #172554; color: white; transform: translateY(-1px); }
+		.page-title{
+		    position:absolute;
+		    left:40px;
+		    top:20px;
 
-        /* PREVIEW CONTAINER (Updated Size)  */
-        .preview-container {
-            max-width: 800px;
-            margin: 50px auto;
-            text-align: center;
-        }
+		    color:#2563eb;
+		    font-size:18px;
+		    font-weight:600;
+		}
 
-        /* PREVIEW CARD (Updated Border & Padding)  */
-        .preview-card {
-            background: white;
-            border-radius: 16px;
-            padding: 60px; /* Increased padding */
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+		.btn-back{
+		    position:absolute;
+		    right:40px;
+		    top:15px;
 
-            /* UPDATED: Navy Blue Border */
-            border: 2px solid #1e3a8a;
+		    background:#2563eb;
+		    color:white;
+		    padding:10px 18px;
+		    border-radius:8px;
+		    text-decoration:none;
+		}
 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+		.signature-icon{
+		    margin-bottom:10px;
+		}
 
-        .signature-box {
-            background: white;
-            padding: 20px;
-            display: inline-block;
-            text-align: left;
-        }
+		.signature-icon img{
+		    width:58px;
+		    height:58px;
+		    object-fit:contain;
+		}
 
-        .sig-content {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            border-left: 4px solid #1e3a8a;
-            padding-left: 20px;
-        }
+		.main-heading{
+		    font-size:28px;
+		    font-weight:700;
+		    color:#222;
+		    margin-bottom:10px;
+		}
 
-        .sig-details h3 { margin: 0; color: #1e3a8a; font-size: 1.4rem; font-weight: 700; }
-        .sig-details p { margin: 2px 0 10px; color: #64748b; font-size: 0.9rem; }
+		.heading-line{
+		    width:120px;
+		    height:3px;
+		    background:#3b82f6;
+		    margin:0 auto 25px;
+		}
 
-        .sig-contact { font-size: 0.85rem; color: #334155; line-height: 1.6; }
-        .sig-contact i { color: #1e3a8a; width: 20px; text-align: center; margin-right: 5px; }
+		.sub-text{
+		    color:#555;
+		    font-size:18px;
+		    margin-bottom:10px;
+		}
 
-        .company-logo {
-            margin-top: 15px;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .company-logo img { height: 35px; }
-        .company-slogan { font-size: 0.75rem; font-style: italic; color: #94a3b8; }
+		.sub-text-2{
+		    color:#555;
+		    font-size:18px;
+		    margin-bottom:60px;
+		}
 
-        .btn-copy {
-            margin-top: 40px;
-            background: #1e3a8a; color: white;
-            border: none; padding: 14px 35px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1rem;
-            display: inline-flex; align-items: center; gap: 10px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2);
-            position: relative;
-            overflow: hidden; /* Essential for shine */
-        }
+		.signature-preview{
+		    max-width:750px;
+		    margin:auto;
+		    background:#fff;
+		    border:2px solid #8fb0ff;
+		    border-radius:12px;
+		    padding:28px;
+		}
 
-        .btn-copy:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.3);
-            background-color: #172554;
-            color: white;
-        }
-        .btn-copy:active { transform: scale(0.98); }
+		.sig-wrapper{
+		    display:flex;
+		    align-items:center;
+		}
 
-        /* SHINING ANIMATION */
-        .btn-copy::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            transition: 0.5s;
-        }
+		.sig-left{
+		    width:190px;
+		    display:flex;
+		    justify-content:center;
+		    align-items:center;
+		}
 
-        .btn-copy::before {
-            animation: shine 3s infinite;
-        }
+		.sig-left img{
+		    width:90px;
+		}
 
-        @keyframes shine {
-            0% { left: -100%; }
-            20% { left: 100%; } /* Fast pass */
-            100% { left: 100%; } /* Wait */
-        }
+		.sig-right{
+		    flex:1;
+		    border-left:3px solid #2563eb;
+		    padding-left:45px;
+		    text-align:left;
+		}
 
-        /* Toast */
-        #toast-message {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 8px;
-            padding: 12px;
-            position: fixed;
-            z-index: 1;
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%);
-            font-size: 14px;
-        }
-        #toast-message.show {
-            visibility: visible;
-            animation: fadein 0.5s, fadeout 0.5s 2.5s;
-        }
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+		.emp-name{
+		    font-size:20px;
+		    font-weight:700;
+		    color:#222;
+		}
 
-    </style>
-    <link href="/css/style.css" rel="stylesheet">
+		.emp-designation{
+		    color:#2563eb;
+		    font-size:18px;
+		    font-weight:700;
+		    margin-top:5px;
+		}
 
-    <style>
-        @media (max-width: 991px) {
+		.emp-department{
+		    font-size:14px;
+		    margin-top:10px;
+		    color:#333;
+		}
 
-            /* 1. COMPACT GLOBAL LAYOUT */
-            html, body {
-                padding-top: 0 !important;
-                margin-top: 0 !important;
-                padding-left: 0 !important;
-                padding-right: 0 !important;
-                overflow-x: hidden !important;
-                width: 100% !important;
-            }
-            body { padding-top: 75px !important; }
+		.signature-divider{
+		    margin:15px 0;
+		    border:none;
+		    border-top:1px solid #ddd;
+		}
 
-            /* 2. SHRINK THE TOP NAV BAR */
-            .top-nav-bar {
-                height: auto !important; padding: 12px 15px !important; flex-direction: row !important;
-                justify-content: space-between !important; align-items: center !important; flex-wrap: nowrap !important;
-            }
-            .brand-section { width: auto !important; justify-content: flex-start !important; margin-bottom: 0 !important; }
-            .brand-section i.fa-signature { font-size: 1.4rem !important; margin-top: 2px !important; }
-            .brand-section span { font-size: 1.1rem !important; margin-left: 8px !important; padding-left: 8px !important; }
+		.contact-item{
+		    display:flex;
+		    align-items:center;
+		    gap:12px;
+		    font-size:14px;
+		    margin-bottom:6px;
+		}
 
-            .btn-back {
-                width: auto !important; padding: 6px 12px !important; font-size: 0.75rem !important;
-                border-radius: 8px !important; display: inline-flex !important; white-space: nowrap !important; margin-top: 0 !important;
-            }
+		.contact-item i{
+		    color:#2563eb;
+		}
 
-            /* 3. ADJUST MAIN CONTAINER */
-            .container {
-                display: flex !important; flex-direction: column !important;
-                justify-content: flex-start !important;
-                min-height: calc(100vh - 85px) !important;
-                padding-bottom: 20px !important;
-                padding-top: 30px !important;
-            }
-            .preview-container { margin: 0 auto !important; padding: 0 10px !important; width: 100% !important; }
-            .preview-container h3 { font-size: 1.25rem !important; }
-            .preview-container p.text-muted { font-size: 0.9rem !important; padding: 0 5px !important; }
+		.company-section{
+		    display:flex;
+		    align-items:center;
+		    gap:15px;
+		}
 
-            /* 4. FIX THE CARD PADDING & SIGNATURE SIZING */
-            .preview-card { padding: 30px 20px !important; border-radius: 12px !important; margin-top: 20px !important; }
-            .signature-box { padding: 15px !important; width: 100% !important; overflow-x: auto !important; }
-            .sig-content { padding-left: 15px !important; gap: 12px !important; border-left-width: 4px !important; }
+		.company-section img{
+		    width:60px;
+		    height:60px;
+		}
 
-            /* Scaled up all the text and logo inside the signature */
-            #signature-box h3 { font-size: 1.3rem !important; margin-bottom: 4px !important; }
-            #signature-box p { font-size: 0.9rem !important; }
-            #signature-box a { word-break: break-all !important; font-size: 0.9rem !important; }
-            #signature-box .d-flex img { height: 36px !important; }
-            #signature-box .d-flex span.fw-bold { font-size: 1rem !important; }
-            #signature-box .d-flex small.italic { font-size: 0.75rem !important; }
+		.company-name{
+		    font-size:24px;
+		    font-weight:700;
+		}
 
-            /* 5. FULL WIDTH ACTION BUTTON */
-            .btn-copy {
-                width: 100% !important;
-                margin-top: 20px !important;
-                padding: 12px 15px !important;
-                font-size: 0.95rem !important;
-                justify-content: center !important;
-                border-radius: 12px !important;
-            }
-        }
+		.company-tag{
+		    color:#444;
+		    font-size:15px;
+		}
+
+		.copy-btn{
+		    margin-top:35px;
+		    background:linear-gradient(90deg,#2563eb,#0f52ff);
+		    color:#fff;
+		    border:none;
+		    border-radius:10px;
+		    padding:12px 28px;
+		    font-size:16px;
+		    font-weight:600;
+		}
+
+		.copy-btn:hover{
+		    opacity:.95;
+		}
+
+		.signature-note{
+		    margin-top:25px;
+		    color:#444;
+		    font-size:20px;
+		}
+
+		.signature-note i{
+		    color:#2563eb;
+		    margin-right:8px;
+		}
+
+		.btn-back:hover{
+		    background:#1d4ed8;
+		    color:#fff;
+		}
     </style>
 
     <link href="/css/dark-mode.css" rel="stylesheet">
     <script src="/js/theme-engine.js"></script>
 </head>
 <body>
+<div class="page-header">
 
-<nav class="top-nav-bar">
-    <div class="brand-section d-flex align-items-center">
-        <i class="fas fa-signature text-dark" style="font-size: 2.5rem;"></i>
-        <span class="fw-bold text-dark" style="border-left: 2px solid #cbd5e1; padding-left: 17px; margin-left: 15px; font-size: 1.5rem; letter-spacing: 0.5px;">
-            EMAIL SIGNATURE
-        </span>
+    <div class="page-title">
+        Email Signature
     </div>
-    <a href="/default-redirect" class="btn-back">
-        <i class="fas fa-arrow-left me-2"></i>Back to Home
-    </a>
-</nav>
+	<a href="/default-redirect" class="btn-back">
+		<i class="fas fa-arrow-left me-2"></i> Back to Home
+	</a>
+    
 
-<div class="container">
-    <div class="preview-container">
-
-        <h3 class="fw-bold mb-3" style="color: #1e3a8a;">Your Official Signature</h3>
-
-        <p class="text-muted mb-4 mx-auto" style="max-width: 700px; font-size: 0.95rem;">
-            Use the button below to copy your official company signature.
-            This image format ensures consistent branding, fonts, and layout across all email clients.
-        </p>
-
-        <div class="preview-card">
-
-            <div id="signature-capture-area" class="signature-box">
-                <div class="sig-content">
-
-                    <div id="signature-box" th:object="${user}" style="font-family: Arial, sans-serif; color: #333;">
-                        <h3 style="color: #1e3a8a; margin-bottom: 5px;" th:text="*{fullName}">[Employee Name Will appear here]</h3>
-                        <p style="margin: 2px 0; font-weight: bold;" th:text="*{employeeProfile?.designation?.toUpperCase() ?: 'EMPLOYEE'}">[Designation]</p>
-                        <p style="margin: 2px 0;" th:text="*{employeeProfile?.businessUnit ?: 'General'}">[Department]</p>
-
-                        <div style="margin-top: 10px; font-size: 0.9rem;">
-                            <p style="margin: 2px 0;">
-                                <strong>Mob:</strong> <span th:text="*{employeeProfile?.mobileNumber ?: 'Not Provided'}">[Phone]</span>
-                            </p>
-                            <p style="margin: 2px 0;">
-                                <strong>Email:</strong> <a th:href="'mailto:' + *{email}" th:text="*{email}" style="color: #1e3a8a; text-decoration: none;">[Email]</a>
-                            </p>
-                        </div>
-                        <div class="d-flex align-items-center mt-3 pt-2 border-top">
-                            <img src="/images/wcg-logo.jpg" alt="Logo" height="40" class="me-2" style="border-radius: 4px;">
-                            <div>
-                                <span class="fw-bold text-dark d-block" style="line-height: 1;">WhiteCircle Group</span>
-                                <small class="text-muted italic" style="font-size: 0.8rem;">"Innovating the Future"</small>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-            <button class="btn-copy" onclick="copyAsImage()">
-                <i class="fas fa-camera"></i> Copy Signature as Image
-            </button>
-
-        </div>
-    </div>
 </div>
+<div class="container">
+	<div class="signature-page">
+
+	    <div class="signature-icon">
+            <img src="/images/sign.png">
+	    </div>
+
+	    <div class="main-heading">
+	        Your Official Signature
+	    </div>
+
+	    <div class="heading-line"></div>
+
+	    <div class="sub-text">
+	        Use the button below to copy your official company signature.
+	    </div>
+
+	    <div class="sub-text-2">
+	        This image format ensures consistent branding, fonts, and layout across all email clients.
+	    </div>
+
+	    <div class="signature-preview">
+
+	        <div id="signature-capture-area">
+
+	            <div class="sig-wrapper">
+
+	                <div class="sig-left">
+	                    <img src="/images/white-logo.png">
+	                </div>
+
+	                <div class="sig-right"
+	                     id="signature-box"
+	                     th:object="${user}">
+
+	                    <div class="emp-name"
+	                         th:text="*{fullName}">
+	                    </div>
+
+	                    <div class="emp-designation"
+	                         th:text="*{employeeProfile?.designation ?: 'Employee'}">
+	                    </div>
+
+	                    <div class="emp-department"
+	                         th:text="*{employeeProfile?.businessUnit ?: 'General'}">
+	                    </div>
+
+	                    <hr class="signature-divider">
+
+	                    <div class="contact-item">
+	                        <i class="fas fa-phone-alt"></i>
+	                        <span>Mob:</span>
+	                        <span th:text="*{employeeProfile?.mobileNumber}"></span>
+	                    </div>
+
+	                    <div class="contact-item">
+	                        <i class="fas fa-envelope"></i>
+	                        <span>Email:</span>
+	                        <a th:text="*{email}"
+	                           th:href="'mailto:' + *{email}">
+	                        </a>
+	                    </div>
+
+	                    <hr class="signature-divider">
+
+	                    <div class="company-section">
+
+	                        <img src="/images/wcg-logo.jpg">
+
+	                        <div>
+	                            <div class="company-name">
+	                                WhiteCircle Group
+	                            </div>
+
+	                            <div class="company-tag">
+	                                "Innovating the future"
+	                            </div>
+	                        </div>
+
+	                    </div>
+
+	                </div>
+
+	            </div>
+
+	        </div>
+
+	    </div>
+
+	    <button class="copy-btn" onclick="copyAsImage()">
+	        <i class="fa-regular fa-image"></i>
+	        Copy Signature
+	    </button>
+
+	    <div class="signature-note">
+	        <i class="fa-solid fa-shield-halved"></i>
+	        The signature will be copied in PNG format.
+	    </div>
+
+	</div>
 
 <div id="toast-message">Signature Image Copied to Clipboard!</div>
 

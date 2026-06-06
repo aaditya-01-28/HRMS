@@ -43,8 +43,11 @@ public class EmployeeApprovalsController {
         // 2. FETCH PENDING REQUESTS (Strictly bound to currentUser)
         List<LeaveRequest> pendingLeaves = leaveRepo.findByUserAndStatusIgnoreCaseOrderByIdDesc(currentUser, "Pending");
         List<Attendance> pendingAttendances = attendanceRepo.findByUserAndApprovalStatusIgnoreCaseOrderByIdDesc(currentUser, "Pending");
-        List<WeeklyTimesheet> pendingTimesheets = timesheetRepo.findByUserAndStatusIgnoreCaseOrderByIdDesc(currentUser, "Submitted");
-
+        List<WeeklyTimesheet> pendingTimesheets =
+                timesheetRepo.findByUserAndStatusIgnoreCaseOrderByIdDesc(
+                        currentUser,
+                        "SUBMITTED"
+                );
         model.addAttribute("pendingLeaves", pendingLeaves);
         model.addAttribute("pendingAttendances", pendingAttendances);
         model.addAttribute("pendingTimesheets", pendingTimesheets);
@@ -56,8 +59,11 @@ public class EmployeeApprovalsController {
         // 3. FETCH APPROVED REQUESTS (Strictly bound to currentUser)
         List<LeaveRequest> approvedLeaves = leaveRepo.findByUserAndStatusIgnoreCaseOrderByIdDesc(currentUser, "Approved");
         List<Attendance> approvedAttendances = attendanceRepo.findByUserAndApprovalStatusIgnoreCaseOrderByIdDesc(currentUser, "Approved");
-        List<WeeklyTimesheet> approvedTimesheets = timesheetRepo.findByUserAndStatusIgnoreCaseOrderByIdDesc(currentUser, "Approved");
-
+        List<WeeklyTimesheet> approvedTimesheets =
+                timesheetRepo.findByUserAndStatusIgnoreCaseOrderByIdDesc(
+                        currentUser,
+                        "APPROVED"
+                );
         model.addAttribute("approvedLeaves", approvedLeaves);
         model.addAttribute("approvedAttendances", approvedAttendances);
         model.addAttribute("approvedTimesheets", approvedTimesheets);
@@ -68,8 +74,11 @@ public class EmployeeApprovalsController {
         // 4. FETCH REJECTED REQUESTS (Strictly bound to currentUser)
         List<LeaveRequest> deniedLeaves = leaveRepo.findByUserAndStatusIgnoreCaseOrderByIdDesc(currentUser, "Rejected");
         List<Attendance> deniedAttendances = attendanceRepo.findByUserAndApprovalStatusIgnoreCaseOrderByIdDesc(currentUser, "Rejected");
-        List<WeeklyTimesheet> deniedTimesheets = timesheetRepo.findByUserAndStatusIgnoreCaseOrderByIdDesc(currentUser, "Rejected");
-
+        List<WeeklyTimesheet> deniedTimesheets =
+                timesheetRepo.findByUserAndStatusIgnoreCaseOrderByIdDesc(
+                        currentUser,
+                        "REJECTED"
+                );
         model.addAttribute("deniedLeaves", deniedLeaves);
         model.addAttribute("deniedAttendances", deniedAttendances);
         model.addAttribute("deniedTimesheets", deniedTimesheets);

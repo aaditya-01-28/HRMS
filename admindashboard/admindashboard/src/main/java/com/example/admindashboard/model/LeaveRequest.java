@@ -71,4 +71,22 @@ public class LeaveRequest {
 
     public String getAdminComments() { return adminComments; }
     public void setAdminComments(String adminComments) { this.adminComments = adminComments; }
+    
+    public String getLeaveIcon() {
+
+        switch (leaveType) {
+
+            case "Sick":
+                return "/images/leave-types/sick-leave.jpeg";
+
+            case "Casual":
+                return "/images/leave-types/casual-leave.jpeg";
+
+            case "Earned":
+                return "/images/leave-types/earned-leave.jpeg";
+
+            default:
+                return "/images/leave-types/sick-leave.jpeg";
+        }
+    }
 }

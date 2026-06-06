@@ -1,6 +1,7 @@
 package com.example.admindashboard.controller;
 
 import com.example.admindashboard.service.AttendanceService;
+
 import com.example.admindashboard.service.EmailService;
 import com.example.admindashboard.model.User;
 import com.example.admindashboard.repository.UserRepository;
@@ -13,7 +14,12 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
+import java.util.List;
+import java.time.LocalDate;
+import com.example.admindashboard.dto.AttendanceRegularizationRequestDTO;
+import com.example.admindashboard.model.AttendanceRegularization;
+import com.example.admindashboard.dto.AttendanceDayDTO;
+import org.springframework.security.core.Authentication;
 @RestController
 @RequestMapping("/api/attendance")
 public class AttendanceController {
@@ -93,7 +99,62 @@ public class AttendanceController {
             return ResponseEntity.badRequest().body("Error submitting record: " + e.getMessage());
         }
     }
+    @GetMapping("/week")
+    public List<AttendanceDayDTO> getCurrentWeekAttendance(
+            @RequestParam String weekStart,
+            Authentication authentication) {
 
+        User user = userRepository
+                .findByUsername(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return attendanceService.getCurrentWeekAttendance(
+                user,
+                LocalDate.parse(weekStart)
+        );
+    }
+    @PostMapping("/day-record")
+    public ResponseEntity<?> saveAttendanceDayRecord(
+            @RequestBody AttendanceRegularizationRequestDTO request,
+            Principal principal) {
+
+        User user = userRepository
+                .findByUsername(principal.getName())
+                .orElseThrow(
+                        () -> new RuntimeException("User not found")
+                );
+
+        AttendanceRegularization saved =
+                attendanceService.saveAttendanceRegularization(
+                        user,
+                        request
+                );
+
+        return ResponseEntity.ok(saved);
+    }
+
+    @PostMapping("/submit-current-week")
+    public ResponseEntity<?> submitCurrentWeek(
+            Principal principal) {
+
+        attendanceService.submitCurrentWeekAttendance(
+                principal.getName()
+        );
+
+        return ResponseEntity.ok("Submitted");
+    }
+
+    @PostMapping("/discard-current-week")
+    public ResponseEntity<?> discardCurrentWeek(
+            Principal principal) {
+
+        attendanceService.discardCurrentWeekAttendance(
+                principal.getName()
+        );
+
+        return ResponseEntity.ok("Discarded");
+    }
+    
     //  Get My Attendance History
     @GetMapping("/my-history")
     public ResponseEntity<?> getMyHistory(Principal principal) {

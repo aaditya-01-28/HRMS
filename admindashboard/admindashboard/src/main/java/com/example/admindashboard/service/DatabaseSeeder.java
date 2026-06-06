@@ -441,6 +441,30 @@ public class DatabaseSeeder implements CommandLineRunner {
         // ==========================================
         // RBAC TESTING ACCOUNTS
         // ==========================================
+        
+     // Test Account: Admin
+
+        if (userRepository.findByUsername("ADMIN001").isEmpty()) {
+
+            User user = new User();
+
+            user.setUsername("ADMIN001");
+            user.setPassword("{noop}Admin@123");
+            user.setRole(adminRole);
+
+            user.setFullName("Anil Sharma");
+            user.setEmail("admin@wcg.com");
+
+            EmployeeProfile profile = new EmployeeProfile();
+
+            profile.setDesignation("Company Admin / IT Admin");
+            profile.setJoiningDate(LocalDate.now());
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+        }
 
         // Test Account 1: HR Admin
         if (userRepository.findByUsername("EMP201").isEmpty()) {
@@ -751,9 +775,268 @@ public class DatabaseSeeder implements CommandLineRunner {
         } else {
             System.out.println("⚡ Insurance Policies already exist. Skipping seed.");
         }
+	
+	    /* ==========================================
+	       ORGANIZATION HIERARCHY MAPPING
+	    ========================================== */
+	
+	    Optional<User> superAdminOpt =
+	            userRepository.findByUsername("ADM001");
+	
+	    Optional<User> adminOpt =
+	            userRepository.findByUsername("ADMIN001");
+	
+	    Optional<User> hrManagerOpt =
+	            userRepository.findByUsername("EMP601");
+	
+	    Optional<User> hrExecutiveOpt =
+	            userRepository.findByUsername("EMP1101");
+	
+	    Optional<User> itSupportOpt =
+	            userRepository.findByUsername("EMP501");
+	    Optional<User> itAdminOpt =
+	            userRepository.findByUsername("EMP302");
+	    Optional<User> managerOpt =
+	            userRepository.findByUsername("EMP303");
 
+	    Optional<User> hrAdminOpt =
+	            userRepository.findByUsername("EMP201");
 
-        System.out.println("=========================================================");
+	    Optional<User> financeOpt =
+	            userRepository.findByUsername("EMP301");
+
+	    Optional<User> finance2Opt =
+	            userRepository.findByUsername("EMP1301");
+
+	    Optional<User> recruiterOpt =
+	            userRepository.findByUsername("EMP401");
+
+	    Optional<User> projectManagerOpt =
+	            userRepository.findByUsername("EMP701");
+
+	    Optional<User> auditorOpt =
+	            userRepository.findByUsername("EMP801");
+
+	    Optional<User> transportOpt =
+	            userRepository.findByUsername("EMP901");
+
+	    Optional<User> lndOpt =
+	            userRepository.findByUsername("EMP1001");
+	    
+	
+	    Optional<User> emp114Opt =
+	            userRepository.findByUsername("EMP114");
+	
+	    Optional<User> emp187Opt =
+	            userRepository.findByUsername("EMP187");
+	
+	    Optional<User> emp129Opt =
+	            userRepository.findByUsername("EMP129");
+	    Optional<User> surajOpt =
+	            userRepository.findByUsername("EMP1010");
+
+	    Optional<User> priyankaOpt =
+	            userRepository.findByUsername("EMP119");
+
+	    Optional<User> mishraOpt =
+	            userRepository.findByUsername("EMP111");
+	
+	    /* SUPER_ADMIN -> ADMIN */
+	
+	    if (superAdminOpt.isPresent() &&
+	            adminOpt.isPresent()) {
+	
+	        User admin = adminOpt.get();
+	
+	        admin.setManager(
+	                superAdminOpt.get()
+	        );
+	
+	        userRepository.save(admin);
+	    }
+	    
+	    /* ADMIN -> ALL DEPARTMENT HEADS */
+
+	    if (adminOpt.isPresent()) {
+
+	        User admin = adminOpt.get();
+	        
+	        if (hrManagerOpt.isPresent()) {
+	            User u = hrManagerOpt.get();
+	            u.setManager(admin);
+	            userRepository.save(u);
+	        }
+	        
+	        if (hrExecutiveOpt.isPresent()) {
+	            User u = hrExecutiveOpt.get();
+	            u.setManager(admin);
+	            userRepository.save(u);
+	        }
+	        if (managerOpt.isPresent()) {
+	            User u = managerOpt.get();
+	            u.setManager(admin);
+	            userRepository.save(u);
+	        }
+
+	        if (itAdminOpt.isPresent()) {
+	            User u = itAdminOpt.get();
+	            u.setManager(admin);
+	            userRepository.save(u);
+	        }
+
+	        if (itSupportOpt.isPresent()) {
+	            User u = itSupportOpt.get();
+	            u.setManager(admin);
+	            userRepository.save(u);
+	        }
+
+	        if (hrAdminOpt.isPresent()) {
+	            User u = hrAdminOpt.get();
+	            u.setManager(admin);
+	            userRepository.save(u);
+	        }
+
+	        if (financeOpt.isPresent()) {
+	            User u = financeOpt.get();
+	            u.setManager(admin);
+	            userRepository.save(u);
+	        }
+
+	        if (finance2Opt.isPresent()) {
+	            User u = finance2Opt.get();
+	            u.setManager(admin);
+	            userRepository.save(u);
+	        }
+
+	        if (recruiterOpt.isPresent()) {
+	            User u = recruiterOpt.get();
+	            u.setManager(admin);
+	            userRepository.save(u);
+	        }
+
+	        if (projectManagerOpt.isPresent()) {
+	            User u = projectManagerOpt.get();
+	            u.setManager(admin);
+	            userRepository.save(u);
+	        }
+
+	        if (auditorOpt.isPresent()) {
+	            User u = auditorOpt.get();
+	            u.setManager(admin);
+	            userRepository.save(u);
+	        }
+
+	        if (transportOpt.isPresent()) {
+	            User u = transportOpt.get();
+	            u.setManager(admin);
+	            userRepository.save(u);
+	        }
+
+	        if (lndOpt.isPresent()) {
+	            User u = lndOpt.get();
+	            u.setManager(admin);
+	            userRepository.save(u);
+	        }
+	    }
+	
+	    /* ADMIN -> HR_MANAGER */
+	
+	    if (adminOpt.isPresent() &&
+	            hrManagerOpt.isPresent()) {
+	
+	        User hrManager =
+	                hrManagerOpt.get();
+	
+	        hrManager.setManager(
+	                adminOpt.get()
+	        );
+	
+	        userRepository.save(hrManager);
+	    }
+	
+	    /* ADMIN -> IT_SUPPORT */
+	
+	    if (adminOpt.isPresent() &&
+	            itSupportOpt.isPresent()) {
+	
+	        User itSupport =
+	                itSupportOpt.get();
+	
+	        itSupport.setManager(
+	                adminOpt.get()
+	        );
+	
+	        userRepository.save(itSupport);
+	    }
+	
+	    /* HR_MANAGER -> HR_EXECUTIVE + EMPLOYEES */
+	
+	    if (hrManagerOpt.isPresent()) {
+	
+	        User hrManager =
+	                hrManagerOpt.get();
+	
+	
+	        if (emp114Opt.isPresent()) {
+	
+	            User user =
+	                    emp114Opt.get();
+	
+	            user.setManager(hrManager);
+	
+	            userRepository.save(user);
+	        }
+	
+	        if (emp187Opt.isPresent()) {
+	
+	            User user =
+	                    emp187Opt.get();
+	
+	            user.setManager(hrManager);
+	
+	            userRepository.save(user);
+	        }
+	
+	        if (emp129Opt.isPresent()) {
+	
+	            User user =
+	                    emp129Opt.get();
+	
+	            user.setManager(hrManager);
+	
+	            userRepository.save(user);
+	        }
+	        if (surajOpt.isPresent()) {
+
+	            User user = surajOpt.get();
+
+	            user.setManager(hrManager);
+
+	            userRepository.save(user);
+	        }
+
+	        if (priyankaOpt.isPresent()) {
+
+	            User user = priyankaOpt.get();
+
+	            user.setManager(hrManager);
+
+	            userRepository.save(user);
+	        }
+
+	        if (mishraOpt.isPresent()) {
+
+	            User user = mishraOpt.get();
+
+	            user.setManager(hrManager);
+
+	            userRepository.save(user);
+	        }
+	    }
+	
+	    System.out.println("=========================================================");
+	        
+        
     }
 
     private Role getOrCreateRole(String roleName) {
