@@ -112,6 +112,23 @@
             border-radius: 8px;
             padding: 10px 15px;
         }
+
+        @media (max-width: 768px) {
+            .profile-layout {
+                flex-direction: column;
+            }
+            .profile-left-panel {
+                min-width: unset;
+                padding: 25px 15px;
+            }
+            .profile-right-panel {
+                padding: 15px;
+            }
+            .detail-row {
+                flex-direction: column;
+                gap: 2px;
+            }
+        }
     </style>
 
     <div class="profile-layout">
@@ -123,7 +140,7 @@
                  th:text="${names.length > 1 ? names[0].substring(0,1).toUpperCase() + names[names.length-1].substring(0,1).toUpperCase() : (names[0].length() > 0 ? names[0].substring(0,1).toUpperCase() : 'U')}">RS</div>
             <div class="profile-name" th:text="${user.fullName != null ? user.fullName : 'Guest'}">Rohit Sharma</div>
             <div class="profile-designation" th:text="${user.employeeProfile != null ? user.employeeProfile.designation : 'Employee'}">Trainee-Tester</div>
-            <div class="mt-2 fw-bold text-primary" th:text="${user.employeeProfile != null && user.employeeProfile.id != null ? 'EMP' + user.employeeProfile.id : 'N/A'}">EMP114</div>
+            <div class="mt-2 fw-bold text-primary" th:text="${user.username}">EMP114</div>
         </div>
         
         <!-- Right Panel: Details -->
@@ -144,7 +161,7 @@
                 
                 <div class="detail-row">
                     <div class="detail-label">Employee ID</div>
-                    <div class="detail-value" th:text="${user.employeeProfile != null && user.employeeProfile.id != null ? 'EMP' + user.employeeProfile.id : 'N/A'}">EMP114</div>
+                    <div class="detail-value" th:text="${user.username}">EMP114</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Email</div>

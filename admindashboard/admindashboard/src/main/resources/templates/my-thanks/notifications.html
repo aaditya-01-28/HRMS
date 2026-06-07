@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:replace="~{my-thanks/layout :: page(~{::div.notifications-container}, 'dashboard', 'Notifications')}">
+<div class="notifications-container">
+    <style>
+        .notif-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .notif-header h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2962ff;
+            margin: 0;
+        }
+        .notif-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .notif-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 18px 20px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+        .notif-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .notif-item.unread {
+            background: #f0f5ff;
+            border-left: 4px solid #2962ff;
+        }
+        .notif-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+        .notif-icon.credit {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .notif-icon.debit {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+        .notif-icon.order {
+            background: #dbeafe;
+            color: #2962ff;
+        }
+        .notif-icon.system {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+        .notif-content {
+            flex: 1;
+        }
+        .notif-title {
+            font-weight: 600;
+            color: #1a202c;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+        .notif-message {
+            color: #4a5568;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+        .notif-time {
+            color: #94a3b8;
+            font-size: 0.78rem;
+            margin-top: 6px;
+        }
+        .empty-notif {
+            text-align: center;
+            padding: 60px 0;
+            color: #64748b;
+        }
+        .empty-notif i {
+            font-size: 3.5rem;
+            color: #cbd5e1;
+            margin-bottom: 15px;
+        }
+        .empty-notif h3 {
+            font-weight: 700;
+            color: #334155;
+        }
+    </style>
+
+    <div class="notif-header">
+        <h2>Notifications</h2>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${notifications == null || notifications.isEmpty()}" class="empty-notif">
+        <i class="far fa-bell-slash d-block"></i>
+        <h3>No Notifications Yet</h3>
+        <p>You'll receive notifications when points are credited, debited, or when you place an order.</p>
+    </div>
+
+    <!-- Notifications List -->
+    <div th:if="${notifications != null && !notifications.isEmpty()}" class="notif-list">
+        <div th:each="notif : ${notifications}" class="notif-item" th:classappend="${!notif.read ? 'unread' : ''}">
+
+            <!-- Icon based on type -->
+            <div th:switch="${notif.type}">
+                <div th:case="'CREDIT'" class="notif-icon credit"><i class="fas fa-arrow-down"></i></div>
+                <div th:case="'DEBIT'" class="notif-icon debit"><i class="fas fa-arrow-up"></i></div>
+                <div th:case="'ORDER'" class="notif-icon order"><i class="fas fa-shopping-bag"></i></div>
+                <div th:case="*" class="notif-icon system"><i class="fas fa-info-circle"></i></div>
+            </div>
+
+            <!-- Content -->
+            <div class="notif-content">
+                <div class="notif-title" th:text="${notif.title}">Points Received</div>
+                <div class="notif-message" th:text="${notif.message}">You received 100 PTS from Om Tripathi.</div>
+                <div class="notif-time">
+                    <i class="far fa-clock me-1"></i>
+                    <span th:text="${#temporals.format(notif.createdAt, 'dd MMM yyyy, hh:mm a')}">06 Jun 2026, 10:30 AM</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</th:block>
+</body>
+</html>

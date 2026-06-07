@@ -170,7 +170,7 @@
                                 </td>
                                 <td class="text-end">
                                     <form th:action="@{/my-thanks/cart/remove}" method="post" class="d-inline">
-                                        <input type="hidden" name="index" th:value="${stat.index}" />
+                                        <input type="hidden" name="id" th:value="${item.id}" />
                                         <button type="submit" class="btn-remove" title="Remove Item">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>

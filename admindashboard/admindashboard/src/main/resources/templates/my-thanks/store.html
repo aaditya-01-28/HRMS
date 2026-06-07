@@ -69,10 +69,9 @@
             background-color: #2962ff;
         }
 
-        /* --- PRODUCT GRID --- */
         .product-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 25px;
         }
         .product-card {
@@ -258,6 +257,65 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .store-header-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .store-filters {
+                flex-direction: column;
+                width: 100%;
+            }
+            .search-input-group {
+                max-width: 100%;
+            }
+            .category-select {
+                width: 100%;
+            }
+            .store-tabs {
+                overflow-x: auto;
+                gap: 15px;
+                flex-wrap: nowrap;
+                padding-bottom: 5px;
+            }
+            .store-tab {
+                white-space: nowrap;
+                font-size: 0.9rem;
+            }
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+                gap: 12px;
+            }
+            .product-card {
+                padding: 10px;
+            }
+            .product-img-wrapper {
+                height: 120px;
+            }
+            .product-title {
+                font-size: 0.85rem;
+            }
+            .product-pts {
+                font-size: 0.85rem;
+            }
+            .action-buttons {
+                flex-direction: column;
+                gap: 6px;
+            }
+            .btn-redeem, .btn-cart {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+            .confirm-modal-body {
+                flex-direction: column;
+                align-items: center;
+            }
+            .confirm-img-box {
+                width: 100px;
+                height: 100px;
+            }
         }
     </style>
 
@@ -513,7 +571,64 @@
         document.addEventListener("DOMContentLoaded", function() {
             confirmModalInstance = new bootstrap.Modal(document.getElementById('confirmModal'));
             successModalInstance = new bootstrap.Modal(document.getElementById('successModal'));
+
+            // Filtering logic setup
+            const searchInput = document.querySelector('.search-input-group input');
+            const categorySelect = document.querySelector('.category-select');
+            const tabs = document.querySelectorAll('.store-tab');
+
+            if(searchInput) searchInput.addEventListener('input', filterStore);
+            if(categorySelect) categorySelect.addEventListener('change', filterStore);
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    filterStore();
+                });
+            });
         });
+
+        function filterStore() {
+            const searchInput = document.querySelector('.search-input-group input');
+            const categorySelect = document.querySelector('.category-select');
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            const selectedCategory = categorySelect ? categorySelect.value : 'all';
+            
+            let activeTab = 'all';
+            document.querySelectorAll('.store-tab').forEach(t => {
+                if(t.classList.contains('active')) activeTab = t.innerText.toLowerCase();
+            });
+
+            document.querySelectorAll('.product-card').forEach(card => {
+                const titleElement = card.querySelector('.product-title');
+                if (!titleElement) return;
+                
+                const title = titleElement.innerText.toLowerCase();
+                const btnHTML = card.querySelector('.btn-redeem').outerHTML.toLowerCase();
+                
+                let category = 'merch';
+                if(btnHTML.includes("'voucher'")) {
+                    category = 'vouchers';
+                    if(title.includes('gift card')) category = 'giftcards';
+                }
+
+                const matchesSearch = title.includes(searchTerm);
+                const matchesSelect = selectedCategory === 'all' || category === selectedCategory;
+                
+                let matchesTab = true;
+                if(activeTab === 'merchandise') matchesTab = (category === 'merch');
+                else if(activeTab === 'gift cards') matchesTab = (category === 'giftcards');
+                else if(activeTab === 'vouchers') matchesTab = (category === 'vouchers');
+
+                if (matchesSearch && matchesSelect && matchesTab) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
 
         function openConfirmModal(productName, points, type, imgSrc, brand) {
             currentProductType = type;
