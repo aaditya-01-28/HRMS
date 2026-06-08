@@ -1,7 +1,8 @@
 package com.example.admindashboard.controller;
 
-import com.example.admindashboard.model.CartItem;
+import com.example.admindashboard.model.ThanksCartItem;
 import com.example.admindashboard.model.User;
+import com.example.admindashboard.repository.ThanksCartItemRepository;
 import com.example.admindashboard.repository.UserRepository;
 import com.example.admindashboard.service.ThanksService;
 
@@ -31,6 +32,9 @@ public class MyThanksController {
     @Autowired
     private ThanksService thanksService;
 
+    @Autowired
+    private ThanksCartItemRepository thanksCartItemRepository;
+
     /* ---------- SESSION CHECK ---------- */
     private boolean isThanksAuthenticated(HttpSession session) {
         return Boolean.TRUE.equals(session.getAttribute("thanksAuthenticated"));
@@ -48,6 +52,24 @@ public class MyThanksController {
         }
 
         return null;
+    }
+
+    @ModelAttribute("cartSize")
+    public int getCartSize(HttpSession session, Principal principal) {
+        User user = getAuthenticatedUser(session, principal);
+        if (user != null) {
+            return thanksCartItemRepository.findByUser(user).size();
+        }
+        return 0;
+    }
+
+    @ModelAttribute("notificationCount")
+    public int getNotificationCount(HttpSession session, Principal principal) {
+        User user = getAuthenticatedUser(session, principal);
+        if (user != null) {
+            return thanksService.getUnreadNotificationCount(user);
+        }
+        return 0;
     }
 
     /* ---------- LOGIN ---------- */
@@ -175,13 +197,10 @@ public class MyThanksController {
         model.addAttribute("wallet", thanksService.getOrCreateWallet(user));
         model.addAttribute("activeMenu", "cart");
 
-        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
-        if (cart == null) {
-            cart = new ArrayList<>();
-        }
+        List<ThanksCartItem> cart = thanksCartItemRepository.findByUser(user);
         model.addAttribute("cartItems", cart);
 
-        int totalPoints = cart.stream().mapToInt(CartItem::getPoints).sum();
+        int totalPoints = cart.stream().mapToInt(ThanksCartItem::getPoints).sum();
         model.addAttribute("cartTotal", totalPoints);
 
         return "my-thanks/cart";
@@ -194,24 +213,29 @@ public class MyThanksController {
             @RequestParam Integer points,
             @RequestParam String productType,
             @RequestParam(required = false) String imageSrc,
-            HttpSession session) {
+            HttpSession session, Principal principal) {
         
-        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
-        if (cart == null) {
-            cart = new ArrayList<>();
+        User user = getAuthenticatedUser(session, principal);
+        if (user == null) {
+            return org.springframework.http.ResponseEntity.status(401).body("Unauthorized");
         }
-        cart.add(new CartItem(itemName, points, productType, imageSrc));
-        session.setAttribute("cart", cart);
+        
+        ThanksCartItem cartItem = new ThanksCartItem(user, itemName, points, productType, imageSrc);
+        thanksCartItemRepository.save(cartItem);
 
-        return org.springframework.http.ResponseEntity.ok().body("{\"status\":\"success\", \"cartSize\":" + cart.size() + "}");
+        int cartSize = thanksCartItemRepository.findByUser(user).size();
+        return org.springframework.http.ResponseEntity.ok().body("{\"status\":\"success\", \"cartSize\":" + cartSize + "}");
     }
 
     @PostMapping("/cart/remove")
-    public String removeFromCart(@RequestParam int index, HttpSession session) {
-        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
-        if (cart != null && index >= 0 && index < cart.size()) {
-            cart.remove(index);
-            session.setAttribute("cart", cart);
+    public String removeFromCart(@RequestParam Long id, HttpSession session, Principal principal) {
+        User user = getAuthenticatedUser(session, principal);
+        if (user != null) {
+            thanksCartItemRepository.findById(id).ifPresent(item -> {
+                if (item.getUser().getId().equals(user.getId())) {
+                    thanksCartItemRepository.delete(item);
+                }
+            });
         }
         return "redirect:/my-thanks/cart";
     }
@@ -222,14 +246,14 @@ public class MyThanksController {
             return "redirect:/my-thanks/login";
         }
         User user = getAuthenticatedUser(session, principal);
-        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+        List<ThanksCartItem> cart = thanksCartItemRepository.findByUser(user);
 
         if (cart == null || cart.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Your cart is empty.");
             return "redirect:/my-thanks/cart";
         }
 
-        int totalPoints = cart.stream().mapToInt(CartItem::getPoints).sum();
+        int totalPoints = cart.stream().mapToInt(ThanksCartItem::getPoints).sum();
         com.example.admindashboard.model.ThanksWallet wallet = thanksService.getOrCreateWallet(user);
 
         if (wallet.getWalletBalance() < totalPoints) {
@@ -238,10 +262,10 @@ public class MyThanksController {
         }
 
         try {
-            for (CartItem item : cart) {
+            for (ThanksCartItem item : cart) {
                 thanksService.redeemItem(user, item.getItemName(), item.getPoints(), item.getProductType());
             }
-            session.removeAttribute("cart");
+            thanksCartItemRepository.deleteAll(cart);
             redirectAttributes.addFlashAttribute("success", "Checkout completed successfully!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Checkout failed: " + e.getMessage());
@@ -299,6 +323,23 @@ public class MyThanksController {
             redirectAttributes.addFlashAttribute("error", "Unable to update profile. User or profile not found.");
         }
         return "redirect:/my-thanks/profile";
+    }
+
+    /* ---------- NOTIFICATIONS ---------- */
+    @GetMapping("/notifications")
+    public String notifications(HttpSession session, Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/my-thanks/login";
+        }
+        User user = getAuthenticatedUser(session, principal);
+        model.addAttribute("user", user);
+        model.addAttribute("wallet", thanksService.getOrCreateWallet(user));
+        model.addAttribute("notifications", thanksService.getNotifications(user));
+        model.addAttribute("activeMenu", "dashboard");
+
+        // Mark all as read when user visits the page
+        thanksService.markAllNotificationsRead(user);
+        return "my-thanks/notifications";
     }
 
     /* ---------- LOGOUT ---------- */

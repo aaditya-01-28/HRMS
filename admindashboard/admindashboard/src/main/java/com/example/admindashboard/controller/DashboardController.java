@@ -500,6 +500,18 @@ public class DashboardController {
         return "password-reset";
     }
 
+    @GetMapping("/forgot-password")
+    public String showForgotPasswordPage() {
+        return "forgot-password";
+    }
+
+    @PostMapping("/forgot-password")
+    public String processForgotPassword(@RequestParam("email") String email, RedirectAttributes redirectAttributes) {
+        // Mock sending email
+        redirectAttributes.addFlashAttribute("success", "A password reset link has been sent to " + email);
+        return "redirect:/forgot-password";
+    }
+
     @GetMapping("/my-whitecircle/login")
     public String showMyWhiteCircle(Model model, Principal principal) { 
         if (principal != null) {

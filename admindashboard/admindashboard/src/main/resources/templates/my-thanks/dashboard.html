@@ -160,6 +160,30 @@
             background: #2962ff;
             color: #fff;
         }
+
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: 1fr !important;
+                gap: 12px;
+            }
+            .stat-card {
+                padding: 18px;
+            }
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            .dashboard-profile-header .d-flex {
+                flex-direction: column;
+                text-align: center;
+            }
+            .section-title {
+                font-size: 1rem;
+            }
+            .custom-table th, .custom-table td {
+                padding: 10px 8px;
+                font-size: 0.8rem;
+            }
+        }
     </style>
 
     <div class="dashboard-profile-header">
@@ -169,7 +193,7 @@
                  th:text="${names.length > 1 ? names[0].substring(0,1).toUpperCase() + names[names.length-1].substring(0,1).toUpperCase() : (names[0].length() > 0 ? names[0].substring(0,1).toUpperCase() : 'U')}">RS</div>
             <div>
                 <h4 class="fw-bold mb-0" style="color: #1a202c;" th:text="${user.fullName != null ? user.fullName : 'Guest'}">Rohit Sharma</h4>
-                <div class="text-muted mb-2" style="font-size: 0.9rem;" th:text="${user.employeeProfile != null && user.employeeProfile.id != null ? 'EMP' + user.employeeProfile.id : ''}">EMP114</div>
+                <div class="text-muted mb-2" style="font-size: 0.9rem;" th:text="${user.username}">EMP114</div>
                 <a href="/my-thanks/profile" class="btn-view-profile">View Profile</a>
             </div>
         </div>
@@ -223,7 +247,7 @@
                 <tr th:each="tx : ${transactions}">
                     <td th:text="${tx.transactionDate}">-</td>
                     <td th:text="${tx.transactionType}">-</td>
-                    <td th:classappend="${tx.transactionType == 'CREDIT' ? 'pts-credit' : 'pts-debit'}" th:text="${(tx.transactionType == 'CREDIT' ? '+' : '-') + tx.points}">0</td>
+                    <td th:classappend="${#strings.equalsIgnoreCase(tx.transactionType, 'CREDIT') ? 'pts-credit' : 'pts-debit'}" th:text="${(#strings.equalsIgnoreCase(tx.transactionType, 'CREDIT') ? '+' : '-') + tx.points}">0</td>
                     <td th:text="${tx.description}">-</td>
                     <td><span class="status-badge status-completed" th:text="${tx.status}">Completed</span></td>
                 </tr>
