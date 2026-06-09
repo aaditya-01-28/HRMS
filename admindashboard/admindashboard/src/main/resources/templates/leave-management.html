@@ -1311,7 +1311,7 @@
         const payload = {
             leaveType, leaveMode: 'Offline', fromDate, toDate,
             totalDays: requestedDays,
-            reason: reasonType + (comments ? ' \u2014 ' + comments : '')
+            reason: reasonType + (comments ? ' - ' + comments : '')
         };
 
         Swal.fire({ title: 'Submitting...', text: 'Please wait...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
