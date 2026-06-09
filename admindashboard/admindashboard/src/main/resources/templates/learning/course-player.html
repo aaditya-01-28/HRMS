@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Player - White Circle</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Dark immersive header */
+        .player-header {
+            background-color: #0f172a;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            color: #38bdf8;
+        }
+
+        .course-title-nav {
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-left: 1px solid #334155;
+            padding-left: 20px;
+        }
+
+        /* Main Container layout */
+        .player-container {
+            display: flex;
+            flex-grow: 1;
+            height: calc(100vh - 60px);
+        }
+
+        /* Left side: Video and tabs */
+        .video-section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background-color: #fff;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            background-color: #000;
+            aspect-ratio: 16 / 9;
+            max-height: 70vh;
+        }
+
+        .video-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .content-tabs {
+            padding: 20px 40px;
+        }
+
+        .tab-headers {
+            display: flex;
+            gap: 30px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tab-btn.active {
+            color: #0f172a;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #3b82f6;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-content {
+            display: none;
+            color: #334155;
+            line-height: 1.6;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        .overview-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        /* Right side: Course Curriculum Sidebar */
+        .curriculum-sidebar {
+            width: 380px;
+            min-width: 380px;
+            background-color: #f8fafc;
+            border-left: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            background-color: #fff;
+        }
+
+        .sidebar-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #0f172a;
+        }
+
+        .module-list {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .module-item {
+            border-bottom: 1px solid #e2e8f0;
+            background: #fff;
+        }
+
+        .module-header {
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #1e293b;
+            background-color: #f8fafc;
+            transition: background 0.2s;
+        }
+
+        .module-header:hover {
+            background-color: #f1f5f9;
+        }
+
+        .module-lessons {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            display: block;
+        }
+
+        .lesson-item {
+            padding: 12px 20px 12px 40px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .lesson-item:hover {
+            background-color: #e2e8f0;
+        }
+
+        .lesson-item.active {
+            background-color: #e0e7ff;
+            border-left: 4px solid #3b82f6;
+            padding-left: 36px;
+        }
+
+        .lesson-icon {
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .lesson-item.active .lesson-icon {
+            color: #3b82f6;
+        }
+
+        .lesson-title {
+            flex-grow: 1;
+        }
+
+        .lesson-duration {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        /* Checkbox styling */
+        .completed-check {
+            color: #10b981;
+            font-size: 16px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="player-header">
+        <div class="header-left">
+            <a href="/learning/dashboard" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <div class="course-title-nav">Spring Boot Mastery</div>
+        </div>
+        <div>
+            <button class="back-btn" style="border:1px solid rgba(255,255,255,0.3); padding:8px 15px; border-radius:6px;">
+                <i class="fa-solid fa-share-nodes"></i> Share
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="player-container">
+        
+        <!-- Video and Details Section -->
+        <div class="video-section">
+            <div class="video-wrapper">
+                <!-- Using a standard unrestricted Spring Boot video (Amigoscode) -->
+                <iframe src="https://www.youtube.com/embed/vtPkZShrvXQ?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+
+            <div class="content-tabs">
+                <div class="tab-headers">
+                    <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+                    <button class="tab-btn" onclick="switchTab('qa', this)">Q&A</button>
+                    <button class="tab-btn" onclick="switchTab('notes', this)">Notes</button>
+                </div>
+
+                <div id="overview" class="tab-content active">
+                    <h1 class="overview-title">1. Introduction to Spring Boot</h1>
+                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px;">
+                        <img src="https://ui-avatars.com/api/?name=Abhinav+Pandey&background=random" style="width:40px; height:40px; border-radius:50%;">
+                        <div>
+                            <div style="font-weight:600;">Abhinav Pandey</div>
+                            <div style="font-size:13px; color:#64748b;">Senior Java Developer</div>
+                        </div>
+                    </div>
+                    <p>In this introductory lesson, we will cover the absolute basics of Spring Boot, what problems it solves in the Java ecosystem, and how you can get started building your first enterprise application. We'll explore Auto-Configuration, Standalone Applications, and Opinionated Defaults.</p>
+                </div>
+
+                <div id="qa" class="tab-content">
+                    <h2 style="margin-top:0;">Questions & Answers</h2>
+                    <p style="color:#64748b;">Search for questions or ask your own!</p>
+                    <input type="text" placeholder="Search all course questions" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:20px;">
+                    <div style="text-align:center; padding:30px; background:#f1f5f9; border-radius:8px;">
+                        No questions asked yet in this section. Be the first!
+                    </div>
+                </div>
+
+                <div id="notes" class="tab-content">
+                    <h2 style="margin-top:0;">Your Notes</h2>
+                    <textarea placeholder="Create a new note at 0:00" style="width:100%; height:100px; padding:12px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px; resize:vertical;"></textarea>
+                    <div style="text-align:right;">
+                        <button style="background:#0f172a; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:600;">Save Note</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Curriculum Sidebar -->
+        <div class="curriculum-sidebar">
+            <div class="sidebar-header">
+                <h3>Course Content</h3>
+            </div>
+            
+            <div class="module-list" id="curriculumList">
+                <!-- Hardcoded for simulation of the player state -->
+                <div class="module-item">
+                    <div class="module-header">
+                        <span>Section 1: Introduction</span>
+                        <i class="fa-solid fa-chevron-up"></i>
+                    </div>
+                    <ul class="module-lessons">
+                        <li class="lesson-item active">
+                            <i class="fa-regular fa-circle-play lesson-icon"></i>
+                            <div class="lesson-title">
+                                <div>1. Introduction to Spring Boot</div>
+                                <div class="lesson-duration">15:20</div>
+                            </div>
+                        </li>
+                        <li class="lesson-item">
+                            <i class="fa-regular fa-file-lines lesson-icon"></i>
+                            <div class="lesson-title">
+                                <div>2. Course Setup & Prerequisites</div>
+                                <div class="lesson-duration">05:45</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="module-item">
+                    <div class="module-header">
+                        <span>Section 2: Rest APIs</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                </div>
+
+                <div class="module-item">
+                    <div class="module-header">
+                        <span>Section 3: Security</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                </div>
+                
+                <div class="module-item">
+                    <div class="module-header">
+                        <span>Section 4: Microservices</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+    </script>
+</body>
+</html>
