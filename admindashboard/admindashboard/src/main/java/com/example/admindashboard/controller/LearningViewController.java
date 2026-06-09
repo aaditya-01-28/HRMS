@@ -84,4 +84,11 @@ public class LearningViewController {
         model.addAttribute("activeTab", "helpdesk");
         return "learning/helpdesk";
     }
+
+    @GetMapping("/course-player")
+    public String coursePlayer(Principal principal, Model model) {
+        addUserToModel(principal, model);
+        model.addAttribute("activeTab", "explore-courses");
+        return "learning/course-player";
+    }
 }

@@ -14,6 +14,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// GLOBAL VIDEO PLAYER ROUTING
+window.playVideo = function() {
+    window.location.href = '/learning/course-player';
+};
+
 function fetchDashboardData() {
     fetch("/api/learning/dashboard")
         .then(res => res.json())
@@ -79,7 +84,7 @@ function fetchDashboardData() {
                 continueContainer.innerHTML += `
                     <div class="progress-item">
                         <div class="progress-info">
-                            <i class="fa-brands fa-envira" style="color:var(--success)"></i>
+                            <img src="https://img.youtube.com/vi/vtPkZShrvXQ/maxresdefault.jpg" style="width: 50px; height: 35px; border-radius: 6px; object-fit: cover;" alt="Thumbnail">
                             <span>${item.courseName}</span>
                         </div>
                         <div class="progress-bar-wrapper">
@@ -88,7 +93,7 @@ function fetchDashboardData() {
                             </div>
                             <span class="progress-text">${item.progress}%</span>
                         </div>
-                        <button class="btn-outline">Continue</button>
+                        <button class="btn-outline" onclick="window.playVideo()">Continue</button>
                     </div>
                 `;
             });
@@ -234,9 +239,8 @@ function fetchMyLearnings() {
                 ongoingContainer.innerHTML += `
                     <div class="ongoing-card">
                         <div class="ongoing-left">
-                            <div class="ongoing-banner ${gradientClass}">
-                                <i class="fa-brands fa-envira"></i>
-                                <span class="banner-tag"><i class="fa-solid fa-fire"></i> ${course.tags}</span>
+                            <div class="ongoing-banner" style="background-image: url('https://img.youtube.com/vi/vtPkZShrvXQ/maxresdefault.jpg'); background-size: cover; background-position: center; border: none;">
+                                <span class="banner-tag" style="background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 4px; font-size: 12px;"><i class="fa-solid fa-fire"></i> ${course.tags}</span>
                             </div>
                             <div class="ongoing-details">
                                 <h3>${course.title}</h3>
@@ -250,7 +254,7 @@ function fetchMyLearnings() {
                                 </div>
                             </div>
                         </div>
-                        <button class="btn-outline" style="padding: 10px 30px;">Continue</button>
+                        <button class="btn-outline" style="padding: 10px 30px;" onclick="window.playVideo()">Continue</button>
                     </div>
                 `;
             });
