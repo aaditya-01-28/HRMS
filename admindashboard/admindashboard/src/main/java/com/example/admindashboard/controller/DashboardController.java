@@ -500,6 +500,18 @@ public class DashboardController {
         return "password-reset";
     }
 
+    @GetMapping("/forgot-password")
+    public String showForgotPasswordPage() {
+        return "forgot-password";
+    }
+
+    @PostMapping("/forgot-password")
+    public String processForgotPassword(@RequestParam("email") String email, RedirectAttributes redirectAttributes) {
+        // Mock sending email
+        redirectAttributes.addFlashAttribute("success", "A password reset link has been sent to " + email);
+        return "redirect:/forgot-password";
+    }
+
     @GetMapping("/my-whitecircle/login")
     public String showMyWhiteCircle(Model model, Principal principal) { 
         if (principal != null) {
@@ -521,9 +533,37 @@ public class DashboardController {
     }
 
     @PostMapping("/my-whitecircle/login")
-    public String processMyWhiteCircleLogin() {
-        // 2. When they click "Continue with My WhiteCircle", they instantly land on your Quick Actions hub
-    	return "redirect:/my-whitecircle"; 
+    public String processMyWhiteCircleLogin(
+            @RequestParam("username") String typedUsername,
+            @RequestParam("password") String typedPassword,
+            Model model,
+            Principal principal) {
+
+        if (principal != null) {
+
+            String loginId = principal.getName();
+            User currentUser = userRepository.findByUsername(loginId)
+                    .orElse(new User());
+
+            String dbPassword = currentUser.getPassword();
+
+            String cleanDbPassword =
+                    dbPassword != null
+                            ? dbPassword.replace("{noop}", "")
+                            : "";
+
+            if (!typedUsername.equalsIgnoreCase(loginId)
+                    || !typedPassword.equals(cleanDbPassword)) {
+
+                model.addAttribute("user", currentUser);
+                model.addAttribute("savedPassword", cleanDbPassword);
+                model.addAttribute("authError", "Invalid credentials");
+
+                return "my-whitecircle-login";
+            }
+        }
+
+        return "redirect:/my-whitecircle";
     }
 
     @GetMapping("/coming-soon")

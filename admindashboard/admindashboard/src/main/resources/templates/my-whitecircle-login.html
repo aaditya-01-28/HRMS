@@ -261,9 +261,19 @@
                     <i class="fa-solid fa-eye" style="position: absolute; right: 14px; top: 41px; cursor: pointer; color: #666666;" onclick="const p = document.getElementById('ssoPassword'); if(p.type==='password'){p.type='text'; this.classList.replace('fa-eye', 'fa-eye-slash');}else{p.type='password'; this.classList.replace('fa-eye-slash', 'fa-eye');}"></i>
 			    </div>
 
-			    <a href="/password-reset" class="link-forgot-password">Forgot Password?</a>
+				<a href="/forgot-password" class="link-forgot-password">Forgot Password?</a>
 
-			    <button type="submit" class="btn-continue-sso">Continue with My WhiteCircle</button>
+				<div th:if="${authError}"
+				     style="color:#dc2626;
+				            font-size:14px;
+				            font-weight:600;
+				            margin-bottom:15px;">
+				    <span th:text="${authError}"></span>
+				</div>
+
+				<button type="submit" class="btn-continue-sso">
+				    Continue with My WhiteCircle
+				</button>
 			</form>
         </div>
 

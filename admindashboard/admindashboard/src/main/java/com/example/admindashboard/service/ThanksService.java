@@ -1,8 +1,10 @@
 package com.example.admindashboard.service;
 
+import com.example.admindashboard.model.ThanksNotification;
 import com.example.admindashboard.model.ThanksTransaction;
 import com.example.admindashboard.model.ThanksWallet;
 import com.example.admindashboard.model.User;
+import com.example.admindashboard.repository.ThanksNotificationRepository;
 import com.example.admindashboard.repository.ThanksTransactionRepository;
 import com.example.admindashboard.repository.ThanksWalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,9 @@ public class ThanksService {
 
     @Autowired
     private ThanksTransactionRepository transactionRepository;
+
+    @Autowired
+    private ThanksNotificationRepository notificationRepository;
 
     /**
      * Gets the user's wallet. If they don't have one, it creates one
@@ -73,6 +78,14 @@ public class ThanksService {
         senderTx.setDescription("Appreciation sent to " + receiver.getFullName());
         transactionRepository.save(senderTx);
 
+        // Notification for sender
+        notificationRepository.save(new ThanksNotification(
+            sender,
+            "Points Sent",
+            "You sent " + points + " PTS to " + receiver.getFullName() + " as appreciation.",
+            "DEBIT"
+        ));
+
         // 4. Add to Receiver
         receiverWallet.setWalletBalance(receiverWallet.getWalletBalance() + points);
         receiverWallet.setTotalPointsEarned(receiverWallet.getTotalPointsEarned() + points);
@@ -88,6 +101,14 @@ public class ThanksService {
         receiverTx.setCategory(category);
         receiverTx.setDescription("Appreciation from " + sender.getFullName() + ": " + message);
         transactionRepository.save(receiverTx);
+
+        // Notification for receiver
+        notificationRepository.save(new ThanksNotification(
+            receiver,
+            "Points Received",
+            "You received " + points + " PTS from " + sender.getFullName() + " — \"" + message + "\"",
+            "CREDIT"
+        ));
     }
 
     /**
@@ -118,6 +139,43 @@ public class ThanksService {
         tx.setDescription(desc + itemName);
 
         transactionRepository.save(tx);
+
+        // Notification for order placed
+        notificationRepository.save(new ThanksNotification(
+            user,
+            "Order Placed",
+            "You redeemed \"" + itemName + "\" for " + points + " PTS. " +
+                (productType.equals("merch") ? "It will be delivered within 5 business days." : "The voucher will be sent to your email."),
+            "ORDER"
+        ));
+    }
+
+    /**
+     * Fetches the user's notifications.
+     */
+    public List<ThanksNotification> getNotifications(User user) {
+        return notificationRepository.findByUserOrderByCreatedAtDesc(user);
+    }
+
+    /**
+     * Returns count of unread notifications.
+     */
+    public int getUnreadNotificationCount(User user) {
+        return notificationRepository.countByUserAndReadFalse(user);
+    }
+
+    /**
+     * Marks all notifications as read.
+     */
+    @Transactional
+    public void markAllNotificationsRead(User user) {
+        List<ThanksNotification> notifications = notificationRepository.findByUserOrderByCreatedAtDesc(user);
+        for (ThanksNotification n : notifications) {
+            if (!n.isRead()) {
+                n.setRead(true);
+                notificationRepository.save(n);
+            }
+        }
     }
 
     /**

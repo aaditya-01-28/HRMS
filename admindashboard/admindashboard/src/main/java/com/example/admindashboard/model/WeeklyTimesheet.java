@@ -32,6 +32,9 @@ public class WeeklyTimesheet {
 
     @Column(columnDefinition = "TEXT")
     private String overallComments;
+    
+    @Column(columnDefinition = "TEXT")
+    private String managerComment;
 
     @Column(name = "total_week_hours")
     private Double totalWeekHours;
@@ -62,6 +65,14 @@ public class WeeklyTimesheet {
 
     public String getOverallComments() { return overallComments; }
     public void setOverallComments(String overallComments) { this.overallComments = overallComments; }
+    
+    public String getManagerComment() {
+        return managerComment;
+    }
+
+    public void setManagerComment(String managerComment) {
+        this.managerComment = managerComment;
+    }
 
     public Double getTotalWeekHours() { return totalWeekHours; }
     public void setTotalWeekHours(Double totalWeekHours) { this.totalWeekHours = totalWeekHours; }

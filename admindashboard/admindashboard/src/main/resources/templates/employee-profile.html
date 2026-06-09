@@ -20,7 +20,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-body);
+             background: #efefef;
             margin: 0; padding: 0;
             color: var(--text-main);
             overflow-x: hidden;
@@ -31,56 +31,16 @@
             min-height: 100vh;
         }
 
-        /* SIDEBAR (TAB MENU) */
-        .profile-sidebar {
-            width: 280px;
-            background-color: var(--sidebar-bg);
-            color: #fff;
-            position: fixed;
-            top: 0; bottom: 0; left: 0;
-            display: flex; flex-direction: column;
-            padding-top: 30px;
-            z-index: 1000;
-        }
-
-        .user-summary {
-            text-align: center;
-            padding: 0 20px 30px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-        }
-
-        .avatar-circle {
-            width: 80px; height: 80px;
-            background: linear-gradient(135deg, #2563eb 0%, #38bdf8 100%);
-            color: white; font-size: 2rem; font-weight: 700;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; border: 3px solid #fff;
-            margin: 0 auto 15px;
-        }
-
-        .user-name { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
-        .user-desig { font-size: 0.85rem; color: #94a3b8; margin-bottom: 0; }
-
-        .nav-pills { padding: 0 15px; }
-        .nav-pills .nav-link {
-            color: #cbd5e1; border-radius: 8px;
-            padding: 12px 16px; margin-bottom: 8px;
-            font-weight: 500; font-size: 0.95rem;
-            display: flex; align-items: center; transition: all 0.2s;
-            text-align: left;
-        }
-        .nav-pills .nav-link i { width: 24px; text-align: center; margin-right: 12px; font-size: 1.1rem; }
-        .nav-pills .nav-link:hover { background-color: var(--sidebar-hover); color: #fff; }
-        .nav-pills .nav-link.active { background-color: var(--sidebar-active); color: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-
+        
         /* MAIN CONTENT AREA */
-        .profile-main {
-            margin-left: 280px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
+        
+		.profile-main {
+		    margin-left: 0;
+		    width: 100%;
+		    flex-grow: 1;
+		    display: flex;
+		    flex-direction: column;
+		}
 
         .top-nav {
             background: #fff; padding: 20px 40px;
@@ -96,7 +56,7 @@
         .progress { width: 150px; height: 8px; border-radius: 10px; background-color: #e2e8f0; }
         .progress-bar { background: linear-gradient(90deg, #2563eb 0%, #38bdf8 100%); border-radius: 10px; }
 
-        .content-area { padding: 40px; max-width: 1000px; margin: 0 auto; width: 100%; flex-grow: 1; }
+        .content-area { padding:15px 25px; max-width: 100%; margin: 0 auto; width: 100%; flex-grow: 1; }
 
         .tab-pane-card {
             background: #fff; border-radius: 16px; border: 1px solid var(--border-color);
@@ -107,22 +67,6 @@
             font-size: 1.3rem; font-weight: 700; color: #1e293b;
             margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #f1f5f9;
         }
-
-        /* FORM FIELDS */
-        .info-box { margin-bottom: 24px; position: relative; }
-        .info-label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
-        .info-value-text { font-size: 0.95rem; font-weight: 500; color: #0f172a; word-break: break-word; min-height: 24px; display: block; }
-        
-        .editable-field {
-            width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px;
-            font-size: 0.95rem; color: #0f172a; transition: all 0.2s; display: none; background: #fff;
-        }
-        .editable-field:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-        .editable-field:read-only { background-color: #f8fafc; color: #475569; border-color: #e2e8f0; cursor: not-allowed; }
-
-        /* Edit Mode Toggle */
-        body.editing .info-value-text { display: none !important; }
-        body.editing .editable-field { display: block !important; }
         
         .empty-field { color: #94a3b8; font-style: italic; }
 
@@ -144,46 +88,267 @@
             .user-name, .user-desig { display: none; }
             .nav-pills .nav-link span { display: none; }
             .nav-pills .nav-link i { margin-right: 0; margin: 0 auto; font-size: 1.3rem; }
-            .profile-main { margin-left: 80px; }
+            .profile-main { margin-left: 0; }
             .top-nav { padding: 15px 20px; }
             .content-area { padding: 20px; }
         }
+		.profile-tabs{
+		    display:grid;
+		    grid-template-columns:repeat(6,1fr);
+		    width:100%;
+		    background:#dfe8f2;
+		    border-top:1px solid #cfd8e3;
+		    border-bottom:1px solid #cfd8e3;
+		}
+
+		.tab-btn{
+		    flex:1;
+		    text-align:center;
+		    border:none;
+		    background:transparent;
+		    padding:16px 10px;
+		    font-weight:700;
+		    color:#233f67;
+		    border-bottom:3px solid transparent;
+		}
+
+		.tab-btn.active{
+		    color:#0066cc;
+		    border-bottom:3px solid #0066cc;
+		}
+
+		.tab-pane-card{
+		    border:none;
+		    box-shadow:none;
+		    background:#efefef;
+		    padding:20px;
+		}
+
+		.tab-header{
+		    display:none;
+		}
+		#v-pills-personal{
+		    display:block;
+		}
+
+		#v-pills-edu,
+		#v-pills-work,
+		#v-pills-project,
+		#v-pills-reporting,
+		#v-pills-emergency{
+		    display:none;
+		}
+		
+		.general-grid{
+		    display:grid;
+		    grid-template-columns:1fr 1fr;
+		    gap:28px 70px;
+		    max-width:1250px;
+		    margin:0 auto;
+		    padding:20px 80px;
+		}
+
+		.field-group{
+		    display:flex;
+		    flex-direction:column;
+		}
+
+		.field-group label{
+		    font-size:14px;
+		    font-weight:700;
+		    margin-bottom:10px;
+		    color:#111;
+		}
+
+		.field-group input,
+		.field-group select{
+		    height:38px;
+		    border:1px solid #666;
+		    border-radius:3px;
+		    padding:0 10px;
+		    background:#fff;
+		}
+
+		.field-group textarea{
+		    height:120px;
+		    border:1px solid #666;
+		    border-radius:3px;
+		    resize:none;
+		    padding:10px;
+		}
+
+		.notes-group{
+		    grid-row:span 2;
+		}
+
+		.tab-pane-card{
+		    background:#efefef;
+		    padding:0;
+		}
+		
+		.classification-grid{
+		    display:grid;
+		    grid-template-columns:1fr 1fr;
+		    gap:28px 70px;
+		    max-width:1100px;
+		    margin:0 auto;
+		    padding:20px 50px;
+		}
+		
+		.statutory-grid{
+		    display:grid;
+		    grid-template-columns:1fr 1fr;
+		    gap:35px 70px;
+		    max-width:1000px;
+		    margin:0 auto;
+		    padding:20px 50px;
+		}
+		.address-grid{
+		    display:grid;
+		    grid-template-columns:1fr 1fr 1fr;
+		    gap:30px 50px;
+		    max-width:1300px;
+		    margin:0 auto;
+		    padding:20px 30px;
+		}
+
+		.address-section-title{
+		    font-size:16px;
+		    font-weight:700;
+		    color:#0033cc;
+		    margin-bottom:15px;
+		}
+
+		.address-column{
+		    display:flex;
+		    flex-direction:column;
+		    gap:18px;
+		}
+		.hr-category-grid{
+		    display:grid;
+		    grid-template-columns:1fr 1fr;
+		    gap:35px 70px;
+		    max-width:900px;
+		    margin:0 auto;
+		    padding:25px 40px;
+		}
+		
+		.documents-grid{
+		    display:grid;
+		    grid-template-columns:repeat(2, 1fr);
+		    gap:60px 120px;
+		    max-width:1200px;
+		    margin:0 auto;
+		    padding:40px 80px;
+		}
+
+		.document-card{
+		    display:flex;
+		    flex-direction:column;
+		    align-items:center;
+		}
+
+		.document-card.center{
+		    grid-column:1 / 3;
+		    justify-self:center;
+		}
+
+		.document-title{
+		    font-size:16px;
+		    font-weight:700;
+		    margin-bottom:15px;
+		    text-align:center;
+		}
+
+		.upload-box{
+			width:280px;
+			height:170px;
+		    border:1px dashed #666;
+		    display:flex;
+		    flex-direction:column;
+		    justify-content:center;
+		    align-items:center;
+		    background:#fff;
+		    cursor:pointer;
+		}
+
+		
+
+		.upload-icon{
+		    font-size:42px;
+		    color:#777;
+		    margin-bottom:8px;
+		}
+
+		.upload-text{
+		    font-size:14px;
+		    font-weight:600;
+		    color:#111;
+		}
+
+		.upload-browse{
+		    color:#0d6efd;
+		    font-weight:600;
+		    margin-top:4px;
+		}
+
+		.upload-box input{
+		    display:none;
+		}
     </style>
 </head>
 <body>
 
 <div class="profile-layout">
     <!-- LEFT SIDEBAR -->
-    <div class="profile-sidebar">
-        <div class="user-summary">
-            <div class="avatar-circle" th:text="${user.fullName != null ? user.fullName.substring(0,1) : 'U'}">U</div>
-            <div class="user-name" th:text="${user.fullName}">Employee Name</div>
-            <div class="user-desig" th:text="${user.employeeProfile?.designation ?: 'Designation'}">Designation</div>
-        </div>
-        
-        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-            <button class="nav-link active" id="v-pills-personal-tab" data-bs-toggle="pill" data-bs-target="#v-pills-personal" type="button" role="tab"><i class="fas fa-user"></i> <span>Personal Details</span></button>
-            <button class="nav-link" id="v-pills-edu-tab" data-bs-toggle="pill" data-bs-target="#v-pills-edu" type="button" role="tab"><i class="fas fa-graduation-cap"></i> <span>Educational Details</span></button>
-            <button class="nav-link" id="v-pills-work-tab" data-bs-toggle="pill" data-bs-target="#v-pills-work" type="button" role="tab"><i class="fas fa-briefcase"></i> <span>Work Details</span></button>
-            <button class="nav-link" id="v-pills-project-tab" data-bs-toggle="pill" data-bs-target="#v-pills-project" type="button" role="tab"><i class="fas fa-network-wired"></i> <span>Project & Allocation</span></button>
-            <button class="nav-link" id="v-pills-reporting-tab" data-bs-toggle="pill" data-bs-target="#v-pills-reporting" type="button" role="tab"><i class="fas fa-sitemap"></i> <span>Reporting Lines</span></button>
-            <button class="nav-link" id="v-pills-emergency-tab" data-bs-toggle="pill" data-bs-target="#v-pills-emergency" type="button" role="tab"><i class="fas fa-phone-alt"></i> <span>Emergency Contact</span></button>
-        </div>
-    </div>
+    
 
     <!-- MAIN CONTENT -->
     <div class="profile-main">
-        <div class="top-nav">
-            <div class="top-nav-title text-primary">
-                <i class="fas fa-user-circle"></i> My Profile
-            </div>
-            <div class="progress-wrapper">
-                <span class="progress-text">Profile <span id="percentLabel" class="text-primary">0%</span> completed</span>
-                <div class="progress">
-                    <div class="progress-bar" id="completionBar" role="progressbar" style="width: 0%"></div>
-                </div>
-            </div>
-        </div>
+		<div class="top-nav">
+
+		    <div class="top-nav-title">
+		        <i class="fas fa-user-circle text-primary"></i>
+		        My Profile
+		    </div>
+
+		</div>
+
+		<div class="profile-tabs">
+
+		    <button class="tab-btn active"
+		            onclick="showProfileTab('v-pills-personal',this)">
+		        General
+		    </button>
+
+		    <button class="tab-btn"
+		            onclick="showProfileTab('v-pills-edu',this)">
+		        Classification
+		    </button>
+
+		    <button class="tab-btn"
+		            onclick="showProfileTab('v-pills-work',this)">
+		        Statutory
+		    </button>
+
+		    <button class="tab-btn"
+		            onclick="showProfileTab('v-pills-project',this)">
+		        Address
+		    </button>
+
+		    <button class="tab-btn"
+		            onclick="showProfileTab('v-pills-reporting',this)">
+		        HR Category
+		    </button>
+
+		    <button class="tab-btn"
+		            onclick="showProfileTab('v-pills-emergency',this)">
+		        Documents
+		    </button>
+
+		</div>
+		
+       
 
         <div class="content-area">
             <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show fw-bold shadow-sm mb-4" role="alert">
@@ -198,90 +363,497 @@
                     
                     <div class="tab-content" id="v-pills-tabContent">
                         
-                        <!-- 1. PERSONAL DETAILS -->
-                        <div class="tab-pane fade show active" id="v-pills-personal" role="tabpanel">
-                            <h4 class="tab-header">Personal Details</h4>
-                            <div class="row">
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Employee Name</label><span class="info-value-text" th:text="${user.fullName}"></span><input type="text" class="editable-field" th:value="${user.fullName}" readonly></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Phone Number</label><span class="info-value-text" th:text="${user.employeeProfile?.mobileNumber}"></span><input type="text" name="mobileNumber" class="editable-field tracked-field" th:value="${user.employeeProfile?.mobileNumber}" pattern="\d{10}" title="10 digits"></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Employee ID</label><span class="info-value-text" th:text="${user.username}"></span><input type="text" class="editable-field" th:value="${user.username}" readonly></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Gender</label><span class="info-value-text" th:text="${user.employeeProfile?.gender}"></span><select name="gender" class="editable-field tracked-field"><option value="">Select</option><option value="Male" th:selected="${user.employeeProfile?.gender == 'Male'}">Male</option><option value="Female" th:selected="${user.employeeProfile?.gender == 'Female'}">Female</option></select></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Designation</label><span class="info-value-text" th:text="${user.employeeProfile?.designation}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.designation}" readonly></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Date of Birth</label><span class="info-value-text" th:text="${user.employeeProfile?.dob}"></span><input type="date" name="dob" class="editable-field tracked-field" th:value="${user.employeeProfile?.dob}" max="9999-12-31"></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Official Email</label><span class="info-value-text" th:text="${user.email}"></span><input type="email" class="editable-field" th:value="${user.email}" readonly></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">PAN Card No.</label><span class="info-value-text text-uppercase" th:text="${user.employeeProfile?.panNo}"></span><input type="text" name="panNo" class="editable-field tracked-field text-uppercase" th:value="${user.employeeProfile?.panNo}" pattern="[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}"></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Personal Email</label><span class="info-value-text" th:text="${user.employeeProfile?.personalEmail}"></span><input type="email" name="personalEmail" class="editable-field tracked-field" th:value="${user.employeeProfile?.personalEmail}"></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Aadhaar Card No.</label><span class="info-value-text" th:text="${user.employeeProfile?.aadharNo}"></span><input type="text" name="aadharNo" class="editable-field tracked-field" th:value="${user.employeeProfile?.aadharNo}" pattern="\d{12}"></div></div>
-                                <div class="col-12"><div class="info-box"><label class="info-label">Permanent Address</label><span class="info-value-text" th:text="${user.employeeProfile?.permanentAddress}"></span><textarea name="permanentAddress" class="editable-field tracked-field" rows="2" th:text="${user.employeeProfile?.permanentAddress}"></textarea></div></div>
-                            </div>
-                        </div>
+						<!-- GENERAL TAB -->
+						<div id="v-pills-personal">
 
-                        <!-- 2. EDUCATIONAL DETAILS -->
-                        <div class="tab-pane fade" id="v-pills-edu" role="tabpanel">
-                            <h4 class="tab-header">Educational Details</h4>
-                            <h6 class="text-primary fw-bold mb-3">Highest Qualification</h6>
-                            <div class="row mb-4 border-bottom pb-2">
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Degree / Course</label><span class="info-value-text" th:text="${user.employeeProfile?.qual1Title}"></span><input type="text" name="qual1Title" class="editable-field tracked-field" th:value="${user.employeeProfile?.qual1Title}"></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">University / Board</label><span class="info-value-text" th:text="${user.employeeProfile?.qual1Inst}"></span><input type="text" name="qual1Inst" class="editable-field tracked-field" th:value="${user.employeeProfile?.qual1Inst}"></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Passing Year</label><span class="info-value-text" th:text="${user.employeeProfile?.qual1Year}"></span><input type="text" name="qual1Year" class="editable-field tracked-field" th:value="${user.employeeProfile?.qual1Year}" pattern="^(19|20)\d{2}$"></div></div>
-                            </div>
-                            <h6 class="text-primary fw-bold mb-3">Secondary Qualification</h6>
-                            <div class="row">
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Degree / Course</label><span class="info-value-text" th:text="${user.employeeProfile?.qual2Title}"></span><input type="text" name="qual2Title" class="editable-field tracked-field" th:value="${user.employeeProfile?.qual2Title}"></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">University / Board</label><span class="info-value-text" th:text="${user.employeeProfile?.qual2Inst}"></span><input type="text" name="qual2Inst" class="editable-field tracked-field" th:value="${user.employeeProfile?.qual2Inst}"></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Passing Year</label><span class="info-value-text" th:text="${user.employeeProfile?.qual2Year}"></span><input type="text" name="qual2Year" class="editable-field tracked-field" th:value="${user.employeeProfile?.qual2Year}" pattern="^(19|20)\d{2}$"></div></div>
-                            </div>
-                        </div>
+						    <div class="general-grid">
 
-                        <!-- 3. WORK DETAILS -->
-                        <div class="tab-pane fade" id="v-pills-work" role="tabpanel">
-                            <h4 class="tab-header">Work Details</h4>
-                            <div class="row">
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Date of Joining</label><span class="info-value-text" th:text="${user.employeeProfile?.joiningDate}"></span><input type="date" name="joiningDate" class="editable-field tracked-field" th:value="${user.employeeProfile?.joiningDate}" max="9999-12-31"></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Experience</label><span class="info-value-text" th:text="${user.employeeProfile?.experience}"></span><input type="text" name="experience" class="editable-field tracked-field" th:value="${user.employeeProfile?.experience}"></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">City</label><span class="info-value-text" th:text="${user.employeeProfile?.city}"></span><input type="text" name="city" class="editable-field tracked-field" th:value="${user.employeeProfile?.city}"></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Work Location / Address</label><span class="info-value-text" th:text="${user.employeeProfile?.workingAddress}"></span><textarea name="workingAddress" class="editable-field tracked-field" rows="2" th:text="${user.employeeProfile?.workingAddress}"></textarea></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">State / Country</label><span class="info-value-text" th:text="${user.employeeProfile?.country}"></span><input type="text" name="country" class="editable-field tracked-field" th:value="${user.employeeProfile?.country}"></div></div>
-                            </div>
-                        </div>
+						        <div class="field-group">
+						            <label>Employee ID *</label>
+						            <input type="text"
+						                   name="employeeId"
+						                   th:value="${user.username}">
+						        </div>
 
-                        <!-- 4. PROJECT & ALLOCATION -->
-                        <div class="tab-pane fade" id="v-pills-project" role="tabpanel">
-                            <h4 class="tab-header">Project & Allocation</h4>
-                            <div class="row">
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Business Unit</label><span class="info-value-text" th:text="${user.employeeProfile?.businessUnit}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.businessUnit}" readonly></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Account Name</label><span class="info-value-text" th:text="${user.employeeProfile?.accountName}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.accountName}" readonly></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Project Name</label><span class="info-value-text" th:text="${user.employeeProfile?.projectName}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.projectName}" readonly></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Project Code</label><span class="info-value-text" th:text="${user.employeeProfile?.projectCode}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.projectCode}" readonly></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Team / Group</label><span class="info-value-text" th:text="${user.employeeProfile?.teamGroup}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.teamGroup}" readonly></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Vertical Name</label><span class="info-value-text" th:text="${user.employeeProfile?.verticalName}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.verticalName}" readonly></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Customer Name</label><span class="info-value-text" th:text="${user.employeeProfile?.customerName}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.customerName}" readonly></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Domain / Industry</label><span class="info-value-text" th:text="${user.employeeProfile?.domainIndustry}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.domainIndustry}" readonly></div></div>
-                            </div>
-                        </div>
+						        <div class="field-group">
+						            <label>Spouse Name</label>
+						            <input type="text"
+						                   name="spouseName">
+						        </div>
 
-                        <!-- 5. REPORTING LINES -->
-                        <div class="tab-pane fade" id="v-pills-reporting" role="tabpanel">
-                            <h4 class="tab-header">Reporting Lines</h4>
-                            <div class="row">
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Reporting Manager</label><span class="info-value-text" th:text="${user.employeeProfile?.reportingManager}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.reportingManager}" readonly></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Project Manager</label><span class="info-value-text" th:text="${user.employeeProfile?.projectManager}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.projectManager}" readonly></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">BU-HR Contact</label><span class="info-value-text" th:text="${user.employeeProfile?.buHrContact}"></span><input type="text" class="editable-field" th:value="${user.employeeProfile?.buHrContact}" readonly></div></div>
-                            </div>
-                        </div>
+						        <div class="field-group">
+						            <label>Full Name *</label>
+						            <input type="text"
+						                   name="fullName"
+						                   th:value="${user.fullName}">
+						        </div>
 
-                        <!-- 6. EMERGENCY CONTACT -->
-                        <div class="tab-pane fade" id="v-pills-emergency" role="tabpanel">
-                            <h4 class="tab-header">Emergency Contact Details</h4>
-                            <div class="row">
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Emergency Contact Person</label><span class="info-value-text" th:text="${user.employeeProfile?.emergencyContactName}"></span><input type="text" name="emergencyContactName" class="editable-field tracked-field" th:value="${user.employeeProfile?.emergencyContactName}"></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Relation with employee</label><span class="info-value-text" th:text="${user.employeeProfile?.relationWithEmployee}"></span><input type="text" name="relationWithEmployee" class="editable-field tracked-field" th:value="${user.employeeProfile?.relationWithEmployee}"></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Emergency Phone No.</label><span class="info-value-text" th:text="${user.employeeProfile?.emergencyPhone}"></span><input type="text" name="emergencyPhone" class="editable-field tracked-field" th:value="${user.employeeProfile?.emergencyPhone}" pattern="\d{10}"></div></div>
-                                <div class="col-md-6"><div class="info-box"><label class="info-label">Alternate Mobile No.</label><span class="info-value-text" th:text="${user.employeeProfile?.altMobile}"></span><input type="text" name="altMobile" class="editable-field tracked-field" th:value="${user.employeeProfile?.altMobile}" pattern="\d{10}"></div></div>
-                            </div>
-                        </div>
+						        <div class="field-group">
+						            <label>Date of Joining</label>
+						            <input type="date"
+						                   name="joiningDate"
+						                   th:value="${user.employeeProfile?.joiningDate}">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Gender *</label>
+						            <select name="gender">
+						                <option value="">Select Gender</option>
+						                <option value="Male">Male</option>
+						                <option value="Female">Female</option>
+						                <option value="Other">Other</option>
+						            </select>
+						        </div>
+
+						        <div class="field-group">
+						            <label>Date of Salary</label>
+						            <input type="date"
+						                   name="salaryDate">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Father's Name</label>
+						            <input type="text"
+						                   name="fatherName">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Probation Period (in days)</label>
+						            <input type="number"
+						                   name="probationPeriod">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Mother's Name</label>
+						            <input type="text"
+						                   name="motherName">
+						        </div>
+
+						        <div class="field-group notes-group">
+						            <label>Notes</label>
+						            <textarea name="notes"></textarea>
+						        </div>
+
+						        <div class="field-group">
+						            <label>Marital Status *</label>
+						            <select name="maritalStatus">
+						                <option value="">Select Marital Status</option>
+						                <option value="Single">Single</option>
+						                <option value="Married">Married</option>
+						                <option value="Divorced">Divorced</option>
+						                <option value="Widowed">Widowed</option>
+						            </select>
+						        </div>
+
+						    </div>
+
+						</div>
+
+						<!-- CLASSIFICATION TAB -->
+						<div id="v-pills-edu" style="display:none;">
+
+						    <div class="classification-grid">
+
+						        <div class="field-group">
+						            <label>Branch</label>
+						            <input type="text" name="branch">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Designation</label>
+						            <select name="designation">
+						                <option value="">Select Designation</option>
+						            </select>
+						        </div>
+
+						        <div class="field-group">
+						            <label>Salary Structure</label>
+						            <select name="salaryStructure">
+						                <option value="">Select Salary Structure</option>
+						            </select>
+						        </div>
+
+						        <div class="field-group">
+						            <label>Bank</label>
+						            <input type="text" name="bank">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Leave Policy</label>
+						            <select name="leavePolicy">
+						                <option value="">Select Leave Policy</option>
+						            </select>
+						        </div>
+
+						        <div class="field-group">
+						            <label>A/C No.</label>
+						            <input type="text" name="accountNumber">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Attendance Structure</label>
+						            <select name="attendanceStructure">
+						                <option value="">Select Attendance Structure</option>
+						            </select>
+						        </div>
+
+						        <div class="field-group">
+						            <label>IFSC Code</label>
+						            <input type="text" name="ifscCode">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Timesheet Policy</label>
+						            <select name="timesheetPolicy">
+						                <option value="">Select Timesheet Policy</option>
+						            </select>
+						        </div>
+
+						        <div class="field-group">
+						            <label>Department</label>
+						            <select name="department">
+						                <option value="">Select Department</option>
+						            </select>
+						        </div>
+
+						        <div class="field-group">
+						            <label>T & A Policy</label>
+						            <select name="taPolicy">
+						                <option value="">Select T & A Policy</option>
+						            </select>
+						        </div>
+
+						        <div class="field-group">
+						            <label>Category</label>
+						            <select name="category">
+						                <option value="">Select Category</option>
+						            </select>
+						        </div>
+
+						    </div>
+
+						</div>
+						<!-- STATUTORY TAB -->
+						<div id="v-pills-work" style="display:none;">
+
+						    <div class="statutory-grid">
+
+						        <div class="field-group">
+						            <label>Aadhar Card No.</label>
+						            <input type="text"
+						                   name="aadharNumber"
+						                   placeholder="XXXX XXXX XXXX">
+						        </div>
+
+						        <div class="field-group">
+						            <label>PF No.</label>
+						            <input type="text"
+						                   name="pfNumber">
+						        </div>
+
+						        <div class="field-group">
+						            <label>PAN Card No.</label>
+						            <input type="text"
+						                   name="panNumber">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Passport No.</label>
+						            <input type="text"
+						                   name="passportNumber">
+						        </div>
+
+						        <div class="field-group">
+						            <label>ESI No.</label>
+						            <input type="text"
+						                   name="esiNumber">
+						        </div>
+
+						        <div class="field-group">
+						            <label>UAN</label>
+						            <input type="text"
+						                   name="uanNumber">
+						        </div>
+
+						    </div>
+
+						</div>
+
+						<!-- ADDRESS TAB -->
+						<div id="v-pills-project" style="display:none;">
+
+						    <div class="address-grid">
+
+						        <!-- Present Address -->
+						        <div class="address-column">
+
+						            <div class="address-section-title">
+						                Present Address
+						            </div>
+
+						            <div class="field-group">
+						                <label>Residential Name</label>
+						                <input type="text" name="presentResidentialName">
+						            </div>
+
+						            <div class="field-group">
+						                <label>Street</label>
+						                <input type="text" name="presentStreet">
+						            </div>
+
+						            <div class="field-group">
+						                <label>City</label>
+						                <input type="text" name="presentCity">
+						            </div>
+
+						            <div class="field-group">
+						                <label>State</label>
+						                <input type="text" name="presentState">
+						            </div>
+
+						            <div class="field-group">
+						                <label>Pincode</label>
+						                <input type="text" name="presentPincode">
+						            </div>
+
+						        </div>
+
+						        <!-- Permanent Address -->
+						        <div class="address-column">
+
+						            <div class="address-section-title">
+						                Permanent Address
+						            </div>
+
+						            <div class="field-group">
+						                <label>Residential Name</label>
+						                <input type="text" name="permanentResidentialName">
+						            </div>
+
+						            <div class="field-group">
+						                <label>Street</label>
+						                <input type="text" name="permanentStreet">
+						            </div>
+
+						            <div class="field-group">
+						                <label>City</label>
+						                <input type="text" name="permanentCity">
+						            </div>
+
+						            <div class="field-group">
+						                <label>State</label>
+						                <input type="text" name="permanentState">
+						            </div>
+
+						            <div class="field-group">
+						                <label>Pincode</label>
+						                <input type="text" name="permanentPincode">
+						            </div>
+
+						        </div>
+
+						        <!-- Contact Info -->
+						        <div class="address-column">
+
+						            <div class="address-section-title">
+						                Contact Info
+						            </div>
+
+						            <div class="field-group">
+						                <label>Mobile No.</label>
+						                <input type="text" name="mobileNo">
+						            </div>
+
+						            <div class="field-group">
+						                <label>Alternate Mobile No.</label>
+						                <input type="text" name="alternateMobileNo">
+						            </div>
+
+						            <div class="field-group">
+						                <label>Official Email ID</label>
+						                <input type="email" name="officialEmail">
+						            </div>
+
+						            <div class="field-group">
+						                <label>Alternate Email ID</label>
+						                <input type="email" name="alternateEmail">
+						            </div>
+
+						            <div class="field-group">
+						                <label>Emergency No.</label>
+						                <input type="text" name="emergencyNo">
+						            </div>
+
+						        </div>
+
+						    </div>
+
+						</div>
+						<!-- HR CATEGORY TAB -->
+						<div id="v-pills-reporting" style="display:none;">
+
+						    <div class="hr-category-grid">
+
+						        <div class="field-group">
+						            <label>Blood Group</label>
+						            <select name="bloodGroup">
+						                <option value="">Select Blood Group</option>
+						                <option>A+</option>
+						                <option>A-</option>
+						                <option>B+</option>
+						                <option>B-</option>
+						                <option>AB+</option>
+						                <option>AB-</option>
+						                <option>O+</option>
+						                <option>O-</option>
+						            </select>
+						        </div>
+
+						        <div class="field-group">
+						            <label>Caste Category</label>
+						            <select name="casteCategory">
+						                <option value="">Select Category</option>
+						                <option>General</option>
+						                <option>OBC</option>
+						                <option>SC</option>
+						                <option>ST</option>
+						            </select>
+						        </div>
+
+						        <div class="field-group">
+						            <label>Qualification</label>
+						            <select name="qualification">
+						                <option value="">Select Qualification</option>
+						                <option>10th</option>
+						                <option>12th</option>
+						                <option>Diploma</option>
+						                <option>B.Tech</option>
+						                <option>M.Tech</option>
+						                <option>MBA</option>
+						                <option>BCA</option>
+						                <option>MCA</option>
+						            </select>
+						        </div>
+
+						        <div class="field-group">
+						            <label>Close Friend's Name</label>
+						            <input type="text" name="closeFriendName">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Driving License No.</label>
+						            <input type="text" name="drivingLicenseNo">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Nationality</label>
+						            <input type="text" name="nationality">
+						        </div>
+
+						    </div>
+
+						</div>
                         
-                    </div>
+						<!-- DOCUMENTS TAB -->
+						<div id="v-pills-emergency" style="display:none;">
+
+						    <div class="documents-grid">
+
+						        <!-- Present Address Image -->
+						        <div class="document-card">
+
+						            <div class="document-title">
+						                Present Address Image
+						            </div>
+
+						            <label class="upload-box">
+
+						                <div class="upload-icon">
+						                    <i class="fas fa-cloud-upload-alt"></i>
+						                </div>
+
+						                <div class="upload-text">
+						                    Upload files here
+						                </div>
+
+						                <div>or</div>
+
+						                <div class="upload-browse">
+						                    Browse
+						                </div>
+
+						                <input type="file"
+						                       name="presentAddressImage">
+
+						            </label>
+
+						        </div>
+
+						        <!-- Aadhar Card Proof -->
+						        <div class="document-card">
+
+						            <div class="document-title">
+						                Aadhar Card Proof
+						            </div>
+
+						            <label class="upload-box">
+
+						                <div class="upload-icon">
+						                    <i class="fas fa-cloud-upload-alt"></i>
+						                </div>
+
+						                <div class="upload-text">
+						                    Upload files here
+						                </div>
+
+						                <div>or</div>
+
+						                <div class="upload-browse">
+						                    Browse
+						                </div>
+
+						                <input type="file"
+						                       name="aadharProof">
+
+						            </label>
+
+						        </div>
+
+						        <!-- PAN Card Proof -->
+						        <div class="document-card center">
+
+						            <div class="document-title">
+						                PAN Card Proof
+						            </div>
+
+						            <label class="upload-box">
+
+						                <div class="upload-icon">
+						                    <i class="fas fa-cloud-upload-alt"></i>
+						                </div>
+
+						                <div class="upload-text">
+						                    Upload files here
+						                </div>
+
+						                <div>or</div>
+
+						                <div class="upload-browse">
+						                    Browse
+						                </div>
+
+						                <input type="file"
+						                       name="panProof">
+
+						            </label>
+
+						        </div>
+
+						    </div>
+
+						</div>
+						
+					</div>
 
                     <div class="action-footer">
                         <button type="button" class="btn btn-action btn-primary" id="editToggleBtn" onclick="toggleEditMode()">Complete Profile</button>
@@ -295,6 +867,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+
     // Initialization
     window.onload = function() {
         // Format empty info boxes
@@ -363,6 +936,30 @@
             }
         }
     }
+	function showProfileTab(tabId, btn) {
+
+	    const tabs = [
+	        'v-pills-personal',
+	        'v-pills-edu',
+	        'v-pills-work',
+	        'v-pills-project',
+	        'v-pills-reporting',
+	        'v-pills-emergency'
+	    ];
+
+	    tabs.forEach(id => {
+	        document.getElementById(id).style.display = 'none';
+	    });
+
+	    document.getElementById(tabId).style.display = 'block';
+
+	    document.querySelectorAll('.tab-btn').forEach(t => {
+	        t.classList.remove('active');
+	    });
+
+	    btn.classList.add('active');
+	}
+
 </script>
 </body>
 </html>
