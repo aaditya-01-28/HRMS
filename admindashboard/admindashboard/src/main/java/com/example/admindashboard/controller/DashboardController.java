@@ -24,7 +24,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 @Controller
 public class DashboardController {
 
@@ -303,9 +304,20 @@ public class DashboardController {
 
     @GetMapping("/employee/profile")
     public String viewProfile(Model model, Principal principal) {
+
         String username = principal.getName();
-        User user = userRepository.findByUsername(username).orElse(null);
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        
+        if (user.getEmployeeProfile() == null) {
+            user.setEmployeeProfile(new EmployeeProfile());
+        }
+
         model.addAttribute("user", user);
+        model.addAttribute("employeeProfile", user.getEmployeeProfile());
+
         return "employee-profile";
     }
 
@@ -327,19 +339,21 @@ public class DashboardController {
 
     @PostMapping("/employee/profile/save-detailed")
     public String saveDetailedProfile(
-            @ModelAttribute EmployeeProfile formProfile,
+    		 @ModelAttribute EmployeeProfile formProfile,
             @RequestParam(value = "mobileNumber", required = false) String mobileNumber,
             @RequestParam(value = "city", required = false) String city,
             @RequestParam(value = "country", required = false) String country,
             @RequestParam(value = "experience", required = false) String experience,
             @RequestParam(value = "joiningDate", required = false) LocalDate joiningDate,
-            @RequestParam(value = "returnUrl", defaultValue = "/employee/full-profile") String returnUrl,
+            @RequestParam(value = "returnUrl", defaultValue = "/employee/profile") String returnUrl,
             Principal principal,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes, Model model) {
 
         String username = principal.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        
 
         EmployeeProfile existingProfile = user.getEmployeeProfile();
         if (existingProfile == null) {
@@ -373,13 +387,66 @@ public class DashboardController {
         existingProfile.setEmergencyPhone(formProfile.getEmergencyPhone());
         existingProfile.setAltMobile(formProfile.getAltMobile());
 
-        // Bank Details
+     // Bank Details
         existingProfile.setBankAccountHolder(formProfile.getBankAccountHolder());
         existingProfile.setBankAccountNumber(formProfile.getBankAccountNumber());
         existingProfile.setBankIfscCode(formProfile.getBankIfscCode());
         existingProfile.setBankName(formProfile.getBankName());
         existingProfile.setBankBranch(formProfile.getBankBranch());
         existingProfile.setBankAccountType(formProfile.getBankAccountType());
+
+
+        // NEW PROFILE FIELDS
+
+        existingProfile.setSpouseName(formProfile.getSpouseName());
+        existingProfile.setFatherName(formProfile.getFatherName());
+        existingProfile.setMotherName(formProfile.getMotherName());
+        existingProfile.setSalaryDate(formProfile.getSalaryDate());
+        existingProfile.setProbationPeriod(formProfile.getProbationPeriod());
+        existingProfile.setMaritalStatus(formProfile.getMaritalStatus());
+        existingProfile.setNotes(formProfile.getNotes());
+
+        existingProfile.setBranch(formProfile.getBranch());
+        existingProfile.setDesignation(formProfile.getDesignation());
+        existingProfile.setSalaryStructure(formProfile.getSalaryStructure());
+        existingProfile.setLeavePolicy(formProfile.getLeavePolicy());
+        existingProfile.setAttendanceStructure(formProfile.getAttendanceStructure());
+        existingProfile.setTimesheetPolicy(formProfile.getTimesheetPolicy());
+        existingProfile.setDepartment(formProfile.getDepartment());
+        existingProfile.setTaPolicy(formProfile.getTaPolicy());
+        existingProfile.setCategory(formProfile.getCategory());
+
+        existingProfile.setPfNumber(formProfile.getPfNumber());
+        existingProfile.setPassportNumber(formProfile.getPassportNumber());
+        existingProfile.setEsiNumber(formProfile.getEsiNumber());
+        existingProfile.setUanNumber(formProfile.getUanNumber());
+
+        existingProfile.setBloodGroup(formProfile.getBloodGroup());
+        existingProfile.setCasteCategory(formProfile.getCasteCategory());
+        existingProfile.setQualification(formProfile.getQualification());
+        existingProfile.setCloseFriendName(formProfile.getCloseFriendName());
+        existingProfile.setDrivingLicenseNo(formProfile.getDrivingLicenseNo());
+        existingProfile.setNationality(formProfile.getNationality());
+        
+     // Present Address
+        existingProfile.setPresentResidentialName(formProfile.getPresentResidentialName());
+        existingProfile.setPresentStreet(formProfile.getPresentStreet());
+        existingProfile.setPresentArea(formProfile.getPresentArea());
+        existingProfile.setPresentCity(formProfile.getPresentCity());
+        existingProfile.setPresentState(formProfile.getPresentState());
+        existingProfile.setPresentPincode(formProfile.getPresentPincode());
+
+        // Permanent Address
+        existingProfile.setPermanentResidentialName(formProfile.getPermanentResidentialName());
+        existingProfile.setPermanentStreet(formProfile.getPermanentStreet());
+        existingProfile.setPermanentArea(formProfile.getPermanentArea());
+        existingProfile.setPermanentCity(formProfile.getPermanentCity());
+        existingProfile.setPermanentState(formProfile.getPermanentState());
+        existingProfile.setPermanentPincode(formProfile.getPermanentPincode());
+
+        // Emails
+        existingProfile.setOfficialEmail(formProfile.getOfficialEmail());
+        existingProfile.setAlternateEmail(formProfile.getAlternateEmail());
 
         user.setEmployeeProfile(existingProfile);
         userRepository.save(user);
