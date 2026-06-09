@@ -54,7 +54,14 @@ public class SecurityConfig {
                                         new RuntimeException("Client users cannot login through Employee Portal.")
                                 );
 
-                                response.sendRedirect("/login?error=true");
+                                String referer = request.getHeader("Referer");
+                                if (referer != null && !referer.isEmpty()) {
+                                    String url = referer.replaceAll("[?&]error=true", "");
+                                    url += url.contains("?") ? "&error=true" : "?error=true";
+                                    response.sendRedirect(url);
+                                } else {
+                                    response.sendRedirect("/login?error=true");
+                                }
                                 return;
                             }
 
@@ -65,7 +72,15 @@ public class SecurityConfig {
                                         "SPRING_SECURITY_LAST_EXCEPTION",
                                         new RuntimeException("Employee users cannot login through Client Portal.")
                                 );
-                                response.sendRedirect("/login?error=true");
+                                
+                                String referer = request.getHeader("Referer");
+                                if (referer != null && !referer.isEmpty()) {
+                                    String url = referer.replaceAll("[?&]error=true", "");
+                                    url += url.contains("?") ? "&error=true" : "?error=true";
+                                    response.sendRedirect(url);
+                                } else {
+                                    response.sendRedirect("/login?error=true");
+                                }
                                 return;
                             }
 
@@ -81,7 +96,17 @@ public class SecurityConfig {
                                 response.sendRedirect("/client/dashboard");
                             }
                         })
-                        .failureUrl("/login?error=true")
+                        .failureHandler((request, response, exception) -> {
+                            request.getSession().setAttribute("SPRING_SECURITY_LAST_EXCEPTION", exception);
+                            String referer = request.getHeader("Referer");
+                            if (referer != null && !referer.isEmpty()) {
+                                String url = referer.replaceAll("[?&]error=true", "");
+                                url += url.contains("?") ? "&error=true" : "?error=true";
+                                response.sendRedirect(url);
+                            } else {
+                                response.sendRedirect("/login?error=true");
+                            }
+                        })
                         .permitAll()
                 )
                 .userDetailsService(customUserDetailsService)
