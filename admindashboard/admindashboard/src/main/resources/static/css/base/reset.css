@@ -9,7 +9,8 @@ html{
 }
 
 body{
-    font-family:'Poppins',sans-serif;
+    font-family: Arial, sans-serif !important;
+    font-size: 12px !important;
     background:var(--background);
     color:var(--text-dark);
 }

@@ -235,6 +235,10 @@
 
             <h2 class="welcome-headline">Welcome Back!</h2>
 
+            <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center" style="margin-bottom: 20px; font-size: 0.9rem; text-align: left; padding: 10px 15px;">
+                <i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i> Invalid username/password. Please try again.
+            </div>
+
             <form action="/learning/login" method="POST">
                 
                 <div class="custom-input-container">

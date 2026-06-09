@@ -1,12 +1,21 @@
 /* =========================================
    1. GLOBAL & TYPOGRAPHY
    ========================================= */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: Arial, sans-serif !important;
+    font-size: 12px !important;
     background-color: #f0f2f5; /* Modern, soft gray-blue background */
     color: #344767; /* Softer text color */
+}
+
+h1, h2, h3 {
+    font-size: 16px !important;
+    font-family: Arial, sans-serif !important;
+}
+
+h4, h5, h6, .sub-heading {
+    font-size: 14px !important;
+    font-family: Arial, sans-serif !important;
 }
 
 /* =========================================
