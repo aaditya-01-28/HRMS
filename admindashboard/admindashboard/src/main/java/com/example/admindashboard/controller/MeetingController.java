@@ -148,4 +148,20 @@ public class MeetingController {
             return ResponseEntity.badRequest().body("Error booking meeting: " + e.getMessage());
         }
     }
+
+    @PostMapping("/{id}/approve")
+    public ResponseEntity<?> approveMeeting(@PathVariable Long id, Principal principal) {
+        try {
+            Meeting meeting = meetingRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Meeting not found"));
+            
+            // Assume any authenticated user can approve it for now (if they see it on their dashboard, they are invited)
+            meeting.setStatus("CONFIRMED");
+            meetingRepository.save(meeting);
+            
+            return ResponseEntity.ok("Meeting confirmed!");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error approving meeting: " + e.getMessage());
+        }
+    }
 }

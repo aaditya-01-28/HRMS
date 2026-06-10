@@ -34,6 +34,8 @@ public class Meeting {
     @Column(length = 1000) // URLs can sometimes be very long
     private String meetingLink;
 
+    private String status = "PENDING"; // Can be PENDING or CONFIRMED
+
     // GETTERS AND SETTERS
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -67,4 +69,7 @@ public class Meeting {
 
     public String getMeetingLink() { return meetingLink; }
     public void setMeetingLink(String meetingLink) { this.meetingLink = meetingLink; }
+
+    public String getStatus() { return status == null ? "PENDING" : status; }
+    public void setStatus(String status) { this.status = status; }
 }
