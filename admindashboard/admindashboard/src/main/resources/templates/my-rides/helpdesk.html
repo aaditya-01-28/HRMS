@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{my-rides/layout :: layout('Helpdesk', 'helpdesk', ~{::content})}">
+<body>
+    <div th:fragment="content">
+        <style>
+            .mr-accordion {
+                background-color: white;
+                color: var(--mr-text-main);
+                cursor: pointer;
+                padding: 1.5rem;
+                width: 100%;
+                border: 1px solid var(--mr-border);
+                border-radius: 8px;
+                text-align: left;
+                outline: none;
+                font-size: 1.25rem;
+                font-weight: bold;
+                transition: 0.4s;
+                margin-bottom: 1rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .mr-accordion:after {
+                content: '\002B';
+                color: var(--mr-text-main);
+                font-weight: bold;
+                float: right;
+                font-size: 1.5rem;
+            }
+            .mr-accordion.active:after {
+                content: "\2212";
+            }
+            .mr-panel {
+                padding: 0 1.5rem;
+                background-color: white;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.2s ease-out;
+                border-radius: 0 0 8px 8px;
+                margin-top: -1rem;
+                margin-bottom: 1rem;
+                border-left: 1px solid var(--mr-border);
+                border-right: 1px solid var(--mr-border);
+                border-bottom: 1px solid var(--mr-border);
+            }
+            .mr-panel p {
+                padding: 1rem 0;
+            }
+        </style>
+        
+        <div class="mr-split-view" style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            
+            <!-- Left Side: FAQ Accordion -->
+            <div style="padding-right: 2rem;">
+                <h2 style="font-weight: bold; margin-bottom: 2rem; font-size: 1.5rem; display: flex; align-items: center; gap: 10px; color: var(--mr-primary);">
+                    <i class="fa-solid fa-headset"></i> Helpdesk
+                </h2>
+                
+                <button class="mr-accordion">How do I book a ride?</button>
+                <div class="mr-panel">
+                    <p>To book a ride, navigate to the 'Book Rides' section from the sidebar, select the date you wish to commute, and click 'Book Now'. Ensure you submit your request before the cutoff time.</p>
+                </div>
+
+                <button class="mr-accordion">Can I cancel a booked ride?</button>
+                <div class="mr-panel">
+                    <p>Yes, you can cancel an upcoming ride from the 'Cancel Ride' page. Please select a valid reason and submit the cancellation request before the scheduled date.</p>
+                </div>
+
+                <button class="mr-accordion">How can I check my ride status?</button>
+                <div class="mr-panel">
+                    <p>Your current ride status and live tracking are available directly on the Home dashboard under 'Today's Trip (Live)'.</p>
+                </div>
+            </div>
+            
+            <div class="mr-divider"></div>
+            
+            <!-- Right Side: Contact Info -->
+            <div style="padding-left: 2rem;">
+                <h2 style="font-weight: bold; margin-bottom: 1.5rem; font-size: 1.5rem; color: var(--mr-primary);">Helpdesk Contact</h2>
+                
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="font-weight: bold; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-headset"></i> Helpdesk 1 (H1)
+                    </h3>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; font-weight: bold;">
+                        <i class="fa-solid fa-phone" style="color: var(--mr-primary);"></i> 0120-456-7890
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 10px;">
+                        <i class="fa-regular fa-envelope" style="color: var(--mr-primary); margin-top: 5px;"></i>
+                        <div>
+                            <div style="font-weight: bold;">transportdept@gmail.com</div>
+                            <div style="color: var(--mr-text-muted); font-size: 0.85rem;">mon-sat | 08:00 AM - 08:00 PM</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 2.5rem;">
+                    <h3 style="font-weight: bold; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-headset"></i> Helpdesk 2 (H2)
+                    </h3>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; font-weight: bold;">
+                        <i class="fa-solid fa-phone" style="color: var(--mr-primary);"></i> 0120-456-7890
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 10px;">
+                        <i class="fa-regular fa-envelope" style="color: var(--mr-primary); margin-top: 5px;"></i>
+                        <div>
+                            <div style="font-weight: bold;">transportdept@gmail.com</div>
+                            <div style="color: var(--mr-text-muted); font-size: 0.85rem;">mon-sat | 08:00 AM - 08:00 PM</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr style="border: 0; border-top: 1px solid var(--mr-border); margin-bottom: 2rem;">
+                
+                <h2 style="font-weight: bold; margin-bottom: 1rem; font-size: 1.5rem; color: var(--mr-primary);">Transport Company</h2>
+                
+                <h3 style="font-weight: bold; margin-bottom: 0.5rem;">Shri Ram Agency</h3>
+                <p style="color: var(--mr-text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">If you face any issue reach out from below details</p>
+                
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; font-weight: bold;">
+                    <i class="fa-solid fa-phone" style="color: var(--mr-primary);"></i> 0120-456-7890
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; font-weight: bold;">
+                    <i class="fa-regular fa-envelope" style="color: var(--mr-primary);"></i> transportdept@gmail.com
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

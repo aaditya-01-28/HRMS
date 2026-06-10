@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{my-rides/layout :: layout('Book Rides', 'book-rides', ~{::content})}">
+<body>
+    <div th:fragment="content">
+        <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <h2 style="font-weight: bold; margin-bottom: 0.5rem; font-size: 1.5rem;">Weekly Schedule</h2>
+            <p style="color: var(--mr-text-muted); margin-bottom: 2rem;"><i class="fa-regular fa-calendar"></i> 08 June - 13 June 2026</p>
+            
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--mr-border);">
+                        <th style="text-align: left; padding: 1rem; font-weight: bold;">Date</th>
+                        <th style="text-align: left; padding: 1rem; font-weight: bold;">Login Time</th>
+                        <th style="text-align: left; padding: 1rem; font-weight: bold;">Logout Time</th>
+                        <th style="text-align: center; padding: 1rem; font-weight: bold;">Schedule</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid var(--mr-border);">
+                        <td style="padding: 1.5rem 1rem; font-weight: bold;">Mon, 08 June</td>
+                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">10:00 AM</td>
+                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">07:00 PM</td>
+                        <td style="padding: 1.5rem 1rem; text-align: center;">
+                            <span style="background-color: var(--mr-success-light); color: var(--mr-success); padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: bold;">Booked</span>
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--mr-border);">
+                        <td style="padding: 1.5rem 1rem; font-weight: bold;">Tue, 09 June</td>
+                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">10:00 AM</td>
+                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">07:00 PM</td>
+                        <td style="padding: 1.5rem 1rem; text-align: center;">
+                            <span style="background-color: var(--mr-success-light); color: var(--mr-success); padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: bold;">Booked</span>
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--mr-border);">
+                        <td style="padding: 1.5rem 1rem; font-weight: bold;">Wed, 10 June</td>
+                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
+                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
+                        <td style="padding: 1.5rem 1rem; text-align: center;">
+                            <a th:href="@{/my-rides/book-now}" class="mr-btn mr-btn-primary" style="text-decoration: none; padding: 0.5rem 1.5rem;">Book Now</a>
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--mr-border);">
+                        <td style="padding: 1.5rem 1rem; font-weight: bold;">Thu, 11 June</td>
+                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
+                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
+                        <td style="padding: 1.5rem 1rem; text-align: center;">
+                            <a th:href="@{/my-rides/book-now}" class="mr-btn mr-btn-primary" style="text-decoration: none; padding: 0.5rem 1.5rem;">Book Now</a>
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--mr-border);">
+                        <td style="padding: 1.5rem 1rem; font-weight: bold;">Fri, 12 June</td>
+                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
+                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
+                        <td style="padding: 1.5rem 1rem; text-align: center;">
+                            <a th:href="@{/my-rides/book-now}" class="mr-btn mr-btn-primary" style="text-decoration: none; padding: 0.5rem 1.5rem;">Book Now</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 1.5rem 1rem; font-weight: bold;">Sat, 13 June</td>
+                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
+                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
+                        <td style="padding: 1.5rem 1rem; text-align: center;">
+                            <a th:href="@{/my-rides/book-now}" class="mr-btn mr-btn-primary" style="text-decoration: none; padding: 0.5rem 1.5rem;">Book Now</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, activeTab, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">My Rides</title>
+    <!-- Fonts and Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/base/reset.css}" rel="stylesheet">
+    <link th:href="@{/css/pages/my-rides.css}" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <nav class="mr-sidebar" id="mr-sidebar">
+        <div class="brand">
+            <img src="/images/wcg-logo.jpg" alt="White Circle" style="border: 2px solid white; border-radius: 12px; height: 80px; width: 80px; object-fit: cover;">
+        </div>
+        
+        <div class="mr-nav">
+            <a th:href="@{/my-rides/dashboard}" class="mr-nav-item" th:classappend="${activeTab == 'dashboard'} ? 'active' : ''">
+                <i class="fa-solid fa-home"></i> <span>Home</span>
+            </a>
+            <a th:href="@{/my-rides/book-rides}" class="mr-nav-item" th:classappend="${activeTab == 'book-rides'} ? 'active' : ''">
+                <i class="fa-solid fa-car"></i> <span>Book Rides</span>
+            </a>
+            <a th:href="@{/my-rides/cancel-ride}" class="mr-nav-item" th:classappend="${activeTab == 'cancel-ride'} ? 'active' : ''">
+                <i class="fa-regular fa-circle-xmark"></i> <span>Cancel Ride</span>
+            </a>
+            <a th:href="@{/my-rides/helpdesk}" class="mr-nav-item" th:classappend="${activeTab == 'helpdesk'} ? 'active' : ''">
+                <i class="fa-solid fa-headset"></i> <span>Helpdesk</span>
+            </a>
+        </div>
+
+        <div class="mr-logout">
+            <form th:action="@{/my-rides/logout}" method="post">
+                <button type="submit" class="mr-nav-item" style="background:none; width:100%; text-align:left; border:none; cursor:pointer;">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Log Out</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="mr-main-content">
+        <!-- Header -->
+        <header class="mr-header">
+            <div class="mr-header-left">
+                <!-- Sidebar Toggle Button -->
+                <button class="mr-sidebar-toggle" id="mr-sidebar-toggle">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="mr-header-title">
+                    <span th:if="${activeTab == 'dashboard'}" th:text="|Let's Start a Ride ${user?.fullName != null ? user?.fullName : 'Guest'}!|">Let's Start a Ride!</span>
+                    <span th:if="${activeTab == 'book-rides' and title != 'Book Now'}">Book Rides</span>
+                    <span th:if="${title == 'Book Now'}">
+                        <a th:href="@{/my-rides/book-rides}" style="color:var(--mr-primary); margin-right:10px; text-decoration:none;"><i class="fa-solid fa-arrow-left"></i></a> 
+                        Book Rides <i class="fa-solid fa-chevron-right" style="font-size:0.8rem; margin:0 10px;"></i> Book Now
+                    </span>
+                    <span th:if="${activeTab == 'cancel-ride'}">Cancel Ride</span>
+                    <span th:if="${activeTab == 'helpdesk'}">Helpdesk</span>
+                </div>
+            </div>
+            
+            <div class="mr-header-right">
+                <div class="mr-notification">
+                    <i class="fa-regular fa-bell"></i>
+                </div>
+                <div class="mr-profile">
+                    <img th:if="${user?.profilePictureUrl != null}" th:src="${user.profilePictureUrl}" alt="Profile" class="mr-profile-img">
+                    <i th:unless="${user?.profilePictureUrl != null}" class="fa-solid fa-circle-user" style="font-size: 40px; color: #94a3b8;"></i>
+                        <span class="mr-profile-name" th:text="${user?.fullName != null ? user?.fullName : 'Guest'}">Rohit Sharma</span>
+                        <span class="mr-profile-role" th:text="${user?.role?.roleName != null ? user?.role?.roleName : 'Employee'}">Trainee-Tester</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Page Content injected here -->
+        <div class="mr-container">
+            <div th:replace="${content}"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script th:src="@{/js/my-rides-api.js}"></script>
+</body>
+</html>
