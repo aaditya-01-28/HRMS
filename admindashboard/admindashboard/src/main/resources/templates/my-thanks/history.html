@@ -131,22 +131,23 @@
     </div>
 
     <!-- Filter Bar -->
-    <div class="filter-bar">
+    <form class="filter-bar" method="GET" th:action="@{/my-thanks/history}">
         <div class="filter-input-group">
-            <input type="date" class="form-control" id="filterFromDate" placeholder="From Date">
+            <input type="date" class="form-control" name="startDate" th:value="${startDate}" placeholder="From Date">
         </div>
         
         <div class="filter-input-group">
-            <input type="date" class="form-control" id="filterToDate" placeholder="To Date">
+            <input type="date" class="form-control" name="endDate" th:value="${endDate}" placeholder="To Date">
         </div>
         
         <div class="search-input-group">
             <i class="fas fa-search"></i>
-            <input type="text" class="form-control" id="filterSearchText" placeholder="Search History...">
+            <input type="text" class="form-control" name="searchQuery" th:value="${searchQuery}" placeholder="Search History...">
         </div>
         
-        <button class="btn btn-search" onclick="filterHistory()">Search</button>
-    </div>
+        <button type="submit" class="btn btn-search">Search</button>
+        <a th:href="@{/my-thanks/history}" class="btn btn-search" style="background-color: #64748b; margin-left: 10px; text-decoration: none;">Clear</a>
+    </form>
 
     <!-- Table -->
     <div class="table-responsive">
@@ -177,41 +178,7 @@
 
 </div>
 
-<script>
-function filterHistory() {
-    const fromDateVal = document.getElementById('filterFromDate').value;
-    const toDateVal = document.getElementById('filterToDate').value;
-    const searchText = document.getElementById('filterSearchText').value.toLowerCase();
-    
-    const rows = document.querySelectorAll('.history-row');
-    
-    const fromDate = fromDateVal ? new Date(fromDateVal) : null;
-    const toDate = toDateVal ? new Date(toDateVal) : null;
-    if (toDate) toDate.setHours(23, 59, 59, 999);
 
-    rows.forEach(row => {
-        const dateStr = row.querySelector('.tx-date').innerText;
-        const typeStr = row.querySelector('.tx-type').innerText.toLowerCase();
-        const descStr = row.querySelector('td:nth-child(4)').innerText.toLowerCase();
-        
-        const txDate = new Date(dateStr);
-        
-        let matchesSearch = typeStr.includes(searchText) || descStr.includes(searchText);
-        let matchesDate = true;
-        
-        if (fromDate && txDate < fromDate) matchesDate = false;
-        if (toDate && txDate > toDate) matchesDate = false;
-        
-        if (matchesSearch && matchesDate) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
-}
-
-document.getElementById('filterSearchText').addEventListener('input', filterHistory);
-</script>
 </th:block>
 </body>
 </html>
