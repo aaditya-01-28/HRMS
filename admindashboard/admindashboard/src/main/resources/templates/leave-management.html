@@ -1252,7 +1252,7 @@
             return;
         }
 
-        if (/[^a-zA-Z0-9\s.,!?'-]/.test(comments)) {
+        if (/[^a-zA-Z0-9\s.,!?\'"()\u2013\u2014-]/.test(comments)) {
             Swal.fire({ icon: 'warning', title: 'Invalid Characters', text: 'Comments contain restricted special characters. Please use only alphanumeric characters and basic punctuation.', confirmButtonColor: '#1e3a8a' });
             return;
         }
