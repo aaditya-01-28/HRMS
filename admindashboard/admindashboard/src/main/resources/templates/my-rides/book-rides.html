@@ -3,8 +3,16 @@
 <body>
     <div th:fragment="content">
         <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-            <h2 style="font-weight: bold; margin-bottom: 0.5rem; font-size: 1.5rem;">Weekly Schedule</h2>
-            <p style="color: var(--mr-text-muted); margin-bottom: 2rem;"><i class="fa-regular fa-calendar"></i> 08 June - 13 June 2026</p>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+                <div>
+                    <h2 style="font-weight: bold; margin-bottom: 0.5rem; font-size: 1.5rem;">Weekly Schedule</h2>
+                    <p id="scheduleRangeText" style="color: var(--mr-text-muted); margin-bottom: 0;"><i class="fa-regular fa-calendar"></i> 08 June - 13 June 2026</p>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 0.5rem; color: var(--mr-text-muted);">Select Start Date</label>
+                    <input type="date" id="startDatePicker" style="padding: 0.5rem 1rem; border: 1px solid var(--mr-border); border-radius: 8px; color: var(--mr-text-main); outline: none; font-family: inherit;">
+                </div>
+            </div>
             
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
@@ -16,57 +24,141 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr style="border-bottom: 1px solid var(--mr-border);">
-                        <td style="padding: 1.5rem 1rem; font-weight: bold;">Mon, 08 June</td>
-                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">10:00 AM</td>
-                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">07:00 PM</td>
-                        <td style="padding: 1.5rem 1rem; text-align: center;">
-                            <span style="background-color: var(--mr-success-light); color: var(--mr-success); padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: bold;">Booked</span>
-                        </td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--mr-border);">
-                        <td style="padding: 1.5rem 1rem; font-weight: bold;">Tue, 09 June</td>
-                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">10:00 AM</td>
-                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">07:00 PM</td>
-                        <td style="padding: 1.5rem 1rem; text-align: center;">
-                            <span style="background-color: var(--mr-success-light); color: var(--mr-success); padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: bold;">Booked</span>
-                        </td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--mr-border);">
-                        <td style="padding: 1.5rem 1rem; font-weight: bold;">Wed, 10 June</td>
-                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
-                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
-                        <td style="padding: 1.5rem 1rem; text-align: center;">
-                            <a th:href="@{/my-rides/book-now}" class="mr-btn mr-btn-primary" style="text-decoration: none; padding: 0.5rem 1.5rem;">Book Now</a>
-                        </td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--mr-border);">
-                        <td style="padding: 1.5rem 1rem; font-weight: bold;">Thu, 11 June</td>
-                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
-                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
-                        <td style="padding: 1.5rem 1rem; text-align: center;">
-                            <a th:href="@{/my-rides/book-now}" class="mr-btn mr-btn-primary" style="text-decoration: none; padding: 0.5rem 1.5rem;">Book Now</a>
-                        </td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--mr-border);">
-                        <td style="padding: 1.5rem 1rem; font-weight: bold;">Fri, 12 June</td>
-                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
-                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
-                        <td style="padding: 1.5rem 1rem; text-align: center;">
-                            <a th:href="@{/my-rides/book-now}" class="mr-btn mr-btn-primary" style="text-decoration: none; padding: 0.5rem 1.5rem;">Book Now</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 1.5rem 1rem; font-weight: bold;">Sat, 13 June</td>
-                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
-                        <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
-                        <td style="padding: 1.5rem 1rem; text-align: center;">
-                            <a th:href="@{/my-rides/book-now}" class="mr-btn mr-btn-primary" style="text-decoration: none; padding: 0.5rem 1.5rem;">Book Now</a>
-                        </td>
-                    </tr>
+                    <!-- Table rows dynamically rendered by Javascript -->
                 </tbody>
             </table>
         </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                let bookedDates = {};
+
+                function fetchBookings() {
+                    return fetch('/api/my-rides/bookings')
+                        .then(res => {
+                            if (res.ok) return res.json();
+                            return [];
+                        })
+                        .then(data => {
+                            if (Array.isArray(data)) {
+                                data.forEach(b => {
+                                    if (b.status !== 'CANCELLED') {
+                                        bookedDates[b.shortDate] = b;
+                                    }
+                                });
+                            }
+                        })
+                        .catch(err => console.error("Error fetching bookings:", err));
+                }
+
+                // Date picker logic setup
+                const startDatePicker = document.getElementById('startDatePicker');
+                const tableBody = document.querySelector('tbody');
+                const rangeText = document.getElementById('scheduleRangeText');
+                
+                fetchBookings().then(() => {
+                    const today = new Date();
+                    const year = today.getFullYear();
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+                    const todayStr = `${year}-${month}-${day}`;
+                    
+                    startDatePicker.min = todayStr;
+                    
+                    if (!startDatePicker.value) {
+                        startDatePicker.value = todayStr;
+                    }
+                    
+                    // Trigger the UI generation on load
+                    startDatePicker.dispatchEvent(new Event('change'));
+                });
+                
+                // Date picker logic
+                
+                startDatePicker.addEventListener('change', function() {
+                    if (!this.value) return;
+                    
+                    const startDate = new Date(this.value);
+                    if (isNaN(startDate)) return;
+                    
+                    tableBody.innerHTML = '';
+                    
+                    const daysMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    const fullDaysMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                    const monthsMap = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                    
+                    let startStr = '';
+                    let endStr = '';
+                    let addedDays = 0;
+                    let offset = 0;
+                    
+                    while(addedDays < 6) { // Add 6 working days
+                        const current = new Date(startDate);
+                        current.setDate(current.getDate() + offset);
+                        offset++;
+                        
+                        // Skip Sundays
+                        if (current.getDay() === 0) continue;
+                        
+                        addedDays++;
+                        
+                        const dayShort = daysMap[current.getDay()];
+                        const dayFull = fullDaysMap[current.getDay()];
+                        const dateNum = String(current.getDate()).padStart(2, '0');
+                        const monthName = monthsMap[current.getMonth()];
+                        const year = current.getFullYear();
+                        
+                        const shortDate = `${dayShort}, ${dateNum} ${monthName}`;
+                        const fullDate = `${dayFull}, ${dateNum} ${monthName} ${year}`;
+                        
+                        if (addedDays === 1) startStr = `${dateNum} ${monthName}`;
+                        if (addedDays === 6) endStr = `${dateNum} ${monthName} ${year}`;
+                        
+                        const bookingInfo = bookedDates[shortDate];
+                        
+                        const tr = document.createElement('tr');
+                        tr.style.borderBottom = '1px solid var(--mr-border)';
+                        
+                        const now = new Date();
+                        now.setHours(0,0,0,0);
+                        current.setHours(0,0,0,0);
+                        const isPast = current < now;
+                        
+                        if(bookingInfo) {
+                            tr.innerHTML = `
+                                <td style="padding: 1.5rem 1rem; font-weight: bold;">${shortDate}</td>
+                                <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">${bookingInfo.login || '10:00 AM'}</td>
+                                <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">${bookingInfo.logout || '07:00 PM'}</td>
+                                <td style="padding: 1.5rem 1rem; text-align: center;">
+                                    <span style="background-color: var(--mr-success-light); color: var(--mr-success); padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: bold;">Booked</span>
+                                </td>
+                            `;
+                        } else if (isPast) {
+                            tr.innerHTML = `
+                                <td style="padding: 1.5rem 1rem; font-weight: bold; color: var(--mr-text-muted); opacity: 0.5;">${shortDate}</td>
+                                <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted); opacity: 0.5;">N/A</td>
+                                <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted); opacity: 0.5;">N/A</td>
+                                <td style="padding: 1.5rem 1rem; text-align: center;">
+                                    <span style="color: var(--mr-text-muted); font-weight: bold; font-size: 0.85rem; padding: 0.5rem; background: #f1f5f9; border-radius: 20px;">Past Date</span>
+                                </td>
+                            `;
+                        } else {
+                            tr.innerHTML = `
+                                <td style="padding: 1.5rem 1rem; font-weight: bold;">${shortDate}</td>
+                                <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
+                                <td style="padding: 1.5rem 1rem; color: var(--mr-text-muted);">N/A</td>
+                                <td style="padding: 1.5rem 1rem; text-align: center;">
+                                    <a href="/my-rides/book-now?date=${encodeURIComponent(fullDate)}" class="mr-btn mr-btn-primary" style="text-decoration: none; padding: 0.5rem 1.5rem;">Book Now</a>
+                                </td>
+                            `;
+                        }
+                        
+                        tableBody.appendChild(tr);
+                    }
+                    
+                    rangeText.innerHTML = `<i class="fa-regular fa-calendar"></i> ${startStr} - ${endStr}`;
+                });
+            });
+        </script>
     </div>
 </body>
 </html>
