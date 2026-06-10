@@ -151,14 +151,27 @@ public class MyThanksController {
 
     /* ---------- HISTORY ---------- */
     @GetMapping("/history")
-    public String history(HttpSession session, Model model, Principal principal) {
+    public String history(
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate startDate,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate endDate,
+            @RequestParam(required = false) String searchQuery,
+            HttpSession session, Model model, Principal principal) {
         if (principal == null) {
             return "redirect:/my-thanks/login";
         }
         User user = getAuthenticatedUser(session, principal);
         model.addAttribute("user", user);
         model.addAttribute("wallet", thanksService.getOrCreateWallet(user));
-        model.addAttribute("transactions", thanksService.getTransactionHistory(user));
+        
+        if (startDate != null || endDate != null || (searchQuery != null && !searchQuery.isEmpty())) {
+            model.addAttribute("transactions", thanksService.getFilteredTransactionHistory(user, startDate, endDate, searchQuery));
+        } else {
+            model.addAttribute("transactions", thanksService.getTransactionHistory(user));
+        }
+        
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("searchQuery", searchQuery);
         model.addAttribute("activeMenu", "history");
         return "my-thanks/history";
     }

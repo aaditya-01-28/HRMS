@@ -184,4 +184,16 @@ public class ThanksService {
     public List<ThanksTransaction> getTransactionHistory(User user) {
         return transactionRepository.findByUserOrderByTransactionDateDesc(user);
     }
+
+    /**
+     * Fetches the user's transaction history with filtering.
+     */
+    public List<ThanksTransaction> getFilteredTransactionHistory(User user, LocalDate startDate, LocalDate endDate, String searchQuery) {
+        if (searchQuery != null && searchQuery.trim().isEmpty()) {
+            searchQuery = null;
+        } else if (searchQuery != null) {
+            searchQuery = "%" + searchQuery.toLowerCase() + "%";
+        }
+        return transactionRepository.findFilteredTransactions(user, startDate, endDate, searchQuery);
+    }
 }
