@@ -12,7 +12,7 @@
     <style>
         :root {
             --bs-primary: #1e3a8a;
-            --bg-color: #f1f5f9;
+            --bg-color: #ffffff;
             --card-bg: #ffffff;
             --border-color: #e2e8f0;
             --text-primary: #1e293b;
@@ -23,7 +23,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
+            background-color: #ffffff !important;
             color: #334155;
             padding-top: 78px;
             animation: fadeInPage 0.5s ease-out forwards;
@@ -33,6 +33,13 @@
             from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* ═══════════════════════ BUTTON OVERRIDES ═══════════════════════ */
+        .btn-primary { background-color: #00236F !important; border-color: #00236F !important; }
+        .btn-primary:hover { background-color: #001540 !important; border-color: #001540 !important; }
+        .btn-outline-primary { color: #00236F !important; border-color: #00236F !important; }
+        .btn-outline-primary:hover { background-color: #00236F !important; color: white !important; }
+        .text-primary { color: #00236F !important; }
 
         /* ═══════════════════════ FIXED HEADER ═══════════════════════ */
         .top-header {
@@ -208,7 +215,7 @@
         }
         .fixed-badge {
             background: #eff6ff;
-            color: #2563eb;
+            color: #00236F;
         }
 
         /* ═══════════════════════ LEAVE WALLET SUMMARY (Minimal Cards) ═══════════════════════ */
@@ -580,7 +587,7 @@
                                     <textarea class="form-control bg-white" id="leaveComments" rows="3"
                                               placeholder="Write the reason in detail..." style="resize: none; border-radius: 12px;"></textarea>
                                     <div class="d-flex flex-column justify-content-end">
-                                        <button type="button" class="btn btn-primary px-4 py-2" onclick="submitLeaveRequest()" style="border-radius: 10px; background-color: #2563eb; border: none; font-weight: 600;">Submit</button>
+                                        <button type="button" class="btn btn-primary px-4 py-2" onclick="submitLeaveRequest()" style="border-radius: 10px; border: none; font-weight: 600;">Submit</button>
                                     </div>
                                 </div>
                             </div>
@@ -614,26 +621,27 @@
                     <div id="ledgerSummaryContainer" style="display:none;"></div>
                     
                     <div class="d-flex justify-content-center gap-3 mt-3">
-                        <button class="btn btn-outline-primary px-4 py-2 fw-bold" onclick="showWalletDetailsModal()" style="border-radius: 8px; border-width: 1.5px; background-color: white;"><i class="fas fa-file-alt me-2" style="display:inline-block;"></i>View Details</button>
-                        <button class="btn btn-outline-primary px-4 py-2 fw-bold" onclick="showLedgerModal()" style="border-radius: 8px; border-width: 1.5px; background-color: white;"><i class="fas fa-chart-line me-2" style="display:inline-block;"></i>Leave History</button>
+                        <button class="btn btn-outline-primary px-4 py-2 fw-bold" onclick="showWalletDetailsModal()" style="border-radius: 8px; border-width: 1.5px;"><i class="fas fa-file-alt me-2" style="display:inline-block;"></i>View Details</button>
+                        <button class="btn btn-outline-primary px-4 py-2 fw-bold" onclick="showLedgerModal()" style="border-radius: 8px; border-width: 1.5px;"><i class="fas fa-chart-line me-2" style="display:inline-block;"></i>Leave History</button>
                     </div>
                 </div>
             </div>
 
             <!-- Absence Requests -->
-            <div class="app-card flex-grow-1">
+            <div class="app-card flex-grow-1 d-flex flex-column">
                 <div class="app-card-header">
                     <div>Absence Request</div>
-                    <a href="/my-timeoff" style="color: #2563eb; text-decoration: none; font-size: 0.85rem; font-weight: 700;">View Details</a>
+                    <a href="/my-timeoff" style="color: #00236F; text-decoration: none; font-size: 0.85rem; font-weight: 700;">View Details</a>
                 </div>
-                <div class="app-card-body pt-3">
+                <div class="app-card-body pt-3 d-flex flex-column flex-grow-1">
                     <div class="row w-100 m-0 align-items-center mb-2" style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 10px 15px; font-weight: 700; color: #3730a3; font-size: 0.85rem;">
                         <div class="col-3 p-0">Leave Type</div>
-                        <div class="col-3 p-0 text-center">From</div>
-                        <div class="col-3 p-0 text-center">To</div>
+                        <div class="col-2 p-0 text-center">From</div>
+                        <div class="col-2 p-0 text-center">To</div>
+                        <div class="col-2 p-0 text-center">Days</div>
                         <div class="col-3 p-0 text-end">Status</div>
                     </div>
-                    <div id="absenceRequestsContainer" style="max-height: 250px; overflow-y: auto;">
+                    <div id="absenceRequestsContainer" style="flex-grow: 1; flex-basis: 0; overflow-y: auto; min-height: 250px;">
                         <div class="loading-state">
                             <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
                             <br><small class="fw-bold text-muted">Loading absence requests...</small>
@@ -846,24 +854,17 @@
         }
 
         let tableHTML = '<div style="font-size:0.72rem; color:#64748b; background:#f8fafc; border-radius:8px; padding:8px 12px; margin-bottom:10px; line-height:1.6;">' +
-            '<strong>Opening</strong> = Yearly balance | ' +
-            '<strong>Monthly Cr.</strong> = Monthly credit | ' +
-            '<strong>Earned</strong> = Extra earned | ' +
-            '<strong>Used</strong> = Taken | ' +
-            '<strong>Encashed</strong> = Encashed | ' +
-            '<strong>Balance</strong> = Remaining' +
+            'Detailed summary of your leave balances.' +
             '</div>' +
             '<div style="max-height:50vh; overflow-y:auto;">' +
             '<table style="width:100%; border-collapse:collapse; font-size:0.78rem; font-family:Inter,sans-serif;">' +
             '<thead>' +
             '<tr style="background:#f8fafc; border-bottom:2px solid #e2e8f0; position:sticky; top:0;">' +
-            '<th style="padding:8px 6px; text-align:left; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Leave Type</th>' +
-            '<th style="padding:8px 6px; text-align:center; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Opening</th>' +
-            '<th style="padding:8px 6px; text-align:center; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Monthly Cr.</th>' +
-            '<th style="padding:8px 6px; text-align:center; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Earned</th>' +
-            '<th style="padding:8px 6px; text-align:center; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Used</th>' +
-            '<th style="padding:8px 6px; text-align:center; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Encashed</th>' +
-            '<th style="padding:8px 6px; text-align:center; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Balance</th>' +
+            '<th style="padding:8px 6px; text-align:left; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f8fafc; white-space:nowrap;">Leave Type</th>' +
+            '<th style="padding:8px 6px; text-align:center; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f8fafc; white-space:nowrap;">Balance</th>' +
+            '<th style="padding:8px 6px; text-align:center; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f8fafc; white-space:nowrap;">Credit</th>' +
+            '<th style="padding:8px 6px; text-align:center; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f8fafc; white-space:nowrap;">Used</th>' +
+            '<th style="padding:8px 6px; text-align:center; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f8fafc; white-space:nowrap;">Remaining</th>' +
             '</tr></thead><tbody>';
 
         const displayTypes = ['CL', 'SL', 'EL', 'COMP_OFF', 'LOP'];
@@ -872,16 +873,18 @@
             if (!displayTypes.includes(w.leaveCode)) return;
 
             const isLOP = w.leaveCode === 'LOP';
-            const balColor = isLOP ? '#7c3aed' : (w.balance > 0 ? '#16a34a' : '#dc2626');
+            const balColor = isLOP ? '#7c3aed' : (w.balance > 0 ? '#1e293b' : '#dc2626');
             const balText = isLOP ? 'Auto' : (w.balance || 0);
+            
+            const creditTotal = (w.monthlyCredit || 0) + (w.earnedCredit || 0);
+            const usedTotal = (w.used || 0) + (w.encashed || 0);
+            
             tableHTML += '<tr style="border-bottom:1px solid #f1f5f9;">' +
-                '<td style="padding:7px 6px; font-weight:600; white-space:nowrap;">' + w.leaveType + ' <span style="color:#94a3b8; font-size:0.65rem;">(' + w.leaveCode + ')</span></td>' +
-                '<td style="padding:7px 6px; text-align:center;">' + (w.openingBalance || 0) + '</td>' +
-                '<td style="padding:7px 6px; text-align:center;">' + (w.monthlyCredit || 0) + '</td>' +
-                '<td style="padding:7px 6px; text-align:center;">' + (w.earnedCredit || 0) + '</td>' +
-                '<td style="padding:7px 6px; text-align:center;">' + (w.used || 0) + '</td>' +
-                '<td style="padding:7px 6px; text-align:center;">' + (w.encashed || 0) + '</td>' +
-                '<td style="padding:7px 6px; text-align:center; font-weight:700; color:' + balColor + ';">' + balText + '</td>' +
+                '<td style="padding:10px 6px; font-weight:700; color:#1e293b; white-space:nowrap;">' + w.leaveType + '</td>' +
+                '<td style="padding:10px 6px; text-align:center; font-weight:600; color:#475569;">' + (w.openingBalance || 0) + '</td>' +
+                '<td style="padding:10px 6px; text-align:center; font-weight:700; color:#16a34a;">+' + creditTotal + '</td>' +
+                '<td style="padding:10px 6px; text-align:center; font-weight:700; color:#dc2626;">-' + usedTotal + '</td>' +
+                '<td style="padding:10px 6px; text-align:center; font-weight:800; color:' + balColor + ';">' + balText + '</td>' +
                 '</tr>';
         });
 
@@ -951,14 +954,13 @@
         }
 
         let tableHTML = '<div style="font-size:0.72rem; color:#64748b; background:#f8fafc; border-radius:8px; padding:8px 12px; margin-bottom:10px;">' +
-            'Each row shows a leave credit (+) or deduction (-) from your account with the resulting balance.</div>' +
+            'Each row shows a leave deduction (-) from your account with the resulting balance.</div>' +
             '<div style="max-height:55vh; overflow-y:auto;">' +
             '<table style="width:100%; border-collapse:collapse; font-size:0.78rem; font-family:Inter,sans-serif;">' +
             '<thead>' +
             '<tr style="background:#f8fafc; border-bottom:2px solid #e2e8f0; position:sticky; top:0;">' +
             '<th style="padding:8px 6px; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Date & Time</th>' +
             '<th style="padding:8px 6px; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Leave Type</th>' +
-            '<th style="padding:8px 6px; text-align:center; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Credit (+)</th>' +
             '<th style="padding:8px 6px; text-align:center; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Debit (-)</th>' +
             '<th style="padding:8px 6px; text-align:center; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Balance</th>' +
             '<th style="padding:8px 6px; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; min-width:140px;">Reason</th>' +
@@ -969,13 +971,11 @@
             const dateObj = t.date ? new Date(t.date) : null;
             const dateFmt = dateObj ? dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '\u2014';
             const timeFmt = dateObj ? dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : '';
-            const credit = t.credit ? ('<span style="color:#16a34a; font-weight:700;">+' + t.credit + '</span>') : '<span style="color:#cbd5e1;">\u2014</span>';
             const debit = t.debit ? ('<span style="color:#dc2626; font-weight:700;">-' + t.debit + '</span>') : '<span style="color:#cbd5e1;">\u2014</span>';
 
             tableHTML += '<tr style="border-bottom:1px solid #f1f5f9;">' +
                 '<td style="padding:7px 6px;"><div style="font-weight:600; white-space:nowrap;">' + dateFmt + '</div><div style="font-size:0.62rem; color:#94a3b8;">' + timeFmt + '</div></td>' +
                 '<td style="padding:7px 6px; font-weight:600;">' + (t.leaveType || '\u2014') + '</td>' +
-                '<td style="padding:7px 6px; text-align:center;">' + credit + '</td>' +
                 '<td style="padding:7px 6px; text-align:center;">' + debit + '</td>' +
                 '<td style="padding:7px 6px; text-align:center; font-weight:700;">' + (t.balanceAfter != null ? t.balanceAfter : '\u2014') + '</td>' +
                 '<td style="padding:7px 6px; word-break:break-word; max-width:180px;">' + (t.reason || '\u2014') + '</td>' +
@@ -1352,11 +1352,11 @@
                 let statusClass = 'status-pending', statusText = 'Pending Approval';
                 let iconBg = '#fff7ed', iconColor = '#f97316';
 
-                if (status === 'APPROVED') { statusClass = 'status-approved'; statusText = 'Approved'; iconBg = '#f0fdf4'; iconColor = '#22c55e'; }
+                if (status === 'APPROVED') { statusClass = 'status-approved'; statusText = 'Approved'; iconBg = '#ecfdf5'; iconColor = '#059669'; }
                 else if (status === 'AUTO_APPROVED' || status === 'AUTO APPROVED') { statusClass = 'status-auto-approved'; statusText = 'Auto Approved'; iconBg = '#ecfdf5'; iconColor = '#059669'; }
                 else if (status === 'REJECTED') { statusClass = 'status-rejected'; statusText = 'Rejected'; iconBg = '#fef2f2'; iconColor = '#ef4444'; }
 
-                const fromDate = leave.fromDate ? new Date(leave.fromDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : '\u2014';
+                const fromDate = leave.fromDate ? new Date(leave.fromDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '\u2014';
                 const toDate = leave.toDate ? new Date(leave.toDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '\u2014';
 
                 let typeIcon = 'fa-calendar-minus';
@@ -1368,14 +1368,24 @@
                 else if (lt.includes('wfh')) typeIcon = 'fa-house-laptop';
                 else if (lt.includes('floater')) typeIcon = 'fa-flag';
 
-                html += '<div class="col-lg-6">' +
-                    '<div class="absence-item" onclick="showLeaveDetails(' + idx + ')">' +
-                    '<div class="absence-icon" style="background:' + iconBg + '; color:' + iconColor + ';"><i class="fas ' + typeIcon + '"></i></div>' +
-                    '<div class="flex-grow-1">' +
-                    '<div class="fw-bold" style="font-size:0.82rem;">' + (leave.leaveType || 'Leave') + '</div>' +
-                    '<div class="text-muted" style="font-size:0.7rem;">' + fromDate + ' \u2014 ' + toDate + ' <span class="ms-2"><i class="fas fa-clock me-1"></i>' + (leave.totalDays || 0) + ' day(s)</span></div>' +
+                html += '<div class="col-12">' +
+                    '<div class="row w-100 m-0 align-items-center absence-item" onclick="showLeaveDetails(' + idx + ')">' +
+                    '<div class="col-3 p-0 d-flex align-items-center">' +
+                    '<div class="absence-icon" style="background:' + iconBg + '; color:' + iconColor + '; width: 34px; height: 34px; margin-right: 12px; font-size:0.8rem; border-radius: 8px;"><i class="fas ' + typeIcon + '"></i></div>' +
+                    '<div class="fw-bold text-dark" style="font-size:0.85rem;">' + (leave.leaveType || 'Leave') + '</div>' +
                     '</div>' +
+                    '<div class="col-2 p-0 text-center">' +
+                    '<div class="text-muted" style="font-size:0.8rem; font-weight:500;">' + fromDate + '</div>' +
+                    '</div>' +
+                    '<div class="col-2 p-0 text-center">' +
+                    '<div class="text-muted" style="font-size:0.8rem; font-weight:500;">' + toDate + '</div>' +
+                    '</div>' +
+                    '<div class="col-2 p-0 text-center">' +
+                    '<div class="text-muted" style="font-size:0.8rem; font-weight:500;"><i class="fas fa-clock me-1"></i>' + (leave.totalDays || 0) + '</div>' +
+                    '</div>' +
+                    '<div class="col-3 p-0 text-end">' +
                     '<span class="badge badge-status ' + statusClass + '">' + statusText + '</span>' +
+                    '</div>' +
                     '</div></div>';
             });
             html += '</div>';
