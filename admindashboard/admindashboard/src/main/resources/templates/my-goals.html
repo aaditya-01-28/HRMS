@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Goals</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Chart JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+		/* ===============================
+		   GLOBAL
+		================================= */
+
+		*{
+		    margin:0;
+		    padding:0;
+		    box-sizing:border-box;
+		}
+
+		body{
+		    font-family:Arial, sans-serif;
+		    font-size:14px;
+		    color:#333;
+		    background:#ffffff;
+		    padding:20px 25px;
+		}
+
+		.goals-container{
+		    width:100%;
+		}
+
+		.page-title{
+		    font-size:20px;
+		    font-weight:700;
+		    color:#0B2E83;
+		    margin-bottom:28px;
+		}
+		.page-header {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    margin-bottom: 20px;
+		}
+
+		.back-btn-header {
+		    display: inline-flex;
+		    align-items: center;
+		    gap: 6px;
+
+		    padding: 8px 16px;
+
+		    background: #ffffff;
+		    color: #0d2d7a;
+
+		    border: 1px solid #0d2d7a;
+		    border-radius: 6px;
+
+		    font-size: 14px;
+		    font-weight: 600;
+
+		    text-decoration: none;
+
+		    transition: all 0.2s ease;
+		}
+
+		.back-btn-header:hover {
+		    background: #0d2d7a;
+		    color: #ffffff;
+		}
+
+		/* ===============================
+		   SUMMARY SECTION
+		================================= */
+
+		.summary-wrapper{
+		    display:flex;
+		    justify-content:space-between;
+		    align-items:center;
+		    margin-bottom:30px;
+		    gap:25px;
+		}
+
+		.summary-container {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    margin: 25px 0 20px;
+		}
+
+		.summary-card {
+		    display: flex;
+		    align-items: center;
+		    gap: 12px;
+		    min-width: 180px;
+		}
+
+		.summary-icon {
+		    font-size: 42px;
+		}
+
+		.summary-details h4 {
+		    font-size: 16px;
+		    margin: 0;
+		    font-weight: 600;
+		}
+
+		.summary-details .count {
+		    font-size: 24px;
+		    font-weight: 700;
+		    margin-top: 2px;
+		}
+
+		.summary-content{
+		    display:flex;
+		    flex-direction:column;
+		    gap:2px;
+		}
+
+		.summary-label{
+		    font-size:14px;
+		    font-weight:600;
+		    color:#333;
+		}
+
+		.summary-value{
+		    font-size:18px;
+		    font-weight:700;
+		}
+
+		.blue{
+		    color:#2F66F5;
+		}
+
+		.green{
+		    color:#2FA84F;
+		}
+
+		.orange{
+		    color:#F28B16;
+		}
+
+		/* ===============================
+		   TABS + BUTTON
+		================================= */
+
+		.goal-tabs{
+		    display:flex;
+		    justify-content:space-between;
+		    align-items:flex-end;
+		    margin-bottom:18px;
+		}
+
+		.tabs-left{
+		    display:flex;
+		    gap:55px;
+		}
+
+		.tab-item{
+		    font-size:14px;
+		    font-weight:500;
+		    color:#444;
+		    cursor:pointer;
+		    padding-bottom:8px;
+		}
+
+		.tab-item.active{
+		    color:#2F66F5;
+		    border-bottom:2px solid #2F66F5;
+		    font-weight:600;
+		}
+
+		.create-btn{
+		    background:#1F57F0;
+		    color:#fff;
+		    border:none;
+		    border-radius:8px;
+		    padding:10px 18px;
+		    font-size:13px;
+		    font-weight:600;
+		    cursor:pointer;
+		    display:flex;
+		    align-items:center;
+		    gap:8px;
+		    box-shadow:0 2px 6px rgba(31,87,240,0.25);
+		}
+
+		.create-btn i{
+		    font-size:14px;
+		}
+
+		/* ===============================
+		   TABLE
+		================================= */
+
+		.table-wrapper{
+		    margin-bottom:24px;
+		}
+
+		table{
+		    width:100%;
+		    border-collapse:collapse;
+		}
+
+		thead{
+		    border:1px solid #9E9E9E;
+		}
+
+		thead th{
+		    padding:7px 10px;
+		    text-align:center;
+		    font-size:14px;
+		    font-weight:600;
+		    color:#222;
+		}
+
+		tbody tr{
+		    border-bottom:1px solid #D8D8D8;
+		}
+
+		tbody td{
+		    padding:12px 10px;
+		    font-size:14px;
+		    text-align:center;
+		    vertical-align:middle;
+		}
+
+		.goal-name{
+		    text-align:left;
+		    padding-left:12px;
+		    font-weight:500;
+		}
+
+		/* ===============================
+		   PRIORITY PILLS
+		================================= */
+
+		.priority{
+		    display:inline-block;
+		    min-width:70px;
+		    padding:4px 12px;
+		    border-radius:15px;
+		    font-size:12px;
+		    font-weight:500;
+		}
+
+		.priority.high{
+		    background:#F7C5C5;
+		    color:#E53935;
+		}
+
+		.priority.medium{
+		    background:#F8D7A5;
+		    color:#F28B16;
+		}
+
+		.priority.low{
+		    background:#BEE0B9;
+		    color:#2E7D32;
+		}
+		/* ===============================
+		   PROGRESS BAR
+		================================= */
+
+		.progress-wrapper {
+		    display: flex;
+		    align-items: center;
+		    gap: 8px;
+		}
+
+		.progress-bar {
+		    width: 85px;
+		    height: 10px;
+		    background: #d9d9d9;
+		}
+
+		.progress-fill {
+		    height: 100%;
+		    background: #2f5de2;
+		}
+
+		.progress-text{
+		    font-size:14px;
+		    font-weight:700;
+		    color:#1546E8;
+		}
+
+		/* ===============================
+		   STATUS PILLS
+		================================= */
+
+		.status-pill {
+		    padding: 5px 20px;
+		    border-radius: 20px;
+		    font-size: 13px;
+		    font-weight: 600;
+		}
+
+		.status-pill.on-track {
+		    background: #9db3dc;
+		    color: #1b3fa8;
+		}
+
+		.status-pill.at-risk {
+		    background: #e9bcbc;
+		    color: #d32f2f;
+		}
+
+		.status-pill.completed {
+		    background: #b7ddb6;
+		    color: #2e7d32;
+		}
+
+		/* ===============================
+		   ACTION MENU
+		================================= */
+
+		.action-menu{
+		    color:#1F2D5C;
+		    font-size:20px;
+		    cursor:pointer;
+		    line-height:1;
+		}
+
+		/* ===============================
+		   CHART SECTION
+		================================= */
+
+		.charts-section{
+		    display:grid;
+		    grid-template-columns:1fr 1fr;
+		    gap:28px;
+		    margin-top:18px;
+		    border-top:1px solid #BDBDBD;
+		    padding-top:18px;
+		}
+
+		/* ===============================
+		   CHART CARD
+		================================= */
+
+		.chart-card{
+		    background:#fff;
+		}
+
+		.chart-header{
+		    display:flex;
+		    justify-content:space-between;
+		    align-items:center;
+		    margin-bottom:12px;
+		}
+
+		.chart-title{
+		    font-size:18px;
+		    font-weight:700;
+		    color:#0B2E83;
+		}
+
+		.update-btn{
+		    background:#F6F9FF;
+		    border:2px solid #2F66F5;
+		    color:#2F66F5;
+		    border-radius:8px;
+		    padding:5px 12px;
+		    font-size:12px;
+		    font-weight:600;
+		    cursor:pointer;
+		}
+
+		.update-btn:hover{
+		    background:#2F66F5;
+		    color:#fff;
+		}
+
+		/* ===============================
+		   BURN CHART
+		================================= */
+
+		.burn-chart-container{
+		    height:180px;
+		    position:relative;
+		}
+
+		/* ===============================
+		   OVERALL PROGRESS
+		================================= */
+
+		.overall-wrapper{
+		    display:flex;
+		    flex-direction:column;
+		    align-items:center;
+		}
+
+		.doughnut-container{
+		    width:150px;
+		    height:150px;
+		    margin-top:5px;
+		}
+
+		/* ===============================
+		   LEGENDS
+		================================= */
+
+		.progress-legend{
+		    width:100%;
+		    max-width:280px;
+		    margin-top:12px;
+		}
+
+		.legend-row{
+		    display:flex;
+		    justify-content:space-between;
+		    align-items:center;
+		    margin-bottom:10px;
+		    font-size:14px;
+		}
+
+		.legend-left{
+		    display:flex;
+		    align-items:center;
+		    gap:10px;
+		    color:#444;
+		}
+
+		.legend-dot{
+		    width:10px;
+		    height:10px;
+		    border-radius:50%;
+		    background:#1F57F0;
+		}
+
+		.legend-line{
+		    width:18px;
+		    border-top:2px dashed #1F57F0;
+		}
+
+		.legend-value{
+		    font-weight:700;
+		    color:#333;
+		}
+		/* Modal */
+
+		.goal-modal-overlay{
+		    display:none;
+		    position:fixed;
+		    inset:0;
+		    background:rgba(0,0,0,0.35);
+		    z-index:9999;
+		    justify-content:center;
+		    align-items:center;
+		}
+
+		.goal-modal-overlay.show{
+		    display:flex;
+		}
+
+		.goal-modal{
+		    width:360px;
+		    background:#fff;
+		    border-radius:8px;
+		    padding:20px;
+		}
+
+		.modal-header{
+		    display:flex;
+		    justify-content:space-between;
+		    align-items:center;
+		    margin-bottom:20px;
+		}
+
+		.modal-header h2{
+		    color:#0B2E83;
+		    font-size:20px;
+		    font-weight:700;
+		}
+
+		.close-modal{
+		    font-size:24px;
+		    cursor:pointer;
+		    color:#444;
+		}
+
+		.form-group{
+		    margin-bottom:18px;
+		}
+
+		.form-group label{
+		    display:block;
+		    margin-bottom:8px;
+		    font-size:14px;
+		    font-weight:600;
+		}
+
+		.required{
+		    color:red;
+		}
+
+		.form-group input,
+		.form-group textarea{
+		    width:100%;
+		    padding:10px 12px;
+		    border:1px solid #A8A8A8;
+		    border-radius:8px;
+		    font-size:14px;
+		    font-family:Arial,sans-serif;
+		}
+
+		.form-group textarea{
+		    resize:none;
+		}
+
+		.priority-selection{
+		    display:flex;
+		    justify-content:space-between;
+		}
+
+		.priority-option{
+		    border:none;
+		    padding:6px 22px;
+		    border-radius:4px;
+		    cursor:pointer;
+		    font-size:13px;
+		}
+
+		.priority-pill {
+		    padding: 4px 18px;
+		    border-radius: 20px;
+		    font-size: 12px;
+		    font-weight: 600;
+		}
+
+		.priority-pill.high {
+		    background: #f3b0b0;
+		    color: #e53935;
+		}
+
+		.priority-pill.medium {
+		    background: #f5d19b;
+		    color: #f57c00;
+		}
+
+		.priority-pill.low {
+		    background: #b8ddb0;
+		    color: #2e7d32;
+		}
+
+		.priority-option.selected{
+		    outline:2px solid #0B2E83;
+		}
+
+		.date-row{
+		    display:flex;
+		    gap:20px;
+		}
+
+		.date-row .form-group{
+		    flex:1;
+		}
+
+		.modal-footer{
+		    margin-top:15px;
+		    display:flex;
+		    justify-content:center;
+		    gap:30px;
+		}
+
+		.back-btn{
+		    min-width:95px;
+		    padding:10px;
+		    border:1px solid #7F7F7F;
+		    border-radius:8px;
+		    background:#fff;
+		    cursor:pointer;
+		    font-size:16px;
+		}
+
+		.save-goal-btn{
+		    min-width:120px;
+		    padding:10px;
+		    border:none;
+		    border-radius:8px;
+		    background:#2F66F5;
+		    color:#fff;
+		    cursor:pointer;
+		    font-size:16px;
+		    font-weight:600;
+		}
+
+		/* ===============================
+		   RESPONSIVE
+		================================= */
+
+		@media(max-width:992px){
+
+		    .summary-wrapper{
+		        flex-wrap:wrap;
+		        row-gap:20px;
+		    }
+
+		    .summary-card{
+		        flex:0 0 calc(50% - 15px);
+		    }
+
+		    .charts-section{
+		        grid-template-columns:1fr;
+		    }
+		}
+
+		@media(max-width:768px){
+
+		    body{
+		        padding:15px;
+		    }
+
+		    .goal-tabs{
+		        flex-direction:column;
+		        align-items:flex-start;
+		        gap:15px;
+		    }
+
+		    .tabs-left{
+		        gap:25px;
+		        flex-wrap:wrap;
+		    }
+
+		    .summary-card{
+		        flex:0 0 100%;
+		    }
+
+		    .create-btn{
+		        width:100%;
+		        justify-content:center;
+		    }
+
+		    .table-wrapper{
+		        overflow-x:auto;
+		    }
+
+		    table{
+		        min-width:850px;
+		    }
+
+		    .doughnut-container{
+		        width:130px;
+		        height:130px;
+		    }
+		}
+
+	        @media(max-width:992px){
+
+	            .charts-section{
+	                grid-template-columns:1fr;
+	            }
+
+	            .summary-wrapper{
+	                flex-direction:column;
+	            }
+
+	            .summary-card{
+	                min-width:100%;
+	            }
+	        }
+
+	       
+	    </style>
+
+	</head>
+
+	<body>
+
+	<div class="goals-container">
+
+		<div class="page-header">
+
+		    <h2>My Goals</h2>
+
+		    <a th:href="@{/my-whitecircle}"
+		       class="back-btn-header">
+
+		        <i class="fa-solid fa-arrow-left"></i>
+		        Back
+
+		    </a>
+
+		</div>
+
+	    <div class="summary-wrapper">
+
+	        <div class="summary-card">
+
+	            <div class="summary-icon blue">
+	                <i class="fa-solid fa-bullseye"></i>
+	            </div>
+
+	            <div class="summary-content">
+	                <span class="summary-label">Total Goals</span>
+					<span class="summary-value"
+					      th:text="${#lists.size(goals)}">0</span>
+	            </div>
+
+	        </div>
+
+	        <div class="summary-card">
+
+	            <div class="summary-icon green">
+	                <i class="fa-solid fa-chart-line"></i>
+	            </div>
+
+	            <div class="summary-content">
+	                <span class="summary-label">On Track</span>
+					<span class="summary-value green"
+					      th:text="${onTrackCount}">0</span>
+	            </div>
+
+	        </div>
+
+	        <div class="summary-card">
+
+	            <div class="summary-icon orange">
+	                <i class="fa-solid fa-circle-exclamation"></i>
+	            </div>
+
+	            <div class="summary-content">
+	                <span class="summary-label">At Risk</span>
+					<span class="summary-value orange"
+					      th:text="${atRiskCount}">0</span>
+	            </div>
+
+	        </div>
+
+	        <div class="summary-card">
+
+	            <div class="summary-icon green">
+	                <i class="fa-solid fa-circle-check"></i>
+	            </div>
+
+	            <div class="summary-content">
+	                <span class="summary-label">Completed</span>
+					<span class="summary-value green"
+					      th:text="${completedCount}">0</span>
+	            </div>
+
+	        </div>
+
+	    </div>
+		
+		<div class="goal-tabs">
+
+		    <div class="tabs-left">
+
+		        <div class="tab-item active">
+		            All Goals
+		        </div>
+
+		        <div class="tab-item">
+		            On Track
+		        </div>
+
+		        <div class="tab-item">
+		            At Risk
+		        </div>
+
+		        <div class="tab-item">
+		            Completed
+		        </div>
+
+		    </div>
+
+		    <button class="create-btn">
+		        <i class="fa-solid fa-plus"></i>
+		        Create New Goal
+		    </button>
+
+		</div>
+
+		<div class="table-wrapper">
+
+		    <table>
+
+				<thead>
+				<tr>
+				    <th>Goal Name</th>
+				    <th>Priority</th>
+				    <th>Start Date</th>
+				    <th>End Date</th>
+				    <th>Progress</th>
+				    <th>Status</th>
+				    <th></th>
+				</tr>
+				</thead>
+
+				<tbody>
+
+				<tr th:if="${#lists.isEmpty(goals)}">
+
+				    <td colspan="7" style="padding:40px;text-align:center;">
+
+				        <i class="fa-solid fa-bullseye"
+				           style="font-size:40px;color:#d3d3d3;"></i>
+
+				        <div style="margin-top:10px;font-size:18px;font-weight:600;color:#555;">
+				            No goals assigned yet
+				        </div>
+
+				        <div style="margin-top:5px;color:#888;">
+				            Click "Create New Goal" to get started.
+				        </div>
+
+				    </td>
+
+				</tr>
+
+				<tr th:each="goal : ${goals}">
+
+				    <td th:text="${goal.title}"></td>
+
+				    <td>
+				        <span class="priority-pill"
+				              th:classappend="${goal.priority == 'HIGH'} ? ' high'
+				                             : (${goal.priority == 'MEDIUM'} ? ' medium' : ' low')"
+				              th:text="${goal.priority}">
+				        </span>
+				    </td>
+
+				    <td th:text="${#temporals.format(goal.startDate,'dd/MM/yyyy')}"></td>
+
+				    <td th:text="${#temporals.format(goal.targetDate,'dd/MM/yyyy')}"></td>
+
+				    <td>
+				        <div class="progress-wrapper">
+
+				            <div class="progress-bar">
+				                <div class="progress-fill"
+				                     th:style="'width:' + ${goal.currentProgress} + '%'">
+				                </div>
+				            </div>
+
+				            <span th:text="${goal.currentProgress + '%'}"></span>
+
+				        </div>
+				    </td>
+
+				    <td>
+				        <span class="status-pill"
+				              th:text="${goal.status.replace('_',' ')}">
+				        </span>
+				    </td>
+
+				    <td>
+				        <i class="fa-solid fa-ellipsis-vertical"></i>
+				    </td>
+
+				</tr>
+			  </tbody>
+
+		    </table>
+
+		</div>
+	    <div class="charts-section">
+
+	        <!-- Goal Burn Chart -->
+
+	        <div class="chart-card">
+
+	            <div class="chart-header">
+
+	                <div class="chart-title">
+	                    Goal Burn Chart
+	                </div>
+
+	                <button class="update-btn">
+	                    Update Progress
+	                </button>
+
+	            </div>
+
+	            <div class="burn-chart-container">
+	                <canvas id="burnChart"></canvas>
+	            </div>
+
+	        </div>
+
+	        <!-- Overall Progress -->
+
+	        <div class="chart-card">
+
+	            <div class="chart-header">
+
+	                <div class="chart-title">
+	                    Overall Progress
+	                </div>
+
+	            </div>
+
+	            <div class="overall-wrapper">
+
+	                <div class="doughnut-container">
+	                    <canvas id="overallChart"></canvas>
+	                </div>
+
+	                <div class="progress-legend">
+
+	                    <div class="legend-row">
+
+	                        <div class="legend-left">
+	                            <span class="legend-dot"></span>
+	                            <span>Completed</span>
+	                        </div>
+
+	                        <span class="legend-value">0%</span>
+
+	                    </div>
+
+	                    <div class="legend-row">
+
+	                        <div class="legend-left">
+	                            <span class="legend-line"></span>
+	                            <span>Remaining</span>
+	                        </div>
+
+	                        <span class="legend-value">0%</span>
+
+	                    </div>
+
+	                </div>
+
+	            </div>
+
+	        </div>
+
+	    </div>
+
+	</div>
+	<!-- Create Goal Modal -->
+	<div class="goal-modal-overlay" id="goalModal">
+
+	    <div class="goal-modal">
+
+	        <div class="modal-header">
+	            <h2>Create New Goal</h2>
+
+	            <span class="close-modal" id="closeModal">
+	                <i class="fa-solid fa-xmark"></i>
+	            </span>
+	        </div>
+
+			<form th:action="@{/employee/my-goals/create}" method="post">
+
+			    <div class="modal-body">
+
+	            <div class="form-group">
+
+	                <label>
+	                    Goal Title <span class="required">*</span>
+	                </label>
+
+					<input type="text"
+					       id="goalTitle"
+					       name="title"
+					       placeholder="Enter Goal Title"
+					       required>
+
+	            </div>
+
+	            <div class="form-group">
+
+	                <label>
+	                    Goal Description <span class="required">*</span>
+	                </label>
+
+					<textarea id="goalDescription"
+					          name="description"
+					          rows="4"
+					          placeholder="Describe your goal details..."
+					          required></textarea>
+
+	            </div>
+				
+
+	            <div class="form-group">
+
+	                <label>
+	                    Priority <span class="required">*</span>
+	                </label>
+
+	                <div class="priority-selection">
+
+	                    <button type="button"
+	                            class="priority-option high"
+	                            data-priority="High">
+	                        High
+	                    </button>
+
+	                    <button type="button"
+	                            class="priority-option medium"
+	                            data-priority="Medium">
+	                        Medium
+	                    </button>
+
+	                    <button type="button"
+	                            class="priority-option low"
+	                            data-priority="Low">
+	                        Low
+	                    </button>
+
+	                </div>
+					<input type="hidden"
+					       name="priority"
+					       id="priorityInput"
+					       required>
+
+	            </div>
+
+	            <div class="date-row">
+
+	                <div class="form-group">
+
+	                    <label>
+	                        Start Date <span class="required">*</span>
+	                    </label>
+
+						<input type="date"
+						       id="startDate"
+						       name="startDate"
+						       required>
+
+	                </div>
+
+	                <div class="form-group">
+
+	                    <label>
+	                        End Date <span class="required">*</span>
+	                    </label>
+
+						<input type="date"
+						       id="endDate"
+						       name="targetDate"
+						       required>
+
+	                </div>
+
+	            </div>
+
+	        </div>
+
+	        <div class="modal-footer">
+
+	            <button type="button"
+	                    class="back-btn"
+	                    id="cancelGoal">
+	                Back
+	            </button>
+
+				<button type="submit"
+				        class="save-goal-btn">
+				    Create
+				</button>
+			</div>
+		</form>
+
+	       
+	  </div>
+  </div>
+  <div class="goal-modal-overlay" id="updateModal">
+
+      <div class="goal-modal">
+
+          <div class="modal-header">
+
+              <h2>Update Progress</h2>
+
+              <span class="close-modal" id="closeUpdateModal">
+                  <i class="fa-solid fa-xmark"></i>
+              </span>
+
+          </div>
+
+          <form id="updateForm"
+                method="post"
+                enctype="multipart/form-data">
+
+              <div class="modal-body">
+
+                  <div class="form-group">
+
+                      <label>Progress (%)</label>
+
+                      <input type="number"
+                             name="progressPercentage"
+                             min="0"
+                             max="100"
+                             required>
+
+                  </div>
+
+                  <div class="form-group">
+
+                      <label>Remarks</label>
+
+                      <textarea name="remarks"
+                                rows="4"></textarea>
+
+                  </div>
+
+                  <div class="form-group">
+
+                      <label>Evidence</label>
+
+                      <input type="file"
+                             name="evidence">
+                  </div>
+
+              </div>
+
+              <div class="modal-footer">
+
+                  <button type="button"
+                          class="back-btn"
+                          id="cancelUpdate">
+
+                      Back
+
+                  </button>
+
+                  <button type="submit"
+                          class="save-goal-btn">
+
+                      Save
+
+                  </button>
+
+              </div>
+
+          </form>
+
+      </div>
+
+  </div>
+
+<script>
+    /* Tabs */
+
+    const tabs = document.querySelectorAll(".tab-item");
+
+    tabs.forEach(tab => {
+
+        tab.addEventListener("click", function () {
+
+            tabs.forEach(item => {
+                item.classList.remove("active");
+            });
+
+            this.classList.add("active");
+
+        });
+
+    });
+
+
+    /* Goal Burn Chart */
+
+    new Chart(document.getElementById("burnChart"), {
+
+        type: "line",
+
+        data: {
+
+            labels: [
+                "Week 1",
+                "Week 2",
+                "Week 3",
+                "Week 4",
+                "Week 5"
+            ],
+
+            datasets: [
+
+                {
+                    label: "Planned",
+
+                    data: [0, 0, 0, 0, 0],
+
+                    borderColor: "#1f57e7",
+
+                    backgroundColor: "#1f57e7",
+
+                    borderWidth: 3,
+
+                    tension: 0.4,
+
+                    pointRadius: 5
+                },
+
+                {
+                    label: "Actual",
+
+                    data: [0, 0, 0, 0, 0],
+
+                    borderColor: "#f28c00",
+
+                    backgroundColor: "#f28c00",
+
+                    borderWidth: 3,
+
+                    tension: 0.4,
+
+                    pointRadius: 5
+                }
+
+            ]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+
+                legend: {
+                    position: "top"
+                }
+
+            },
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    max: 100,
+
+                    ticks: {
+
+                        callback: function(value) {
+                            return value + "%";
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+
+    /* Overall Progress */
+
+    new Chart(document.getElementById("overallChart"), {
+
+        type: "doughnut",
+
+        data: {
+
+            labels: [
+                "Completed",
+                "Remaining"
+            ],
+
+            datasets: [
+
+                {
+
+                    data: [0, 100],
+
+                    backgroundColor: [
+                        "#1f57e7",
+                        "#d9d9d9"
+                    ],
+
+                    borderWidth: 0
+
+                }
+
+            ]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            cutout: "75%",
+
+            plugins: {
+
+                legend: {
+                    display: false
+                }
+
+            }
+
+        }
+
+    });
+	const modal = document.getElementById("goalModal");
+
+	document.querySelector(".create-btn").addEventListener("click", () => {
+	    modal.classList.add("show");
+	});
+
+	document.getElementById("closeModal").addEventListener("click", () => {
+	    modal.classList.remove("show");
+	});
+
+	document.getElementById("cancelGoal").addEventListener("click", () => {
+	    modal.classList.remove("show");
+	});
+
+	let selectedPriority = "";
+
+	document.querySelectorAll(".priority-option").forEach(btn => {
+
+	    btn.addEventListener("click", function(){
+
+	        document.querySelectorAll(".priority-option")
+	            .forEach(b => b.classList.remove("selected"));
+
+	        this.classList.add("selected");
+
+			selectedPriority = this.dataset.priority.toUpperCase();
+
+			document.getElementById("priorityInput").value =
+			        selectedPriority;
+	    });
+
+	});
+	const updateModal =
+	        document.getElementById("updateModal");
+
+	document.querySelectorAll(".open-update-modal")
+	    .forEach(btn => {
+
+	        btn.addEventListener("click", function () {
+
+	            const goalId = this.dataset.goalid;
+
+	            document.getElementById("updateForm")
+	                    .action =
+	                    "/employee/my-goals/" + goalId + "/update"
+
+	            updateModal.classList.add("show");
+
+	        });
+
+	});
+
+	document.getElementById("closeUpdateModal")
+	    .addEventListener("click", () => {
+
+	        updateModal.classList.remove("show");
+
+	});
+
+	document.getElementById("cancelUpdate")
+	    .addEventListener("click", () => {
+
+	        updateModal.classList.remove("show");
+
+	});
+	
+</script>
+
+</body>
+
+</html>
