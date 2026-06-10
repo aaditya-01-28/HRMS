@@ -66,7 +66,7 @@ public class LeaveController {
             if (leaveRequest.getReason() == null || leaveRequest.getReason().trim().isEmpty()) {
                 return ResponseEntity.badRequest().body("Please provide a reason/comment for your leave request.");
             }
-            if (!leaveRequest.getReason().matches("^[a-zA-Z0-9\\s.,!?\\'-]+$")) {
+            if (!leaveRequest.getReason().matches("^[-a-zA-Z0-9\\s.,!?\\'\"\u2013\u2014()]+$")) {
                 return ResponseEntity.badRequest().body("Comments contain restricted special characters.");
             }
             if (leaveRequest.getFromDate() == null || leaveRequest.getToDate() == null) {
