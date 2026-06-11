@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{my-rides/layout :: layout('Book Now', 'book-rides', ~{::content})}">
+<body>
+    <div th:fragment="content">
+        <div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto;">
+            
+            <h2 id="bookingDateHeading" style="font-weight: bold; margin-bottom: 2rem;"><i class="fa-regular fa-calendar"></i> Wednesday, 10 June 2026</h2>
+            
+            <form id="bookForm" th:action="@{/my-rides/book-rides}" method="get">
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 0.5rem; font-size: 1.1rem;">Company</label>
+                    <div style="position: relative;">
+                        <i class="fa-regular fa-building" style="position: absolute; left: 15px; top: 12px; color: var(--mr-text-muted);"></i>
+                        <input type="text" value="WhiteCircle Group" readonly style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border: 1px solid var(--mr-border); border-radius: 8px; font-size: 1rem; background-color: #f8fafc; color: var(--mr-text-muted); box-sizing:border-box;">
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 0.5rem; font-size: 1.1rem;">Login Time</label>
+                    <div style="position: relative;">
+                        <i class="fa-regular fa-clock" style="position: absolute; left: 15px; top: 12px; color: var(--mr-text-muted);"></i>
+                        <input type="text" id="loginTime" value="10:00 AM" style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border: 1px solid var(--mr-border); border-radius: 8px; font-size: 1rem; box-sizing:border-box;">
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 2.5rem;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 0.5rem; font-size: 1.1rem;">Logout Time</label>
+                    <div style="position: relative;">
+                        <i class="fa-regular fa-clock" style="position: absolute; left: 15px; top: 12px; color: var(--mr-text-muted);"></i>
+                        <input type="text" id="logoutTime" value="07:00 PM" style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border: 1px solid var(--mr-border); border-radius: 8px; font-size: 1rem; box-sizing:border-box;">
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
+                    <a th:href="@{/my-rides/book-rides}" class="mr-btn" style="text-decoration: none; font-size: 1.25rem; padding: 0.75rem 3rem; background: transparent; color: var(--mr-text-main); border: 1px solid var(--mr-border);">Cancel</a>
+                    <button type="submit" class="mr-btn mr-btn-primary" style="font-size: 1.25rem; padding: 0.75rem 3rem;">Book Ride</button>
+                </div>
+            </form>
+            
+        </div>
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const dateParam = urlParams.get('date');
+                if (dateParam) {
+                    document.getElementById('bookingDateHeading').innerHTML = '<i class="fa-regular fa-calendar"></i> ' + dateParam;
+                }
+                
+                const form = document.getElementById('bookForm');
+                if(form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        
+                        const loginTime = document.getElementById('loginTime').value;
+                        const logoutTime = document.getElementById('logoutTime').value;
+                        
+                        // Extract full date
+                        const fullDateStr = dateParam || 'Wednesday, 10 June 2026';
+                        
+                        fetch('/api/my-rides/book', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                date: fullDateStr,
+                                loginTime: loginTime,
+                                logoutTime: logoutTime
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if(data.success) {
+                                window.location.href = form.getAttribute('action');
+                            } else {
+                                alert("Failed to book: " + data.message);
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            alert("An error occurred while booking.");
+                        });
+                    });
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

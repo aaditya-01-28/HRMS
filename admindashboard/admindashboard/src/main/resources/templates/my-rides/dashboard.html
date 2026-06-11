@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{my-rides/layout :: layout('My Rides Dashboard', 'dashboard', ~{::content})}">
+<body>
+    <div th:fragment="content">
+        <div class="mr-split-view" style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            
+            <!-- Left Side: Today's Ride -->
+            <div style="padding-right: 2rem;">
+                <h3 class="mr-section-title" id="dashboardTodayDate"><i class="fa-regular fa-calendar"></i> Loading...</h3>
+                
+                <div style="margin-top: 2rem; text-align: center;">
+                    <h2 style="font-size: 1.5rem; font-weight: bold;">Today's Ride</h2>
+                    <p style="color: var(--mr-text-muted);">Your default commute details</p>
+                    
+                    <div style="margin-top: 2rem; display: inline-block; text-align: left; position: relative;">
+                        <!-- Timeline line -->
+                        <div style="position: absolute; left: 9px; top: 20px; bottom: 20px; width: 2px; border-left: 2px dashed var(--mr-success);"></div>
+                        
+                        <div style="display: flex; gap: 1rem; margin-bottom: 3rem; position: relative;">
+                            <i class="fa-solid fa-circle-check" style="color: var(--mr-success); background: white; z-index: 1;"></i>
+                            <div>
+                                <div style="color: var(--mr-text-muted);">Login Time</div>
+                                <div style="font-size: 1.25rem; font-weight: bold;" id="dashLoginTime">N/A</div>
+                                <div style="color: var(--mr-text-muted); font-size: 0.85rem;"><i class="fa-solid fa-location-dot"></i> Home sector 19</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; position: relative;">
+                            <i class="fa-solid fa-location-dot" style="color: var(--mr-danger); background: white; z-index: 1;"></i>
+                            <div>
+                                <div style="color: var(--mr-text-muted);">Logout Time</div>
+                                <div style="font-size: 1.25rem; font-weight: bold;" id="dashLogoutTime">N/A</div>
+                                <div style="color: var(--mr-text-muted); font-size: 0.85rem;"><i class="fa-solid fa-location-dot"></i> WCG Office</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 3rem;">
+                        <button class="mr-btn mr-btn-primary open-map-modal">View Details</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mr-divider"></div>
+            
+            <!-- Right Side: Live Trip -->
+            <div style="padding-left: 2rem;">
+                <h3 class="mr-section-title" style="color: var(--mr-primary);">Today's Trip (Live)</h3>
+                
+                <div style="margin-top: 1rem; border: 1px solid var(--mr-border); border-radius: 8px; overflow: hidden; position: relative;">
+                    <div style="background: url('/images/map-mockup.png') center center/cover no-repeat; height: 200px; width: 100%;">
+                    </div>
+                    
+                    <!-- Floating ETA card -->
+                    <div style="position: absolute; top: 10px; right: 10px; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--mr-text-muted);">Arriving in</div>
+                        <div style="font-size: 1.5rem; font-weight: bold;">12 <span style="font-size: 0.85rem; font-weight: normal;">min</span></div>
+                        <div style="font-size: 0.75rem; color: var(--mr-text-muted);">(2.4 km away)</div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-top: 1.5rem;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-circle-check" style="color: var(--mr-success);"></i>
+                            <span style="font-weight: bold;">07:00 PM</span> <span style="color: var(--mr-text-muted);">(Logout Time)</span>
+                        </div>
+                        <div style="margin-left: 1.5rem; color: var(--mr-text-muted); font-size: 0.85rem;"><i class="fa-solid fa-location-dot"></i> WCG Office</div>
+                        
+                        <div style="border-left: 1px dashed var(--mr-success); height: 40px; margin-left: 6px;"></div>
+                        
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-location-dot" style="color: var(--mr-danger);"></i>
+                            <span style="color: var(--mr-text-muted); font-size: 0.85rem;">Home sector 19</span>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: right;">
+                        <img src="/images/cab.png" alt="Taxi" style="width: 80px; object-fit: contain; float: right; margin-bottom: 5px;">
+                        <div style="clear: both;"></div>
+                        <div style="font-size: 0.85rem; margin-top: 5px;">MP-04-UD-0007</div>
+                        
+                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 2rem;">
+                            <i class="fa-solid fa-circle-user" style="font-size: 2.5rem; color: #94a3b8;"></i>
+                            <div style="text-align: left;">
+                                <div style="font-weight: bold;">Suresh Mishra</div>
+                                <div style="color: var(--mr-text-muted); font-size: 0.85rem;">Cab Driver</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-top: 2rem; border-top: 1px solid var(--mr-border); padding-top: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-clock-rotate-left" style="color: var(--mr-primary); font-size: 1.5rem;"></i>
+                        <div>
+                            <div style="font-weight: bold;">Expected time</div>
+                            <div style="font-size: 0.9rem;">06:50 PM</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-route" style="color: var(--mr-primary); font-size: 1.5rem;"></i>
+                        <div>
+                            <div style="font-weight: bold;">Distance remaining</div>
+                            <div style="font-size: 0.9rem;">2.4 KM</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem; text-align: right;">
+                    <button class="mr-btn open-map-modal" style="width: 200px; font-weight: bold; border: 2px solid var(--mr-primary); background: transparent;">View Trip Details</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div id="mr-map-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+            <div style="background: white; border-radius: 12px; width: 500px; padding: 2rem; position: relative;">
+                <button class="close-modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                <h3 style="color: var(--mr-primary); margin-bottom: 1rem;" id="modalTodayDate">Loading...</h3>
+                <div style="background: url('/images/map-mockup.png') center center/cover no-repeat; height: 200px; width: 100%; border-radius: 8px;">
+                </div>
+                
+                <h4 style="margin-top: 1.5rem; font-weight: bold;">Driver Detail:</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-circle-user" style="font-size: 2.5rem; color: #94a3b8;"></i>
+                        <div>
+                            <div style="font-weight: bold;">Suresh Mishra</div>
+                            <div style="color: var(--mr-text-muted); font-size: 0.85rem;">Cab Driver</div>
+                        </div>
+                    </div>
+                    <div style="color: var(--mr-primary); font-weight: bold;">
+                        <i class="fa-solid fa-phone"></i> +91 989850800
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-top: 1.5rem; border-top: 1px solid var(--mr-border); padding-top: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img src="/images/cab.png" alt="Taxi" style="width: 80px; object-fit: contain;">
+                        <div>
+                            <div style="font-weight: bold;">MP-04-UD-0007</div>
+                            <div style="font-size: 0.85rem; color: var(--mr-text-muted);">Alto 800</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-clock-rotate-left" style="color: var(--mr-primary); font-size: 1.5rem;"></i>
+                        <div>
+                            <div style="font-weight: bold;">Expected time</div>
+                            <div style="font-size: 0.9rem;">06:50 PM</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
