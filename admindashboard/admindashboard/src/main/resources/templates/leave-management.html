@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -7,7 +7,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
 
     <style>
         :root {
@@ -34,14 +34,14 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ═══════════════════════ BUTTON OVERRIDES ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• BUTTON OVERRIDES â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .btn-primary { background-color: #00236F !important; border-color: #00236F !important; }
         .btn-primary:hover { background-color: #001540 !important; border-color: #001540 !important; }
         .btn-outline-primary { color: #00236F !important; border-color: #00236F !important; }
         .btn-outline-primary:hover { background-color: #00236F !important; color: white !important; }
         .text-primary { color: #00236F !important; }
 
-        /* ═══════════════════════ FIXED HEADER ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• FIXED HEADER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .top-header {
             background: white; border-bottom: 2px solid var(--bs-primary);
             padding: 18px 40px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
@@ -66,14 +66,14 @@
             background-color: #172554; transform: translateY(-2px); color: white;
         }
 
-        /* ═══════════════════════ CONTAINER ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• CONTAINER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .main-container {
             max-width: 1400px;
             margin: 30px auto 40px;
             padding: 0 20px;
         }
 
-        /* ═══════════════════════ CARDS ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• CARDS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .app-card {
             background: #f3f4f6; border: 1px solid #e5e7eb;
             border-radius: 12px; overflow: hidden; margin-bottom: 0;
@@ -94,7 +94,7 @@
         }
         .view-all-link:hover { color: white; opacity: 1; }
 
-        /* ═══════════════════════ FORM STYLES ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• FORM STYLES â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .form-label {
             font-size: 0.78rem; font-weight: 600; color: #64748b; margin-bottom: 5px;
         }
@@ -107,7 +107,7 @@
         }
         .form-control:read-only { background-color: #f8fafc; color: #475569; }
 
-        /* ═══════════════════════ UPCOMING HOLIDAYS (Custom UI) ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• UPCOMING HOLIDAYS (Custom UI) â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .holiday-wrapper {
             background: #ffffff;
             border-radius: 8px;
@@ -218,7 +218,7 @@
             color: #00236F;
         }
 
-        /* ═══════════════════════ LEAVE WALLET SUMMARY (Minimal Cards) ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• LEAVE WALLET SUMMARY (Minimal Cards) â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .wallet-grid {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 12px;
@@ -243,14 +243,14 @@
         .chip-zero { color: #dc2626; }
         .chip-auto { color: #7c3aed; font-size: 0.7rem !important; font-style: italic; }
 
-        /* ═══════════════════════ STATUS BADGES ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• STATUS BADGES â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .badge-status { padding: 5px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; }
         .status-pending { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
         .status-approved { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
         .status-rejected { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
         .status-auto-approved { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
 
-        /* ═══════════════════════ CALENDAR ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• CALENDAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .calendar-grid {
             display: grid; grid-template-columns: repeat(7, 1fr);
             gap: 4px; text-align: center;
@@ -299,7 +299,7 @@
             transform: translateX(-50%); border: 4px solid transparent; border-top-color: #1e293b;
         }
 
-        /* ═══════════════════════ ABSENCE REQUEST ITEMS ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• ABSENCE REQUEST ITEMS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .absence-item {
             display: flex; align-items: center; padding: 12px 18px;
             border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: all 0.2s ease;
@@ -312,7 +312,7 @@
             margin-right: 14px; flex-shrink: 0; font-size: 0.9rem;
         }
 
-        /* ═══════════════════════ BUTTONS ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• BUTTONS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .btn-navy {
             background: var(--bs-primary); color: white; border: none;
             padding: 10px 28px; border-radius: 10px; font-weight: 700;
@@ -327,7 +327,7 @@
         }
         .btn-navy-outline:hover { background: var(--bs-primary); color: white; transform: translateY(-2px); }
 
-        /* ═══════════════════════ BALANCE WARNING ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• BALANCE WARNING â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .balance-warning {
             background: #fef3c7; border: 1px solid #fde68a;
             border-radius: 8px; padding: 10px 14px; margin-top: 10px;
@@ -335,7 +335,7 @@
             display: none; align-items: center; gap: 8px;
         }
 
-        /* ═══════════════════════ EMPTY STATE ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• EMPTY STATE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .empty-state { text-align: center; padding: 30px 20px; color: #94a3b8; }
         .empty-state i { font-size: 2rem; margin-bottom: 10px; opacity: 0.4; }
         .empty-state p { font-size: 0.82rem; font-weight: 500; margin-bottom: 0; }
@@ -343,13 +343,13 @@
         .loading-state { text-align: center; padding: 25px 20px; }
         .loading-state .spinner-border { width: 1.5rem; height: 1.5rem; }
 
-        /* ═══════════════════════ SCROLL ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SCROLL â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .scroll-container { max-height: 350px; overflow-y: auto; }
         .scroll-container::-webkit-scrollbar { width: 4px; }
         .scroll-container::-webkit-scrollbar-track { background: #f8fafc; }
         .scroll-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* ═══════════════════════ SWEETALERT PREMIUM ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SWEETALERT PREMIUM â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         div:where(.swal2-container) {
             font-family: 'Inter', sans-serif !important;
             z-index: 99999 !important;
@@ -382,7 +382,7 @@
     <link href="/css/style.css" rel="stylesheet">
 
     <style>
-        /* ═══════════════════════ RESPONSIVE ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• RESPONSIVE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         @media (max-width: 991px) {
             html, body { padding-top: 0 !important; margin-top: 0 !important; overflow-x: hidden !important; width: 100% !important; }
             body { padding-top: 70px !important; }
@@ -407,7 +407,7 @@
             .absence-item { padding: 10px 14px !important; }
         }
 
-        /* ═══════════════════════ DARK MODE ═══════════════════════ */
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• DARK MODE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         [data-bs-theme="dark"] body { background-color: #0f172a; color: #e2e8f0; }
         [data-bs-theme="dark"] .top-header { background: #1e293b; border-bottom-color: #334155; }
         [data-bs-theme="dark"] .top-header .page-title span { color: #e2e8f0; }
@@ -440,7 +440,7 @@
 </head>
 <body>
 
-<!-- ═══════════════════════ FIXED HEADER ═══════════════════════ -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• FIXED HEADER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <header class="top-header">
     <div class="page-title">
         <i class="fas fa-calendar-check"></i>
@@ -456,7 +456,7 @@
 <div class="main-container">
 
     <div class="row g-4">
-        <!-- ═══════════════════════ LEFT COLUMN ═══════════════════════ -->
+        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• LEFT COLUMN â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
         <div class="col-lg-6 d-flex flex-column gap-4">
             
             <!-- Applicant Details -->
@@ -601,7 +601,7 @@
 
         </div>
 
-        <!-- ═══════════════════════ RIGHT COLUMN ═══════════════════════ -->
+        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• RIGHT COLUMN â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
         <div class="col-lg-6 d-flex flex-column gap-4">
             
             <!-- Leave Wallet -->
@@ -675,12 +675,12 @@
 
 </div>
 
-<!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SCRIPTS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 
-    // ═══════════════════════ GLOBAL SWAL DEFAULTS ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• GLOBAL SWAL DEFAULTS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     // Override SweetAlert defaults globally so ALL popups are properly positioned
     const _origSwalFire = Swal.fire.bind(Swal);
     Swal.fire = function(opts) {
@@ -691,7 +691,7 @@
         return _origSwalFire(opts);
     };
 
-    // ═══════════════════════ GLOBAL STATE ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• GLOBAL STATE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     let calendarMonth = new Date().getMonth();
     let calendarYear = new Date().getFullYear();
     let calendarData = { leaves: [], holidays: [] };
@@ -703,7 +703,7 @@
     const monthNames = ['January','February','March','April','May','June',
                         'July','August','September','October','November','December'];
 
-    // ═══════════════════════ HOLIDAY EMOJI/IMAGE MAPPING ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• HOLIDAY EMOJI/IMAGE MAPPING â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     function getHolidayImage(name) {
         const n = (name || '').toLowerCase();
         let src = '';
@@ -722,13 +722,13 @@
         if (src) {
             return `<img src="${src}" alt="${name}" style="max-width: 40px; max-height: 40px; object-fit: contain;">`;
         } else if (n.includes('eid')) {
-            return `<div style="font-size: 2rem;">🌙</div>`;
+            return `<div style="font-size: 2rem;">ðŸŒ™</div>`;
         } else {
             return `<i class="fas fa-calendar-day" style="color: #6366f1; font-size: 1.8rem;"></i>`;
         }
     }
 
-    // ═══════════════════════ 1. FETCH UPCOMING HOLIDAYS ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 1. FETCH UPCOMING HOLIDAYS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     async function fetchUpcomingHolidays() {
         const container = document.getElementById('upcomingHolidaysContainer');
         try {
@@ -779,7 +779,7 @@
         }
     }
 
-    // ═══════════════════════ 2. FETCH LEAVE WALLET (Minimal Chips) ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 2. FETCH LEAVE WALLET (Minimal Chips) â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     async function fetchLeaveWallet() {
         const grid = document.getElementById('walletCardsGrid');
         try {
@@ -846,7 +846,7 @@
         }
     }
 
-    // ═══════════════════════ 3. WALLET DETAILS MODAL (SweetAlert) ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 3. WALLET DETAILS MODAL (SweetAlert) â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     function showWalletDetailsModal() {
         if (!walletData || walletData.length === 0) {
             Swal.fire({ icon: 'info', title: 'No Data', text: 'No leave wallet data available.', confirmButtonColor: '#1e3a8a' });
@@ -899,7 +899,7 @@
         });
     }
 
-    // ═══════════════════════ 4. FETCH LEAVE LEDGER ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 4. FETCH LEAVE LEDGER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     async function fetchLeaveLedger() {
         const container = document.getElementById('ledgerSummaryContainer');
         try {
@@ -946,7 +946,7 @@
         }
     }
 
-    // ═══════════════════════ 5. LEDGER DETAILS MODAL (SweetAlert) ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 5. LEDGER DETAILS MODAL (SweetAlert) â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     function showLedgerModal() {
         if (!ledgerData || ledgerData.length === 0) {
             Swal.fire({ icon: 'info', title: 'No Transactions', text: 'No leave transactions found.', confirmButtonColor: '#1e3a8a' });
@@ -994,7 +994,7 @@
         });
     }
 
-    // ═══════════════════════ 6. FETCH CALENDAR DATA ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 6. FETCH CALENDAR DATA â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     async function fetchCalendarData(month, year) {
         try {
             const res = await fetch('/api/leave/calendar-data?month=' + (month + 1) + '&year=' + year);
@@ -1006,7 +1006,7 @@
         renderCalendar(month, year);
     }
 
-    // ═══════════════════════ 7. RENDER CALENDAR ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 7. RENDER CALENDAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     function renderCalendar(month, year) {
         const grid = document.getElementById('calendarDaysGrid');
         const title = document.getElementById('calendarMonthTitle');
@@ -1085,7 +1085,7 @@
         fetchCalendarData(calendarMonth, calendarYear);
     }
 
-    // ═══════════════════════ 8. CALCULATE DAYS ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 8. CALCULATE DAYS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     function calculateDays() {
         const leaveType = document.getElementById('leaveType').value;
         const startInput = document.getElementById('fromDate');
@@ -1157,7 +1157,7 @@
         }
     }
 
-    // ═══════════════════════ 9. PREVIEW (SweetAlert Popup) ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 9. PREVIEW (SweetAlert Popup) â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     function openPreviewPopup() {
         const leaveType = document.getElementById('leaveType');
         const reasonType = document.getElementById('reasonType');
@@ -1233,7 +1233,7 @@
         });
     }
 
-    // ═══════════════════════ 10. SUBMIT LEAVE REQUEST ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 10. SUBMIT LEAVE REQUEST â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     async function submitLeaveRequest() {
         const leaveType = document.getElementById('leaveType').value;
         const reasonType = document.getElementById('reasonType').value;
@@ -1333,7 +1333,7 @@
         }
     }
 
-    // ═══════════════════════ 11. FETCH ABSENCE REQUESTS ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 11. FETCH ABSENCE REQUESTS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     async function fetchAbsenceRequests() {
         const container = document.getElementById('absenceRequestsContainer');
         try {
@@ -1395,7 +1395,7 @@
         }
     }
 
-    // ═══════════════════════ 12. LEAVE DETAILS (SweetAlert) ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 12. LEAVE DETAILS (SweetAlert) â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     function showLeaveDetails(index) {
         if (!absenceData || !absenceData[index]) return;
         const leave = absenceData[index];
@@ -1438,7 +1438,7 @@
         });
     }
 
-    // ═══════════════════════ DOM CONTENT LOADED ═══════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• DOM CONTENT LOADED â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     document.addEventListener('DOMContentLoaded', () => {
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('fromDate').min = today;
@@ -1454,3 +1454,4 @@
 </script>
 </body>
 </html>
+
