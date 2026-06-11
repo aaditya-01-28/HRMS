@@ -151,6 +151,24 @@ public class DashboardController {
         return "client-dashboard";
     }
 
+    private List<Meeting> getPendingMeetingInvites(String username) {
+        User currentUser = userRepository.findByUsername(username).orElse(null);
+        List<Meeting> allPending = meetingRepository.findByMeetingDateGreaterThanEqualOrderByMeetingDateAscStartTimeAsc(LocalDate.now())
+                .stream().filter(m -> "PENDING".equals(m.getStatus()) && !m.getOrganizer().getUsername().equals(username)).toList();
+                
+        return allPending.stream().filter(meeting -> {
+            if (meeting.getSpecificEmployeeIds() != null && meeting.getSpecificEmployeeIds().contains(username)) return true;
+            EmployeeProfile myProfile = currentUser != null ? currentUser.getEmployeeProfile() : null;
+            EmployeeProfile organizerProfile = meeting.getOrganizer() != null ? meeting.getOrganizer().getEmployeeProfile() : null;
+            if ("TEAM".equals(meeting.getParticipantType()) && myProfile != null && myProfile.getBusinessUnit() != null) {
+                if (organizerProfile != null && myProfile.getBusinessUnit().equals(organizerProfile.getBusinessUnit())) {
+                    return true;
+                }
+            }
+            return false;
+        }).toList();
+    }
+
     @GetMapping("/manager/dashboard")
     public String showManagerDashboard(org.springframework.ui.Model model, java.security.Principal principal) {
         String currentUserId = principal.getName();
@@ -214,6 +232,7 @@ public class DashboardController {
 
         model.addAttribute("recentTickets", serviceRequestRepository.findTop3ByEmployeeIdOrderByIdDesc(currentUserId));
         model.addAttribute("teamRequests", unifiedRequests);
+        model.addAttribute("pendingMeetingInvites", getPendingMeetingInvites(currentUserId));
 
         return "manager-dashboard";
     }
@@ -297,6 +316,7 @@ public class DashboardController {
         java.util.List<com.example.admindashboard.model.ServiceRequest> recentTickets =
                 serviceRequestRepository.findTop3ByEmployeeIdOrderByIdDesc(currentUserId);
         model.addAttribute("recentTickets", recentTickets);
+        model.addAttribute("pendingMeetingInvites", getPendingMeetingInvites(currentUserId));
         return "employee-dashboard";
     }
 
@@ -482,8 +502,14 @@ public class DashboardController {
         List<Meeting> allUpcomingMeetings = meetingRepository
                 .findByMeetingDateGreaterThanEqualOrderByMeetingDateAscStartTimeAsc(LocalDate.now());
 
-        List<Meeting> myMeetings = allUpcomingMeetings.stream().filter(meeting -> {
-            if (meeting.getOrganizer().getUsername().equals(currentUsername)) return true;
+        List<Meeting> myBookings = allUpcomingMeetings.stream()
+                .filter(meeting -> meeting.getOrganizer().getUsername().equals(currentUsername))
+                .toList();
+
+        List<Meeting> upcomingMeetings = allUpcomingMeetings.stream().filter(meeting -> {
+            // Only show CONFIRMED meetings in the schedule
+            if (!"CONFIRMED".equals(meeting.getStatus())) return false;
+
             if (meeting.getSpecificEmployeeIds() != null && meeting.getSpecificEmployeeIds().contains(currentUsername)) return true;
 
             EmployeeProfile myProfile = currentUser != null ? currentUser.getEmployeeProfile() : null;
@@ -505,8 +531,10 @@ public class DashboardController {
             backUrl = "/admin/dashboard"; // Override for anyone with Admin access
         }
 
-        model.addAttribute("meetings", myMeetings);
+        model.addAttribute("myBookings", myBookings);
+        model.addAttribute("upcomingMeetings", upcomingMeetings);
         model.addAttribute("user", currentUser);
+        model.addAttribute("allUsers", userRepository.findAll());
         model.addAttribute("backUrl", backUrl); // Send the dynamic URL to the HTML page
 
         return "conference-room";

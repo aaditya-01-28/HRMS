@@ -21,6 +21,12 @@
             color: #334155;
         }
 
+        /* Override Bootstrap default active nav-pill color to custom #00236F */
+        .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+            background-color: #00236F !important;
+            color: #fff !important;
+        }
+
         .top-header {
             background: white;
             border-bottom: 2px solid #cbd5e1; /* Added a stronger, thicker border */
@@ -191,6 +197,42 @@
             border-radius: 10px !important; padding: 12px 30px !important;
             font-weight: 600 !important;
         }
+
+        /* TAG INPUT STYLES */
+        .tag-input-container {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            border: 1px solid #cbd5e1; border-radius: 20px;
+            padding: 8px 12px; background: #fff; min-height: 42px;
+            position: relative; cursor: text;
+        }
+        .tag-pill {
+            background: #f8fafc; border: 1px solid #e2e8f0;
+            border-radius: 20px; padding: 4px 12px;
+            display: inline-flex; align-items: center;
+            font-size: 0.85rem; color: #334155; font-weight: 500;
+        }
+        .tag-pill-close {
+            margin-left: 8px; cursor: pointer; color: #94a3b8; font-weight: bold; font-size: 1rem;
+        }
+        .tag-pill-close:hover { color: #ef4444; }
+        .tag-input {
+            border: none; outline: none; flex: 1; min-width: 140px;
+            font-size: 0.9rem; background: transparent; padding: 4px 0;
+        }
+        .autocomplete-dropdown {
+            position: absolute; top: 100%; left: 0; right: 0;
+            background: #fff; border: 1px solid #cbd5e1; border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            max-height: 250px; overflow-y: auto; z-index: 1000;
+            display: none; margin-top: 5px; padding: 5px 0;
+        }
+        .autocomplete-item {
+            padding: 10px 15px; cursor: pointer; font-size: 0.9rem;
+            border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px;
+        }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item:hover { background: #f8fafc; }
+        .autocomplete-item i { color: #3b82f6; }
 
     </style>
     <link href="/css/style.css" rel="stylesheet">
@@ -377,8 +419,12 @@
                     </div>
 
                     <div class="mb-3 d-none" id="specificEmployeeField">
-                        <label for="specificEmployeeIds" class="form-label fw-bold" id="specificInputLabel" style="font-size: 0.9rem;">Enter IDs</label>
-                        <input type="text" class="form-control rounded-pill" id="specificEmployeeIds" placeholder="Enter IDs" style="border-color: #cbd5e1; font-size: 0.9rem; padding: 10px 20px;">
+                        <label class="form-label fw-bold" id="specificInputLabel" style="font-size: 0.9rem;">Enter IDs</label>
+                        <div class="tag-input-container" id="tagInputContainer" onclick="document.getElementById('tagInputSearch').focus()">
+                            <input type="text" class="tag-input" id="tagInputSearch" placeholder="Type name or ID..." autocomplete="off">
+                            <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+                        </div>
+                        <input type="hidden" id="specificEmployeeIds" value="">
                         <small class="text-muted ms-2" id="specificEmployeeHelp" style="font-size: 0.75rem;">Separate multiple IDs with a comma</small>
                     </div>
 
@@ -399,7 +445,7 @@
                     </div>
 
                     <div class="text-center mt-4">
-                        <button type="button" class="btn btn-primary text-white fw-bold px-4 py-2 w-50" onclick="submitMeeting()" style="background-color: #2563eb; border-radius: 8px; border: none; font-size: 1rem;">
+                        <button type="button" class="btn btn-primary text-white fw-bold px-4 py-2 w-50" onclick="submitMeeting()" style="background-color: #00236F; border-radius: 8px; border: none; font-size: 1rem;">
                             Confirm Booking
                         </button>
                     </div>
@@ -409,9 +455,17 @@
 
         <div class="col-lg-7">
             <div class="bg-white p-4 border" style="border-radius: 12px; height: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <ul class="nav nav-pills mb-4" id="meetingTabs" role="tablist" style="border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold" id="upcoming-tab" data-bs-toggle="pill" data-bs-target="#upcoming" type="button" role="tab" aria-selected="true">Upcoming Schedule</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold" id="mybookings-tab" data-bs-toggle="pill" data-bs-target="#mybookings" type="button" role="tab" aria-selected="false">My Bookings</button>
+                    </li>
+                </ul>
+
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold text-dark mb-0 pb-2" style="border-bottom: 2px solid #e2e8f0; display: inline-block;">Upcoming Meeting Schedule</h5>
-                    <div class="d-flex gap-2">
+                    <div class="d-flex gap-2 ms-auto">
                         <input type="date" class="form-control rounded-pill bg-light border-0" id="filterDate" onchange="filterMeetings()" style="font-size: 0.85rem;">
                         <select class="form-select rounded-pill bg-light border-0 w-auto" id="filterMode" onchange="filterMeetings()" style="font-size: 0.85rem;">
                             <option value="All">All Meetings</option>
@@ -421,47 +475,95 @@
                     </div>
                 </div>
 
-                <div th:if="${meetings == null or meetings.isEmpty()}" class="text-center p-5 text-muted">
-                    <i class="fas fa-mug-hot fa-3x mb-3 text-light"></i>
-                    <h5>No Meetings Scheduled</h5>
-                    <p>The conference room is currently open and available.</p>
-                </div>
-
-                <div id="noFilterMatch" class="text-center p-5 text-muted d-none">
-                    <i class="fas fa-search fa-3x mb-3 text-light"></i>
-                    <h5>No Matches Found</h5>
-                    <p>No meetings match your selected date or mode filter.</p>
-                </div>
-
-                <div class="meeting-list">
-                    <div th:each="meeting : ${meetings}" class="meeting-item d-flex align-items-start mb-4 pb-4" style="border-bottom: 1px solid #f8fafc;"
-                         th:data-date="${#temporals.format(meeting.meetingDate, 'yyyy-MM-dd')}"
-                         th:data-mode="${meeting.meetingMode}">
-                        
-                        <div class="me-3 mt-1 d-flex justify-content-center align-items-center rounded border" style="width: 45px; height: 45px; border-color: #e2e8f0;">
-                            <i th:if="${meeting.meetingMode == 'Online' and meeting.platform == 'Google Meet'}" class="fas fa-video fa-fw fa-lg" style="color: #10b981;"></i>
-                            <i th:if="${meeting.meetingMode == 'Online' and meeting.platform != 'Google Meet'}" class="fas fa-users fa-fw fa-lg" style="color: #3b82f6;"></i>
-                            <i th:if="${meeting.meetingMode == 'Offline'}" class="far fa-calendar-alt fa-fw fa-lg" style="color: #3b82f6;"></i>
+                <div class="tab-content" id="meetingTabsContent">
+                    <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+                        <div th:if="${upcomingMeetings == null or upcomingMeetings.isEmpty()}" class="text-center p-5 text-muted">
+                            <i class="fas fa-mug-hot fa-3x mb-3 text-light"></i>
+                            <h5>No Meetings Scheduled</h5>
+                            <p>The conference room is currently open and available.</p>
                         </div>
 
-                        <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem;" th:text="${meeting.meetingTitle}">Meeting Title</h6>
-                                <span th:with="now=${T(java.time.LocalDateTime).now()},
-                                               meetingStart=${meeting.meetingDate.atTime(meeting.startTime)},
-                                               meetingEnd=${meeting.meetingDate.atTime(meeting.endTime)}"
-                                      th:text="${now.isAfter(meetingEnd) ? 'Completed' : (now.isAfter(meetingStart) ? 'Ongoing' : 'Upcoming')}"
-                                      th:style="${now.isAfter(meetingEnd) ? 'background-color: #f1f5f9; color: #64748b; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;' : (now.isAfter(meetingStart) ? 'background-color: #fef3c7; color: #d97706; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;' : (meeting.platform == 'Google Meet' ? 'background-color: #d1fae5; color: #059669; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;' : 'background-color: #e0e7ff; color: #4338ca; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;'))}"
-                                      class="badge rounded-pill"></span>
+                        <div id="noFilterMatchUpcoming" class="text-center p-5 text-muted d-none no-filter-match">
+                            <i class="fas fa-search fa-3x mb-3 text-light"></i>
+                            <h5>No Matches Found</h5>
+                            <p>No meetings match your selected date or mode filter.</p>
+                        </div>
+
+                        <div class="meeting-list">
+                            <div th:each="meeting : ${upcomingMeetings}" class="meeting-item d-flex align-items-start mb-4 pb-4" style="border-bottom: 1px solid #f8fafc;"
+                                 th:data-date="${#temporals.format(meeting.meetingDate, 'yyyy-MM-dd')}"
+                                 th:data-mode="${meeting.meetingMode}">
+                                
+                                <div class="me-3 mt-1 d-flex justify-content-center align-items-center rounded border" style="width: 45px; height: 45px; border-color: #e2e8f0;">
+                                    <i th:if="${meeting.meetingMode == 'Online' and meeting.platform == 'Google Meet'}" class="fas fa-video fa-fw fa-lg" style="color: #10b981;"></i>
+                                    <i th:if="${meeting.meetingMode == 'Online' and meeting.platform != 'Google Meet'}" class="fas fa-users fa-fw fa-lg" style="color: #3b82f6;"></i>
+                                    <i th:if="${meeting.meetingMode == 'Offline'}" class="far fa-calendar-alt fa-fw fa-lg" style="color: #3b82f6;"></i>
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem;" th:text="${meeting.meetingTitle}">Meeting Title</h6>
+                                        <span th:with="now=${T(java.time.LocalDateTime).now()},
+                                                       meetingStart=${meeting.meetingDate.atTime(meeting.startTime)},
+                                                       meetingEnd=${meeting.meetingDate.atTime(meeting.endTime)}"
+                                              th:text="${now.isAfter(meetingEnd) ? 'Completed' : (now.isAfter(meetingStart) ? 'Ongoing' : 'Upcoming')}"
+                                              th:style="${now.isAfter(meetingEnd) ? 'background-color: #f1f5f9; color: #64748b; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;' : (now.isAfter(meetingStart) ? 'background-color: #fef3c7; color: #d97706; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;' : 'background-color: #e0e7ff; color: #4338ca; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;')}"
+                                              class="badge rounded-pill"></span>
+                                    </div>
+                                    <div class="text-muted mb-2" style="font-size: 0.9rem; font-weight: 500;">
+                                        <span th:text="${meeting.platform}">Platform</span> • 
+                                        <span th:text="${meeting.organizer.fullName}">Name</span>
+                                    </div>
+                                    <div class="text-muted" style="font-size: 0.85rem;">
+                                        <i class="far fa-calendar-alt me-1"></i>
+                                        <span th:text="${#temporals.format(meeting.meetingDate, 'dd MMMM yyyy')}">01 June 2026</span> • 
+                                        <span th:text="${#temporals.format(meeting.startTime, 'hh:mm a')}">10:00 AM</span> - <span th:text="${#temporals.format(meeting.endTime, 'hh:mm a')}">11:00 AM</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="text-muted mb-2" style="font-size: 0.9rem; font-weight: 500;">
-                                <span th:text="${meeting.platform}">Platform</span> • 
-                                <span th:text="${meeting.organizer.fullName}">Name</span>
-                            </div>
-                            <div class="text-muted" style="font-size: 0.85rem;">
-                                <i class="far fa-calendar-alt me-1"></i>
-                                <span th:text="${#temporals.format(meeting.meetingDate, 'dd MMMM yyyy')}">01 June 2026</span> • 
-                                <span th:text="${#temporals.format(meeting.startTime, 'hh:mm a')}">10:00 AM</span> - <span th:text="${#temporals.format(meeting.endTime, 'hh:mm a')}">11:00 AM</span>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="mybookings" role="tabpanel" aria-labelledby="mybookings-tab">
+                        <div th:if="${myBookings == null or myBookings.isEmpty()}" class="text-center p-5 text-muted">
+                            <i class="fas fa-folder-open fa-3x mb-3 text-light"></i>
+                            <h5>No Bookings Found</h5>
+                            <p>You haven't booked any meetings yet.</p>
+                        </div>
+
+                        <div id="noFilterMatchMyBookings" class="text-center p-5 text-muted d-none no-filter-match">
+                            <i class="fas fa-search fa-3x mb-3 text-light"></i>
+                            <h5>No Matches Found</h5>
+                            <p>No meetings match your selected date or mode filter.</p>
+                        </div>
+
+                        <div class="meeting-list">
+                            <div th:each="meeting : ${myBookings}" class="meeting-item d-flex align-items-start mb-4 pb-4" style="border-bottom: 1px solid #f8fafc;"
+                                 th:data-date="${#temporals.format(meeting.meetingDate, 'yyyy-MM-dd')}"
+                                 th:data-mode="${meeting.meetingMode}">
+                                
+                                <div class="me-3 mt-1 d-flex justify-content-center align-items-center rounded border" style="width: 45px; height: 45px; border-color: #e2e8f0;">
+                                    <i th:if="${meeting.meetingMode == 'Online' and meeting.platform == 'Google Meet'}" class="fas fa-video fa-fw fa-lg" style="color: #10b981;"></i>
+                                    <i th:if="${meeting.meetingMode == 'Online' and meeting.platform != 'Google Meet'}" class="fas fa-users fa-fw fa-lg" style="color: #3b82f6;"></i>
+                                    <i th:if="${meeting.meetingMode == 'Offline'}" class="far fa-calendar-alt fa-fw fa-lg" style="color: #3b82f6;"></i>
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 1.1rem;" th:text="${meeting.meetingTitle}">Meeting Title</h6>
+                                        <span th:if="${meeting.status == 'PENDING'}" class="badge rounded-pill bg-warning text-dark" style="font-weight: 600; padding: 6px 14px; font-size: 0.75rem;">Pending Approval</span>
+                                        <span th:if="${meeting.status == 'CONFIRMED'}" class="badge rounded-pill bg-success text-white" style="font-weight: 600; padding: 6px 14px; font-size: 0.75rem;">Confirmed</span>
+                                    </div>
+                                    <div class="text-muted mb-2" style="font-size: 0.9rem; font-weight: 500;">
+                                        <span th:text="${meeting.platform}">Platform</span> • 
+                                        <span>Organized by You</span>
+                                    </div>
+                                    <div class="text-muted" style="font-size: 0.85rem;">
+                                        <i class="far fa-calendar-alt me-1"></i>
+                                        <span th:text="${#temporals.format(meeting.meetingDate, 'dd MMMM yyyy')}">01 June 2026</span> • 
+                                        <span th:text="${#temporals.format(meeting.startTime, 'hh:mm a')}">10:00 AM</span> - <span th:text="${#temporals.format(meeting.endTime, 'hh:mm a')}">11:00 AM</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -525,10 +627,13 @@
             }
         });
 
-        // Toggle the "No Matches Found" message
-        const noMatchMessage = document.getElementById('noFilterMatch');
+        // Toggle the "No Matches Found" message for active tab
+        const activeTabPane = document.querySelector('.tab-pane.active');
+        const noMatchMessage = activeTabPane.querySelector('.no-filter-match');
         if (noMatchMessage) {
-            if (visibleCount === 0 && meetingCards.length > 0) {
+            const listContainer = activeTabPane.querySelector('.meeting-list');
+            const totalItems = listContainer ? listContainer.children.length : 0;
+            if (visibleCount === 0 && totalItems > 0) {
                 noMatchMessage.classList.remove('d-none');
             } else {
                 noMatchMessage.classList.add('d-none');
@@ -541,22 +646,22 @@
         const specificField = document.getElementById("specificEmployeeField");
         const specificHelp = document.getElementById("specificEmployeeHelp");
         const specificLabel = document.getElementById("specificInputLabel");
-        const specificInput = document.getElementById("specificEmployeeIds");
-
         if (participantType === "SPECIFIC_EMP") {
             specificField.classList.remove("d-none");
             specificHelp.classList.remove("d-none");
             specificLabel.innerText = "Enter Employee IDs";
-            specificInput.placeholder = "Enter Employee IDs";
+            document.getElementById("tagInputSearch").placeholder = "Type Employee name or ID...";
         } else if (participantType === "SPECIFIC_ADM") {
             specificField.classList.remove("d-none");
             specificHelp.classList.remove("d-none");
             specificLabel.innerText = "Enter Admin IDs";
-            specificInput.placeholder = "Enter Admin IDs";
+            document.getElementById("tagInputSearch").placeholder = "Type Admin name or ID...";
         } else {
             specificField.classList.add("d-none");
             specificHelp.classList.add("d-none");
-            specificInput.value = "";
+            document.getElementById("specificEmployeeIds").value = "";
+            selectedTags.clear();
+            document.querySelectorAll(".tag-pill").forEach(e => e.remove());
         }
     }
 
@@ -805,6 +910,77 @@
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     });
+</script>
+<script th:inline="javascript">
+    const allEmployees = [];
+    /*[# th:each="u : ${allUsers}"]*/
+    allEmployees.push({ id: /*[[${u.username}]]*/ "", name: /*[[${u.fullName}]]*/ "" });
+    /*[/]*/
+
+    const selectedTags = new Set();
+    const tagInputSearch = document.getElementById("tagInputSearch");
+    const dropdown = document.getElementById("autocompleteDropdown");
+    const container = document.getElementById("tagInputContainer");
+    const hiddenInput = document.getElementById("specificEmployeeIds");
+
+    tagInputSearch.addEventListener("input", function() {
+        const val = this.value.toLowerCase().trim();
+        dropdown.innerHTML = "";
+        if (!val) {
+            dropdown.style.display = "none";
+            return;
+        }
+        
+        const matches = allEmployees.filter(emp => 
+            (emp.name.toLowerCase().includes(val) || emp.id.toLowerCase().includes(val)) && !selectedTags.has(emp.id)
+        );
+        
+        if (matches.length > 0) {
+            matches.forEach(emp => {
+                const div = document.createElement("div");
+                div.className = "autocomplete-item";
+                div.innerHTML = `<i class="fas fa-user-circle fa-lg me-2"></i> <div><strong>${emp.name}</strong> <br><span class="text-muted" style="font-size: 0.75rem;">${emp.id}</span></div>`;
+                div.onclick = function(e) {
+                    e.stopPropagation();
+                    addTag(emp.id, emp.name);
+                    tagInputSearch.value = "";
+                    dropdown.style.display = "none";
+                };
+                dropdown.appendChild(div);
+            });
+            dropdown.style.display = "block";
+        } else {
+            dropdown.style.display = "none";
+        }
+    });
+
+    document.addEventListener("click", function(e) {
+        if (!container.contains(e.target)) {
+            dropdown.style.display = "none";
+        }
+    });
+
+    function addTag(id, name) {
+        if (selectedTags.has(id)) return;
+        selectedTags.add(id);
+        
+        const pill = document.createElement("div");
+        pill.className = "tag-pill";
+        pill.innerHTML = `${name} <span class="tag-pill-close" onclick="removeTag('${id}', this)">&times;</span>`;
+        
+        container.insertBefore(pill, tagInputSearch);
+        updateHiddenInput();
+    }
+
+    function removeTag(id, element) {
+        selectedTags.delete(id);
+        element.parentElement.remove();
+        updateHiddenInput();
+    }
+    
+    function updateHiddenInput() {
+        hiddenInput.value = Array.from(selectedTags).join(",");
+    }
 </script>
 </body>
 </html>
