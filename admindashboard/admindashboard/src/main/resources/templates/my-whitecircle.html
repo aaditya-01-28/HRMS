@@ -213,12 +213,20 @@
             </div>
         </div>
 
-        <div class="col">
-            <div class="action-box" onclick="window.location.href='/coming-soon'">
-                <div class="icon-wrapper-flat"><i class="fa-solid fa-bullseye"></i></div>
-                <div class="box-title">Manage Goal</div>
-            </div>
-        </div>
+		<div class="col">
+		    <div class="action-box"
+		         th:onclick="|window.location.href='@{/employee/my-goals}'|">
+
+		        <div class="icon-wrapper-flat">
+		            <i class="fa-solid fa-bullseye"></i>
+		        </div>
+
+		        <div class="box-title">
+		            Manage Goal
+		        </div>
+
+		    </div>
+		</div>
 
         <div class="col">
             <div class="action-box" onclick="window.location.href='/coming-soon'">

@@ -1,5 +1,5 @@
 package com.example.admindashboard.controller;
-
+import jakarta.servlet.http.HttpSession;
 import com.example.admindashboard.model.*;
 import com.example.admindashboard.repository.*;
 import com.example.admindashboard.service.AuditLogService;
@@ -604,11 +604,13 @@ public class DashboardController {
             @RequestParam("username") String typedUsername,
             @RequestParam("password") String typedPassword,
             Model model,
-            Principal principal) {
+            Principal principal,
+            HttpSession session) {
 
         if (principal != null) {
 
             String loginId = principal.getName();
+
             User currentUser = userRepository.findByUsername(loginId)
                     .orElse(new User());
 
@@ -628,11 +630,13 @@ public class DashboardController {
 
                 return "my-whitecircle-login";
             }
+
+            // SUCCESS LOGIN
+            session.setAttribute("loggedInUser", currentUser);
         }
 
         return "redirect:/my-whitecircle";
     }
-
     @GetMapping("/coming-soon")
     public String comingSoonPage() {
         return "work-in-progress"; // Work In Progress page for static cards
