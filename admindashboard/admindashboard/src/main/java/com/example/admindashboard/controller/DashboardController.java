@@ -306,6 +306,7 @@ public class DashboardController {
         model.addAttribute("totalPending", totalPending);
         model.addAttribute("totalApproved", totalApproved);
         model.addAttribute("totalRejected", totalRejected);
+        model.addAttribute("user", currentUser);
 
         return "manager-workflow";
     }
