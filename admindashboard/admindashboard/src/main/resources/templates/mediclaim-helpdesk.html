@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Mediclaim Helpdesk</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+	<style>
+
+		  *{
+		      margin:0;
+		      padding:0;
+		      box-sizing:border-box;
+		      font-family:Arial,sans-serif !important;
+		  }
+
+		  body{
+		      background:#F3F4F6;
+		      font-size:14px;
+		      color:#111827;
+		  }
+
+		  .dashboard-wrapper{
+		      display:flex;
+		      min-height:100vh;
+		  }
+
+		  /* SIDEBAR */
+
+		  .sidebar{
+		      width:250px;
+		      background:#001A57;
+		      padding:24px 10px;
+		      flex-shrink:0;
+		  }
+
+		  .sidebar-logo{
+		      text-align:center;
+		      margin-bottom:40px;
+		  }
+
+		  .sidebar-logo img{
+		      width:50px;
+		      height:50px;
+		      object-fit:contain;
+		  }
+
+		  .sidebar-menu{
+		      display:flex;
+		      flex-direction:column;
+		      gap:12px;
+		  }
+
+		  .menu-item{
+		      display:flex;
+		      align-items:center;
+		      gap:8px;
+
+		      color:white;
+		      text-decoration:none;
+
+		      padding:10px 12px;
+
+		      border-radius:10px;
+
+		      font-size:14px;
+		  }
+
+		  .menu-item:hover,
+		  .menu-item.active{
+		      background:#2E63FF;
+		  }
+
+		  /* MAIN */
+
+		  .main-section{
+		      flex:1;
+		      padding:24px 40px;
+		  }
+
+		  /* HEADER */
+
+		  .helpdesk-header{
+		      display:flex;
+		      align-items:center;
+		      gap:12px;
+
+		      margin-bottom:40px;
+		  }
+
+		  .helpdesk-header i{
+		      font-size:28px;
+		      color:#333;
+		  }
+
+		  .helpdesk-header h1{
+		      font-size:20px;
+		      color:#0B2E7A;
+		      font-weight:700;
+		  }
+
+		  /* BODY LAYOUT */
+
+		  .helpdesk-container{
+		      display:flex;
+		      justify-content:space-between;
+		      gap:50px;
+		  }
+
+		  /* FAQ SECTION */
+
+		  .faq-section{
+		      flex:0 0 58%;
+		  }
+
+		  .faq-card{
+		      margin-bottom:25px;
+		  }
+
+		  .faq-question{
+		      width:100%;
+
+		      background:white;
+
+		      border:1px solid #8F8F8F;
+		      border-radius:12px;
+
+		      padding:22px 20px;
+
+		      display:flex;
+		      justify-content:space-between;
+		      align-items:center;
+
+		      cursor:pointer;
+
+		      font-size:14px;
+		      font-weight:700;
+
+		      text-align:left;
+		  }
+
+		  .faq-question span{
+		      font-size:14px;
+		      font-weight:700;
+		  }
+
+		  .faq-question i{
+		      font-size:24px;
+		      color:#333;
+		  }
+
+		  .faq-answer{
+		      display:none;
+
+		      background:white;
+
+		      border:1px solid #D1D5DB;
+		      border-top:none;
+
+		      padding:18px 20px;
+
+		      border-radius:0 0 12px 12px;
+
+		      line-height:1.7;
+		  }
+
+		  .faq-answer p{
+		      font-size:14px;
+		  }
+
+		  /* CONTACT SECTION */
+
+		  .contact-section{
+		      flex:0 0 32%;
+		  }
+
+		  .contact-section h2{
+		      font-size:20px;
+		      color:#0B2E7A;
+		      font-weight:700;
+
+		      margin-bottom:24px;
+		  }
+
+		  .contact-card{
+		      margin-bottom:30px;
+		  }
+
+		  .contact-name{
+		      display:flex;
+		      align-items:center;
+		      gap:10px;
+
+		      margin-bottom:16px;
+
+		      font-size:14px;
+		      font-weight:700;
+		  }
+
+		  .contact-detail{
+		      display:flex;
+		      align-items:center;
+		      gap:10px;
+
+		      margin-bottom:14px;
+
+		      font-size:14px;
+		  }
+
+		  .contact-detail i{
+		      width:18px;
+		  }
+
+		  .contact-section hr{
+		      margin:20px 0 30px 0;
+		      border:none;
+		      border-top:2px solid #BDBDBD;
+		  }
+
+		  /* COMPANY */
+
+		  .company-card{
+		      margin-top:20px;
+		  }
+
+		  .company-name{
+		      font-size:14px;
+		      font-weight:700;
+
+		      margin-bottom:12px;
+		  }
+
+		  .company-message{
+		      font-size:14px;
+
+		      margin-bottom:22px;
+
+		      color:#444;
+
+		      line-height:1.6;
+		  }
+
+		  /* RESPONSIVE */
+
+		  @media(max-width:992px){
+
+		      .helpdesk-container{
+		          flex-direction:column;
+		      }
+
+		      .faq-section,
+		      .contact-section{
+		          flex:1;
+		      }
+		  }
+
+	  </style>
+
+</head>
+
+<body>
+
+<div class="dashboard-wrapper">
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <!-- Add WhiteCircle logo later -->
+
+			<img th:src="@{/images/wcg-logo.jpg}"
+			     alt="WhiteCircle"
+			     class="sidebar-logo">
+
+        </div>
+
+        <div class="sidebar-menu">
+
+            <a href="/employee/mediclaim/portal"
+               class="menu-item">
+
+                <i class="fa-solid fa-table-columns"></i>
+
+                Dashboard
+
+            </a>
+
+            <a href="#"
+               class="menu-item">
+
+                <i class="fa-solid fa-file-shield"></i>
+
+                Coverage
+
+            </a>
+
+            <a href="/employee/mediclaim/track/list"
+               class="menu-item">
+
+                <i class="fa-solid fa-file-medical"></i>
+
+                Claims
+
+            </a>
+
+            <a href="/employee/mediclaim/helpdesk"
+               class="menu-item active">
+
+                <i class="fa-solid fa-circle-question"></i>
+
+                Help center
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- MAIN CONTENT -->
+
+    <div class="main-section">
+
+        <!-- HEADER -->
+
+        <div class="helpdesk-header">
+
+            <i class="fa-solid fa-headset"></i>
+
+            <h1>
+
+                Helpdesk
+
+            </h1>
+
+        </div>
+
+        <div class="helpdesk-container">
+
+            <!-- LEFT -->
+
+            <div class="faq-section">
+
+                <div class="faq-card">
+
+                    <button type="button"
+                            class="faq-question">
+
+							<span>
+							    FAQ Question
+							</span>
+
+                        <i class="fa-solid fa-plus"></i>
+
+                    </button>
+
+                    <div class="faq-answer">
+
+						<p>
+						    FAQ Answer
+						</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT -->
+
+            <div class="contact-section">
+
+                <h2>
+
+                    Helpdesk Contact
+
+                </h2>
+
+                <div class="contact-card">
+
+                    <div class="contact-name">
+
+                        <i class="fa-solid fa-headset"></i>
+
+                        <span>
+
+                            Name
+
+                        </span>
+
+                    </div>
+
+                    <div class="contact-detail">
+
+                        <i class="fa-solid fa-phone"></i>
+
+						<span>
+						    Phone
+						</span>
+
+                    </div>
+
+                    <div class="contact-detail">
+
+                        <i class="fa-solid fa-envelope"></i>
+
+						<span>
+						    Email
+						</span>
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <h2>
+
+                    Transport Company
+
+                </h2>
+
+                <div class="company-card">
+
+                   <div class="company-name">
+
+                        Company Name
+
+                    </div>
+
+					<div class="company-message">
+
+                        Message
+
+                    </div>
+
+                    <div class="contact-detail">
+
+                        <i class="fa-solid fa-phone"></i>
+
+                        <span>
+
+                            Phone
+
+                        </span>
+
+                    </div>
+
+                    <div class="contact-detail">
+
+                        <i class="fa-solid fa-envelope"></i>
+
+                        <span>
+
+                            Email
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+	document.addEventListener("DOMContentLoaded", function () {
+	
+	    const faqButtons = document.querySelectorAll(".faq-question");
+	
+	    faqButtons.forEach(button => {
+	
+	        button.addEventListener("click", function () {
+	
+	            const answer = this.nextElementSibling;
+	            const icon = this.querySelector("i");
+	
+	            const isOpen = answer.style.display === "block";
+	
+	            /* Close all FAQs */
+	
+	            document.querySelectorAll(".faq-answer").forEach(item => {
+	                item.style.display = "none";
+	            });
+	
+	            document.querySelectorAll(".faq-question i").forEach(item => {
+	                item.classList.remove("fa-minus");
+	                item.classList.add("fa-plus");
+	            });
+	
+	            /* Open selected FAQ */
+	
+	            if (!isOpen) {
+	
+	                answer.style.display = "block";
+	
+	                icon.classList.remove("fa-plus");
+	                icon.classList.add("fa-minus");
+	            }
+	
+	        });
+	
+	    });
+	
+	});
+
+</script>
+
+</body>
+
+</html>

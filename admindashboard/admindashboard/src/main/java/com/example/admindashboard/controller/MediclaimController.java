@@ -48,30 +48,106 @@ public class MediclaimController {
     private com.example.admindashboard.repository.HospitalRepository hospitalRepository;
 
     @GetMapping("/auth")
-    public String mediclaimAuth() { return "mediclaim-login"; }
+    public String mediclaimAuth(Model model, Principal principal) {
 
+        if (principal != null) {
+
+            String loginId = principal.getName();
+
+            User currentUser = userRepository
+                    .findByUsername(loginId)
+                    .orElse(new User());
+
+            model.addAttribute("user", currentUser);
+
+        } else {
+
+            model.addAttribute("user", new User());
+        }
+
+        return "mediclaim-login";
+    }
+    
+    @PostMapping("/login")
+    public String processMediclaimAuthentication(
+            @RequestParam("username") String typedUsername,
+            @RequestParam("password") String typedPassword,
+            Model model,
+            Principal principal) {
+
+        if (principal != null) {
+
+            String loginId = principal.getName();
+
+            User currentUser = userRepository
+                    .findByUsername(loginId)
+                    .orElse(new User());
+
+            String dbPassword = currentUser.getPassword();
+
+            String cleanDbPassword =
+                    dbPassword != null
+                            ? dbPassword.replace("{noop}", "")
+                            : "";
+
+            if (!typedUsername.equalsIgnoreCase(loginId)
+                    || !typedPassword.equals(cleanDbPassword)) {
+
+                model.addAttribute("user", currentUser);
+                model.addAttribute("authError", "Invalid credentials");
+
+                return "mediclaim-login";
+            }
+
+            return "redirect:/employee/mediclaim/portal";
+        }
+
+        return "redirect:/login";
+    }
     @GetMapping("/portal")
     public String mediclaimPortal(Principal principal, Model model) {
+
         if (principal == null) {
             return "redirect:/employee/mediclaim/auth";
         }
 
-        Optional<User> userOpt = userRepository.findByUsername(principal.getName());
+        Optional<User> userOpt =
+                userRepository.findByUsername(principal.getName());
+
         if (userOpt.isPresent()) {
+
             User user = userOpt.get();
+
             model.addAttribute("user", user);
 
-            // Fetch all claims for the user, ordered by newest first
-            List<Mediclaim> claims = mediclaimRepository.findByUserOrderBySubmissionDateDesc(user);
+            /* ADD THESE TWO BLOCKS HERE */
+
+            profileRepository.findByUser_Username(principal.getName())
+                    .ifPresent(profile ->
+                            model.addAttribute("profile", profile));
+
+            policyRepository.findByUser(user)
+                    .ifPresent(policy ->
+                            model.addAttribute("policy", policy));
+
+            /* EXISTING LOGIC */
+
+            List<Mediclaim> claims =
+                    mediclaimRepository.findByUserOrderBySubmissionDateDesc(user);
+
             model.addAttribute("claims", claims);
 
-            // Calculate how many claims are currently "Pending" for the badge
-            long pendingCount = claims.stream().filter(c -> "Pending".equals(c.getStatus())).count();
+            long pendingCount = claims.stream()
+                    .filter(c -> "Pending".equals(c.getStatus()))
+                    .count();
+
             model.addAttribute("pendingCount", pendingCount);
         }
 
         return "mediclaim-dashboard";
     }
+
+        
 
     @GetMapping("/policy")
     public String mediclaimPolicy(Principal principal, Model model) {
@@ -186,33 +262,7 @@ public class MediclaimController {
         return "mediclaim-hospitals";
     }
 
-    @PostMapping("/verify-login")
-    @ResponseBody
-    public ResponseEntity<String> verifyMediclaimLogin(@RequestBody Map<String, String> payload, Principal principal) {
-        String empId = payload.get("empId");
-        String password = payload.get("password");
-
-        if (principal == null || !principal.getName().equals(empId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Employee ID.");
-        }
-
-        Optional<User> userOpt = userRepository.findByUsername(empId);
-
-        if (userOpt.isPresent()) {
-            String dbPassword = userOpt.get().getPassword();
-
-            // Logic: Compare {noop} password manually
-            if (dbPassword != null && dbPassword.startsWith("{noop}")) {
-                String rawDbPassword = dbPassword.replace("{noop}", "");
-                if (password.equals(rawDbPassword)) {
-                    return ResponseEntity.ok("Success");
-                }
-            }
-        }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password.");
-    }
-
+    
     // 1. UPDATE THIS GET MAPPING
     @GetMapping("/dependents")
     public String mediclaimDependents(Principal principal, Model model) {
@@ -259,6 +309,12 @@ public class MediclaimController {
 
         // Refresh the page to show the newly added dependent
         return "redirect:/employee/mediclaim/dependents";
+    }
+    
+    @GetMapping("/helpdesk")
+    public String mediclaimHelpdesk() {
+
+        return "mediclaim-helpdesk";
     }
 
     // 3. ADD THIS POST MAPPING FOR CLAIM SUBMISSION

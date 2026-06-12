@@ -20,236 +20,412 @@
             --text-muted: #64748b;
         }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-color); color: var(--text-dark); padding-top: 120px; padding-bottom: 50px; }
+		*{
+		    margin:0;
+		    padding:0;
+		    box-sizing:border-box;
+		    font-family:Arial,sans-serif !important;
+		}
 
-        .med-nav { position: fixed; top: 0; left: 0; right: 0; height: 80px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05); }
+		body{
+		    background:#F3F4F6;
+		    font-size:14px;
+		    color:#111827;
+		}
 
-        .container { max-width: 1200px; }
+		.dashboard-wrapper{
+		    display:flex;
+		    min-height:100vh;
+		}
 
-        /* --- DYNAMIC GRID LAYOUT --- */
-        .claims-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            align-items: start;
-        }
-        @media (max-width: 992px) { .claims-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) { .claims-grid { grid-template-columns: 1fr; } }
+		/* SIDEBAR */
 
-        /* --- CARD STYLING & EXPANSION --- */
-        .claim-card {
-            background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.03);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            overflow: hidden; border: 1px solid transparent;
-        }
-        .claim-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(30, 136, 229, 0.08); border-color: rgba(30, 136, 229, 0.2); }
+		.sidebar{
+		    width:250px;
+		    background:#001A57;
+		    color:white;
+		    flex-shrink:0;
+		    padding:22px 10px;
+		}
 
-        .claim-summary { padding: 30px; display: block; }
+		.sidebar-logo{
+		    text-align:center;
+		    margin-bottom:40px;
+		}
 
-        /* TIGHTENED EXPANDED VIEW PADDING */
-        .claim-detail-view { display: none; padding: 20px 25px; animation: fadeIn 0.5s ease; }
+		.sidebar-logo img{
+		    width:50px;
+		    height:50px;
+		    object-fit:contain;
+		}
 
-        /* When the card is expanded */
-        .claim-card.expanded {
-            grid-column: 1 / -1; /* Spans full width */
-            transform: translateY(0);
-            border-left: 6px solid var(--med-primary);
-        }
-        .claim-card.expanded .claim-summary { display: none; }
-        .claim-card.expanded .claim-detail-view { display: block; }
+		.sidebar-menu{
+		    display:flex;
+		    flex-direction:column;
+		    gap:12px;
+		}
 
-        .close-btn {
-            cursor: pointer; font-size: 1.2rem; color: var(--text-muted);
-            transition: all 0.3s ease; width: 35px; height: 35px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; background: #f8fafc;
-        }
-        .close-btn:hover { color: white; background: var(--med-red); transform: rotate(90deg); }
+		.menu-item{
+		    display:flex;
+		    align-items:center;
+		    gap:8px;
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+		    color:white;
+		    text-decoration:none;
 
-        /* --- TIMELINE & INTERNAL PANELS (TIGHTENED) --- */
-        .inner-panel { background: #f8fafc; border-radius: 16px; padding: 20px; border: 1px solid #e2e8f0; height: 100%; }
-        .panel-title { font-weight: 800; font-size: 1.05rem; margin-bottom: 15px; color: var(--med-primary); }
+		    padding:10px 12px;
 
-        .timeline { position: relative; padding-left: 20px; }
-        .timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: #cbd5e1; }
+		    border-radius:10px;
 
-        /* REDUCED TIMELINE MARGIN */
-        .timeline-step { position: relative; margin-bottom: 20px; }
-        .timeline-step:last-child { margin-bottom: 0; }
-        .step-dot { position: absolute; left: -31px; width: 24px; height: 24px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; transition: all 0.3s ease; }
-        .step-title { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); margin-bottom: 0; }
-        .step-date { font-size: 0.75rem; color: var(--text-muted); }
+		    font-size:14px;
+		}
 
-        .step-dot.completed { background: var(--med-green); box-shadow: 0 0 10px rgba(67, 160, 71, 0.3); }
-        .step-dot.active { background: var(--med-orange); animation: pulse 2s infinite; }
-        .step-dot.rejected { background: var(--med-red); box-shadow: 0 0 10px rgba(229, 57, 53, 0.3); }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(251, 140, 0, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(251, 140, 0, 0); } }
+		.menu-item.active{
+		    background:#2E63FF;
+		}
 
-        /* TIGHTENED INFO ROWS */
-        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #cbd5e1; }
-        .info-row:last-child { border-bottom: none; }
+		.menu-item:hover{
+		    background:#2E63FF;
+		}
 
-        .doc-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 15px; background: white; transition: all 0.3s; }
-        .doc-card:hover { border-color: var(--med-primary); box-shadow: 0 5px 15px rgba(30, 136, 229, 0.08); }
+		/* MAIN */
+
+		.main-section{
+		    flex:1;
+		}
+
+		.top-header{
+		    height:90px;
+
+		    background:#F3F4F6;
+
+		    border-bottom:2px solid #cbd5e1;
+
+		    display:flex;
+		    align-items:center;
+		    justify-content:space-between;
+
+		    padding:0 30px;
+		}
+
+		.header-left{
+		    display:flex;
+		    align-items:center;
+		    gap:15px;
+		}
+
+		.header-icon{
+		    width:50px;
+		    height:50px;
+		}
+
+		.header-left h1{
+		    font-size:20px;
+		    font-weight:700;
+		    color:#0B2E7A;
+		}
+
+		.back-home-btn{
+		    background:#2E63FF;
+		    color:white;
+
+		    text-decoration:none;
+
+		    padding:14px 30px;
+
+		    border-radius:10px;
+
+		    font-size:14px;
+		    font-weight:700;
+		}
+
+		/* CONTENT */
+
+		.dashboard-content{
+		    padding:35px 28px;
+		}
+
+		.claims-header{
+		    display:flex;
+		    justify-content:space-between;
+		    align-items:center;
+
+		    margin-bottom:22px;
+		}
+
+		.claims-header h2{
+		    font-size:20px;
+		    font-weight:700;
+		}
+
+		.hospital-btn{
+		    background:#F5F5F5;
+
+		    border:none;
+
+		    padding:14px 38px;
+
+		    border-radius:12px;
+
+		    font-size:14px;
+		    font-weight:700;
+
+		    box-shadow:0 2px 10px rgba(0,0,0,0.12);
+
+		    cursor:pointer;
+		}
+
+		/* TABLE */
+
+		.claims-table{
+		    width:100%;
+		    max-width:900px;
+
+		    border-collapse:collapse;
+
+		    background:white;
+		}
+
+		.claims-table th,
+		.claims-table td{
+		    border:1px solid black;
+
+		    padding:12px 14px;
+
+		    text-align:left;
+
+		    font-size:14px;
+		}
+
+		.claims-table th{
+		    font-size:20px;
+		    color:#0B2E7A;
+		    font-weight:700;
+		}
+
+		.empty-claims{
+		    text-align:center;
+		    padding:30px !important;
+		}
+
+		/* STATUS */
+
+		.status-approved{
+		    color:#16A34A;
+		    font-weight:700;
+		}
+
+		.status-pending{
+		    color:#F59E0B;
+		    font-weight:700;
+		}
+
+		.status-rejected{
+		    color:#EF4444;
+		    font-weight:700;
+		}
+
+		
     </style>
 </head>
 <body>
 
-<nav class="med-nav">
-    <div class="fw-bold fs-4 text-primary"><i class="fas fa-shield-heart me-2"></i> WhiteCircle Health</div>
-    <a href="/employee/mediclaim/portal" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold">
-        <i class="fas fa-arrow-left me-1"></i>Back to Dashboard</a>
-</nav>
+	<div class="dashboard-wrapper">
 
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold m-0">Claim Tracking Vault</h3>
-            <p class="text-muted m-0">Monitor the live status of all your submitted claims.</p>
-        </div>
-    </div>
+	    <!-- SIDEBAR -->
 
-    <div th:if="${allClaims == null or allClaims.empty}" class="text-center mt-5 p-5 bg-white rounded-4 shadow-sm border">
-        <i class="fas fa-folder-open fa-4x text-muted opacity-50 mb-3"></i>
-        <h4 class="fw-bold text-dark">No Claims Found</h4>
-        <p class="text-muted">You have not submitted any claims yet.</p>
-    </div>
+	    <div class="sidebar">
 
-    <div class="claims-grid" th:if="${allClaims != null and !allClaims.empty}">
+	        <div class="sidebar-logo">
 
-        <div class="claim-card" th:each="claim : ${allClaims}" th:id="'claim-card-' + ${claim.id}">
+	            <!-- Add WhiteCircle Logo -->
+				<img th:src="@{/images/wcg-logo.jpg}"
+				     alt="WhiteCircle"
+				     class="sidebar-logo">
 
-            <div class="claim-summary">
-                <div class="d-flex justify-content-between align-items-start mb-3 border-bottom pb-3">
-                    <div>
-                        <h5 class="fw-bold mb-1 text-dark" th:text="'CLM-' + ${#temporals.format(claim.submissionDate, 'yyyy')} + '-' + ${#numbers.formatInteger(claim.id, 4)}">CLM-0000</h5>
-                        <span class="text-muted small fw-medium"><i class="fas fa-hospital me-1"></i> <span th:text="${claim.hospitalName}">Hospital Name</span></span>
-                    </div>
-                </div>
+	        </div>
 
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted small fw-bold text-uppercase">Claim Type</span>
-                        <span class="fw-bold text-dark" th:text="${claim.claimType}">Type</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted small fw-bold text-uppercase">Amount</span>
-                        <span class="fw-bold text-primary fs-5" th:text="'â‚¹' + ${#numbers.formatDecimal(claim.claimAmount, 0, 'COMMA', 0, 'POINT')}">â‚¹0</span>
-                    </div>
+	        <div class="sidebar-menu">
 
-                    <div class="text-center p-2 rounded-3 bg-light border">
-                        <span class="badge rounded-pill w-100 py-2 fs-6"
-                              th:classappend="${claim.status == 'Pending' ? 'bg-warning text-dark' : (claim.status == 'Rejected' ? 'bg-danger text-white' : 'bg-success text-white')}"
-                              th:text="${claim.status}">Pending
-                        </span>
-                    </div>
-                </div>
+	            <a href="/employee/mediclaim/portal"
+	               class="menu-item">
 
-                <button class="btn btn-outline-primary w-100 rounded-pill fw-bold expand-btn" th:data-id="${claim.id}">
-                    <i class="fas fa-eye me-2"></i> View Tracking Details
-                </button>
-            </div>
+	                <i class="fa-solid fa-table-columns"></i>
 
+	                Dashboard
 
-            <div class="claim-detail-view">
+	            </a>
+				<a href="/employee/mediclaim/policy"
+				   class="menu-item">
 
-                <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                    <div>
-                        <h4 class="fw-bold m-0" th:text="'Claim #CLM-' + ${#temporals.format(claim.submissionDate, 'yyyy')} + '-' + ${#numbers.formatInteger(claim.id, 4)}">Claim #CLM-0000</h4>
-                        <span class="badge mt-2 px-3 py-1 rounded-pill"
-                              th:classappend="${claim.status == 'Pending' ? 'bg-warning text-dark' : (claim.status == 'Rejected' ? 'bg-danger text-white' : 'bg-success text-white')}"
-                              th:text="${claim.status}">Status</span>
-                    </div>
-                    <div class="close-btn shrink-btn" th:data-id="${claim.id}" title="Close Details">
-                        <i class="fas fa-times"></i>
-                    </div>
-                </div>
+				    <i class="fa-solid fa-file-shield"></i>
 
-                <div class="row g-3 align-items-stretch">
+				    Coverage
 
-                    <div class="col-lg-4 col-md-12">
-                        <div class="inner-panel">
-                            <div class="panel-title"><i class="fas fa-route me-2"></i> Tracking Timeline</div>
-                            <div class="timeline">
-                                <div class="timeline-step">
-                                    <div class="step-dot completed"><i class="fas fa-check"></i></div>
-                                    <div class="step-title">Submitted</div>
-                                    <div class="step-date" th:text="${#temporals.format(claim.submissionDate, 'dd MMM yyyy, HH:mm')}">Date</div>
-                                </div>
+				</a>
 
-                                <div class="timeline-step">
-                                    <div class="step-dot" th:classappend="${claim.status == 'Pending' ? 'active' : (claim.status == 'Rejected' ? 'rejected' : 'completed')}">
-                                        <i class="fas" th:classappend="${claim.status == 'Pending' ? 'fa-hourglass-half text-white' : (claim.status == 'Rejected' ? 'fa-times' : 'fa-check')}"></i>
-                                    </div>
-                                    <div class="step-title" th:classappend="${claim.status == 'Pending' ? 'text-warning' : (claim.status == 'Rejected' ? 'text-danger' : '')}">HR Review</div>
-                                    <div class="step-date" th:if="${claim.status == 'Pending'}">Awaiting HR verification</div>
-                                </div>
+				<a href="/employee/mediclaim/track/list"
+				   class="menu-item active">
 
-                                <div class="timeline-step">
-                                    <div class="step-dot" th:classappend="${claim.status == 'Pending' or claim.status == 'Rejected' ? '' : (claim.status == 'Approved' ? 'active' : 'completed')}">
-                                        <i class="fas" th:classappend="${claim.status == 'Approved' ? 'fa-cog text-white' : (claim.status == 'Settled' ? 'fa-check' : 'fa-minus text-white')}"></i>
-                                    </div>
-                                    <div class="step-title" th:classappend="${claim.status == 'Pending' or claim.status == 'Rejected' ? 'text-muted' : (claim.status == 'Approved' ? 'text-warning' : '')}">TPA Processing</div>
-                                    <div class="step-date" th:if="${claim.status == 'Approved'}">In review with Third Party Admin</div>
-                                </div>
+				    <i class="fa-solid fa-file-medical"></i>
+				    Claims
+				</a>
 
-                                <div class="timeline-step">
-                                    <div class="step-dot" th:classappend="${claim.status == 'Settled' ? 'completed' : ''}">
-                                        <i class="fas" th:classappend="${claim.status == 'Settled' ? 'fa-check' : 'fa-minus text-white'}"></i>
-                                    </div>
-                                    <div class="step-title" th:classappend="${claim.status == 'Settled' ? '' : 'text-muted'}">Claim Approved</div>
-                                </div>
+				<a href="/employee/mediclaim/helpdesk"
+				   class="menu-item">
 
-                                <div class="timeline-step">
-                                    <div class="step-dot" th:classappend="${claim.status == 'Settled' ? 'completed' : ''}">
-                                        <i class="fas" th:classappend="${claim.status == 'Settled' ? 'fa-check' : 'fa-minus text-white'}"></i>
-                                    </div>
-                                    <div class="step-title" th:classappend="${claim.status == 'Settled' ? 'text-success' : 'text-muted'}">Paid / Settled</div>
-                                    <div class="step-date" th:if="${claim.status == 'Settled'}">Amount credited to account</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+				    <i class="fa-solid fa-circle-question"></i>
+				    Help center
+				</a>
 
-                    <div class="col-lg-4 col-md-6">
-                        <div class="inner-panel">
-                            <div class="panel-title"><i class="fas fa-file-medical-alt me-2"></i> Submission Details</div>
-                            <div class="info-row"><span class="info-label text-muted fw-bold">Hospital</span><span class="info-value fw-bold text-dark text-end" th:text="${claim.hospitalName}">Hospital Name</span></div>
-                            <div class="info-row"><span class="info-label text-muted fw-bold">Diagnosis</span><span class="info-value fw-bold text-dark text-end" th:text="${claim.diagnosis}">Diagnosis</span></div>
-                            <div class="info-row"><span class="info-label text-muted fw-bold">Type</span><span class="info-value fw-bold text-dark text-end" th:text="${claim.claimType}">Type</span></div>
-                            <div class="info-row border-0"><span class="info-label text-muted fw-bold">Requested</span><span class="info-value text-primary fw-bold fs-5 text-end" th:text="'â‚¹' + ${#numbers.formatDecimal(claim.claimAmount, 0, 'COMMA', 0, 'POINT')}">â‚¹0</span></div>
+	        </div>
 
-                            <div class="mt-3 bg-white p-2 rounded small text-muted border">
-                                <i class="fas fa-info-circle me-1 text-primary"></i> <em th:text="${claim.remarks != null and claim.remarks != '' ? claim.remarks : 'No additional remarks provided.'}">Remarks</em>
-                            </div>
-                        </div>
-                    </div>
+	    </div>
 
-                    <div class="col-lg-4 col-md-6">
-                        <div class="inner-panel">
-                            <div class="panel-title mb-3"><i class="fas fa-paperclip me-2"></i> Attached Documents</div>
-                            <div class="doc-card flex-column align-items-start text-start">
-                                <div class="d-flex w-100 align-items-center gap-3">
-                                    <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-3"><i class="fas fa-file-pdf fs-3"></i></div>
-                                    <div class="flex-grow-1">
-                                        <h6 class="m-0 fw-bold text-dark text-truncate" style="max-width: 180px;" th:text="'claim_documents_' + ${claim.id} + '.pdf'">claim_documents.pdf</h6>
-                                        <span class="text-muted small">Uploaded on <span th:text="${#temporals.format(claim.submissionDate, 'dd MMM')}">Date</span></span>
-                                    </div>
-                                </div>
-                                <button class="btn btn-outline-primary btn-sm rounded-pill fw-bold w-100 mt-2"><i class="fas fa-download me-1"></i> View Document</button>
-                            </div>
-                        </div>
-                    </div>
+	    <!-- MAIN -->
 
-                </div>
+	    <div class="main-section">
 
-            </div>
-        </div>
-    </div>
-</div>
+	        <!-- HEADER -->
 
+	        <div class="top-header">
+
+	            <div class="header-left">
+
+	                <!-- Mediclaim Icon -->
+	                <img src=""
+	                     alt="Mediclaim"
+	                     class="header-icon">
+
+	                <h1>
+
+	                    My Mediclaims
+
+	                </h1>
+
+	            </div>
+
+	            <a href="/employee/mediclaim/portal"
+	               class="back-home-btn">
+
+	                Back to Dashboard
+
+	            </a>
+
+	        </div>
+
+	        <!-- CONTENT -->
+
+	        <div class="dashboard-content">
+
+	            <div class="claims-header">
+
+	                <h2>
+
+	                    Track your submitted claims
+
+	                </h2>
+
+					<a href="/employee/mediclaim/hospitals"
+					   class="hospital-btn">
+
+					    Find Hospitals
+
+					</a>
+
+	            </div>
+
+	            <table class="claims-table">
+
+	                <thead>
+
+	                <tr>
+
+	                    <th>Claim ID</th>
+
+	                    <th>Hospital Name</th>
+
+	                    <th>Claim type</th>
+
+	                    <th>Amount</th>
+
+	                    <th>Status</th>
+
+	                </tr>
+
+	                </thead>
+
+	                <tbody>
+
+	                <tr th:each="claim : ${allClaims}">
+
+	                    <td>
+
+	                        CLM<span th:text="${claim.id}">
+
+	                        </span>
+
+	                    </td>
+
+	                    <td th:text="${claim.hospitalName}">
+
+	                        Hospital
+
+	                    </td>
+
+	                    <td th:text="${claim.claimType}">
+
+	                        Type
+
+	                    </td>
+
+	                    <td>
+
+	                        ₹ <span th:text="${claim.claimAmount}">
+
+	                        </span>
+
+	                    </td>
+
+	                    <td>
+
+	                        <span th:text="${claim.status}"
+
+	                              th:classappend="
+	                              ${claim.status == 'Approved'} ? ' status-approved' :
+	                              (${claim.status == 'Pending'} ? ' status-pending' :
+	                              ' status-rejected')">
+
+	                            Status
+
+	                        </span>
+
+	                    </td>
+
+	                </tr>
+
+	                <tr th:if="${allClaims == null or allClaims.empty}">
+
+	                    <td colspan="5"
+	                        class="empty-claims">
+
+	                        No claims submitted yet.
+
+	                    </td>
+
+	                </tr>
+
+	                </tbody>
+
+	            </table>
+
+	        </div>
+
+	    </div>
+
+	</div>
+
+	</body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
