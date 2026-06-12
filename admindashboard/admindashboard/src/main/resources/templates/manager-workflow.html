@@ -7,17 +7,19 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/dark-mode.css" rel="stylesheet">
+    <script src="/js/theme-engine.js"></script>
 
     <style>
         :root {
             --bs-primary: #1e3a8a;
             --bs-primary-dark: #172554;
-            --bg-color: #f1f5f9;
+            --bg-color: #ffffff;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: #334155;
             padding-top: 100px;
@@ -25,587 +27,578 @@
 
         /* === TOP HEADER === */
         .top-header {
-            background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-dark) 100%);
+            background: #ffffff;
             padding: 0 36px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             height: 85px;
+            border-bottom: 1px solid #e2e8f0;
         }
         .header-title {
-            color: white; font-size: 1.5rem; font-weight: 700;
+            color: var(--bs-primary); font-size: 1.5rem; font-weight: 700;
             display: flex; align-items: center; letter-spacing: -0.5px; margin: 0;
         }
-        .header-icon-wrapper {
-            background: rgba(255,255,255,0.1); padding: 8px; border-radius: 6px;
-            margin-right: 15px; display: flex; align-items: center; justify-content: center;
-            width: 40px; height: 40px;
+        .header-email {
+            color: var(--bs-primary);
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .btn-back {
-            color: white; background-color: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.4);
+            color: #1e293b; background-color: #f1f5f9; border: 1px solid #e2e8f0;
             border-radius: 8px; padding: 8px 18px; font-size: 0.9rem; font-weight: 600;
             text-decoration: none; display: inline-flex; align-items: center; transition: all 0.3s ease;
-            backdrop-filter: blur(4px);
         }
         .btn-back:hover {
-            background-color: white; color: var(--bs-primary);
-            transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background-color: #e2e8f0; color: var(--bs-primary);
         }
 
-        .main-container { max-width: 1100px; margin: 0 auto 50px; padding: 0 20px; }
-
-        /* === STAT CARDS === */
-        .stat-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
-        .stat-card {
-            background: white; border-radius: 14px; padding: 20px 24px;
-            border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            display: flex; align-items: center; gap: 16px;
-            transition: all 0.3s ease;
-        }
-        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
-        .stat-icon {
-            width: 50px; height: 50px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
-        }
-        .stat-icon.pending { background: #fff7ed; color: #ea580c; }
-        .stat-icon.approved { background: #f0fdf4; color: #16a34a; }
-        .stat-icon.rejected { background: #fef2f2; color: #dc2626; }
-        .stat-number { font-size: 1.8rem; font-weight: 800; color: #1e293b; line-height: 1; }
-        .stat-label { font-size: 0.7rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .main-container { max-width: 1200px; margin: 0 auto 50px; padding: 0 20px; }
 
         /* === TABS === */
-        .nav-pills {
-            background: white; padding: 8px; border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;
-            display: inline-flex; margin-bottom: 25px;
+        .custom-tabs {
+            display: flex;
+            gap: 30px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 20px;
         }
-        .nav-pills .nav-link {
-            color: #64748b; font-weight: 600; border-radius: 8px;
-            padding: 10px 24px; transition: all 0.3s ease; margin: 0 3px; border: none;
+        .custom-tab {
+            padding: 10px 0;
+            color: #64748b;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .nav-pills .nav-link:hover { background: #f8fafc; color: var(--bs-primary); }
-        .nav-pills .nav-link.active {
-            background-color: var(--bs-primary); color: white;
-            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2);
+        .custom-tab:hover {
+            color: var(--bs-primary);
         }
-        .badge-count {
-            background: rgba(255,255,255,0.25); color: white;
-            padding: 2px 8px; border-radius: 20px; font-size: 0.75rem; margin-left: 8px;
-        }
-        .nav-link:not(.active) .badge-count { background: #e2e8f0; color: #475569; }
-
-        /* === APPROVAL CARDS === */
-        .approval-card {
-            background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px;
-            padding: 20px 24px; margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative; overflow: hidden;
-            display: flex; gap: 16px; align-items: flex-start;
-        }
-        .approval-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 24px rgba(30, 58, 138, 0.06);
-            border-color: #cbd5e1;
+        .custom-tab.active {
+            color: var(--bs-primary);
+            border-bottom-color: var(--bs-primary);
         }
 
-        /* Color Ribbons */
-        .card-ribbon { position: absolute; left: 0; top: 0; bottom: 0; width: 5px; }
-        .ribbon-leave { background: linear-gradient(180deg, #3b82f6, #1e3a8a); }
-        .ribbon-timesheet { background: linear-gradient(180deg, #a855f7, #6b21a8); }
-        .ribbon-ticket { background: linear-gradient(180deg, #f59e0b, #b45309); }
-
-        /* Icon Avatars */
-        .icon-box {
-            width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        /* === FILTERS === */
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
-        .bg-leave { background: #eff6ff; color: #2563eb; }
-        .bg-timesheet { background: #f3e8ff; color: #7c3aed; }
-        .bg-ticket { background: #fffbeb; color: #d97706; }
-
-        .req-info { flex-grow: 1; }
-        .header-row { display: flex; justify-content: space-between; align-items: flex-start; }
-        .req-title { font-weight: 800; color: #1e293b; font-size: 1rem; margin: 0 0 2px 0; }
-        .req-employee { font-size: 0.85rem; color: #475569; font-weight: 600; margin-bottom: 2px; }
-        .req-meta { font-size: 0.72rem; color: #94a3b8; font-weight: 600; letter-spacing: 0.3px; }
-
-        /* Expand Toggle */
-        .toggle-details-btn {
-            background: none; border: none; padding: 0; margin-top: 6px;
-            font-size: 0.8rem; font-weight: 700; color: var(--bs-primary);
-            display: inline-flex; align-items: center; gap: 5px; text-decoration: none; cursor: pointer;
+        .filter-select, .filter-input {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            color: #334155;
+            outline: none;
+            background: white;
         }
-        .toggle-details-btn:hover { text-decoration: underline; color: #172554; }
-
-        .expanded-content { border-top: 1px dashed #cbd5e1; margin-top: 12px; padding-top: 12px; }
-
-        /* Details Grid */
-        .details-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px;
-            background: #f8fafc; border-radius: 8px; padding: 12px 15px; border: 1px solid #f1f5f9;
-        }
-        .detail-item { display: flex; flex-direction: column; }
-        .detail-label { font-size: 0.68rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; letter-spacing: 0.5px; }
-        .detail-value { font-size: 0.85rem; color: #1e293b; font-weight: 600; }
-
-        /* Status Badges */
-        .status-badge {
-            padding: 6px 14px; border-radius: 50px; font-size: 0.7rem; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px;
-            white-space: nowrap;
-        }
-        .badge-pending { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
-        .badge-approved { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
-        .badge-rejected { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
-
-        /* Action Buttons */
-        .action-group { display: flex; gap: 8px; margin-top: 12px; }
-        .btn-approve-action {
-            background: #16a34a; color: white; border: none; border-radius: 8px;
-            padding: 8px 20px; font-weight: 700; font-size: 0.8rem;
-            display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .btn-approve-action:hover { background: #15803d; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(22, 163, 74, 0.3); }
-
-        .btn-reject-action {
-            background: white; color: #dc2626; border: 1px solid #fecaca; border-radius: 8px;
-            padding: 8px 20px; font-weight: 700; font-size: 0.8rem;
-            display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .btn-reject-action:hover { background: #dc2626; color: white; border-color: #dc2626; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(220, 38, 38, 0.25); }
-
-        .btn-view-action {
-            background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; border-radius: 8px;
-            padding: 8px 20px; font-weight: 700; font-size: 0.8rem;
-            display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
-            transition: all 0.2s ease; text-decoration: none;
-        }
-        .btn-view-action:hover { background: var(--bs-primary); color: white; border-color: var(--bs-primary); transform: translateY(-1px); }
-
-        /* Rejection Reason */
-        .rejection-box {
-            background: #fef2f2; border-left: 3px solid #ef4444;
-            padding: 12px 15px; border-radius: 6px; margin-top: 12px;
+        .btn-filter {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 600;
+            color: #475569;
         }
 
-        /* SweetAlert Polish */
-        div:where(.swal2-container) { font-family: 'Inter', sans-serif !important; }
-        .swal2-popup { border-radius: 16px !important; padding: 2.5em 2em !important; border-top: 6px solid #1e3a8a !important; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2) !important; }
-        .swal2-title { color: #1e293b !important; font-weight: 800 !important; font-size: 1.5rem !important; }
-        .swal2-html-container { color: #475569 !important; font-weight: 500 !important; }
-        .swal2-textarea { border: 1px solid #cbd5e1 !important; border-radius: 8px !important; padding: 15px !important; font-size: 0.95rem !important; }
-        .swal2-textarea:focus { border-color: #1e3a8a !important; box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1) !important; }
-        .swal2-confirm { border-radius: 8px !important; padding: 12px 25px !important; font-weight: 700 !important; }
-        .swal2-cancel { border-radius: 8px !important; padding: 12px 25px !important; font-weight: 600 !important; background-color: #f1f5f9 !important; color: #64748b !important; }
+        /* === TABLE === */
+        .workflow-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid #cbd5e1;
+        }
+        .workflow-table th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: 600;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #cbd5e1;
+            text-align: left;
+        }
+        .workflow-table td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+        .workflow-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .emp-avatar {
+            width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 12px;
+        }
+        .emp-name {
+            font-weight: 700; color: #1e293b; margin-bottom: 2px; line-height: 1.2;
+        }
+        .emp-role {
+            font-size: 0.8rem; color: #64748b;
+        }
 
-        /* Empty State */
-        .empty-state { text-align: center; padding: 60px 20px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; }
-        .empty-state i { color: #cbd5e1; margin-bottom: 16px; }
+        /* Status & Type Pills */
+        .pill {
+            padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: white; display: inline-block;
+        }
+        .pill-red { background-color: #ef4444; }
+        .pill-green { background-color: #16a34a; }
+        .pill-orange { background-color: #f59e0b; }
+        .pill-blue { background-color: #3b82f6; }
 
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            body { padding-top: 80px; }
-            .top-header { padding: 0 16px; height: 70px; }
-            .header-title { font-size: 1.1rem; }
-            .stat-cards { grid-template-columns: 1fr; }
-            .main-container { padding: 0 15px; }
-            .approval-card { padding: 14px 16px; gap: 10px; }
-            .header-row { flex-wrap: wrap; gap: 8px; }
-            .action-group { flex-wrap: wrap; }
-            .details-grid { grid-template-columns: 1fr 1fr; }
+        /* Modal Styles */
+        .modal-header-custom {
+            display: flex; align-items: center; border-bottom: none; padding: 24px 24px 0;
+        }
+        .btn-back-circle {
+            width: 36px; height: 36px; border-radius: 50%; background: #2563eb; color: white; 
+            display: flex; align-items: center; justify-content: center; border: none; cursor: pointer;
+        }
+        .modal-title-custom {
+            flex-grow: 1; text-align: center; color: var(--bs-primary); font-weight: 700; font-size: 1.2rem; margin-right: 36px;
+        }
+        .modal-body-custom {
+            padding: 24px;
+        }
+        .detail-row {
+            display: flex; margin-bottom: 16px;
+        }
+        .detail-label-col {
+            width: 140px; color: #64748b; font-weight: 600; flex-shrink: 0;
+        }
+        .detail-val-col {
+            font-weight: 700; color: #1e293b;
+        }
+        .modal-footer-custom {
+            display: flex; justify-content: center; gap: 20px; padding: 24px; border-top: none;
+        }
+        .btn-cancel-custom {
+            border: 1px solid #1e293b; background: white; color: #1e293b; font-weight: 700; font-size: 1.1rem; padding: 10px 40px; border-radius: 6px;
+        }
+        .btn-update-custom {
+            background: #2563eb; color: white; border: none; font-weight: 700; font-size: 1.1rem; padding: 10px 30px; border-radius: 6px;
         }
     </style>
-    <link href="/css/style.css" rel="stylesheet">
-    <link href="/css/dark-mode.css" rel="stylesheet">
-    <script src="/js/theme-engine.js"></script>
 </head>
 <body>
 
 <div class="top-header">
-    <div class="header-title">
-        <div class="header-icon-wrapper">
-            <i class="fas fa-project-diagram fs-5 text-white"></i>
+    <div class="d-flex align-items-center gap-3">
+        <div class="header-title">
+            Manage Workflow
         </div>
-        Manage Workflow
     </div>
-    <a href="/default-redirect" class="btn-back">
-        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
-    </a>
+    <div class="d-flex align-items-center gap-4">
+        <div class="header-email">
+            <i class="far fa-envelope"></i> <span th:text="${user?.email ?: 'manager.headwcg@gmail.com'}">manager.headwcg@gmail.com</span>
+        </div>
+        <a th:href="@{/manager/dashboard}" class="btn-back">
+            <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+        </a>
+    </div>
 </div>
 
 <div class="main-container">
 
-    <!-- Stat Cards -->
-    <div class="stat-cards">
-        <div class="stat-card">
-            <div class="stat-icon pending"><i class="fas fa-hourglass-half"></i></div>
-            <div>
-                <div class="stat-number" th:text="${totalPending}">0</div>
-                <div class="stat-label">Pending Review</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon approved"><i class="fas fa-check-circle"></i></div>
-            <div>
-                <div class="stat-number" th:text="${totalApproved}">0</div>
-                <div class="stat-label">Approved</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon rejected"><i class="fas fa-times-circle"></i></div>
-            <div>
-                <div class="stat-number" th:text="${totalRejected}">0</div>
-                <div class="stat-label">Rejected</div>
-            </div>
-        </div>
-    </div>
-
     <!-- Tabs -->
-    <div class="d-flex justify-content-center mb-1">
-        <ul class="nav nav-pills" role="tablist">
-            <li class="nav-item">
-                <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#pending" type="button">
-                    <i class="fas fa-hourglass-half me-2"></i>Pending
-                    <span class="badge-count" th:text="${totalPending}">0</span>
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#approved" type="button">
-                    <i class="fas fa-check-circle me-2"></i>Approved
-                    <span class="badge-count" th:text="${totalApproved}">0</span>
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#rejected" type="button">
-                    <i class="fas fa-times-circle me-2"></i>Rejected
-                    <span class="badge-count" th:text="${totalRejected}">0</span>
-                </button>
-            </li>
-        </ul>
-    </div>
-
-    <div class="tab-content">
-
-        <!-- ===== PENDING TAB ===== -->
-        <div class="tab-pane fade show active" id="pending" role="tabpanel">
-
-            <!-- Pending Leaves -->
-            <div th:each="leave : ${pendingLeaves}" class="approval-card">
-                <div class="card-ribbon ribbon-leave"></div>
-                <div class="icon-box bg-leave"><i class="fas fa-umbrella-beach"></i></div>
-                <div class="req-info">
-                    <div class="header-row">
-                        <div>
-                            <h5 class="req-title" th:text="${leave.leaveType} + ' Leave Request'">Leave Request</h5>
-                            <div class="req-employee"><i class="fas fa-user me-1"></i> <span th:text="${leave.user.fullName}">Employee</span> <span class="text-muted" style="font-size: 0.75rem;" th:text="'(' + ${leave.user.username} + ')'"></span></div>
-                            <span class="req-meta"><i class="fas fa-clock me-1"></i> Submitted: <span th:text="${leave.createdAt != null ? leave.createdAt : 'N/A'}">Date</span></span>
-                            <button class="toggle-details-btn" type="button" data-bs-toggle="collapse" th:data-bs-target="'#collapseLeave' + ${leave.id}">
-                                View Details <i class="fas fa-chevron-down ms-1"></i>
-                            </button>
-                        </div>
-                        <span class="status-badge badge-pending"><i class="fas fa-circle-notch fa-spin"></i> Pending</span>
-                    </div>
-
-                    <div class="collapse" th:id="'collapseLeave' + ${leave.id}">
-                        <div class="expanded-content">
-                            <div class="mb-3" th:if="${leave.reason != null}">
-                                <span class="detail-label d-block"><i class="fas fa-align-left me-1"></i> Reason</span>
-                                <p class="mb-0 text-dark fw-medium" style="font-size: 0.9rem;" th:text="${leave.reason}">Reason...</p>
-                            </div>
-                            <div class="details-grid mb-3">
-                                <div class="detail-item">
-                                    <span class="detail-label"><i class="fas fa-tag me-1"></i> Leave Type</span>
-                                    <span class="detail-value" th:text="${leave.leaveType}">Casual</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label"><i class="fas fa-laptop-house me-1"></i> Mode</span>
-                                    <span class="detail-value" th:text="${leave.leaveMode != null ? leave.leaveMode : 'Offline'}">Offline</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label"><i class="far fa-calendar-alt me-1"></i> Date Range</span>
-                                    <span class="detail-value" th:text="${leave.fromDate} + ' to ' + ${leave.toDate}">Dates</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label"><i class="fas fa-sun me-1"></i> Total Days</span>
-                                    <span class="detail-value" th:text="${leave.totalDays} + ' Days'">3 Days</span>
-                                </div>
-                            </div>
-                            <div class="action-group">
-                                <button class="btn-approve-action" th:onclick="|approveLeave(${leave.id})|"><i class="fas fa-check"></i> Approve</button>
-                                <button class="btn-reject-action" th:onclick="|rejectLeave(${leave.id})|"><i class="fas fa-times"></i> Reject</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pending Timesheets -->
-            <div th:each="ts : ${pendingTimesheets}" class="approval-card">
-                <div class="card-ribbon ribbon-timesheet"></div>
-                <div class="icon-box bg-timesheet"><i class="fas fa-business-time"></i></div>
-                <div class="req-info">
-                    <div class="header-row">
-                        <div>
-                            <h5 class="req-title">Timesheet Submission</h5>
-                            <div class="req-employee"><i class="fas fa-user me-1"></i> <span th:text="${ts.user.fullName}">Employee</span> <span class="text-muted" style="font-size: 0.75rem;" th:text="'(' + ${ts.user.username} + ')'"></span></div>
-                            <span class="req-meta"><i class="fas fa-clock me-1"></i> Submitted: <span th:text="${ts.submissionDate != null ? ts.submissionDate : 'N/A'}">Date</span></span>
-                            <button class="toggle-details-btn" type="button" data-bs-toggle="collapse" th:data-bs-target="'#collapseTS' + ${ts.id}">
-                                View Details <i class="fas fa-chevron-down ms-1"></i>
-                            </button>
-                        </div>
-                        <span class="status-badge badge-pending"><i class="fas fa-circle-notch fa-spin"></i> Pending</span>
-                    </div>
-
-                    <div class="collapse" th:id="'collapseTS' + ${ts.id}">
-                        <div class="expanded-content">
-                            <div class="details-grid mb-3">
-                                <div class="detail-item">
-                                    <span class="detail-label"><i class="far fa-calendar-alt me-1"></i> Week</span>
-                                    <span class="detail-value" th:text="${ts.weekStartDate} + ' to ' + ${ts.weekEndDate}">Week</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label"><i class="fas fa-hourglass-half me-1"></i> Total Hours</span>
-                                    <span class="detail-value fw-bold text-primary" th:text="${ts.totalHours != null ? ts.totalHours + ' Hrs' : '0 Hrs'}">0 Hrs</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label"><i class="fas fa-calendar-check me-1"></i> Present Days</span>
-                                    <span class="detail-value text-success fw-bold" th:text="${ts.presentDays != null ? ts.presentDays : 'N/A'}">5</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label"><i class="fas fa-calendar-times me-1"></i> Absent Days</span>
-                                    <span class="detail-value text-danger fw-bold" th:text="${ts.absentDays != null ? ts.absentDays : 'N/A'}">0</span>
-                                </div>
-                            </div>
-                            <div class="action-group">
-                                <a th:href="'/admin/timesheet-approval'" class="btn-view-action"><i class="fas fa-eye"></i> Review in Portal</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pending Service Requests -->
-            <div th:each="ticket : ${pendingTickets}" class="approval-card">
-                <div class="card-ribbon ribbon-ticket"></div>
-                <div class="icon-box bg-ticket"><i class="fas fa-headset"></i></div>
-                <div class="req-info">
-                    <div class="header-row">
-                        <div>
-                            <h5 class="req-title" th:text="${ticket.type != null ? ticket.type : 'Service Request'}">Service Request</h5>
-                            <div class="req-employee"><i class="fas fa-user me-1"></i> <span th:text="${ticket.employeeName}">Employee</span> <span class="text-muted" style="font-size: 0.75rem;" th:text="'(' + ${ticket.employeeId} + ')'"></span></div>
-                            <span class="req-meta"><i class="fas fa-clock me-1"></i> Submitted: <span th:text="${ticket.submissionDate != null ? ticket.submissionDate : 'N/A'}">Date</span></span>
-                            <button class="toggle-details-btn" type="button" data-bs-toggle="collapse" th:data-bs-target="'#collapseTK' + ${ticket.id}">
-                                View Details <i class="fas fa-chevron-down ms-1"></i>
-                            </button>
-                        </div>
-                        <span class="status-badge badge-pending"><i class="fas fa-circle-notch fa-spin"></i> Open</span>
-                    </div>
-
-                    <div class="collapse" th:id="'collapseTK' + ${ticket.id}">
-                        <div class="expanded-content">
-                            <div class="details-grid mb-3">
-                                <div class="detail-item">
-                                    <span class="detail-label"><i class="fas fa-tag me-1"></i> Category</span>
-                                    <span class="detail-value" th:text="${ticket.category != null ? ticket.category : 'General'}">Category</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label"><i class="fas fa-info-circle me-1"></i> Type</span>
-                                    <span class="detail-value" th:text="${ticket.type != null ? ticket.type : 'N/A'}">Type</span>
-                                </div>
-                            </div>
-                            <div th:if="${ticket.description != null}" class="mb-3">
-                                <span class="detail-label d-block"><i class="fas fa-align-left me-1"></i> Description</span>
-                                <p class="mb-0 text-dark fw-medium" style="font-size: 0.9rem;" th:text="${ticket.description}">Description...</p>
-                            </div>
-                            <div class="action-group">
-                                <a href="/admin-helpdesk-requests" class="btn-view-action"><i class="fas fa-external-link-alt"></i> Manage in Helpdesk</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Empty State -->
-            <div th:if="${totalPending == 0}" class="empty-state">
-                <i class="fas fa-check-double fa-3x"></i>
-                <h5 class="fw-bold text-dark mt-2">You're all caught up!</h5>
-                <p class="text-muted mb-0">No pending requests require your attention.</p>
-            </div>
+    <div class="custom-tabs">
+        <div class="custom-tab active" id="tab-leave" onclick="switchTab('leave')">
+            <i class="far fa-user"></i> Leave Request <span class="badge bg-secondary ms-1" th:text="${totalPending}"></span>
         </div>
-
-        <!-- ===== APPROVED TAB ===== -->
-        <div class="tab-pane fade" id="approved" role="tabpanel">
-
-            <div th:each="leave : ${approvedLeaves}" class="approval-card">
-                <div class="card-ribbon ribbon-leave"></div>
-                <div class="icon-box bg-leave"><i class="fas fa-umbrella-beach"></i></div>
-                <div class="req-info">
-                    <div class="header-row">
-                        <div>
-                            <h5 class="req-title" th:text="${leave.leaveType} + ' Leave'">Leave</h5>
-                            <div class="req-employee"><i class="fas fa-user me-1"></i> <span th:text="${leave.user.fullName}">Employee</span></div>
-                            <span class="req-meta"><i class="far fa-calendar-alt me-1"></i> <span th:text="${leave.fromDate} + ' to ' + ${leave.toDate}">Dates</span> Â· <span th:text="${leave.totalDays} + ' Days'">Days</span></span>
-                        </div>
-                        <span class="status-badge badge-approved"><i class="fas fa-check-circle"></i> Approved</span>
-                    </div>
-                </div>
-            </div>
-
-            <div th:each="ts : ${approvedTimesheets}" class="approval-card">
-                <div class="card-ribbon ribbon-timesheet"></div>
-                <div class="icon-box bg-timesheet"><i class="fas fa-business-time"></i></div>
-                <div class="req-info">
-                    <div class="header-row">
-                        <div>
-                            <h5 class="req-title">Timesheet</h5>
-                            <div class="req-employee"><i class="fas fa-user me-1"></i> <span th:text="${ts.user.fullName}">Employee</span></div>
-                            <span class="req-meta"><i class="far fa-calendar-alt me-1"></i> Week: <span th:text="${ts.weekStartDate} + ' to ' + ${ts.weekEndDate}">Week</span> Â· <span th:text="${ts.totalHours != null ? ts.totalHours + ' Hrs' : '0 Hrs'}">Hrs</span></span>
-                        </div>
-                        <span class="status-badge badge-approved"><i class="fas fa-check-circle"></i> Approved</span>
-                    </div>
-                </div>
-            </div>
-
-            <div th:if="${totalApproved == 0}" class="empty-state">
-                <i class="fas fa-info-circle fa-3x"></i>
-                <h5 class="fw-bold text-dark mt-2">No approved requests yet.</h5>
-                <p class="text-muted mb-0">Approved team requests will appear here.</p>
-            </div>
+        <div class="custom-tab" id="tab-ticket" onclick="switchTab('ticket')">
+            <i class="fas fa-ticket-alt"></i> Log Ticket
         </div>
-
-        <!-- ===== REJECTED TAB ===== -->
-        <div class="tab-pane fade" id="rejected" role="tabpanel">
-
-            <div th:each="leave : ${rejectedLeaves}" class="approval-card">
-                <div class="card-ribbon ribbon-leave"></div>
-                <div class="icon-box bg-leave"><i class="fas fa-umbrella-beach"></i></div>
-                <div class="req-info">
-                    <div class="header-row">
-                        <div>
-                            <h5 class="req-title" th:text="${leave.leaveType} + ' Leave'">Leave</h5>
-                            <div class="req-employee"><i class="fas fa-user me-1"></i> <span th:text="${leave.user.fullName}">Employee</span></div>
-                            <span class="req-meta"><i class="far fa-calendar-alt me-1"></i> <span th:text="${leave.fromDate} + ' to ' + ${leave.toDate}">Dates</span></span>
-                        </div>
-                        <span class="status-badge badge-rejected"><i class="fas fa-times-circle"></i> Rejected</span>
-                    </div>
-                    <div th:if="${leave.managerComments != null}" class="rejection-box mt-2">
-                        <span class="fw-bold text-danger" style="font-size: 0.75rem; text-transform: uppercase;"><i class="fas fa-exclamation-triangle me-1"></i> Rejection Notes:</span>
-                        <p class="mb-0 text-dark small fw-medium mt-1" th:text="${leave.managerComments}">Reason</p>
-                    </div>
-                </div>
-            </div>
-
-            <div th:each="ts : ${rejectedTimesheets}" class="approval-card">
-                <div class="card-ribbon ribbon-timesheet"></div>
-                <div class="icon-box bg-timesheet"><i class="fas fa-business-time"></i></div>
-                <div class="req-info">
-                    <div class="header-row">
-                        <div>
-                            <h5 class="req-title">Timesheet</h5>
-                            <div class="req-employee"><i class="fas fa-user me-1"></i> <span th:text="${ts.user.fullName}">Employee</span></div>
-                            <span class="req-meta"><i class="far fa-calendar-alt me-1"></i> Week: <span th:text="${ts.weekStartDate} + ' to ' + ${ts.weekEndDate}">Week</span></span>
-                        </div>
-                        <span class="status-badge badge-rejected"><i class="fas fa-times-circle"></i> Rejected</span>
-                    </div>
-                    <div th:if="${ts.rejectionReason != null}" class="rejection-box mt-2">
-                        <span class="fw-bold text-danger" style="font-size: 0.75rem; text-transform: uppercase;"><i class="fas fa-exclamation-triangle me-1"></i> Rejection Notes:</span>
-                        <p class="mb-0 text-dark small fw-medium mt-1" th:text="${ts.rejectionReason}">Reason</p>
-                    </div>
-                </div>
-            </div>
-
-            <div th:if="${totalRejected == 0}" class="empty-state">
-                <i class="fas fa-info-circle fa-3x"></i>
-                <h5 class="fw-bold text-dark mt-2">No rejected requests.</h5>
-                <p class="text-muted mb-0">Rejected team requests will appear here.</p>
-            </div>
+        <div class="custom-tab" id="tab-timesheet" onclick="switchTab('timesheet')">
+            <i class="far fa-clock"></i> Timesheets
         </div>
     </div>
+
+    <!-- ===== LEAVE REQUEST VIEW ===== -->
+    <div id="view-leave">
+        <div class="filter-row">
+            <select class="filter-select" id="leaveTypeFilter" onchange="filterTables()">
+                <option value="All">All Leave Types</option>
+                <option value="Sick">Sick</option>
+                <option value="Casual">Casual</option>
+                <option value="Earned">Earned</option>
+            </select>
+            <select class="filter-select" id="leaveStatusFilter" onchange="filterTables()">
+                <option value="All">Status: All</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+            <input type="text" class="filter-input" id="leaveSearchInput" placeholder="Search by name..." onkeyup="filterTables()" style="width: 220px;">
+        </div>
+
+        <table class="workflow-table" id="leaveTable">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Leave Type</th>
+                    <th>Duration</th>
+                    <th>Dates</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Pending Leaves -->
+                <tr th:each="leave : ${pendingLeaves}" class="leave-row"
+                    th:data-id="${leave.id}"
+                    th:data-name="${leave.user.fullName}"
+                    th:data-role="${leave.user.employeeProfile?.designation ?: 'Employee'}"
+                    th:data-type="${leave.leaveType}"
+                    th:data-days="${leave.totalDays}"
+                    th:data-from="${leave.fromDate}"
+                    th:data-to="${leave.toDate}"
+                    th:data-reason="${leave.reason}"
+                    th:data-applied="${leave.createdAt != null ? leave.createdAt : 'N/A'}"
+                    data-status="Pending"
+                    onclick="openLeaveModal(this)">
+                    <td class="d-flex align-items-center">
+                        <img src="/images/default-avatar.png" class="emp-avatar">
+                        <div>
+                            <div class="emp-name" th:text="${leave.user.fullName}"></div>
+                            <div class="emp-role" th:text="${leave.user.employeeProfile?.designation ?: 'Employee'}"></div>
+                        </div>
+                    </td>
+                    <td class="leave-type-col"><span th:class="'pill ' + (${leave.leaveType == 'Sick'} ? 'pill-red' : 'pill-green')" th:text="${leave.leaveType}"></span></td>
+                    <td th:text="${leave.totalDays} + ' days'"></td>
+                    <td th:text="${leave.fromDate} + ' - ' + ${leave.toDate}"></td>
+                    <td th:text="${leave.reason}"></td>
+                    <td class="leave-status-col"><span class="pill pill-orange">Pending</span></td>
+                </tr>
+                <!-- Approved Leaves -->
+                <tr th:each="leave : ${approvedLeaves}" class="leave-row"
+                    th:data-id="${leave.id}"
+                    th:data-name="${leave.user.fullName}"
+                    th:data-role="${leave.user.employeeProfile?.designation ?: 'Employee'}"
+                    th:data-type="${leave.leaveType}"
+                    th:data-days="${leave.totalDays}"
+                    th:data-from="${leave.fromDate}"
+                    th:data-to="${leave.toDate}"
+                    th:data-reason="${leave.reason}"
+                    th:data-applied="${leave.createdAt != null ? leave.createdAt : 'N/A'}"
+                    data-status="Approved"
+                    onclick="openLeaveModal(this)">
+                    <td class="d-flex align-items-center">
+                        <img src="/images/default-avatar.png" class="emp-avatar">
+                        <div>
+                            <div class="emp-name" th:text="${leave.user.fullName}"></div>
+                            <div class="emp-role" th:text="${leave.user.employeeProfile?.designation ?: 'Employee'}"></div>
+                        </div>
+                    </td>
+                    <td class="leave-type-col"><span th:class="'pill ' + (${leave.leaveType == 'Sick'} ? 'pill-red' : 'pill-green')" th:text="${leave.leaveType}"></span></td>
+                    <td th:text="${leave.totalDays} + ' days'"></td>
+                    <td th:text="${leave.fromDate} + ' - ' + ${leave.toDate}"></td>
+                    <td th:text="${leave.reason}"></td>
+                    <td class="leave-status-col"><span class="pill pill-green">Approved</span></td>
+                </tr>
+                <!-- Rejected Leaves -->
+                <tr th:each="leave : ${rejectedLeaves}" class="leave-row"
+                    th:data-id="${leave.id}"
+                    th:data-name="${leave.user.fullName}"
+                    th:data-role="${leave.user.employeeProfile?.designation ?: 'Employee'}"
+                    th:data-type="${leave.leaveType}"
+                    th:data-days="${leave.totalDays}"
+                    th:data-from="${leave.fromDate}"
+                    th:data-to="${leave.toDate}"
+                    th:data-reason="${leave.reason}"
+                    th:data-applied="${leave.createdAt != null ? leave.createdAt : 'N/A'}"
+                    data-status="Rejected"
+                    onclick="openLeaveModal(this)">
+                    <td class="d-flex align-items-center">
+                        <img src="/images/default-avatar.png" class="emp-avatar">
+                        <div>
+                            <div class="emp-name" th:text="${leave.user.fullName}"></div>
+                            <div class="emp-role" th:text="${leave.user.employeeProfile?.designation ?: 'Employee'}"></div>
+                        </div>
+                    </td>
+                    <td class="leave-type-col"><span th:class="'pill ' + (${leave.leaveType == 'Sick'} ? 'pill-red' : 'pill-green')" th:text="${leave.leaveType}"></span></td>
+                    <td th:text="${leave.totalDays} + ' days'"></td>
+                    <td th:text="${leave.fromDate} + ' - ' + ${leave.toDate}"></td>
+                    <td th:text="${leave.reason}"></td>
+                    <td class="leave-status-col"><span class="pill pill-red">Rejected</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ===== LOG TICKET VIEW ===== -->
+    <div id="view-ticket" style="display:none;">
+        <div class="filter-row">
+            <select class="filter-select"><option>All Ticket Types</option></select>
+            <select class="filter-select"><option>Status: All</option></select>
+            <input type="text" class="filter-input" placeholder="Search by subject..." style="width: 220px;">
+        </div>
+
+        <table class="workflow-table">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Ticket Type</th>
+                    <th>Subject</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="ticket : ${pendingTickets}" th:onclick="|openTicketModal(${ticket.id})|">
+                    <td class="d-flex align-items-center">
+                        <img src="/images/default-avatar.png" class="emp-avatar">
+                        <div>
+                            <div class="emp-name" th:text="${ticket.employeeName}"></div>
+                            <div class="emp-role">Employee</div>
+                        </div>
+                    </td>
+                    <td th:text="${ticket.type != null ? ticket.type : 'Hardware Request'}"></td>
+                    <td th:text="${ticket.category != null ? ticket.category : 'General Request'}"></td>
+                    <td><span class="pill pill-red">High</span></td>
+                    <td><span class="pill pill-blue">In Progress</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ===== TIMESHEETS VIEW ===== -->
+    <div id="view-timesheet" style="display:none;">
+        <div class="filter-row">
+            <select class="filter-select"><option>Status: All</option></select>
+            <input type="text" class="filter-input" placeholder="Search by name..." style="width: 220px;">
+        </div>
+
+        <table class="workflow-table">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Week</th>
+                    <th>Total Hours</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="ts : ${pendingTimesheets}">
+                    <td class="d-flex align-items-center">
+                        <img src="/images/default-avatar.png" class="emp-avatar">
+                        <div>
+                            <div class="emp-name" th:text="${ts.user.fullName}"></div>
+                            <div class="emp-role" th:text="${ts.user.employeeProfile?.designation ?: 'Employee'}"></div>
+                        </div>
+                    </td>
+                    <td th:text="${ts.weekStartDate} + ' to ' + ${ts.weekEndDate}"></td>
+                    <td th:text="${ts.totalHours != null ? ts.totalHours + ' Hrs' : '0 Hrs'}"></td>
+                    <td><span class="pill pill-orange">Pending</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- Leave Details Modal -->
+<div class="modal fade" id="leaveModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content" style="border-radius: 12px; border: none;">
+      <div class="modal-header-custom">
+        <button type="button" class="btn-back-circle" data-bs-dismiss="modal"><i class="fas fa-arrow-left"></i></button>
+        <div class="modal-title-custom">Leave Request Details</div>
+      </div>
+      <div class="modal-body-custom">
+          
+          <div class="d-flex align-items-center mb-4 pb-3" style="border-bottom: 1px solid #e2e8f0;">
+              <img src="/images/default-avatar.png" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 15px;">
+              <div>
+                  <div class="emp-name" style="font-size: 1.2rem;" id="modalLeaveEmpName"></div>
+                  <div class="emp-role" id="modalLeaveEmpRole"></div>
+              </div>
+          </div>
+
+          <div class="detail-row">
+              <div class="detail-label-col">Leave Type:</div>
+              <div class="detail-val-col"><span class="pill" id="modalLeaveType"></span></div>
+          </div>
+          <div class="detail-row">
+              <div class="detail-label-col">Duration:</div>
+              <div class="detail-val-col"><span id="modalLeaveDuration"></span> days</div>
+          </div>
+          <div class="detail-row">
+              <div class="detail-label-col">Date:</div>
+              <div class="detail-val-col"><span id="modalLeaveFrom"></span> - <span id="modalLeaveTo"></span></div>
+          </div>
+          <div class="detail-row">
+              <div class="detail-label-col">Reason:</div>
+              <div class="detail-val-col" id="modalLeaveReason"></div>
+          </div>
+          <div class="detail-row">
+              <div class="detail-label-col">Applied On:</div>
+              <div class="detail-val-col" id="modalLeaveApplied"></div>
+          </div>
+
+      </div>
+      <div class="modal-footer-custom">
+        <button type="button" class="btn-cancel-custom" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn-update-custom" id="modalLeaveApproveBtn">Update Status</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ticket Details Modal -->
+<div class="modal fade" id="ticketModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content" style="border-radius: 12px; border: none;">
+      <div class="modal-header-custom">
+        <button type="button" class="btn-back-circle" data-bs-dismiss="modal"><i class="fas fa-arrow-left"></i></button>
+        <div class="modal-title-custom">Raised Ticket Details</div>
+      </div>
+      <div class="modal-body-custom">
+          
+          <div class="d-flex align-items-center mb-4 pb-3" style="border-bottom: 1px solid #e2e8f0;">
+              <img src="/images/default-avatar.png" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 15px;">
+              <div>
+                  <div class="emp-name" style="font-size: 1.2rem;" id="modalTicketEmpName">Neha Sharma</div>
+                  <div class="emp-role" id="modalTicketEmpRole">SDE-1 • Software Development Team</div>
+              </div>
+          </div>
+
+          <div class="detail-row">
+              <div class="detail-label-col">Priority:</div>
+              <div class="detail-val-col"><span class="pill pill-red">High</span></div>
+          </div>
+          <div class="detail-row">
+              <div class="detail-label-col">Ticket Type:</div>
+              <div class="detail-val-col" id="modalTicketType">Software Request</div>
+          </div>
+          <div class="detail-row">
+              <div class="detail-label-col">Subject:</div>
+              <div class="detail-val-col" id="modalTicketSubject">Request for Figma Pro Access</div>
+          </div>
+          <div class="detail-row">
+              <div class="detail-label-col">Description:</div>
+              <div class="detail-val-col" id="modalTicketDesc">Actually, to attach videos on the prototype Figma charges Pro Subscription.</div>
+          </div>
+          <div class="detail-row">
+              <div class="detail-label-col">Raised On:</div>
+              <div class="detail-val-col">06 June 2026, 10:30 AM</div>
+          </div>
+
+      </div>
+      <div class="modal-footer-custom">
+        <button type="button" class="btn-cancel-custom" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn-update-custom">Update Status</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    function switchTab(tabId) {
+        document.querySelectorAll('.custom-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
+        document.getElementById('view-leave').style.display = 'none';
+        document.getElementById('view-ticket').style.display = 'none';
+        document.getElementById('view-timesheet').style.display = 'none';
+        document.getElementById('view-' + tabId).style.display = 'block';
+    }
+
+    const leaveModal = new bootstrap.Modal(document.getElementById('leaveModal'));
+    const ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
+
+    function openLeaveModal(row) {
+        const id = row.getAttribute('data-id');
+        document.getElementById('modalLeaveEmpName').innerText = row.getAttribute('data-name');
+        document.getElementById('modalLeaveEmpRole').innerText = row.getAttribute('data-role');
+        
+        const typeSpan = document.getElementById('modalLeaveType');
+        const type = row.getAttribute('data-type');
+        typeSpan.innerText = type;
+        typeSpan.className = 'pill ' + (type === 'Sick' ? 'pill-red' : 'pill-green');
+        
+        document.getElementById('modalLeaveDuration').innerText = row.getAttribute('data-days');
+        document.getElementById('modalLeaveFrom').innerText = row.getAttribute('data-from');
+        document.getElementById('modalLeaveTo').innerText = row.getAttribute('data-to');
+        document.getElementById('modalLeaveReason').innerText = row.getAttribute('data-reason');
+        document.getElementById('modalLeaveApplied').innerText = row.getAttribute('data-applied');
+
+        const btn = document.getElementById('modalLeaveApproveBtn');
+        const status = row.getAttribute('data-status');
+        if(status === 'Pending') {
+            btn.style.display = 'inline-block';
+            btn.innerText = 'Approve Leave';
+            btn.onclick = function() {
+                leaveModal.hide();
+                approveLeave(id);
+            };
+        } else {
+            btn.style.display = 'none';
+        }
+
+        leaveModal.show();
+    }
+
+    function openTicketModal(ticketId) {
+        ticketModal.show();
+    }
+
+    // Basic Table Filter Logic
+    function filterTables() {
+        const typeFilter = document.getElementById('leaveTypeFilter').value;
+        const statusFilter = document.getElementById('leaveStatusFilter').value;
+        const searchInput = document.getElementById('leaveSearchInput').value.toLowerCase();
+        
+        const rows = document.querySelectorAll('.leave-row');
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name').toLowerCase();
+            const type = row.getAttribute('data-type');
+            const status = row.getAttribute('data-status');
+            
+            let match = true;
+            if (typeFilter !== 'All' && type !== typeFilter) match = false;
+            if (statusFilter !== 'All' && status !== statusFilter) match = false;
+            if (searchInput !== '' && !name.includes(searchInput)) match = false;
+            
+            row.style.display = match ? '' : 'none';
+        });
+    }
+
     // === LEAVE APPROVAL ===
     async function approveLeave(id) {
         const confirmResult = await Swal.fire({
             title: 'Approve Leave?',
-            html: 'This will officially grant the requested time off and notify the employee.',
+            html: 'This will officially grant the requested time off.',
             icon: 'question',
-            iconColor: '#16a34a',
             showCancelButton: true,
-            confirmButtonColor: '#16a34a',
+            confirmButtonColor: '#2563eb',
             cancelButtonText: 'Cancel',
-            confirmButtonText: '<i class="fas fa-check me-2"></i> Yes, Approve',
-            reverseButtons: true
+            confirmButtonText: 'Yes, Approve'
         });
 
         if (!confirmResult.isConfirmed) return;
 
         Swal.fire({
             title: 'Approving...',
-            text: 'Updating employee balances and schedules...',
             allowOutsideClick: false,
             didOpen: () => { Swal.showLoading(); }
         });
 
-        const startTime = Date.now();
         try {
             const response = await fetch(`/api/admin/leave/approve/${id}`, { method: 'POST' });
-            const elapsed = Date.now() - startTime;
-            if (elapsed < 1200) await new Promise(r => setTimeout(r, 1200 - elapsed));
-
             if (response.ok) {
-                await Swal.fire({ icon: 'success', title: 'Leave Approved!', text: 'The employee has been notified.', confirmButtonColor: '#1e3a8a', timer: 2000, showConfirmButton: false });
+                await Swal.fire({ icon: 'success', title: 'Leave Approved!', timer: 1500, showConfirmButton: false });
                 window.location.reload();
             } else { throw new Error(await response.text()); }
         } catch (error) {
-            Swal.fire({ icon: 'error', title: 'Approval Failed', text: error.message, confirmButtonColor: '#1e3a8a' });
-        }
-    }
-
-    // === LEAVE REJECTION ===
-    async function rejectLeave(id) {
-        const { value: adminNote, isConfirmed } = await Swal.fire({
-            title: 'Reject Leave Request',
-            input: 'textarea',
-            inputLabel: 'Reason for Rejection (Required)',
-            inputPlaceholder: 'Enter reason for rejection...',
-            icon: 'warning',
-            iconColor: '#dc2626',
-            showCancelButton: true,
-            confirmButtonColor: '#dc2626',
-            cancelButtonText: 'Cancel',
-            confirmButtonText: '<i class="fas fa-times me-2"></i> Reject Request',
-            reverseButtons: true,
-            inputValidator: (value) => { if (!value.trim()) return 'You must provide a reason!'; }
-        });
-
-        if (!isConfirmed) return;
-
-        Swal.fire({
-            title: 'Rejecting...',
-            text: 'Logging decision and notifying employee...',
-            allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
-        });
-
-        const startTime = Date.now();
-        try {
-            const url = `/api/admin/leave/reject/${id}?note=${encodeURIComponent(adminNote)}`;
-            const response = await fetch(url, { method: 'POST' });
-            const elapsed = Date.now() - startTime;
-            if (elapsed < 1200) await new Promise(r => setTimeout(r, 1200 - elapsed));
-
-            if (response.ok) {
-                await Swal.fire({ icon: 'success', title: 'Request Rejected', text: 'The employee has been notified.', confirmButtonColor: '#1e3a8a', timer: 2000, showConfirmButton: false });
-                window.location.reload();
-            } else { throw new Error(await response.text()); }
-        } catch (error) {
-            Swal.fire({ icon: 'error', title: 'Rejection Failed', text: error.message, confirmButtonColor: '#1e3a8a' });
+            Swal.fire({ icon: 'error', title: 'Approval Failed', text: error.message });
         }
     }
 </script>
