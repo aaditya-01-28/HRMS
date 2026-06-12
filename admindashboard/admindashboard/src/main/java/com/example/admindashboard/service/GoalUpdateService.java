@@ -30,7 +30,7 @@ public class GoalUpdateService {
 
         if(goalUpdate.getProgressPercentage() >= 100){
 
-            goal.setStatus("PENDING_REVIEW");
+            goal.setStatus("COMPLETED");
 
         }else{
 
@@ -46,6 +46,11 @@ public class GoalUpdateService {
 
         return goalUpdateRepository
                 .findByGoalOrderBySubmittedAtDesc(goal);
+    }
+    public List<GoalUpdate> getGoalHistoryAsc(Goal goal){
+
+        return goalUpdateRepository
+                .findByGoalOrderBySubmittedAtAsc(goal);
     }
 
 }

@@ -8,7 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
+import com.example.admindashboard.service.GoalUpdateService;
+import com.example.admindashboard.service.GoalBurnChartService;
 import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
@@ -19,10 +20,17 @@ public class GoalController {
 
     @Autowired
     private GoalService goalService;
+    
+    @Autowired
+    private GoalUpdateService goalUpdateService;
+    
+    @Autowired
+    private GoalBurnChartService goalBurnChartService;
 
     @GetMapping
     public String myGoals(Model model,
                           HttpSession session) {
+    	
 
         User user = (User) session.getAttribute("loggedInUser");
         
@@ -35,6 +43,13 @@ public class GoalController {
         }
 
         List<Goal> goals = goalService.getActiveGoalsByUser(user);
+        
+        int overallProgress =
+                goalService.calculateOverallProgress(goals);
+
+        model.addAttribute(
+                "overallProgress",
+                overallProgress);
 
         model.addAttribute("goals", goals);
 
@@ -55,6 +70,30 @@ public class GoalController {
                 goals.stream()
                         .filter(g -> "COMPLETED".equals(g.getStatus()))
                         .count());
+        Goal selectedGoal =
+                goals.isEmpty()
+                        ? null
+                        : goals.get(0);
+
+        model.addAttribute(
+                "selectedGoal",
+                selectedGoal);
+
+        model.addAttribute(
+                "goalUpdates",
+                selectedGoal == null
+                        ? List.of()
+                        : goalUpdateService.getGoalHistoryAsc(
+                                selectedGoal));
+        model.addAttribute(
+                "completedCount",
+                goals.stream()
+                        .filter(g -> "COMPLETED".equals(g.getStatus()))
+                        .count());
+        model.addAttribute(
+                "burnChart",
+                goalBurnChartService.generateBurnChart(goals));
+        
 
         return "my-goals";
     }
