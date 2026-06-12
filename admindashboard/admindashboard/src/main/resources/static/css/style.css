@@ -1,21 +1,17 @@
 /* =========================================
    1. GLOBAL & TYPOGRAPHY
    ========================================= */
-body {
+body, p, span, a, div, td, th, li, label, input, textarea, button, select, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     font-family: Arial, sans-serif !important;
-    font-size: 12px !important;
+}
+
+body {
     background-color: #f0f2f5; /* Modern, soft gray-blue background */
     color: #344767; /* Softer text color */
 }
 
-h1, h2, h3 {
-    font-size: 16px !important;
-    font-family: Arial, sans-serif !important;
-}
-
-h4, h5, h6, .sub-heading {
-    font-size: 14px !important;
-    font-family: Arial, sans-serif !important;
+i, .fas, .far, .fab, .fa, .fa-solid, .fa-regular {
+    font-family: "Font Awesome 6 Free", "FontAwesome" !important;
 }
 
 /* =========================================
