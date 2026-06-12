@@ -62,4 +62,18 @@ public class GoalService {
 
         goalRepository.save(goal);
     }
+    public int calculateOverallProgress(List<Goal> goals) {
+
+        if (goals == null || goals.isEmpty()) {
+            return 0;
+        }
+
+        return (int) Math.round(
+                goals.stream()
+                        .mapToInt(goal -> goal.getCurrentProgress())
+                        .average()
+                        .orElse(0)
+        );
+    }
+    
 }

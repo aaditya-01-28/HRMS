@@ -137,13 +137,44 @@ public class AttendanceController {
     public ResponseEntity<?> submitCurrentWeek(
             Principal principal) {
 
-        attendanceService.submitCurrentWeekAttendance(
-                principal.getName()
-        );
+        try {
 
-        return ResponseEntity.ok("Submitted");
+            attendanceService.submitCurrentWeekAttendance(
+                    principal.getName()
+            );
+
+            return ResponseEntity.ok("Submitted");
+
+        } catch (RuntimeException ex) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(ex.getMessage());
+        }
     }
+    
+    @PostMapping("/save-current-week-draft")
+    public ResponseEntity<?> saveCurrentWeekDraft(
+            Principal principal) {
 
+        try {
+
+            attendanceService.saveCurrentWeekDraft(
+                    principal.getName()
+            );
+
+            return ResponseEntity.ok(
+                    "Draft Saved"
+            );
+
+        } catch (RuntimeException ex) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(ex.getMessage());
+        }
+    }
+    
     @PostMapping("/discard-current-week")
     public ResponseEntity<?> discardCurrentWeek(
             Principal principal) {

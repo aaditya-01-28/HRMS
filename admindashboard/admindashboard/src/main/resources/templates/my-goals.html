@@ -271,6 +271,7 @@
 
 		.progress-wrapper {
 		    display: flex;
+			justify-content:center;
 		    align-items: center;
 		    gap: 8px;
 		}
@@ -298,7 +299,7 @@
 
 		.status-pill {
 		    padding: 5px 20px;
-		    border-radius: 20px;
+		    
 		    font-size: 13px;
 		    font-weight: 600;
 		}
@@ -667,7 +668,7 @@
 	                min-width:100%;
 	            }
 	        }
-
+			
 	       
 	    </style>
 
@@ -833,29 +834,37 @@
 
 				    <td th:text="${#temporals.format(goal.targetDate,'dd/MM/yyyy')}"></td>
 
+					<td>
+
+					    <div class="progress-wrapper">
+
+					        <div class="progress-bar">
+
+					            <div class="progress-fill"
+					                 th:style="'width:' + ${goal.currentProgress} + '%'">
+					            </div>
+
+					        </div>
+
+					        <span class="progress-text"
+					              th:text="${goal.currentProgress + '%'}">
+					        </span>
+
+					    </div>
+
+					</td>
 				    <td>
-				        <div class="progress-wrapper">
-
-				            <div class="progress-bar">
-				                <div class="progress-fill"
-				                     th:style="'width:' + ${goal.currentProgress} + '%'">
-				                </div>
-				            </div>
-
-				            <span th:text="${goal.currentProgress + '%'}"></span>
-
-				        </div>
+						<span class="status-pill"
+						      th:classappend="${goal.status == 'ON_TRACK'} ? ' on-track'
+						                     : (${goal.status == 'AT_RISK'} ? ' at-risk'
+						                     : ' completed')"
+						      th:text="${goal.status.replace('_',' ')}">
+						</span>
 				    </td>
 
-				    <td>
-				        <span class="status-pill"
-				              th:text="${goal.status.replace('_',' ')}">
-				        </span>
-				    </td>
+					<td>  
 
-				    <td>
-				        <i class="fa-solid fa-ellipsis-vertical"></i>
-				    </td>
+					</td>
 
 				</tr>
 			  </tbody>
@@ -869,17 +878,20 @@
 
 	        <div class="chart-card">
 
-	            <div class="chart-header">
+				<div class="chart-header">
 
-	                <div class="chart-title">
-	                    Goal Burn Chart
-	                </div>
+					<div class="chart-title">
+					    Goal Burn Chart
+					</div>
 
-	                <button class="update-btn">
-	                    Update Progress
-	                </button>
+					<button class="update-btn"
+					        id="burnChartUpdateBtn">
 
-	            </div>
+					    Update Progress
+
+					</button>
+
+				</div>
 
 	            <div class="burn-chart-container">
 	                <canvas id="burnChart"></canvas>
@@ -893,9 +905,16 @@
 
 	            <div class="chart-header">
 
-	                <div class="chart-title">
-	                    Overall Progress
-	                </div>
+					<div class="chart-title">
+					    Overall Progress
+					</div>
+
+					<button class="update-btn"
+					        id="overallChartUpdateBtn">
+
+					    Update Progress
+
+					</button>
 
 	            </div>
 
@@ -914,7 +933,9 @@
 	                            <span>Completed</span>
 	                        </div>
 
-	                        <span class="legend-value">0%</span>
+							<span class="legend-value"
+							      th:text="${overallProgress + '%'}">
+							</span>
 
 	                    </div>
 
@@ -925,7 +946,9 @@
 	                            <span>Remaining</span>
 	                        </div>
 
-	                        <span class="legend-value">0%</span>
+							<span class="legend-value"
+							      th:text="${100 - overallProgress + '%'}">
+							</span>
 
 	                    </div>
 
@@ -1082,69 +1105,84 @@
 
           </div>
 
-          <form id="updateForm"
-                method="post"
-                enctype="multipart/form-data">
+		  <form id="updateForm"
+		        method="post"
+		        enctype="multipart/form-data">
 
-              <div class="modal-body">
+		      <!-- ADD THIS BLOCK HERE -->
 
-                  <div class="form-group">
+		      <div class="form-group">
 
-                      <label>Progress (%)</label>
+		          <label>
+		              Select Goal
+		          </label>
 
-                      <input type="number"
-                             name="progressPercentage"
-                             min="0"
-                             max="100"
-                             required>
+		          <select id="goalSelector"
+		                  style="width:100%;
+		                         padding:10px;
+		                         border:1px solid #A8A8A8;
+		                         border-radius:8px;">
 
-                  </div>
+		              <option value="">
+		                  Select Goal
+		              </option>
 
-                  <div class="form-group">
+					  <option th:each="goal : ${goals}"
+					          th:value="${goal.goalId}"
+					          th:text="${goal.title}">
+					  </option>
 
-                      <label>Remarks</label>
+		          </select>
 
-                      <textarea name="remarks"
-                                rows="4"></textarea>
+		      </div>
 
-                  </div>
+		      <!-- EXISTING FIELD -->
 
-                  <div class="form-group">
+		      <div class="form-group">
 
-                      <label>Evidence</label>
+		          <label>Progress (%)</label>
 
-                      <input type="file"
-                             name="evidence">
-                  </div>
+				  <input type="number"
+				         name="progressPercentage"
+				         min="0"
+				         max="100"
+				         required>
 
-              </div>
+		      </div>
 
-              <div class="modal-footer">
+		      <div class="form-group">
 
-                  <button type="button"
-                          class="back-btn"
-                          id="cancelUpdate">
+		          <label>Remarks</label>
 
-                      Back
+		          <textarea name="remarks"></textarea>
 
-                  </button>
+		      </div>
+			  <div class="modal-footer">
 
-                  <button type="submit"
-                          class="save-goal-btn">
+			      <button type="button"
+			              class="back-btn"
+			              id="cancelUpdate">
 
-                      Save
+			          Back
 
-                  </button>
+			      </button>
 
-              </div>
+			      <button type="submit"
+			              class="save-goal-btn">
 
-          </form>
+			          Update
+
+			      </button>
+
+			  </div>
+
+		  </form>
 
       </div>
 
   </div>
 
-<script>
+<script th:inline="javascript">
     /* Tabs */
 
     const tabs = document.querySelectorAll(".tab-item");
@@ -1165,54 +1203,57 @@
 
 
     /* Goal Burn Chart */
+	const burnLabels =
+	            [[${burnChart.![label]}]];
+
+	    const expectedData =
+	            [[${burnChart.![expected]}]];
+
+	    const actualData =
+	            [[${burnChart.![actual]}]];
 
     new Chart(document.getElementById("burnChart"), {
+		
 
         type: "line",
 
         data: {
 
-            labels: [
-                "Week 1",
-                "Week 2",
-                "Week 3",
-                "Week 4",
-                "Week 5"
-            ],
+            labels: burnLabels,
 
             datasets: [
 
-                {
-                    label: "Planned",
+			{
+			    label: "Planned",
 
-                    data: [0, 0, 0, 0, 0],
+			    data: expectedData,
 
-                    borderColor: "#1f57e7",
+			    borderColor: "#1f57e7",
 
-                    backgroundColor: "#1f57e7",
+			    borderDash: [6,6],
 
-                    borderWidth: 3,
+			    borderWidth: 2,
 
-                    tension: 0.4,
+			    tension: 0.4,
 
-                    pointRadius: 5
-                },
+			    pointRadius: 0
+			},
 
-                {
-                    label: "Actual",
+			{
+			    label: "Actual",
 
-                    data: [0, 0, 0, 0, 0],
+			    data: actualData,
 
-                    borderColor: "#f28c00",
+			    borderColor: "#1f57e7",
 
-                    backgroundColor: "#f28c00",
+			    backgroundColor: "#1f57e7",
 
-                    borderWidth: 3,
+			    borderWidth: 3,
 
-                    tension: 0.4,
+			    tension: 0.4,
 
-                    pointRadius: 5
-                }
+			    pointRadius: 4
+			},
 
             ]
 
@@ -1258,6 +1299,8 @@
 
 
     /* Overall Progress */
+	const overallProgress =
+	        [[${overallProgress}]];
 
     new Chart(document.getElementById("overallChart"), {
 
@@ -1274,7 +1317,10 @@
 
                 {
 
-                    data: [0, 100],
+					data: [
+					    overallProgress,
+					    100 - overallProgress
+					],
 
                     backgroundColor: [
                         "#1f57e7",
@@ -1340,23 +1386,22 @@
 	});
 	const updateModal =
 	        document.getElementById("updateModal");
+	function openProgressModal(){
 
-	document.querySelectorAll(".open-update-modal")
-	    .forEach(btn => {
+	    updateModal.classList.add("show");
 
-	        btn.addEventListener("click", function () {
+	    document.getElementById("goalSelector")
+	            .value = "";
 
-	            const goalId = this.dataset.goalid;
+	    document.getElementById("updateForm")
+	            .action = "";
+	}
 
-	            document.getElementById("updateForm")
-	                    .action =
-	                    "/employee/my-goals/" + goalId + "/update"
+	document.getElementById("burnChartUpdateBtn")
+	    .addEventListener("click", openProgressModal);
 
-	            updateModal.classList.add("show");
-
-	        });
-
-	});
+	document.getElementById("overallChartUpdateBtn")
+	    .addEventListener("click", openProgressModal);
 
 	document.getElementById("closeUpdateModal")
 	    .addEventListener("click", () => {
@@ -1371,6 +1416,21 @@
 	        updateModal.classList.remove("show");
 
 	});
+	document.getElementById("goalSelector")
+	    .addEventListener("change", function(){
+
+	        const goalId = this.value;
+
+	        if(goalId){
+
+	            document.getElementById("updateForm")
+	                    .action =
+	                    "/employee/my-goals/"
+	                    + goalId
+	                    + "/update";
+	        }
+	    });
+	
 	
 </script>
 

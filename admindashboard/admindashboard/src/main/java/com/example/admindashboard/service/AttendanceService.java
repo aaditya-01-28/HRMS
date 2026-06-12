@@ -1,5 +1,4 @@
 package com.example.admindashboard.service;
-
 import com.example.admindashboard.model.Attendance;
 import com.example.admindashboard.repository.AttendanceRegularizationRepository;
 import java.time.DayOfWeek;
@@ -313,35 +312,13 @@ public class AttendanceService {
             Attendance latestAttendance =
                     weeklyAttendance.get(0);
 
-            boolean hasRecordedTime =
-                    attendanceRegularizationRepository
-                            .findByUserAndDate(
-                                    user,
-                                    mondayDate
-                            )
-                            .size() > 0;
+           
 
-            for (int i = 1; i < 7 && !hasRecordedTime; i++) {
+            if (latestAttendance.getApprovalStatus() != null) {
 
-                hasRecordedTime =
-                        attendanceRegularizationRepository
-                                .findByUserAndDate(
-                                        user,
-                                        mondayDate.plusDays(i)
-                                )
-                                .size() > 0;
-            }
+                weekStatus = latestAttendance.getApprovalStatus();
 
-            if (!hasRecordedTime) {
-
-                weekStatus = "Draft";
-
-            } else if (latestAttendance.getApprovalStatus() != null) {
-
-                weekStatus =
-                        latestAttendance.getApprovalStatus();
-
-            } else {
+            }else {
 
                 weekStatus = "Draft";
             }
@@ -455,6 +432,75 @@ public class AttendanceService {
         return result;
     }
     
+    public void resetRejectedAttendance(
+            Attendance attendance) {
+
+        User user = attendance.getUser();
+
+        LocalDate monday =
+                LocalDate.parse(
+                        attendance.getWeekStartDate()
+                );
+
+        for (int i = 0; i < 7; i++) {
+
+            LocalDate currentDate =
+                    monday.plusDays(i);
+
+            List<AttendanceRegularization> records =
+                    attendanceRegularizationRepository
+                            .findByUserAndDate(
+                                    user,
+                                    currentDate
+                            );
+
+            attendanceRegularizationRepository.deleteAll(records);
+        }
+
+        attendance.setTotalHours("0hr 00min");
+
+        attendance.setPresentDays(0);
+
+        attendance.setAbsentDays(6);
+
+        attendance.setMondayHours(0.0);
+        attendance.setTuesdayHours(0.0);
+        attendance.setWednesdayHours(0.0);
+        attendance.setThursdayHours(0.0);
+        attendance.setFridayHours(0.0);
+        attendance.setSaturdayHours(0.0);
+        
+        attendance.setMondayStatus(null);
+        attendance.setMondayMode(null);
+        attendance.setMondayReason(null);
+
+        attendance.setTuesdayStatus(null);
+        attendance.setTuesdayMode(null);
+        attendance.setTuesdayReason(null);
+
+        attendance.setWednesdayStatus(null);
+        attendance.setWednesdayMode(null);
+        attendance.setWednesdayReason(null);
+
+        attendance.setThursdayStatus(null);
+        attendance.setThursdayMode(null);
+        attendance.setThursdayReason(null);
+
+        attendance.setFridayStatus(null);
+        attendance.setFridayMode(null);
+        attendance.setFridayReason(null);
+
+        attendance.setSaturdayStatus(null);
+        attendance.setSaturdayMode(null);
+        attendance.setSaturdayReason(null);
+
+        attendance.setSubmittedOn(null);
+
+        attendance.setApprovalStatus("Rejected");
+
+        attendanceRepository.save(attendance);
+    }
+    
     public AttendanceRegularization saveAttendanceRegularization(
             User user,
             AttendanceRegularizationRequestDTO request) {
@@ -515,6 +561,69 @@ public class AttendanceService {
         return attendanceRegularizationRepository
                 .save(regularization);
     }
+    
+    public void saveCurrentWeekDraft(
+            String username) {
+
+        User user =
+                userRepository
+                        .findByUsername(username)
+                        .orElseThrow(
+                                () -> new RuntimeException(
+                                        "User not found"
+                                )
+                        );
+
+        LocalDate monday =
+                LocalDate.now()
+                         .with(DayOfWeek.MONDAY);
+
+        String weekStart =
+                monday.toString();
+
+        String weekEnd =
+                monday.plusDays(6)
+                      .toString();
+
+        List<Attendance> attendanceList =
+                attendanceRepository
+                        .findByUserAndWeekStartDateAndWeekEndDate(
+                                user,
+                                weekStart,
+                                weekEnd
+                        );
+
+        Attendance attendance;
+
+        if (!attendanceList.isEmpty()) {
+
+        	attendance = attendanceList.stream()
+        	        .max((a, b) -> Long.compare(a.getId(), b.getId()))
+        	        .orElseThrow();
+            
+
+            if ("Pending".equalsIgnoreCase(attendance.getApprovalStatus())
+                    || "Approved".equalsIgnoreCase(attendance.getApprovalStatus())) {
+
+                throw new RuntimeException(
+                        "Cannot save draft after submission."
+                );
+            }
+
+        } else {
+
+            attendance = new Attendance();
+
+            attendance.setUser(user);
+            attendance.setWeekStartDate(weekStart);
+            attendance.setWeekEndDate(weekEnd);
+        }
+
+        attendance.setApprovalStatus("Draft");
+
+        attendanceRepository.save(attendance);
+    }
+    
     public void submitCurrentWeekAttendance(
             String username) {
 
@@ -548,7 +657,9 @@ public class AttendanceService {
 
         if (!attendanceList.isEmpty()) {
 
-            attendance = attendanceList.get(0);
+        	attendance = attendanceList.stream()
+        	        .max((a, b) -> Long.compare(a.getId(), b.getId()))
+        	        .orElseThrow();
 
         } else {
 
@@ -557,6 +668,12 @@ public class AttendanceService {
             attendance.setUser(user);
             attendance.setWeekStartDate(weekStart);
             attendance.setWeekEndDate(weekEnd);
+        }
+        if ("Pending".equalsIgnoreCase(attendance.getApprovalStatus())) {
+
+            throw new RuntimeException(
+                    "Attendance for this week has already been submitted."
+            );
         }
         
         int totalMinutes = 0;
@@ -579,6 +696,7 @@ public class AttendanceService {
                                     user,
                                     currentDate
                             );
+            
 
             if (!records.isEmpty()) {
 
@@ -665,7 +783,38 @@ public class AttendanceService {
                 LocalDate.now()
                          .with(DayOfWeek.MONDAY);
 
-        for (int i = 0; i < 7; i++) {
+        List<Attendance> attendanceList =
+                attendanceRepository
+                        .findByUserAndWeekStartDateAndWeekEndDate(
+                                user,
+                                monday.toString(),
+                                monday.plusDays(6).toString()
+                        );
+
+        if (attendanceList.isEmpty()) {
+            return;
+        }
+
+        Attendance attendance = attendanceList.stream()
+                .max((a, b) -> Long.compare(a.getId(), b.getId()))
+                .orElseThrow();
+
+        /*
+         * If Pending → Discard not allowed
+         */
+        if ("Pending".equalsIgnoreCase(attendance.getApprovalStatus())) {
+
+            throw new RuntimeException(
+                    "Cannot discard submitted attendance."
+            );
+        }
+
+        /*
+         * Approved → remove only editable days
+         * Draft → remove everything
+         */
+
+        for (int i = 0; i < 6; i++) {
 
             LocalDate currentDate =
                     monday.plusDays(i);
@@ -677,25 +826,114 @@ public class AttendanceService {
                                     currentDate
                             );
 
-            
+            boolean approvedDay =
+                    "Approved".equalsIgnoreCase(
+                            attendance.getApprovalStatus()
+                    )
+                    && !records.isEmpty();
+
+            /*
+             * Keep approved days intact
+             */
+            if (approvedDay) {
+                continue;
+            }
+
+            attendanceRegularizationRepository
+                    .deleteAll(records);
         }
 
-        List<Attendance> attendanceList =
-                attendanceRepository
-                        .findByUserAndWeekStartDateAndWeekEndDate(
-                                user,
-                                monday.toString(),
-                                monday.plusDays(6).toString()
-                        );
-
-        if (!attendanceList.isEmpty()) {
-
-            Attendance attendance =
-                    attendanceList.get(0);
-
-            attendance.setApprovalStatus("Draft");
-
-            attendanceRepository.save(attendance);
-        }
+        /*
+         * Recalculate summary
+         */
+        submitCurrentWeekAttendanceInternal(
+                attendance,
+                user,
+                monday
+        );
     }
+    private void submitCurrentWeekAttendanceInternal(
+            Attendance attendance,
+            User user,
+            LocalDate monday) {
+
+        int totalMinutes = 0;
+        int presentDays = 0;
+
+        double mondayHours = 0;
+        double tuesdayHours = 0;
+        double wednesdayHours = 0;
+        double thursdayHours = 0;
+        double fridayHours = 0;
+        double saturdayHours = 0;
+
+        for (int i = 0; i < 6; i++) {
+
+            LocalDate currentDate =
+                    monday.plusDays(i);
+
+            List<AttendanceRegularization> records =
+                    attendanceRegularizationRepository
+                            .findByUserAndDate(
+                                    user,
+                                    currentDate
+                            );
+
+            if (!records.isEmpty()) {
+                presentDays++;
+            }
+
+            int dayMinutes = 0;
+
+            for (AttendanceRegularization record : records) {
+
+                java.util.regex.Matcher matcher =
+                        java.util.regex.Pattern
+                                .compile("(\\d+)hr\\s*(\\d+)min")
+                                .matcher(record.getDuration());
+
+                if (matcher.find()) {
+
+                    int mins =
+                            Integer.parseInt(matcher.group(1)) * 60
+                            + Integer.parseInt(matcher.group(2));
+
+                    totalMinutes += mins;
+                    dayMinutes += mins;
+                }
+            }
+
+            double dayHours = dayMinutes / 60.0;
+
+            switch (i) {
+
+                case 0 -> mondayHours = dayHours;
+                case 1 -> tuesdayHours = dayHours;
+                case 2 -> wednesdayHours = dayHours;
+                case 3 -> thursdayHours = dayHours;
+                case 4 -> fridayHours = dayHours;
+                case 5 -> saturdayHours = dayHours;
+            }
+        }
+
+        attendance.setPresentDays(presentDays);
+        attendance.setAbsentDays(6 - presentDays);
+
+        attendance.setTotalHours(
+                (totalMinutes / 60)
+                + "hr "
+                + (totalMinutes % 60)
+                + "min"
+        );
+
+        attendance.setMondayHours(mondayHours);
+        attendance.setTuesdayHours(tuesdayHours);
+        attendance.setWednesdayHours(wednesdayHours);
+        attendance.setThursdayHours(thursdayHours);
+        attendance.setFridayHours(fridayHours);
+        attendance.setSaturdayHours(saturdayHours);
+
+        attendanceRepository.save(attendance);
+    }
+    
 }

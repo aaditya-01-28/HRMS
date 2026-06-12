@@ -11,5 +11,6 @@ import java.util.List;
 public interface GoalUpdateRepository extends JpaRepository<GoalUpdate, Long> {
 
     List<GoalUpdate> findByGoalOrderBySubmittedAtDesc(Goal goal);
+    List<GoalUpdate> findByGoalOrderBySubmittedAtAsc(Goal goal);
 
 }

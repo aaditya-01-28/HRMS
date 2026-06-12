@@ -469,6 +469,158 @@
 		    background: #1c1c1c;
 		    border-color: #444;
 		}
+		
+		/* =====================================================
+		   RESPONSIVE DESIGN
+		===================================================== */
+
+		/* Tablets */
+		@media (max-width: 992px) {
+
+		    .summary-section {
+		        flex-wrap: wrap;
+		        gap: 25px;
+		    }
+
+		    .summary-item {
+		        min-width: 180px;
+		    }
+
+		    .table-actions {
+		        flex-wrap: wrap;
+		        gap: 15px;
+		    }
+
+		    .submit-btn,
+		    .discard-btn {
+		        min-width: 180px;
+		    }
+		}
+
+		/* Mobile */
+		@media (max-width: 768px) {
+
+		    .attendance-header {
+		        flex-direction: column;
+		        align-items: flex-start;
+		        gap: 15px;
+		        height: auto;
+		        padding: 15px;
+		    }
+
+		    .back-home-btn {
+		        width: 100%;
+		        text-align: center;
+		    }
+
+		    .week-navigation {
+		        justify-content: center;
+		        flex-wrap: wrap;
+		        text-align: center;
+		    }
+
+		    #weekRange {
+		        width: 100%;
+		        order: -1;
+		        margin-bottom: 10px;
+		    }
+
+		    .summary-section {
+		        flex-direction: column;
+		        gap: 20px;
+		    }
+
+		    .summary-item {
+		        width: 100%;
+		    }
+
+		    .summary-value {
+		        font-size: 22px;
+		    }
+
+		    .summary-status {
+		        font-size: 26px;
+		    }
+
+		    .attendance-table-wrapper {
+		        overflow-x: auto;
+		    }
+
+		    .attendance-table {
+		        min-width: 700px;
+		    }
+
+		    .table-actions {
+		        flex-direction: column;
+		    }
+
+		    .submit-btn,
+		    .discard-btn {
+		        width: 100%;
+		    }
+
+		    .absence-box {
+		        width: 100%;
+		    }
+
+		    #createRequestBtn {
+		        width: 100%;
+		    }
+
+		    .modal-dialog {
+		        margin: 10px;
+		    }
+
+		    .attendance-submit-btn {
+		        width: 100%;
+		    }
+		}
+
+		/* Small Mobile */
+		@media (max-width: 576px) {
+
+		    .attendance-title {
+		        font-size: 16px;
+		    }
+
+		    .attendance-icon {
+		        width: 36px;
+		        height: 36px;
+		        font-size: 16px;
+		    }
+
+		    .attendance-table th,
+		    .attendance-table td {
+		        padding: 12px 10px;
+		        font-size: 14px;
+		    }
+
+		    .summary-value {
+		        font-size: 20px;
+		    }
+
+		    .summary-status {
+		        font-size: 22px;
+		    }
+
+		    .modal-summary-grid {
+		        padding: 12px;
+		    }
+
+		    .modal-summary-card {
+		        flex-direction: column;
+		        gap: 5px;
+		    }
+
+		    .row.g-4 > div {
+		        width: 100%;
+		    }
+
+		    .col-6 {
+		        width: 100%;
+		        margin-bottom: 10px;
+		    }
+		}
     </style>
 
     <link href="/css/dark-mode.css" rel="stylesheet">
@@ -675,23 +827,24 @@
 
     <!-- Actions -->
 
-    <div class="table-actions">
+	<div class="table-actions">
 
-        <button id="submitAttendanceBtn"
-                class="submit-btn">
+	    <button id="saveDraftBtn"
+	            class="discard-btn">
+	        Save Draft
+	    </button>
 
-            Submit
+	    <button id="submitAttendanceBtn"
+	            class="submit-btn">
+	        Submit
+	    </button>
 
-        </button>
+	    <button id="discardAttendanceBtn"
+	            class="discard-btn">
+	        Discard
+	    </button>
 
-        <button id="discardAttendanceBtn"
-                class="discard-btn">
-
-            Discard
-
-        </button>
-
-    </div>
+	</div>
 
     <!-- Absence Section -->
 
@@ -711,7 +864,7 @@
             </p>
 
             <button id="createRequestBtn"
-			onclick="window.location.href='/leave-management'">
+			onclick="window.location.href='/leave-management?returnTo=/attendance';">
 
                 + Create Request
 
@@ -943,6 +1096,12 @@
 	                submitAttendanceRecord
 	            );
 			document
+			    .getElementById('saveDraftBtn')
+			    .addEventListener(
+			        'click',
+			        saveAttendanceDraft
+			    );
+			document
 			    .getElementById('submitAttendanceBtn')
 			    .addEventListener(
 			        'click',
@@ -991,15 +1150,33 @@
 
 	        const data =
 	            await response.json();
-				
-			if (data.length > 0) {
+				let disableBottomActions = !isCurrentWeek();
 
-			    document.getElementById(
-			        'weeklyStatus'
-			    ).innerText =
-			        data[0].approvalStatus || 'Draft';
-			}
+				if (status === 'Pending') {
 
+				    disableBottomActions = true;
+
+				} else if (status === 'Approved') {
+
+				    const hasEditableDays = data.some(day =>
+				        day.plannedHours !== '0hr 00min' &&
+				        day.recordings === 0
+				    );
+
+				    disableBottomActions = !hasEditableDays;
+				}
+
+				document.getElementById(
+				    'submitAttendanceBtn'
+				).disabled = disableBottomActions;
+
+				document.getElementById(
+				    'saveDraftBtn'
+				).disabled = disableBottomActions;
+
+				document.getElementById(
+				    'discardAttendanceBtn'
+				).disabled = disableBottomActions;
 	        const tbody =
 	            document.getElementById(
 	                'attendanceTableBody'
@@ -1011,6 +1188,15 @@
 	        let recordedTotal = 0;
 
 	        data.forEach(day => {
+				const status =
+				    day.approvalStatus || 'Draft';
+
+				const isDayLocked =
+				    status === 'Pending'
+				    || (
+				        status === 'Approved'
+				        && day.recordings > 0
+				    );
 
 	            if(day.plannedHours !== '0hr 00min'){
 	                plannedTotal += 9;
@@ -1062,7 +1248,7 @@
 								    : `
 								    <button
 								        class="record-btn"
-								        ${!isCurrentWeek() ? 'disabled' : ''}
+								        ${isDayLocked ? 'disabled' : ''}
 								        onclick="openAttendanceModal('${day.actualDate}','${day.date}')">
 
 								        <i class="fas fa-chevron-right"></i>
@@ -1081,16 +1267,6 @@
 	                row
 	            );
 	        });
-			const canEdit = isCurrentWeek();
-			
-
-			document.getElementById(
-			    'submitAttendanceBtn'
-			).disabled = !canEdit;
-
-			document.getElementById(
-			    'discardAttendanceBtn'
-			).disabled = !canEdit;
 
 			document.getElementById(
 			    'plannedWorkingHours'
@@ -1167,6 +1343,44 @@
 
 	    modal.show();
 	}
+	async function saveAttendanceDraft() {
+
+	    try {
+
+	        const response =
+	            await fetch(
+	                '/api/attendance/save-current-week-draft',
+	                {
+	                    method: 'POST'
+	                }
+	            );
+
+	        if (!response.ok) {
+
+	            const message =
+	                await response.text();
+
+	            throw new Error(message);
+	        }
+
+	        Swal.fire(
+	            'Saved',
+	            'Draft saved successfully.',
+	            'success'
+	        );
+
+	        await loadAttendanceWeek();
+
+	    } catch (e) {
+
+	        Swal.fire(
+	            'Error',
+	            e.message,
+	            'error'
+	        );
+	    }
+	}
+	
 	async function submitAttendanceRecord() {
 
 	    try {
@@ -1180,6 +1394,53 @@
 			    document.getElementById(
 			        'durationMinutes'
 			    ).value || 0;
+				
+			const enteredMinutes =
+			    (parseInt(hours) * 60) +
+			    parseInt(minutes);
+
+			const recordedText =
+			    document.getElementById(
+			        'modalRecordedHours'
+			    ).innerText;
+
+			const plannedText =
+			    document.getElementById(
+			        'modalPlannedHours'
+			    ).innerText;
+
+			const extractMinutes = (text) => {
+			    const match = text.match(/(\d+)h?r?\s*(\d+)m?i?n?/i);
+
+			    if (!match) {
+			        return 0;
+			    }
+
+			    return (
+			        parseInt(match[1]) * 60 +
+			        parseInt(match[2])
+			    );
+			};
+
+			const recordedMinutes =
+			    extractMinutes(recordedText);
+
+			const plannedMinutes =
+			    extractMinutes(plannedText);
+
+			if (
+			    recordedMinutes + enteredMinutes >
+			    plannedMinutes
+			) {
+			    Swal.fire({
+			        icon: 'warning',
+			        title: 'Invalid Duration',
+			        text:
+			            'Recorded hours cannot exceed the planned working hours.'
+			    });
+
+			    return;
+			}
 
 			const payload = {
 
@@ -1210,7 +1471,7 @@
 	            );
 
 	        if (!response.ok) {
-				await loadAttendanceWeek();
+			    await loadAttendanceWeek();
 
 	            throw new Error(
 	                'Submission Failed'
@@ -1232,7 +1493,7 @@
 	            )
 	            .hide();
 
-	        loadAttendanceWeek();
+	        await loadAttendanceWeek();
 
 	    } catch (error) {
 
@@ -1265,9 +1526,18 @@
 	                }
 	            );
 
-	        if (!response.ok) {
-	            throw new Error();
-	        }
+				if (!response.ok) {
+
+				    const errorMessage = await response.text();
+
+				    Swal.fire({
+				        icon: 'error',
+				        title: 'Submission Failed',
+				        text: errorMessage
+				    });
+
+				    return;
+				}
 
 	        Swal.fire(
 	            'Success',
@@ -1275,7 +1545,7 @@
 	            'success'
 	        );
 
-	        loadAttendanceWeek();
+	        await loadAttendanceWeek();
 
 	    } catch (e) {
 
@@ -1320,7 +1590,7 @@
 	            'success'
 	        );
 
-	        loadAttendanceWeek();
+	        await loadAttendanceWeek();
 
 	    } catch (e) {
 

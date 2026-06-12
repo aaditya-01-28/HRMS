@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
+import com.example.admindashboard.service.AttendanceService;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +23,9 @@ public class AdminRegularizationController {
 
     @Autowired
     private AttendanceRepository attendanceRepository;
+    
+    @Autowired
+    private AttendanceService attendanceService;
 
     // NEW: Inject UserRepository to check the current logged-in user's role and hierarchy
     @Autowired
@@ -81,7 +84,11 @@ public class AdminRegularizationController {
 
             if ("Rejected".equalsIgnoreCase(status)) {
 
-                formattedStatus = "Rejected";
+                attendanceService.resetRejectedAttendance(req);
+
+                return ResponseEntity.ok(
+                        "Attendance rejected and reset to draft."
+                );
 
             } else {
 
