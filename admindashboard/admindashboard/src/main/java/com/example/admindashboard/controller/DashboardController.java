@@ -1446,7 +1446,10 @@ public class DashboardController {
 
     @PreAuthorize("hasAuthority('employee_create')")
     @PostMapping("/admin/add-employee-submit")
-    public String addEmployee(@ModelAttribute User user, Model model) {
+    public String addEmployee(
+            @ModelAttribute User user,
+            @ModelAttribute EmployeeProfile employeeProfile,
+            Model model) {
         String rawUsername = user.getUsername() != null ? user.getUsername().trim() : "";
 
         String employeeId = rawUsername.toUpperCase();
@@ -1482,20 +1485,17 @@ public class DashboardController {
                 .orElseThrow(() -> new RuntimeException("EMPLOYEE role not found"));
 
         user.setRole(empRole);
-        
         /*****************************************
-         * INTERN INITIALIZATION BLOCK
+         * EMPLOYEE PROFILE INITIALIZATION
          *****************************************/
+        employeeProfile.setUser(user);
+
         if (employeeId.startsWith("INT")) {
-
-            EmployeeProfile internProfile = new EmployeeProfile();
-            internProfile.setUser(user);
-
-            internProfile.setDesignation("Intern");
-            internProfile.setCategory("Intern");
-
-            user.setEmployeeProfile(internProfile);
+            employeeProfile.setDesignation("Intern");
+            employeeProfile.setCategory("Intern");
         }
+
+        user.setEmployeeProfile(employeeProfile);
 
         userRepository.save(user);
         return "redirect:/admin/reports?type=employee";
