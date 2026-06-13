@@ -5,10 +5,10 @@ import com.example.admindashboard.repository.*;
 import com.example.admindashboard.service.AuditLogService;
 import com.example.admindashboard.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.example.admindashboard.repository.LeaveRequestRepository;
-
+import com.example.admindashboard.service.GoalBurnChartService;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -64,6 +64,15 @@ public class DashboardController {
 
     @Autowired
     private LeaveRequestRepository leaveRequestRepository;
+    
+    @Autowired
+    private GoalRepository goalRepository;
+    
+    @Autowired
+    private GoalBurnChartService goalBurnChartService;
+
+    @Autowired
+    private GoalUpdateRepository goalUpdateRepository;
 
     @Autowired
     private com.example.admindashboard.repository.AttendanceRepository attendanceRepository;
@@ -1698,6 +1707,33 @@ public class DashboardController {
         model.addAttribute("hardwareCount", hardwareCount);
 
         return "admin-helpdesk-requests";
+    }
+
+    @Transactional
+    @PostMapping("/employee/my-goals/{goalId}/delete")
+    public String deleteGoal(@PathVariable Long goalId) {
+
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new RuntimeException("Goal not found"));
+
+        goalUpdateRepository.deleteByGoal(goal);
+
+        goalRepository.delete(goal);
+
+        return "redirect:/employee/my-goals";
+    }
+    
+    @GetMapping("/employee/goals/{goalId}/chart")
+    @ResponseBody
+    public List<BurnChartPoint> getGoalChart(
+            @PathVariable Long goalId) {
+
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() ->
+                        new RuntimeException("Goal not found"));
+
+        return goalBurnChartService
+                .generateSingleGoalBurnChart(goal);
     }
 
     // FIXED LOCK: Global search requires basic admin view rights so Finance/Recruiters can use it

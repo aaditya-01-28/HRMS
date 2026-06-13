@@ -1,6 +1,7 @@
 package com.example.admindashboard.service;
 
 import com.example.admindashboard.model.BurnChartPoint;
+
 import com.example.admindashboard.model.Goal;
 import com.example.admindashboard.model.GoalUpdate;
 import com.example.admindashboard.repository.GoalUpdateRepository;
@@ -13,7 +14,10 @@ import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Set;
+import java.util.TreeSet;
 @Service
 public class GoalBurnChartService {
 
@@ -50,9 +54,33 @@ public class GoalBurnChartService {
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofPattern("dd MMM");
 
-        LocalDate currentDate = earliestStart;
+        /*****************************************
+         * ACTUAL UPDATE DATES
+         *****************************************/
+        Set<LocalDate> chartDates = new TreeSet<>();
 
-        while (!currentDate.isAfter(latestEnd)) {
+        chartDates.add(earliestStart);
+        chartDates.add(latestEnd);
+
+        for (Goal goal : goals) {
+
+            List<GoalUpdate> updates =
+                    goalUpdateRepository
+                            .findByGoalOrderBySubmittedAtAsc(goal);
+
+            for (GoalUpdate update : updates) {
+
+                chartDates.add(
+                        update.getSubmittedAt()
+                              .toLocalDate()
+                );
+            }
+        }
+
+        /*****************************************
+         * BUILD CHART
+         *****************************************/
+        for (LocalDate currentDate : chartDates) {
 
             double expectedSum = 0;
             double actualSum = 0;
@@ -67,11 +95,13 @@ public class GoalBurnChartService {
                     continue;
                 }
 
-                if (!currentDate.isBefore(goal.getStartDate())
-                        && !currentDate.isAfter(goal.getTargetDate())) {
+                if (!currentDate.isBefore(goal.getStartDate())) {
 
                     activeGoals++;
 
+                    /*********************************
+                     * PLANNED
+                     *********************************/
                     long goalDuration =
                             ChronoUnit.DAYS.between(
                                     goal.getStartDate(),
@@ -86,19 +116,29 @@ public class GoalBurnChartService {
                                     goal.getStartDate(),
                                     currentDate);
 
+                    elapsed = Math.min(
+                            elapsed,
+                            goalDuration);
+
                     double expected =
-                            (elapsed * 100.0) / goalDuration;
+                            (elapsed * 100.0)
+                                    / goalDuration;
 
                     expected =
-                            Math.min(100, Math.max(0, expected));
+                            Math.min(100,
+                                    Math.max(0,
+                                            expected));
 
                     expectedSum += expected;
 
+                    /*********************************
+                     * ACTUAL
+                     *********************************/
                     List<GoalUpdate> updates =
                             goalUpdateRepository
                                     .findByGoalOrderBySubmittedAtAsc(goal);
 
-                    int latestProgress = 0;
+                    int cumulativeProgress = 0;
 
                     for (GoalUpdate update : updates) {
 
@@ -106,24 +146,34 @@ public class GoalBurnChartService {
                                 .toLocalDate()
                                 .isAfter(currentDate)) {
 
-                            latestProgress =
+                            cumulativeProgress +=
                                     update.getProgressPercentage();
                         }
                     }
 
-                    actualSum += latestProgress;
+                    cumulativeProgress =
+                            Math.min(cumulativeProgress, 100);
+
+                    actualSum += cumulativeProgress;
+                  
                 }
             }
 
+            int totalGoals = goals.size();
+
             int expectedAverage =
-                    activeGoals == 0
+                    totalGoals == 0
                             ? 0
-                            : (int) Math.round(expectedSum / activeGoals);
+                            : (int) Math.round(
+                                    expectedSum
+                                            / totalGoals);
 
             int actualAverage =
-                    activeGoals == 0
+                    totalGoals == 0
                             ? 0
-                            : (int) Math.round(actualSum / activeGoals);
+                            : (int) Math.round(
+                                    actualSum
+                                            / totalGoals);
 
             chart.add(
                     new BurnChartPoint(
@@ -132,9 +182,168 @@ public class GoalBurnChartService {
                             actualAverage
                     )
             );
-
-            currentDate = currentDate.plusDays(5);
         }
+
+        return chart;
+    }
+    
+    public List<BurnChartPoint> generateSingleGoalChart(Goal goal) {
+
+        List<BurnChartPoint> chart = new ArrayList<>();
+
+        if (goal == null
+                || goal.getStartDate() == null
+                || goal.getTargetDate() == null) {
+
+            return chart;
+        }
+
+        LocalDate startDate = goal.getStartDate();
+        LocalDate endDate = goal.getTargetDate();
+
+        long totalDays = ChronoUnit.DAYS.between(startDate, endDate);
+
+        if (totalDays <= 0) {
+            totalDays = 1;
+        }
+
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("dd MMM");
+
+        Set<LocalDate> chartDates = new TreeSet<>();
+
+        chartDates.add(startDate);
+
+        List<GoalUpdate> updates =
+                goalUpdateRepository
+                        .findByGoalOrderBySubmittedAtAsc(goal);
+
+        for (GoalUpdate update : updates) {
+
+            chartDates.add(
+                    update.getSubmittedAt()
+                            .toLocalDate()
+            );
+        }
+
+        chartDates.add(endDate);
+
+        for (LocalDate currentDate : chartDates) {
+
+            /*
+             * PLANNED
+             */
+            long elapsedDays =
+                    ChronoUnit.DAYS.between(
+                            startDate,
+                            currentDate);
+
+            elapsedDays = Math.min(
+                    elapsedDays,
+                    totalDays);
+
+            int planned =
+                    (int) Math.round(
+                            (elapsedDays * 100.0)
+                                    / totalDays);
+
+            planned = Math.min(
+                    100,
+                    Math.max(0, planned));
+
+            /*
+             * ACTUAL
+             */
+            int actual = 0;
+
+            for (GoalUpdate update : updates) {
+
+                if (!update.getSubmittedAt()
+                        .toLocalDate()
+                        .isAfter(currentDate)) {
+
+                    actual +=
+                            update.getProgressPercentage();
+                }
+            }
+
+            actual = Math.min(actual, 100);
+
+            chart.add(
+                    new BurnChartPoint(
+                            currentDate.format(formatter),
+                            planned,
+                            actual
+                    )
+            );
+        }
+
+        return chart;
+    }
+    public List<BurnChartPoint> generateSingleGoalBurnChart(Goal goal) {
+
+        List<BurnChartPoint> chart = new ArrayList<>();
+
+        if (goal == null
+                || goal.getStartDate() == null
+                || goal.getTargetDate() == null) {
+
+            return chart;
+        }
+
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("dd MMM HH:mm");
+
+        List<GoalUpdate> updates =
+                goalUpdateRepository
+                        .findByGoalOrderBySubmittedAtAsc(goal);
+
+        /*
+         * START POINT
+         */
+        chart.add(
+                new BurnChartPoint(
+                        goal.getStartDate().format(
+                                DateTimeFormatter.ofPattern("dd MMM")
+                        ),
+                        0,
+                        0
+                )
+        );
+
+        /*
+         * ACTUAL FLUCTUATIONS
+         */
+        int cumulative = 0;
+
+        for (GoalUpdate update : updates) {
+
+            cumulative += update.getProgressPercentage();
+
+            cumulative = Math.min(cumulative, 100);
+
+            chart.add(
+                    new BurnChartPoint(
+                            update.getSubmittedAt()
+                                    .format(formatter),
+                            0,
+                            cumulative
+                    )
+            );
+        }
+
+        /*
+         * END POINT
+         */
+        chart.add(
+                new BurnChartPoint(
+                        goal.getTargetDate().format(
+                                DateTimeFormatter.ofPattern("dd MMM")
+                        ),
+                        100,
+                        cumulative
+                )
+        );
 
         return chart;
     }

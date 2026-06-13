@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import com.example.admindashboard.service.GoalUpdateService;
 import com.example.admindashboard.service.GoalBurnChartService;
 import jakarta.servlet.http.HttpSession;
-
+import com.example.admindashboard.model.BurnChartPoint;
 import java.util.List;
-
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 @Controller
 @RequestMapping("/employee/my-goals")
 public class GoalController {
@@ -43,7 +44,53 @@ public class GoalController {
         }
 
         List<Goal> goals = goalService.getActiveGoalsByUser(user);
-        
+        LocalDate today = LocalDate.now();
+
+        goals.forEach(goal -> {
+
+            int progress = goal.getCurrentProgress() == null
+                    ? 0
+                    : goal.getCurrentProgress();
+
+            if (progress >= 100) {
+
+                goal.setStatus("COMPLETED");
+                return;
+            }
+
+            if (goal.getStartDate() != null
+                    && goal.getTargetDate() != null
+                    && !today.isBefore(goal.getStartDate())) {
+
+                long totalDays = ChronoUnit.DAYS.between(
+                        goal.getStartDate(),
+                        goal.getTargetDate());
+
+                totalDays = Math.max(totalDays, 1);
+
+                long elapsedDays = ChronoUnit.DAYS.between(
+                        goal.getStartDate(),
+                        today);
+
+                elapsedDays = Math.min(elapsedDays, totalDays);
+
+                int expectedProgress = (int) Math.round(
+                        (elapsedDays * 100.0) / totalDays);
+
+                if (progress < expectedProgress) {
+
+                    goal.setStatus("AT_RISK");
+
+                } else {
+
+                    goal.setStatus("ON_TRACK");
+                }
+
+            } else {
+
+                goal.setStatus("ON_TRACK");
+            }
+        });
         int overallProgress =
                 goalService.calculateOverallProgress(goals);
 
@@ -115,6 +162,16 @@ public class GoalController {
         goalService.saveGoal(goal);
 
         return "redirect:/employee/my-goals";
+    }
+    
+    @GetMapping("/{goalId}/chart")
+    @ResponseBody
+    public List<BurnChartPoint> getGoalChart(@PathVariable Long goalId) {
+
+        Goal goal = goalService.getGoalById(goalId);
+
+        return goalBurnChartService.generateSingleGoalBurnChart(goal);
+        
     }
 
     @GetMapping("/archive/{goalId}")

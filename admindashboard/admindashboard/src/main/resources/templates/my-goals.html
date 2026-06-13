@@ -593,6 +593,123 @@
 		    font-size:16px;
 		    font-weight:600;
 		}
+		
+		.goal-menu {
+		    position: absolute;
+		    top: 30px;
+		    right: 0;
+		    width: 170px;
+		    background: #fff;
+		    border-radius: 12px;
+		    border: 1px solid #e5e7eb;
+		    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+		    overflow: hidden;
+		    z-index: 1000;
+		}
+
+		.goal-menu-item {
+		    width: 100%;
+		    border: none;
+		    background: white;
+		    padding: 12px 16px;
+		    text-align: left;
+		    cursor: pointer;
+
+		    display: flex;
+		    align-items: center;
+		    gap: 12px;
+
+		    font-size: 14px;
+		    font-weight: 500;
+		    color: #374151;
+
+		    transition: all 0.2s ease;
+		}
+
+		.goal-menu-item:hover {
+		    background: #f3f4f6;
+		}
+
+		.goal-menu-item i {
+		    width: 18px;
+		    font-size: 15px;
+		    color: #2563eb;
+		}
+
+		.delete-item {
+		    color: #dc2626;
+		}
+
+		.delete-item i {
+		    color: #dc2626;
+		}
+
+		.delete-item:hover {
+		    background: #fef2f2;
+		}
+
+		.goal-menu-btn {
+		    border: none;
+		    background: transparent;
+		    cursor: pointer;
+
+		    width: 34px;
+		    height: 34px;
+		    border-radius: 50%;
+
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+
+		    transition: all 0.2s ease;
+		}
+
+		.goal-menu-btn:hover {
+		    background: #f3f4f6;
+		}
+
+		.goal-menu-btn i {
+		    font-size: 18px;
+		    color: #4b5563;
+		}
+		
+		.goal-chart-modal{
+		    display:none;
+		    position:fixed;
+		    z-index:9999;
+		    left:0;
+		    top:0;
+		    width:100%;
+		    height:100%;
+		    background:rgba(0,0,0,0.45);
+		}
+
+		.goal-chart-content{
+		    background:#fff;
+		    width:70%;
+		    max-width:900px;
+		    margin:5% auto;
+		    padding:25px;
+		    border-radius:16px;
+		    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+		}
+
+		.goal-chart-header{
+		    display:flex;
+		    justify-content:space-between;
+		    align-items:center;
+		    margin-bottom:20px;
+		}
+
+		.close-chart{
+		    font-size:30px;
+		    cursor:pointer;
+		    color:#666;
+		}
+
+		.close-chart:hover{
+		    color:red;
+		}
 
 		/* ===============================
 		   RESPONSIVE
@@ -862,7 +979,43 @@
 						</span>
 				    </td>
 
-					<td>  
+					<td style="position: relative;">
+
+						<button type="button"
+						        class="goal-menu-btn"
+						        onclick="toggleMenu(this)">
+
+						    <i class="fa-solid fa-ellipsis-vertical"></i>
+
+						</button>
+
+						<div class="goal-menu"
+						     style="display:none;">
+
+						    <button type="button"
+						            th:onclick="|showGoalChart(${goal.goalId})|"
+						            class="goal-menu-item">
+
+						        <i class="fa-solid fa-chart-line"></i>
+						        View Chart
+
+						    </button>
+
+						    <form th:action="@{/employee/my-goals/{id}/delete(id=${goal.goalId})}"
+						          method="post"
+						          onsubmit="return confirm('Delete this goal?');">
+
+						        <button type="submit"
+						                class="goal-menu-item delete-item">
+
+						            <i class="fa-solid fa-trash"></i>
+						            Delete Goal
+
+						        </button>
+
+						    </form>
+
+						</div>
 
 					</td>
 
@@ -1086,9 +1239,7 @@
 				    Create
 				</button>
 			</div>
-		</form>
-
-	       
+		</form>    
 	  </div>
   </div>
   <div class="goal-modal-overlay" id="updateModal">
@@ -1181,38 +1332,101 @@
       </div>
 
   </div>
+  <div id="goalChartModal" class="goal-chart-modal">
+
+      <div class="goal-chart-content">
+
+          <div class="goal-chart-header">
+
+              <h3 id="goalChartTitle">
+                  Goal Progress Chart
+              </h3>
+
+              <span class="close-chart"
+                    onclick="closeGoalChart()">
+                  &times;
+              </span>
+
+          </div>
+
+          <canvas id="singleGoalChart"
+                  height="120">
+          </canvas>
+
+      </div>
+
+  </div>
 
 <script th:inline="javascript">
     /* Tabs */
 
-    const tabs = document.querySelectorAll(".tab-item");
+	const tabs = document.querySelectorAll(".tab-item");
+	const rows = document.querySelectorAll("tbody tr");
 
-    tabs.forEach(tab => {
+	tabs.forEach(tab => {
 
-        tab.addEventListener("click", function () {
+	    tab.addEventListener("click", function () {
 
-            tabs.forEach(item => {
-                item.classList.remove("active");
-            });
+	        tabs.forEach(item => item.classList.remove("active"));
+	        this.classList.add("active");
 
-            this.classList.add("active");
+	        const selectedTab = this.textContent.trim().toUpperCase();
 
-        });
+	        rows.forEach(row => {
 
-    });
+	            const statusElement = row.querySelector(".status-pill");
+
+	            if (!statusElement) {
+	                return;
+	            }
+
+	            const status = statusElement.textContent.trim().toUpperCase();
+
+	            if (selectedTab === "ALL GOALS") {
+
+	                row.style.display = "";
+
+	            } else if (
+	                (selectedTab === "ON TRACK" && status === "ON TRACK") ||
+	                (selectedTab === "AT RISK" && status === "AT RISK") ||
+	                (selectedTab === "COMPLETED" && status === "COMPLETED")
+	            ) {
+
+	                row.style.display = "";
+
+	            } else {
+
+	                row.style.display = "none";
+	            }
+
+	        });
+
+	    });
+
+	});
 
 
     /* Goal Burn Chart */
 	const burnLabels =
-	            [[${burnChart.![label]}]];
+	        [[${burnChart.![label]}]];
 
-	    const expectedData =
-	            [[${burnChart.![expected]}]];
+	const totalPoints = burnLabels.length;
 
-	    const actualData =
-	            [[${burnChart.![actual]}]];
+	const expectedData = burnLabels.map((_, index) => {
 
-    new Chart(document.getElementById("burnChart"), {
+	    if (totalPoints === 1) {
+	        return 100;
+	    }
+
+	    return Math.round((index / (totalPoints - 1)) * 100);
+	});
+
+	const actualData =
+	        [[${burnChart.![actual]}]];
+
+			const burnChart = new Chart(
+			    document.getElementById("burnChart"),
+			    {
 		
 
         type: "line",
@@ -1234,7 +1448,7 @@
 
 			    borderWidth: 2,
 
-			    tension: 0.4,
+			    tension: 0,
 
 			    pointRadius: 0
 			},
@@ -1248,11 +1462,21 @@
 
 			    backgroundColor: "#1f57e7",
 
-			    borderWidth: 3,
+			    borderWidth: 4,
 
-			    tension: 0.4,
+			    tension: 0,
 
-			    pointRadius: 4
+			    pointRadius: 5,
+
+			    pointHoverRadius: 7,
+
+			    pointBackgroundColor: "#1f57e7",
+
+			    pointBorderColor: "#1f57e7",
+
+			    pointBorderWidth: 2,
+
+			    fill: false
 			},
 
             ]
@@ -1273,25 +1497,60 @@
 
             },
 
-            scales: {
+			scales: {
 
-                y: {
+			    x: {
 
-                    beginAtZero: true,
+			        grid: {
 
-                    max: 100,
+			            display: true,
 
-                    ticks: {
+			            color: "#d3d3d3",
 
-                        callback: function(value) {
-                            return value + "%";
-                        }
+			            borderDash: [5, 5]
+			        },
 
-                    }
+			        ticks: {
 
-                }
+			            color: "#444",
 
-            }
+			            font: {
+			                size: 14
+			            }
+			        }
+			    },
+
+			    y: {
+
+			        beginAtZero: true,
+
+			        max: 100,
+
+			        ticks: {
+
+			            stepSize: 20,
+
+			            callback: function(value) {
+			                return value + "%";
+			            },
+
+			            color: "#444",
+
+			            font: {
+			                size: 14
+			            }
+			        },
+
+			        grid: {
+
+			            display: true,
+
+			            color: "#d3d3d3",
+
+			            borderDash: [5, 5]
+			        }
+			    }
+			}
 
         }
 
@@ -1430,7 +1689,118 @@
 	                    + "/update";
 	        }
 	    });
+		
+		function toggleMenu(button) {
+
+		    document.querySelectorAll('.goal-menu').forEach(menu => {
+
+		        if (menu !== button.nextElementSibling) {
+		            menu.style.display = 'none';
+		        }
+
+		    });
+
+		    const menu = button.nextElementSibling;
+
+		    menu.style.display =
+		        menu.style.display === 'block'
+		            ? 'none'
+		            : 'block';
+		}
+
+		window.onclick = function(e) {
+
+		    if (!e.target.closest('.goal-menu-btn')) {
+
+		        document.querySelectorAll('.goal-menu')
+		            .forEach(menu => menu.style.display = 'none');
+		    }
+		}
 	
+		
+		let singleGoalChart;
+
+		function showGoalChart(goalId) {
+		    fetch('/employee/my-goals/' + goalId + '/chart')
+		        .then(response => response.json())
+		        .then(data => {
+		            document.getElementById("goalChartModal").style.display = "block";
+
+		            const ctx = document.getElementById("singleGoalChart");
+		            if (singleGoalChart) {
+		                singleGoalChart.destroy();
+		            }
+
+		            // Prepare Data
+		            const labels = data.map(p => p.label); // Ensure these are date strings
+		            const actual = data.map(p => p.actual);
+		            
+		            // Create "Planned" line (Linear progression from 0 to 100)
+		            const totalPoints = labels.length;
+		            const planned = labels.map((_, index) => {
+		                if (totalPoints <= 1) return 100;
+		                return Math.round((index / (totalPoints - 1)) * 100);
+		            });
+
+		            singleGoalChart = new Chart(ctx, {
+		                type: 'line',
+		                data: {
+		                    labels: labels,
+		                    datasets: [
+		                        {
+		                            label: 'Planned',
+		                            data: planned,
+		                            borderColor: '#1f57e7',
+		                            borderDash: [6, 6],
+		                            borderWidth: 2,
+		                            tension: 0,
+		                            pointRadius: 0,
+		                            fill: false
+		                        },
+		                        {
+		                            label: 'Actual',
+		                            data: actual,
+		                            borderColor: '#1f57e7',
+		                            borderWidth: 4,
+		                            tension: 0,
+		                            pointRadius: 5,
+		                            fill: false
+		                        }
+		                    ]
+		                },
+		                options: {
+		                    responsive: true,
+		                    plugins: { legend: { position: 'top' } },
+		                    scales: {
+		                        x: {
+		                            ticks: {
+		                                // This ensures the X-axis shows dates clearly
+		                                maxRotation: 45,
+		                                minRotation: 45
+		                            }
+		                        },
+		                        y: {
+		                            beginAtZero: true,
+		                            min: 0,
+		                            max: 100,
+		                            ticks: {
+		                                stepSize: 20,
+		                                callback: function(value) { return value + '%'; }
+		                            }
+		                        }
+		                    }
+		                }
+		            });
+		        });
+		}
+
+		function closeGoalChart(){
+
+		    document.getElementById(
+		        "goalChartModal"
+		    ).style.display = "none";
+		}
+		
 	
 </script>
 
