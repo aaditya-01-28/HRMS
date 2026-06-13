@@ -501,7 +501,10 @@ public class DashboardController {
         User currentUser = userRepository.findByUsername(currentUsername).orElse(null);
 
         List<Meeting> allUpcomingMeetings = meetingRepository
-                .findByMeetingDateGreaterThanEqualOrderByMeetingDateAscStartTimeAsc(LocalDate.now());
+                .findByMeetingDateGreaterThanEqualOrderByMeetingDateAscStartTimeAsc(LocalDate.now())
+                .stream()
+                .filter(m -> !(m.getMeetingDate().isEqual(LocalDate.now()) && m.getEndTime().isBefore(java.time.LocalTime.now())))
+                .collect(java.util.stream.Collectors.toList());
 
         List<Meeting> myBookings = allUpcomingMeetings.stream()
                 .filter(meeting -> meeting.getOrganizer().getUsername().equals(currentUsername))
