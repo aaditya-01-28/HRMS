@@ -3,6 +3,7 @@ package com.example.admindashboard.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "leave_requests")
@@ -29,6 +30,11 @@ public class LeaveRequest {
     private String status;
     private String adminComments; // For HR notes when denying
     private LocalDate createdAt;
+    private LocalDateTime actionDate; // When the leave was approved/rejected
+    private String handedOverTo; // Who the work is handed over to during leave
+    private String documentName; // Uploaded document name (e.g., Medical_Certificate.pdf)
+    private String documentPath; // File path for the uploaded document
+    private String assignedTo; // Text note for who the request is assigned to
 
     // GETTERS AND SETTERS
 
@@ -71,6 +77,21 @@ public class LeaveRequest {
 
     public String getAdminComments() { return adminComments; }
     public void setAdminComments(String adminComments) { this.adminComments = adminComments; }
+
+    public LocalDateTime getActionDate() { return actionDate; }
+    public void setActionDate(LocalDateTime actionDate) { this.actionDate = actionDate; }
+
+    public String getHandedOverTo() { return handedOverTo; }
+    public void setHandedOverTo(String handedOverTo) { this.handedOverTo = handedOverTo; }
+
+    public String getDocumentName() { return documentName; }
+    public void setDocumentName(String documentName) { this.documentName = documentName; }
+
+    public String getDocumentPath() { return documentPath; }
+    public void setDocumentPath(String documentPath) { this.documentPath = documentPath; }
+
+    public String getAssignedTo() { return assignedTo; }
+    public void setAssignedTo(String assignedTo) { this.assignedTo = assignedTo; }
     
     public String getLeaveIcon() {
 

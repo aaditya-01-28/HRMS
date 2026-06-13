@@ -19,6 +19,94 @@
             --bg-color: #ffffff;
         }
 
+        /* Layout Transition CSS */
+        #leave-left-pane, #leave-right-pane,
+        #timesheet-left-pane, #timesheet-right-pane {
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .pane-hidden {
+            flex: 0 0 0% !important;
+            max-width: 0% !important;
+            opacity: 0 !important;
+            overflow: hidden !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            border: none !important;
+        }
+
+        /* Leave table styling */
+        #leaveCardsContainer table {
+            width: 100%;
+            table-layout: auto;
+        }
+        #leaveCardsContainer table th,
+        #leaveCardsContainer table td {
+            padding: 10px 12px;
+            vertical-align: middle;
+        }
+        #leaveCardsContainer table tbody tr:hover {
+            background-color: #f1f5f9 !important;
+        }
+        .selected-card {
+            background-color: #e8f0fe !important;
+        }
+        #timesheetCardsContainer table tbody tr:hover {
+            background-color: #f1f5f9 !important;
+        }
+
+        /* Compact mode: hide Dates (col 4) and Reason (col 5) when detail pane is open */
+        .compact-table th:nth-child(4),
+        .compact-table td:nth-child(4),
+        .compact-table th:nth-child(5),
+        .compact-table td:nth-child(5) {
+            display: none;
+        }
+
+        /* Ticket compact mode: hide Subject (col 3) and Priority (col 4) when detail pane is open */
+        .ticket-compact-table th:nth-child(3),
+        .ticket-compact-table td:nth-child(3),
+        .ticket-compact-table th:nth-child(4),
+        .ticket-compact-table td:nth-child(4) {
+            display: none;
+        }
+
+        /* Timesheet compact mode: hide Total Hours (col 3) and Billable Hours (col 4) when detail pane is open */
+        .timesheet-compact-table th:nth-child(3),
+        .timesheet-compact-table td:nth-child(3),
+        .timesheet-compact-table th:nth-child(4),
+        .timesheet-compact-table td:nth-child(4) {
+            display: none;
+        }
+
+        /* Responsive: hide extra columns on smaller screens */
+        @media (max-width: 992px) {
+            #leaveCardsContainer table th:nth-child(4),
+            #leaveCardsContainer table td:nth-child(4),
+            #leaveCardsContainer table th:nth-child(5),
+            #leaveCardsContainer table td:nth-child(5) {
+                display: none;
+            }
+        }
+        @media (max-width: 768px) {
+            #leaveCardsContainer table th:nth-child(3),
+            #leaveCardsContainer table td:nth-child(3) {
+                display: none;
+            }
+            #leave-right-pane {
+                position: fixed !important;
+                top: 100px;
+                right: 0;
+                width: 90vw !important;
+                max-width: 90vw !important;
+                height: calc(100vh - 100px);
+                background: #fff;
+                z-index: 999;
+                box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+                overflow-y: auto;
+            }
+        }
+
         body {
             background-color: var(--bg-color);
             color: #334155;
@@ -54,7 +142,7 @@
             background-color: #e2e8f0; color: var(--bs-primary);
         }
 
-        .main-container { max-width: 1200px; margin: 0 auto 50px; padding: 0 20px; }
+        .main-container { max-width: 100%; margin: 0 auto 50px; padding: 0 36px; }
 
         /* === TABS === */
         .custom-tabs {
@@ -194,9 +282,16 @@
             Manage Workflow
         </div>
     </div>
-    <div class="d-flex align-items-center gap-4">
-        <div class="header-email">
-            <i class="far fa-envelope"></i> <span th:text="${user?.email ?: 'manager.headwcg@gmail.com'}">manager.headwcg@gmail.com</span>
+    <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-3 px-3 py-2 rounded-3" style="background: #f1f5f9;">
+            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white" id="navbar-avatar" style="width: 42px; height: 42px; font-size: 16px; background: linear-gradient(135deg, #1e3a8a, #3b82f6);">
+                <span th:text="${user?.fullName != null ? (user.fullName.contains(' ') ? #strings.substring(user.fullName, 0, 1) + #strings.substring(user.fullName, #strings.indexOf(user.fullName, ' ') + 1, #strings.indexOf(user.fullName, ' ') + 2) : #strings.substring(user.fullName, 0, 1)) : 'U'}"></span>
+            </div>
+            <div>
+                <div class="fw-bold text-dark" style="font-size: 0.9rem; line-height: 1.2;" th:text="${user?.fullName ?: 'Manager'}">Manager</div>
+                <div class="text-muted" style="font-size: 0.72rem;" th:text="${user?.employeeProfile?.designation ?: user?.role?.roleName ?: 'Manager'}">Manager</div>
+                <div class="text-muted" style="font-size: 0.68rem;"><i class="far fa-envelope me-1" style="font-size:0.6rem;"></i><span th:text="${user?.email ?: ''}"></span></div>
+            </div>
         </div>
         <a th:href="@{/manager/dashboard}" class="btn-back">
             <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
@@ -209,294 +304,706 @@
     <!-- Tabs -->
     <div class="custom-tabs">
         <div class="custom-tab active" id="tab-leave" onclick="switchTab('leave')">
-            <i class="far fa-user"></i> Leave Request <span class="badge bg-secondary ms-1" th:text="${totalPending}"></span>
+            <i class="far fa-user"></i> Leave Request <span class="badge bg-secondary ms-1" th:if="${not #lists.isEmpty(pendingLeaves)}" th:text="${#lists.size(pendingLeaves)}"></span>
         </div>
         <div class="custom-tab" id="tab-ticket" onclick="switchTab('ticket')">
-            <i class="fas fa-ticket-alt"></i> Log Ticket
+            <i class="fas fa-ticket-alt"></i> Log Ticket <span class="badge bg-secondary ms-1" th:if="${not #lists.isEmpty(pendingTickets)}" th:text="${#lists.size(pendingTickets)}"></span>
         </div>
         <div class="custom-tab" id="tab-timesheet" onclick="switchTab('timesheet')">
-            <i class="far fa-clock"></i> Timesheets
+            <i class="far fa-clock"></i> Timesheets <span class="badge bg-secondary ms-1" th:if="${not #lists.isEmpty(pendingTimesheets)}" th:text="${#lists.size(pendingTimesheets)}"></span>
         </div>
     </div>
 
     <!-- ===== LEAVE REQUEST VIEW ===== -->
-    <div id="view-leave">
-        <div class="filter-row">
-            <select class="filter-select" id="leaveTypeFilter" onchange="filterTables()">
-                <option value="All">All Leave Types</option>
-                <option value="Sick">Sick</option>
-                <option value="Casual">Casual</option>
-                <option value="Earned">Earned</option>
-            </select>
-            <select class="filter-select" id="leaveStatusFilter" onchange="filterTables()">
-                <option value="All">Status: All</option>
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
-            </select>
-            <input type="text" class="filter-input" id="leaveSearchInput" placeholder="Search by name..." onkeyup="filterTables()" style="width: 220px;">
-        </div>
+    <div id="view-leave" style="overflow-x: hidden;">
+        <div class="row">
+            <!-- Left Pane: List -->
+            <div class="col-12 pe-3" id="leave-left-pane" style="height: 75vh; overflow-y: auto;">
+                <div class="filter-row flex-column align-items-stretch gap-2 mb-3 px-1">
+                    <div class="d-flex gap-2">
+                        <select class="filter-select flex-grow-1" id="leaveTypeFilter" onchange="filterTables()">
+                            <option value="All">All Types</option>
+                            <option value="Sick">Sick</option>
+                            <option value="Casual">Casual</option>
+                            <option value="Earned">Earned</option>
+                        </select>
+                        <select class="filter-select flex-grow-1" id="leaveStatusFilter" onchange="filterTables()">
+                            <option value="All">All Status</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <input type="text" class="filter-input w-100" id="leaveSearchInput" placeholder="Search by name..." onkeyup="filterTables()">
+                </div>
+                
+                <div id="leaveCardsContainer" class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 0.88rem;">
+                        <thead style="position: sticky; top: 0; z-index: 2; background: linear-gradient(180deg, #f3f4f6 0%, #e5e7eb 100%); border-top: 1px solid #9ca3af; border-bottom: 1px solid #9ca3af;">
+                            <tr>
+                                <th class="text-dark fw-bold py-2 border-0" style="min-width: 160px; font-size: 0.95rem;">Employee</th>
+                                <th class="text-dark fw-bold py-2 border-0" style="font-size: 0.95rem;">Leave Type</th>
+                                <th class="text-dark fw-bold py-2 border-0" style="font-size: 0.95rem;">Duration</th>
+                                <th class="text-dark fw-bold py-2 border-0" style="font-size: 0.95rem;">Dates</th>
+                                <th class="text-dark fw-bold py-2 border-0" style="font-size: 0.95rem;">Reason</th>
+                                <th class="text-dark fw-bold py-2 border-0 text-end" style="font-size: 0.95rem; padding-right: 1.5rem;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Pending Leaves -->
+                            <tr th:each="leave : ${pendingLeaves}" class="leave-row"
+                                style="cursor: pointer;"
+                                th:data-id="${leave.id}"
+                                th:data-name="${leave.user.fullName}"
+                                th:data-role="${leave.user.employeeProfile?.designation ?: 'Employee'}"
+                                th:data-type="${leave.leaveType}"
+                                th:data-days="${leave.totalDays}"
+                                th:data-from="${leave.fromDate}"
+                                th:data-to="${leave.toDate}"
+                                th:data-reason="${leave.reason}"
+                                th:data-applied="${leave.createdAt != null ? leave.createdAt : 'N/A'}"
+                                th:data-handed="${leave.handedOverTo != null ? leave.handedOverTo : 'None'}"
+                                th:data-docname="${leave.documentName != null ? leave.documentName : ''}"
+                                th:data-docpath="${leave.documentPath != null ? leave.documentPath : ''}"
+                                data-status="Pending"
+                                onclick="selectLeave(this)">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-2 table-avatar-initials" style="width:36px; height:36px; font-size: 14px;" th:data-name="${leave.user.fullName}"></div>
+                                        <div>
+                                            <div class="fw-bold text-dark" th:text="${leave.user.fullName}"></div>
+                                            <div class="text-muted small" th:text="${leave.user.employeeProfile?.designation ?: 'Employee'}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span th:class="'badge rounded-pill ' + (${leave.leaveType == 'Sick'} ? 'bg-danger' : 'bg-success')" th:text="${leave.leaveType}"></span></td>
+                                <td class="text-dark" th:text="${leave.totalDays} + ' days'"></td>
+                                <td class="text-dark text-nowrap" th:text="${leave.fromDate} + ' - ' + ${leave.toDate}"></td>
+                                <td class="text-muted" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" th:text="${leave.reason}"></td>
+                                <td class="text-end"><span class="fw-bold" style="color: #e67e22;">Pending</span></td>
+                            </tr>
+                            <!-- Approved Leaves -->
+                            <tr th:each="leave : ${approvedLeaves}" class="leave-row"
+                                style="cursor: pointer;"
+                                th:data-id="${leave.id}"
+                                th:data-name="${leave.user.fullName}"
+                                th:data-role="${leave.user.employeeProfile?.designation ?: 'Employee'}"
+                                th:data-type="${leave.leaveType}"
+                                th:data-days="${leave.totalDays}"
+                                th:data-from="${leave.fromDate}"
+                                th:data-to="${leave.toDate}"
+                                th:data-reason="${leave.reason}"
+                                th:data-applied="${leave.createdAt != null ? leave.createdAt : 'N/A'}"
+                                th:data-comments="${leave.adminComments != null ? leave.adminComments : ''}"
+                                th:data-actiondate="${leave.actionDate != null ? leave.actionDate : ''}"
+                                th:data-handed="${leave.handedOverTo != null ? leave.handedOverTo : 'None'}"
+                                th:data-docname="${leave.documentName != null ? leave.documentName : ''}"
+                                th:data-docpath="${leave.documentPath != null ? leave.documentPath : ''}"
+                                data-status="Approved"
+                                onclick="selectLeave(this)">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-2 table-avatar-initials" style="width:36px; height:36px; font-size: 14px;" th:data-name="${leave.user.fullName}"></div>
+                                        <div>
+                                            <div class="fw-bold text-dark" th:text="${leave.user.fullName}"></div>
+                                            <div class="text-muted small" th:text="${leave.user.employeeProfile?.designation ?: 'Employee'}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span th:class="'badge rounded-pill ' + (${leave.leaveType == 'Sick'} ? 'bg-danger' : 'bg-success')" th:text="${leave.leaveType}"></span></td>
+                                <td class="text-dark" th:text="${leave.totalDays} + ' days'"></td>
+                                <td class="text-dark text-nowrap" th:text="${leave.fromDate} + ' - ' + ${leave.toDate}"></td>
+                                <td class="text-muted" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" th:text="${leave.reason}"></td>
+                                <td class="text-end"><span class="fw-bold text-success">Approved</span></td>
+                            </tr>
+                            <!-- Rejected Leaves -->
+                            <tr th:each="leave : ${rejectedLeaves}" class="leave-row"
+                                style="cursor: pointer;"
+                                th:data-id="${leave.id}"
+                                th:data-name="${leave.user.fullName}"
+                                th:data-role="${leave.user.employeeProfile?.designation ?: 'Employee'}"
+                                th:data-type="${leave.leaveType}"
+                                th:data-days="${leave.totalDays}"
+                                th:data-from="${leave.fromDate}"
+                                th:data-to="${leave.toDate}"
+                                th:data-reason="${leave.reason}"
+                                th:data-applied="${leave.createdAt != null ? leave.createdAt : 'N/A'}"
+                                th:data-comments="${leave.adminComments != null ? leave.adminComments : ''}"
+                                th:data-actiondate="${leave.actionDate != null ? leave.actionDate : ''}"
+                                th:data-handed="${leave.handedOverTo != null ? leave.handedOverTo : 'None'}"
+                                th:data-docname="${leave.documentName != null ? leave.documentName : ''}"
+                                th:data-docpath="${leave.documentPath != null ? leave.documentPath : ''}"
+                                data-status="Rejected"
+                                onclick="selectLeave(this)">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-2 table-avatar-initials" style="width:36px; height:36px; font-size: 14px;" th:data-name="${leave.user.fullName}"></div>
+                                        <div>
+                                            <div class="fw-bold text-dark" th:text="${leave.user.fullName}"></div>
+                                            <div class="text-muted small" th:text="${leave.user.employeeProfile?.designation ?: 'Employee'}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span th:class="'badge rounded-pill ' + (${leave.leaveType == 'Sick'} ? 'bg-danger' : 'bg-success')" th:text="${leave.leaveType}"></span></td>
+                                <td class="text-dark" th:text="${leave.totalDays} + ' days'"></td>
+                                <td class="text-dark text-nowrap" th:text="${leave.fromDate} + ' - ' + ${leave.toDate}"></td>
+                                <td class="text-muted" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" th:text="${leave.reason}"></td>
+                                <td class="text-end"><span class="fw-bold text-danger">Rejected</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-        <table class="workflow-table" id="leaveTable">
-            <thead>
-                <tr>
-                    <th>Employee</th>
-                    <th>Leave Type</th>
-                    <th>Duration</th>
-                    <th>Dates</th>
-                    <th>Reason</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Pending Leaves -->
-                <tr th:each="leave : ${pendingLeaves}" class="leave-row"
-                    th:data-id="${leave.id}"
-                    th:data-name="${leave.user.fullName}"
-                    th:data-role="${leave.user.employeeProfile?.designation ?: 'Employee'}"
-                    th:data-type="${leave.leaveType}"
-                    th:data-days="${leave.totalDays}"
-                    th:data-from="${leave.fromDate}"
-                    th:data-to="${leave.toDate}"
-                    th:data-reason="${leave.reason}"
-                    th:data-applied="${leave.createdAt != null ? leave.createdAt : 'N/A'}"
-                    data-status="Pending"
-                    onclick="openLeaveModal(this)">
-                    <td class="d-flex align-items-center">
-                        <img src="/images/default-avatar.png" class="emp-avatar">
+            <!-- Right Pane: Details -->
+            <div class="col-md-6 ps-4 pt-2 pane-hidden" id="leave-right-pane" style="height: 75vh; overflow-y: auto;">
+                <!-- Active State -->
+                <div id="leave-detail-content" style="display:none; padding-right: 15px;">
+                    <!-- New Clean UI Layout for Detail -->
+                    <div class="d-flex align-items-center mb-5 pb-3">
+                        <i class="fas fa-arrow-left text-primary bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; cursor: pointer;" onclick="closeDetailsPane()"></i>
+                        <h5 class="fw-bold text-primary mb-0 mx-auto">Leave Request Details</h5>
+                        <div style="width: 32px;"></div> <!-- Spacer to keep title centered -->
+                    </div>
+
+                    <div class="d-flex align-items-center mb-4 ps-2">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center border border-2 border-primary fw-bold text-primary bg-primary bg-opacity-10 me-3 shadow-sm" style="width: 48px; height: 48px; font-size: 18px;" id="detail-avatar-text"></div>
                         <div>
-                            <div class="emp-name" th:text="${leave.user.fullName}"></div>
-                            <div class="emp-role" th:text="${leave.user.employeeProfile?.designation ?: 'Employee'}"></div>
+                            <div class="fw-bold text-dark fs-6" id="detail-emp-name">Employee Name</div>
+                            <div class="text-muted small" id="detail-emp-role">Employee Role</div>
                         </div>
-                    </td>
-                    <td class="leave-type-col"><span th:class="'pill ' + (${leave.leaveType == 'Sick'} ? 'pill-red' : 'pill-green')" th:text="${leave.leaveType}"></span></td>
-                    <td th:text="${leave.totalDays} + ' days'"></td>
-                    <td th:text="${leave.fromDate} + ' - ' + ${leave.toDate}"></td>
-                    <td th:text="${leave.reason}"></td>
-                    <td class="leave-status-col"><span class="pill pill-orange">Pending</span></td>
-                </tr>
-                <!-- Approved Leaves -->
-                <tr th:each="leave : ${approvedLeaves}" class="leave-row"
-                    th:data-id="${leave.id}"
-                    th:data-name="${leave.user.fullName}"
-                    th:data-role="${leave.user.employeeProfile?.designation ?: 'Employee'}"
-                    th:data-type="${leave.leaveType}"
-                    th:data-days="${leave.totalDays}"
-                    th:data-from="${leave.fromDate}"
-                    th:data-to="${leave.toDate}"
-                    th:data-reason="${leave.reason}"
-                    th:data-applied="${leave.createdAt != null ? leave.createdAt : 'N/A'}"
-                    data-status="Approved"
-                    onclick="openLeaveModal(this)">
-                    <td class="d-flex align-items-center">
-                        <img src="/images/default-avatar.png" class="emp-avatar">
-                        <div>
-                            <div class="emp-name" th:text="${leave.user.fullName}"></div>
-                            <div class="emp-role" th:text="${leave.user.employeeProfile?.designation ?: 'Employee'}"></div>
-                        </div>
-                    </td>
-                    <td class="leave-type-col"><span th:class="'pill ' + (${leave.leaveType == 'Sick'} ? 'pill-red' : 'pill-green')" th:text="${leave.leaveType}"></span></td>
-                    <td th:text="${leave.totalDays} + ' days'"></td>
-                    <td th:text="${leave.fromDate} + ' - ' + ${leave.toDate}"></td>
-                    <td th:text="${leave.reason}"></td>
-                    <td class="leave-status-col"><span class="pill pill-green">Approved</span></td>
-                </tr>
-                <!-- Rejected Leaves -->
-                <tr th:each="leave : ${rejectedLeaves}" class="leave-row"
-                    th:data-id="${leave.id}"
-                    th:data-name="${leave.user.fullName}"
-                    th:data-role="${leave.user.employeeProfile?.designation ?: 'Employee'}"
-                    th:data-type="${leave.leaveType}"
-                    th:data-days="${leave.totalDays}"
-                    th:data-from="${leave.fromDate}"
-                    th:data-to="${leave.toDate}"
-                    th:data-reason="${leave.reason}"
-                    th:data-applied="${leave.createdAt != null ? leave.createdAt : 'N/A'}"
-                    data-status="Rejected"
-                    onclick="openLeaveModal(this)">
-                    <td class="d-flex align-items-center">
-                        <img src="/images/default-avatar.png" class="emp-avatar">
-                        <div>
-                            <div class="emp-name" th:text="${leave.user.fullName}"></div>
-                            <div class="emp-role" th:text="${leave.user.employeeProfile?.designation ?: 'Employee'}"></div>
-                        </div>
-                    </td>
-                    <td class="leave-type-col"><span th:class="'pill ' + (${leave.leaveType == 'Sick'} ? 'pill-red' : 'pill-green')" th:text="${leave.leaveType}"></span></td>
-                    <td th:text="${leave.totalDays} + ' days'"></td>
-                    <td th:text="${leave.fromDate} + ' - ' + ${leave.toDate}"></td>
-                    <td th:text="${leave.reason}"></td>
-                    <td class="leave-status-col"><span class="pill pill-red">Rejected</span></td>
-                </tr>
-            </tbody>
-        </table>
+                    </div>
+
+                    <table class="table table-borderless ms-2 mb-4" style="max-width: 600px;">
+                        <tbody>
+                            <tr>
+                                <td class="text-muted fw-bold pb-3" style="width: 120px;">Leave Type:</td>
+                                <td class="fw-bold pb-3" id="detail-type-col"><span id="detail-type" class="text-danger">Sick</span></td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted fw-bold pb-3">Duration:</td>
+                                <td class="fw-bold text-dark pb-3" id="detail-duration">2 days</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted fw-bold pb-3">Date:</td>
+                                <td class="fw-bold text-dark pb-3" id="detail-dates">08 June - 10 June 2026</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted fw-bold pb-3 align-top">Reason:</td>
+                                <td class="fw-bold text-dark pb-3" id="detail-reason">Cold & fever, Doctor has advised me to take rest for atleast 2 days.</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted fw-bold pb-3">Handed over to:</td>
+                                <td class="fw-bold text-dark pb-3" id="detail-handed">Rohan Sharma</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted fw-bold pb-3">Document:</td>
+                                <td class="fw-bold pb-3" id="detail-document-container">
+                                    <span class="text-dark" id="detail-no-document">No document uploaded</span>
+                                    <a href="#" id="detail-document-link" class="text-primary text-decoration-none" style="display:none;" target="_blank">
+                                        <span id="detail-document-name">Medical_Certificate.pdf</span> <i class="fas fa-download ms-1"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted fw-bold pb-3">Applied On:</td>
+                                <td class="fw-bold text-dark pb-3" id="detail-applied">06 June 2026, 10:30 AM</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div id="reviewer-remarks-section" style="display:none;" class="ms-3 mb-4 p-3 bg-light rounded border-start border-4 border-primary">
+                        <div class="fw-bold text-dark mb-1">Reviewer Remarks</div>
+                        <div class="text-muted small mb-2"><i class="fas fa-clock me-1"></i> <span id="detail-action-date"></span></div>
+                        <div class="text-dark fst-italic" id="detail-admin-comments"></div>
+                        <div class="mt-2"><span class="badge" id="detail-status-badge"></span></div>
+                    </div>
+
+                    <div class="d-flex gap-3 ms-2 mt-5" id="action-buttons-container">
+                        <button class="btn btn-outline-dark px-4 fw-bold shadow-sm bg-white" onclick="closeDetailsPane()" style="width: 140px;">Cancel</button>
+                        <button class="btn btn-primary px-4 fw-bold shadow-sm" id="btn-open-update-modal" onclick="openUpdateModal()" style="width: 160px;">Update Status</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- ===== LOG TICKET VIEW ===== -->
-    <div id="view-ticket" style="display:none;">
-        <div class="filter-row">
-            <select class="filter-select"><option>All Ticket Types</option></select>
-            <select class="filter-select"><option>Status: All</option></select>
-            <input type="text" class="filter-input" placeholder="Search by subject..." style="width: 220px;">
+    <div id="view-ticket" class="row g-0" style="display:none; transition: all 0.3s ease;">
+        <!-- Left Pane: Table -->
+        <div class="col-12" id="ticket-left-pane" style="transition: all 0.3s ease;">
+            <div class="bg-white rounded-3 shadow-sm border overflow-hidden p-3" style="min-height: 75vh;">
+                <!-- Filter Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex gap-3">
+                        <select class="filter-select flex-grow-1" id="ticketTypeFilter" onchange="filterTicketTables()">
+                            <option value="All">All Ticket Types</option>
+                            <option value="Software Request">Software Request</option>
+                            <option value="Hardware Request">Hardware Request</option>
+                        </select>
+                        <select class="filter-select flex-grow-1" id="ticketStatusFilter" onchange="filterTicketTables()">
+                            <option value="All">Status: All</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <input type="text" class="filter-input w-100" id="ticketSearchInput" placeholder="Search by subject..." onkeyup="filterTicketTables()" style="max-width: 250px;">
+                </div>
+                
+                <div id="ticketCardsContainer" class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 0.88rem;">
+                        <thead style="position: sticky; top: 0; z-index: 2; background: linear-gradient(180deg, #f3f4f6 0%, #e5e7eb 100%); border-top: 1px solid #9ca3af; border-bottom: 1px solid #9ca3af;">
+                            <tr>
+                                <th class="text-dark fw-bold py-2 border-0" style="min-width: 160px; font-size: 0.95rem;">Employee</th>
+                                <th class="text-dark fw-bold py-2 border-0" style="font-size: 0.95rem;">Ticket Type</th>
+                                <th class="text-dark fw-bold py-2 border-0" style="font-size: 0.95rem;">Subject</th>
+                                <th class="text-dark fw-bold py-2 border-0" style="font-size: 0.95rem;">Priority</th>
+                                <th class="text-dark fw-bold py-2 border-0 text-end" style="font-size: 0.95rem; padding-right: 1.5rem;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Pending Tickets -->
+                            <tr th:each="ticket : ${pendingTickets}" class="ticket-row"
+                                style="cursor: pointer;"
+                                th:data-id="${ticket.id}"
+                                th:data-name="${ticket.employeeName}"
+                                th:data-role="${ticket.department != null ? ticket.department : 'Employee'}"
+                                th:data-type="${ticket.type != null ? ticket.type : 'Software Request'}"
+                                th:data-subject="${ticket.category != null ? ticket.category : 'General Request'}"
+                                th:data-desc="${ticket.justification}"
+                                th:data-priority="${ticket.priority != null ? ticket.priority : 'High'}"
+                                th:data-applied="${ticket.submissionDate != null ? ticket.submissionDate : 'N/A'}"
+                                th:data-comments="${ticket.adminComments != null ? ticket.adminComments : ''}"
+                                th:data-actiondate="${ticket.actionDate != null ? ticket.actionDate : ''}"
+                                th:data-assigned="${ticket.assignedTo != null ? ticket.assignedTo : 'None'}"
+                                th:data-docname="${ticket.attachmentName}"
+                                data-status="In Progress"
+                                onclick="selectTicket(this)">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-2 table-avatar-initials" style="width:36px; height:36px; font-size: 14px;" th:data-name="${ticket.employeeName}"></div>
+                                        <div>
+                                            <div class="fw-bold text-dark" th:text="${ticket.employeeName}"></div>
+                                            <div class="text-muted small" th:text="${ticket.department != null ? ticket.department : 'Employee'}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-dark fw-medium" th:text="${ticket.type != null ? ticket.type : 'Software Request'}"></td>
+                                <td class="text-dark" th:text="${ticket.category != null ? ticket.category : 'General Request'}"></td>
+                                <td><span th:class="'fw-bold ' + (${ticket.priority == 'Low'} ? 'text-success' : 'text-danger')" th:text="${ticket.priority != null ? ticket.priority : 'High'}"></span></td>
+                                <td class="text-end"><span class="fw-bold text-primary">In Progress</span></td>
+                            </tr>
+                            
+                            <!-- Approved/Resolved Tickets -->
+                            <tr th:each="ticket : ${approvedTickets}" class="ticket-row"
+                                style="cursor: pointer;"
+                                th:data-id="${ticket.id}"
+                                th:data-name="${ticket.employeeName}"
+                                th:data-role="${ticket.department != null ? ticket.department : 'Employee'}"
+                                th:data-type="${ticket.type != null ? ticket.type : 'Hardware Request'}"
+                                th:data-subject="${ticket.category != null ? ticket.category : 'Driver Updation'}"
+                                th:data-desc="${ticket.justification}"
+                                th:data-priority="${ticket.priority != null ? ticket.priority : 'High'}"
+                                th:data-applied="${ticket.submissionDate != null ? ticket.submissionDate : 'N/A'}"
+                                th:data-comments="${ticket.adminComments != null ? ticket.adminComments : ''}"
+                                th:data-actiondate="${ticket.actionDate != null ? ticket.actionDate : ''}"
+                                th:data-assigned="${ticket.assignedTo != null ? ticket.assignedTo : 'None'}"
+                                th:data-docname="${ticket.attachmentName}"
+                                th:data-status="${ticket.status}"
+                                onclick="selectTicket(this)">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-2 table-avatar-initials" style="width:36px; height:36px; font-size: 14px;" th:data-name="${ticket.employeeName}"></div>
+                                        <div>
+                                            <div class="fw-bold text-dark" th:text="${ticket.employeeName}"></div>
+                                            <div class="text-muted small" th:text="${ticket.department != null ? ticket.department : 'Employee'}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-dark fw-medium" th:text="${ticket.type != null ? ticket.type : 'Hardware Request'}"></td>
+                                <td class="text-dark" th:text="${ticket.category != null ? ticket.category : 'Driver Updation'}"></td>
+                                <td><span th:class="'fw-bold ' + (${ticket.priority == 'Low'} ? 'text-success' : 'text-danger')" th:text="${ticket.priority != null ? ticket.priority : 'High'}"></span></td>
+                                <td class="text-end"><span class="fw-bold text-success" th:text="${ticket.status}"></span></td>
+                            </tr>
+                            
+                            <!-- Rejected Tickets -->
+                            <tr th:each="ticket : ${rejectedTickets}" class="ticket-row"
+                                style="cursor: pointer;"
+                                th:data-id="${ticket.id}"
+                                th:data-name="${ticket.employeeName}"
+                                th:data-role="${ticket.department != null ? ticket.department : 'Employee'}"
+                                th:data-type="${ticket.type != null ? ticket.type : 'Software Request'}"
+                                th:data-subject="${ticket.category != null ? ticket.category : 'General Request'}"
+                                th:data-desc="${ticket.justification}"
+                                th:data-priority="${ticket.priority != null ? ticket.priority : 'High'}"
+                                th:data-applied="${ticket.submissionDate != null ? ticket.submissionDate : 'N/A'}"
+                                th:data-comments="${ticket.adminComments != null ? ticket.adminComments : ''}"
+                                th:data-actiondate="${ticket.actionDate != null ? ticket.actionDate : ''}"
+                                th:data-assigned="${ticket.assignedTo != null ? ticket.assignedTo : 'None'}"
+                                th:data-docname="${ticket.attachmentName}"
+                                data-status="Rejected"
+                                onclick="selectTicket(this)">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-2 table-avatar-initials" style="width:36px; height:36px; font-size: 14px;" th:data-name="${ticket.employeeName}"></div>
+                                        <div>
+                                            <div class="fw-bold text-dark" th:text="${ticket.employeeName}"></div>
+                                            <div class="text-muted small" th:text="${ticket.department != null ? ticket.department : 'Employee'}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-dark fw-medium" th:text="${ticket.type != null ? ticket.type : 'Software Request'}"></td>
+                                <td class="text-dark" th:text="${ticket.category != null ? ticket.category : 'General Request'}"></td>
+                                <td><span th:class="'fw-bold ' + (${ticket.priority == 'Low'} ? 'text-success' : 'text-danger')" th:text="${ticket.priority != null ? ticket.priority : 'High'}"></span></td>
+                                <td class="text-end"><span class="fw-bold text-danger">Rejected</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
-        <table class="workflow-table">
-            <thead>
-                <tr>
-                    <th>Employee</th>
-                    <th>Ticket Type</th>
-                    <th>Subject</th>
-                    <th>Priority</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="ticket : ${pendingTickets}" th:onclick="|openTicketModal(${ticket.id})|">
-                    <td class="d-flex align-items-center">
-                        <img src="/images/default-avatar.png" class="emp-avatar">
-                        <div>
-                            <div class="emp-name" th:text="${ticket.employeeName}"></div>
-                            <div class="emp-role">Employee</div>
-                        </div>
-                    </td>
-                    <td th:text="${ticket.type != null ? ticket.type : 'Hardware Request'}"></td>
-                    <td th:text="${ticket.category != null ? ticket.category : 'General Request'}"></td>
-                    <td><span class="pill pill-red">High</span></td>
-                    <td><span class="pill pill-blue">In Progress</span></td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- Right Pane: Details -->
+        <div class="col-md-6 ps-4 pt-2 pane-hidden" id="ticket-right-pane" style="height: 75vh; overflow-y: auto;">
+            <!-- Active State -->
+            <div id="ticket-detail-content" style="display:none; padding-right: 15px;">
+                <!-- New Clean UI Layout for Detail -->
+                <div class="d-flex align-items-center mb-5 pb-3">
+                    <i class="fas fa-arrow-left text-primary bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; cursor: pointer;" onclick="closeTicketDetailsPane()"></i>
+                    <h5 class="fw-bold text-primary mb-0 mx-auto">Raised Ticket Details</h5>
+                    <div style="width: 32px;"></div>
+                </div>
+
+                <div class="d-flex align-items-center mb-5">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-3" id="detailTicketInitials" style="width:50px; height:50px; font-size: 20px;"></div>
+                    <div>
+                        <div class="fw-bold text-dark fs-6" id="detailTicketEmpName"></div>
+                        <div class="text-muted small" id="detailTicketEmpRole"></div>
+                    </div>
+                </div>
+
+                <div class="d-flex mb-4">
+                    <div class="text-muted" style="width: 120px;">Priority:</div>
+                    <div class="fw-bold text-danger" id="detailTicketPriority">High</div>
+                </div>
+                <div class="d-flex mb-4">
+                    <div class="text-muted" style="width: 120px;">Ticket Type:</div>
+                    <div class="fw-bold text-dark" id="detailTicketType">Software Request</div>
+                </div>
+                <div class="d-flex mb-4">
+                    <div class="text-muted" style="width: 120px;">Subject:</div>
+                    <div class="fw-bold text-dark" id="detailTicketSubject">Request for Figma Pro Access</div>
+                </div>
+                <div class="d-flex mb-4">
+                    <div class="text-muted" style="width: 120px;">Description:</div>
+                    <div class="fw-bold text-dark" id="detailTicketDesc"></div>
+                </div>
+                <div class="d-flex mb-4" id="detailTicketAttachmentRow">
+                    <div class="text-muted" style="width: 120px;">Attachments:</div>
+                    <div class="fw-bold text-primary d-flex align-items-center">
+                        <a href="#" id="detailTicketAttachmentLink" class="text-primary text-decoration-none" download>
+                            <span id="detailTicketAttachment"></span>
+                            <i class="fas fa-download ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="d-flex mb-5">
+                    <div class="text-muted" style="width: 120px;">Raised On:</div>
+                    <div class="fw-bold text-dark" id="detailTicketApplied"></div>
+                </div>
+
+                <!-- Action Remarks Area (Shows if handled) -->
+                <div id="ticketRemarksSection" class="p-4 bg-light rounded-3 mb-5 d-none">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small fw-bold text-uppercase">Admin Remarks</span>
+                        <span class="text-muted small" id="detailTicketActionDate"></span>
+                    </div>
+                    <div class="fw-medium text-dark mb-2" id="detailTicketComments"></div>
+                    <div class="text-muted small" id="detailTicketAssignedText"></div>
+                </div>
+
+                <!-- Bottom Sticky Actions -->
+                <div class="d-flex gap-3 justify-content-center mt-5 pt-3" id="ticketActionButtons" style="position: sticky; bottom: 0; background: white; padding-bottom: 20px;">
+                    <button class="btn btn-outline-secondary px-5 py-2 fw-bold" style="border-radius: 8px;" onclick="closeTicketDetailsPane()">Cancel</button>
+                    <button class="btn btn-primary px-5 py-2 fw-bold" style="border-radius: 8px;" onclick="openTicketUpdateModal()">Update Status</button>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="ticket-empty-state" class="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
+                <i class="fas fa-ticket-alt fs-1 mb-3 opacity-25"></i>
+                <h5>Select a ticket to view details</h5>
+            </div>
+        </div>
     </div>
 
     <!-- ===== TIMESHEETS VIEW ===== -->
-    <div id="view-timesheet" style="display:none;">
-        <div class="filter-row">
-            <select class="filter-select"><option>Status: All</option></select>
-            <input type="text" class="filter-input" placeholder="Search by name..." style="width: 220px;">
+    <div id="view-timesheet" class="row g-0" style="display:none; transition: all 0.3s ease;">
+        <!-- Left Pane: Table -->
+        <div class="col-12" id="timesheet-left-pane" style="transition: all 0.3s ease;">
+            <div class="bg-white rounded-3 shadow-sm border overflow-hidden p-3" style="min-height: 75vh;">
+                <!-- Filter Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex gap-3">
+                        <select class="filter-select flex-grow-1" id="timesheetStatusFilter" onchange="filterTimesheetTables()">
+                            <option value="All">All Status</option>
+                            <option value="Submitted">Submitted</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <input type="text" class="filter-input w-100" id="timesheetSearchInput" placeholder="Search by name..." onkeyup="filterTimesheetTables()" style="max-width: 250px;">
+                </div>
+                
+                <div id="timesheetCardsContainer" class="table-responsive" style="max-height: 68vh; overflow-y: auto;">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 0.88rem;">
+                        <thead style="position: sticky; top: 0; z-index: 2; background: linear-gradient(180deg, #f3f4f6 0%, #e5e7eb 100%); border-top: 1px solid #9ca3af; border-bottom: 1px solid #9ca3af;">
+                            <tr>
+                                <th class="text-dark fw-bold py-2 border-0" style="min-width: 160px; font-size: 0.95rem;">Employee</th>
+                                <th class="text-dark fw-bold py-2 border-0" style="font-size: 0.95rem;">Week</th>
+                                <th class="text-dark fw-bold py-2 border-0" style="font-size: 0.95rem;">Total Hours</th>
+                                <th class="text-dark fw-bold py-2 border-0" style="font-size: 0.95rem;">Billable Hours</th>
+                                <th class="text-dark fw-bold py-2 border-0 text-end" style="font-size: 0.95rem; padding-right: 1.5rem;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Pending/Submitted Timesheets -->
+                            <tr th:each="ts : ${pendingTimesheets}" class="ts-row"
+                                style="cursor: pointer;"
+                                th:data-id="${ts.id}"
+                                th:data-userid="${ts.user.username}"
+                                th:data-name="${ts.user.fullName}"
+                                th:data-role="${ts.user.employeeProfile?.designation ?: 'Employee'}"
+                                th:data-weekstart="${ts.weekStartDate}"
+                                th:data-weekend="${ts.weekEndDate}"
+                                th:data-submitted="${ts.submissionDate != null ? ts.submissionDate : 'N/A'}"
+                                th:data-total="${ts.totalWeekHours != null ? ts.totalWeekHours : 0}"
+                                th:data-monhrs="${!ts.entries.isEmpty() ? ts.entries[0].monHours : 0}"
+                                th:data-montask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-tuehrs="${!ts.entries.isEmpty() ? ts.entries[0].tueHours : 0}"
+                                th:data-tuetask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-wedhrs="${!ts.entries.isEmpty() ? ts.entries[0].wedHours : 0}"
+                                th:data-wedtask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-thuhrs="${!ts.entries.isEmpty() ? ts.entries[0].thuHours : 0}"
+                                th:data-thutask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-frihrs="${!ts.entries.isEmpty() ? ts.entries[0].friHours : 0}"
+                                th:data-fritask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-comments="${ts.overallComments != null ? ts.overallComments : ''}"
+                                data-status="Submitted"
+                                onclick="selectTimesheet(this)">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-2 table-avatar-initials" style="width:36px; height:36px; font-size: 14px;" th:data-name="${ts.user.fullName}"></div>
+                                        <div>
+                                            <div class="fw-bold text-dark" th:text="${ts.user.fullName}"></div>
+                                            <div class="text-muted small" th:text="${ts.user.employeeProfile?.designation ?: 'Employee'}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-dark text-nowrap" th:text="${ts.weekStartDate} + ' - ' + ${ts.weekEndDate}"></td>
+                                <td class="text-dark" th:text="${ts.totalWeekHours != null ? ts.totalWeekHours + ' hrs' : '0 hrs'}"></td>
+                                <td class="text-dark" th:text="${ts.totalWeekHours != null ? ts.totalWeekHours + ' hrs' : '0 hrs'}"></td>
+                                <td class="text-end"><span class="fw-bold text-warning">Submitted</span></td>
+                            </tr>
+                            <!-- Approved Timesheets -->
+                            <tr th:each="ts : ${approvedTimesheets}" class="ts-row"
+                                style="cursor: pointer;"
+                                th:data-id="${ts.id}"
+                                th:data-userid="${ts.user.username}"
+                                th:data-name="${ts.user.fullName}"
+                                th:data-role="${ts.user.employeeProfile?.designation ?: 'Employee'}"
+                                th:data-weekstart="${ts.weekStartDate}"
+                                th:data-weekend="${ts.weekEndDate}"
+                                th:data-submitted="${ts.submissionDate != null ? ts.submissionDate : 'N/A'}"
+                                th:data-total="${ts.totalWeekHours != null ? ts.totalWeekHours : 0}"
+                                th:data-monhrs="${!ts.entries.isEmpty() ? ts.entries[0].monHours : 0}"
+                                th:data-montask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-tuehrs="${!ts.entries.isEmpty() ? ts.entries[0].tueHours : 0}"
+                                th:data-tuetask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-wedhrs="${!ts.entries.isEmpty() ? ts.entries[0].wedHours : 0}"
+                                th:data-wedtask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-thuhrs="${!ts.entries.isEmpty() ? ts.entries[0].thuHours : 0}"
+                                th:data-thutask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-frihrs="${!ts.entries.isEmpty() ? ts.entries[0].friHours : 0}"
+                                th:data-fritask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-comments="${ts.overallComments != null ? ts.overallComments : ''}"
+                                data-status="Approved"
+                                onclick="selectTimesheet(this)">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-2 table-avatar-initials" style="width:36px; height:36px; font-size: 14px;" th:data-name="${ts.user.fullName}"></div>
+                                        <div>
+                                            <div class="fw-bold text-dark" th:text="${ts.user.fullName}"></div>
+                                            <div class="text-muted small" th:text="${ts.user.employeeProfile?.designation ?: 'Employee'}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-dark text-nowrap" th:text="${ts.weekStartDate} + ' - ' + ${ts.weekEndDate}"></td>
+                                <td class="text-dark" th:text="${ts.totalWeekHours != null ? ts.totalWeekHours + ' hrs' : '0 hrs'}"></td>
+                                <td class="text-dark" th:text="${ts.totalWeekHours != null ? ts.totalWeekHours + ' hrs' : '0 hrs'}"></td>
+                                <td class="text-end"><span class="fw-bold text-success">Approved</span></td>
+                            </tr>
+                            <!-- Rejected Timesheets -->
+                            <tr th:each="ts : ${rejectedTimesheets}" class="ts-row"
+                                style="cursor: pointer;"
+                                th:data-id="${ts.id}"
+                                th:data-userid="${ts.user.username}"
+                                th:data-name="${ts.user.fullName}"
+                                th:data-role="${ts.user.employeeProfile?.designation ?: 'Employee'}"
+                                th:data-weekstart="${ts.weekStartDate}"
+                                th:data-weekend="${ts.weekEndDate}"
+                                th:data-submitted="${ts.submissionDate != null ? ts.submissionDate : 'N/A'}"
+                                th:data-total="${ts.totalWeekHours != null ? ts.totalWeekHours : 0}"
+                                th:data-monhrs="${!ts.entries.isEmpty() ? ts.entries[0].monHours : 0}"
+                                th:data-montask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-tuehrs="${!ts.entries.isEmpty() ? ts.entries[0].tueHours : 0}"
+                                th:data-tuetask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-wedhrs="${!ts.entries.isEmpty() ? ts.entries[0].wedHours : 0}"
+                                th:data-wedtask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-thuhrs="${!ts.entries.isEmpty() ? ts.entries[0].thuHours : 0}"
+                                th:data-thutask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-frihrs="${!ts.entries.isEmpty() ? ts.entries[0].friHours : 0}"
+                                th:data-fritask="${!ts.entries.isEmpty() ? ts.entries[0].comments : ''}"
+                                th:data-comments="${ts.overallComments != null ? ts.overallComments : ''}"
+                                data-status="Rejected"
+                                onclick="selectTimesheet(this)">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-2 table-avatar-initials" style="width:36px; height:36px; font-size: 14px;" th:data-name="${ts.user.fullName}"></div>
+                                        <div>
+                                            <div class="fw-bold text-dark" th:text="${ts.user.fullName}"></div>
+                                            <div class="text-muted small" th:text="${ts.user.employeeProfile?.designation ?: 'Employee'}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-dark text-nowrap" th:text="${ts.weekStartDate} + ' - ' + ${ts.weekEndDate}"></td>
+                                <td class="text-dark" th:text="${ts.totalWeekHours != null ? ts.totalWeekHours + ' hrs' : '0 hrs'}"></td>
+                                <td class="text-dark" th:text="${ts.totalWeekHours != null ? ts.totalWeekHours + ' hrs' : '0 hrs'}"></td>
+                                <td class="text-end"><span class="fw-bold text-danger">Rejected</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
-        <table class="workflow-table">
-            <thead>
-                <tr>
-                    <th>Employee</th>
-                    <th>Week</th>
-                    <th>Total Hours</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="ts : ${pendingTimesheets}">
-                    <td class="d-flex align-items-center">
-                        <img src="/images/default-avatar.png" class="emp-avatar">
-                        <div>
-                            <div class="emp-name" th:text="${ts.user.fullName}"></div>
-                            <div class="emp-role" th:text="${ts.user.employeeProfile?.designation ?: 'Employee'}"></div>
-                        </div>
-                    </td>
-                    <td th:text="${ts.weekStartDate} + ' to ' + ${ts.weekEndDate}"></td>
-                    <td th:text="${ts.totalHours != null ? ts.totalHours + ' Hrs' : '0 Hrs'}"></td>
-                    <td><span class="pill pill-orange">Pending</span></td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- Right Pane: Details -->
+        <div class="col-md-6 ps-4 pt-2 pane-hidden" id="timesheet-right-pane" style="height: 75vh; overflow-y: auto;">
+            <!-- Active State -->
+            <div id="timesheet-detail-content" style="display:none; padding-right: 15px;">
+                <!-- Header with back button -->
+                <div class="d-flex align-items-center mb-4 pb-3">
+                    <i class="fas fa-arrow-left text-primary bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; cursor: pointer;" onclick="closeTimesheetDetailsPane()"></i>
+                    <h5 class="fw-bold text-primary mb-0 mx-auto">Timesheet Details</h5>
+                    <div style="width: 32px;"></div>
+                </div>
+
+                <!-- Employee Info -->
+                <div class="d-flex align-items-center mb-4">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-3" id="detailTsInitials" style="width:50px; height:50px; font-size: 20px;"></div>
+                    <div>
+                        <div class="fw-bold text-dark fs-6" id="detailTsEmpName"></div>
+                        <div class="text-muted small" id="detailTsEmpRole"></div>
+                    </div>
+                </div>
+
+                <!-- Timesheet Summary Info -->
+                <div class="p-3 rounded-3 mb-4" style="background: #f1f5f9; font-size: 0.82rem;">
+                    <div class="d-flex flex-wrap gap-3 align-items-center">
+                        <div><span class="text-muted">Week:</span> <strong id="detailTsWeek">--</strong></div>
+                        <div class="text-muted">|</div>
+                        <div><span class="text-muted">Submitted On:</span> <strong id="detailTsSubmitted">--</strong></div>
+                        <div class="text-muted">|</div>
+                        <div><span class="text-muted">Total Hours:</span> <strong id="detailTsTotalHours">--</strong></div>
+                        <div class="text-muted">|</div>
+                        <div><span class="text-muted">Billable Hours:</span> <strong id="detailTsBillableHours">--</strong></div>
+                    </div>
+                </div>
+
+                <!-- Daily Breakdown Table -->
+                <h6 class="fw-bold text-dark mb-3"><i class="far fa-calendar-alt me-2 text-primary"></i>Daily Breakdown</h6>
+                <div class="table-responsive mb-4">
+                    <table class="table table-sm table-bordered align-middle mb-0" style="font-size: 0.82rem;">
+                        <thead style="background: #f8fafc;">
+                            <tr>
+                                <th class="text-muted fw-bold py-2">Day</th>
+                                <th class="text-muted fw-bold py-2">Hours</th>
+                                <th class="text-muted fw-bold py-2">Task / Project</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailTsDailyBreakdown">
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Recent Timesheets Section -->
+                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-history me-2 text-primary"></i>Recent Timesheets</h6>
+                <div class="table-responsive mb-4">
+                    <table class="table table-sm table-bordered align-middle mb-0" style="font-size: 0.8rem;">
+                        <thead style="background: #f8fafc;">
+                            <tr>
+                                <th class="text-muted fw-bold py-2">Status</th>
+                                <th class="text-muted fw-bold py-2">Timecard Name</th>
+                                <th class="text-muted fw-bold py-2">Period Starting</th>
+                                <th class="text-muted fw-bold py-2">Period Ending</th>
+                                <th class="text-muted fw-bold py-2">Record Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailTsRecentTable">
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Admin Remarks Section (shown if handled) -->
+                <div id="tsRemarksSection" class="p-4 bg-light rounded-3 mb-4 d-none">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small fw-bold text-uppercase">Admin Remarks</span>
+                    </div>
+                    <div class="fw-medium text-dark mb-2" id="detailTsComments"></div>
+                </div>
+
+                <!-- Bottom Sticky Actions -->
+                <div class="d-flex gap-3 justify-content-center mt-4 pt-3" id="tsActionButtons" style="position: sticky; bottom: 0; background: white; padding-bottom: 20px;">
+                    <button class="btn btn-outline-secondary px-5 py-2 fw-bold" style="border-radius: 8px;" onclick="closeTimesheetDetailsPane()">Cancel</button>
+                    <button class="btn btn-primary px-5 py-2 fw-bold" style="border-radius: 8px;" onclick="openTimesheetUpdateModal()">Update Timesheet</button>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="timesheet-empty-state" class="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
+                <i class="far fa-clock fs-1 mb-3 opacity-25"></i>
+                <h5>Select a timesheet to view details</h5>
+            </div>
+        </div>
     </div>
+
+    <!-- Hidden JSON data for JS to build recent timesheets -->
+    <script th:inline="javascript">
+        var allTimesheetsData = [];
+        /*[# th:each="ts : ${allTimesheets}"]*/
+        allTimesheetsData.push({
+            id: /*[[${ts.id}]]*/ 0,
+            userId: /*[[${ts.user.username}]]*/ '',
+            userName: /*[[${ts.user.fullName}]]*/ '',
+            status: /*[[${ts.status}]]*/ '',
+            weekStart: /*[[${ts.weekStartDate != null ? ts.weekStartDate.toString() : ''}]]*/ '',
+            weekEnd: /*[[${ts.weekEndDate != null ? ts.weekEndDate.toString() : ''}]]*/ '',
+            totalHours: /*[[${ts.totalWeekHours}]]*/ 0,
+            submissionDate: /*[[${ts.submissionDate != null ? ts.submissionDate.toString() : ''}]]*/ ''
+        });
+        /*[/]*/
+    </script>
 
 </div>
 
-<!-- Leave Details Modal -->
-<div class="modal fade" id="leaveModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content" style="border-radius: 12px; border: none;">
-      <div class="modal-header-custom">
-        <button type="button" class="btn-back-circle" data-bs-dismiss="modal"><i class="fas fa-arrow-left"></i></button>
-        <div class="modal-title-custom">Leave Request Details</div>
-      </div>
-      <div class="modal-body-custom">
-          
-          <div class="d-flex align-items-center mb-4 pb-3" style="border-bottom: 1px solid #e2e8f0;">
-              <img src="/images/default-avatar.png" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 15px;">
-              <div>
-                  <div class="emp-name" style="font-size: 1.2rem;" id="modalLeaveEmpName"></div>
-                  <div class="emp-role" id="modalLeaveEmpRole"></div>
-              </div>
-          </div>
 
-          <div class="detail-row">
-              <div class="detail-label-col">Leave Type:</div>
-              <div class="detail-val-col"><span class="pill" id="modalLeaveType"></span></div>
-          </div>
-          <div class="detail-row">
-              <div class="detail-label-col">Duration:</div>
-              <div class="detail-val-col"><span id="modalLeaveDuration"></span> days</div>
-          </div>
-          <div class="detail-row">
-              <div class="detail-label-col">Date:</div>
-              <div class="detail-val-col"><span id="modalLeaveFrom"></span> - <span id="modalLeaveTo"></span></div>
-          </div>
-          <div class="detail-row">
-              <div class="detail-label-col">Reason:</div>
-              <div class="detail-val-col" id="modalLeaveReason"></div>
-          </div>
-          <div class="detail-row">
-              <div class="detail-label-col">Applied On:</div>
-              <div class="detail-val-col" id="modalLeaveApplied"></div>
-          </div>
 
-      </div>
-      <div class="modal-footer-custom">
-        <button type="button" class="btn-cancel-custom" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn-update-custom" id="modalLeaveApproveBtn">Update Status</button>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- Ticket Details Modal -->
-<div class="modal fade" id="ticketModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content" style="border-radius: 12px; border: none;">
-      <div class="modal-header-custom">
-        <button type="button" class="btn-back-circle" data-bs-dismiss="modal"><i class="fas fa-arrow-left"></i></button>
-        <div class="modal-title-custom">Raised Ticket Details</div>
-      </div>
-      <div class="modal-body-custom">
-          
-          <div class="d-flex align-items-center mb-4 pb-3" style="border-bottom: 1px solid #e2e8f0;">
-              <img src="/images/default-avatar.png" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 15px;">
-              <div>
-                  <div class="emp-name" style="font-size: 1.2rem;" id="modalTicketEmpName">Neha Sharma</div>
-                  <div class="emp-role" id="modalTicketEmpRole">SDE-1 • Software Development Team</div>
-              </div>
-          </div>
-
-          <div class="detail-row">
-              <div class="detail-label-col">Priority:</div>
-              <div class="detail-val-col"><span class="pill pill-red">High</span></div>
-          </div>
-          <div class="detail-row">
-              <div class="detail-label-col">Ticket Type:</div>
-              <div class="detail-val-col" id="modalTicketType">Software Request</div>
-          </div>
-          <div class="detail-row">
-              <div class="detail-label-col">Subject:</div>
-              <div class="detail-val-col" id="modalTicketSubject">Request for Figma Pro Access</div>
-          </div>
-          <div class="detail-row">
-              <div class="detail-label-col">Description:</div>
-              <div class="detail-val-col" id="modalTicketDesc">Actually, to attach videos on the prototype Figma charges Pro Subscription.</div>
-          </div>
-          <div class="detail-row">
-              <div class="detail-label-col">Raised On:</div>
-              <div class="detail-val-col">06 June 2026, 10:30 AM</div>
-          </div>
-
-      </div>
-      <div class="modal-footer-custom">
-        <button type="button" class="btn-cancel-custom" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn-update-custom">Update Status</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -508,42 +1015,262 @@
         document.getElementById('view-leave').style.display = 'none';
         document.getElementById('view-ticket').style.display = 'none';
         document.getElementById('view-timesheet').style.display = 'none';
-        document.getElementById('view-' + tabId).style.display = 'block';
+        document.getElementById('view-' + tabId).style.display = 'flex';
+        // Hide details pane if switching tabs
+        if (tabId === 'ticket') {
+            closeTicketDetailsPane();
+        } else if (tabId === 'leave') {
+            closeDetailsPane();
+        } else if (tabId === 'timesheet') {
+            closeTimesheetDetailsPane();
+        }
     }
 
-    const leaveModal = new bootstrap.Modal(document.getElementById('leaveModal'));
-    const ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
-
-    function openLeaveModal(row) {
-        const id = row.getAttribute('data-id');
-        document.getElementById('modalLeaveEmpName').innerText = row.getAttribute('data-name');
-        document.getElementById('modalLeaveEmpRole').innerText = row.getAttribute('data-role');
+    function selectLeave(card) {
+        const id = card.getAttribute('data-id');
         
-        const typeSpan = document.getElementById('modalLeaveType');
-        const type = row.getAttribute('data-type');
-        typeSpan.innerText = type;
-        typeSpan.className = 'pill ' + (type === 'Sick' ? 'pill-red' : 'pill-green');
-        
-        document.getElementById('modalLeaveDuration').innerText = row.getAttribute('data-days');
-        document.getElementById('modalLeaveFrom').innerText = row.getAttribute('data-from');
-        document.getElementById('modalLeaveTo').innerText = row.getAttribute('data-to');
-        document.getElementById('modalLeaveReason').innerText = row.getAttribute('data-reason');
-        document.getElementById('modalLeaveApplied').innerText = row.getAttribute('data-applied');
-
-        const btn = document.getElementById('modalLeaveApproveBtn');
-        const status = row.getAttribute('data-status');
-        if(status === 'Pending') {
-            btn.style.display = 'inline-block';
-            btn.innerText = 'Approve Leave';
-            btn.onclick = function() {
-                leaveModal.hide();
-                approveLeave(id);
-            };
-        } else {
-            btn.style.display = 'none';
+        // Toggle off if already selected
+        if (window.currentSelectedLeaveId === id) {
+            closeDetailsPane();
+            window.currentSelectedLeaveId = null;
+            return;
         }
 
-        leaveModal.show();
+        // Adjust Layout Classes for Split View
+        const leftPane = document.getElementById('leave-left-pane');
+        const rightPane = document.getElementById('leave-right-pane');
+        const leaveTable = document.querySelector('#leaveCardsContainer table');
+        
+        leftPane.className = "col-md-6 pe-3";
+        leftPane.style.borderRight = "1px solid #e2e8f0";
+        
+        // Add compact mode to hide extra columns
+        if (leaveTable) leaveTable.classList.add('compact-table');
+        
+        rightPane.classList.remove('pane-hidden');
+
+        document.getElementById('leave-detail-content').style.display = 'block';
+        window.currentSelectedLeaveId = id;
+
+        // Populate detail fields
+        const empName = card.getAttribute('data-name');
+        document.getElementById('detail-emp-name').innerText = empName;
+        document.getElementById('detail-emp-role').innerText = card.getAttribute('data-role');
+        
+        // Generate Initials for Avatar
+        const nameParts = empName.trim().split(' ');
+        const initials = nameParts.length > 1 ? nameParts[0][0] + nameParts[1][0] : nameParts[0][0];
+        document.getElementById('detail-avatar-text').innerText = initials.toUpperCase();
+        
+        const type = card.getAttribute('data-type');
+        const typeEl = document.getElementById('detail-type');
+        typeEl.innerText = type;
+        if (type === 'Sick') {
+            typeEl.className = 'text-danger';
+        } else if (type === 'Earned') {
+            typeEl.className = 'text-primary';
+        } else {
+            typeEl.className = 'text-success';
+        }
+        
+        document.getElementById('detail-duration').innerText = card.getAttribute('data-days') + " days";
+        
+        // Format dates
+        const fromDate = new Date(card.getAttribute('data-from')).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+        const toDate = new Date(card.getAttribute('data-to')).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+        document.getElementById('detail-dates').innerText = `${fromDate} - ${toDate}`;
+        
+        document.getElementById('detail-reason').innerText = card.getAttribute('data-reason');
+        document.getElementById('detail-handed').innerText = card.getAttribute('data-handed');
+        
+        // Applied On format
+        const appliedOn = card.getAttribute('data-applied');
+        if (appliedOn && appliedOn !== 'N/A') {
+            try {
+                const dt = new Date(appliedOn);
+                document.getElementById('detail-applied').innerText = dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(' am', ' AM').replace(' pm', ' PM');
+            } catch(e) {
+                document.getElementById('detail-applied').innerText = appliedOn;
+            }
+        } else {
+            document.getElementById('detail-applied').innerText = 'N/A';
+        }
+
+        // Document link
+        const docName = card.getAttribute('data-docname');
+        const docPath = card.getAttribute('data-docpath');
+        const docLink = document.getElementById('detail-document-link');
+        const noDoc = document.getElementById('detail-no-document');
+        
+        if (docName && docName.trim() !== '') {
+            noDoc.style.display = 'none';
+            docLink.style.display = 'inline-block';
+            document.getElementById('detail-document-name').innerText = docName;
+            docLink.href = docPath;
+        } else {
+            noDoc.style.display = 'inline-block';
+            docLink.style.display = 'none';
+        }
+
+        const status = card.getAttribute('data-status');
+        const actionButtons = document.getElementById('action-buttons-container');
+        const remarksSection = document.getElementById('reviewer-remarks-section');
+        
+        if (status === 'Pending') {
+            actionButtons.style.display = 'flex';
+            remarksSection.style.display = 'none';
+        } else {
+            actionButtons.style.display = 'none';
+            showReviewerRemarks(card, status);
+        }
+        
+        // Highlight active card
+        document.querySelectorAll('.leave-row').forEach(c => {
+            c.classList.remove('table-active');
+            c.style.backgroundColor = '';
+        });
+        card.classList.add('table-active');
+        card.style.backgroundColor = '#e8f0fe';
+    }
+
+    function showReviewerRemarks(card, status) {
+        const remarksSection = document.getElementById('reviewer-remarks-section');
+        const comments = card.getAttribute('data-comments');
+        const actionDate = card.getAttribute('data-actiondate');
+        
+        remarksSection.style.display = 'block';
+        
+        const badge = document.getElementById('detail-status-badge');
+        badge.innerText = status;
+        if (status === 'Approved') {
+            badge.className = 'badge bg-success';
+        } else {
+            badge.className = 'badge bg-danger';
+        }
+        
+        // Format action date
+        if (actionDate && actionDate.trim() !== '') {
+            try {
+                const dt = new Date(actionDate);
+                document.getElementById('detail-action-date').innerText = dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(' am', ' AM').replace(' pm', ' PM');
+            } catch(e) {
+                document.getElementById('detail-action-date').innerText = actionDate;
+            }
+        } else {
+            document.getElementById('detail-action-date').innerText = 'N/A';
+        }
+        
+        // Show comments
+        if (comments && comments.trim() !== '') {
+            document.getElementById('detail-admin-comments').innerText = comments;
+        } else {
+            document.getElementById('detail-admin-comments').innerText = 'No remarks were provided.';
+        }
+    }
+
+    function closeDetailsPane() {
+        // Revert Layout Classes to Full Width
+        const leftPane = document.getElementById('leave-left-pane');
+        const rightPane = document.getElementById('leave-right-pane');
+        const leaveTable = document.querySelector('#leaveCardsContainer table');
+        
+        leftPane.className = "col-12 pe-3";
+        leftPane.style.borderRight = "none";
+        
+        // Remove compact mode to show all columns
+        if (leaveTable) leaveTable.classList.remove('compact-table');
+        
+        rightPane.classList.add('pane-hidden');
+        
+        setTimeout(() => {
+            if (rightPane.classList.contains('pane-hidden')) {
+                document.getElementById('leave-detail-content').style.display = 'none';
+            }
+        }, 400); // Wait for transition to complete before hiding content
+
+        document.querySelectorAll('.leave-row').forEach(c => {
+            c.classList.remove('table-active');
+            c.style.backgroundColor = '';
+        });
+        window.currentSelectedLeaveId = null;
+    }
+
+    function openUpdateModal() {
+        // Reset modal fields
+        document.getElementById('modal-status-select').value = 'Pending';
+        document.getElementById('modal-assigned-to').value = '';
+        document.getElementById('modal-comments').value = '';
+        document.getElementById('modal-char-count').innerText = '0';
+        
+        const modal = new bootstrap.Modal(document.getElementById('updateLeaveModal'));
+        modal.show();
+    }
+
+    async function submitLeaveAction() {
+        const id = window.currentSelectedLeaveId;
+        if (!id) return;
+
+        const action = document.getElementById('modal-status-select').value;
+        const remarks = document.getElementById('modal-comments').value.trim();
+        const assignedTo = document.getElementById('modal-assigned-to').value.trim();
+
+        if (action === 'Pending') {
+            Swal.fire('Required', 'Please select an Action (Approve/Reject) from the Status dropdown.', 'warning');
+            return;
+        }
+
+        if (action === 'REJECT' && remarks.length === 0) {
+            Swal.fire('Required', 'Please provide a reason for rejection in the comments section.', 'warning');
+            return;
+        }
+
+        // Show loading state
+        Swal.fire({
+            title: 'Processing...',
+            text: 'Please wait while we save your action...',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading() }
+        });
+
+        const endpoint = action === 'APPROVE' ? `/api/admin/leave/approve/${id}` : `/api/admin/leave/reject/${id}`;
+        const formData = new URLSearchParams();
+        if (remarks) formData.append('note', remarks);
+        if (assignedTo) formData.append('assignedTo', assignedTo);
+
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                // Close SweetAlert loader
+                Swal.close();
+                
+                // Hide update modal
+                bootstrap.Modal.getInstance(document.getElementById('updateLeaveModal')).hide();
+                
+                // Configure success modal texts based on action
+                if (action === 'APPROVE') {
+                    document.getElementById('success-assign-text').innerText = assignedTo ? `Request approved and forwarded to ${assignedTo}.` : 'Request approved successfully.';
+                } else {
+                    document.getElementById('success-assign-text').innerText = assignedTo ? `Request rejected and forwarded to ${assignedTo}.` : 'Request rejected successfully.';
+                }
+                
+                // Show success modal
+                const successModal = new bootstrap.Modal(document.getElementById('workflowConfirmedModal'));
+                successModal.show();
+            } else {
+                const errorMsg = await response.text();
+                Swal.fire('Error!', errorMsg || 'Something went wrong.', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error!', 'An unexpected network error occurred.', 'error');
+        }
     }
 
     function openTicketModal(ticketId) {
@@ -567,41 +1294,528 @@
             if (statusFilter !== 'All' && status !== statusFilter) match = false;
             if (searchInput !== '' && !name.includes(searchInput)) match = false;
             
-            row.style.display = match ? '' : 'none';
+            if (match) {
+                row.classList.remove('d-none');
+            } else {
+                row.classList.add('d-none');
+            }
         });
     }
 
-    // === LEAVE APPROVAL ===
-    async function approveLeave(id) {
-        const confirmResult = await Swal.fire({
-            title: 'Approve Leave?',
-            html: 'This will officially grant the requested time off.',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#2563eb',
-            cancelButtonText: 'Cancel',
-            confirmButtonText: 'Yes, Approve'
+    // Generate table row avatars on load
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('.table-avatar-initials').forEach(el => {
+            const name = el.getAttribute('data-name');
+            if (name) {
+                const nameParts = name.trim().split(' ');
+                const initials = nameParts.length > 1 ? nameParts[0][0] + nameParts[1][0] : nameParts[0][0];
+                el.innerText = initials.toUpperCase();
+            }
+        });
+    });
+    // Ticket Filter
+    function filterTicketTables() {
+        const typeFilter = document.getElementById('ticketTypeFilter').value;
+        const statusFilter = document.getElementById('ticketStatusFilter').value;
+        const searchInput = document.getElementById('ticketSearchInput').value.toLowerCase();
+        
+        document.querySelectorAll('#ticketCardsContainer .ticket-row').forEach(row => {
+            const subject = row.getAttribute('data-subject').toLowerCase();
+            const type = row.getAttribute('data-type');
+            const status = row.getAttribute('data-status');
+            
+            let show = true;
+            if (typeFilter !== 'All' && type !== typeFilter) show = false;
+            if (statusFilter !== 'All' && status !== statusFilter) show = false;
+            if (searchInput && !subject.includes(searchInput)) show = false;
+            
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    // Select Ticket
+    function selectTicket(row) {
+        const id = row.getAttribute('data-id');
+        
+        if (window.currentSelectedTicketId === id) {
+            closeTicketDetailsPane();
+            window.currentSelectedTicketId = null;
+            return;
+        }
+
+        const leftPane = document.getElementById('ticket-left-pane');
+        const rightPane = document.getElementById('ticket-right-pane');
+        const ticketTable = document.querySelector('#ticketCardsContainer table');
+        
+        leftPane.className = "col-md-6 pe-3";
+        rightPane.classList.remove('pane-hidden');
+        ticketTable.classList.add('table-sm');
+        ticketTable.classList.add('ticket-compact-table');
+        
+        document.querySelectorAll('#ticketCardsContainer .ticket-row').forEach(r => r.classList.remove('selected-card'));
+        row.classList.add('selected-card');
+        window.currentSelectedTicketId = id;
+        
+        document.getElementById('ticket-empty-state').style.display = 'none';
+        document.getElementById('ticket-detail-content').style.display = 'block';
+
+        const name = row.getAttribute('data-name');
+        const nameParts = name.trim().split(' ');
+        const initials = nameParts.length > 1 ? nameParts[0][0] + nameParts[1][0] : nameParts[0][0];
+        document.getElementById('detailTicketInitials').innerText = initials.toUpperCase();
+        
+        document.getElementById('detailTicketEmpName').innerText = name;
+        document.getElementById('detailTicketEmpRole').innerText = row.getAttribute('data-role');
+        document.getElementById('detailTicketType').innerText = row.getAttribute('data-type');
+        document.getElementById('detailTicketSubject').innerText = row.getAttribute('data-subject');
+        document.getElementById('detailTicketDesc').innerText = row.getAttribute('data-desc');
+        document.getElementById('detailTicketApplied').innerText = row.getAttribute('data-applied');
+        document.getElementById('detailTicketPriority').innerText = row.getAttribute('data-priority');
+        
+        const docName = row.getAttribute('data-docname');
+        const docPath = row.getAttribute('data-docpath');
+        const attachmentRow = document.getElementById('detailTicketAttachmentRow');
+        if (docName && docName !== 'null' && docName !== '') {
+            attachmentRow.classList.remove('d-none');
+            document.getElementById('detailTicketAttachment').innerText = docName;
+            const link = document.getElementById('detailTicketAttachmentLink');
+            link.href = docPath && docPath !== 'null' ? docPath : '#';
+            link.download = docName;
+        } else {
+            attachmentRow.classList.add('d-none');
+        }
+
+        const status = row.getAttribute('data-status');
+        const actionButtons = document.getElementById('ticketActionButtons');
+        const remarksSection = document.getElementById('ticketRemarksSection');
+
+        if (status === 'In Progress' || status === 'Open') {
+            actionButtons.classList.remove('d-none');
+            remarksSection.classList.add('d-none');
+        } else {
+            actionButtons.classList.add('d-none');
+            remarksSection.classList.remove('d-none');
+            document.getElementById('detailTicketActionDate').innerText = row.getAttribute('data-actiondate');
+            document.getElementById('detailTicketComments').innerText = row.getAttribute('data-comments') || 'No remarks provided.';
+            document.getElementById('detailTicketAssignedText').innerText = "Assigned To: " + (row.getAttribute('data-assigned') || 'None');
+        }
+    }
+
+    function closeTicketDetailsPane() {
+        document.getElementById('ticket-left-pane').className = "col-12";
+        document.getElementById('ticket-right-pane').classList.add('pane-hidden');
+        document.querySelector('#ticketCardsContainer table').classList.remove('table-sm');
+        document.querySelector('#ticketCardsContainer table').classList.remove('ticket-compact-table');
+        document.querySelectorAll('#ticketCardsContainer .ticket-row').forEach(r => r.classList.remove('selected-card'));
+        window.currentSelectedTicketId = null;
+    }
+
+    // Ticket Update action
+    function openTicketUpdateModal() {
+        document.getElementById('modal-ticket-status-select').value = "In Progress";
+        document.getElementById('modal-ticket-assigned-to').value = "";
+        document.getElementById('modal-ticket-comments').value = "";
+        const updateTicketModal = new bootstrap.Modal(document.getElementById('updateTicketModal'));
+        updateTicketModal.show();
+    }
+
+    function submitTicketAction() {
+        if (!window.currentSelectedTicketId) return;
+        
+        const status = document.getElementById('modal-ticket-status-select').value;
+        const assignedTo = document.getElementById('modal-ticket-assigned-to').value;
+        const comments = document.getElementById('modal-ticket-comments').value;
+
+        fetch(`/api/requests/update-status?id=${window.currentSelectedTicketId}&status=${status}&assignedTo=${encodeURIComponent(assignedTo)}&adminComments=${encodeURIComponent(comments)}`, {
+            method: 'POST'
+        })
+        .then(response => {
+            if (response.ok) {
+                const updateTicketModal = bootstrap.Modal.getInstance(document.getElementById('updateTicketModal'));
+                updateTicketModal.hide();
+                
+                if (assignedTo) {
+                    document.getElementById('success-assign-text').innerText = "Request further forwarded to " + assignedTo;
+                } else {
+                    document.getElementById('success-assign-text').innerText = "Request status updated to " + status;
+                }
+                const successModal = new bootstrap.Modal(document.getElementById('workflowConfirmedModal'));
+                successModal.show();
+            } else {
+                Swal.fire('Error', 'Failed to update ticket status', 'error');
+            }
+        });
+    }
+
+    // ==================== TIMESHEET FUNCTIONS ====================
+    
+    function selectTimesheet(row) {
+        const id = row.getAttribute('data-id');
+        
+        if (window.currentSelectedTimesheetId === id) {
+            closeTimesheetDetailsPane();
+            window.currentSelectedTimesheetId = null;
+            return;
+        }
+
+        const leftPane = document.getElementById('timesheet-left-pane');
+        const rightPane = document.getElementById('timesheet-right-pane');
+        const tsTable = document.querySelector('#timesheetCardsContainer table');
+        
+        leftPane.className = "col-md-6 pe-3";
+        rightPane.classList.remove('pane-hidden');
+        tsTable.classList.add('table-sm');
+        tsTable.classList.add('timesheet-compact-table');
+        
+        document.querySelectorAll('#timesheetCardsContainer .ts-row').forEach(r => r.classList.remove('selected-card'));
+        row.classList.add('selected-card');
+        window.currentSelectedTimesheetId = id;
+        
+        document.getElementById('timesheet-empty-state').style.display = 'none';
+        document.getElementById('timesheet-detail-content').style.display = 'block';
+
+        const name = row.getAttribute('data-name');
+        const nameParts = name.trim().split(' ');
+        const initials = nameParts.length > 1 ? nameParts[0][0] + nameParts[1][0] : nameParts[0][0];
+        document.getElementById('detailTsInitials').innerText = initials.toUpperCase();
+        
+        document.getElementById('detailTsEmpName').innerText = name;
+        document.getElementById('detailTsEmpRole').innerText = row.getAttribute('data-role');
+        
+        // Summary bar
+        const weekStart = row.getAttribute('data-weekstart');
+        const weekEnd = row.getAttribute('data-weekend');
+        document.getElementById('detailTsWeek').innerText = weekStart + ' – ' + weekEnd;
+        
+        const submitted = row.getAttribute('data-submitted');
+        if (submitted && submitted !== 'N/A') {
+            try {
+                const dt = new Date(submitted);
+                document.getElementById('detailTsSubmitted').innerText = dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+            } catch(e) {
+                document.getElementById('detailTsSubmitted').innerText = submitted;
+            }
+        } else {
+            document.getElementById('detailTsSubmitted').innerText = 'N/A';
+        }
+        
+        const totalHrs = parseFloat(row.getAttribute('data-total')) || 0;
+        document.getElementById('detailTsTotalHours').innerText = totalHrs + ' hrs';
+        document.getElementById('detailTsBillableHours').innerText = totalHrs + ' hrs';
+
+        // Daily Breakdown
+        const days = [
+            { name: 'Monday', hrs: row.getAttribute('data-monhrs'), task: row.getAttribute('data-montask') },
+            { name: 'Tuesday', hrs: row.getAttribute('data-tuehrs'), task: row.getAttribute('data-tuetask') },
+            { name: 'Wednesday', hrs: row.getAttribute('data-wedhrs'), task: row.getAttribute('data-wedtask') },
+            { name: 'Thursday', hrs: row.getAttribute('data-thuhrs'), task: row.getAttribute('data-thutask') },
+            { name: 'Friday', hrs: row.getAttribute('data-frihrs'), task: row.getAttribute('data-fritask') }
+        ];
+        
+        const breakdownBody = document.getElementById('detailTsDailyBreakdown');
+        breakdownBody.innerHTML = '';
+        days.forEach(d => {
+            const hrs = parseFloat(d.hrs) || 0;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="fw-medium">${d.name}</td>
+                <td>${hrs > 0 ? hrs + ' hrs' : '<span class="text-muted">—</span>'}</td>
+                <td>${d.task || '<span class="text-muted">—</span>'}</td>
+            `;
+            breakdownBody.appendChild(tr);
         });
 
-        if (!confirmResult.isConfirmed) return;
+        // Recent Timesheets table
+        const userId = row.getAttribute('data-userid');
+        const recentBody = document.getElementById('detailTsRecentTable');
+        recentBody.innerHTML = '';
+        
+        const userTimesheets = allTimesheetsData
+            .filter(ts => ts.userId === userId)
+            .sort((a, b) => (b.weekStart || '').localeCompare(a.weekStart || ''))
+            .slice(0, 10);
+        
+        if (userTimesheets.length === 0) {
+            recentBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">No recent timesheets found</td></tr>';
+        } else {
+            userTimesheets.forEach(ts => {
+                const statusClass = ts.status === 'Approved' ? 'text-success' : 
+                                    ts.status === 'Rejected' ? 'text-danger' : 'text-warning';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="fw-bold ${statusClass}">${ts.status || 'Pending'}</span></td>
+                    <td class="fw-medium">${ts.userName}</td>
+                    <td>${ts.weekStart || '—'}</td>
+                    <td>${ts.weekEnd || '—'}</td>
+                    <td>${ts.totalHours ? ts.totalHours + ' hrs' : '0 hrs'}</td>
+                `;
+                recentBody.appendChild(tr);
+            });
+        }
+
+        // Show remarks or action buttons based on status
+        const status = row.getAttribute('data-status');
+        const actionButtons = document.getElementById('tsActionButtons');
+        const remarksSection = document.getElementById('tsRemarksSection');
+        const comments = row.getAttribute('data-comments');
+
+        if (status === 'Submitted' || status === 'Pending') {
+            actionButtons.classList.remove('d-none');
+            actionButtons.style.display = 'flex';
+            remarksSection.classList.add('d-none');
+        } else {
+            actionButtons.classList.add('d-none');
+            actionButtons.style.display = 'none';
+            if (comments && comments.trim()) {
+                remarksSection.classList.remove('d-none');
+                document.getElementById('detailTsComments').innerText = comments;
+            } else {
+                remarksSection.classList.add('d-none');
+            }
+        }
+    }
+
+    function closeTimesheetDetailsPane() {
+        const leftPane = document.getElementById('timesheet-left-pane');
+        const rightPane = document.getElementById('timesheet-right-pane');
+        if (!leftPane || !rightPane) return;
+        
+        leftPane.className = "col-12";
+        rightPane.classList.add('pane-hidden');
+        
+        const tsTable = document.querySelector('#timesheetCardsContainer table');
+        if (tsTable) {
+            tsTable.classList.remove('table-sm');
+            tsTable.classList.remove('timesheet-compact-table');
+        }
+        
+        document.querySelectorAll('#timesheetCardsContainer .ts-row').forEach(r => r.classList.remove('selected-card'));
+        window.currentSelectedTimesheetId = null;
+    }
+
+    function filterTimesheetTables() {
+        const statusFilter = document.getElementById('timesheetStatusFilter').value;
+        const searchInput = document.getElementById('timesheetSearchInput').value.toLowerCase();
+        
+        document.querySelectorAll('#timesheetCardsContainer .ts-row').forEach(row => {
+            const name = row.getAttribute('data-name').toLowerCase();
+            const status = row.getAttribute('data-status');
+            
+            let show = true;
+            if (statusFilter !== 'All' && status !== statusFilter) show = false;
+            if (searchInput && !name.includes(searchInput)) show = false;
+            
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    function openTimesheetUpdateModal() {
+        document.getElementById('modal-ts-status-select').value = "Approved";
+        document.getElementById('modal-ts-assigned-to').value = "";
+        document.getElementById('modal-ts-comments').value = "";
+        document.getElementById('modal-ts-char-count').innerText = '0';
+        const tsModal = new bootstrap.Modal(document.getElementById('updateTimesheetModal'));
+        tsModal.show();
+    }
+
+    async function submitTimesheetAction() {
+        if (!window.currentSelectedTimesheetId) return;
+        
+        const status = document.getElementById('modal-ts-status-select').value;
+        const comments = document.getElementById('modal-ts-comments').value.trim();
+        const assignedTo = document.getElementById('modal-ts-assigned-to').value.trim();
+
+        if (status === 'Rejected' && comments.length === 0) {
+            Swal.fire('Required', 'Please provide a reason for rejection.', 'warning');
+            return;
+        }
 
         Swal.fire({
-            title: 'Approving...',
+            title: 'Processing...',
+            text: 'Please wait while we update the timesheet...',
             allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
+            didOpen: () => { Swal.showLoading() }
         });
 
+        const formData = new URLSearchParams();
+        if (comments) formData.append('comments', comments);
+
         try {
-            const response = await fetch(`/api/admin/leave/approve/${id}`, { method: 'POST' });
+            const response = await fetch(`/api/admin/timesheet/${window.currentSelectedTimesheetId}/${status}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            });
+
             if (response.ok) {
-                await Swal.fire({ icon: 'success', title: 'Leave Approved!', timer: 1500, showConfirmButton: false });
-                window.location.reload();
-            } else { throw new Error(await response.text()); }
+                Swal.close();
+                bootstrap.Modal.getInstance(document.getElementById('updateTimesheetModal')).hide();
+                
+                if (assignedTo) {
+                    document.getElementById('success-assign-text').innerText = `Timesheet ${status.toLowerCase()} and forwarded to ${assignedTo}.`;
+                } else {
+                    document.getElementById('success-assign-text').innerText = `Timesheet has been ${status.toLowerCase()} successfully.`;
+                }
+                document.getElementById('success-email-text').innerText = 'A confirmation mail will be sent to the employee.';
+                
+                const successModal = new bootstrap.Modal(document.getElementById('workflowConfirmedModal'));
+                successModal.show();
+            } else {
+                const errorMsg = await response.text();
+                Swal.fire('Error!', errorMsg || 'Something went wrong.', 'error');
+            }
         } catch (error) {
-            Swal.fire({ icon: 'error', title: 'Approval Failed', text: error.message });
+            console.error(error);
+            Swal.fire('Error!', 'An unexpected network error occurred.', 'error');
         }
     }
 </script>
+
+    <!-- Modals for Leave Request and Log Ticket Workflow -->
+    <!-- Update Ticket Request Modal -->
+    <div class="modal fade" id="updateTicketModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow" style="border-radius: 12px;">
+                <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                    <h5 class="modal-title text-primary fw-bold">Update Ticket Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-4 pb-4 pt-3">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-1">Status <span class="text-danger">*</span></label>
+                        <select class="form-select text-dark shadow-sm" id="modal-ticket-status-select" style="border-radius: 6px;">
+                            <option value="In Progress">In Progress</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-1">Assign to (Optional)</label>
+                        <select class="form-select shadow-sm" id="modal-ticket-assigned-to" style="border-radius: 6px;">
+                            <option value="">-- Unassigned --</option>
+                            <option th:each="u : ${assignableUsers}" th:value="${u.fullName} + ' (' + ${u.role.roleName} + ')'" th:text="${u.fullName} + ' (' + ${u.role.roleName} + ')'"></option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-1">Add comments (Optional)</label>
+                        <textarea class="form-control shadow-sm" id="modal-ticket-comments" rows="3" placeholder="Write a comment here..." style="border-radius: 6px;" onkeyup="document.getElementById('modal-ticket-char-count').innerText = this.value.length;"></textarea>
+                        <div class="text-end small text-muted mt-1"><span id="modal-ticket-char-count">0</span>/200</div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-dark bg-white fw-bold shadow-sm px-4" data-bs-dismiss="modal" style="border-radius: 20px;">Cancel</button>
+                        <button type="button" class="btn btn-success fw-bold shadow-sm px-4 text-white" style="border-radius: 20px; background-color: #059669; border:none;" onclick="submitTicketAction()">Update Status</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. Update Leave Request Modal -->
+    <div class="modal fade" id="updateLeaveModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow" style="border-radius: 12px;">
+                <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                    <h5 class="modal-title text-primary fw-bold">Update Leave Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-4 pb-4 pt-3">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-1">Status <span class="text-danger">*</span></label>
+                        <select class="form-select text-dark shadow-sm" id="modal-status-select" style="border-radius: 6px;">
+                            <option value="Pending">Pending</option>
+                            <option value="APPROVE">Approve</option>
+                            <option value="REJECT">Reject</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-1">Assign to (Optional)</label>
+                        <select class="form-select shadow-sm" id="modal-assigned-to" style="border-radius: 6px;">
+                            <option value="">-- Unassigned --</option>
+                            <option th:each="u : ${assignableUsers}" th:value="${u.fullName} + ' (' + ${u.role.roleName} + ')'" th:text="${u.fullName} + ' (' + ${u.role.roleName} + ')'"></option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-1">Add comments (Optional)</label>
+                        <textarea class="form-control shadow-sm" id="modal-comments" rows="3" placeholder="Write a comment here..." style="border-radius: 6px;" onkeyup="document.getElementById('modal-char-count').innerText = this.value.length;"></textarea>
+                        <div class="text-end small text-muted mt-1"><span id="modal-char-count">0</span>/200</div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-dark bg-white fw-bold shadow-sm px-4" data-bs-dismiss="modal" style="border-radius: 20px;">Cancel</button>
+                        <button type="button" class="btn btn-success fw-bold shadow-sm px-4 text-white" style="border-radius: 20px; background-color: #059669; border:none;" onclick="submitLeaveAction()">Update Status</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Timesheet Modal -->
+    <div class="modal fade" id="updateTimesheetModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow" style="border-radius: 12px;">
+                <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                    <h5 class="modal-title text-primary fw-bold">Update Timesheet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-4 pb-4 pt-3">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-1">Status <span class="text-danger">*</span></label>
+                        <select class="form-select text-dark shadow-sm" id="modal-ts-status-select" style="border-radius: 6px;">
+                            <option value="Approved">Approve</option>
+                            <option value="Rejected">Reject</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-1">Assign to (Optional)</label>
+                        <select class="form-select shadow-sm" id="modal-ts-assigned-to" style="border-radius: 6px;">
+                            <option value="">-- Unassigned --</option>
+                            <option th:each="u : ${assignableUsers}" th:value="${u.fullName} + ' (' + ${u.role.roleName} + ')'" th:text="${u.fullName} + ' (' + ${u.role.roleName} + ')'"></option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-1">Add comments (Optional)</label>
+                        <textarea class="form-control shadow-sm" id="modal-ts-comments" rows="3" placeholder="Write a comment here..." style="border-radius: 6px;" onkeyup="document.getElementById('modal-ts-char-count').innerText = this.value.length;"></textarea>
+                        <div class="text-end small text-muted mt-1"><span id="modal-ts-char-count">0</span>/200</div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-dark bg-white fw-bold shadow-sm px-4" data-bs-dismiss="modal" style="border-radius: 20px;">Cancel</button>
+                        <button type="button" class="btn btn-success fw-bold shadow-sm px-4 text-white" style="border-radius: 20px; background-color: #059669; border:none;" onclick="submitTimesheetAction()">Update Status</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Workflow Confirmed Success Modal -->
+    <div class="modal fade" id="workflowConfirmedModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow" style="border-radius: 12px; max-width: 320px; margin: 0 auto;">
+                <div class="modal-header border-bottom-0 pb-0 pt-2 pe-2">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center px-4 pb-4 pt-0">
+                    <div class="mb-3 d-flex justify-content-center">
+                        <div class="bg-success bg-opacity-25 rounded-3 d-flex align-items-center justify-content-center position-relative" style="width: 100px; height: 70px;">
+                            <i class="far fa-envelope text-success fs-1"></i>
+                            <i class="fas fa-check-circle text-success fs-5 bg-white rounded-circle position-absolute" style="bottom: 10px; right: 10px;"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-3">Status Updated</h5>
+                    <div class="text-start mb-4">
+                        <div class="d-flex mb-2 align-items-start">
+                            <i class="fas fa-sync-alt text-primary mt-1 me-2" style="font-size: 0.8rem;"></i>
+                            <span class="small text-muted" id="success-assign-text" style="font-size: 0.75rem;">Request status updated.</span>
+                        </div>
+                        <div class="d-flex align-items-start">
+                            <i class="far fa-envelope text-primary mt-1 me-2" style="font-size: 0.8rem;"></i>
+                            <span class="small text-muted" id="success-email-text" style="font-size: 0.75rem;">A confirmation mail will be sent to the employee.</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary w-100 fw-bold shadow-sm" style="border-radius: 6px;" data-bs-dismiss="modal" onclick="window.location.reload()">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>

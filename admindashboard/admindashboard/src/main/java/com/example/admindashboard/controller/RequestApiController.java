@@ -149,9 +149,19 @@ public class RequestApiController {
     // LOCK: Only Admins can update the status of a ticket.
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @PostMapping("/update-status")
-    public ResponseEntity<?> updateStatus(@RequestParam Long id, @RequestParam String status) {
+    public ResponseEntity<?> updateStatus(@RequestParam Long id, 
+                                          @RequestParam String status,
+                                          @RequestParam(required = false) String assignedTo,
+                                          @RequestParam(required = false) String adminComments) {
         ServiceRequest request = repository.findById(id).orElseThrow();
         request.setStatus(status);
+        if (assignedTo != null && !assignedTo.isEmpty()) {
+            request.setAssignedTo(assignedTo);
+        }
+        if (adminComments != null && !adminComments.isEmpty()) {
+            request.setAdminComments(adminComments);
+        }
+        request.setActionDate(java.time.LocalDate.now());
         repository.save(request);
 
         // --- EMAIL TRIGGER START ---

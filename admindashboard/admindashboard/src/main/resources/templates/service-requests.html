@@ -521,11 +521,9 @@
 	    // 1. This line targets the hidden input and wipes the selected file completely
 	    if (document.getElementById('fileInputHidden')) {
 	        document.getElementById('fileInputHidden').value = "";
-	    }
-	    
-	    // 2. This line changes the text on your dropzone layout back to the standard placeholder text
-	    if (document.getElementById('dropzoneText')) {
 	        document.getElementById('dropzoneText').innerHTML = "Browse files";
+            window.uploadedTicketFileName = null;
+            window.uploadedTicketFileBase64 = null;
 	    }
 	}
 
@@ -592,6 +590,8 @@
             justification: description,
             location: locationVal,
             status: "Open",
+            attachmentName: window.uploadedTicketFileName || null,
+            attachmentPath: window.uploadedTicketFileBase64 || null,
             notificationEmailPrimary: /*[[${@environment.getProperty('app.notification.email.primary')}]]*/ 'primary_fallback@example.com',
             notificationEmailSecondary: /*[[${@environment.getProperty('app.notification.email.secondary')}]]*/ 'secondary_fallback@example.com'
         };
@@ -644,13 +644,26 @@
 		}
 	}
 
+	window.uploadedTicketFileName = null;
+	window.uploadedTicketFileBase64 = null;
+
 	function displaySelectedFile(input) {
 	    const textWrapper = document.getElementById('dropzoneText');
 	    if (input.files && input.files.length > 0) {
 	        const file = input.files[0];
 	        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
 	        textWrapper.innerHTML = `<i class="fas fa-file-alt me-2" style="color: #2563eb;"></i> <strong>${file.name}</strong> (${fileSizeMB} MB) <span class="ms-3 text-secondary" style="font-size: 0.85rem; text-decoration: underline;">Change file</span>`;
-	    }
+            
+            window.uploadedTicketFileName = file.name;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                window.uploadedTicketFileBase64 = e.target.result;
+            };
+            reader.readAsDataURL(file);
+	    } else {
+            window.uploadedTicketFileName = null;
+            window.uploadedTicketFileBase64 = null;
+        }
 	}
 </script>
 </body>

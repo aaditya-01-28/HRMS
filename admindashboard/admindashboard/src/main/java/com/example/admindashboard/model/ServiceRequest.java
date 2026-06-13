@@ -42,6 +42,14 @@ public class ServiceRequest {
     @Column(columnDefinition = "TEXT")
     private String justification;
 
+    // NEW FIELDS: Workflow tracking
+    private String assignedTo;
+    @Column(columnDefinition = "TEXT")
+    private String adminComments;
+    private LocalDate actionDate;
+    private String attachmentName;
+    private String attachmentPath;
+
     @PrePersist
     public void generateTicketId() {
         String prefix;
@@ -113,4 +121,19 @@ public class ServiceRequest {
 
     public String getJustification() { return justification; }
     public void setJustification(String justification) { this.justification = justification; }
+
+    public String getAssignedTo() { return assignedTo; }
+    public void setAssignedTo(String assignedTo) { this.assignedTo = assignedTo; }
+
+    public String getAdminComments() { return adminComments; }
+    public void setAdminComments(String adminComments) { this.adminComments = adminComments; }
+
+    public LocalDate getActionDate() { return actionDate; }
+    public void setActionDate(LocalDate actionDate) { this.actionDate = actionDate; }
+
+    public String getAttachmentName() { return attachmentName; }
+    public void setAttachmentName(String attachmentName) { this.attachmentName = attachmentName; }
+
+    public String getAttachmentPath() { return attachmentPath; }
+    public void setAttachmentPath(String attachmentPath) { this.attachmentPath = attachmentPath; }
 }
