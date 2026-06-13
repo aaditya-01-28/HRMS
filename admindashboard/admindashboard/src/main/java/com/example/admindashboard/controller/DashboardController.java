@@ -1449,13 +1449,20 @@ public class DashboardController {
     public String addEmployee(@ModelAttribute User user, Model model) {
         String rawUsername = user.getUsername() != null ? user.getUsername().trim() : "";
 
-        if (!rawUsername.toUpperCase().startsWith("EMP")) {
-            model.addAttribute("errorMessage", "Invalid ID Format! Employee IDs must start with 'EMP' (e.g., EMP101). Admin (ADM) IDs cannot be created here.");
+        String employeeId = rawUsername.toUpperCase();
+
+        if (!(employeeId.startsWith("EMP") || employeeId.startsWith("INT"))) {
+
+            model.addAttribute(
+                "errorMessage",
+                "Invalid ID Format! IDs must start with EMP or INT."
+            );
+
             return "add-employee";
         }
 
-        if (userRepository.existsByUsername(rawUsername)) {
-            model.addAttribute("errorMessage", "Employee ID '" + rawUsername + "' already exists. Please use a different ID.");
+        if (userRepository.existsByUsername(employeeId)) {
+            model.addAttribute("errorMessage", "Employee / Intern ID'" + rawUsername + "' already exists. Please use a different ID.");
             return "add-employee";
         }
         String email = user.getEmail();
@@ -1471,8 +1478,24 @@ public class DashboardController {
         user.setUsername(rawUsername.toUpperCase());
         user.setPassword("{noop}welcome123");
 
-        Role empRole = roleRepository.findByRoleName("EMPLOYEE").orElse(null);
+        Role empRole = roleRepository.findByRoleName("EMPLOYEE")
+                .orElseThrow(() -> new RuntimeException("EMPLOYEE role not found"));
+
         user.setRole(empRole);
+        
+        /*****************************************
+         * INTERN INITIALIZATION BLOCK
+         *****************************************/
+        if (employeeId.startsWith("INT")) {
+
+            EmployeeProfile internProfile = new EmployeeProfile();
+            internProfile.setUser(user);
+
+            internProfile.setDesignation("Intern");
+            internProfile.setCategory("Intern");
+
+            user.setEmployeeProfile(internProfile);
+        }
 
         userRepository.save(user);
         return "redirect:/admin/reports?type=employee";
