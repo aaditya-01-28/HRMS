@@ -479,6 +479,11 @@ public class DashboardController {
     @GetMapping("/employee/profile/edit")
     public String showEditMyProfileForm(Principal principal, Model model) {
         User currentEmployee = userService.findByUsername(principal.getName());
+        if (currentEmployee.getEmployeeProfile() == null) {
+            EmployeeProfile newProfile = new EmployeeProfile();
+            newProfile.setUser(currentEmployee);
+            currentEmployee.setEmployeeProfile(newProfile);
+        }
         model.addAttribute("employee", currentEmployee);
         return "edit-my-profile";
     }

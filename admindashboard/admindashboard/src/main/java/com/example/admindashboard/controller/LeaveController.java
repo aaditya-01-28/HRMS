@@ -73,8 +73,15 @@ public class LeaveController {
                 return ResponseEntity.badRequest().body("Dates are required.");
             }
             
-            // 2. Recalculate totalDays by subtracting holidays (LMS-001)
-            long rawDays = java.time.temporal.ChronoUnit.DAYS.between(leaveRequest.getFromDate(), leaveRequest.getToDate()) + 1;
+            // 2. Recalculate totalDays by excluding weekends and subtracting holidays (LMS-001)
+            long rawDays = 0;
+            java.time.LocalDate tempDate = leaveRequest.getFromDate();
+            while (!tempDate.isAfter(leaveRequest.getToDate())) {
+                if (tempDate.getDayOfWeek() != java.time.DayOfWeek.SUNDAY) {
+                    rawDays++;
+                }
+                tempDate = tempDate.plusDays(1);
+            }
             List<Holiday> holidays = holidayRepository.findByHolidayDateBetweenAndActiveTrue(leaveRequest.getFromDate(), leaveRequest.getToDate());
             double finalDays = (double) (rawDays - holidays.size());
             
