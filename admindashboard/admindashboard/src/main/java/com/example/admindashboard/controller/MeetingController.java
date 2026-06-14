@@ -45,8 +45,8 @@ public class MeetingController {
             if (meeting.getMeetingDate().isBefore(today)) {
                 return ResponseEntity.badRequest().body("Cannot book meetings in the past.");
             }
-            if (meeting.getMeetingDate().isAfter(today.plusYears(1))) {
-                return ResponseEntity.badRequest().body("Cannot book meetings more than 1 year in advance.");
+            if (meeting.getMeetingDate().getYear() > today.getYear()) {
+                return ResponseEntity.badRequest().body("Cannot book a meeting for a future year. Invalid year.");
             }
 
             // 4. Overlapping meetings check

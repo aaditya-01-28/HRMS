@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -492,6 +492,8 @@
                         <div class="meeting-list">
                             <div th:each="meeting : ${upcomingMeetings}" class="meeting-item d-flex align-items-start mb-4 pb-4" style="border-bottom: 1px solid #f8fafc;"
                                  th:data-date="${#temporals.format(meeting.meetingDate, 'yyyy-MM-dd')}"
+                                 th:data-start="${#temporals.format(meeting.startTime, 'HH:mm')}"
+                                 th:data-end="${#temporals.format(meeting.endTime, 'HH:mm')}"
                                  th:data-mode="${meeting.meetingMode}">
                                 
                                 <div class="me-3 mt-1 d-flex justify-content-center align-items-center rounded border" style="width: 45px; height: 45px; border-color: #e2e8f0;">
@@ -508,7 +510,7 @@
                                                        meetingEnd=${meeting.meetingDate.atTime(meeting.endTime)}"
                                               th:text="${now.isAfter(meetingEnd) ? 'Completed' : (now.isAfter(meetingStart) ? 'Ongoing' : 'Upcoming')}"
                                               th:style="${now.isAfter(meetingEnd) ? 'background-color: #f1f5f9; color: #64748b; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;' : (now.isAfter(meetingStart) ? 'background-color: #fef3c7; color: #d97706; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;' : 'background-color: #e0e7ff; color: #4338ca; font-weight: 600; padding: 6px 14px; font-size: 0.75rem;')}"
-                                              class="badge rounded-pill"></span>
+                                              class="badge rounded-pill status-badge-dynamic"></span>
                                     </div>
                                     <div class="text-muted mb-2" style="font-size: 0.9rem; font-weight: 500;">
                                         <span th:text="${meeting.platform}">Platform</span> â€¢ 
@@ -576,6 +578,56 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    // --- REAL-TIME STATUS UPDATER (MT014) ---
+    function updateMeetingBadges() {
+        const now = new Date();
+        // current time in minutes for easy comparison
+        const currentMins = (now.getHours() * 60) + now.getMinutes();
+        const todayStr = now.toISOString().split('T')[0];
+
+        document.querySelectorAll('.meeting-item').forEach(card => {
+            const dateStr = card.getAttribute('data-date');
+            const startStr = card.getAttribute('data-start');
+            const endStr = card.getAttribute('data-end');
+
+            if (!dateStr || !startStr || !endStr) return; // Skip if attributes are missing
+
+            const badge = card.querySelector('.status-badge-dynamic');
+            if (!badge) return;
+
+            // We only dynamically update meetings that are TODAY. 
+            // If it's a future date, it remains 'Upcoming'. If it's a past date, it remains 'Completed'.
+            if (dateStr === todayStr) {
+                const [sH, sM] = startStr.split(':').map(Number);
+                const [eH, eM] = endStr.split(':').map(Number);
+                const startMins = (sH * 60) + sM;
+                const endMins = (eH * 60) + eM;
+
+                if (currentMins >= endMins) {
+                    badge.textContent = 'Completed';
+                    badge.style.backgroundColor = '#f1f5f9';
+                    badge.style.color = '#64748b';
+                } else if (currentMins >= startMins && currentMins < endMins) {
+                    badge.textContent = 'Ongoing';
+                    badge.style.backgroundColor = '#fef3c7';
+                    badge.style.color = '#d97706';
+                } else {
+                    badge.textContent = 'Upcoming';
+                    badge.style.backgroundColor = '#e0e7ff';
+                    badge.style.color = '#4338ca';
+                }
+            } else if (dateStr < todayStr) {
+                badge.textContent = 'Completed';
+                badge.style.backgroundColor = '#f1f5f9';
+                badge.style.color = '#64748b';
+            }
+        });
+    }
+
+    // Run immediately and then every 1 minute
+    updateMeetingBadges();
+    setInterval(updateMeetingBadges, 60000);
+
     function toggleLocation() {
         // Fixed: Grab the value from the exact correct ID
         const mode = document.getElementById('meetingMode').value;
@@ -705,6 +757,14 @@
             return;
         }
 
+        // --- SPECIFIC PARTICIPANT VALIDATION (MT015 Fix) ---
+        if (payload.participantType === 'SPECIFIC_EMP' || payload.participantType === 'SPECIFIC_ADM') {
+            if (!payload.specificEmployeeIds || payload.specificEmployeeIds.trim() === '') {
+                Swal.fire({ icon: 'warning', title: 'Missing IDs', text: 'Please enter at least one Employee/Admin ID.', confirmButtonColor: '#1e3a8a' });
+                return;
+            }
+        }
+
         // --- TIME VALIDATION CHECK ---
         const [startHours, startMins] = payload.startTime.split(':').map(Number);
         const [endHours, endMins] = payload.endTime.split(':').map(Number);
@@ -793,10 +853,9 @@
         }
     }
 
-    // Force all date inputs to have a maximum year of 1 year from now
+    // Force all date inputs to have a maximum date of Dec 31st of the current year
     const maxDate = new Date();
-    maxDate.setFullYear(maxDate.getFullYear() + 1);
-    const maxDateString = maxDate.toISOString().split('T')[0];
+    const maxDateString = maxDate.getFullYear() + "-12-31";
 
     document.querySelectorAll('input[type="date"]').forEach(function(dateInput) {
         dateInput.setAttribute('max', maxDateString);
@@ -826,6 +885,15 @@
                     });
 
                     // Instantly wipe the invalid entry from the input box
+                    this.value = '';
+                } else if (this.value > maxDateString) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Invalid Year',
+                        text: 'You cannot schedule a meeting for a future year. Please select a date in the current year.',
+                        confirmButtonColor: '#1e3a8a'
+                    });
+                    
                     this.value = '';
                 }
             }
