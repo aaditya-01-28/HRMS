@@ -36,6 +36,9 @@ public class DashboardController {
     private TimesheetRepository timesheetRepository;
 
     @Autowired
+    private WeeklyTimesheetRepository weeklyTimesheetRepository;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -251,16 +254,18 @@ public class DashboardController {
 
         // --- PENDING ---
         List<LeaveRequest> pendingLeaves = new ArrayList<>();
-        List<Timesheet> pendingTimesheets = new ArrayList<>();
+        List<WeeklyTimesheet> pendingTimesheets = new ArrayList<>();
         List<ServiceRequest> pendingTickets = new ArrayList<>();
+        List<ServiceRequest> approvedTickets = new ArrayList<>();
+        List<ServiceRequest> rejectedTickets = new ArrayList<>();
 
         // --- APPROVED ---
         List<LeaveRequest> approvedLeaves = new ArrayList<>();
-        List<Timesheet> approvedTimesheets = new ArrayList<>();
+        List<WeeklyTimesheet> approvedTimesheets = new ArrayList<>();
 
         // --- REJECTED ---
         List<LeaveRequest> rejectedLeaves = new ArrayList<>();
-        List<Timesheet> rejectedTimesheets = new ArrayList<>();
+        List<WeeklyTimesheet> rejectedTimesheets = new ArrayList<>();
 
         if (!teamUsernames.isEmpty()) {
             // Leaves
@@ -275,37 +280,64 @@ public class DashboardController {
                     .collect(Collectors.toList());
 
             // Timesheets
-            pendingTimesheets = timesheetRepository.findAll().stream()
+            pendingTimesheets = weeklyTimesheetRepository.findAll().stream()
                     .filter(t -> t.getUser() != null && teamUsernames.contains(t.getUser().getUsername())
                             && ("Pending".equalsIgnoreCase(t.getStatus()) || "Submitted".equalsIgnoreCase(t.getStatus())))
                     .collect(Collectors.toList());
-            approvedTimesheets = timesheetRepository.findAll().stream()
+            approvedTimesheets = weeklyTimesheetRepository.findAll().stream()
                     .filter(t -> t.getUser() != null && teamUsernames.contains(t.getUser().getUsername()) && "Approved".equalsIgnoreCase(t.getStatus()))
                     .collect(Collectors.toList());
-            rejectedTimesheets = timesheetRepository.findAll().stream()
+            rejectedTimesheets = weeklyTimesheetRepository.findAll().stream()
                     .filter(t -> t.getUser() != null && teamUsernames.contains(t.getUser().getUsername()) && "Rejected".equalsIgnoreCase(t.getStatus()))
                     .collect(Collectors.toList());
 
             // Service Requests
             pendingTickets = serviceRequestRepository.findAll().stream()
-                    .filter(t -> teamUsernames.contains(t.getEmployeeId()) && "Open".equalsIgnoreCase(t.getStatus()))
+                    .filter(t -> teamUsernames.contains(t.getEmployeeId()) && ("Open".equalsIgnoreCase(t.getStatus()) || "In Progress".equalsIgnoreCase(t.getStatus())))
+                    .collect(Collectors.toList());
+            approvedTickets = serviceRequestRepository.findAll().stream()
+                    .filter(t -> teamUsernames.contains(t.getEmployeeId()) && ("Approved".equalsIgnoreCase(t.getStatus()) || "Resolved".equalsIgnoreCase(t.getStatus())))
+                    .collect(Collectors.toList());
+            rejectedTickets = serviceRequestRepository.findAll().stream()
+                    .filter(t -> teamUsernames.contains(t.getEmployeeId()) && "Rejected".equalsIgnoreCase(t.getStatus()))
                     .collect(Collectors.toList());
         }
 
         int totalPending = pendingLeaves.size() + pendingTimesheets.size() + pendingTickets.size();
-        int totalApproved = approvedLeaves.size() + approvedTimesheets.size();
-        int totalRejected = rejectedLeaves.size() + rejectedTimesheets.size();
+        int totalApproved = approvedLeaves.size() + approvedTimesheets.size() + approvedTickets.size();
+        int totalRejected = rejectedLeaves.size() + rejectedTimesheets.size() + rejectedTickets.size();
 
         model.addAttribute("pendingLeaves", pendingLeaves);
         model.addAttribute("pendingTimesheets", pendingTimesheets);
         model.addAttribute("pendingTickets", pendingTickets);
         model.addAttribute("approvedLeaves", approvedLeaves);
         model.addAttribute("approvedTimesheets", approvedTimesheets);
+        model.addAttribute("approvedTickets", approvedTickets);
         model.addAttribute("rejectedLeaves", rejectedLeaves);
         model.addAttribute("rejectedTimesheets", rejectedTimesheets);
+        model.addAttribute("rejectedTickets", rejectedTickets);
+        
+        // Combine all timesheet lists for "Recent Timesheets" table in the frontend
+        java.util.List<WeeklyTimesheet> allTimesheets = new ArrayList<>();
+        allTimesheets.addAll(pendingTimesheets);
+        allTimesheets.addAll(approvedTimesheets);
+        allTimesheets.addAll(rejectedTimesheets);
+        model.addAttribute("allTimesheets", allTimesheets);
         model.addAttribute("totalPending", totalPending);
         model.addAttribute("totalApproved", totalApproved);
         model.addAttribute("totalRejected", totalRejected);
+        
+        // Fetch L1/L2 Support users for genuine assignment dropdown
+        java.util.List<com.example.admindashboard.model.User> assignableUsers = userRepository.findAll().stream()
+                .filter(u -> {
+                    if (u.getRole() == null || !"ACTIVE".equals(u.getStatus())) return false;
+                    String r = u.getRole().getRoleName();
+                    // Using Admin/HR/IT roles as the genuine "Level 1 / Level 2" support assignees
+                    return "ROLE_SUPER_ADMIN".equals(r) || "ROLE_ADMIN".equals(r) || "ROLE_HR_ADMIN".equals(r) || "ROLE_IT_ADMIN".equals(r);
+                })
+                .collect(Collectors.toList());
+        model.addAttribute("assignableUsers", assignableUsers);
+        
         model.addAttribute("user", currentUser);
 
         return "manager-workflow";

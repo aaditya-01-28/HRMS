@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,11 @@ public class AdminLeaveController {
     @PreAuthorize("hasAuthority('leave_approve')")
     @PostMapping("/api/admin/leave/approve/{id}")
     @ResponseBody
-    public ResponseEntity<String> approveLeave(@PathVariable Long id, Principal principal) {
+    public ResponseEntity<String> approveLeave(
+            @PathVariable Long id,
+            @RequestParam(value = "note", required = false) String note,
+            @RequestParam(value = "assignedTo", required = false) String assignedTo,
+            Principal principal) {
         try {
             User currentUser = userRepository.findByUsername(principal.getName()).orElseThrow();
             boolean isManager = currentUser.getRole() != null && "MANAGER".equalsIgnoreCase(currentUser.getRole().getRoleName());
@@ -101,6 +106,11 @@ public class AdminLeaveController {
                         .body("Leave already approved.");
             }
             leave.setStatus("Approved");
+            leave.setAdminComments(note);
+            leave.setActionDate(LocalDateTime.now());
+            if (assignedTo != null && !assignedTo.isBlank()) {
+                leave.setAssignedTo(assignedTo);
+            }
             leaveRequestRepository.save(leave);
 
             // Map leave type string to code
@@ -124,6 +134,7 @@ public class AdminLeaveController {
                 emailData.put("specificType", leave.getLeaveType());
                 emailData.put("submittedOn", leave.getCreatedAt());
                 emailData.put("duration", leave.getFromDate() + " to " + leave.getToDate() + " (" + leave.getTotalDays() + " Days)");
+                emailData.put("adminComments", note);
 
                 emailService.sendRequestStatusUpdateToEmployee(
                         leave.getUser().getEmail(),
@@ -222,6 +233,7 @@ public class AdminLeaveController {
             emailData.put("specificType", leave.getLeaveType());
             emailData.put("submittedOn", leave.getCreatedAt());
             emailData.put("duration", leave.getFromDate() + " to " + leave.getToDate() + " (" + leave.getTotalDays() + " Days)");
+            emailData.put("adminComments", note);
 
             if (lopDays > 0) {
                 emailData.put("lopNote", regularDays + " day(s) from " + leave.getLeaveType() + " + " + lopDays + " day(s) as LOP");
@@ -255,6 +267,7 @@ public class AdminLeaveController {
     public ResponseEntity<String> rejectLeave(
             @PathVariable Long id,
             @RequestParam(value = "note", required = false) String note,
+            @RequestParam(value = "assignedTo", required = false) String assignedTo,
             Principal principal) {
 
         try {
@@ -271,6 +284,10 @@ public class AdminLeaveController {
 
             leave.setStatus("Rejected");
             leave.setAdminComments(note);
+            leave.setActionDate(LocalDateTime.now());
+            if (assignedTo != null && !assignedTo.isBlank()) {
+                leave.setAssignedTo(assignedTo);
+            }
 
             leaveRequestRepository.save(leave);
 

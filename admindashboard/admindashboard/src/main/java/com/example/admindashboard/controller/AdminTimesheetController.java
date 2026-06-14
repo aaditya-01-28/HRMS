@@ -50,7 +50,7 @@ public class AdminTimesheetController {
 
     // 1. Fetch timesheets by status
     // FIXED LOCK: Added ROLE_HR_EXECUTIVE to the permitted roles
-    @PreAuthorize("hasAnyAuthority('ROLE_HR_MANAGER','ROLE_ADMIN','ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER','ROLE_HR_EXECUTIVE','ROLE_HR_MANAGER','ROLE_ADMIN','ROLE_SUPER_ADMIN')")
     @GetMapping("/list")
     
     public ResponseEntity<List<WeeklyTimesheet>> getTimesheets(@RequestParam String status, Principal principal) {
@@ -99,7 +99,7 @@ public class AdminTimesheetController {
 
     // 2. Approve or Reject
     // FIXED LOCK: Added ROLE_HR_EXECUTIVE to the permitted roles
-    @PreAuthorize("hasAnyAuthority('ROLE_HR_MANAGER','ROLE_ADMIN','ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER','ROLE_HR_EXECUTIVE','ROLE_HR_MANAGER','ROLE_ADMIN','ROLE_SUPER_ADMIN')")
     @PostMapping("/{id}/{status}")
     public ResponseEntity<?> updateStatus(
             @PathVariable Long id,
