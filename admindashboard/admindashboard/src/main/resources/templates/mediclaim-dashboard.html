@@ -24,380 +24,459 @@
             --glass-border: rgba(255, 255, 255, 0.6);
         }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-dark);
-            padding-top: 110px;
-            padding-bottom: 40px;
-            background-image: radial-gradient(circle at 10% 0%, rgba(30, 136, 229, 0.08) 0%, transparent 40%),
-                              radial-gradient(circle at 90% 100%, rgba(67, 160, 71, 0.05) 0%, transparent 40%);
-            background-attachment: fixed;
-        }
+		*{
+		    margin:0;
+		    padding:0;
+		    box-sizing:border-box;
+		    font-family:Arial,sans-serif;
+		}
 
-        /* --- TOP NAV --- */
-        .med-nav {
-            position: fixed; top: 0; left: 0; right: 0; height: 80px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 40px; z-index: 1000;
-            border-bottom: 1px solid var(--glass-border);
-            box-shadow: 0 4px 30px rgba(0,0,0,0.03);
-        }
-        .brand-logo { font-weight: 800; font-size: 1.4rem; color: var(--med-primary); display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px;}
+		body{
+		    background:#f3f3f3;
+		    font-size:14px;
+		}
 
-        /* --- TOP NAV LINKS --- */
-        .nav-links { display: flex; gap: 24px; align-items: center; margin-left: 50px; }
-        .nav-links a { color: var(--text-dark); text-decoration: none; font-weight: 700; font-size: 0.95rem; transition: 0.3s; opacity: 0.7; }
-        .nav-links a:hover, .nav-links a.active { color: var(--med-primary); opacity: 1; }
+		.dashboard-wrapper{
+		    display:flex;
+		    min-height:100vh;
+		}
 
-        /* --- LEFT SIDEBAR --- */
-        .med-sidebar {
-            position: fixed; top: 80px; left: 0; bottom: 0; width: 260px;
-            background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-right: 1px solid var(--glass-border);
-            padding: 30px 20px; z-index: 900;
-            display: flex; flex-direction: column; gap: 8px;
-        }
-        .sidebar-link {
-            display: flex; align-items: center; gap: 15px;
-            padding: 14px 20px; border-radius: 12px;
-            color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-        .sidebar-link i { font-size: 1.2rem; width: 24px; text-align: center; }
-        .sidebar-link:hover, .sidebar-link.active {
-            background: rgba(30, 136, 229, 0.1); color: var(--med-primary); font-weight: 700;
-        }
+		.sidebar{
+		    width:250px;
+		    background:#001A57;
+		    color:white;
+		    padding:25px 10px;
+		    flex-shrink:0;
+		}
 
-        /* --- MAIN CONTENT WRAPPER --- */
-        .main-content {
-            margin-left: 260px; /* Offset for sidebar */
-            padding: 0 20px;
-        }
+		.sidebar-logo{
+		    text-align:center;
+		    margin-bottom:40px;
+		}
 
-        @media (max-width: 1024px) {
-            .main-content { margin-left: 0; }
-        }
+		.sidebar-logo img{
+		    width:50px;
+		    height:50px;
+		    object-fit:contain;
+		}
 
-        /* --- SAAS LAYOUT GRID --- */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2.2fr 1fr;
-            gap: 24px;
-            max-width: 1300px;
-            margin: 0 auto;
-        }
+		.sidebar-menu{
+		    display:flex;
+		    flex-direction:column;
+		    gap:12px;
+		}
 
-        /* --- UNIFIED HEALTH WALLET (HERO BANNER) - COMPACTED --- */
-        .health-wallet-panel {
-            background: linear-gradient(135deg, var(--med-primary) 0%, var(--med-primary-dark) 100%);
-            border-radius: 20px;
-            padding: 25px 35px; /* TIGHTENED PADDING */
-            color: white;
-            box-shadow: 0 15px 35px rgba(30, 136, 229, 0.15);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+		.menu-item{
+		    color:white;
+		    text-decoration:none;
+		    font-size:14px;
+		    padding:10px 12px;
+		    border-radius:10px;
+		    display:flex;
+		    align-items:center;
+		    gap:8px;
+		}
 
-        /* Decorative Background Pattern */
-        .health-wallet-panel::after {
-            content: '\f21e'; /* Heartbeat icon */
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            position: absolute;
-            right: -10px;
-            bottom: -30px;
-            font-size: 12rem;
-            color: rgba(255,255,255,0.05);
-            pointer-events: none;
-            transform: rotate(-15deg);
-        }
+		.menu-item.active{
+		    background:#2E63FF;
+		}
 
-        .wallet-metrics { z-index: 2; }
-        .wallet-label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.8); margin-bottom: 4px; }
-        .wallet-balance { font-size: 2.6rem; /* SCALED DOWN */ font-weight: 800; margin-bottom: 12px; line-height: 1; letter-spacing: -1px; }
+		.menu-item:hover{
+		    background:#2E63FF;
+		}
 
-        .sub-metrics-row { display: flex; gap: 30px; /* TIGHTENED GAP */ }
-        .sub-metric span { display: block; font-size: 0.75rem; color: rgba(255,255,255,0.7); text-transform: uppercase; font-weight: 700; margin-bottom: 2px;}
-        .sub-metric h5 { margin: 0; font-weight: 700; font-size: 1.15rem; /* SCALED DOWN */ }
+		.main-section{
+		    flex:1;
+		    background:#f5f5f5;
+		}
 
-        /* Animated Progress Circle - COMPACTED */
-        .progress-circle {
-            width: 130px; height: 130px; border-radius: 50%; /* SCALED DOWN */
-            background: conic-gradient(#ffffff 24%, rgba(255,255,255,0.2) 0deg);
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
-            animation: loadProgress 1.5s ease-out forwards;
-            z-index: 2;
-        }
-        .progress-circle::before {
-            content: ''; position: absolute; width: 105px; height: 105px; /* SCALED DOWN */
-            background: var(--med-primary-dark); border-radius: 50%;
-        }
-        .progress-value { position: relative; z-index: 1; font-size: 1.6rem; /* SCALED DOWN */ font-weight: 800; color: white; text-align: center; line-height: 1.1; }
-        .progress-value span { display: block; font-size: 0.7rem; color: rgba(255,255,255,0.7); font-weight: 600; text-transform: uppercase; }
+		.top-header{
+		    height:90px;
+		    background:#F0F2F5;
+		    border-bottom:2px solid #cbd5e1;
 
-        @keyframes loadProgress {
-            0% { background: conic-gradient(#ffffff 0%, rgba(255,255,255,0.2) 0deg); }
-            100% { background: conic-gradient(#ffffff 24%, rgba(255,255,255,0.2) 0deg); }
-        }
+		    display:flex;
+		    justify-content:space-between;
+		    align-items:center;
 
-        /* --- SPLIT ANALYTICS PANES --- */
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-top: 24px;
-        }
+		    padding:0 40px;
+		}
 
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.03);
-            display: flex; flex-direction: column;
-        }
+		.header-left{
+		    display:flex;
+		    align-items:center;
+		    gap:15px;
+		}
 
-        .panel-title { font-weight: 800; font-size: 1.1rem; color: var(--text-dark); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .panel-title i { color: var(--med-primary); }
+		.header-icon{
+		    width:50px;
+		    height:50px;
+		    object-fit:contain;
+		}
 
-        /* Pending Claims List */
-        .claim-list-item {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 14px 16px;
-            display: flex; justify-content: space-between; align-items: center;
-            transition: all 0.2s ease;
-        }
-        .claim-list-item:hover { transform: translateX(5px); border-color: var(--med-orange); box-shadow: 0 5px 15px rgba(251, 140, 0, 0.1); }
+		.header-left h1{
+		    font-size:20px;
+		    color:#0B2E7A;
+		    font-weight:700;
+		}
 
-        /* --- QUICK ACTION SIDEBAR --- */
-        .action-sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
+		.back-home-btn{
+		    background:#2E63FF;
+		    color:white;
+		    text-decoration:none;
 
-        .premium-btn {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 18px;
-            padding: 20px;
-            display: flex; align-items: center; gap: 18px;
-            text-decoration: none; color: var(--text-dark);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.02);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative; overflow: hidden;
-        }
+		    padding:14px 32px;
 
-        .btn-icon-wrapper {
-            width: 50px; height: 50px; border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; transition: all 0.3s ease;
-            background: #f8fafc;
-        }
+		    border-radius:10px;
 
-        .premium-btn h6 { margin: 0 0 3px 0; font-weight: 800; font-size: 1rem; }
-        .premium-btn p { margin: 0; font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+		    font-size:14px;
+		    font-weight:700;
+		}
 
-        /* Specific Button Colors & Bounce/Ripple Effects */
-        .raise-claim .btn-icon-wrapper { color: var(--med-primary); background: rgba(30, 136, 229, 0.1); }
-        .add-dep .btn-icon-wrapper { color: var(--med-green); background: rgba(67, 160, 71, 0.1); }
-        .view-pol .btn-icon-wrapper { color: var(--med-orange); background: rgba(251, 140, 0, 0.1); }
-        .find-hosp .btn-icon-wrapper { color: var(--med-red); background: rgba(229, 57, 53, 0.1); }
+		.dashboard-content{
+		    padding:30px 60px;
+		}
 
-        .premium-btn:hover { transform: translateY(-4px); box-shadow: 0 15px 35px rgba(0,0,0,0.08); background: #ffffff; }
-        .premium-btn:hover .btn-icon-wrapper { transform: scale(1.15) rotate(-5deg); color: white; }
+		.welcome-section{
+		    display:flex;
+		    align-items:center;
+		    gap:20px;
+		    margin-bottom:30px;
+		}
 
-        .premium-btn.raise-claim:hover .btn-icon-wrapper { background: var(--med-primary); box-shadow: 0 8px 20px rgba(30, 136, 229, 0.3); }
-        .premium-btn.add-dep:hover .btn-icon-wrapper { background: var(--med-green); box-shadow: 0 8px 20px rgba(67, 160, 71, 0.3); }
-        .premium-btn.view-pol:hover .btn-icon-wrapper { background: var(--med-orange); box-shadow: 0 8px 20px rgba(251, 140, 0, 0.3); }
-        .premium-btn.find-hosp:hover .btn-icon-wrapper { background: var(--med-red); box-shadow: 0 8px 20px rgba(229, 57, 53, 0.3); }
+		.provider-logo{
+		    width:50px;
+		    height:50px;
+		    object-fit:contain;
+		}
 
-        /* Ripple Effect Core */
-        .premium-btn::after {
-            content: ""; position: absolute; width: 100px; height: 100px;
-            background: rgba(0,0,0,0.05); border-radius: 50%;
-            transform: scale(0); opacity: 0; pointer-events: none;
-            transition: transform 0.5s, opacity 1s;
-            top: 50%; left: 50%; margin-top: -50px; margin-left: -50px;
-        }
-        .premium-btn:active::after { transform: scale(4); opacity: 1; transition: 0s; }
+		.welcome-section h2{
+		    font-size:20px;
+		    font-weight:700;
+		    color:#111827;
+		}
 
-        @media (max-width: 1024px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-            .health-wallet-panel { flex-direction: column; text-align: center; gap: 30px; }
-            .sub-metrics-row { justify-content: center; }
-            .action-sidebar { display: grid; grid-template-columns: 1fr 1fr; }
-        }
-        @media (max-width: 768px) {
-            .analytics-grid { grid-template-columns: 1fr; }
-            .action-sidebar { grid-template-columns: 1fr; }
-        }
+		.info-section{
+		    max-width:750px;
+		}
+
+		.info-row{
+		    display:flex;
+		    margin-bottom:18px;
+		}
+
+		.label{
+		    width:140px;
+		    font-size:14px;
+		    color:#222;
+		}
+
+		.value{
+		    font-size:14px;
+		    font-weight:600;
+		    color:#111;
+		}
+
+		.divider{
+		    margin:30px 0;
+		    border:none;
+		    border-top:1px solid #8f8f8f;
+		    max-width:750px;
+		}
+
     </style>
 </head>
 <body>
+	<div class="dashboard-wrapper">
 
-<nav class="med-nav">
-    <div class="d-flex align-items-center">
-        <div class="brand-logo">
-            <i class="fas fa-shield-heart fs-3"></i> WhiteCircle Health
-        </div>
+	    <!-- Sidebar -->
 
-        <div class="nav-links d-none d-lg-flex">
-            <a href="/employee/mediclaim/portal" class="active">Dashboard</a>
-            <a href="/employee/mediclaim/policy">Insurance</a>
-            <a th:href="@{/employee/mediclaim/track/list}">Claims</a>
-        </div>
-    </div>
+	    <div class="sidebar">
 
-    <div class="d-flex align-items-center gap-3">
-        <a href="/employee/mediclaim/notifications" class="text-decoration-none position-relative me-2">
-            <i class="fas fa-bell fs-5 text-muted"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">3</span>
-        </a>
+	        <div class="sidebar-logo">
 
-        <div class="d-flex align-items-center gap-2">
-            <a href="/employee/mediclaim/profile" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold shadow-sm">
-                <i class="fas fa-user-circle me-1"></i> My Profile
-            </a>
-        </div>
+	            <!-- Replace image later -->
+				<img th:src="@{/images/wcg-logo.jpg}"
+				     alt="WhiteCircle"
+				     class="sidebar-logo">
 
-        <a href="/default-redirect" class="btn btn-light border btn-sm fw-bold rounded-pill px-3 shadow-sm">
-            <i class="fas fa-sign-out-alt me-1"></i> Exit Vault
-        </a>
-    </div>
-</nav>
+	        </div>
 
-<aside class="med-sidebar d-none d-lg-flex">
-    <div class="text-uppercase small fw-bold text-muted mb-2 px-3" style="letter-spacing: 1px;">Main Menu</div>
-    <a href="/employee/mediclaim/portal" class="sidebar-link active"><i class="fas fa-home"></i> Dashboard</a>
-    <a href="/employee/mediclaim/policy" class="sidebar-link"><i class="fas fa-file-contract"></i> Policies</a>
-    <a href="/employee/mediclaim/dependents" class="sidebar-link"><i class="fas fa-users"></i> Dependents</a>
-    <a th:href="@{/employee/mediclaim/track/list}" class="sidebar-link"><i class="fas fa-notes-medical"></i> Claims</a>
-    <a href="#" class="sidebar-link"><i class="fas fa-folder-open"></i> Documents</a>
-</aside>
+	        <div class="sidebar-menu">
 
-<main class="main-content">
-    <div class="dashboard-grid">
-        <div>
-            <div class="health-wallet-panel">
-                <div class="wallet-metrics">
-                    <div class="wallet-label">Available Balance</div>
-                    <div class="wallet-balance">â‚¹3,80,000</div>
+	            <a href="/employee/mediclaim/portal"
+	               class="menu-item active">
 
-                    <div class="sub-metrics-row">
-                        <div class="sub-metric">
-                            <span>Total Coverage</span>
-                            <h5>â‚¹5,00,000</h5>
-                        </div>
-                        <div class="sub-metric">
-                            <span>Amount Used</span>
-                            <h5>â‚¹1,20,000</h5>
-                        </div>
-                    </div>
-                </div>
+	                <i class="fa-solid fa-table-columns"></i>
 
-                <div class="progress-circle">
-                    <div class="progress-value">
-                        24%
-                        <span>Utilized</span>
-                    </div>
-                </div>
-            </div>
+	                Dashboard
 
-            <div class="analytics-grid">
-                <div class="glass-panel">
-                    <div class="panel-title"><i class="fas fa-chart-pie"></i> Claim Status Distribution</div>
-                    <div class="flex-grow-1 d-flex justify-content-center align-items-center" style="position: relative; height: 220px;">
-                        <canvas id="claimsPieChart"></canvas>
-                    </div>
-                </div>
+	            </a>
 
-                <div class="glass-panel">
-                    <div class="panel-title d-flex justify-content-between w-100">
-                        <span><i class="fas fa-file-medical-alt"></i> Recent Claims</span>
-                        <span class="badge bg-warning text-dark rounded-pill" th:text="${pendingCount != null ? pendingCount + ' Pending' : '0 Pending'}">0 Pending</span>
-                    </div>
+	            <a href="/employee/mediclaim/policy"
+	               class="menu-item">
 
-                    <div class="d-flex flex-column gap-3 mt-2">
-                        <div th:if="${#lists.isEmpty(claims)}" class="alert alert-light border text-center py-3 m-0">
-                            <span class="text-muted small fw-bold">No claims raised yet.</span>
-                        </div>
+	                <i class="fa-solid fa-file-shield"></i>
 
-                        <div class="claim-list-item" th:each="claim, stat : ${claims}" th:if="${stat.index < 3}"
-                             th:classappend="${claim.status == 'Settled' or claim.status == 'Rejected' ? 'opacity-50' : ''}">
+	                Coverage
 
-                            <div>
-                                <h6 class="fw-bold m-0" style="font-size: 0.95rem;"
-                                    th:text="'CLM-' + ${#temporals.format(claim.submissionDate, 'yyyy')} + '-' + ${#numbers.formatInteger(claim.id, 4)}">CLM-0000</h6>
-                                <span class="text-muted small" th:text="${claim.hospitalName + ' â€¢ ' + claim.claimType}">Hospital â€¢ Type</span>
-                            </div>
+	            </a>
 
-                            <span class="badge border"
-                                  th:classappend="${claim.status == 'Pending' ? 'bg-warning bg-opacity-10 text-warning border-warning' :
-                                                  (claim.status == 'Approved' or claim.status == 'Settled' ? 'bg-success bg-opacity-10 text-success border-success' :
-                                                  'bg-danger bg-opacity-10 text-danger border-danger')}"
-                                  th:text="${claim.status}">Status</span>
-                        </div>
-                    </div>
+	            <a href="/employee/mediclaim/track/list"
+	               class="menu-item">
 
-                    <div class="mt-4 pt-2 border-top" th:if="${not #lists.isEmpty(claims)}">
-                        <a th:href="@{/employee/mediclaim/track/{id}(id=${claims[0].id})}"
-                           class="btn btn-outline-primary btn-sm w-100 fw-bold rounded-pill"
-                           style="padding: 8px; font-size: 0.85rem;">
-                            <i class="fas fa-eye me-2"></i>View Tracking Details
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+	                <i class="fa-solid fa-file-medical"></i>
 
-        <div class="action-sidebar">
-            <h5 class="fw-bold mb-1 mt-2">Quick Actions</h5>
+	                Claims
 
-            <a href="/employee/mediclaim/claim" class="premium-btn raise-claim">
-                <div class="btn-icon-wrapper"><i class="fas fa-plus"></i></div>
-                <div>
-                    <h6>Raise New Claim</h6>
-                    <p>Reimbursement & cashless</p>
-                </div>
-            </a>
+	            </a>
 
-            <a href="/employee/mediclaim/dependents" class="premium-btn add-dep">
-                <div class="btn-icon-wrapper"><i class="fas fa-user-plus"></i></div>
-                <div>
-                    <h6>Add Dependent</h6>
-                    <p>Register family members</p>
-                </div>
-            </a>
+				<a href="/employee/mediclaim/helpdesk"
+				   class="menu-item">
 
-            <a href="/employee/mediclaim/policy" class="premium-btn view-pol">
-                <div class="btn-icon-wrapper"><i class="fas fa-file-contract"></i></div>
-                <div>
-                    <h6>Insurance Policy</h6>
-                    <p>View coverage details</p>
-                </div>
-            </a>
+	                <i class="fa-solid fa-circle-question"></i>
 
-            <a href="/employee/mediclaim/hospitals" class="premium-btn find-hosp">
-                <div class="btn-icon-wrapper"><i class="fas fa-hospital-symbol"></i></div>
-                <div>
-                    <h6>Find Hospital</h6>
-                    <p>Network & cashless clinics</p>
-                </div>
-            </a>
-        </div>
-    </div>
+	                Help center
+
+	            </a>
+
+	        </div>
+
+	    </div>
+
+	    <!-- Main -->
+
+	    <div class="main-section">
+
+	        <!-- Header -->
+
+	        <div class="top-header">
+
+	            <div class="header-left">
+
+	                <!-- Replace image later -->
+	                <img src=""
+	                     alt="Mediclaim"
+	                     class="header-icon">
+
+	                <h1>
+
+	                    My Mediclaims
+
+	                </h1>
+
+	            </div>
+
+	            <a href="/employee/dashboard"
+	               class="back-home-btn">
+
+	                Back to Home
+
+	            </a>
+
+	        </div>
+
+	        <!-- Content -->
+
+	        <div class="dashboard-content">
+
+	            <div class="welcome-section">
+
+	                <!-- Replace image later -->
+	                <img src=""
+	                     alt="Provider Logo"
+	                     class="provider-logo">
+
+	                <div>
+
+	                    <h2>
+
+	                        Welcome to
+
+	                        <span th:text="${policy != null ? policy.providerName : '-'}">
+
+	                            Provider
+
+	                        </span>
+
+	                    </h2>
+
+	                </div>
+
+	            </div>
+
+	            <!-- Employee Information -->
+
+	            <div class="info-section">
+
+	                <div class="info-row">
+
+	                    <div class="label">
+
+	                        Name:
+	                    </div>
+
+	                    <div class="value"
+	                         th:text="${user.fullName}">
+
+	                        Employee Name
+
+	                    </div>
+
+	                </div>
+
+	                <div class="info-row">
+
+	                    <div class="label">
+
+	                        Email:
+	                    </div>
+
+	                    <div class="value"
+	                         th:text="${profile != null ? profile.officialEmail : '-'}">
+
+	                        Email
+
+	                    </div>
+
+	                </div>
+
+	                <div class="info-row">
+
+	                    <div class="label">
+
+	                        Phone No.:
+	                    </div>
+
+	                    <div class="value"
+	                         th:text="${profile != null ? profile.mobileNumber : '-'}">
+
+	                        Mobile
+
+	                    </div>
+
+	                </div>
+
+	                <div class="info-row">
+
+	                    <div class="label">
+
+	                        Company:
+	                    </div>
+
+	                    <div class="value"
+	                         th:text="${profile != null ? profile.businessUnit : '-'}">
+
+	                        Company
+
+	                    </div>
+
+	                </div>
+
+	            </div>
+
+	            <hr class="divider">
+
+	            <!-- Policy Information -->
+
+	            <div class="info-section">
+
+	                <div class="info-row">
+
+	                    <div class="label">
+
+	                        Insurer:
+	                    </div>
+
+	                    <div class="value"
+	                         th:text="${policy.providerName}">
+
+	                        Insurer
+
+	                    </div>
+
+	                </div>
+
+	                <div class="info-row">
+
+	                    <div class="label">
+
+	                        Policy Name:
+	                    </div>
+
+	                    <div class="value"
+	                         th:text="${policy.providerName}">
+
+	                        Group Health Insurance
+
+	                    </div>
+
+	                </div>
+
+	                <div class="info-row">
+
+	                    <div class="label">
+
+	                        Policy No.:
+	                    </div>
+
+	                    <div class="value"
+	                         th:text="${policy != null ? policy.policyNumber : '-'}">
+
+	                        Policy Number
+
+	                    </div>
+
+	                </div>
+
+	                <div class="info-row">
+
+	                    <div class="label">
+
+	                        Policy Period:
+	                    </div>
+
+	                    <div class="value">
+
+	                        <span th:text="${policy.validFrom}">
+
+	                        </span>
+
+	                        -
+
+	                        <span th:text="${policy.validUntil}">
+
+	                        </span>
+
+	                    </div>
+
+	                </div>
+
+	                <div class="info-row">
+
+	                    <div class="label">
+
+	                        Insured:
+	                    </div>
+
+	                    <div class="value"
+	                         th:text="${user.fullName}">
+
+	                        Insured Person
+
+	                    </div>
+
+	                </div>
+
+	            </div>
+
+	        </div>
+
+	    </div>
+
+	</div>
+
+
 </main> <script>
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('claimsPieChart').getContext('2d');

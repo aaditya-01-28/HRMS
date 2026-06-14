@@ -8,4 +8,5 @@ import java.util.List;
 public interface MediclaimRepository extends JpaRepository<Mediclaim, Long> {
     // This will let us easily fetch all claims for the logged-in user later!
     List<Mediclaim> findByUserOrderBySubmissionDateDesc(User user);
+    
 }

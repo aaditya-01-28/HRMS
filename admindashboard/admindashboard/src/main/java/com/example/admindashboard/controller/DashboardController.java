@@ -5,10 +5,10 @@ import com.example.admindashboard.repository.*;
 import com.example.admindashboard.service.AuditLogService;
 import com.example.admindashboard.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.example.admindashboard.repository.LeaveRequestRepository;
-
+import com.example.admindashboard.service.GoalBurnChartService;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -67,6 +67,15 @@ public class DashboardController {
 
     @Autowired
     private LeaveRequestRepository leaveRequestRepository;
+    
+    @Autowired
+    private GoalRepository goalRepository;
+    
+    @Autowired
+    private GoalBurnChartService goalBurnChartService;
+
+    @Autowired
+    private GoalUpdateRepository goalUpdateRepository;
 
     @Autowired
     private com.example.admindashboard.repository.AttendanceRepository attendanceRepository;
@@ -1486,16 +1495,26 @@ public class DashboardController {
 
     @PreAuthorize("hasAuthority('employee_create')")
     @PostMapping("/admin/add-employee-submit")
-    public String addEmployee(@ModelAttribute User user, Model model) {
+    public String addEmployee(
+            @ModelAttribute User user,
+            @ModelAttribute EmployeeProfile employeeProfile,
+            Model model) {
         String rawUsername = user.getUsername() != null ? user.getUsername().trim() : "";
 
-        if (!rawUsername.toUpperCase().startsWith("EMP")) {
-            model.addAttribute("errorMessage", "Invalid ID Format! Employee IDs must start with 'EMP' (e.g., EMP101). Admin (ADM) IDs cannot be created here.");
+        String employeeId = rawUsername.toUpperCase();
+
+        if (!(employeeId.startsWith("EMP") || employeeId.startsWith("INT"))) {
+
+            model.addAttribute(
+                "errorMessage",
+                "Invalid ID Format! IDs must start with EMP or INT."
+            );
+
             return "add-employee";
         }
 
-        if (userRepository.existsByUsername(rawUsername)) {
-            model.addAttribute("errorMessage", "Employee ID '" + rawUsername + "' already exists. Please use a different ID.");
+        if (userRepository.existsByUsername(employeeId)) {
+            model.addAttribute("errorMessage", "Employee / Intern ID'" + rawUsername + "' already exists. Please use a different ID.");
             return "add-employee";
         }
         String email = user.getEmail();
@@ -1511,8 +1530,21 @@ public class DashboardController {
         user.setUsername(rawUsername.toUpperCase());
         user.setPassword("{noop}welcome123");
 
-        Role empRole = roleRepository.findByRoleName("EMPLOYEE").orElse(null);
+        Role empRole = roleRepository.findByRoleName("EMPLOYEE")
+                .orElseThrow(() -> new RuntimeException("EMPLOYEE role not found"));
+
         user.setRole(empRole);
+        /*****************************************
+         * EMPLOYEE PROFILE INITIALIZATION
+         *****************************************/
+        employeeProfile.setUser(user);
+
+        if (employeeId.startsWith("INT")) {
+            employeeProfile.setDesignation("Intern");
+            employeeProfile.setCategory("Intern");
+        }
+
+        user.setEmployeeProfile(employeeProfile);
 
         userRepository.save(user);
         return "redirect:/admin/reports?type=employee";
@@ -1715,6 +1747,33 @@ public class DashboardController {
         model.addAttribute("hardwareCount", hardwareCount);
 
         return "admin-helpdesk-requests";
+    }
+
+    @Transactional
+    @PostMapping("/employee/my-goals/{goalId}/delete")
+    public String deleteGoal(@PathVariable Long goalId) {
+
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new RuntimeException("Goal not found"));
+
+        goalUpdateRepository.deleteByGoal(goal);
+
+        goalRepository.delete(goal);
+
+        return "redirect:/employee/my-goals";
+    }
+    
+    @GetMapping("/employee/goals/{goalId}/chart")
+    @ResponseBody
+    public List<BurnChartPoint> getGoalChart(
+            @PathVariable Long goalId) {
+
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() ->
+                        new RuntimeException("Goal not found"));
+
+        return goalBurnChartService
+                .generateSingleGoalBurnChart(goal);
     }
 
     // FIXED LOCK: Global search requires basic admin view rights so Finance/Recruiters can use it
