@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -722,7 +722,7 @@
         if (src) {
             return `<img src="${src}" alt="${name}" style="max-width: 40px; max-height: 40px; object-fit: contain;">`;
         } else if (n.includes('eid')) {
-            return `<div style="font-size: 2rem;">ðŸŒ™</div>`;
+            return `<i class="fas fa-moon" style="color: #6366f1; font-size: 1.8rem;"></i>`;
         } else {
             return `<i class="fas fa-calendar-day" style="color: #6366f1; font-size: 1.8rem;"></i>`;
         }
@@ -1022,7 +1022,13 @@
         const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
 
         const leaveMap = {};
-        (calendarData.leaves || []).forEach(l => { leaveMap[l.date] = l; });
+        (calendarData.leaves || []).forEach(l => {
+            // Because the backend returns leaves in descending order (newest first),
+            // we only want to map the first (newest) status for any given date.
+            if (!leaveMap[l.date]) {
+                leaveMap[l.date] = l;
+            }
+        });
         const holidayMap = {};
         (calendarData.holidays || []).forEach(h => { holidayMap[h.date] = h; });
 
@@ -1034,7 +1040,7 @@
         for (let d = 1; d <= totalDays; d++) {
             const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
             const dayOfWeek = new Date(year, month, d).getDay();
-            const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+            const isWeekend = (dayOfWeek === 0);
 
             let cssClass = '';
             let tooltipText = '';
@@ -1102,7 +1108,14 @@
         warning.style.display = 'none';
 
         if (startInput.value && endInput.value && end >= start) {
-            let diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)) + 1;
+            let diffDays = 0;
+            let current = new Date(start);
+            while (current <= end) {
+                if (current.getDay() !== 0) {
+                    diffDays++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
 
             if (window.upcomingHolidays && window.upcomingHolidays.length > 0) {
                 let holidayCount = 0;
@@ -1118,7 +1131,7 @@
 
             if (absenceData && absenceData.length > 0) {
                 const isDuplicate = absenceData.some(leave => {
-                    if (leave.status === 'REJECTED') return false;
+                    if (leave.status && leave.status.toUpperCase() === 'REJECTED') return false;
                     return (start <= new Date(leave.toDate) && end >= new Date(leave.fromDate));
                 });
                 if (isDuplicate) {
@@ -1146,7 +1159,7 @@
             if (btoInput) {
                 let backDate = new Date(end);
                 backDate.setDate(backDate.getDate() + 1);
-                while (backDate.getDay() === 0 || backDate.getDay() === 6) {
+                while (backDate.getDay() === 0) {
                     backDate.setDate(backDate.getDate() + 1);
                 }
                 btoInput.value = backDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' (' + backDate.toLocaleDateString('en-GB', { weekday: 'long' }) + ')';
@@ -1286,7 +1299,7 @@
         if (absenceData && absenceData.length > 0) {
             const reqStart = new Date(fromDate); const reqEnd = new Date(toDate);
             const isDuplicate = absenceData.some(leave => {
-                if (leave.status === 'REJECTED') return false;
+                if (leave.status && leave.status.toUpperCase() === 'REJECTED') return false;
                 return (reqStart <= new Date(leave.toDate) && reqEnd >= new Date(leave.fromDate));
             });
             if (isDuplicate) {
@@ -1369,7 +1382,7 @@
                 else if (lt.includes('floater')) typeIcon = 'fa-flag';
 
                 html += '<div class="col-12">' +
-                    '<div class="row w-100 m-0 align-items-center absence-item" onclick="showLeaveDetails(' + idx + ')">' +
+                    '<div class="row w-100 m-0 align-items-center absence-item" onclick="showLeaveDetails(' + idx + ')" style="padding: 10px 15px; border-bottom: 1px solid #f1f5f9; cursor: pointer;">' +
                     '<div class="col-3 p-0 d-flex align-items-center">' +
                     '<div class="absence-icon" style="background:' + iconBg + '; color:' + iconColor + '; width: 34px; height: 34px; margin-right: 12px; font-size:0.8rem; border-radius: 8px;"><i class="fas ' + typeIcon + '"></i></div>' +
                     '<div class="fw-bold text-dark" style="font-size:0.85rem;">' + (leave.leaveType || 'Leave') + '</div>' +
