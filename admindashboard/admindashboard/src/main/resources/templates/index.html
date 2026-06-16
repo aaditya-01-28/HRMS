@@ -89,9 +89,24 @@
             opacity: 0.6;
             font-weight: 400;
         }
-        /* Style for the eye icon button */
+        .input-group > .input-group-text, .input-group > .form-control, .input-group > .btn {
+            border-color: #64748b;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+        .input-group > .input-group-text {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        .input-group > .btn {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #64748b;
+        }
         .btn-toggle-password {
-            border-color: #dee2e6; /* matches standard bootstrap input border */
             color: #6c757d;
         }
         .btn-toggle-password:hover {
@@ -179,10 +194,28 @@
         </div>
     </div>
 
-    <div class="row justify-content-center" id="login-container">
-        <div class="col-md-5">
+</div> <!-- End of container -->
 
-            <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center mb-3 border-0 shadow-sm"
+<!-- SPLIT SCREEN LOGIN OVERLAY -->
+<div class="row m-0 w-100 h-100" id="login-container" style="display: none; position: fixed; top: 0; left: 0; z-index: 1000; background: white;">
+    
+    <!-- LEFT SIDE: RECEPTION IMAGE -->
+    <div class="col-lg-7 p-0 d-none d-lg-block h-100" style="position: relative; background-color: white;">
+        <img src="/images/Reception.png" alt="Reception" style="width: 100%; height: 100%; object-fit: cover; object-position: left center;">
+    </div>
+
+    <!-- RIGHT SIDE: LOGIN FORM -->
+    <div class="col-lg-5 col-md-12 p-0 h-100 d-flex align-items-center justify-content-center position-relative bg-white" style="overflow-y: auto;">
+        
+        <div class="position-absolute top-0 end-0 p-4">
+             <button class="btn btn-outline-dark btn-sm rounded-pill px-4 fw-bold" onclick="showLanding()">
+                 <i class="fas fa-arrow-left me-2"></i>Back
+             </button>
+        </div>
+
+        <div class="w-100" style="max-width: 420px; padding: 2rem;">
+            
+            <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center mb-4 border-0 shadow-sm"
                  style="background-color: #fff5f5; border-left: 4px solid #dc3545 !important; border-radius: 8px;">
                 <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                 <div style="color: #a94442; font-size: 0.85rem; font-weight: 500;">
@@ -190,87 +223,98 @@
                 </div>
             </div>
 
-            <div class="text-start mb-3">
-                <button class="btn btn-outline-light btn-sm" onclick="showLanding()">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Portal Selection
-                </button>
+            <div class="text-center mb-4">
+                <img src="/images/wcg-logo.jpg" alt="Logo" style="height: 70px; border-radius: 12px; margin-bottom: 20px;">
+                <h3 class="fw-bold" style="color: #0b2471;" id="login-title">Welcome to Whitecircle Group</h3>
+                <p class="text-dark fs-5 fw-semibold mt-3" id="login-subtitle">Please login your account</p>
             </div>
 
-            <div class="card border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
-
-                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 text-center">
-                    <h4 class="fw-bold" id="login-title">Login</h4>
-                    <p class="text-muted small" id="login-subtitle">Please enter your credentials.</p>
-                </div>
-
-                <div class="card-body p-4">
-
-                    <div id="employee-form-section">
-                        <form action="/perform_login" method="post">
-                            <input type="hidden" name="portalType" value="employee">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold small text-dark">User ID</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-id-badge"></i></span>
-                                    <input type="text" name="username" class="form-control bg-light border-start-0"
-                                           placeholder="e.g. ADM001 or EMP002" required>
-                                </div>
-                                <div class="form-text small">Use your Admin (ADM) or Employee (EMP) ID.</div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="form-label fw-bold small text-dark">Password</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-lock"></i></span>
-                                    <input type="password" name="password" id="employeePassword" class="form-control bg-light border-start-0 border-end-0"
-                                           placeholder="••••••" required>
-                                    <button class="btn bg-light btn-toggle-password border-start-0" type="button" onclick="togglePassword('employeePassword', 'eyeIconEmp')">
-                                        <i class="fas fa-eye" id="eyeIconEmp"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn btn-dark w-100 py-2 fw-bold shadow-sm">
-                                <i class="fas fa-sign-in-alt me-2"></i> Secure Access
-                            </button>
-                        </form>
+            <!-- Employee Form -->
+            <div id="employee-form-section">
+                <form action="/perform_login" method="post">
+                    <input type="hidden" name="portalType" value="employee">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark fs-6">User ID</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-user text-muted"></i></span>
+                            <input type="text" name="username" class="form-control border-start-0 ps-0 fw-semibold" placeholder="e.g. EMP114 or EMP002" required>
+                        </div>
                     </div>
 
-                    <div id="client-form-section" style="display: none;">
-                        <form action="/perform_login" method="post">
-                            <input type="hidden" name="portalType" value="client">
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold text-dark">Client ID</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-user-tie"></i></span>
-                                    <input type="text" name="username" class="form-control bg-light border-start-0"
-                                           placeholder="e.g. CLI001" required>
-                                </div>
-                                <div class="form-text small">Use your Client (CLI) ID.</div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="form-label small fw-bold text-dark">Password</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-key"></i></span>
-                                    <input type="password" name="password" id="clientPassword" class="form-control bg-light border-start-0 border-end-0"
-                                           placeholder="••••••" required>
-                                    <button class="btn bg-light btn-toggle-password border-start-0" type="button" onclick="togglePassword('clientPassword', 'eyeIconCli')">
-                                        <i class="fas fa-eye" id="eyeIconCli"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn btn-dark w-100 py-2 fw-bold">
-                                <i class="fas fa-rocket me-2"></i>Access Project Dashboard
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark fs-6">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-lock text-muted"></i></span>
+                            <input type="password" name="password" id="employeePassword" class="form-control border-start-0 border-end-0 ps-0 fw-semibold" placeholder="••••••••" required>
+                            <button class="btn border border-start-0 bg-white text-muted btn-toggle-password" type="button" onclick="togglePassword('employeePassword', 'eyeIconEmp')">
+                                <i class="fas fa-eye-slash" id="eyeIconEmp"></i>
                             </button>
-                        </form>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+                        <div class="form-check">
+                            <input class="form-check-input border-dark" type="checkbox" id="rememberMe">
+                            <label class="form-check-label text-dark fw-semibold small" for="rememberMe">
+                                Remember me
+                            </label>
+                        </div>
+                        <a href="/forgot-password" class="text-decoration-none small" style="color: #ef4444;">Forgot Password?</a>
                     </div>
 
-                </div>
-                <div class="card-footer bg-light text-center py-3 border-0">
-                    <small class="text-muted">Need help? Contact <a href="#" class="text-decoration-none fw-bold">IT Support</a></small>
-                </div>
+                    <button type="submit" class="btn w-100 py-2 fw-bold fs-5 shadow-sm text-white rounded-3" style="background-color: #2563eb; display: flex; justify-content: center; align-items: center; gap: 10px;">
+                        Login <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <div class="text-muted small mt-3 lh-sm text-center" style="font-size: 0.75rem;">
+                        By logging in, you agree to the company's policies & privacy guidelines.
+                    </div>
+                </form>
+            </div>
+
+            <!-- Client Form -->
+            <div id="client-form-section" style="display: none;">
+                <form action="/perform_login" method="post">
+                    <input type="hidden" name="portalType" value="client">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark fs-6">Client ID</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-user-tie text-muted"></i></span>
+                            <input type="text" name="username" class="form-control border-start-0 ps-0 fw-semibold" placeholder="e.g. CLI001" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark fs-6">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-lock text-muted"></i></span>
+                            <input type="password" name="password" id="clientPassword" class="form-control border-start-0 border-end-0 ps-0 fw-semibold" placeholder="••••••••" required>
+                            <button class="btn border border-start-0 bg-white text-muted btn-toggle-password" type="button" onclick="togglePassword('clientPassword', 'eyeIconCli')">
+                                <i class="fas fa-eye-slash" id="eyeIconCli"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+                        <div class="form-check">
+                            <input class="form-check-input border-dark" type="checkbox" id="rememberMeCli">
+                            <label class="form-check-label text-dark fw-semibold small" for="rememberMeCli">
+                                Remember me
+                            </label>
+                        </div>
+                        <a href="/forgot-password" class="text-decoration-none small" style="color: #ef4444;">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn w-100 py-2 fw-bold fs-5 shadow-sm text-white rounded-3" style="background-color: #2563eb; display: flex; justify-content: center; align-items: center; gap: 10px;">
+                        Login <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <div class="text-muted small mt-3 lh-sm text-center" style="font-size: 0.75rem;">
+                        By logging in, you agree to the company's policies & privacy guidelines.
+                    </div>
+                </form>
+            </div>
+
+            <div class="text-center mt-5">
+                <small class="text-muted">Need help? Contact <a href="#" class="text-decoration-none" style="color: #2563eb; font-weight: 600;">IT Support</a></small>
             </div>
         </div>
     </div>
@@ -318,12 +362,12 @@
 
         if (passwordInput.type === "password") {
             passwordInput.type = "text";
-            eyeIcon.classList.remove("fa-eye");
-            eyeIcon.classList.add("fa-eye-slash");
-        } else {
-            passwordInput.type = "password";
             eyeIcon.classList.remove("fa-eye-slash");
             eyeIcon.classList.add("fa-eye");
+        } else {
+            passwordInput.type = "password";
+            eyeIcon.classList.remove("fa-eye");
+            eyeIcon.classList.add("fa-eye-slash");
         }
     }
 </script>
