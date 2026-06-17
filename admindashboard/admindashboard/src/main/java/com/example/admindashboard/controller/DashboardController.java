@@ -574,12 +574,7 @@ public class DashboardController {
         }).toList();
 
         // FIXED: Dynamic Routing Logic for the "Back" Button
-        String backUrl = "/employee/dashboard"; // Default for standard employees
-
-        if (authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("admin_dashboard_view"))) {
-            backUrl = "/admin/dashboard"; // Override for anyone with Admin access
-        }
+        String backUrl = "/default-redirect"; // Let the centralized redirect handler manage role-based routing
 
         model.addAttribute("myBookings", myBookings);
         model.addAttribute("upcomingMeetings", upcomingMeetings);

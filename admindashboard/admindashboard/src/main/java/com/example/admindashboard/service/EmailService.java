@@ -231,6 +231,41 @@ public class EmailService {
         }
     }
 
+    @Async
+    public void sendPasswordResetEmail(String to, String resetUrl) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(to);
+            helper.setFrom(systemEmail, "WhiteCircle Security");
+            helper.setSubject("WhiteCircle - Password Reset Request");
+
+            String htmlContent = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;'>"
+                + "<div style='text-align: center; margin-bottom: 20px;'>"
+                + "  <h2 style='color: #1e3a8a; margin: 0;'>Password Reset Request</h2>"
+                + "</div>"
+                + "<p style='color: #334155; font-size: 16px;'>Hello,</p>"
+                + "<p style='color: #334155; font-size: 16px;'>We received a request to reset the password for your WhiteCircle account.</p>"
+                + "<p style='color: #334155; font-size: 16px;'>Click the secure button below to set a new password. This link will safely expire in 1 hour.</p>"
+                + "<div style='text-align: center; margin: 35px 0;'>"
+                + "  <a href='" + resetUrl + "' style='background-color: #2563eb; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;'>Reset My Password</a>"
+                + "</div>"
+                + "<p style='color: #64748b; font-size: 14px;'>If you didn't request a password reset, you can safely ignore this email. Your account remains secure.</p>"
+                + "<hr style='border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;'/>"
+                + "<p style='color: #94a3b8; font-size: 12px; text-align: center;'>Best regards,<br>The WhiteCircle Team</p>"
+                + "</div>";
+
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+
+            System.out.println("✅ Password Reset Email Sent Successfully to: " + to);
+
+        } catch (Exception e) {
+            System.err.println("❌ Failed to send password reset email to " + to + ": " + e.getMessage());
+        }
+    }
+
     // =========================================================================
     // ADDED: DYNAMIC SEAMLESS ROUTING FOR SENDING EMPLOYEE TICKETS
     // =========================================================================
