@@ -281,13 +281,14 @@ public class DashboardController {
 
         if (isItSupport) {
             List<ServiceRequest> allItTickets = serviceRequestRepository.findAll().stream()
-                    .filter(t -> t.getType() != null && 
-                        (t.getType().toLowerCase().contains("software") || 
-                         t.getType().toLowerCase().contains("hardware") || 
-                         t.getType().toLowerCase().contains("incident") ||
-                         t.getType().toLowerCase().contains("access") ||
-                         t.getType().toLowerCase().contains("network") ||
-                         t.getType().toLowerCase().contains("permission")))
+                    .filter(t -> (t.getType() != null && "IT".equalsIgnoreCase(t.getType())) ||
+                                 (t.getCategory() != null && 
+                                  (t.getCategory().toLowerCase().contains("software") || 
+                                   t.getCategory().toLowerCase().contains("hardware") || 
+                                   t.getCategory().toLowerCase().contains("incident") ||
+                                   t.getCategory().toLowerCase().contains("access") ||
+                                   t.getCategory().toLowerCase().contains("network") ||
+                                   t.getCategory().toLowerCase().contains("permission"))))
                     .collect(Collectors.toList());
 
             pendingTickets = allItTickets.stream()
@@ -299,6 +300,13 @@ public class DashboardController {
                     .filter(t -> "Assigned".equalsIgnoreCase(t.getStatus()) && t.getAssignedTo() != null && t.getAssignedTo().contains(myName))
                     .collect(Collectors.toList());
             model.addAttribute("myAssignedTickets", assignedTickets);
+            
+            // Fetch other tickets (temporarily empty per user request)
+            List<ServiceRequest> otherTickets = new java.util.ArrayList<>();
+            model.addAttribute("otherTickets", otherTickets);
+            
+            // Add all IT tickets to model for the main IT Support tab
+            model.addAttribute("allItTickets", allItTickets);
             
             // Dashboard Stats
             int totalTickets = allItTickets.size();
@@ -317,6 +325,11 @@ public class DashboardController {
             int softwareCount = (int) allItTickets.stream().filter(t -> t.getType().toLowerCase().contains("software")).count();
             int hardwareCount = (int) allItTickets.stream().filter(t -> t.getType().toLowerCase().contains("hardware")).count();
             int accessCount = (int) allItTickets.stream().filter(t -> t.getType().toLowerCase().contains("access") || t.getType().toLowerCase().contains("permission")).count();
+            
+            List<User> itSupportUsers = userRepository.findAll().stream()
+                    .filter(u -> u.getRole() != null && "IT_SUPPORT".equalsIgnoreCase(u.getRole().getRoleName()))
+                    .collect(Collectors.toList());
+            model.addAttribute("itSupportUsers", itSupportUsers);
             int networkCount = (int) allItTickets.stream().filter(t -> t.getType().toLowerCase().contains("network") || t.getType().toLowerCase().contains("incident")).count();
             
             model.addAttribute("softwareCount", softwareCount);

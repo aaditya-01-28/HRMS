@@ -495,14 +495,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="t, iter : ${allItTickets}" th:if="${iter.index < 5}">
+                                <tr th:each="t, iter : ${pendingTickets}" th:if="${iter.index < 5}">
                                     <td class="fw-bold" th:text="${t.ticketId != null ? t.ticketId : 'T' + t.id}">T101</td>
                                     <td class="fw-bold text-dark" th:text="${t.category != null ? t.category : t.type}">Needs update</td>
                                     <td class="text-muted fw-bold" th:text="${t.employeeName}">Neha Sharma</td>
                                     <td th:class="${'fw-bold ' + (t.priority == 'High' ? 'text-danger' : (t.priority == 'Medium' ? 'text-warning' : 'text-success'))}" th:text="${t.priority != null ? t.priority : 'High'}">High</td>
                                     <td class="fw-bold text-warning" th:text="${t.status}">Pending</td>
                                 </tr>
-                                <tr th:if="${#lists.isEmpty(allItTickets)}">
+                                <tr th:if="${#lists.isEmpty(pendingTickets)}">
                                     <td colspan="5" class="text-center py-4 text-muted">No recent tickets</td>
                                 </tr>
                             </tbody>
@@ -681,7 +681,7 @@
             </div>
 
             <!-- Right Pane: Details -->
-            <div class="col-md-6 ps-4 pt-2 pane-hidden" id="leave-right-pane" style="height: 75vh; overflow-y: auto;">
+            <div class="col-6 ps-4 pt-2 pane-hidden" id="leave-right-pane" style="height: 75vh; overflow-y: auto;">
                 <!-- Default State -->
                 <div id="default-leave-state" class="h-100 d-flex flex-column align-items-center justify-content-center text-muted" style="padding-right: 15px;">
                     <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3 border shadow-sm" style="width: 80px; height: 80px;">
@@ -759,7 +759,7 @@
     </div>
 
     <!-- ===== LOG TICKET VIEW ===== -->
-    <div id="view-ticket" class="row g-0" th:style="${isItSupport ? 'display:flex; transition: all 0.3s ease;' : 'display:none; transition: all 0.3s ease;'}">
+    <div id="view-ticket" class="row g-0 flex-nowrap" th:style="${isItSupport ? 'display:flex; transition: all 0.3s ease;' : 'display:none; transition: all 0.3s ease;'}">
         <!-- Left Pane: Table -->
         <div class="col-12" id="ticket-left-pane" style="transition: all 0.3s ease;">
             <div class="bg-white rounded-3 shadow-sm border p-3">
@@ -820,13 +820,13 @@
                         </thead>
                         <tbody>
                             <!-- Pending Tickets -->
-                            <tr th:each="ticket : ${pendingTickets}" class="ticket-row"
+                            <tr th:each="ticket : ${isItSupport ? allItTickets : pendingTickets}" class="ticket-row"
                                 style="cursor: pointer;"
                                 th:data-id="${ticket.id}"
                                 th:data-name="${ticket.employeeName}"
                                 th:data-role="${ticket.department != null ? ticket.department : 'Employee'}"
-                                th:data-type="${ticket.type != null ? ticket.type : 'Software Request'}"
-                                th:data-subject="${ticket.category != null ? ticket.category : 'General Request'}"
+                                th:data-type="${ticket.category != null ? ticket.category : 'Software Request'}"
+                                th:data-subject="${ticket.detailItem != null ? ticket.detailItem : 'General Request'}"
                                 th:data-desc="${ticket.justification}"
                                 th:data-priority="${ticket.priority != null ? ticket.priority : 'High'}"
                                 th:data-applied="${ticket.submissionDate != null ? ticket.submissionDate : 'N/A'}"
@@ -844,10 +844,10 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="text-dark fw-medium" th:text="${ticket.type != null ? ticket.type : 'Software Request'}"></td>
-                                <td class="text-dark" th:text="${ticket.category != null ? ticket.category : 'General Request'}"></td>
+                                <td class="text-dark fw-medium" th:text="${ticket.category != null ? ticket.category : 'Software Request'}"></td>
+                                <td class="text-dark" th:text="${ticket.detailItem != null ? ticket.detailItem : 'General Request'}"></td>
                                 <td><span th:class="'fw-bold ' + (${ticket.priority == 'Low'} ? 'text-success' : 'text-danger')" th:text="${ticket.priority != null ? ticket.priority : 'High'}"></span></td>
-                                <td class="text-end"><span class="fw-bold text-primary">In Progress</span></td>
+                                <td class="text-end"><span class="fw-bold text-primary" th:text="${ticket.status}">In Progress</span><br><small th:if="${ticket.status == 'Assigned' && ticket.assignedTo != null}" class="text-muted" style="font-size: 0.75rem;">To: <span th:text="${ticket.assignedTo}"></span></small></td>
                             </tr>
                             
                             <!-- Approved/Resolved Tickets -->
@@ -856,8 +856,8 @@
                                 th:data-id="${ticket.id}"
                                 th:data-name="${ticket.employeeName}"
                                 th:data-role="${ticket.department != null ? ticket.department : 'Employee'}"
-                                th:data-type="${ticket.type != null ? ticket.type : 'Hardware Request'}"
-                                th:data-subject="${ticket.category != null ? ticket.category : 'Driver Updation'}"
+                                th:data-type="${ticket.category != null ? ticket.category : 'Hardware Request'}"
+                                th:data-subject="${ticket.detailItem != null ? ticket.detailItem : 'Driver Updation'}"
                                 th:data-desc="${ticket.justification}"
                                 th:data-priority="${ticket.priority != null ? ticket.priority : 'High'}"
                                 th:data-applied="${ticket.submissionDate != null ? ticket.submissionDate : 'N/A'}"
@@ -875,8 +875,8 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="text-dark fw-medium" th:text="${ticket.type != null ? ticket.type : 'Hardware Request'}"></td>
-                                <td class="text-dark" th:text="${ticket.category != null ? ticket.category : 'Driver Updation'}"></td>
+                                <td class="text-dark fw-medium" th:text="${ticket.category != null ? ticket.category : 'Hardware Request'}"></td>
+                                <td class="text-dark" th:text="${ticket.detailItem != null ? ticket.detailItem : 'Driver Updation'}"></td>
                                 <td><span th:class="'fw-bold ' + (${ticket.priority == 'Low'} ? 'text-success' : 'text-danger')" th:text="${ticket.priority != null ? ticket.priority : 'High'}"></span></td>
                                 <td class="text-end"><span class="fw-bold text-success" th:text="${ticket.status}"></span></td>
                             </tr>
@@ -887,8 +887,8 @@
                                 th:data-id="${ticket.id}"
                                 th:data-name="${ticket.employeeName}"
                                 th:data-role="${ticket.department != null ? ticket.department : 'Employee'}"
-                                th:data-type="${ticket.type != null ? ticket.type : 'Software Request'}"
-                                th:data-subject="${ticket.category != null ? ticket.category : 'General Request'}"
+                                th:data-type="${ticket.category != null ? ticket.category : 'Software Request'}"
+                                th:data-subject="${ticket.detailItem != null ? ticket.detailItem : 'General Request'}"
                                 th:data-desc="${ticket.justification}"
                                 th:data-priority="${ticket.priority != null ? ticket.priority : 'High'}"
                                 th:data-applied="${ticket.submissionDate != null ? ticket.submissionDate : 'N/A'}"
@@ -906,8 +906,8 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="text-dark fw-medium" th:text="${ticket.type != null ? ticket.type : 'Software Request'}"></td>
-                                <td class="text-dark" th:text="${ticket.category != null ? ticket.category : 'General Request'}"></td>
+                                <td class="text-dark fw-medium" th:text="${ticket.category != null ? ticket.category : 'Software Request'}"></td>
+                                <td class="text-dark" th:text="${ticket.detailItem != null ? ticket.detailItem : 'General Request'}"></td>
                                 <td><span th:class="'fw-bold ' + (${ticket.priority == 'Low'} ? 'text-success' : 'text-danger')" th:text="${ticket.priority != null ? ticket.priority : 'High'}"></span></td>
                                 <td class="text-end"><span class="fw-bold text-danger">Rejected</span></td>
                             </tr>
@@ -918,7 +918,7 @@
         </div>
 
         <!-- Right Pane: Details -->
-        <div class="col-md-6 ps-4 pt-2 pane-hidden" id="ticket-right-pane" style="height: 75vh; overflow-y: auto;">
+        <div class="col-6 ps-4 pt-2 pane-hidden" id="ticket-right-pane" style="height: 75vh; overflow-y: auto;">
             <!-- Active State -->
             <div id="ticket-detail-content" style="display:none; padding-right: 15px;">
                 <!-- New Clean UI Layout for Detail -->
@@ -992,18 +992,24 @@
     </div>
 
     <!-- ===== MY ASSIGN VIEW ===== -->
-<div id="view-myassign" class="row g-0" th:style="${isItSupport ? 'display:flex; transition: all 0.3s ease;' : 'display:none; transition: all 0.3s ease;'}">
+<div id="view-myassign" class="row g-0 flex-nowrap" th:style="${isItSupport ? 'display:flex; transition: all 0.3s ease;' : 'display:none; transition: all 0.3s ease;'}">
         <!-- Left Pane: Table -->
         <div class="col-12" id="myassign-left-pane" style="transition: all 0.3s ease;">
             <div class="bg-white rounded-3 shadow-sm border p-3">
                 <!-- Filter Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex gap-3 flex-grow-1">
                         <select class="filter-select" id="myassignDeptFilter" onchange="filterMyAssignTables()" style="width: auto;">
                             <option value="All">All Types</option>
                             <option value="Software">Software</option>
                             <option value="Hardware">Hardware</option>
                             <option value="Access">Access/Permission</option>
                             <option value="Network">Network/Incident</option>
+                        </select>
+                        <select class="filter-select" id="myassignStatusFilter" onchange="filterMyAssignTables()" style="width: auto;">
+                            <option value="All">Status: All</option>
+                            <option value="Assigned">Assigned</option>
+                            <option value="In Progress">In Progress</option>
                         </select>
                         <button class="btn btn-outline-secondary bg-white text-dark d-flex align-items-center" style="border-color: #cbd5e1; font-size: 0.85rem;">
                             <i class="far fa-calendar-alt me-2"></i> 01 June 2026 - 30 June 2026
@@ -1034,8 +1040,8 @@
                                 th:data-id="${ticket.id}"
                                 th:data-name="${ticket.employeeName}"
                                 th:data-role="${ticket.department != null ? ticket.department : 'Employee'}"
-                                th:data-type="${ticket.type != null ? ticket.type : 'Software Request'}"
-                                th:data-subject="${ticket.category != null ? ticket.category : 'General Request'}"
+                                th:data-type="${ticket.category != null ? ticket.category : 'Software Request'}"
+                                th:data-subject="${ticket.detailItem != null ? ticket.detailItem : 'General Request'}"
                                 th:data-desc="${ticket.justification}"
                                 th:data-priority="${ticket.priority != null ? ticket.priority : 'High'}"
                                 th:data-applied="${ticket.submissionDate != null ? ticket.submissionDate : 'N/A'}"
@@ -1053,10 +1059,10 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="text-dark fw-medium" th:text="${ticket.type != null ? ticket.type : 'Software Request'}"></td>
-                                <td class="text-dark" th:text="${ticket.category != null ? ticket.category : 'General Request'}"></td>
+                                <td class="text-dark fw-medium" th:text="${ticket.category != null ? ticket.category : 'Software Request'}"></td>
+                                <td class="text-dark" th:text="${ticket.detailItem != null ? ticket.detailItem : 'General Request'}"></td>
                                 <td><span th:class="'fw-bold ' + (${ticket.priority == 'Low'} ? 'text-success' : 'text-danger')" th:text="${ticket.priority != null ? ticket.priority : 'High'}"></span></td>
-                                <td class="text-end"><span class="fw-bold text-primary">In Progress</span></td>
+                                <td class="text-end"><span class="fw-bold text-primary" th:text="${ticket.status}">In Progress</span><br><small th:if="${ticket.status == 'Assigned' && ticket.assignedTo != null}" class="text-muted" style="font-size: 0.75rem;">To: <span th:text="${ticket.assignedTo}"></span></small></td>
                             </tr>
                             
                             </tbody>
@@ -1066,7 +1072,7 @@
         </div>
 
         <!-- Right Pane: Details -->
-        <div class="col-md-6 ps-4 pt-2 pane-hidden" id="myassign-right-pane" style="height: 75vh; overflow-y: auto;">
+        <div class="col-6 ps-4 pt-2 pane-hidden" id="myassign-right-pane" style="height: 75vh; overflow-y: auto;">
             <!-- Active State -->
             <div id="myassign-detail-content" style="display:none; padding-right: 15px;">
                 <!-- New Clean UI Layout for Detail -->
@@ -1292,7 +1298,7 @@
         </div>
 
         <!-- Right Pane: Details -->
-        <div class="col-md-6 ps-4 pt-2 pane-hidden" id="timesheet-right-pane" style="height: 75vh; overflow-y: auto;">
+        <div class="col-6 ps-4 pt-2 pane-hidden" id="timesheet-right-pane" style="height: 75vh; overflow-y: auto;">
             <!-- Active State -->
             <div id="timesheet-detail-content" style="display:none; padding-right: 15px;">
                 <!-- Header with back button -->
@@ -1384,11 +1390,163 @@
     </div>
 
     <!-- ===== OTHER TICKET VIEW (Empty for now) ===== -->
-    <div id="view-other" class="row g-0" style="display:none; transition: all 0.3s ease;">
-        <div class="col-12" style="height: 75vh; display:flex; align-items:center; justify-content:center;">
-            <h4 class="text-muted">No other tickets available</h4>
+<!-- ===== OTHER TICKET VIEW ===== -->
+<div id="view-other" class="row g-0 flex-nowrap" th:style="${isItSupport ? 'display:flex; transition: all 0.3s ease;' : 'display:none; transition: all 0.3s ease;'}">
+        <!-- Left Pane: Table -->
+        <div class="col-12" id="other-left-pane" style="transition: all 0.3s ease;">
+            <div class="bg-white rounded-3 shadow-sm border p-3">
+                <!-- Filter Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex gap-3 flex-grow-1">
+                        <select class="filter-select" id="otherDeptFilter" onchange="filterOtherTables()" style="width: auto;">
+                            <option value="All">All Types</option>
+                            <option value="Software">Software</option>
+                            <option value="Hardware">Hardware</option>
+                            <option value="Access">Access/Permission</option>
+                            <option value="Network">Network/Incident</option>
+                        </select>
+                        <select class="filter-select" id="otherStatusFilter" onchange="filterOtherTables()" style="width: auto;">
+                            <option value="All">Status: All</option>
+                            <option value="Close">Close</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                        <button class="btn btn-outline-secondary bg-white text-dark d-flex align-items-center" style="border-color: #cbd5e1; font-size: 0.85rem;">
+                            <i class="far fa-calendar-alt me-2"></i> 01 June 2026 - 30 June 2026
+                        </button>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary bg-white text-dark d-flex align-items-center" style="border-color: #cbd5e1; font-size: 0.85rem;">
+                            <i class="fas fa-filter me-2"></i> Filters
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="otherCardsContainer" class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="font-size: 0.88rem;">
+                        <thead style="position: sticky; top: 0; z-index: 2; background: linear-gradient(180deg, #f3f4f6 0%, #e5e7eb 100%); border-top: 1px solid #9ca3af; border-bottom: 1px solid #9ca3af;">
+                            <tr>
+                                <th class="text-dark fw-bold py-2 border-0" style="min-width: 160px; font-size: 0.95rem;">Employee</th>
+                                <th class="text-dark fw-bold py-2 border-0" style="font-size: 0.95rem;">Ticket Type</th>
+                                <th class="text-dark fw-bold py-2 border-0" style="font-size: 0.95rem;">Subject</th>
+                                <th class="text-dark fw-bold py-2 border-0" style="font-size: 0.95rem;">Priority</th>
+                                <th class="text-dark fw-bold py-2 border-0 text-end" style="font-size: 0.95rem; padding-right: 1.5rem;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Pending Tickets -->
+                            <tr th:each="ticket : ${otherTickets}" class="ticket-row"
+                                style="cursor: pointer;"
+                                th:data-id="${ticket.id}"
+                                th:data-name="${ticket.employeeName}"
+                                th:data-role="${ticket.department != null ? ticket.department : 'Employee'}"
+                                th:data-type="${ticket.category != null ? ticket.category : 'Software Request'}"
+                                th:data-subject="${ticket.detailItem != null ? ticket.detailItem : 'General Request'}"
+                                th:data-desc="${ticket.justification}"
+                                th:data-priority="${ticket.priority != null ? ticket.priority : 'High'}"
+                                th:data-applied="${ticket.submissionDate != null ? ticket.submissionDate : 'N/A'}"
+                                th:data-comments="${ticket.adminComments != null ? ticket.adminComments : ''}"
+                                th:data-actiondate="${ticket.actionDate != null ? ticket.actionDate : ''}"
+                                th:data-assigned="${ticket.assignedTo != null ? ticket.assignedTo : 'None'}"
+                                th:data-docname="${ticket.attachmentName}"
+                                th:data-status="${ticket.status}"
+                                onclick="selectOther(this)">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-2 table-avatar-initials" style="width:36px; height:36px; font-size: 14px;" th:data-name="${ticket.employeeName}"></div>
+                                        <div>
+                                            <div class="fw-bold text-dark" th:text="${ticket.employeeName}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-dark fw-medium" th:text="${ticket.category != null ? ticket.category : 'Software Request'}"></td>
+                                <td class="text-dark" th:text="${ticket.detailItem != null ? ticket.detailItem : 'General Request'}"></td>
+                                <td><span th:class="'fw-bold ' + (${ticket.priority == 'Low'} ? 'text-success' : 'text-danger')" th:text="${ticket.priority != null ? ticket.priority : 'High'}"></span></td>
+                                <td class="text-end"><span class="fw-bold text-primary" th:text="${ticket.status}">In Progress</span><br><small th:if="${ticket.status == 'Assigned' && ticket.assignedTo != null}" class="text-muted" style="font-size: 0.75rem;">To: <span th:text="${ticket.assignedTo}"></span></small></td>
+                            </tr>
+                            
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Pane: Details -->
+        <div class="col-6 ps-4 pt-2 pane-hidden" id="other-right-pane" style="height: 75vh; overflow-y: auto;">
+            <!-- Active State -->
+            <div id="other-detail-content" style="display:none; padding-right: 15px;">
+                <!-- New Clean UI Layout for Detail -->
+                <div class="d-flex align-items-center mb-5 pb-3">
+                    <i class="fas fa-arrow-left text-primary bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; cursor: pointer;" onclick="closeOtherDetailsPane()"></i>
+                    <h5 class="fw-bold text-primary mb-0 mx-auto">Raised Ticket Details</h5>
+                    <div style="width: 32px;"></div>
+                </div>
+
+                <div class="d-flex align-items-center mb-5">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-3" id="detailOtherInitials" style="width:50px; height:50px; font-size: 20px;"></div>
+                    <div>
+                        <div class="fw-bold text-dark fs-6" id="detailOtherEmpName"></div>
+                        <div class="text-muted small" id="detailOtherEmpRole"></div>
+                    </div>
+                </div>
+
+                <div class="d-flex mb-4">
+                    <div class="text-muted" style="width: 120px;">Priority:</div>
+                    <div class="fw-bold text-danger" id="detailOtherPriority">High</div>
+                </div>
+                <div class="d-flex mb-4">
+                    <div class="text-muted" style="width: 120px;">Ticket Type:</div>
+                    <div class="fw-bold text-dark" id="detailOtherType">Software Request</div>
+                </div>
+                <div class="d-flex mb-4">
+                    <div class="text-muted" style="width: 120px;">Subject:</div>
+                    <div class="fw-bold text-dark" id="detailOtherSubject">Request for Figma Pro Access</div>
+                </div>
+                <div class="d-flex mb-4">
+                    <div class="text-muted" style="width: 120px;">Description:</div>
+                    <div class="fw-bold text-dark" id="detailOtherDesc"></div>
+                </div>
+                <div class="d-flex mb-4" id="detailOtherAttachmentRow">
+                    <div class="text-muted" style="width: 120px;">Attachments:</div>
+                    <div class="fw-bold text-primary d-flex align-items-center">
+                        <a href="#" id="detailOtherAttachmentLink" class="text-primary text-decoration-none" download>
+                            <span id="detailOtherAttachment"></span>
+                            <i class="fas fa-download ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="d-flex mb-5">
+                    <div class="text-muted" style="width: 120px;">Raised On:</div>
+                    <div class="fw-bold text-dark" id="detailOtherApplied"></div>
+                </div>
+
+                <!-- Action Remarks Area (Shows if handled) -->
+                <div id="otherRemarksSection" class="p-4 bg-light rounded-3 mb-5 d-none">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small fw-bold text-uppercase">Admin Remarks</span>
+                        <span class="text-muted small" id="detailOtherActionDate"></span>
+                    </div>
+                    <div class="fw-medium text-dark mb-2" id="detailOtherComments"></div>
+                    <div class="text-muted small" id="detailOtherAssignedText"></div>
+                </div>
+
+                <!-- Bottom Sticky Actions -->
+                <div class="d-flex gap-3 justify-content-center mt-5 pt-3" id="otherActionButtons" style="position: sticky; bottom: 0; background: white; padding-bottom: 20px;">
+                    <button class="btn btn-outline-secondary px-5 py-2 fw-bold" style="border-radius: 8px;" onclick="closeOtherDetailsPane()">Cancel</button>
+                    <button class="btn btn-primary px-5 py-2 fw-bold" style="border-radius: 8px;" onclick="openOtherUpdateModal()">Update Status</button>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="other-empty-state" class="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
+                <i class="fas fa-ticket-alt fs-1 mb-3 opacity-25"></i>
+                <h5>Select a ticket to view details</h5>
+            </div>
         </div>
     </div>
+
+    
+
 
     <!-- Hidden JSON data for JS to build recent timesheets -->
     <script th:inline="javascript">
@@ -1464,7 +1622,7 @@
         const rightPane = document.getElementById('leave-right-pane');
         const leaveTable = document.querySelector('#leaveCardsContainer table');
         
-        leftPane.className = "col-md-6 pe-3";
+        leftPane.className = "col-6 pe-3";
         leftPane.style.borderRight = "1px solid #e2e8f0";
         
         // Add compact mode to hide extra columns
@@ -1765,10 +1923,35 @@
     }
 
     function filterMyAssignTables() {
-        const deptFilter = document.getElementById('myassignDeptFilter').value;
-        const statusFilter = document.getElementById('myassignStatusFilter').value;
+        const deptFilter = document.getElementById('myassignDeptFilter') ? document.getElementById('myassignDeptFilter').value : 'All';
+        const statusFilter = document.getElementById('myassignStatusFilter') ? document.getElementById('myassignStatusFilter').value : 'All';
         
         document.querySelectorAll('#myassignCardsContainer .ticket-row').forEach(row => {
+            const role = row.getAttribute('data-role');
+            const type = row.getAttribute('data-type');
+            const status = row.getAttribute('data-status');
+            
+            let show = true;
+            if (deptFilter !== 'All') {
+                if (['IT', 'HR', 'Finance'].includes(deptFilter)) {
+                    if (deptFilter === 'IT' && !role.includes('IT')) show = false;
+                    else if (deptFilter === 'HR' && !role.includes('HR')) show = false;
+                    else if (deptFilter === 'Finance' && !role.includes('Finance')) show = false;
+                } else {
+                    if (!type || !type.includes(deptFilter)) show = false;
+                }
+            }
+            if (statusFilter !== 'All' && status !== statusFilter) show = false;
+            
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    function filterOtherTables() {
+        const deptFilter = document.getElementById('otherDeptFilter') ? document.getElementById('otherDeptFilter').value : 'All';
+        const statusFilter = document.getElementById('otherStatusFilter') ? document.getElementById('otherStatusFilter').value : 'All';
+        
+        document.querySelectorAll('#otherCardsContainer .ticket-row').forEach(row => {
             const role = row.getAttribute('data-role');
             const type = row.getAttribute('data-type');
             const status = row.getAttribute('data-status');
@@ -1803,7 +1986,7 @@
         const rightPane = document.getElementById('ticket-right-pane');
         const ticketTable = document.querySelector('#ticketCardsContainer table');
         
-        leftPane.className = "col-md-6 pe-3";
+        leftPane.className = "col-6 pe-3";
         rightPane.classList.remove('pane-hidden');
         ticketTable.classList.add('table-sm');
         ticketTable.classList.add('ticket-compact-table');
@@ -1882,7 +2065,7 @@
         const rightPane = document.getElementById('myassign-right-pane');
         const myassignTable = document.querySelector('#myassignCardsContainer table');
         
-        leftPane.className = "col-md-6 pe-3";
+        leftPane.className = "col-6 pe-3";
         rightPane.classList.remove('pane-hidden');
         myassignTable.classList.add('table-sm');
         myassignTable.classList.add('ticket-compact-table');
@@ -1981,11 +2164,6 @@
         const assignedTo = document.getElementById('modal-ticket-assigned-to').value;
         const comments = document.getElementById('modal-ticket-comments').value;
         
-        if (!assignedTo) {
-            Swal.fire('Required', 'Please assign this ticket to someone.', 'warning');
-            return;
-        }
-        
         const selectedRow = document.querySelector(`.ticket-row[data-id="${window.currentSelectedTicketId}"]`);
 
         if (status === 'Assigned' && !assignedTo) {
@@ -1993,13 +2171,13 @@
             return;
         }
 
-        const formData = new FormData();
+        const formData = new URLSearchParams();
         formData.append('id', window.currentSelectedTicketId);
         formData.append('status', status);
         if (assignedTo) formData.append('assignedTo', assignedTo);
         if (comments) formData.append('adminComments', comments);
 
-        fetch('/api/admin/request/update-status', {
+        fetch('/api/requests/update-status', {
             method: 'POST',
             body: formData
         }).then(response => {
@@ -2020,6 +2198,152 @@
         openTicketUpdateModal();
     }
 
+    function selectOther(row) {
+        const id = row.getAttribute('data-id');
+        
+        if (window.currentSelectedOtherId === id) {
+            closeOtherDetailsPane();
+            window.currentSelectedOtherId = null;
+            return;
+        }
+
+        const leftPane = document.getElementById('other-left-pane');
+        const rightPane = document.getElementById('other-right-pane');
+        const otherTable = document.querySelector('#otherCardsContainer table');
+        
+        leftPane.className = "col-6 pe-3";
+        rightPane.classList.remove('pane-hidden');
+        otherTable.classList.add('table-sm');
+        otherTable.classList.add('ticket-compact-table');
+        
+        document.querySelectorAll('#otherCardsContainer .ticket-row').forEach(r => r.classList.remove('selected-card'));
+        row.classList.add('selected-card');
+        window.currentSelectedOtherId = id;
+        
+        document.getElementById('other-empty-state').style.display = 'none';
+        document.getElementById('other-detail-content').style.display = 'block';
+
+        const name = row.getAttribute('data-name');
+        const nameParts = name.trim().split(' ');
+        const initials = nameParts.length > 1 ? nameParts[0][0] + nameParts[1][0] : nameParts[0][0];
+        document.getElementById('detailOtherInitials').innerText = initials.toUpperCase();
+        
+        document.getElementById('detailOtherEmpName').innerText = name;
+        document.getElementById('detailOtherEmpRole').innerText = row.getAttribute('data-role');
+        document.getElementById('detailOtherType').innerText = row.getAttribute('data-type');
+        document.getElementById('detailOtherSubject').innerText = row.getAttribute('data-subject');
+        document.getElementById('detailOtherDesc').innerText = row.getAttribute('data-desc');
+        document.getElementById('detailOtherApplied').innerText = row.getAttribute('data-applied');
+        document.getElementById('detailOtherPriority').innerText = row.getAttribute('data-priority');
+        
+        const docName = row.getAttribute('data-docname');
+        const docPath = row.getAttribute('data-docpath');
+        const attachmentRow = document.getElementById('detailOtherAttachmentRow');
+        if (docName && docName !== 'null' && docName !== '') {
+            attachmentRow.classList.remove('d-none');
+            document.getElementById('detailOtherAttachment').innerText = docName;
+            const link = document.getElementById('detailOtherAttachmentLink');
+            link.href = docPath && docPath !== 'null' ? docPath : '#';
+            link.download = docName;
+        } else {
+            if (attachmentRow) attachmentRow.classList.add('d-none');
+        }
+
+        const status = row.getAttribute('data-status');
+        const actionButtons = document.getElementById('otherActionButtons');
+        const remarksSection = document.getElementById('otherRemarksSection');
+
+        if (status === 'In Progress' || status === 'Open' || status === 'Assigned') {
+            actionButtons.classList.remove('d-none');
+            remarksSection.classList.add('d-none');
+        } else {
+            actionButtons.classList.add('d-none');
+            remarksSection.classList.remove('d-none');
+            document.getElementById('detailOtherActionDate').innerText = row.getAttribute('data-actiondate');
+            document.getElementById('detailOtherComments').innerText = row.getAttribute('data-comments') || 'No remarks provided.';
+            document.getElementById('detailOtherAssignedText').innerText = "Assigned To: " + (row.getAttribute('data-assigned') || 'None');
+        }
+    }
+
+    function closeOtherDetailsPane() {
+        document.getElementById('other-left-pane').className = "col-12";
+        document.getElementById('other-right-pane').classList.add('pane-hidden');
+        document.getElementById('other-detail-content').style.display = 'none';
+        document.getElementById('other-empty-state').style.display = 'flex';
+        const otherTable = document.querySelector('#otherCardsContainer table');
+        otherTable.classList.remove('table-sm');
+        otherTable.classList.remove('ticket-compact-table');
+        document.querySelectorAll('#otherCardsContainer .ticket-row').forEach(r => r.classList.remove('selected-card'));
+        window.currentSelectedOtherId = null;
+    }
+
+    // Ticket Update action
+    function openTicketUpdateModal() {
+        document.getElementById('modal-ticket-status-select').value = "In Progress";
+        document.getElementById('modal-ticket-assigned-to').value = "";
+        document.getElementById('modal-ticket-comments').value = "";
+        toggleTicketAssignTo();
+        const updateTicketModal = new bootstrap.Modal(document.getElementById('updateTicketModal'));
+        updateTicketModal.show();
+    }
+    
+    function toggleTicketAssignTo() {
+        const status = document.getElementById('modal-ticket-status-select').value;
+        const container = document.getElementById('ticket-assign-to-container');
+        if (status === 'Assigned') {
+            container.style.display = 'block';
+        } else {
+            // Only hide for IT Support workflow where they select Assigned, 
+            // for non-IT Support, we probably always show it.
+            // Using a simple check to see if "Assigned" is an option in the select
+            const hasAssigned = Array.from(document.getElementById('modal-ticket-status-select').options).some(o => o.value === 'Assigned');
+            if (hasAssigned) {
+                container.style.display = 'none';
+            }
+        }
+    }
+
+    function submitTicketAction() {
+        if (!window.currentSelectedTicketId) return;
+        
+        const status = document.getElementById('modal-ticket-status-select').value;
+        const assignedTo = document.getElementById('modal-ticket-assigned-to').value;
+        const comments = document.getElementById('modal-ticket-comments').value;
+        
+        const selectedRow = document.querySelector(`.ticket-row[data-id="${window.currentSelectedTicketId}"]`);
+
+        if (status === 'Assigned' && !assignedTo) {
+            Swal.fire('Error!', 'Please select an assignee.', 'error');
+            return;
+        }
+
+        const formData = new URLSearchParams();
+        formData.append('id', window.currentSelectedTicketId);
+        formData.append('status', status);
+        if (assignedTo) formData.append('assignedTo', assignedTo);
+        if (comments) formData.append('adminComments', comments);
+
+        fetch('/api/requests/update-status', {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            if (response.ok) {
+                const updateTicketModal = bootstrap.Modal.getInstance(document.getElementById('updateTicketModal'));
+                updateTicketModal.hide();
+                
+                const successModal = new bootstrap.Modal(document.getElementById('workflowConfirmedModal'));
+                successModal.show();
+            } else {
+                Swal.fire('Error', 'Failed to update ticket status', 'error');
+            }
+        });
+    }
+
+    function openOtherUpdateModal() {
+        window.currentSelectedTicketId = window.currentSelectedOtherId;
+        openTicketUpdateModal();
+    }
+
     // ==================== TIMESHEET FUNCTIONS ====================
     
     function selectTimesheet(row) {
@@ -2035,7 +2359,7 @@
         const rightPane = document.getElementById('timesheet-right-pane');
         const tsTable = document.querySelector('#timesheetCardsContainer table');
         
-        leftPane.className = "col-md-6 pe-3";
+        leftPane.className = "col-6 pe-3";
         rightPane.classList.remove('pane-hidden');
         tsTable.classList.add('table-sm');
         tsTable.classList.add('timesheet-compact-table');
@@ -2274,7 +2598,7 @@
                         <label class="form-label fw-bold mb-1">Assign to <span class="text-danger">*</span></label>
                         <select class="form-select shadow-sm" id="modal-ticket-assigned-to" style="border-radius: 6px;">
                             <option value="">-- Unassigned --</option>
-                            <option th:each="u : ${assignableUsers}" th:value="${u.fullName}" th:text="${u.fullName} + ' (' + ${u.role.roleName} + ')'" th:selected="${isItSupport and u.fullName == user.fullName}"></option>
+                            <option th:each="u : ${itSupportUsers}" th:value="${u.fullName}" th:text="${u.fullName} + ' (' + ${u.role.roleName} + ')'" th:selected="${isItSupport and u.fullName == user.fullName}"></option>
                         </select>
                     </div>
                     <div class="mb-4">
@@ -2312,7 +2636,7 @@
                         <label class="form-label fw-bold mb-1">Assign to (Optional)</label>
                         <select class="form-select shadow-sm" id="modal-assigned-to" style="border-radius: 6px;">
                             <option value="">-- Unassigned --</option>
-                            <option th:each="u : ${assignableUsers}" th:value="${u.fullName} + ' (' + ${u.role.roleName} + ')'" th:text="${u.fullName} + ' (' + ${u.role.roleName} + ')'"></option>
+                            <option th:each="u : ${itSupportUsers}" th:value="${u.fullName} + ' (' + ${u.role.roleName} + ')'" th:text="${u.fullName} + ' (' + ${u.role.roleName} + ')'"></option>
                         </select>
                     </div>
                     <div class="mb-4">
@@ -2349,7 +2673,7 @@
                         <label class="form-label fw-bold mb-1">Assign to (Optional)</label>
                         <select class="form-select shadow-sm" id="modal-ts-assigned-to" style="border-radius: 6px;">
                             <option value="">-- Unassigned --</option>
-                            <option th:each="u : ${assignableUsers}" th:value="${u.fullName} + ' (' + ${u.role.roleName} + ')'" th:text="${u.fullName} + ' (' + ${u.role.roleName} + ')'"></option>
+                            <option th:each="u : ${itSupportUsers}" th:value="${u.fullName} + ' (' + ${u.role.roleName} + ')'" th:text="${u.fullName} + ' (' + ${u.role.roleName} + ')'"></option>
                         </select>
                     </div>
                     <div class="mb-4">
@@ -2399,4 +2723,6 @@
 
 </body>
 </html>
+
+
 
