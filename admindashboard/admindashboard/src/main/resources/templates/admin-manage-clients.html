@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -58,7 +58,7 @@
         /* Action Buttons */
         .btn-action-group { display: flex; gap: 8px; justify-content: flex-end; }
         .btn-icon { width: 34px; height: 34px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; border: none; transition: all 0.2s; font-size: 0.85rem; }
-        .btn-view { background-color: #eff6ff; color: #2563eb; }
+        .btn-view { background-color: #eff6ff; color: #1e3a8a; }
         .btn-view:hover { background-color: #3b82f6; color: white; }
         .btn-edit { background-color: #fffbeb; color: #d97706; }
         .btn-edit:hover { background-color: #d97706; color: white; }
@@ -545,7 +545,7 @@
                                     <div class="company-avatar shadow-sm">${initials}</div>
                                     <div>
                                         <div class="fw-bold text-dark fs-6 d-flex align-items-center gap-2">${client.companyName} <span class="info-pill">${client.clientId}</span></div>
-                                        <div class="text-muted small mt-1"><i class="fas fa-briefcase me-1 opacity-50"></i> ${domain} <span class="mx-1">â€¢</span> <i class="fas fa-map-marker-alt me-1 opacity-50 text-danger"></i> ${location}</div>
+                                        <div class="text-muted small mt-1"><i class="fas fa-briefcase me-1 opacity-50"></i> ${domain} <span class="mx-1">•</span> <i class="fas fa-map-marker-alt me-1 opacity-50 text-danger"></i> ${location}</div>
                                     </div>
                                 </div>
                             </td>
