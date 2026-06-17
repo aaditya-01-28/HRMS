@@ -100,10 +100,11 @@ public class DashboardController {
             request.isUserInRole("IT_ADMIN") || request.isUserInRole("HR_MANAGER") ||
             request.isUserInRole("PROJECT_MANAGER") || request.isUserInRole("FINANCE")) {
             return "redirect:/admin/dashboard";
+        } else if (request.isUserInRole("IT_SUPPORT")) {
+            return "redirect:/itsupport/dashboard";
         } else if (request.isUserInRole("MANAGER") || request.isUserInRole("HR_EXECUTIVE") ||
                    request.isUserInRole("RECRUITER") || request.isUserInRole("LND") ||
-                   request.isUserInRole("TRANSPORT") || request.isUserInRole("AUDITOR") ||
-                   request.isUserInRole("IT_SUPPORT")) {
+                   request.isUserInRole("TRANSPORT") || request.isUserInRole("AUDITOR")) {
             return "redirect:/manager/dashboard";
         } else if (request.isUserInRole("CLIENT")) {
             return "redirect:/client/dashboard";
@@ -181,7 +182,7 @@ public class DashboardController {
         }).toList();
     }
 
-    @GetMapping("/manager/dashboard")
+    @GetMapping({"/manager/dashboard", "/itsupport/dashboard"})
     public String showManagerDashboard(org.springframework.ui.Model model, java.security.Principal principal) {
         String currentUserId = principal.getName();
         User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
@@ -276,7 +277,54 @@ public class DashboardController {
         List<LeaveRequest> rejectedLeaves = new ArrayList<>();
         List<WeeklyTimesheet> rejectedTimesheets = new ArrayList<>();
 
-        if (!teamUsernames.isEmpty()) {
+        boolean isItSupport = currentUser.getRole() != null && "IT_SUPPORT".equalsIgnoreCase(currentUser.getRole().getRoleName());
+
+        if (isItSupport) {
+            List<ServiceRequest> allItTickets = serviceRequestRepository.findAll().stream()
+                    .filter(t -> t.getType() != null && 
+                        (t.getType().toLowerCase().contains("software") || 
+                         t.getType().toLowerCase().contains("hardware") || 
+                         t.getType().toLowerCase().contains("incident") ||
+                         t.getType().toLowerCase().contains("access") ||
+                         t.getType().toLowerCase().contains("network") ||
+                         t.getType().toLowerCase().contains("permission")))
+                    .collect(Collectors.toList());
+
+            pendingTickets = allItTickets.stream()
+                    .filter(t -> "Open".equalsIgnoreCase(t.getStatus()))
+                    .collect(Collectors.toList());
+                    
+            // Also fetch assigned tickets for the user
+            List<ServiceRequest> assignedTickets = allItTickets.stream()
+                    .filter(t -> "Assigned".equalsIgnoreCase(t.getStatus()) && t.getAssignedTo() != null && t.getAssignedTo().contains(myName))
+                    .collect(Collectors.toList());
+            model.addAttribute("myAssignedTickets", assignedTickets);
+            
+            // Dashboard Stats
+            int totalTickets = allItTickets.size();
+            int pendingCount = pendingTickets.size();
+            int inProgressCount = (int) allItTickets.stream().filter(t -> "Assigned".equalsIgnoreCase(t.getStatus())).count();
+            int resolvedTodayCount = (int) allItTickets.stream().filter(t -> "Close".equalsIgnoreCase(t.getStatus()) && java.time.LocalDate.now().equals(t.getActionDate())).count();
+            String avgResolutionTime = "4.2 hrs"; // Mock for now
+            
+            model.addAttribute("totalTickets", totalTickets);
+            model.addAttribute("pendingCount", pendingCount);
+            model.addAttribute("inProgressCount", inProgressCount);
+            model.addAttribute("resolvedTodayCount", resolvedTodayCount);
+            model.addAttribute("avgResolutionTime", avgResolutionTime);
+            
+            // Category breakdown counts
+            int softwareCount = (int) allItTickets.stream().filter(t -> t.getType().toLowerCase().contains("software")).count();
+            int hardwareCount = (int) allItTickets.stream().filter(t -> t.getType().toLowerCase().contains("hardware")).count();
+            int accessCount = (int) allItTickets.stream().filter(t -> t.getType().toLowerCase().contains("access") || t.getType().toLowerCase().contains("permission")).count();
+            int networkCount = (int) allItTickets.stream().filter(t -> t.getType().toLowerCase().contains("network") || t.getType().toLowerCase().contains("incident")).count();
+            
+            model.addAttribute("softwareCount", softwareCount);
+            model.addAttribute("hardwareCount", hardwareCount);
+            model.addAttribute("accessCount", accessCount);
+            model.addAttribute("networkCount", networkCount);
+            model.addAttribute("allItTickets", allItTickets);
+        } else if (!teamUsernames.isEmpty()) {
             // Leaves
             pendingLeaves = leaveRequestRepository.findAll().stream()
                     .filter(l -> l.getUser() != null && teamUsernames.contains(l.getUser().getUsername()) && "Pending".equalsIgnoreCase(l.getStatus()))
@@ -348,6 +396,7 @@ public class DashboardController {
         model.addAttribute("assignableUsers", assignableUsers);
         
         model.addAttribute("user", currentUser);
+        model.addAttribute("isItSupport", isItSupport);
 
         return "manager-workflow";
     }

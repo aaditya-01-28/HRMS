@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -157,7 +157,7 @@
 		.view-details{
 		    display:inline-block;
 		    margin-top:6px;
-		    color:#2563eb;
+		    color:#1e3a8a;
 		    font-size:13px;
 		    font-weight:600;
 		    text-decoration:none;
@@ -187,7 +187,7 @@
 		
 		.request-content a{
 		    text-decoration:none;
-		    color:#2563eb;
+		    color:#1e3a8a;
 		    font-weight:600;
 		    font-size:14px;
 		}
@@ -256,7 +256,7 @@
 		}
 
 		.text-primary{
-		    color:#2563eb;
+		    color:#1e3a8a;
 		}
 
 		.text-success{
@@ -647,22 +647,22 @@
 
 			        <div class="filter-option active"
 			             onclick="filterRequests('all')">
-			            âŠž All Requests
+			            ⊞ All Requests
 			        </div>
 
 			        <div class="filter-option"
 			             onclick="filterRequests('leave')">
-			            ðŸ– Leave Requests
+			            🏖 Leave Requests
 			        </div>
 
 			        <div class="filter-option"
 			             onclick="filterRequests('timesheet')">
-			            ðŸ“ Timesheets
+			            📝 Timesheets
 			        </div>
 
 			        <div class="filter-option"
 			             onclick="filterRequests('attendance')">
-			            ðŸŽ– Attendance
+			            🎖 Attendance
 			        </div>
 
 			    </div>
@@ -715,7 +715,7 @@
 				<a href="javascript:void(0)"
 				   class="view-details"
 				   onclick="toggleDetails(this)">
-				    View Details â–¼
+				    View Details ▼
 				</a>
 
 				<div class="details-section">
@@ -806,26 +806,26 @@
 	            <a href="javascript:void(0)"
 	               class="view-details"
 	               onclick="toggleDetails(this)">
-	                View Details â–¼
+	                View Details ▼
 	            </a>
 				<div class="details-section">
 
 				    <div class="detail-row">
-				        <span class="detail-label">ðŸ“… Week Starting</span>
+				        <span class="detail-label">📅 Week Starting</span>
 				        <span class="detail-value"
 				              th:text="${timesheet.weekStartDate}">
 				        </span>
 				    </div>
 
 				    <div class="detail-row">
-				        <span class="detail-label">â± Total Hours</span>
+				        <span class="detail-label">⏱ Total Hours</span>
 				        <span class="detail-value"
 				              th:text="${timesheet.totalWeekHours + ' hrs'}">
 				        </span>
 				    </div>
 
 				    <div class="detail-row">
-				        <span class="detail-label">ðŸ“ Logged Tasks</span>
+				        <span class="detail-label">📝 Logged Tasks</span>
 				        <span class="detail-value">
 				            Project Id: 1 | Task Id: 2
 				        </span>
@@ -836,7 +836,7 @@
 				    </div>
 
 				    <div class="detail-row">
-				        <span class="detail-label">ðŸ“„ Employee Notes</span>
+				        <span class="detail-label">📄 Employee Notes</span>
 				        <span class="detail-value"
 				              th:text="${timesheet.overallComments}">
 				        </span>
@@ -872,7 +872,7 @@
 	            <a href="javascript:void(0)"
 	               class="view-details"
 	               onclick="toggleDetails(this)">
-	                View Details â–¼
+	                View Details ▼
 	            </a>
 				<div class="details-section">
 
@@ -975,7 +975,7 @@
 	            <a href="javascript:void(0)"
 	               class="view-details"
 	               onclick="toggleDetails(this)">
-	                View Details â–¼
+	                View Details ▼
 	            </a>
 
 	            <div class="details-section">
@@ -1061,27 +1061,27 @@
 	            <a href="javascript:void(0)"
 	               class="view-details"
 	               onclick="toggleDetails(this)">
-	                View Details â–¼
+	                View Details ▼
 	            </a>
 
 	            <div class="details-section">
 
 	                <div class="detail-row">
-	                    <span class="detail-label">ðŸ“… Week Starting</span>
+	                    <span class="detail-label">📅 Week Starting</span>
 	                    <span class="detail-value"
 	                          th:text="${timesheet.weekStartDate}">
 	                    </span>
 	                </div>
 
 	                <div class="detail-row">
-	                    <span class="detail-label">â± Total Hours</span>
+	                    <span class="detail-label">⏱ Total Hours</span>
 	                    <span class="detail-value"
 	                          th:text="${timesheet.totalWeekHours + ' hrs'}">
 	                    </span>
 	                </div>
 
 	                <div class="detail-row">
-	                    <span class="detail-label">ðŸ“„ Employee Notes</span>
+	                    <span class="detail-label">📄 Employee Notes</span>
 	                    <span class="detail-value"
 	                          th:text="${timesheet.overallComments}">
 	                    </span>
@@ -1117,7 +1117,7 @@
 	            <a href="javascript:void(0)"
 	               class="view-details"
 	               onclick="toggleDetails(this)">
-	                View Details â–¼
+	                View Details ▼
 	            </a>
 
 	            <div class="details-section">
@@ -1215,7 +1215,7 @@
 	            <a href="javascript:void(0)"
 	               class="view-details"
 	               onclick="toggleDetails(this)">
-	                View Details â–¼
+	                View Details ▼
 	            </a>
 
 	            <div class="details-section">
@@ -1266,7 +1266,7 @@
 						<div class="detail-item rejection-notes">
 
 						    <div class="detail-label text-danger">
-						        ðŸ“ Manager's Rejection Notes
+						        📝 Manager's Rejection Notes
 						    </div>
 
 						    <div class="detail-value"
@@ -1306,27 +1306,27 @@
 	            <a href="javascript:void(0)"
 	               class="view-details"
 	               onclick="toggleDetails(this)">
-	                View Details â–¼
+	                View Details ▼
 	            </a>
 
 				<div class="details-section">
 
 				    <div class="detail-row">
-				        <span class="detail-label">ðŸ“… Week Starting</span>
+				        <span class="detail-label">📅 Week Starting</span>
 				        <span class="detail-value"
 				              th:text="${timesheet.weekStartDate}">
 				        </span>
 				    </div>
 
 				    <div class="detail-row">
-				        <span class="detail-label">â± Total Hours</span>
+				        <span class="detail-label">⏱ Total Hours</span>
 				        <span class="detail-value"
 				              th:text="${timesheet.totalWeekHours + ' hrs'}">
 				        </span>
 				    </div>
 
 				    <div class="detail-row">
-				        <span class="detail-label">ðŸ“„ Employee Notes</span>
+				        <span class="detail-label">📄 Employee Notes</span>
 				        <span class="detail-value"
 				              th:text="${timesheet.overallComments}">
 				        </span>
@@ -1335,7 +1335,7 @@
 				    <div class="rejection-notes">
 
 				        <div class="rejection-title">
-				            ðŸ“ Manager's Rejection Notes
+				            📝 Manager's Rejection Notes
 				        </div>
 
 				        <div class="rejection-message"
@@ -1375,7 +1375,7 @@
 	            <a href="javascript:void(0)"
 	               class="view-details"
 	               onclick="toggleDetails(this)">
-	                View Details â–¼
+	                View Details ▼
 	            </a>
 
 				<div class="details-section">
@@ -1431,7 +1431,7 @@
 				    <div class="rejection-notes">
 
 				        <div class="rejection-title">
-				            ðŸ“ Manager's Rejection Notes
+				            📝 Manager's Rejection Notes
 				        </div>
 
 				        <div class="rejection-message"
@@ -1516,16 +1516,16 @@
 	    document.querySelectorAll('.view-details').forEach(link => {
 
 	        if(link !== element){
-	            link.innerHTML = "View Details â–¼";
+	            link.innerHTML = "View Details ▼";
 	        }
 	    });
 
 	    currentDetails.classList.toggle('show');
 
 	    if(currentDetails.classList.contains('show')){
-	        element.innerHTML = "Hide Details â–²";
+	        element.innerHTML = "Hide Details ▲";
 	    }else{
-	        element.innerHTML = "View Details â–¼";
+	        element.innerHTML = "View Details ▼";
 	    }
 	}
 	document.getElementById("pendingTab").onclick = function () {
