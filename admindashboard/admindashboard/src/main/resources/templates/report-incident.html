@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -44,7 +44,7 @@
             position: absolute;
             top: 25px;
             right: 40px;
-            background-color: #2563eb;
+            background-color: #1e3a8a;
             color: #ffffff !important;
             font-size: 0.88rem;
             font-weight: 600;
@@ -114,7 +114,7 @@
             padding-left: 6px;
         }
         .input-box-field:focus {
-            border-color: #2563eb;
+            border-color: #1e3a8a;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
@@ -148,7 +148,7 @@
             outline: none;
         }
         .description-section textarea.form-control-custom:focus {
-            border-color: #2563eb;
+            border-color: #1e3a8a;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
@@ -171,7 +171,7 @@
             background-color: #f9fafb;
         }
         .upload-dropzone span {
-            color: #2563eb;
+            color: #1e3a8a;
             font-weight: 600;
         }
 
@@ -185,7 +185,7 @@
         }
 
         .btn-action-solid {
-            background-color: #2563eb;
+            background-color: #1e3a8a;
             color: #ffffff !important;
             font-weight: 600;
             font-size: 0.92rem;
@@ -201,12 +201,12 @@
 
         .btn-action-outline {
             background-color: #ffffff;
-            color: #2563eb !important;
+            color: #1e3a8a !important;
             font-weight: 600;
             font-size: 0.92rem;
             padding: 11px 45px;
             border-radius: 6px;
-            border: 1.5px solid #2563eb;
+            border: 1.5px solid #1e3a8a;
             transition: background-color 0.2s, color 0.2s;
         }
         .btn-action-outline:hover {
@@ -352,7 +352,7 @@
         const subcategoryVal = document.getElementById('incSubcategoryField').value.trim();
 
         if (!category || !mobile || !email || !locationVal || !priority) {
-            Swal.fire({ icon: 'info', title: 'Missing Info', text: 'Please fill in all required fields.', confirmButtonColor: '#2563eb' });
+            Swal.fire({ icon: 'info', title: 'Missing Info', text: 'Please fill in all required fields.', confirmButtonColor: '#1e3a8a' });
             return;
         }
 
@@ -360,11 +360,11 @@
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
         if (!mobileRegex.test(mobile)) {
-            Swal.fire({ icon: 'error', title: 'Invalid Mobile Number', text: 'Please enter a valid 10-digit number.', confirmButtonColor: '#2563eb' });
+            Swal.fire({ icon: 'error', title: 'Invalid Mobile Number', text: 'Please enter a valid 10-digit number.', confirmButtonColor: '#1e3a8a' });
             return;
         }
         if (!emailRegex.test(email)) {
-            Swal.fire({ icon: 'error', title: 'Invalid Email Address', text: 'Please enter a valid email address.', confirmButtonColor: '#2563eb' });
+            Swal.fire({ icon: 'error', title: 'Invalid Email Address', text: 'Please enter a valid email address.', confirmButtonColor: '#1e3a8a' });
             return;
         }
 
@@ -448,7 +448,7 @@
                 icon: 'error',
                 title: 'Helpdesk Offline',
                 text: 'Could not reach the portal. Please check your network connection.',
-                confirmButtonColor: '#2563eb'
+                confirmButtonColor: '#1e3a8a'
             });
         }
     }
@@ -457,7 +457,7 @@
         if (input.files && input.files.length > 0) {
             const file = input.files[0];
             const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-            textWrapper.innerHTML = `<i class="fas fa-file-alt me-2" style="color: #2563eb;"></i> <strong>${file.name}</strong> (${fileSizeMB} MB) <span class="ms-3 text-secondary" style="font-size: 0.85rem; text-decoration: underline;">Change file</span>`;
+            textWrapper.innerHTML = `<i class="fas fa-file-alt me-2" style="color: #1e3a8a;"></i> <strong>${file.name}</strong> (${fileSizeMB} MB) <span class="ms-3 text-secondary" style="font-size: 0.85rem; text-decoration: underline;">Change file</span>`;
         }
     }
 </script>

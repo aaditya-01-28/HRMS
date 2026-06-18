@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -11,7 +11,7 @@
 
     <style>
         :root {
-            --primary-blue: #2563eb;
+            --primary-blue: #1e3a8a;
             --hover-blue: #1d4ed8;
             --border-color: #d1d5db;
         }
@@ -547,7 +547,7 @@
                 icon: 'warning',
                 title: 'Required Fields Missing',
                 text: 'Please populate all mandatory items marked with (*)',
-                confirmButtonColor: '#2563eb'
+                confirmButtonColor: '#1e3a8a'
             });
             return;
         }
@@ -560,7 +560,7 @@
                 icon: 'error',
                 title: 'Invalid Mobile Number',
                 text: 'Please enter a valid 10-digit mobile number.',
-                confirmButtonColor: '#2563eb'
+                confirmButtonColor: '#1e3a8a'
             });
             return;
         }
@@ -570,7 +570,7 @@
                 icon: 'error',
                 title: 'Invalid Email ID',
                 text: 'Please enter a valid email address.',
-                confirmButtonColor: '#2563eb'
+                confirmButtonColor: '#1e3a8a'
             });
             return;
         }
@@ -616,7 +616,7 @@
 		            icon: 'success',
 		            title: 'Ticket Saved!',
 		            text: 'Your service ticket request has been logged successfully.',
-		            confirmButtonColor: '#2563eb'
+		            confirmButtonColor: '#1e3a8a'
 		        });
 
 		        if (sessionUser.isRoleUser) {
@@ -639,7 +639,7 @@
 		        icon: 'error',
 		        title: 'Submission Failed',
 		        text: 'Could not  communicate with server database adapter pipelines.',
-		        confirmButtonColor: '#2563eb'
+		        confirmButtonColor: '#1e3a8a'
 		    });
 		}
 	}
@@ -652,7 +652,7 @@
 	    if (input.files && input.files.length > 0) {
 	        const file = input.files[0];
 	        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-	        textWrapper.innerHTML = `<i class="fas fa-file-alt me-2" style="color: #2563eb;"></i> <strong>${file.name}</strong> (${fileSizeMB} MB) <span class="ms-3 text-secondary" style="font-size: 0.85rem; text-decoration: underline;">Change file</span>`;
+	        textWrapper.innerHTML = `<i class="fas fa-file-alt me-2" style="color: #1e3a8a;"></i> <strong>${file.name}</strong> (${fileSizeMB} MB) <span class="ms-3 text-secondary" style="font-size: 0.85rem; text-decoration: underline;">Change file</span>`;
             
             window.uploadedTicketFileName = file.name;
             const reader = new FileReader();
