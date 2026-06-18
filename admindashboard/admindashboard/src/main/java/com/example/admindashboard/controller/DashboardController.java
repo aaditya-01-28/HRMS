@@ -102,8 +102,10 @@ public class DashboardController {
             return "redirect:/admin/dashboard";
         } else if (request.isUserInRole("IT_SUPPORT")) {
             return "redirect:/itsupport/dashboard";
+        } else if (request.isUserInRole("LND")) {
+            return "redirect:/learninghead/dashboard";
         } else if (request.isUserInRole("MANAGER") || request.isUserInRole("HR_EXECUTIVE") ||
-                   request.isUserInRole("RECRUITER") || request.isUserInRole("LND") ||
+                   request.isUserInRole("RECRUITER") || 
                    request.isUserInRole("TRANSPORT") || request.isUserInRole("AUDITOR")) {
             return "redirect:/manager/dashboard";
         } else if (request.isUserInRole("CLIENT")) {
@@ -182,8 +184,8 @@ public class DashboardController {
         }).toList();
     }
 
-    @GetMapping({"/manager/dashboard", "/itsupport/dashboard"})
-    public String showManagerDashboard(org.springframework.ui.Model model, java.security.Principal principal) {
+    @GetMapping({"/manager/dashboard", "/itsupport/dashboard", "/learninghead/dashboard"})
+    public String showManagerDashboard(org.springframework.ui.Model model, java.security.Principal principal, jakarta.servlet.http.HttpServletRequest request) {
         String currentUserId = principal.getName();
         User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
         String myName = currentUser.getFullName();
@@ -247,6 +249,9 @@ public class DashboardController {
         model.addAttribute("teamRequests", unifiedRequests);
         model.addAttribute("pendingMeetingInvites", getPendingMeetingInvites(currentUserId));
 
+        if (request.getRequestURI().contains("learninghead")) {
+            return "learninghead-dashboard";
+        }
         return "manager-dashboard";
     }
 

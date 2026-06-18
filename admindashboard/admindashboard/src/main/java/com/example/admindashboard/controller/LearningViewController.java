@@ -17,6 +17,9 @@ public class LearningViewController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private com.example.admindashboard.repository.ServiceRequestRepository serviceRequestRepository;
+
     private void addUserToModel(Principal principal, Model model) {
         if (principal != null) {
             String loginId = principal.getName();
@@ -41,6 +44,33 @@ public class LearningViewController {
         addUserToModel(principal, model);
         model.addAttribute("activeTab", "dashboard");
         return "learning/dashboard";
+    }
+
+    @GetMapping("/workflow")
+    public String workflow(Principal principal, Model model) {
+        addUserToModel(principal, model);
+        model.addAttribute("activeTab", "workflow");
+
+        java.util.List<com.example.admindashboard.model.ServiceRequest> allLearningTickets = serviceRequestRepository.findAll().stream()
+                .filter(t -> (t.getType() != null && "Learning".equalsIgnoreCase(t.getType())) ||
+                             (t.getCategory() != null && t.getCategory().toLowerCase().contains("learning")))
+                .collect(java.util.stream.Collectors.toList());
+
+        java.util.List<com.example.admindashboard.model.ServiceRequest> pendingLearningTickets = allLearningTickets.stream()
+                .filter(t -> "Open".equalsIgnoreCase(t.getStatus()) || "Assigned".equalsIgnoreCase(t.getStatus()) || "Close".equalsIgnoreCase(t.getStatus()))
+                .collect(java.util.stream.Collectors.toList());
+
+        // Other Tickets (empty for now per user request)
+        java.util.List<com.example.admindashboard.model.ServiceRequest> otherTickets = new java.util.ArrayList<>();
+
+        model.addAttribute("allItTickets", allLearningTickets);
+        model.addAttribute("pendingTickets", pendingLearningTickets);
+        model.addAttribute("otherTickets", otherTickets);
+        // Is IT support flag set to true so the UI renders the full list similar to manager workflow
+        model.addAttribute("isItSupport", true);
+        model.addAttribute("isLearningWorkflow", true);
+
+        return "learning/learning-workflow";
     }
 
     @GetMapping("/explore-courses")
