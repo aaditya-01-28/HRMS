@@ -15,11 +15,12 @@
             --bs-purple: #7c3aed;  /* Timesheet Purple */
             --bs-orange: #d97706;  /* Attendance Orange */
             --bg-color: #f1f5f9;
+			font-family:Arial,sans-serif;
         }
 
 		body{
 		    background:#f8f8f8;
-		    font-family:'Poppins',sans-serif;
+		    font-family:Arial,sans-serif;
 		}
 
 		.approval-header{
@@ -647,22 +648,26 @@
 
 			        <div class="filter-option active"
 			             onclick="filterRequests('all')">
-			            ⊞ All Requests
+
+			            <i class="fas fa-list"></i> All Requests
+			           
 			        </div>
 
 			        <div class="filter-option"
 			             onclick="filterRequests('leave')">
-			            🏖 Leave Requests
+			            <i class="fas fa-plane"></i> Leave Requests
+			           
 			        </div>
 
 			        <div class="filter-option"
 			             onclick="filterRequests('timesheet')">
-			            📝 Timesheets
+			            <i class="fas fa-file-alt"></i> Timesheets
+			            
 			        </div>
 
 			        <div class="filter-option"
 			             onclick="filterRequests('attendance')">
-			            🎖 Attendance
+			            <i class="fas fa-calendar-check"></i> Attendance
 			        </div>
 
 			    </div>
@@ -811,21 +816,29 @@
 				<div class="details-section">
 
 				    <div class="detail-row">
-				        <span class="detail-label">📅 Week Starting</span>
+						<span class="detail-label">
+						    <i class="fa-regular fa-calendar"></i> Week Starting
+						</span>
 				        <span class="detail-value"
 				              th:text="${timesheet.weekStartDate}">
 				        </span>
 				    </div>
 
 				    <div class="detail-row">
-				        <span class="detail-label">⏱ Total Hours</span>
+						<span class="detail-label">
+						    <i class="fa-regular fa-clock"></i> Total Hours
+						</span>
+
 				        <span class="detail-value"
 				              th:text="${timesheet.totalWeekHours + ' hrs'}">
 				        </span>
 				    </div>
 
 				    <div class="detail-row">
-				        <span class="detail-label">📝 Logged Tasks</span>
+						<span class="detail-label">
+						    <i class="fa-regular fa-clipboard"></i> Logged Tasks
+						</span>
+
 				        <span class="detail-value">
 				            Project Id: 1 | Task Id: 2
 				        </span>
@@ -836,8 +849,10 @@
 				    </div>
 
 				    <div class="detail-row">
-				        <span class="detail-label">📄 Employee Notes</span>
-				        <span class="detail-value"
+						<span class="detail-label">
+						    <i class="fa-regular fa-file-lines"></i> Employee Notes
+						</span>				        
+						<span class="detail-value"
 				              th:text="${timesheet.overallComments}">
 				        </span>
 				    </div>
@@ -1067,21 +1082,26 @@
 	            <div class="details-section">
 
 	                <div class="detail-row">
-	                    <span class="detail-label">📅 Week Starting</span>
+	                    <span class="detail-label"><i class="fa-regular fa-calendar"></i> Week Starting</span>
 	                    <span class="detail-value"
 	                          th:text="${timesheet.weekStartDate}">
 	                    </span>
 	                </div>
 
 	                <div class="detail-row">
-	                    <span class="detail-label">⏱ Total Hours</span>
+						<span class="detail-label">
+						    <i class="fa-regular fa-clock"></i> Total Hours
+						</span>
+
 	                    <span class="detail-value"
 	                          th:text="${timesheet.totalWeekHours + ' hrs'}">
 	                    </span>
 	                </div>
 
 	                <div class="detail-row">
-	                    <span class="detail-label">📄 Employee Notes</span>
+
+	                    <span class="detail-label"><i class="fa-regular fa-file-lines"></i>Employee Notes</span>
+
 	                    <span class="detail-value"
 	                          th:text="${timesheet.overallComments}">
 	                    </span>
@@ -1266,7 +1286,7 @@
 						<div class="detail-item rejection-notes">
 
 						    <div class="detail-label text-danger">
-						        📝 Manager's Rejection Notes
+						        Manager's Rejection Notes
 						    </div>
 
 						    <div class="detail-value"
@@ -1312,21 +1332,26 @@
 				<div class="details-section">
 
 				    <div class="detail-row">
-				        <span class="detail-label">📅 Week Starting</span>
+				        <span class="detail-label"><i class="fa-regular fa-calendar"></i> Week Starting</span>
+
 				        <span class="detail-value"
 				              th:text="${timesheet.weekStartDate}">
 				        </span>
 				    </div>
 
 				    <div class="detail-row">
-				        <span class="detail-label">⏱ Total Hours</span>
+						<span class="detail-label">
+						    <i class="fa-regular fa-clock"></i> Total Hours
+						</span>
+
 				        <span class="detail-value"
 				              th:text="${timesheet.totalWeekHours + ' hrs'}">
 				        </span>
 				    </div>
 
 				    <div class="detail-row">
-				        <span class="detail-label">📄 Employee Notes</span>
+				        <span class="detail-label"><i class="fa-regular fa-file-lines"></i> Employee Notes</span>
+
 				        <span class="detail-value"
 				              th:text="${timesheet.overallComments}">
 				        </span>
@@ -1335,7 +1360,8 @@
 				    <div class="rejection-notes">
 
 				        <div class="rejection-title">
-				            📝 Manager's Rejection Notes
+				            Manager's Rejection Notes
+
 				        </div>
 
 				        <div class="rejection-message"
@@ -1431,11 +1457,13 @@
 				    <div class="rejection-notes">
 
 				        <div class="rejection-title">
-				            📝 Manager's Rejection Notes
+
+				            <i class="fa-regular fa-note-sticky"></i> Manager's Rejection Notes
+
 				        </div>
 
 				        <div class="rejection-message"
-				            th:text="${attendance.hrComments}">
+				            th:text="${attendance.reason}">
 				            Rejected by manager
 				        </div>
 
