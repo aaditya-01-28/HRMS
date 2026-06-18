@@ -98,7 +98,7 @@ public class DashboardController {
     public String defaultRedirect(HttpServletRequest request) {
         if (request.isUserInRole("SUPER_ADMIN") || request.isUserInRole("HR_ADMIN") ||
             request.isUserInRole("IT_ADMIN") || request.isUserInRole("HR_MANAGER") ||
-            request.isUserInRole("PROJECT_MANAGER") || request.isUserInRole("FINANCE")) {
+            request.isUserInRole("PROJECT_MANAGER")) {
             return "redirect:/admin/dashboard";
         } else if (request.isUserInRole("IT_SUPPORT")) {
             return "redirect:/itsupport/dashboard";
@@ -106,8 +106,10 @@ public class DashboardController {
             return "redirect:/learninghead/dashboard";
         } else if (request.isUserInRole("MANAGER") || request.isUserInRole("HR_EXECUTIVE") ||
                    request.isUserInRole("RECRUITER") || 
-                   request.isUserInRole("TRANSPORT") || request.isUserInRole("AUDITOR")) {
+                   request.isUserInRole("TRANSPORT")) {
             return "redirect:/manager/dashboard";
+        } else if (request.isUserInRole("AUDITOR") || request.isUserInRole("FINANCE")) {
+            return "redirect:/accounts/dashboard";
         } else if (request.isUserInRole("CLIENT")) {
             return "redirect:/client/dashboard";
         } else {
@@ -184,7 +186,7 @@ public class DashboardController {
         }).toList();
     }
 
-    @GetMapping({"/manager/dashboard", "/itsupport/dashboard", "/learninghead/dashboard"})
+    @GetMapping({"/manager/dashboard", "/itsupport/dashboard", "/learninghead/dashboard", "/accounts/dashboard"})
     public String showManagerDashboard(org.springframework.ui.Model model, java.security.Principal principal, jakarta.servlet.http.HttpServletRequest request) {
         String currentUserId = principal.getName();
         User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
@@ -251,12 +253,14 @@ public class DashboardController {
 
         if (request.getRequestURI().contains("learninghead")) {
             return "learninghead-dashboard";
+        } else if (request.getRequestURI().contains("accounts")) {
+            return "accounts-dashboard";
         }
         return "manager-dashboard";
     }
 
-    @GetMapping("/manager/workflow")
-    public String showManagerWorkflow(org.springframework.ui.Model model, java.security.Principal principal) {
+    @GetMapping({"/manager/workflow", "/accounts/workflow"})
+    public String showManagerWorkflow(org.springframework.ui.Model model, java.security.Principal principal, jakarta.servlet.http.HttpServletRequest request) {
         String currentUserId = principal.getName();
         User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
         String myName = currentUser.getFullName();
@@ -416,6 +420,22 @@ public class DashboardController {
         model.addAttribute("user", currentUser);
         model.addAttribute("isItSupport", isItSupport);
 
+        if (request.getRequestURI().contains("accounts")) {
+            java.util.List<ServiceRequest> allAccountsTickets = serviceRequestRepository.findAll().stream()
+                    .filter(t -> "PAYROLL".equalsIgnoreCase(t.getType()) || "FINANCE".equalsIgnoreCase(t.getType()))
+                    .collect(Collectors.toList());
+
+            java.util.List<ServiceRequest> pendingAccountsTickets = allAccountsTickets.stream()
+                    .filter(t -> "Open".equalsIgnoreCase(t.getStatus()) || "Assigned".equalsIgnoreCase(t.getStatus()) || "Close".equalsIgnoreCase(t.getStatus()))
+                    .collect(Collectors.toList());
+
+            model.addAttribute("allItTickets", allAccountsTickets);
+            model.addAttribute("pendingTickets", pendingAccountsTickets);
+            model.addAttribute("otherTickets", new java.util.ArrayList<>());
+            model.addAttribute("isItSupport", true); // To trigger the UI list rendering correctly
+
+            return "accounts-workflow";
+        }
         return "manager-workflow";
     }
 
