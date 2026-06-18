@@ -142,6 +142,14 @@ public class DashboardController {
         return "admin-dashboard";
     }
 
+    @GetMapping("/api/verify-user")
+    @ResponseBody
+    public String verifyUser(@RequestParam String username) {
+        return userRepository.findByUsername(username.trim().toUpperCase())
+                .map(u -> "User found: " + u.getUsername() + " | Role: " + (u.getRole() != null ? u.getRole().getRoleName() : "None") + " | Password matches welcome123: " + "{noop}welcome123".equals(u.getPassword()))
+                .orElse("User NOT found in database for ID: " + username.trim().toUpperCase());
+    }
+
     @GetMapping("/client/dashboard")
     public String showClientDashboard(Model model, Principal principal) {
 
