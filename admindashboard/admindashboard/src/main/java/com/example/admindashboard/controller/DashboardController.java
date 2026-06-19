@@ -114,6 +114,8 @@ public class DashboardController {
             return "redirect:/HR/dashboard";
         } else if (request.isUserInRole("CLIENT")) {
             return "redirect:/client/dashboard";
+        } else if (request.isUserInRole("REWARDS")) {
+            return "redirect:/rewards-manager/dashboard";
         } else {
             return "redirect:/employee/dashboard";
         }
@@ -196,7 +198,7 @@ public class DashboardController {
         }).toList();
     }
 
-    @GetMapping({"/manager/dashboard", "/itsupport/dashboard", "/learninghead/dashboard", "/accounts/dashboard", "/transportation/dashboard", "/HR/dashboard"})
+    @GetMapping({"/manager/dashboard", "/itsupport/dashboard", "/learninghead/dashboard", "/accounts/dashboard", "/transportation/dashboard", "/HR/dashboard", "/rewards-manager/dashboard"})
     public String showManagerDashboard(org.springframework.ui.Model model, java.security.Principal principal, jakarta.servlet.http.HttpServletRequest request) {
         String currentUserId = principal.getName();
         User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
@@ -269,11 +271,13 @@ public class DashboardController {
             return "transport-dashboard";
         } else if (request.getRequestURI().contains("HR")) {
             return "hr-dashboard";
+        } else if (request.getRequestURI().contains("rewards-manager")) {
+            return "rewards-dashboard";
         }
         return "manager-dashboard";
     }
 
-    @GetMapping({"/manager/workflow", "/accounts/workflow", "/transportation/workflow", "/HR/workflow"})
+    @GetMapping({"/manager/workflow", "/accounts/workflow", "/transportation/workflow", "/HR/workflow", "/rewards-manager/workflow"})
     public String showManagerWorkflow(org.springframework.ui.Model model, java.security.Principal principal, jakarta.servlet.http.HttpServletRequest request) {
         String currentUserId = principal.getName();
         User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
@@ -501,6 +505,33 @@ public class DashboardController {
             model.addAttribute("isItSupport", false); // HR workflow shows all tabs normally
 
             return "hr-workflow";
+        } else if (request.getRequestURI().contains("rewards-manager")) {
+            java.util.List<ServiceRequest> rewardsTickets = serviceRequestRepository.findAll().stream()
+                    .filter(t -> "REWARDS".equalsIgnoreCase(t.getType()))
+                    .collect(Collectors.toList());
+            
+            java.util.List<ServiceRequest> pendingRewardsTickets = rewardsTickets.stream()
+                    .filter(t -> "Open".equalsIgnoreCase(t.getStatus()) || "Assigned".equalsIgnoreCase(t.getStatus()))
+                    .collect(Collectors.toList());
+
+            // Also pass all pending leaves and timesheets for Rewards manager as in HR
+            java.util.List<LeaveRequest> allPendingLeaves = leaveRequestRepository.findAll().stream()
+                    .filter(l -> "PENDING".equalsIgnoreCase(l.getStatus()))
+                    .collect(Collectors.toList());
+                    
+            java.util.List<WeeklyTimesheet> allPendingTimesheets = weeklyTimesheetRepository.findAll().stream()
+                    .filter(t -> "Submitted".equalsIgnoreCase(t.getStatus()) || "Pending".equalsIgnoreCase(t.getStatus()))
+                    .collect(Collectors.toList());
+
+            model.addAttribute("pendingLeaves", allPendingLeaves);
+            model.addAttribute("pendingTimesheets", allPendingTimesheets);
+            
+            model.addAttribute("allItTickets", rewardsTickets);
+            model.addAttribute("pendingTickets", pendingRewardsTickets);
+            model.addAttribute("otherTickets", new java.util.ArrayList<>());
+            model.addAttribute("isItSupport", false);
+
+            return "rewards-workflow";
         }
         return "manager-workflow";
     }

@@ -76,6 +76,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         Role auditorRole = getOrCreateRole("AUDITOR");
         Role transportRole = getOrCreateRole("TRANSPORT");
         Role lndRole = getOrCreateRole("LND");
+        Role rewardsRole = getOrCreateRole("REWARDS");
 
         // ==========================================
         // THE MATRIX MAPPING (Strict 1:1 with BRD)
@@ -256,6 +257,13 @@ public class DatabaseSeeder implements CommandLineRunner {
                 docUpload
         )));
         roleRepository.save(lndRole);
+
+        // REWARDS
+        rewardsRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView
+        )));
+        roleRepository.save(rewardsRole);
 
         // 8. STANDARD EMPLOYEE (Self-Service only, NO adminDashView)
         employeeRole.setPermissions(new HashSet<>(Arrays.asList(
