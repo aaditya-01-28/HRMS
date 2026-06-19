@@ -21,183 +21,466 @@
             --glass-border: rgba(255, 255, 255, 0.6);
         }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-color); color: var(--text-dark); padding-top: 100px; padding-bottom: 50px; overflow-x: hidden; }
+		*{
+		    margin:0;
+		    padding:0;
+		    box-sizing:border-box;
+		}
 
-        .med-nav { position: fixed; top: 0; left: 0; right: 0; height: 80px; background: var(--glass-bg); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 1000; border-bottom: 1px solid var(--glass-border); }
-        .brand-logo { font-weight: 800; font-size: 1.4rem; color: var(--med-primary); display: flex; align-items: center; gap: 12px; }
 
-        .page-container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
-        .header-section { margin-bottom: 30px; }
-        .header-section h3 { font-weight: 800; }
+		body{
+		    background:#F3F4F6;
+		    font-size:14px;
+		    color:#111827;
+			font-family:Arial,sans-serif;
+		}
 
-        .split-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; }
+		.dashboard-wrapper{
+		    display:flex;
+		    min-height:100vh;
+		}
 
-        .slide-in-left { animation: slideInLeft 0.6s forwards; }
-        .slide-in-right { animation: slideInRight 0.6s forwards; opacity: 0; }
-        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes slideInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+		/* SIDEBAR */
 
-        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.04); height: fit-content; }
-        .panel-title { font-weight: 800; font-size: 1.15rem; margin-bottom: 25px; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; }
+		.sidebar{
+		    width:250px;
+		    background:#001A57;
+		    padding:24px 10px;
+		    flex-shrink:0;
+		}
 
-        .form-label { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
-        .form-control, .form-select { border-radius: 12px; border: 1px solid #cbd5e1; padding: 12px 15px; font-weight: 500; background: #f8fafc; }
-        .form-control:focus, .form-select:focus { border-color: var(--med-primary); box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.1); background: #ffffff; }
+		.sidebar-logo{
+		    text-align:center;
+		    margin-bottom:40px;
+		}
 
-        .btn-submit { background: linear-gradient(135deg, var(--med-primary) 0%, var(--med-primary-dark) 100%); color: white; border: none; border-radius: 12px; padding: 14px; font-weight: 700; width: 100%; transition: all 0.3s; }
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(30, 136, 229, 0.3); }
+		.sidebar-logo img{
+		    width:50px;
+		    height:50px;
+		    object-fit:contain;
+		}
 
-        .toggle-wrapper { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; }
-        .toggle-label { font-weight: 700; margin: 0; }
-        .toggle-subtext { font-size: 0.75rem; color: var(--text-muted); margin: 0; }
-        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--med-green); }
-        input:checked + .slider:before { transform: translateX(22px); }
+		.sidebar-menu{
+		    display:flex;
+		    flex-direction:column;
+		    gap:12px;
+		}
 
-        .dependent-list { display: flex; flex-direction: column; gap: 15px; }
-        .dependent-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; display: flex; align-items: center; gap: 20px; transition: all 0.3s; }
-        .dependent-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-color: var(--med-primary); }
+		.menu-item{
+		    display:flex;
+		    align-items:center;
+		    gap:8px;
+		    color:white;
+		    text-decoration:none;
+		    padding:10px 12px;
+		    border-radius:10px;
+		    font-size:14px;
+		}
 
-        .avatar-circle { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; color: white; flex-shrink: 0; }
-        .dep-info { flex-grow: 1; }
-        .dep-name { font-weight: 800; font-size: 1.1rem; margin: 0 0 5px 0; }
-        .dep-meta { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; margin: 0; }
+		.menu-item:hover,
+		.menu-item.active{
+		    background:#2E63FF;
+		}
 
-        .badge-status { padding: 8px 16px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; }
-        .status-covered { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-        .status-not-covered { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+		/* MAIN */
 
-        @media (max-width: 991px) { .split-grid { grid-template-columns: 1fr; } .slide-in-right { animation: slideInLeft 0.6s forwards; } }
+		.main-section{
+		    flex:1;
+		    display:flex;
+		    flex-direction:column;
+		}
+
+		.top-header{
+		    height:90px;
+		    background:#F0F2F5;
+
+		    border-bottom:2px solid #CBD5E1;
+
+		    display:flex;
+		    align-items:center;
+		    justify-content:space-between;
+
+		    padding:0 30px;
+		}
+
+		.header-left{
+		    display:flex;
+		    align-items:center;
+		    gap:12px;
+		}
+
+		.header-icon{
+		    width:42px;
+		    height:42px;
+		    object-fit:contain;
+		}
+
+		.header-left h1{
+		    font-size:20px;
+		    font-weight:700;
+		    color:#0B2E7A;
+		    margin:0;
+		}
+
+		.back-home-btn{
+		    background:#2E63FF;
+		    color:white;
+
+		    text-decoration:none;
+
+		    padding:12px 35px;
+
+		    border-radius:8px;
+
+		    font-size:14px;
+		    font-weight:700;
+		}
+
+		.back-home-btn:hover{
+		    color:white;
+		}
+
+		/* CONTENT */
+
+		.dashboard-content{
+		    padding:35px 40px;
+		}
+
+		/* PAGE TITLE */
+
+		.page-title{
+		    font-size:20px;
+		    font-weight:700;
+		    margin-bottom:25px;
+		}
+
+		/* FORM */
+
+		.form-group{
+		    margin-bottom:30px;
+		    width:350px;
+		}
+
+		.form-group label{
+		    display:block;
+		    margin-bottom:10px;
+		    font-size:14px;
+		    font-weight:700;
+		    color:#111827;
+		}
+
+		.custom-input{
+		    width:100%;
+		    height:44px;
+
+		    border:1px solid #333;
+		    border-radius:6px;
+
+		    background:white;
+
+		    padding:0 12px;
+
+		    font-size:14px;
+		}
+
+		.custom-input:focus{
+		    outline:none;
+		}
+
+		/* UPLOAD BOX */
+
+		.upload-box{
+		    width:350px;
+		    height:150px;
+
+		    border:1px dashed #444;
+
+		    background:white;
+
+		    display:flex;
+		    flex-direction:column;
+		    justify-content:center;
+		    align-items:center;
+
+		    position:relative;
+		}
+
+		.upload-box i{
+		    font-size:42px;
+		    color:#777;
+		    margin-bottom:10px;
+		}
+
+		.upload-box p{
+		    margin:0;
+		    font-size:14px;
+		    font-weight:700;
+		}
+
+		.upload-box span{
+		    color:#2E63FF;
+		    font-weight:700;
+		}
+
+		.upload-box input{
+		    position:absolute;
+		    inset:0;
+		    opacity:0;
+		    cursor:pointer;
+		}
+
+		/* BUTTON */
+
+		.submit-btn{
+		    width:150px;
+		    height:42px;
+
+		    border:none;
+		    border-radius:8px;
+
+		    background:#2E63FF;
+		    color:white;
+
+		    font-size:18px;
+		    font-weight:700;
+
+		    cursor:pointer;
+		}
+
+		.submit-btn:hover{
+		    opacity:.95;
+		}
+
+		/* RESPONSIVE */
+
+		@media(max-width:992px){
+
+		    .dashboard-content{
+		        padding:25px;
+		    }
+
+		    .form-group,
+		    .upload-box{
+		        width:100%;
+		        max-width:450px;
+		    }
+		}
+
+		@media(max-width:768px){
+
+		    .dashboard-wrapper{
+		        flex-direction:column;
+		    }
+
+		    .sidebar{
+		        width:100%;
+		    }
+
+		    .top-header{
+		        height:auto;
+		        flex-direction:column;
+		        gap:15px;
+		        padding:20px;
+		    }
+
+		    .back-home-btn{
+		        width:100%;
+		        text-align:center;
+		    }
+
+		    .dashboard-content{
+		        padding:20px;
+		    }
+
+		    .form-group{
+		        width:100%;
+		    }
+
+		    .upload-box{
+		        width:100%;
+		    }
+		}
     </style>
 </head>
 <body>
 
-<nav class="med-nav">
-    <div class="brand-logo"><i class="fas fa-shield-heart fs-3"></i> WhiteCircle Health</div>
-    <div class="d-flex align-items-center gap-4">
-        <a href="/employee/mediclaim/portal" class="btn btn-light border btn-sm fw-bold rounded-pill px-3 shadow-sm"><i class="fas fa-arrow-left me-1"></i> Back to Dashboard</a>
-    </div>
-</nav>
+<div class="dashboard-wrapper">
 
-<div class="page-container">
-    <div class="header-section">
-        <h3>Family & Dependents</h3>
-        <p class="text-muted">Manage your family floater coverage and register new dependents.</p>
-    </div>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
 
-    <div class="split-grid">
-        <div class="glass-panel slide-in-left">
-            <div class="panel-title">Add New Dependent</div>
-
-            <form id="dependentForm" th:action="@{/employee/mediclaim/dependents/add}" method="post">
-                <div class="mb-3">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" class="form-control" name="fullName" placeholder="Name of Dependent " required>
-                </div>
-
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Relationship</label>
-                        <select class="form-select" name="relationship" required>
-                            <option value="" disabled selected>Select...</option>
-                            <option value="Spouse">Spouse</option>
-                            <option value="Child">Child</option>
-                            <option value="Parent">Parent</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Date of Birth</label>
-                        <input type="date" class="form-control" name="dob" id="dobInput" required>
-                    </div>
-                </div>
-
-                <div class="mb-3 mt-3">
-                    <label class="form-label">Coverage %</label>
-                    <input type="number" class="form-control" name="coveragePercentage" placeholder="Enter percentage (0-100)" min="0" max="100" required>
-                </div>
-
-                <div class="toggle-wrapper mb-4 mt-2">
-                    <div>
-                        <p class="toggle-label">Include in Insurance Cover</p>
-                        <p class="toggle-subtext">Add to active family floater policy</p>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" name="isCovered" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <button type="submit" class="btn-submit"><i class="fas fa-user-plus me-2"></i> Register Dependent</button>
-            </form>
+        <div class="sidebar-logo">
+            <img th:src="@{/images/wcg-logo.jpg}" alt="WhiteCircle">
         </div>
 
-        <div class="glass-panel slide-in-right">
-            <div class="panel-title d-flex justify-content-between align-items-center">
-                <span>Registered Family Members</span>
-                <span class="badge bg-primary rounded-pill" th:text="${dependents != null ? dependents.size() : 0}">0</span>
-            </div>
+        <div class="sidebar-menu">
 
-            <div class="dependent-list">
+            <a href="/employee/mediclaim/portal"
+               class="menu-item">
+                <i class="fa-solid fa-table-columns"></i>
+                Dashboard
+            </a>
 
-                <div th:if="${dependents == null or dependents.empty}" class="alert alert-light border text-center py-4">
-                    <i class="fas fa-users text-muted fs-3 mb-2 d-block"></i>
-                    <span class="text-muted fw-bold">No dependents added yet.</span>
-                </div>
+            <a href="/employee/mediclaim/policy"
+               class="menu-item active">
+                <i class="fa-solid fa-file-shield"></i>
+                Coverage
+            </a>
 
-                <div class="dependent-card" th:each="dep : ${dependents}">
-                    <div class="avatar-circle" th:data-name="${dep.fullName}"></div>
-                    <div class="dep-info">
-                        <h4 class="dep-name" th:text="${dep.fullName}">Name</h4>
-                        <p class="dep-meta">
-                            <i class="fas me-1" th:classappend="${dep.relationship == 'Spouse' ? 'fa-user-friends' : (dep.relationship == 'Child' ? 'fa-child' : 'fa-user')}"></i>
-                            <span th:text="${dep.relationship}">Relationship</span> â€¢ Born: <span th:text="${#temporals.format(dep.dob, 'dd MMM yyyy')}">Date</span>
-                        </p>
-                    </div>
-                    <div class="badge-status"
-                         th:classappend="${dep.covered ? 'status-covered' : 'status-not-covered'}">
-                        <i class="fas" th:classappend="${dep.covered ? 'fa-shield-alt' : 'fa-times-circle'}"></i>
-                        <span th:text="${dep.covered ? 'Covered (' + dep.coveragePercentage + '%)' : 'Not Covered'}">Covered</span>
-                    </div>
-                </div>
+            <a href="/employee/mediclaim/track/list"
+               class="menu-item">
+                <i class="fa-solid fa-file-medical"></i>
+                Claims
+            </a>
 
-            </div>
+            <a href="/employee/mediclaim/helpdesk"
+               class="menu-item">
+                <i class="fa-solid fa-circle-question"></i>
+                Help Center
+            </a>
+
         </div>
+
     </div>
+
+    <!-- MAIN -->
+    <div class="main-section">
+
+        <div class="top-header">
+
+            <div class="header-left">
+
+                <img th:src="@{/images/wcg-logo.jpg}"
+                     class="header-icon">
+
+                <h1>My Mediclaims</h1>
+
+            </div>
+
+            <a href="/employee/mediclaim/policy"
+               class="back-home-btn">
+                Back
+            </a>
+
+        </div>
+
+        <div class="dashboard-content">
+			<h2 class="page-title">
+			    Add Dependents
+			</h2>
+
+			<form id="dependentForm"
+			      th:action="@{/employee/mediclaim/dependents/add}"
+			      method="post"
+			      enctype="multipart/form-data">
+
+			    <div class="form-group">
+
+			        <label>Full Name</label>
+
+			        <input type="text"
+			               name="fullName"
+			               class="custom-input"
+			               required>
+
+			    </div>
+
+			    <div class="form-group">
+
+			        <label>Relationship</label>
+
+			        <select name="relationship"
+			                class="custom-input"
+			                required>
+
+			            <option value="">Select</option>
+			            <option value="Spouse">Spouse</option>
+			            <option value="Child">Child</option>
+			            <option value="Parent">Parent</option>
+
+			        </select>
+
+			    </div>
+
+			    <div class="form-group">
+
+			        <label>Date Of Birth</label>
+
+			        <input type="date"
+			               name="dob"
+			               id="dobInput"
+			               class="custom-input"
+			               required>
+
+			    </div>
+
+			    <div class="form-group">
+
+			        <label>Gender</label>
+
+			        <select name="gender"
+			                class="custom-input">
+
+			            <option value="">Select Gender</option>
+			            <option value="Male">Male</option>
+			            <option value="Female">Female</option>
+			            <option value="Other">Other</option>
+
+			        </select>
+
+			    </div>
+
+			    <div class="form-group">
+
+			        <label>Coverage Percentage</label>
+
+			        <input type="number"
+			               name="coveragePercentage"
+			               min="0"
+			               max="100"
+			               class="custom-input"
+			               required>
+
+			    </div>
+
+			    <div class="form-group">
+
+			        <label>Upload Documents</label>
+
+			        <div class="upload-box">
+
+			            <i class="fa-solid fa-cloud-arrow-up"></i>
+
+			            <p>Upload files here</p>
+
+			            <span>or Browse</span>
+
+						<input type="file"
+						       name="document"
+						       id="document"
+						       accept=".pdf,.jpg,.jpeg,.png">
+					   <p id="selectedFileName"
+					      style="margin-top:10px;font-size:13px;">
+					       No file selected
+					   </p>
+
+			        </div>
+
+			    </div>
+
+			    <button type="submit"
+			            class="submit-btn">
+			        Add
+			    </button>
+
+			</form>
+
+        </div>
+
+    </div>
+
 </div>
 
-<div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-light border-bottom-0">
-                <h5 class="modal-title fw-bold">Confirm Registration</h5>
-            </div>
-            <div class="modal-body py-4 text-center">
-                <p class="fs-5 mb-0">Are you sure you want to add this dependent to your profile?</p>
-                <p class="text-muted small mt-2">This information will be submitted to the HRMS system.</p>
-            </div>
-            <div class="modal-footer border-top-0 d-flex justify-content-center">
-                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" id="cancelConfirmBtn">Cancel</button>
-                <button type="button" class="btn btn-primary rounded-pill px-4" id="proceedRegisterBtn">Confirm & Register</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow text-center p-4">
-            <div class="modal-body py-4">
-                <i class="fas fa-check-circle text-success mb-3" style="font-size: 4rem;"></i>
-                <h4 class="fw-bold text-dark">Success!</h4>
-                <p class="text-muted mb-4">Dependent successfully registered to your profile.</p>
-                <button type="button" class="btn btn-success rounded-pill px-5" id="closeSuccessBtn">Done</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -276,6 +559,18 @@
             window.location.reload();
         });
     });
+	
+	document.getElementById("document")
+	        .addEventListener("change", function () {
+
+	    const fileName =
+	        this.files.length > 0
+	            ? this.files[0].name
+	            : "No file selected";
+
+	    document.getElementById("selectedFileName")
+	            .textContent = fileName;
+	});
 </script>
 </body>
 </html>

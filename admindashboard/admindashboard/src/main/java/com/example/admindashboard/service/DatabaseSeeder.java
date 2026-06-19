@@ -77,6 +77,12 @@ public class DatabaseSeeder implements CommandLineRunner {
         Role transportRole = getOrCreateRole("TRANSPORT");
         Role lndRole = getOrCreateRole("LND");
         Role rewardsRole = getOrCreateRole("REWARDS");
+        Role seniorManagerRole = getOrCreateRole("SENIOR_MANAGER");
+        Role seniorHrRole = getOrCreateRole("SENIOR_HR");
+        Role seniorLndHeadRole = getOrCreateRole("SENIOR_LND_HEAD");
+        Role seniorAccountsHeadRole = getOrCreateRole("SENIOR_ACCOUNTS_HEAD");
+        Role seniorTransportHeadRole = getOrCreateRole("SENIOR_TRANSPORT_HEAD");
+        Role seniorRewardsHeadRole = getOrCreateRole("SENIOR_REWARDS_HEAD");
 
         // ==========================================
         // THE MATRIX MAPPING (Strict 1:1 with BRD)
@@ -257,6 +263,71 @@ public class DatabaseSeeder implements CommandLineRunner {
                 docUpload
         )));
         roleRepository.save(lndRole);
+        
+     // SENIOR MANAGER
+        seniorManagerRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                attView,
+                leaveView,
+                payrollView,
+                appView,
+                assetView,
+                docView
+        )));
+        roleRepository.save(seniorManagerRole);
+
+        // SENIOR HR
+        seniorHrRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                empCreate,
+                empEdit,
+                attView,
+                leaveView,
+                leaveApprove,
+                appView,
+                docView,
+                docUpload
+        )));
+        roleRepository.save(seniorHrRole);
+
+        // SENIOR LND HEAD
+        seniorLndHeadRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                appView,
+                docView,
+                docUpload
+        )));
+        roleRepository.save(seniorLndHeadRole);
+
+        // SENIOR ACCOUNTS HEAD
+        seniorAccountsHeadRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                payrollView,
+                payrollGen,
+                payrollEdit,
+                payslipView
+        )));
+        roleRepository.save(seniorAccountsHeadRole);
+
+        // SENIOR TRANSPORT HEAD
+        seniorTransportHeadRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView
+        )));
+        roleRepository.save(seniorTransportHeadRole);
+
+        // SENIOR REWARDS HEAD
+        seniorRewardsHeadRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView,
+                appView,
+                docView
+        )));
+        roleRepository.save(seniorRewardsHeadRole);
 
         // REWARDS
         rewardsRole.setPermissions(new HashSet<>(Arrays.asList(

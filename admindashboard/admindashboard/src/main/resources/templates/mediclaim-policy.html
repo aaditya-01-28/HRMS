@@ -12,255 +12,1084 @@
     <style>
         :root {
             --med-primary: #1E88E5;
-            --med-primary-dark: #1565C0;
-            --med-green: #43A047;
-            --med-orange: #FB8C00;
             --bg-color: #f4f7fb;
             --text-dark: #0f172a;
             --text-muted: #64748b;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.6);
+           
         }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-dark);
-            padding-top: 100px;
-            padding-bottom: 50px;
-            background-image: radial-gradient(circle at 50% 0%, rgba(30, 136, 229, 0.05) 0%, transparent 60%);
-            background-attachment: fixed;
-            min-height: 100vh;
-        }
+		*{
+		    margin:0;
+		    padding:0;
+		    box-sizing:border-box;
+		    
+		}
 
-        /* --- TOP NAV --- */
-        .med-nav {
-            position: fixed; top: 0; left: 0; right: 0; height: 80px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 40px; z-index: 1000;
-            border-bottom: 1px solid var(--glass-border);
-            box-shadow: 0 4px 30px rgba(0,0,0,0.03);
-        }
-        .brand-logo { font-weight: 800; font-size: 1.4rem; color: var(--med-primary); display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px;}
+		body{
+		    background:#F3F4F6;
+		    font-size:14px;
+		    color:#111827;
+			font-family:Arial,sans-serif;
+		}
 
-        /* --- PAGE HEADER --- */
-        .page-header {
-            max-width: 1000px;
-            margin: 0 auto 40px;
-            text-align: center;
-            opacity: 0;
-            animation: fadeInUp 0.6s ease forwards;
-        }
-        .page-header h2 { font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
-        .page-header p { color: var(--text-muted); font-size: 1.05rem; max-width: 600px; margin: 0 auto; }
+		.dashboard-wrapper{
+		    display:flex;
+		    min-height:100vh;
+		}
 
-        /* --- ANIMATIONS --- */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+		/* SIDEBAR */
 
-        @keyframes glowPulse {
-            0% { box-shadow: 0 0 0 0 rgba(67, 160, 71, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(67, 160, 71, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(67, 160, 71, 0); }
-        }
+		.sidebar{
+		    width:250px;
+		    background:#001A57;
+		    padding:24px 10px;
+		    flex-shrink:0;
+		}
 
-        .fade-in-scroll {
-            opacity: 0;
-            animation: fadeInUp 0.8s ease forwards;
-            animation-delay: 0.2s;
-        }
+		.sidebar-logo{
+		    text-align:center;
+		    margin-bottom:40px;
+		}
 
-        /* --- 3D FLIP CARD --- */
-        .policy-container {
-            max-width: 480px;
-            margin: 0 auto;
-            perspective: 1000px;
-        }
+		.sidebar-logo img{
+		    width:50px;
+		    height:50px;
+		    object-fit:contain;
+		}
 
-        .flip-card-inner {
-            position: relative;
-            width: 100%;
-            height: 380px;
-            text-align: center;
-            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-style: preserve-3d;
-            cursor: pointer;
-        }
+		.sidebar-menu{
+		    display:flex;
+		    flex-direction:column;
+		    gap:12px;
+		}
 
-        .policy-container:hover .flip-card-inner {
-            transform: rotateY(180deg);
-        }
+		.menu-item{
+		    display:flex;
+		    align-items:center;
+		    gap:8px;
 
-        .flip-card-front, .flip-card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 24px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-        }
+		    color:white;
+		    text-decoration:none;
 
-        /* FRONT OF CARD */
-        .flip-card-front {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-top: 6px solid var(--med-primary);
-        }
+		    padding:10px 12px;
 
-        .card-icon {
-            width: 60px; height: 60px;
-            background: rgba(30, 136, 229, 0.1);
-            color: var(--med-primary);
-            border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.8rem; margin: 0 auto 20px;
-        }
+		    border-radius:10px;
 
-        .policy-title { font-weight: 800; font-size: 1.4rem; color: var(--text-dark); margin-bottom: 5px;}
-        .provider-name { color: var(--text-muted); font-weight: 600; font-size: 0.95rem; margin-bottom: 25px; }
+		    font-size:14px;
+		}
 
-        .policy-details {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 20px;
-            display: flex; justify-content: space-between;
-            margin-bottom: auto;
-        }
-        .detail-block { text-align: left; }
-        .detail-block span { display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
-        .detail-block h5 { margin: 0; font-weight: 800; color: var(--med-primary-dark); font-size: 1.1rem;}
+		.menu-item:hover,
+		.menu-item.active{
+		    background:#2E63FF;
+		}
 
-        .badge-active {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin: 0 auto;
-            animation: glowPulse 2s infinite;
-        }
+		/* MAIN */
 
-        /* BACK OF CARD */
-        .flip-card-back {
-            background: linear-gradient(135deg, var(--med-primary) 0%, var(--med-primary-dark) 100%);
-            color: white;
-            transform: rotateY(180deg);
-            border: 1px solid rgba(255,255,255,0.2);
-            justify-content: center;
-        }
+		.main-section{
+		    flex:1;
+		}
 
-        .back-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 30px; letter-spacing: 0.5px;}
+		.top-header{
+		    height:90px;
+		    background:#F0F2F5;
 
-        .btn-action {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 14px 20px;
-            border-radius: 12px;
-            font-weight: 700;
-            text-decoration: none;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            transition: all 0.3s ease;
-            margin-bottom: 15px;
-        }
-        .btn-action:hover {
-            background: white;
-            color: var(--med-primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        }
+		    border-bottom:2px solid #CBD5E1;
 
-        .flip-hint {
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.6);
-            margin-top: 20px;
-            font-weight: 500;
-        }
+		    display:flex;
+		    justify-content:space-between;
+		    align-items:center;
 
+		    padding:0 30px;
+		}
+
+		.header-left{
+		    display:flex;
+		    align-items:center;
+		    gap:12px;
+		}
+
+		.header-icon{
+		    width:42px;
+		    height:42px;
+		    object-fit:contain;
+		}
+
+		.header-left h1{
+		    font-size:20px;
+		    font-weight:700;
+		    color:#0B2E7A;
+		}
+
+		.back-home-btn{
+		    background:#2E63FF;
+		    color:white;
+
+		    text-decoration:none;
+
+		    padding:12px 24px;
+
+		    border-radius:8px;
+
+		    font-size:14px;
+		    font-weight:700;
+		}
+
+		.back-home-btn:hover{
+		    color:white;
+		}
+
+		/* CONTENT */
+
+		.dashboard-content{
+		    padding:28px 40px;
+		}
+
+		/* POLICY + ECARD */
+
+		.coverage-top{
+		    display:flex;
+		    justify-content:space-between;
+		    gap:40px;
+
+		    margin-bottom:35px;
+		}
+
+		.policy-section{
+		    flex:1;
+		}
+
+		.policy-section h3{
+		    font-size:14px;
+		    font-weight:700;
+		    margin-bottom:25px;
+		}
+
+		.info-row{
+		    display:flex;
+		    margin-bottom:14px;
+		}
+
+		.label{
+		    width:120px;
+		    font-size:14px;
+		}
+
+		.value{
+		    font-size:14px;
+		    font-weight:700;
+		}
+
+		/* ECARD */
+
+		.ecard-box{
+		    width:320px;
+
+		    border:1px solid #222;
+
+		    border-radius:6px;
+
+		    padding:16px;
+
+		    background:#DCE6F1;
+		}
+
+		.ecard-box h3{
+		    font-size:14px;
+		    font-weight:700;
+		    margin-bottom:14px;
+		}
+
+		.ecard-box p{
+		    font-size:14px;
+		    margin-bottom:10px;
+		    line-height:1.5;
+		}
+
+		/* ACCORDIONS */
+
+		.accordion-btn{
+		    width:100%;
+
+		    background:white;
+
+		    border:1px solid #666;
+
+		    border-radius:4px;
+
+		    padding:12px 16px;
+
+		    margin-bottom:18px;
+
+		    display:flex;
+		    justify-content:space-between;
+		    align-items:center;
+
+		    font-size:14px;
+		    font-weight:700;
+
+		    cursor:pointer;
+		}
+
+		.accordion-btn i{
+		    font-size:18px;
+		}
+
+		/* ADD DEPENDENTS */
+
+		.add-dependent-wrapper{
+		    margin:18px 0 25px 0;
+		}
+
+		.add-dependent-btn{
+		    display:inline-flex;
+		    align-items:center;
+		    gap:8px;
+
+		    background:#2E63FF;
+		    color:#fff;
+
+		    text-decoration:none;
+
+		    padding:10px 18px;
+
+		    border-radius:6px;
+
+		    font-size:14px;
+		    font-weight:600;
+
+		    transition:.2s ease;
+		}
+
+		.add-dependent-btn:hover{
+		    background:#1E4ED8;
+		    color:#fff;
+		}
+
+		.add-dependent-btn i{
+		    font-size:13px;
+		}
+
+		/* RESPONSIVE */
+
+			  @media(max-width:992px){
+
+			      .helpdesk-container{
+			          flex-direction:column;
+			      }
+
+			      .faq-section,
+			      .contact-section{
+			          flex:1;
+			      }
+			  }
+		.accordion-content{
+		    display:none;
+		    background:#ffffff;
+		    border:1px solid #222;
+		    border-top:none;
+		    overflow-x:auto;
+		}
+
+		.accordion-content.show{
+		    display:block;
+		}
+
+		.family-table{
+		    width:100%;
+		    border-collapse:collapse;
+		}
+
+		.family-table th,
+		.family-table td{
+		    border:1px solid #222;
+		    padding:12px;
+		    text-align:center;
+		    font-size:14px;
+		}
+
+		.family-table th{
+		    font-weight:700;
+		    background:#f8f8f8;
+		}
+		.family-table{
+		    width:100%;
+		    border-collapse:collapse;
+		}
+
+		.family-table th,
+		.family-table td{
+		    border:1px solid #222;
+		    text-align:center;
+		    padding:12px;
+		    font-size:14px;
+		}
+
+		.family-table th{
+		    background:#f8f8f8;
+		    font-weight:700;
+		}
+		.documents-table{
+		    width:100%;
+		    border-collapse:collapse;
+		}
+
+		.documents-table th,
+		.documents-table td{
+		    border:1px solid #222;
+		    padding:12px;
+		    text-align:center;
+		    font-size:14px;
+		}
+
+		.documents-table th{
+		    background:#f8f8f8;
+		    font-weight:700;
+		}
+
+		.empty-documents{
+		    padding:20px;
+		    color:#666;
+		}
+		.claims-table{
+		    width:100%;
+		    border-collapse:collapse;
+		}
+
+		.claims-table th,
+		.claims-table td{
+		    border:1px solid #222;
+		    text-align:center;
+		    padding:12px;
+		    font-size:14px;
+		}
+
+		.claims-table th{
+		    background:#f8f8f8;
+		    font-weight:700;
+		}
+
+		.status-approved{
+		    color:#0A9E18;
+		    font-weight:600;
+		}
+
+		.status-pending{
+		    color:#F59E0B;
+		    font-weight:600;
+		}
+
+		.status-rejected{
+		    color:#DC2626;
+		    font-weight:600;
+		}
+		
+		.hospital-table{
+		    width:100%;
+		    border-collapse:collapse;
+		}
+
+		.hospital-table th,
+		.hospital-table td{
+		    border:1px solid #222;
+		    text-align:center;
+		    padding:12px;
+		    font-size:14px;
+		}
+
+		.hospital-table th{
+		    background:#f8f8f8;
+		    font-weight:700;
+		}
+		.terms-container{
+		    display:grid;
+		    grid-template-columns:1fr 1fr;
+		    gap:60px;
+		    padding:25px;
+		}
+
+		.terms-column{
+		    min-height:250px;
+		}
+
+		.benefits-title{
+		    color:#16A34A;
+		    font-size:18px;
+		    font-weight:700;
+		    margin-bottom:20px;
+		}
+
+		.exclusions-title{
+		    color:#EF4444;
+		    font-size:18px;
+		    font-weight:700;
+		    margin-bottom:20px;
+		}
+
+		.empty-terms{
+		    font-size:14px;
+		    color:#666;
+		}
+
+		@media(max-width:768px){
+
+		    .terms-container{
+		        grid-template-columns:1fr;
+		        gap:30px;
+		    }
+
+		}
     </style>
 </head>
 <body>
 
-<nav class="med-nav">
-    <div class="brand-logo">
-        <i class="fas fa-shield-heart fs-3"></i> WhiteCircle Health
-    </div>
-    <div class="d-flex align-items-center gap-4">
-        <a href="/employee/mediclaim/portal" class="btn btn-light border btn-sm fw-bold rounded-pill px-3 shadow-sm">
-            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
-        </a>
-    </div>
-</nav>
+<div class="dashboard-wrapper">
 
-<div class="container fade-in-scroll">
-    <div class="page-header">
-        <h2>Your Insurance Policies</h2>
-        <p>Hover over the policy card to access your digital documents and view the cashless hospital network.</p>
-    </div>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
 
-    <div th:if="${policy == null}" class="text-center mt-5">
-        <i class="fas fa-file-excel fa-4x text-muted opacity-50 mb-3"></i>
-        <h4 class="fw-bold text-dark">No Active Policy Found</h4>
-        <p class="text-muted">It appears you do not have an active corporate insurance policy registered yet. Please contact HR.</p>
-    </div>
+        <div class="sidebar-logo">
+            <img th:src="@{/images/wcg-logo.jpg}"
+                 alt="WhiteCircle">
+        </div>
 
-    <div class="policy-container" th:if="${policy != null}">
-        <div class="flip-card-inner">
+        <div class="sidebar-menu">
 
-            <div class="flip-card-front">
-                <div class="card-icon"><i class="fas fa-briefcase-medical"></i></div>
-                <div class="policy-title">Group Health Insurance</div>
-                <div class="provider-name" th:text="'Provider: ' + ${policy.providerName != null ? policy.providerName : 'Star Health'}">Provider: Star Health</div>
+            <a href="/employee/mediclaim/portal"
+               class="menu-item">
+                <i class="fa-solid fa-table-columns"></i>
+                Dashboard
+            </a>
 
-                <div class="policy-details">
-                    <div class="detail-block">
-                        <span>Total Coverage</span>
-                        <h5 th:text="'â‚¹' + ${policy.totalCoverage != null ? #numbers.formatDecimal(policy.totalCoverage, 0, 'COMMA', 0, 'POINT') : '5,00,000'}">â‚¹5,00,000</h5>
-                    </div>
-                    <div class="detail-block text-end">
-                        <span>Validity</span>
-                        <h5 class="text-dark" th:text="${policy.validFrom != null ? policy.validFrom.year + ' - ' + policy.validUntil.year : '2026 - 2027'}">2026 - 2027</h5>
-                    </div>
-                </div>
+            <a href="/employee/mediclaim/policy"
+               class="menu-item active">
+                <i class="fa-solid fa-file-shield"></i>
+                Coverage
+            </a>
 
-                <div class="mt-4">
-                    <div class="badge-active">
-                        <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
-                        <span th:text="${policy.status != null ? #strings.toUpperCase(policy.status) + ' POLICY' : 'ACTIVE POLICY'}">ACTIVE POLICY</span>
-                    </div>
-                </div>
-            </div>
+            <a href="/employee/mediclaim/track/list"
+               class="menu-item">
+                <i class="fa-solid fa-file-medical"></i>
+                Claims
+            </a>
 
-            <div class="flip-card-back">
-                <div class="back-title" th:text="${policy.policyNumber != null ? policy.policyNumber : 'WCG-2026-MED'}">WCG-2026-MED</div>
-
-                <a href="#" class="btn-action">
-                    <i class="fas fa-file-pdf fs-5"></i> View PDF Document
-                </a>
-
-                <a th:href="@{/employee/mediclaim/hospitals}" class="btn-action">
-                    <i class="fas fa-hospital fs-5"></i> Network Hospitals
-                </a>
-
-                <div class="flip-hint"><i class="fas fa-sync-alt me-1"></i> Hover away to flip back</div>
-            </div>
+            <a href="/employee/mediclaim/helpdesk"
+               class="menu-item">
+                <i class="fa-solid fa-circle-question"></i>
+                Help Center
+            </a>
 
         </div>
+
     </div>
+
+
+    <!-- MAIN -->
+    <div class="main-section">
+
+        <!-- HEADER -->
+        <div class="top-header">
+
+            <div class="header-left">
+
+                <img th:src="@{/images/wcg-logo.jpg}"
+                     class="header-icon">
+
+                <h1>My Mediclaims</h1>
+
+            </div>
+
+            <a href="/employee/mediclaim/portal"
+               class="back-home-btn">
+                Back to Dashboard
+            </a>
+
+        </div>
+
+
+        <!-- CONTENT -->
+        <div class="dashboard-content">
+
+            <!-- POLICY + ECARD -->
+            <div class="coverage-top">
+
+                <!-- LEFT -->
+                <div class="policy-section">
+
+					<h3 th:text="${policy.policyName != null ?
+					              policy.policyName + ' (Self)' :
+					              'Group Medical Policy (Self)'}">
+					    Group Medical Policy(Self)
+					</h3>
+
+					<div class="info-row">
+					    <span class="label">Insurer:</span>
+					    <span class="value"
+					          th:text="${policy.providerName != null ?
+					                   policy.providerName : '-'}">
+					    </span>
+					</div>
+
+                    <div class="info-row">
+                        <span class="label">Policy Name:</span>
+						<span class="value"
+						      th:text="${policy.policyName != null ? policy.policyName : '-'}">
+						</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="label">Policy No.:</span>
+                        <span class="value"
+                              th:text="${policy.policyNumber}">
+                        </span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="label">Policy Period:</span>
+						<span class="value"
+						      th:text="${#temporals.format(policy.validFrom,'dd MMM yyyy')
+						      + ' - ' +
+						      #temporals.format(policy.validUntil,'dd MMM yyyy')}">
+						</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="label">Insured:</span>
+                        <span class="value"
+                              th:text="${policy.user.username}">
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <!-- RIGHT -->
+                <div class="ecard-box">
+
+                    <h3>E-Card</h3>
+
+					<p>
+					    Insurer:
+					    <span th:text="${policy.providerName != null ?
+					                  policy.providerName : '-'}"></span>
+					</p>
+
+					<p>
+					    Policy:
+					    <span th:text="${policy.policyName}">
+					    </span>
+					</p>
+
+                    <p>
+                        Insured:
+                        <span th:text="${policy.user.username}"></span>
+                    </p>
+
+                    <p>
+                        Policy No:
+                        <span th:text="${policy.policyNumber}"></span>
+                    </p>
+
+                    <p>
+                        Sum insured:
+                        ₹
+						<span th:text="${policy.totalCoverage != null ?
+						        #numbers.formatDecimal(policy.totalCoverage,0,'COMMA',0,'POINT')
+						        : '0'}">
+						</span>
+                    </p>
+					<p>
+					    Amount Used:
+					    ₹
+					    <span th:text="${policy.amountUsed != null ?
+								#numbers.formatDecimal(policy.amountUsed,0,'COMMA',0,'POINT')
+								: '0'}">
+					    </span>
+					</p>
+
+                    <p>
+						Policy Period:
+						<span th:text="${policy.validFrom != null && policy.validUntil != null ?
+								#temporals.format(policy.validFrom,'dd MMM yyyy')
+								+ ' - ' +
+								#temporals.format(policy.validUntil,'dd MMM yyyy')
+								: '-'}">
+						</span>
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- FAMILY -->
+			<div class="family-accordion">
+
+			    <button type="button"
+			            class="accordion-btn"
+			            id="familyAccordionBtn">
+
+			        <span>Family Details</span>
+
+			        <i class="fa-solid fa-plus"
+			           id="familyAccordionIcon"></i>
+
+			    </button>
+
+				<div class="accordion-content"
+				     id="familyAccordionContent">
+
+				    <table class="family-table">
+
+				        <thead>
+
+				        <tr>
+				            <th>Name</th>
+				            <th>Relation</th>
+				            <th>DOB</th>
+				            <th>Gender</th>
+				            <th>Sum Insured</th>
+				        </tr>
+
+				        </thead>
+
+				        <tbody>
+
+				        <tr th:if="${dependents == null || dependents.empty}">
+				            <td colspan="5">
+				                No family members added.
+				            </td>
+				        </tr>
+
+				        <tr th:each="dep : ${dependents}">
+
+				            <td th:text="${dep.fullName}">
+				                Name
+				            </td>
+
+				            <td th:text="${dep.relationship}">
+				                Relation
+				            </td>
+
+				            <td th:text="${#temporals.format(dep.dob,'dd/MM/yyyy')}">
+				                DOB
+				            </td>
+
+				            <td th:text="${dep.gender}">
+				                Gender
+				            </td>
+
+				            <td>
+				                ₹
+				                <span th:text="${policy.totalCoverage != null
+				                        && dep.coveragePercentage != null
+				                        ?
+				                        #numbers.formatDecimal(
+				                        (policy.totalCoverage * dep.coveragePercentage) / 100,
+				                        0,
+				                        'COMMA',
+				                        0,
+				                        'POINT')
+				                        :
+				                        '0'}">
+				                </span>
+				            </td>
+
+				        </tr>
+
+				        </tbody>
+
+				    </table>
+
+				</div>
+
+			</div>
+
+			<div class="add-dependent-wrapper">
+
+			    <a href="/employee/mediclaim/dependents"
+			       class="add-dependent-btn">
+
+			        <i class="fa-solid fa-user-plus"></i>
+
+			        Add Dependents
+
+			    </a>
+
+			</div>
+
+
+			<!-- DOCUMENTS -->
+
+			<div class="documents-accordion">
+
+			    <button type="button"
+			            class="accordion-btn"
+			            id="documentsAccordionBtn">
+
+			        <span>Documents</span>
+
+			        <i class="fa-solid fa-plus"
+			           id="documentsAccordionIcon"></i>
+
+			    </button>
+
+			    <div class="accordion-content"
+			         id="documentsAccordionContent">
+
+			        <table class="documents-table">
+
+			            <thead>
+			            <tr>
+			                <th>Document Name</th>
+			                <th>View</th>
+			                <th>Download</th>
+			            </tr>
+			            </thead>
+
+			            <tbody>
+
+			            <tr>
+			                <td colspan="3"
+			                    class="empty-documents">
+			                    No documents available.
+			                </td>
+			            </tr>
+
+			            </tbody>
+
+			        </table>
+
+			    </div>
+
+			</div>
+
+
+			<!-- CLAIMS -->
+
+			<div class="claims-accordion">
+
+			    <button type="button"
+			            class="accordion-btn"
+			            id="claimsAccordionBtn">
+
+			        <span>Claims</span>
+
+			        <i class="fa-solid fa-plus"
+			           id="claimsAccordionIcon"></i>
+
+			    </button>
+
+			    <div class="accordion-content"
+			         id="claimsAccordionContent">
+
+			        <table class="claims-table">
+
+			            <thead>
+
+			            <tr>
+			                <th>Claim Id</th>
+			                <th>Hosp. Name</th>
+			                <th>Claim Type</th>
+			                <th>Amount</th>
+			                <th>Status</th>
+			            </tr>
+
+			            </thead>
+
+			            <tbody>
+
+			            <tr th:if="${claims == null || claims.empty}">
+			                <td colspan="5">
+			                    No claims found.
+			                </td>
+			            </tr>
+
+			            <tr th:each="claim : ${claims}">
+
+			                <td th:text="${claim.id}">
+			                </td>
+
+			                <td th:text="${claim.hospitalName}">
+			                </td>
+
+			                <td th:text="${claim.claimType}">
+			                </td>
+
+			                <td>
+			                    ₹
+			                    <span th:text="${#numbers.formatDecimal(
+			                            claim.claimAmount,
+			                            0,
+			                            'COMMA',
+			                            0,
+			                            'POINT')}">
+			                    </span>
+			                </td>
+
+			                <td>
+
+			                    <span th:classappend="
+			                        ${claim.status == 'Approved'} ? 'status-approved' :
+			                        (${claim.status == 'Rejected'} ? 'status-rejected' :
+			                        'status-pending')"
+
+			                          th:text="${claim.status}">
+			                    </span>
+
+			                </td>
+
+			            </tr>
+
+			            </tbody>
+
+			        </table>
+
+			    </div>
+
+			</div>
+
+
+			<!-- NETWORK HOSPITALS -->
+
+			<div class="hospital-accordion">
+
+			    <button type="button"
+			            class="accordion-btn"
+			            id="hospitalAccordionBtn">
+
+			        <span>Network Hospitals</span>
+
+			        <i class="fa-solid fa-plus"
+			           id="hospitalAccordionIcon"></i>
+
+			    </button>
+
+			    <div class="accordion-content"
+			         id="hospitalAccordionContent">
+
+			        <table class="hospital-table">
+
+			            <thead>
+
+			            <tr>
+			                <th>Hosp. Name</th>
+			                <th>City</th>
+			                <th>Cashless Available</th>
+			            </tr>
+
+			            </thead>
+
+			            <tbody>
+
+			            <tr th:if="${hospitals == null || hospitals.empty}">
+			                <td colspan="3">
+			                    No hospitals available.
+			                </td>
+			            </tr>
+
+						<tr th:each="hospital : ${hospitals}">
+
+						    <td th:text="${hospital.name}">
+						    </td>
+
+						    <td th:text="${hospital.location}">
+						    </td>
+
+						    <td th:text="${hospital.cashless ? 'Yes' : 'No'}">
+						    </td>
+
+						</tr>
+
+			            </tbody>
+
+			        </table>
+
+			    </div>
+
+			</div>
+
+
+			<!-- TERMS & CONDITIONS -->
+
+			<div class="terms-accordion">
+
+			    <button type="button"
+			            class="accordion-btn"
+			            id="termsAccordionBtn">
+
+			        <span>Terms & Conditions</span>
+
+			        <i class="fa-solid fa-plus"
+			           id="termsAccordionIcon"></i>
+
+			    </button>
+
+			    <div class="accordion-content"
+			         id="termsAccordionContent">
+
+			        <div class="terms-container">
+
+			            <div class="terms-column">
+
+			                <h4 class="benefits-title">
+			                    Benefits
+			                </h4>
+
+			                <div class="empty-terms">
+			                    No benefits configured.
+			                </div>
+
+			            </div>
+
+			            <div class="terms-column">
+
+			                <h4 class="exclusions-title">
+			                    Exclusions
+			                </h4>
+
+			                <div class="empty-terms">
+			                    No exclusions configured.
+			                </div>
+
+			            </div>
+
+			        </div>
+
+			    </div>
+
+			</div>
+
+        </div>
+
+    </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const btn = document.getElementById("familyAccordionBtn");
+    const content = document.getElementById("familyAccordionContent");
+    const icon = document.getElementById("familyAccordionIcon");
+
+    btn.addEventListener("click", function () {
+
+        content.classList.toggle("show");
+
+        if(content.classList.contains("show")){
+            icon.classList.remove("fa-plus");
+            icon.classList.add("fa-minus");
+        }else{
+            icon.classList.remove("fa-minus");
+            icon.classList.add("fa-plus");
+        }
+    });
+
+});
+const documentsBtn =
+    document.getElementById("documentsAccordionBtn");
+
+const documentsContent =
+    document.getElementById("documentsAccordionContent");
+
+const documentsIcon =
+    document.getElementById("documentsAccordionIcon");
+
+documentsBtn.addEventListener("click", function(){
+
+    documentsContent.classList.toggle("show");
+
+    if(documentsContent.classList.contains("show")){
+
+        documentsIcon.classList.remove("fa-plus");
+        documentsIcon.classList.add("fa-minus");
+
+    }else{
+
+        documentsIcon.classList.remove("fa-minus");
+        documentsIcon.classList.add("fa-plus");
+
+    }
+});
+const claimsBtn =
+    document.getElementById("claimsAccordionBtn");
+
+const claimsContent =
+    document.getElementById("claimsAccordionContent");
+
+const claimsIcon =
+    document.getElementById("claimsAccordionIcon");
+
+claimsBtn.addEventListener("click", function(){
+
+    claimsContent.classList.toggle("show");
+
+    if(claimsContent.classList.contains("show")){
+
+        claimsIcon.classList.remove("fa-plus");
+        claimsIcon.classList.add("fa-minus");
+
+    }else{
+
+        claimsIcon.classList.remove("fa-minus");
+        claimsIcon.classList.add("fa-plus");
+
+    }
+
+});
+const hospitalBtn =
+    document.getElementById("hospitalAccordionBtn");
+
+const hospitalContent =
+    document.getElementById("hospitalAccordionContent");
+
+const hospitalIcon =
+    document.getElementById("hospitalAccordionIcon");
+
+hospitalBtn.addEventListener("click", function(){
+
+    hospitalContent.classList.toggle("show");
+
+    if(hospitalContent.classList.contains("show")){
+
+        hospitalIcon.classList.remove("fa-plus");
+        hospitalIcon.classList.add("fa-minus");
+
+    }else{
+
+        hospitalIcon.classList.remove("fa-minus");
+        hospitalIcon.classList.add("fa-plus");
+
+    }
+
+});
+const termsBtn =
+    document.getElementById("termsAccordionBtn");
+
+const termsContent =
+    document.getElementById("termsAccordionContent");
+
+const termsIcon =
+    document.getElementById("termsAccordionIcon");
+
+termsBtn.addEventListener("click", function(){
+
+    termsContent.classList.toggle("show");
+
+    if(termsContent.classList.contains("show")){
+
+        termsIcon.classList.remove("fa-plus");
+        termsIcon.classList.add("fa-minus");
+
+    }else{
+
+        termsIcon.classList.remove("fa-minus");
+        termsIcon.classList.add("fa-plus");
+
+    }
+
+});
+</script>
 </body>
 </html>

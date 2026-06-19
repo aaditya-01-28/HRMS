@@ -17,7 +17,14 @@ public class InsurancePolicy {
     private String policyNumber;
     private String providerName;
     private Double totalCoverage;
-    private Double amountUsed;
+    private String policyName;
+    public String getPolicyName() {
+		return policyName;
+	}
+	public void setPolicyName(String policyName) {
+		this.policyName = policyName;
+	}
+	private Double amountUsed;
     private LocalDate validFrom;
     private LocalDate validUntil;
     private String status; // Active, Expired

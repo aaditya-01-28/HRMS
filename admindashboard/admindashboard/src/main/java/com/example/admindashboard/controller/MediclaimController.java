@@ -24,7 +24,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+import com.example.admindashboard.model.Hospital;
 @Controller
 @RequestMapping("/employee/mediclaim")
 public class MediclaimController {
@@ -151,40 +151,42 @@ public class MediclaimController {
 
     @GetMapping("/policy")
     public String mediclaimPolicy(Principal principal, Model model) {
+
         if (principal == null) {
             return "redirect:/employee/mediclaim/auth";
         }
 
-        Optional<User> userOpt = userRepository.findByUsername(principal.getName());
+        Optional<User> userOpt =
+                userRepository.findByUsername(principal.getName());
+
         if (userOpt.isPresent()) {
+
             User user = userOpt.get();
-            // Fetch the user's specific insurance policy
-            policyRepository.findByUser(user).ifPresent(policy -> {
-                model.addAttribute("policy", policy);
-            });
+
+            policyRepository.findByUser(user)
+                    .ifPresent(policy ->
+                            model.addAttribute("policy", policy));
+
+            List<MediclaimDependent> dependents =
+                    dependentRepository.findByUser(user);
+
+            model.addAttribute("dependents", dependents);
+            
+            List<Mediclaim> claims =
+                    mediclaimRepository
+                            .findByUserOrderBySubmissionDateDesc(user);
+
+            model.addAttribute("claims", claims);
+            
+            List<Hospital> hospitals =
+                    hospitalRepository.findAll();
+
         }
 
         return "mediclaim-policy";
     }
 
-    @GetMapping("/claim")
-    public String showRaiseClaimPage(Principal principal, Model model) {
-        if (principal == null) {
-            return "redirect:/employee/mediclaim/auth";
-        }
-
-        // Fetch the logged-in user
-        Optional<User> userOpt = userRepository.findByUsername(principal.getName());
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-
-            // Fetch all claims for this user and add them to the model
-            List<Mediclaim> userClaims = mediclaimRepository.findByUserOrderBySubmissionDateDesc(user);
-            model.addAttribute("claims", userClaims);
-        }
-
-        return "mediclaim-claim";
-    }
+    
 
     // 4. UPDATE THIS GET MAPPING FOR TRACKING
     @GetMapping("/track/list")
@@ -284,11 +286,15 @@ public class MediclaimController {
 
     // 2. ADD THIS NEW POST MAPPING
     @PostMapping("/dependents/add")
-    public String addDependent(@RequestParam("fullName") String fullName,
-                               @RequestParam("relationship") String relationship,
-                               @RequestParam("dob") String dob,
-                               @RequestParam(value = "isCovered", required = false) String isCovered,
-                               Principal principal) {
+    public String addDependent(
+            @RequestParam String fullName,
+            @RequestParam String relationship,
+            @RequestParam String dob,
+            @RequestParam(required = false) String gender,
+            @RequestParam Integer coveragePercentage,
+            @RequestParam(required = false) Boolean isCovered,
+            @RequestParam(required = false) MultipartFile document,
+            Principal principal) {
 
         if (principal == null) return "redirect:/employee/mediclaim/auth";
 
@@ -299,9 +305,11 @@ public class MediclaimController {
             dependent.setUser(userOpt.get());
             dependent.setFullName(fullName);
             dependent.setRelationship(relationship);
-            dependent.setDob(java.time.LocalDate.parse(dob)); // Parses HTML5 yyyy-mm-dd format
+            dependent.setDob(java.time.LocalDate.parse(dob));
 
-            // If the checkbox is checked, it sends a value ("on"). If unchecked, it sends null.
+            dependent.setGender(gender);
+            dependent.setCoveragePercentage(coveragePercentage);
+
             dependent.setCovered(isCovered != null);
 
             dependentRepository.save(dependent);
