@@ -97,8 +97,7 @@ public class DashboardController {
     @GetMapping("/default-redirect")
     public String defaultRedirect(HttpServletRequest request) {
         if (request.isUserInRole("SUPER_ADMIN") || request.isUserInRole("HR_ADMIN") ||
-            request.isUserInRole("IT_ADMIN") || request.isUserInRole("HR_MANAGER") ||
-            request.isUserInRole("PROJECT_MANAGER")) {
+            request.isUserInRole("IT_ADMIN") || request.isUserInRole("PROJECT_MANAGER")) {
             return "redirect:/admin/dashboard";
         } else if (request.isUserInRole("IT_SUPPORT")) {
             return "redirect:/itsupport/dashboard";
@@ -111,6 +110,8 @@ public class DashboardController {
             return "redirect:/transportation/dashboard";
         } else if (request.isUserInRole("AUDITOR") || request.isUserInRole("FINANCE")) {
             return "redirect:/accounts/dashboard";
+        } else if (request.isUserInRole("HR_MANAGER")) {
+            return "redirect:/HR/dashboard";
         } else if (request.isUserInRole("CLIENT")) {
             return "redirect:/client/dashboard";
         } else {
@@ -195,7 +196,7 @@ public class DashboardController {
         }).toList();
     }
 
-    @GetMapping({"/manager/dashboard", "/itsupport/dashboard", "/learninghead/dashboard", "/accounts/dashboard", "/transportation/dashboard"})
+    @GetMapping({"/manager/dashboard", "/itsupport/dashboard", "/learninghead/dashboard", "/accounts/dashboard", "/transportation/dashboard", "/HR/dashboard"})
     public String showManagerDashboard(org.springframework.ui.Model model, java.security.Principal principal, jakarta.servlet.http.HttpServletRequest request) {
         String currentUserId = principal.getName();
         User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
@@ -266,11 +267,13 @@ public class DashboardController {
             return "accounts-dashboard";
         } else if (request.getRequestURI().contains("transportation")) {
             return "transport-dashboard";
+        } else if (request.getRequestURI().contains("HR")) {
+            return "hr-dashboard";
         }
         return "manager-dashboard";
     }
 
-    @GetMapping({"/manager/workflow", "/accounts/workflow", "/transportation/workflow"})
+    @GetMapping({"/manager/workflow", "/accounts/workflow", "/transportation/workflow", "/HR/workflow"})
     public String showManagerWorkflow(org.springframework.ui.Model model, java.security.Principal principal, jakarta.servlet.http.HttpServletRequest request) {
         String currentUserId = principal.getName();
         User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
@@ -461,6 +464,43 @@ public class DashboardController {
             model.addAttribute("isItSupport", true); // To trigger the UI list rendering correctly
 
             return "transport-workflow";
+        } else if (request.getRequestURI().contains("HR")) {
+            
+            // 1. HR Tickets (Pending) -> Used for 'HR Tickets' tab
+            java.util.List<ServiceRequest> hrTickets = serviceRequestRepository.findAll().stream()
+                    .filter(t -> "HR".equalsIgnoreCase(t.getType()) || "HUMAN_RESOURCES".equalsIgnoreCase(t.getType()))
+                    .collect(Collectors.toList());
+                    
+            java.util.List<ServiceRequest> pendingHrTickets = hrTickets.stream()
+                    .filter(t -> "Open".equalsIgnoreCase(t.getStatus()) || "Assigned".equalsIgnoreCase(t.getStatus()))
+                    .collect(Collectors.toList());
+
+            // 2. Accounts/Finance Tickets -> Used for 'Accounts/Finance' tab
+            java.util.List<ServiceRequest> accountsTickets = serviceRequestRepository.findAll().stream()
+                    .filter(t -> "PAYROLL".equalsIgnoreCase(t.getType()) || "FINANCE".equalsIgnoreCase(t.getType()))
+                    .collect(Collectors.toList());
+                    
+            // We'll pass HR tickets as 'pendingTickets' and Accounts tickets as 'accountsTickets'
+            // We also need all globally pending leaves and timesheets!
+            java.util.List<LeaveRequest> allPendingLeaves = leaveRequestRepository.findAll().stream()
+                    .filter(l -> "PENDING".equalsIgnoreCase(l.getStatus()))
+                    .collect(Collectors.toList());
+                    
+            java.util.List<WeeklyTimesheet> allPendingTimesheets = weeklyTimesheetRepository.findAll().stream()
+                    .filter(t -> "Submitted".equalsIgnoreCase(t.getStatus()) || "Pending".equalsIgnoreCase(t.getStatus()))
+                    .collect(Collectors.toList());
+
+            model.addAttribute("pendingLeaves", allPendingLeaves);
+            model.addAttribute("pendingTimesheets", allPendingTimesheets);
+            
+            // Reusing existing model names to avoid massive UI refactoring, we'll map them in HTML
+            model.addAttribute("pendingTickets", pendingHrTickets);
+            model.addAttribute("myAssignedTickets", accountsTickets); 
+            model.addAttribute("otherTickets", new java.util.ArrayList<>());
+            
+            model.addAttribute("isItSupport", false); // HR workflow shows all tabs normally
+
+            return "hr-workflow";
         }
         return "manager-workflow";
     }
