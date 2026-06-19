@@ -105,9 +105,10 @@ public class DashboardController {
         } else if (request.isUserInRole("LND")) {
             return "redirect:/learninghead/dashboard";
         } else if (request.isUserInRole("MANAGER") || request.isUserInRole("HR_EXECUTIVE") ||
-                   request.isUserInRole("RECRUITER") || 
-                   request.isUserInRole("TRANSPORT")) {
+                   request.isUserInRole("RECRUITER")) {
             return "redirect:/manager/dashboard";
+        } else if (request.isUserInRole("TRANSPORT")) {
+            return "redirect:/transportation/dashboard";
         } else if (request.isUserInRole("AUDITOR") || request.isUserInRole("FINANCE")) {
             return "redirect:/accounts/dashboard";
         } else if (request.isUserInRole("CLIENT")) {
@@ -194,7 +195,7 @@ public class DashboardController {
         }).toList();
     }
 
-    @GetMapping({"/manager/dashboard", "/itsupport/dashboard", "/learninghead/dashboard", "/accounts/dashboard"})
+    @GetMapping({"/manager/dashboard", "/itsupport/dashboard", "/learninghead/dashboard", "/accounts/dashboard", "/transportation/dashboard"})
     public String showManagerDashboard(org.springframework.ui.Model model, java.security.Principal principal, jakarta.servlet.http.HttpServletRequest request) {
         String currentUserId = principal.getName();
         User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
@@ -263,11 +264,13 @@ public class DashboardController {
             return "learninghead-dashboard";
         } else if (request.getRequestURI().contains("accounts")) {
             return "accounts-dashboard";
+        } else if (request.getRequestURI().contains("transportation")) {
+            return "transport-dashboard";
         }
         return "manager-dashboard";
     }
 
-    @GetMapping({"/manager/workflow", "/accounts/workflow"})
+    @GetMapping({"/manager/workflow", "/accounts/workflow", "/transportation/workflow"})
     public String showManagerWorkflow(org.springframework.ui.Model model, java.security.Principal principal, jakarta.servlet.http.HttpServletRequest request) {
         String currentUserId = principal.getName();
         User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
@@ -443,6 +446,21 @@ public class DashboardController {
             model.addAttribute("isItSupport", true); // To trigger the UI list rendering correctly
 
             return "accounts-workflow";
+        } else if (request.getRequestURI().contains("transportation")) {
+            java.util.List<ServiceRequest> allTransportTickets = serviceRequestRepository.findAll().stream()
+                    .filter(t -> "TRANSPORT".equalsIgnoreCase(t.getType()) || "TRANSPORTATION".equalsIgnoreCase(t.getType()) || "FACILITY".equalsIgnoreCase(t.getType()))
+                    .collect(Collectors.toList());
+
+            java.util.List<ServiceRequest> pendingTransportTickets = allTransportTickets.stream()
+                    .filter(t -> "Open".equalsIgnoreCase(t.getStatus()) || "Assigned".equalsIgnoreCase(t.getStatus()) || "Close".equalsIgnoreCase(t.getStatus()))
+                    .collect(Collectors.toList());
+
+            model.addAttribute("allItTickets", allTransportTickets);
+            model.addAttribute("pendingTickets", pendingTransportTickets);
+            model.addAttribute("otherTickets", new java.util.ArrayList<>());
+            model.addAttribute("isItSupport", true); // To trigger the UI list rendering correctly
+
+            return "transport-workflow";
         }
         return "manager-workflow";
     }
