@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WhiteCircle | Senior Transport Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .sidebar {
+            width: 105px;
+            position: absolute !important;
+            left: 0;
+            top: 0;
+            bottom: 40px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            z-index: 1000;
+        }
+        .sidebar-link {
+            color: #6c757d;
+            font-size: 1.4rem;
+            margin-bottom: 30px; /* Increased from 20px for a much wider gap */
+            transition: all 0.2s;
+            text-decoration: none;
+            position: relative;
+        }
+        .sidebar-link:hover, .sidebar-link.active { color: #0d6efd; transform: scale(1.1); }
+
+        /* Profile Button Hover Effect */
+        .profile-btn { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .profile-btn:hover { transform: scale(1.15); box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4); border-radius: 50%; }
+
+        .main-content {
+            margin-left: 105px;
+            padding: 20px;
+            min-height: 120vh; /* Changed from 'height' to 'min-height' to allow smooth, natural scrolling */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* NORMAL SCROLLABLE TOP NAVBAR */
+        .top-navbar {
+            position: static !important;
+            z-index: 1020;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            margin-bottom: 23px !important;
+        }
+
+        .widget-card {
+            background: white;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .widget-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(30, 58, 138, 0.15); /* Navy tinted shadow */
+        }
+
+        .widget-header {
+            padding: 12px 20px;
+            border-bottom: 2px solid #cbd5e1;
+            font-weight: 700;
+            color: var(--bs-primary); /* <--- THIS SETS THE NAVY BLUE COLOR */
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .widget-body {
+            padding: 15px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        /* App Buttons */
+        .app-btn {
+            border: 0.8px solid var(--bs-primary);
+            border-radius: 10px;
+            padding: 16px 14px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.04);
+            cursor: pointer;
+            background: white;
+            text-decoration: none;
+            color: #343a40;
+            height: 100%;
+            position: relative;
+        }
+
+        .app-btn:hover {
+            border-color: var(--bs-primary); /* Navy Blue Highlight */
+            background: #ffffff;
+            /* Lift Up & Deeper Shadow */
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(30, 58, 138, 0.15);
+        }
+
+        .app-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            line-height: 1.2;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* HOLIDAY LIST LINK FIX  */
+        .cal-header-navy .holiday-link {
+            color: rgba(255, 255, 255, 0.75) !important; /* Soft white by default */
+            transition: all 0.2s ease;
+            text-decoration: none !important;
+        }
+
+        .cal-header-navy .holiday-link:hover {
+            color: #ffffff !important; /* Snaps to pure, bright white */
+            opacity: 1 !important; /* Overrides the Bootstrap opacity class */
+            text-decoration: underline !important; /* Adds the underline */
+            text-underline-offset: 4px; /* Drops the underline down slightly so it looks modern */
+        }
+
+        /* DYNAMIC CALENDAR STYLES  */
+        .dash-calendar-card {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cal-header-navy {
+            background-color: #1e3a8a; /* Navy Blue */
+            color: #ffffff;
+            padding: 14px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .cal-body {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cal-month-title {
+            text-align: center;
+            color: #1e3a8a;
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .cal-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        /* CALENDAR LAYOUT FIX  */
+        .cal-navigation-wrapper {
+            padding-top: 2px; /* Reduced slightly to prevent bottom cut-off */
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cal-days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            row-gap: 6px; /* Slightly tighter rows to ensure 6-week months fit */
+            text-align: center;
+        }
+        .cal-day-cell {
+            height: 30px; /* Fixed height helps keep the layout consistent */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Base style for the number wrapper */
+        .day-number {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        /* TODAY is now Solid Navy Blue */
+        .day-today {
+            background-color: #1e3a8a;
+            color: #ffffff;
+            font-weight: 800;
+            box-shadow: 0 2px 4px rgba(30, 58, 138, 0.3);
+        }
+
+        /* NATIONAL & PUBLIC HOLIDAYS (Purple) */
+        .day-event {
+            background-color: #f3e8ff !important; /* Light Purple background */
+            color: #7e22ce !important; /* Deep Purple text */
+            font-weight: 800;
+            border: 1px solid #e9d5ff !important;
+            cursor: pointer;
+        }
+
+        /* MAJOR FESTIVALS (Amber/Gold - As requested) */
+        .day-major-event {
+            background-color: #fef3c7 !important;
+            color: #b45309 !important;
+            font-weight: 800;
+            border: 1px solid #fde68a !important;
+            cursor: pointer;
+        }
+
+        /* Legend Dots Update */
+        .dot-event { background: #7e22ce !important; }
+        .dot-major { background: #f59e0b !important; }
+
+        /* Hover effects for arrows */
+        #prevMonthBtn:hover, #nextMonthBtn:hover {
+            transform: scale(1.1);
+            color: #0d6efd !important;
+        }
+
+        /* Legend - Swapped the dot colors to match */
+        .cal-legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 15px;
+            margin-top: auto;
+        }
+        .legend-item { font-size: 0.75rem; color: #64748b; display: flex; align-items: center; gap: 5px; font-weight: 600;}
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        /* Swapped colors here */
+        .dot-today { background: #1e3a8a; }
+        .dot-event { background: #cbd5e1; }
+
+        /* Banner Area */
+        .milestone-banner {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-radius: 12px;
+            height: 100%;
+            min-height: 120px;
+        }
+        /* Parallel Columns Helper */
+        .parallel-col {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 100%;
+        }
+
+        /* OPTION 1: FORMAL NAVY THEME */
+        :root {
+            --bs-primary: #1e3a8a; /* Deep Navy */
+            --bs-primary-rgb: 30, 58, 138;
+        }
+
+        /* Override hardcoded blue in sidebar & widgets */
+        .sidebar-link:hover, .sidebar-link.active { color: #1e3a8a !important; }
+        .calendar-today { background-color: #1e3a8a !important; }
+        .app-btn:hover { border-color: #1e3a8a !important; background-color: #f0f4ff !important; }
+        .holiday-link:hover { color: #1e3a8a !important; }
+        .text-primary { color: #1e3a8a !important; }
+        .bg-primary { background-color: #1e3a8a !important; }
+
+        /* 1.SMOOTH PAGE ENTRY ANIMATION */
+        body {
+            animation: fadeInPage 0.6s ease-out forwards;
+        }
+        @keyframes fadeInPage {
+            from {
+                opacity: 0;
+                transform: translateY(15px); /* Slides up slightly */
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 2.TACTILE CLICK EFFECT */
+        .app-btn:active, .sidebar-link:active, .btn:active {
+            transform: scale(0.96) !important; /* Shrinks slightly when clicked */
+            transition: transform 0.1s;
+        }
+
+        /* 3.FROSTED GLASS STICKY NAVBAR */
+        .top-navbar {
+            position: sticky;
+            top: 20px; /* Floats slightly from top */
+            z-index: 1020;
+            background: rgba(255, 255, 255, 0.85); /* Semi-transparent */
+            backdrop-filter: blur(12px); /* The "Frosted" blur effect */
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* 4. WATERFALL CARD ENTRY */
+        .main-content .col-lg-6, .main-content .col-lg-4 {
+            opacity: 0;
+            animation: slideUpCard 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        /* Define the Slide Up Animation */
+        @keyframes slideUpCard {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Add delays so they load one by one */
+        .main-content .row:nth-of-type(2) .col-lg-6:nth-child(1) { animation-delay: 0.1s; } /* Self Service */
+        .main-content .row:nth-of-type(2) .col-lg-6:nth-child(2) { animation-delay: 0.2s; } /* Applications */
+        .main-content .row:nth-of-type(3) .col-lg-4:nth-child(1) { animation-delay: 0.3s; } /* Calendar */
+        .main-content .row:nth-of-type(3) .col-lg-4:nth-child(2) { animation-delay: 0.4s; } /* Middle */
+        .main-content .row:nth-of-type(3) .col-lg-4:nth-child(3) { animation-delay: 0.5s; } /* Right */
+
+        /* 5. ALIVE SEARCH BAR */
+        .form-control:focus {
+            box-shadow: none; /* Remove default blue glow */
+            border-color: transparent;
+        }
+
+        /* Animate the container when input is clicked */
+        .input-group:focus-within {
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15); /* Soft Navy Glow */
+            border-color: var(--bs-primary);
+            transform: scale(1.02); /* Expands slightly */
+            transition: all 0.2s ease;
+        }
+
+        /* Color the search icon blue when active */
+        .input-group:focus-within .fa-search {
+            color: var(--bs-primary) !important;
+            transition: color 0.2s;
+        }
+
+        /* 6. SWINGING ICONS */
+        @keyframes swing {
+            20% { transform: rotate(15deg); }
+            40% { transform: rotate(-10deg); }
+            60% { transform: rotate(5deg); }
+            80% { transform: rotate(-5deg); }
+            100% { transform: rotate(0deg); }
+        }
+        /* Apply to sidebar icons on hover */
+        .sidebar-link:hover i {
+            animation: swing 0.6s ease;
+            display: inline-block; /* Required for rotation to work */
+        }
+
+        /* 7. SHEEN EFFECT */
+        .app-btn {
+            overflow: hidden; /* Keeps the shine inside the button */
+            position: relative; /* Needed for the shine positioning */
+        }
+
+        /* The "Light Beam" */
+        .app-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%; /* Start outside the left */
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.6) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: skewX(-25deg); /* Tilt the beam */
+            transition: none; /* No transition on exit */
+        }
+        /* Trigger animation on hover */
+        .app-btn:hover::after {
+            left: 200%; /* Move across to the right */
+            transition: left 0.6s ease-in-out; /* Smooth sweep speed */
+        }
+
+        /* 8. GROWING LINK UNDERLINES */
+        .widget-header a {
+            position: relative;
+            text-decoration: none !important; /* Remove default underline */
+            display: inline-block;
+        }
+        .widget-header a::after {
+            content: '';
+            position: absolute;
+            width: 0; /* Start with 0 width */
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--bs-primary); /* Navy Blue Line */
+            transition: width 0.3s ease-out; /* Smooth growth */
+        }
+        .widget-header a:hover::after {
+            width: 100%; /* Expand to full width on hover */
+        }
+
+        /* Special Navy Header (For APPS & SELF SERVICE)  */
+        .navy-header {
+            background-color: var(--bs-primary); /* Navy Blue Background */
+            color: white !important; /* Main Text White */
+
+            /* Round the top corners to match the card */
+            border-radius: 12px 12px 0 0;
+
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Style the "View All" links and "Pen" icons inside this header */
+        .navy-header a,
+        .navy-header i {
+            color: #bfdbfe !important; /* Suggested: Pale Cyan */
+            opacity: 0.9;
+            transition: all 0.2s ease;
+        }
+
+        /* Hover effect for the links/icons */
+        .navy-header a:hover,
+        .navy-header i:hover {
+            color: #ffffff !important; /* Turn pure white on hover */
+            opacity: 1;
+            text-decoration: none;
+        }
+
+        /* SEARCH BOX ACTIVE ANIMATION  */
+        .search-box-wrapper {
+            border-color: #cbd5e1 !important;
+            border-radius: 50px; /* Pill shape */
+            transition: all 0.3s ease;
+        }
+
+        /* When the employee clicks inside the search bar */
+        .search-box-wrapper:focus-within {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2) !important;
+            transform: translateY(-2px); /* Lifts it up smoothly */
+        }
+
+        /* MODERN DROPDOWN CARD  */
+        .search-dropdown-card {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 12px; /* Perfect gap below the search bar */
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15); /* Strong shadow */
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            z-index: 1050;
+        }
+
+        /* RESULT ITEM LAYOUT  */
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+        .search-result-item:last-child {
+            border-bottom: none; /* Removes line from the very last item */
+        }
+        .search-result-item:hover {
+            background: #f8fafc;
+        }
+
+        /* A clean icon placeholder instead of a bulky avatar */
+        .search-icon-wrapper {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #3b82f6;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        /* FESTIVE BIRTHDAY WIDGET STYLES */
+        .birthday-card-active {
+            background: linear-gradient(135deg, #ffffff 0%, #fdf4ff 100%);
+            border: 1px solid #f5d0fe !important;
+            transition: all 0.3s ease;
+        }
+        .birthday-cake-icon {
+            color: #d946ef; /* Vibrant Pink/Purple */
+            animation: cakeFloat 2s ease-in-out infinite;
+        }
+        @keyframes cakeFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .btn-wish {
+            background-color: #fdf4ff;
+            color: #a21caf;
+            border: 1px solid #f5d0fe;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-wish:hover {
+            background-color: #a21caf;
+            color: white;
+            transform: scale(1.05);
+        }
+
+    </style>
+    <link href="/css/style.css" rel="stylesheet">
+
+    <style>
+        @media (max-width: 991px) {
+
+            /* 1. COMPACT GLOBAL LAYOUT */
+            html, body {
+                padding-top: 0 !important;
+                margin-top: 0 !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                padding-bottom: 50px !important; /* Buffer for FIXED bottom nav */
+                overflow-x: hidden !important;
+                width: 100% !important;
+                background-color: #f8fafc;
+            }
+
+            /* 2. FIXED BOTTOM NAVIGATION (EQUIDISTANT & VIEWPORT-LOCKED) */
+            .sidebar {
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                top: auto !important;
+                width: 100% !important;
+                height: 60px !important;
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                background: #ffffff !important;
+                border-top: 1px solid #e2e8f0 !important;
+                box-shadow: 0 -8px 20px rgba(0,0,0,0.06) !important;
+                z-index: 9999 !important;
+                padding: 0 !important;
+            }
+            .sidebar > div { display: contents !important; }
+            .sidebar .sidebar-link, .sidebar .profile-btn {
+                flex: 1 !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                height: 100% !important;
+                text-decoration: none !important;
+            }
+            .sidebar-link i { font-size: 1.4rem !important; }
+            .profile-btn div { margin: 0 !important; }
+
+            /* 3. RESET MAIN CONTENT */
+            .main-content {
+                margin-top: 0 !important;
+                margin-left: 0 !important;
+                padding-top: 0 !important;
+                padding-bottom: 10px !important;
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+                height: auto !important;
+            }
+
+            /* 4. INTERACTIVE APP HEADER */
+            .top-navbar {
+                display: grid !important;
+                grid-template-areas:
+                    "branding toggle"
+                    "search search";
+                grid-template-columns: 1fr auto;
+                gap: 10px;
+                padding: 12px 15px !important;
+                margin-top: 12px !important;
+                margin-bottom: 15px !important;
+                background: #ffffff !important;
+                border-bottom: 1px solid #edf2f7 !important;
+                border-radius: 12px !important;
+            }
+            .top-navbar .col-md-4:nth-child(1) { grid-area: branding; justify-content: flex-start !important; margin-bottom: 0 !important; padding: 0 !important; }
+                    .top-navbar img {
+                height: 44px !important; /* Increased from 32px for a punchier logo */
+            }
+
+            .top-navbar span {
+                font-size: 1.35rem !important; /* Increased from 1rem */
+                font-weight: 800 !important;   /* Makes the text extra bold */
+                letter-spacing: 0.5px !important; /* Gives it a premium spread */
+                margin-left: 12px !important;
+            }
+            .top-navbar .col-md-4:nth-child(3) { grid-area: toggle; justify-content: flex-end !important; padding: 0 !important; }
+            .top-navbar .bg-light.rounded-pill { padding: 4px 10px !important; background: #f1f5f9 !important; }
+            .top-navbar .form-check-label { display: none; }
+            .top-navbar .col-md-4:nth-child(2) { grid-area: search; width: 100% !important; padding: 0 !important; z-index: 1050; }
+            .search-box-wrapper { background: #f1f5f9 !important; border: 1px solid #e2e8f0 !important; border-radius: 10px !important; padding: 6px 12px !important; }
+            .search-box-wrapper i { font-size: 0.8rem; }
+            .search-box-wrapper input { font-size: 0.85rem !important; }
+
+            /* 5. ENHANCED COMPACT CARDS & GRID BUTTONS (3 per row) */
+            .row { display: flex; flex-direction: column; }
+            .col-lg-6, .col-lg-4, .col-md-6 { width: 100% !important; margin-bottom: 12px !important; }
+            .widget-card { border-radius: 10px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.03) !important; }
+            .widget-header { padding: 8px 15px !important; font-size: 0.8rem !important; }
+            .widget-body { padding: 10px !important; }
+
+            .widget-body .row { flex-direction: row !important; flex-wrap: wrap !important; margin: 0 -4px !important; }
+            .widget-body .col-md-6 { width: 33.33% !important; padding: 4px !important; }
+
+            .app-btn { flex-direction: column !important; padding: 12px 5px !important; height: 80px !important; justify-content: center; text-align: center; }
+            .app-btn i { font-size: 1.2rem !important; margin-right: 0 !important; margin-bottom: 5px; }
+            .app-text { font-size: 0.65rem !important; line-height: 1.1; font-weight: 500; }
+
+            /* 6. WIDGET TIGHTENING */
+            .cal-body { padding: 12px !important; }
+            .cal-day-cell { height: 26px !important; }
+            .day-number { width: 22px !important; height: 22px !important; font-size: 0.7rem; }
+            .parallel-col { gap: 10px !important; }
+            .milestone-banner { min-height: 90px !important; }
+
+            /* 7. COMPACT SEARCH DROPDOWN */
+            .search-dropdown-card { top: 115px !important; max-height: 280px !important; overflow-y: auto !important; margin: 0 10px !important; width: calc(100% - 20px) !important; border-radius: 12px !important; }
+            .search-result-item { padding: 10px 15px !important; }
+            .search-result-item h6 { font-size: 0.85rem !important; margin-bottom: 2px !important; }
+            .search-result-item small { font-size: 0.7rem !important; }
+            .search-icon-wrapper { width: 32px !important; height: 32px !important; font-size: 0.9rem !important; }
+
+            /* 8. ULTRA-COMPACT "SINGLE-SCREEN" MODAL */
+            #employeeDirModal .modal-dialog { margin: 0 auto !important; display: flex !important; align-items: flex-start !important; padding-top: 120px !important; height: auto !important; }
+            #employeeDirModal .modal-content { border-radius: 12px !important; max-height: 90vh; width: 100%; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important; }
+            #employeeDirModal .modal-content > div:first-child { height: 50px !important; }
+            #employeeDirModal .modal-body { padding: 10px 12px !important; }
+            #employeeDirModal .d-flex.flex-md-row { margin-top: -25px !important; margin-bottom: 8px !important; }
+            #modalEmpAvatar { width: 55px !important; height: 55px !important; font-size: 1.3rem !important; border: 2px solid #fff !important; }
+            #modalEmpName { font-size: 0.95rem !important; margin-bottom: 0 !important; }
+            #modalEmpDesignation { font-size: 0.7rem !opacity: 0.8; }
+            #modalEmpLocation { font-size: 0.6rem !important; padding: 2px 8px !important; }
+            #employeeDirModal .row.g-4 { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 6px !important; }
+            #employeeDirModal .col-md-6 h6 { grid-column: span 2 !important; margin-top: 5px !important; margin-bottom: 3px !important; font-size: 0.6rem !important; color: #1e3a8a; text-transform: uppercase; letter-spacing: 0.5px; }
+            #employeeDirModal .col-md-6 { display: contents !important; }
+            #employeeDirModal .mb-3, #employeeDirModal .col-md-6 > div { margin-bottom: 0 !important; padding: 5px !important; background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 6px; }
+            #employeeDirModal small { font-size: 0.5rem !important; color: #64748b !important; display: block; margin-bottom: 0px; }
+            #employeeDirModal span, #employeeDirModal a { font-size: 0.68rem !important; font-weight: 700 !important; color: #1e293b !important; }
+            #employeeDirModal hr { display: none; }
+
+
+            /* =========================================================
+               9. MOBILE-ONLY DARK MODE FIXES (SEARCH & PROFILE MODAL)
+               ========================================================= */
+            [data-bs-theme="dark"] #employeeDirModal .modal-content,
+            [data-bs-theme="dark"] .search-dropdown-card,
+            [data-bs-theme="dark"] .search-result-item {
+                background-color: #1e1e1e !important;
+                border-color: #333333 !important;
+            }
+
+            /* The inset detail boxes (Department, Email, etc.) */
+            [data-bs-theme="dark"] #employeeDirModal .mb-3,
+            [data-bs-theme="dark"] #employeeDirModal .col-md-6 > div {
+                background-color: #121212 !important;
+                border-color: #2d2d2d !important;
+            }
+
+            /* Avatar Rings & Backgrounds */
+            [data-bs-theme="dark"] #employeeDirModal .bg-white.p-1,
+            [data-bs-theme="dark"] #modalEmpAvatar,
+            [data-bs-theme="dark"] .search-icon-wrapper {
+                background-color: #121212 !important;
+                border-color: #333333 !important;
+            }
+
+            /* Text Contrast Fixes */
+            [data-bs-theme="dark"] #employeeDirModal .text-dark,
+            [data-bs-theme="dark"] #employeeDirModal a.text-dark,
+            [data-bs-theme="dark"] .search-result-item .text-dark {
+                color: #ffffff !important;
+            }
+
+            [data-bs-theme="dark"] #employeeDirModal .text-muted,
+            [data-bs-theme="dark"] .search-result-item .text-muted {
+                color: #94a3b8 !important;
+            }
+
+            /* Location Badge */
+            [data-bs-theme="dark"] #employeeDirModal .badge.bg-light {
+                background-color: #2d2d2d !important;
+                color: #e2e8f0 !important;
+                border-color: #475569 !important;
+            }
+
+            /* Search Dropdown Hover Effect */
+            [data-bs-theme="dark"] .search-result-item:hover {
+                background-color: #2a2a2a !important;
+            }
+
+        }
+    </style>
+
+
+    <link href="/css/dark-mode.css" rel="stylesheet">
+    <script src="/js/theme-engine.js"></script>
+</head>
+<body>
+
+<div class="sidebar">
+    <a href="/senior_transport/dashboard" class="sidebar-link active" data-bs-toggle="tooltip" data-bs-placement="right" title="Home"><i class="fas fa-home"></i></a>
+    <a href="/chat" class="sidebar-link" data-bs-toggle="tooltip" data-bs-placement="right" title="Chat"><i class="fas fa-comment-dots"></i></a>
+    <a href="#" class="sidebar-link" data-bs-toggle="tooltip" data-bs-placement="right" title="My Team"><i class="fas fa-user-friends"></i></a>
+    <a href="/my-thanks/login" target="_blank" class="sidebar-link" data-bs-toggle="tooltip" data-bs-placement="right" title="My Thanks"><i class="fas fa-gift"></i></a>
+
+    <div style="margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 25px; margin-bottom: 170px;">
+        <a href="/employee/profile" class="profile-btn" data-bs-toggle="tooltip" data-bs-placement="right" title="My Profile">
+            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px;">
+                <i class="fas fa-user fs-5"></i>
+            </div>
+        </a>
+
+        <a href="/" class="sidebar-link text-danger mb-0" data-bs-toggle="tooltip" data-bs-placement="right" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+</div>
+
+<div class="main-content">
+
+    <div class="top-navbar row align-items-center gx-0">
+        <div class="col-md-4 ps-4 d-flex align-items-center">
+            <img src="/images/wcg-logo.jpg"
+                 alt="Logo"
+                 style="height: 70px; width: auto; border-radius: 8px;">
+            <span class="ms-3 fw-bold text-dark"
+                  style="font-size: 1.8rem; letter-spacing: 1px; text-transform: uppercase;">
+                White Circle
+            </span>
+        </div>
+
+        <div class="col-md-4 position-relative z-3">
+
+            <div class="search-box-wrapper d-flex align-items-center bg-white border px-3 py-2 shadow-sm">
+                <i class="fas fa-search text-muted"></i>
+                <input type="text" class="form-control border-0 shadow-none bg-transparent ms-2 p-0" id="empSearchInput" placeholder="Search colleagues..." autocomplete="off">
+            </div>
+
+            <div id="searchResultsDropdown" class="search-dropdown-card d-none">
+                <div id="searchResultsList" class="d-flex flex-column mb-0">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-4 pe-4 text-end">
+            <div class="d-inline-flex align-items-center bg-light rounded-pill px-3 py-1 border">
+                <div class="form-check form-switch d-flex align-items-center">
+                    <i class="fas fa-sun text-warning me-2 small"></i>
+                    <input class="form-check-input fs-5 m-0" type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" style="cursor: pointer;">
+                    <label class="form-check-label ms-2 text-dark" for="darkModeToggle">
+                        <i class="fas fa-moon"></i>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3" style="flex: 0 0 auto;">
+
+        <div class="col-lg-6">
+            <div class="widget-card">
+                <div class="widget-header navy-header">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-user-cog me-2"></i>Self Services
+                    </div>
+                    <a href="#" class="small fw-bold">View All</a>
+                </div>
+                <div class="widget-body">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <a href="/conference-room" class="app-btn">
+                                <i class="fas fa-handshake text-primary me-2 fs-5"></i>
+                                <span class="app-text">Conference Room</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/leave-management" class="app-btn">
+                                <i class="fas fa-calendar-minus text-primary me-2 fs-5"></i>
+                                <span class="app-text">Leave Management System (LMS)</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/attendance" class="app-btn">
+                                <i class="fas fa-user-clock text-primary me-2 fs-5"></i>
+                                <span class="app-text">Attendance Regulation</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/my-approvals" class="app-btn">
+                                <i class="fas fa-check-double text-primary me-2 fs-5"></i>
+                                <span class="app-text">My Approvals</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/email-signature" class="app-btn">
+                                <i class="fas fa-signature text-primary me-2 fs-5"></i>
+                                <span class="app-text">Email Signature</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/password-reset" class="app-btn">
+                                <i class="fas fa-unlock-alt text-primary me-2 fs-5"></i>
+                                <span class="app-text">Password Reset</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="widget-card">
+                <div class="widget-header navy-header">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-th me-2"></i>Applications
+                    </div>
+                    <a href="#expandedApps" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="expandedApps" class="small fw-bold text-white text-decoration-none" id="viewAllAppsBtn">View All</a>
+                </div>
+                <div class="widget-body">
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <a href="/senior_transport/my_space" class="app-btn" target="_blank">
+                                <i class="fas fa-shuttle-van text-primary me-2 fs-5"></i>
+                                <span class="app-text">My Space</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/my-whitecircle/login" class="app-btn" target="_blank">
+                                <i class="fas fa-id-badge text-primary me-2 fs-5"></i>
+                                <span class="app-text">My WhiteCircle</span>
+                            </a>
+                        </div>
+						<div class="col-md-6">
+						    <a href="/erp/authenticate" class="app-btn" style="cursor: pointer;" target="_blank">
+						        <i class="fas fa-business-time text-primary me-2 fs-5"></i>
+						        <span class="app-text">ERP and Time Sheet</span>
+						    </a>
+						</div>
+                        <div class="col-md-6">
+                            <a href="/tickets/authenticate" class="app-btn" target="_blank">
+                                <i class="fas fa-ticket-alt text-primary me-2 fs-5"></i>
+                                <span class="app-text">Log Tickets</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/payroll" class="app-btn" target="_blank">
+                                <i class="fas fa-file-invoice-dollar text-primary me-2 fs-5"></i>
+                                <span class="app-text">Pay Roll</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/learning/login" class="app-btn" target="_blank">
+                                <i class="fas fa-tasks text-primary me-2 fs-5"></i>
+                                <span class="app-text">My Learnings</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/my-thanks/login" class="app-btn" target="_blank">
+                                <i class="fas fa-gift text-primary me-2 fs-5"></i>
+                                <span class="app-text">My Thanks</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="collapse mt-2" id="expandedApps">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <a href="/employee/mediclaim/auth" class="app-btn" target="_blank">
+                                    <i class="fas fa-notes-medical text-primary me-2 fs-5"></i>
+                                    <span class="app-text">My Mediclaim</span>
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="/my-rides/login" class="app-btn" target="_blank">
+                                    <i class="fas fa-car text-primary me-2 fs-5"></i>
+                                    <span class="app-text">My Rides</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    <div class="row g-3" style="flex: 1; min-height: 0;">
+
+        <div class="col-lg-4 h-100">
+            <div th:replace="~{fragments/spiral-calendar :: spiralCalendar}"></div>
+        </div>
+
+        <div class="col-lg-4 h-100">
+            <div class="parallel-col">
+
+                <div class="widget-card d-flex flex-column" style="flex: 1; height: 100%;">
+                    <div class="widget-header d-flex justify-content-between align-items-center pb-2 border-bottom mb-2">
+                        <span class="fw-bold text-dark" style="font-size: 0.9rem; letter-spacing: 0.5px;">
+                            <i class="fas fa-ticket-alt text-primary me-2"></i> TICKET STATUS
+                        </span>
+                        <a th:href="@{/tickets/authenticate}" class="text-primary text-decoration-none" style="font-size: 0.8rem; font-weight: 700;">View All</a>
+                    </div>
+
+                    <div class="widget-body flex-grow-1 d-flex flex-column" th:classappend="${#lists.isEmpty(recentTickets)} ? 'justify-content-center' : 'justify-content-start'" style="overflow-y: auto;">
+
+                        <div class="text-center py-4" th:if="${#lists.isEmpty(recentTickets)}">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                                <i class="fas fa-inbox text-muted fs-5"></i>
+                            </div>
+                            <p class="text-dark fw-bold mb-0" style="font-size: 0.9rem;">No Active Tickets</p>
+                            <span class="text-muted" style="font-size: 0.8rem;">You haven't raised any requests yet.</span>
+                        </div>
+
+                        <div class="d-flex flex-column gap-2" th:if="${not #lists.isEmpty(recentTickets)}">
+                            <div th:each="ticket : ${recentTickets}" class="d-flex justify-content-between align-items-center py-2 px-3 border rounded-3 bg-light" style="border-color: #e2e8f0 !important; transition: all 0.2s ease;">
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm"
+                                         th:classappend="${ticket.type == 'HARDWARE' ? 'bg-danger' : (ticket.type == 'INCIDENT' ? 'bg-warning text-dark' : 'bg-primary')}"
+                                         style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                        <i class="fas" th:classappend="${ticket.type == 'HARDWARE' ? 'fa-laptop' : (ticket.type == 'INCIDENT' ? 'fa-exclamation-triangle' : 'fa-cube')}"></i>
+                                    </div>
+
+                                    <div>
+                                        <div class="fw-bold text-dark mb-0" style="font-size: 0.85rem;" th:text="${ticket.ticketId}">#TCK-101</div>
+                                        <div class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;" th:text="${ticket.category ?: ticket.type}">Category</div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <span class="badge rounded-pill shadow-sm"
+                                          th:classappend="${ticket.status == 'Closed' or ticket.status == 'Resolved' ? 'bg-success' : (ticket.status == 'In Progress' ? 'bg-primary' : (ticket.status == 'Open' ? 'bg-danger' : 'bg-secondary'))}"
+                                          style="font-size: 0.65rem; padding: 4px 10px;"
+                                          th:text="${ticket.status}">Status
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget-card d-flex flex-column" style="flex: 1; height: 100%;">
+                    <div class="widget-header d-flex justify-content-between align-items-center pb-2 border-bottom mb-2">
+                        <span class="fw-bold text-dark" style="font-size: 0.9rem; letter-spacing: 0.5px;">
+                            <i class="fas fa-handshake text-primary me-2"></i> PENDING INVITES
+                        </span>
+                        <a th:href="@{/conference-room}" class="text-primary text-decoration-none" style="font-size: 0.8rem; font-weight: 700;">View Room</a>
+                    </div>
+                    <div class="widget-body flex-grow-1 d-flex flex-column justify-content-start" style="overflow-y: auto;">
+                        <div class="text-center py-4" th:if="${#lists.isEmpty(pendingMeetingInvites)}">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                                <i class="fas fa-calendar-check text-muted fs-5"></i>
+                            </div>
+                            <p class="text-dark fw-bold mb-0" style="font-size: 0.9rem;">No Pending Invites</p>
+                        </div>
+                        <div class="d-flex flex-column gap-2" th:if="${not #lists.isEmpty(pendingMeetingInvites)}">
+                            <div th:each="invite : ${pendingMeetingInvites}" class="d-flex justify-content-between align-items-center py-2 px-3 border rounded-3 bg-light" style="border-color: #e2e8f0 !important;">
+                                <div>
+                                    <div class="fw-bold text-dark mb-0" style="font-size: 0.85rem;" th:text="${invite.meetingTitle}">Meeting</div>
+                                    <div class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem;" th:text="${invite.organizer.fullName}">Organizer</div>
+                                </div>
+                                <button class="btn btn-sm btn-primary rounded-pill fw-bold" style="font-size: 0.7rem; padding: 4px 12px;" th:onclick="'approveMeeting(' + ${invite.id} + ')'">Approve</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget-card p-0 border-0" style="flex: 1; overflow: hidden;">
+                    <div class="milestone-banner">
+                        <div>
+                            <h5 class="fw-bold mb-1">Milestone Journey</h5>
+                            <p class="small opacity-75 mb-0">#BetterTogether</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 h-100">
+            <div class="parallel-col">
+                <div class="widget-card" style="flex: 1;">
+                    <div class="widget-header"><span>BIRTHDAYS</span></div>
+                    <div class="widget-body">
+                        <div class="d-flex align-items-center mt-2">
+                            <i class="fas fa-birthday-cake text-primary fa-lg me-3"></i>
+                            <div>
+                                <h6 class="mb-0 small fw-bold" id="todayDateLabel">Loading...</h6>
+                                <div id="birthdayListContainer">
+                                    <small class="text-muted">Checking...</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="widget-card bg-dark text-white" style="flex: 1;">
+                    <div class="widget-header border-bottom-0 text-white"><span>LEARNING</span></div>
+                    <div class="widget-body d-flex align-items-center justify-content-center">
+                        <div class="text-center">
+                            <i class="fas fa-hand-holding-heart fa-2x text-info mb-2"></i>
+                            <h6 class="mb-0">H Fun</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="employeeDirModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg"> <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+
+        <div style="height: 120px; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); position: relative;">
+            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close" style="z-index: 10;"></button>
+        </div>
+
+        <div class="modal-body px-4 px-md-5 pb-5 pt-0 text-center text-md-start">
+
+            <div class="d-flex flex-column flex-md-row align-items-center align-items-md-end" style="margin-top: -50px; margin-bottom: 25px;">
+                <div class="bg-white p-1 rounded-circle shadow-sm" style="z-index: 1;">
+                    <div id="modalEmpAvatar" class="d-flex align-items-center justify-content-center text-primary fw-bold rounded-circle"
+                         style="width: 100px; height: 100px; font-size: 2.5rem; background: #f8fafc; border: 2px solid #e2e8f0;">
+                        A
+                    </div>
+                </div>
+                <div class="ms-md-4 mt-3 mt-md-0 pb-md-2 text-center text-md-start flex-grow-1">
+                    <h3 class="fw-bold text-dark mb-1" id="modalEmpName">Employee Name</h3>
+                    <p class="text-primary fw-semibold mb-0" id="modalEmpDesignation">Designation / Role</p>
+                </div>
+                <div class="pb-md-2 mt-3 mt-md-0">
+                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill shadow-sm" style="font-weight: 600;">
+                            <i class="fas fa-map-marker-alt text-danger me-1"></i> <span id="modalEmpLocation">Location</span>
+                        </span>
+                </div>
+            </div>
+
+            <hr class="text-muted opacity-25 mb-4">
+
+            <div class="row g-4 text-start">
+
+                <div class="col-md-6 border-end-md">
+                    <h6 class="fw-bold text-uppercase text-muted mb-3" style="font-size: 0.75rem; letter-spacing: 1px;"><i class="fas fa-briefcase me-2"></i>Work Details</h6>
+
+                    <div class="mb-3">
+                        <small class="text-muted d-block fw-semibold" style="font-size: 0.7rem;">DEPARTMENT</small>
+                        <span class="text-dark fw-bold" id="modalEmpDept">N/A</span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block fw-semibold" style="font-size: 0.7rem;">EMPLOYEE ID</small>
+                        <span class="text-dark fw-bold" id="modalEmpId">N/A</span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block fw-semibold" style="font-size: 0.7rem;">JOINING DATE & EXP</small>
+                        <span class="text-dark fw-bold" id="modalEmpExp">N/A</span>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block fw-semibold" style="font-size: 0.7rem;">CURRENT PROJECT</small>
+                        <span class="text-dark fw-bold" id="modalEmpProject">N/A</span>
+                    </div>
+                </div>
+
+                <div class="col-md-6 ps-md-4">
+                    <h6 class="fw-bold text-uppercase text-muted mb-3" style="font-size: 0.75rem; letter-spacing: 1px;"><i class="fas fa-address-book me-2"></i>Contact & Reporting</h6>
+
+                    <div class="mb-3">
+                        <small class="text-muted d-block fw-semibold" style="font-size: 0.7rem;">EMAIL ADDRESS</small>
+                        <a href="#" class="text-primary fw-bold text-decoration-none" id="modalEmpEmail">N/A</a>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block fw-semibold" style="font-size: 0.7rem;">MOBILE NUMBER</small>
+                        <a href="#" class="text-dark fw-bold text-decoration-none" id="modalEmpPhone">N/A</a>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block fw-semibold" style="font-size: 0.7rem;">REPORTING MANAGER</small>
+                        <div class="d-flex align-items-center mt-1">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold me-2" style="width: 24px; height: 24px; font-size: 0.7rem;" id="modalManagerInitial">M</div>
+                            <span class="text-dark fw-bold" id="modalEmpManager">N/A</span>
+                        </div>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block fw-semibold" style="font-size: 0.7rem;">HR CONTACT</small>
+                        <span class="text-dark fw-bold" id="modalEmpHr">N/A</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Initialize Bootstrap Tooltips (For Sidebar Hover Effects)
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+    let calendarMonth = new Date().getMonth();
+    let calendarYear = new Date().getFullYear();
+    let calendarData = { leaves: [], holidays: [] };
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+    async function fetchCalendarData(month, year) {
+        try {
+            const res = await fetch('/api/leave/calendar-data?month=' + (month + 1) + '&year=' + year);
+            if (!res.ok) throw new Error('Failed');
+            calendarData = await res.json();
+        } catch (e) {
+            calendarData = { leaves: [], holidays: [] };
+        }
+        renderCalendar(month, year);
+    }
+
+    function renderCalendar(month, year) {
+        const grid = document.getElementById('calendarDaysGrid');
+        const title = document.getElementById('calendarMonthTitle');
+        if(!grid || !title) return;
+        
+        title.textContent = monthNames[month] + ' ' + year;
+
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const totalDays = lastDay.getDate();
+        let startDay = firstDay.getDay() - 1;
+        if (startDay < 0) startDay = 6;
+
+        const today = new Date();
+        const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+
+        const leaveMap = {};
+        (calendarData.leaves || []).forEach(l => { leaveMap[l.date] = l; });
+        const holidayMap = {};
+        (calendarData.holidays || []).forEach(h => { holidayMap[h.date] = h; });
+
+        let html = '';
+        for (let i = 0; i < startDay; i++) {
+            html += '<div class="calendar-day cal-empty"></div>';
+        }
+
+        for (let d = 1; d <= totalDays; d++) {
+            const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+            const dayOfWeek = new Date(year, month, d).getDay();
+            const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+
+            let cssClass = '';
+            let tooltipText = '';
+
+            if (dateStr === todayStr) {
+                cssClass = 'cal-today'; tooltipText = 'Today';
+            } else if (leaveMap[dateStr]) {
+                const leave = leaveMap[dateStr];
+                const st = (leave.status || '').toUpperCase();
+                if (st === 'APPROVED' || st === 'AUTO_APPROVED' || st === 'AUTO APPROVED') {
+                    cssClass = 'cal-approved'; tooltipText = (leave.type || 'Leave') + ' \u2014 Approved';
+                } else if (st === 'PENDING' || st === 'PENDING_APPROVAL') {
+                    cssClass = 'cal-pending'; tooltipText = (leave.type || 'Leave') + ' \u2014 Pending';
+                } else if (st === 'REJECTED') {
+                    cssClass = 'cal-rejected'; tooltipText = (leave.type || 'Leave') + ' \u2014 Rejected';
+                }
+            } else if (holidayMap[dateStr]) {
+                const hol = holidayMap[dateStr];
+                if ((hol.type || '').toLowerCase() === 'floater') {
+                    cssClass = 'cal-floater-holiday'; tooltipText = hol.name + ' (Floater)';
+                } else {
+                    cssClass = 'cal-fixed-holiday'; tooltipText = hol.name;
+                }
+            } else if (isWeekend) {
+                cssClass = 'cal-weekend';
+            }
+
+            const safeTooltip = tooltipText.replace(/'/g, "\\'");
+            const tooltipAttr = tooltipText ? ' onmouseenter="showCalTooltip(event, \'' + safeTooltip + '\')" onmouseleave="hideCalTooltip(event)"' : '';
+            html += '<div class="calendar-day ' + cssClass + '"' + tooltipAttr + '>' + d + '</div>';
+        }
+        grid.innerHTML = html;
+    }
+
+    window.showCalTooltip = function(e, text) {
+        const el = e.target; const tip = document.createElement('div');
+        tip.className = 'cal-tooltip'; tip.textContent = text;
+        el.style.position = 'relative'; el.appendChild(tip);
+    };
+    window.hideCalTooltip = function(e) {
+        const tip = e.target.querySelector('.cal-tooltip'); if (tip) tip.remove();
+    };
+    window.navigateMonth = function(dir) {
+        calendarMonth += dir;
+        if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
+        if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
+        fetchCalendarData(calendarMonth, calendarYear);
+    };
+
+    fetchCalendarData(calendarMonth, calendarYear);
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById('empSearchInput');
+        const dropdown = document.getElementById('searchResultsDropdown');
+        const resultsList = document.getElementById('searchResultsList');
+
+        let searchTimeout = null;
+
+        // Listen for typing in the search bar
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+
+            clearTimeout(searchTimeout);
+
+            // Hide dropdown if query is too short
+            if (query.length < 2) {
+                dropdown.classList.add('d-none');
+                dropdown.classList.remove('show'); // NEW: Added Bootstrap show toggle
+                return;
+            }
+
+            // Debounce: Wait 300ms after user stops typing to hit the database
+            searchTimeout = setTimeout(() => {
+                fetchSearchResults(query);
+            }, 300);
+        });
+
+        // Hide dropdown when clicking anywhere outside of it
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('d-none');
+                dropdown.classList.remove('show'); // NEW: Added Bootstrap show toggle
+            }
+        });
+
+        async function fetchSearchResults(query) {
+            try {
+                const response = await fetch(`/api/users/search?query=${encodeURIComponent(query)}`);
+                if (!response.ok) {
+                    throw new Error(`Search failed with status: ${response.status}`);
+                }
+
+                const users = await response.json();
+                renderResults(users);
+            } catch (error) {
+                console.error("Search API Error:", error);
+                // If it fails, show an error message in the dropdown
+                dropdown.classList.remove('d-none');
+                dropdown.classList.add('show');
+                resultsList.innerHTML = `<div class="p-3 text-center text-danger small fw-bold">Unable to fetch results. Check console.</div>`;
+            }
+        }
+
+        function renderResults(users) {
+            // NEW: Make sure both classes are updated to force visibility
+            dropdown.classList.remove('d-none');
+            dropdown.classList.add('show');
+
+            resultsList.innerHTML = '';
+
+            if (users.length === 0) {
+                resultsList.innerHTML = `<div class="p-3 text-center text-muted small fw-bold">No colleagues found matching your search.</div>`;
+                return;
+            }
+
+            users.forEach(user => {
+                // Generate a quick initial for the avatar
+                const initial = user.fullName ? user.fullName.charAt(0).toUpperCase() : '?';
+                const dept = user.businessUnit || 'General';
+                const role = user.designation || user.role || 'Employee';
+
+                const item = document.createElement('div');
+                // Force perfect horizontal alignment using Bootstrap flex classes
+                item.className = 'search-result-item d-flex align-items-center justify-content-between w-100';
+                item.dataset.user = JSON.stringify(user);
+
+                item.innerHTML = `
+                    <div class="d-flex align-items-center gap-3 overflow-hidden">
+                        <div class="search-icon-wrapper flex-shrink-0">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="text-truncate">
+                            <h6 class="mb-1 fw-bold text-dark lh-1 text-truncate">${user.fullName}</h6>
+                            <small class="text-muted text-truncate d-block" style="font-size: 0.8rem;">
+                                <i class="fas fa-briefcase me-1 opacity-75"></i>${dept} &bull; ${role}
+                            </small>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right text-muted small opacity-50 flex-shrink-0 ms-3"></i>
+                `;
+
+                // Add click listener to open the modal
+                item.addEventListener('click', function() {
+                    openEmployeeModal(JSON.parse(this.dataset.user));
+                    dropdown.classList.add('d-none');
+                    dropdown.classList.remove('show'); // Hide dropdown after click
+                    searchInput.value = ''; // Clear search bar
+                });
+
+                resultsList.appendChild(item);
+            });
+        }
+
+        function openEmployeeModal(user) {
+            // Header Info
+            document.getElementById('modalEmpName').textContent = user.fullName || 'N/A';
+            document.getElementById('modalEmpAvatar').textContent = user.fullName ? user.fullName.charAt(0).toUpperCase() : '?';
+            document.getElementById('modalEmpDesignation').textContent = user.designation || user.role || 'Employee';
+
+            // Location Badge
+            let location = user.city || user.workLocation || 'Head Office';
+            document.getElementById('modalEmpLocation').textContent = location;
+
+            // Work Details
+            document.getElementById('modalEmpDept').textContent = user.businessUnit || 'General';
+            document.getElementById('modalEmpId').textContent = user.username || 'N/A';
+
+            let joining = user.joiningDate || 'Unknown Date';
+            let exp = user.experience ? `(${user.experience})` : '';
+            document.getElementById('modalEmpExp').textContent = `${joining} ${exp}`;
+
+            document.getElementById('modalEmpProject').textContent = user.projectName || 'Internal Core';
+
+            // Contact & Reporting
+            const emailEl = document.getElementById('modalEmpEmail');
+            emailEl.textContent = user.email || 'N/A';
+            emailEl.href = user.email ? `mailto:${user.email}` : '#';
+
+            const phoneEl = document.getElementById('modalEmpPhone');
+            phoneEl.textContent = user.mobileNumber || 'Not Provided';
+            phoneEl.href = user.mobileNumber ? `tel:${user.mobileNumber}` : '#';
+
+            document.getElementById('modalEmpManager').textContent = user.reportingManager || 'N/A';
+            document.getElementById('modalManagerInitial').textContent = user.reportingManager ? user.reportingManager.charAt(0).toUpperCase() : '-';
+
+            document.getElementById('modalEmpHr').textContent = user.buHrContact || 'General HR';
+
+            // Show the Modal
+            new bootstrap.Modal(document.getElementById('employeeDirModal')).show();
+        }
+
+        updateBirthdayWidget();
+    });
+
+    //  DYNAMIC BIRTHDAY WIDGET LOGIC
+    async function updateBirthdayWidget() {
+    const container = document.getElementById('birthdayListContainer');
+    const dateLabel = document.getElementById('todayDateLabel');
+    const card = container.closest('.widget-card'); // Select the whole card
+
+    const today = new Date();
+    dateLabel.textContent = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
+
+    try {
+        const response = await fetch('/api/users/birthdays-today');
+        const birthdays = await response.json();
+
+        container.innerHTML = '';
+
+        if (birthdays.length === 0) {
+            container.innerHTML = `<small class="text-muted">No birthdays today</small>`;
+            card.classList.remove('birthday-card-active');
+            return;
+        }
+
+        // Apply celebratory style if there are birthdays
+        card.classList.add('birthday-card-active');
+        const cakeIcon = document.querySelector('.fa-birthday-cake');
+        if(cakeIcon) cakeIcon.classList.add('birthday-cake-icon');
+
+        const profileInitials = document.querySelector('.profile-btn div')?.textContent || "";
+
+        birthdays.forEach(user => {
+            const bdayDiv = document.createElement('div');
+            bdayDiv.className = "mt-3 p-2 rounded-3 bg-white shadow-sm border border-light";
+
+            const userInitials = user.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+
+            if (userInitials === profileInitials) {
+                // IT'S YOUR BIRTHDAY!
+                bdayDiv.style.background = "linear-gradient(to right, #fae8ff, #f5d0fe)";
+                bdayDiv.innerHTML = `
+                    <h6 class="text-dark mb-1 fw-bold">🎉 Happy Birthday, You!</h6>
+                    <small class="text-muted d-block">The whole team is celebrating with you today!</small>
+                `;
+            } else {
+                // COLLEAGUE'S BIRTHDAY + SEND WISH BUTTON
+                const subject = encodeURIComponent(`Happy Birthday, ${user.fullName}! 🎂`);
+                const body = encodeURIComponent(`Hi ${user.fullName.split(' ')[0]},\n\nWishing you a very Happy Birthday and a fantastic year ahead!\n\nBest regards,`);
+                const mailtoLink = `mailto:${user.email}?subject=${subject}&body=${body}`;
+
+                bdayDiv.innerHTML = `
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="overflow-hidden">
+                            <small class="text-dark fw-bold d-block text-truncate">${user.fullName}</small>
+                            <small class="text-muted d-block text-truncate" style="font-size: 0.7rem;">${user.designation || 'Team Member'}</small>
+                        </div>
+                        <a href="${mailtoLink}" class="btn-wish flex-shrink-0 ms-2">
+                            <i class="fas fa-paper-plane me-1"></i> Wish
+                        </a>
+                    </div>
+                `;
+            }
+            container.appendChild(bdayDiv);
+        });
+
+    } catch (error) {
+        console.error("Birthday Fetch Error:", error);
+        container.innerHTML = `<small class="text-danger">Syncing...</small>`;
+    }
+}
+
+    document.addEventListener("DOMContentLoaded", function() {
+                const expandedApps = document.getElementById('expandedApps');
+                const viewAllAppsBtn = document.getElementById('viewAllAppsBtn');
+
+                if(expandedApps && viewAllAppsBtn) {
+                    expandedApps.addEventListener('show.bs.collapse', function () {
+                        viewAllAppsBtn.innerText = 'View Less';
+                    });
+                    expandedApps.addEventListener('hide.bs.collapse', function () {
+                        viewAllAppsBtn.innerText = 'View All';
+                    });
+                }
+            });
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    async function approveMeeting(meetingId) {
+        try {
+            const response = await fetch('/api/meetings/' + meetingId + '/approve', {
+                method: 'POST'
+            });
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Approved!',
+                    text: 'The meeting has been confirmed.',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.reload();
+                });
+            } else {
+                Swal.fire('Error', 'Failed to approve meeting', 'error');
+            }
+        } catch (e) {
+            Swal.fire('Error', 'Network error', 'error');
+        }
+    }
+</script>
+</body>
+</html>
