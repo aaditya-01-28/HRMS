@@ -9,7 +9,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true) // NEW: This turns on @PreAuthorize!
@@ -20,7 +21,10 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        // DelegatingPasswordEncoder supports BOTH:
+        // - {noop}welcome123  (existing plaintext users)
+        // - {bcrypt}$2a$...   (new BCrypt-encoded users)
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     @Bean
