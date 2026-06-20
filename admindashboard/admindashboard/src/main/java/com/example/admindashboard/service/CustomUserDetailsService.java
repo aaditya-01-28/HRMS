@@ -24,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         System.out.println("Attempting login for user: " + username);
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(username.toUpperCase())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         Set<GrantedAuthority> authorities = new HashSet<>();

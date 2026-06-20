@@ -342,7 +342,7 @@
         </div>
     </div>
     <div class="d-flex align-items-center gap-3">
-        <a th:href="${isItSupport ? '/itsupport/dashboard' : '/manager/dashboard'}" class="btn btn-light text-dark fw-bold">
+        <a th:href="@{/rewards-manager/dashboard}" class="btn btn-light text-dark fw-bold">
             <i class="fas fa-arrow-left me-2"></i> Back
         </a>
         <div class="d-flex align-items-center gap-3 px-3 py-2 rounded-3" style="background: #f4f6f8; border: 1px solid #e2e8f0;">
@@ -518,31 +518,25 @@
 
     <!-- Tabs -->
     <div class="custom-tabs mt-4">
-        <!-- Manager Tabs -->
-        <div class="custom-tab active" id="tab-leave" onclick="switchTab('leave')" th:if="${!isItSupport}">
-            <i class="far fa-user"></i> Leave Request <span class="badge bg-secondary ms-1" th:if="${not #lists.isEmpty(pendingLeaves)}" th:text="${#lists.size(pendingLeaves)}"></span>
+        <div class="custom-tab" id="tab-leave" onclick="switchTab('leave')" style="display: none;">
+            <i class="far fa-user"></i> Leave Requests
         </div>
-        <div class="custom-tab" id="tab-ticket" onclick="switchTab('ticket')" th:if="${!isItSupport}">
-            <i class="fas fa-ticket-alt"></i> Log Ticket <span class="badge bg-secondary ms-1" th:if="${not #lists.isEmpty(pendingTickets)}" th:text="${#lists.size(pendingTickets)}"></span>
+        <div class="custom-tab" id="tab-timesheet" onclick="switchTab('timesheet')" style="display: none;">
+            <i class="far fa-clock"></i> Timesheets
         </div>
-        <div class="custom-tab" id="tab-timesheet" onclick="switchTab('timesheet')" th:if="${!isItSupport}">
-            <i class="far fa-clock"></i> Timesheets <span class="badge bg-secondary ms-1" th:if="${not #lists.isEmpty(pendingTimesheets)}" th:text="${#lists.size(pendingTimesheets)}"></span>
+        <div class="custom-tab active" id="tab-ticket" onclick="switchTab('ticket')">
+            <i class="fas fa-ticket-alt"></i> Rewards Tickets
         </div>
-
-        <!-- IT Support Tabs -->
-        <div class="custom-tab active" id="tab-ticket" onclick="switchTab('ticket')" th:if="${isItSupport}">
-            <i class="fas fa-desktop"></i> IT Support <span class="badge bg-secondary ms-1" th:if="${not #lists.isEmpty(pendingTickets) and #lists.size(pendingTickets) > 0}" th:text="${#lists.size(pendingTickets)}"></span>
+        <div class="custom-tab" id="tab-accounts" onclick="switchTab('accounts')" style="display: none;">
+            <i class="fas fa-file-invoice-dollar"></i> Finance
         </div>
-        <div class="custom-tab" id="tab-myassign" onclick="switchTab('myassign')" th:if="${isItSupport}">
-            <i class="fas fa-user-check"></i> My Assign <span class="badge bg-secondary ms-1" th:if="${not #lists.isEmpty(myAssignedTickets) and #lists.size(myAssignedTickets) > 0}" th:text="${#lists.size(myAssignedTickets)}"></span>
-        </div>
-        <div class="custom-tab" id="tab-other" onclick="switchTab('other')" th:if="${isItSupport}">
-            <i class="far fa-folder"></i> Other Ticket <span class="badge bg-secondary ms-1" th:if="${not #lists.isEmpty(otherTickets) and #lists.size(otherTickets) > 0}" th:text="${#lists.size(otherTickets)}"></span>
+        <div class="custom-tab" id="tab-other" onclick="switchTab('other')">
+            <i class="far fa-folder"></i> Other
         </div>
     </div>
 
     <!-- ===== LEAVE REQUEST VIEW ===== -->
-    <div id="view-leave" th:style="${isItSupport ? 'display:none; overflow-x: hidden;' : 'overflow-x: hidden;'}">
+    <div id="view-leave" style="display:none; overflow-x: hidden;">
         <div class="row">
             <!-- Left Pane: List -->
             <div class="col-12 pe-3" id="leave-left-pane" style="height: 75vh; overflow-y: auto;">
@@ -584,11 +578,11 @@
                                 th:data-name="${leave.user?.fullName}"
                                 th:data-role="${leave.user?.employeeProfile?.designation}"
                                 th:data-type="${leave.leaveType}"
-                                th:data-start="${leave.startDate}"
-                                th:data-end="${leave.endDate}"
+                                th:data-start="${leave.fromDate}"
+                                th:data-end="${leave.toDate}"
                                 th:data-days="${leave.totalDays}"
                                 th:data-reason="${leave.reason}"
-                                th:data-applied="${leave.appliedOn}"
+                                th:data-applied="${leave.createdAt}"
                                 th:data-comments="${leave.adminComments != null ? leave.adminComments : ''}"
                                 th:data-actiondate="${leave.actionDate != null ? leave.actionDate : ''}"
                                 th:data-docname="${leave.documentName}"
@@ -605,7 +599,7 @@
                                 </td>
                                 <td class="text-dark fw-medium" th:text="${leave.leaveType}"></td>
                                 <td class="text-dark" th:text="${leave.totalDays} + ' Days'"></td>
-                                <td class="text-muted" th:text="${#temporals.format(leave.startDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.endDate, 'MMM dd, yyyy')}"></td>
+                                <td class="text-muted" th:text="${#temporals.format(leave.fromDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.toDate, 'MMM dd, yyyy')}"></td>
                                 <td class="text-muted text-truncate" style="max-width: 150px;" th:text="${leave.reason}"></td>
                                 <td class="text-end"><span class="badge bg-warning text-dark border border-warning px-3 py-2 rounded-pill">Pending</span></td>
                             </tr>
@@ -617,11 +611,11 @@
                                 th:data-name="${leave.user?.fullName}"
                                 th:data-role="${leave.user?.employeeProfile?.designation}"
                                 th:data-type="${leave.leaveType}"
-                                th:data-start="${leave.startDate}"
-                                th:data-end="${leave.endDate}"
+                                th:data-start="${leave.fromDate}"
+                                th:data-end="${leave.toDate}"
                                 th:data-days="${leave.totalDays}"
                                 th:data-reason="${leave.reason}"
-                                th:data-applied="${leave.appliedOn}"
+                                th:data-applied="${leave.createdAt}"
                                 th:data-comments="${leave.adminComments != null ? leave.adminComments : ''}"
                                 th:data-actiondate="${leave.actionDate != null ? leave.actionDate : ''}"
                                 th:data-docname="${leave.documentName}"
@@ -638,7 +632,7 @@
                                 </td>
                                 <td class="text-dark fw-medium" th:text="${leave.leaveType}"></td>
                                 <td class="text-dark" th:text="${leave.totalDays} + ' Days'"></td>
-                                <td class="text-muted" th:text="${#temporals.format(leave.startDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.endDate, 'MMM dd, yyyy')}"></td>
+                                <td class="text-muted" th:text="${#temporals.format(leave.fromDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.toDate, 'MMM dd, yyyy')}"></td>
                                 <td class="text-muted text-truncate" style="max-width: 150px;" th:text="${leave.reason}"></td>
                                 <td class="text-end"><span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill">Approved</span></td>
                             </tr>
@@ -650,11 +644,11 @@
                                 th:data-name="${leave.user?.fullName}"
                                 th:data-role="${leave.user?.employeeProfile?.designation}"
                                 th:data-type="${leave.leaveType}"
-                                th:data-start="${leave.startDate}"
-                                th:data-end="${leave.endDate}"
+                                th:data-start="${leave.fromDate}"
+                                th:data-end="${leave.toDate}"
                                 th:data-days="${leave.totalDays}"
                                 th:data-reason="${leave.reason}"
-                                th:data-applied="${leave.appliedOn}"
+                                th:data-applied="${leave.createdAt}"
                                 th:data-comments="${leave.adminComments != null ? leave.adminComments : ''}"
                                 th:data-actiondate="${leave.actionDate != null ? leave.actionDate : ''}"
                                 th:data-docname="${leave.documentName}"
@@ -671,7 +665,7 @@
                                 </td>
                                 <td class="text-dark fw-medium" th:text="${leave.leaveType}"></td>
                                 <td class="text-dark" th:text="${leave.totalDays} + ' Days'"></td>
-                                <td class="text-muted" th:text="${#temporals.format(leave.startDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.endDate, 'MMM dd, yyyy')}"></td>
+                                <td class="text-muted" th:text="${#temporals.format(leave.fromDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.toDate, 'MMM dd, yyyy')}"></td>
                                 <td class="text-muted text-truncate" style="max-width: 150px;" th:text="${leave.reason}"></td>
                                 <td class="text-end"><span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill">Rejected</span></td>
                             </tr>
@@ -758,8 +752,8 @@
         </div>
     </div>
 
-    <!-- ===== LOG TICKET VIEW ===== -->
-    <div id="view-ticket" class="row g-0 flex-nowrap" th:style="${isItSupport ? 'display:flex; transition: all 0.3s ease;' : 'display:none; transition: all 0.3s ease;'}">
+    <!-- ===== HR TICKETS VIEW ===== -->
+    <div id="view-ticket" style="display:block; overflow-x: hidden;">
         <!-- Left Pane: Table -->
         <div class="col-12" id="ticket-left-pane" style="transition: all 0.3s ease;">
             <div class="bg-white rounded-3 shadow-sm border p-3">
@@ -990,11 +984,10 @@
             </div>
         </div>
     </div>
-
-    <!-- ===== MY ASSIGN VIEW ===== -->
-<div id="view-myassign" class="row g-0 flex-nowrap" th:style="${isItSupport ? 'display:flex; transition: all 0.3s ease;' : 'display:none; transition: all 0.3s ease;'}">
+    <!-- ===== ACCOUNTS/FINANCE VIEW ===== -->
+    <div id="view-accounts" class="row g-0 flex-nowrap" style="display:none; transition: all 0.3s ease;">
         <!-- Left Pane: Table -->
-        <div class="col-12" id="myassign-left-pane" style="transition: all 0.3s ease;">
+        <div class="col-12" id="accounts-left-pane" style="transition: all 0.3s ease;">
             <div class="bg-white rounded-3 shadow-sm border p-3">
                 <!-- Filter Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -1146,8 +1139,8 @@
     </div>
 
     
-<!-- ===== TIMESHEETS VIEW ===== -->
-    <div id="view-timesheet" class="row g-0" style="display:none; transition: all 0.3s ease;">
+    <!-- ===== TIMESHEET VIEW ===== -->
+    <div id="view-timesheet" style="display:none; overflow-x: hidden;">
         <!-- Left Pane: Table -->
         <div class="col-12" id="other-left-pane" style="transition: all 0.3s ease;">
             <div class="bg-white rounded-3 shadow-sm border p-3">
@@ -1590,7 +1583,7 @@
         const tabEl = document.getElementById('tab-' + tabId);
         if (tabEl) tabEl.classList.add('active');
         
-        ['leave', 'ticket', 'myassign', 'other', 'timesheet'].forEach(v => {
+        ['leave', 'ticket', 'accounts', 'other', 'timesheet'].forEach(v => {
             const el = document.getElementById('view-' + v);
             if(el) el.style.display = 'none';
         });

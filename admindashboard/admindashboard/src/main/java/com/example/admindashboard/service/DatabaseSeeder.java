@@ -76,6 +76,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         Role auditorRole = getOrCreateRole("AUDITOR");
         Role transportRole = getOrCreateRole("TRANSPORT");
         Role lndRole = getOrCreateRole("LND");
+        Role rewardsRole = getOrCreateRole("REWARDS");
         Role seniorManagerRole = getOrCreateRole("SENIOR_MANAGER");
         Role seniorHrRole = getOrCreateRole("SENIOR_HR");
         Role seniorLndHeadRole = getOrCreateRole("SENIOR_LND_HEAD");
@@ -357,6 +358,13 @@ public class DatabaseSeeder implements CommandLineRunner {
                 rewardProgramManage, rewardCatalogManage, pointsAllocate, pointsAdjust, rewardApprove, rewardReportView, campaignManage, notificationConfigure, platformConfigure
         )));
         roleRepository.save(seniorRewardsHeadRole);
+
+        // REWARDS
+        rewardsRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView,
+                empView
+        )));
+        roleRepository.save(rewardsRole);
 
         // 8. STANDARD EMPLOYEE (Self-Service only, NO adminDashView)
         employeeRole.setPermissions(new HashSet<>(Arrays.asList(
