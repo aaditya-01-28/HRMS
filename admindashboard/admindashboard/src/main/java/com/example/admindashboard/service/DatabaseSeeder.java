@@ -137,6 +137,60 @@ public class DatabaseSeeder implements CommandLineRunner {
         Permission settingShifts = getOrCreatePermission("settings_manage_shifts");
         Permission settingRoles = getOrCreatePermission("settings_manage_roles");
 
+        // NEW LEVEL 3 GRANULAR PERMISSIONS
+        Permission teamView = getOrCreatePermission("team_view");
+        Permission teamEditLimited = getOrCreatePermission("team_edit_limited");
+        Permission timesheetApprove = getOrCreatePermission("timesheet_approve");
+        Permission goalAssign = getOrCreatePermission("goal_assign");
+        Permission recruitmentFeedback = getOrCreatePermission("recruitment_feedback");
+        Permission expenseApprove = getOrCreatePermission("expense_approve");
+        Permission reportViewTeam = getOrCreatePermission("report_view_team");
+
+        Permission learningStrategyManage = getOrCreatePermission("learning_strategy_manage");
+        Permission courseCreate = getOrCreatePermission("course_create");
+        Permission courseEdit = getOrCreatePermission("course_edit");
+        Permission courseAssign = getOrCreatePermission("course_assign");
+        Permission trainingSchedule = getOrCreatePermission("training_schedule");
+        Permission skillFrameworkManage = getOrCreatePermission("skill_framework_manage");
+        Permission assessmentCreate = getOrCreatePermission("assessment_create");
+        Permission certificationIssue = getOrCreatePermission("certification_issue");
+        Permission trainingReportView = getOrCreatePermission("training_report_view");
+        Permission trainerManage = getOrCreatePermission("trainer_manage");
+        Permission learningBudgetManage = getOrCreatePermission("learning_budget_manage");
+
+        Permission glManage = getOrCreatePermission("gl_manage");
+        Permission journalEntryCreate = getOrCreatePermission("journal_entry_create");
+        Permission journalEntryApprove = getOrCreatePermission("journal_entry_approve");
+        Permission payrollApprove = getOrCreatePermission("payroll_approve");
+        Permission budgetManage = getOrCreatePermission("budget_manage");
+        Permission invoiceCreate = getOrCreatePermission("invoice_create");
+        Permission invoiceApprove = getOrCreatePermission("invoice_approve");
+        Permission taxManage = getOrCreatePermission("tax_manage");
+        Permission financialReportView = getOrCreatePermission("financial_report_view");
+        Permission vendorManage = getOrCreatePermission("vendor_manage");
+        Permission auditLogView = getOrCreatePermission("audit_log_view");
+
+        Permission fleetManage = getOrCreatePermission("fleet_manage");
+        Permission driverManage = getOrCreatePermission("driver_manage");
+        Permission routeManage = getOrCreatePermission("route_manage");
+        Permission transportAssign = getOrCreatePermission("transport_assign");
+        Permission transportApprove = getOrCreatePermission("transport_approve");
+        Permission transportExpenseApprove = getOrCreatePermission("transport_expense_approve");
+        Permission maintenanceTrack = getOrCreatePermission("maintenance_track");
+        Permission gpsTrackView = getOrCreatePermission("gps_track_view");
+        Permission safetyIncidentManage = getOrCreatePermission("safety_incident_manage");
+        Permission transportReportView = getOrCreatePermission("transport_report_view");
+
+        Permission rewardProgramManage = getOrCreatePermission("reward_program_manage");
+        Permission rewardCatalogManage = getOrCreatePermission("reward_catalog_manage");
+        Permission pointsAllocate = getOrCreatePermission("points_allocate");
+        Permission pointsAdjust = getOrCreatePermission("points_adjust");
+        Permission rewardApprove = getOrCreatePermission("reward_approve");
+        Permission rewardReportView = getOrCreatePermission("reward_report_view");
+        Permission campaignManage = getOrCreatePermission("campaign_manage");
+        Permission notificationConfigure = getOrCreatePermission("notification_configure");
+        Permission platformConfigure = getOrCreatePermission("platform_configure");
+
         System.out.println("🔗 Assigning Permissions to Roles...");
 
         // 1. SUPER ADMIN (Full Access)
@@ -266,66 +320,42 @@ public class DatabaseSeeder implements CommandLineRunner {
         
      // SENIOR MANAGER
         seniorManagerRole.setPermissions(new HashSet<>(Arrays.asList(
-                adminDashView,
-                empView,
-                attView,
-                leaveView,
-                payrollView,
-                appView,
-                assetView,
-                docView
+                adminDashView, empView, empEdit, attView, attApprove, attExport, leaveApply, leaveApprove, leaveView, payslipView, payslipDownload, recInterview, appRate, appView, assetView, docView,
+                teamView, teamEditLimited, timesheetApprove, goalAssign, recruitmentFeedback, expenseApprove, reportViewTeam
         )));
         roleRepository.save(seniorManagerRole);
 
         // SENIOR HR
         seniorHrRole.setPermissions(new HashSet<>(Arrays.asList(
-                adminDashView,
-                empView,
-                empCreate,
-                empEdit,
-                attView,
-                leaveView,
-                leaveApprove,
-                appView,
-                docView,
-                docUpload
+                adminDashView, empView, empCreate, empEdit, empDelete, attView, attMark, attEdit, attApprove, attExport, leaveApply, leaveApprove, leaveView, leaveConfig, payrollView, payrollGen, payrollEdit, payslipView, payslipDownload, recPost, recManage, recInterview, recOffer, appCreate, appRate, appView, assetAssign, assetView, docUpload, docView, docDelete, settingHolidays, settingShifts
         )));
         roleRepository.save(seniorHrRole);
 
         // SENIOR LND HEAD
         seniorLndHeadRole.setPermissions(new HashSet<>(Arrays.asList(
-                adminDashView,
-                empView,
-                appView,
-                docView,
-                docUpload
+                adminDashView, empView, appView, appCreate, appRate, docView, docUpload,
+                learningStrategyManage, courseCreate, courseEdit, courseAssign, trainingSchedule, skillFrameworkManage, assessmentCreate, certificationIssue, trainingReportView, trainerManage, learningBudgetManage
         )));
         roleRepository.save(seniorLndHeadRole);
 
         // SENIOR ACCOUNTS HEAD
         seniorAccountsHeadRole.setPermissions(new HashSet<>(Arrays.asList(
-                adminDashView,
-                empView,
-                payrollView,
-                payrollGen,
-                payrollEdit,
-                payslipView
+                adminDashView, empView, payrollView, payrollGen, payrollEdit, payslipView, payslipDownload,
+                glManage, journalEntryCreate, journalEntryApprove, payrollApprove, budgetManage, invoiceCreate, invoiceApprove, taxManage, financialReportView, vendorManage, auditLogView
         )));
         roleRepository.save(seniorAccountsHeadRole);
 
         // SENIOR TRANSPORT HEAD
         seniorTransportHeadRole.setPermissions(new HashSet<>(Arrays.asList(
-                adminDashView,
-                empView
+                adminDashView, empView,
+                fleetManage, driverManage, routeManage, transportAssign, transportApprove, transportExpenseApprove, maintenanceTrack, gpsTrackView, safetyIncidentManage, transportReportView
         )));
         roleRepository.save(seniorTransportHeadRole);
 
         // SENIOR REWARDS HEAD
         seniorRewardsHeadRole.setPermissions(new HashSet<>(Arrays.asList(
-                adminDashView,
-                empView,
-                appView,
-                docView
+                adminDashView, empView, appView, docView,
+                rewardProgramManage, rewardCatalogManage, pointsAllocate, pointsAdjust, rewardApprove, rewardReportView, campaignManage, notificationConfigure, platformConfigure
         )));
         roleRepository.save(seniorRewardsHeadRole);
 

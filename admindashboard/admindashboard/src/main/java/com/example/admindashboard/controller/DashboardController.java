@@ -60,6 +60,9 @@ public class DashboardController {
     private RoleRepository roleRepository;
 
     @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
+    @Autowired
     private AuditLogService auditLogService;
 
     @Autowired
@@ -96,8 +99,21 @@ public class DashboardController {
 
     @GetMapping("/default-redirect")
     public String defaultRedirect(HttpServletRequest request) {
-        if (request.isUserInRole("SUPER_ADMIN") || request.isUserInRole("HR_ADMIN") ||
-            request.isUserInRole("IT_ADMIN") || request.isUserInRole("PROJECT_MANAGER")) {
+        if (request.isUserInRole("SENIOR_MANAGER")) {
+            return "redirect:/senior_manager/dashboard";
+        } else if (request.isUserInRole("SENIOR_HR")) {
+            return "redirect:/senior_hr/dashboard";
+        } else if (request.isUserInRole("SENIOR_LND_HEAD")) {
+            return "redirect:/senior_lnd/dashboard";
+        } else if (request.isUserInRole("SENIOR_ACCOUNTS_HEAD")) {
+            return "redirect:/senior_accounts/dashboard";
+        } else if (request.isUserInRole("SENIOR_TRANSPORT_HEAD")) {
+            return "redirect:/senior_transport/dashboard";
+        } else if (request.isUserInRole("SENIOR_REWARDS_HEAD")) {
+            return "redirect:/senior_rewards/dashboard";
+        } else if (request.isUserInRole("SUPER_ADMIN") || request.isUserInRole("HR_ADMIN") ||
+            request.isUserInRole("IT_ADMIN") || request.isUserInRole("HR_MANAGER") ||
+            request.isUserInRole("PROJECT_MANAGER") || request.isUserInRole("FINANCE")) {
             return "redirect:/admin/dashboard";
         } else if (request.isUserInRole("IT_SUPPORT")) {
             return "redirect:/itsupport/dashboard";
@@ -1707,7 +1723,7 @@ public class DashboardController {
 	        		    return "add-employee";
         }
         user.setUsername(rawUsername.toUpperCase());
-        user.setPassword("{noop}welcome123");
+        user.setPassword(passwordEncoder.encode("welcome123"));
 
         Role empRole = roleRepository.findByRoleName("EMPLOYEE")
                 .orElseThrow(() -> new RuntimeException("EMPLOYEE role not found"));
