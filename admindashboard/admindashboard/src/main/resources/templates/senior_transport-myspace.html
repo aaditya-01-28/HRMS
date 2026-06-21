@@ -401,7 +401,7 @@
                     <div class="user-email">transport@wcg.com</div>
                 </div>
                 <div class="user-avatar">
-                    <span th:text="${#authentication.name != null ? #authentication.name.substring(0, 1) : 'R'}">R</span>
+                    <span th:text="${#authentication.name?.substring(0, 1)}">R</span>
                 </div>
             </div>
         </div>
@@ -1043,7 +1043,8 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script th:inline="none">
+        /*<![CDATA[*/
         // Set today's date in header
         const today = new Date();
         const options = { day: '2-digit', month: 'short', year: 'numeric' };
@@ -1156,6 +1157,7 @@
             document.getElementById('vendor-list-view').style.display = 'block';
             document.getElementById('add-vendor-wizard').style.display = 'none';
         }
+        /*]]>*/
     </script>
 </body>
 </html>
