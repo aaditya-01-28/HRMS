@@ -15,37 +15,43 @@ public class SeniorDashboardController {
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_manager/dashboard")
     public String showSeniorManagerDashboard(Model model, Principal principal, HttpServletRequest request) {
-        return "senior_manager-dashboard";
+    	loadDashboardData(model);
+    	return "employee-dashboard";
     }
 
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_hr/dashboard")
     public String showSeniorHrDashboard(Model model, Principal principal, HttpServletRequest request) {
-        return "senior_hr-dashboard";
+    	loadDashboardData(model);
+    	return "employee-dashboard";
     }
 
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_lnd/dashboard")
     public String showSeniorLndDashboard(Model model, Principal principal, HttpServletRequest request) {
-        return "senior_lnd-dashboard";
+    	loadDashboardData(model);
+    	return "employee-dashboard";
     }
 
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_accounts/dashboard")
     public String showSeniorAccountsDashboard(Model model, Principal principal, HttpServletRequest request) {
-        return "senior_accounts-dashboard";
+    	loadDashboardData(model);
+    	return "employee-dashboard";
     }
 
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_transport/dashboard")
     public String showSeniorTransportDashboard(Model model, Principal principal, HttpServletRequest request) {
-        return "senior_transport-dashboard";
+    	loadDashboardData(model);
+    	return "employee-dashboard";
     }
 
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_rewards/dashboard")
     public String showSeniorRewardsDashboard(Model model, Principal principal, HttpServletRequest request) {
-        return "senior_rewards-dashboard";
+    	loadDashboardData(model);
+    	return "employee-dashboard";
     }
 
     // --- WORKFLOW ROUTES ---
@@ -85,4 +91,8 @@ public class SeniorDashboardController {
     public String showSeniorRewardsWorkflow(Model model, Principal principal) {
         return "senior_rewards-workflow";
     }
+    private void loadDashboardData(Model model) {
+        model.addAttribute("showMySpace", true);
+    }
+    
 }

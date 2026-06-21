@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+	*{
+	    margin:0;
+	    padding:0;
+	    box-sizing:border-box;
+	    font-family:Arial,sans-serif;
+	}
+
+	body{
+	    background:#f7f7f7;
+	    color:#222;
+	    font-size:14px;
+	    overflow-x:hidden;
+	}
+	.learning-dashboard{
+	    display:flex;
+	    min-height:100vh;
+	}
+
+	.dashboard-content{
+	    flex:1;
+	    padding:8px 35px 20px 35px;
+	}
+	
+	.dashboard-header{
+	    display:flex;
+	    justify-content:flex-end;
+	    align-items:center;
+	    gap:25px;
+	    margin-bottom:8px;
+	}
+
+	.header-email{
+	    display:flex;
+	    align-items:center;
+	    gap:8px;
+	    color:#1f3f95;
+	    font-size:14px;
+	    font-weight:600;
+	}
+
+	.header-profile{
+	    display:flex;
+	    align-items:center;
+	    gap:12px;
+	}
+
+	.profile-image{
+	    width:42px;
+	    height:42px;
+	    border-radius:50%;
+	    object-fit:cover;
+	}
+
+	.profile-info{
+	    display:flex;
+	    flex-direction:column;
+	}
+
+	.profile-name{
+	    font-size:14px;
+	    font-weight:700;
+	}
+
+	.profile-role{
+	    font-size:12px;
+	    color:#888;
+	}
+	/* =========================
+		   SIDEBAR
+		========================= */
+
+	.sidebar-header{
+	    padding:16px 15px;
+	    display:flex;
+	    align-items:center;
+	    gap:12px;
+	    border-bottom:1px solid #ececec;
+	}
+
+	.company-logo{
+	    width:42px;
+	    height:42px;
+	    object-fit:contain;
+	}
+
+	.company-details h3{
+	    font-size:14px;
+	    font-weight:700;
+	    margin-bottom:2px;
+	}
+
+	.company-details span{
+	    font-size:11px;
+	    color:#666;
+	}
+
+	.sidebar-menu{
+	    margin-top:12px;
+	}
+
+	.menu-item{
+	    display:flex;
+	    align-items:center;
+	    gap:10px;
+	    text-decoration:none;
+	    color:#333;
+	    padding:12px 15px;
+	    font-size:13px;
+	    transition:.2s;
+	}
+
+	.menu-item:hover{
+	    background:#f4f6fb;
+	}
+
+	.menu-item.active{
+	    background:#2d62ea;
+	    color:#fff;
+	}
+
+	.menu-item i{
+	    width:16px;
+	}
+	.sidebar{
+	    width:230px;
+	    background:#ffffff;
+	    border-right:1px solid #d8d8d8;
+	    display:flex;
+	    flex-direction:column;
+	}
+	/* ==========================================
+	   APPROVALS PAGE
+	========================================== */
+
+	.approvals-container{
+	    width:100%;
+	}
+
+	/* TITLE */
+
+	.approvals-header-section{
+	    margin-bottom:18px;
+	}
+
+	.approvals-title{
+	    font-size:24px;
+	    font-weight:700;
+	    color:#1f2937;
+	    margin-bottom:12px;
+	}
+
+	.approvals-count{
+		display:inline-flex;
+	   padding-bottom:3px;
+	   border-bottom:2px solid #2563eb;
+	    align-items:center;
+	    gap:8px;
+	    color:#2563eb;
+	    font-size:16px;
+	    font-weight:600;
+	    width:max-content;
+	    
+	}
+
+	.approvals-count i{
+	    font-size:18px;
+	}
+
+	.count-badge{
+	    font-weight:700;
+	}
+
+	/* FILTERS */
+
+	.filters-section{
+	    display:flex;
+	    align-items:center;
+	    justify-content:space-between;
+	    gap:18px;
+	    margin-bottom:10px;
+	}
+
+	.filter-group{
+	    position:relative;
+	}
+
+	.filter-select{
+	    width:210px;
+	    height:40px;
+	    border:1px solid #9ca3af;
+	    border-radius:6px;
+	    background:#fff;
+	    padding:0 15px;
+	    font-size:15px;
+	    color:#4b5563;
+	    outline:none;
+	}
+
+	.filter-select:focus{
+	    border-color:#2563eb;
+	}
+
+	.date-range-group{
+	    position:relative;
+	}
+
+	.date-range-input{
+	    width:260px;
+	    height:42px;
+	    border:1px solid #9ca3af;
+	    border-radius:6px;
+	    background:#fff;
+	    padding:0 40px 0 15px;
+	    font-size:15px;
+	    color:#4b5563;
+	    outline:none;
+	}
+
+	.date-range-group i{
+	    position:absolute;
+	    right:12px;
+	    top:50%;
+	    transform:translateY(-50%);
+	    color:#6b7280;
+	    pointer-events:none;
+	}
+
+	.filter-button{
+	    height:42px;
+		min-width:95px;
+	    padding:0 12px;
+	    border:1px solid #9ca3af;
+	    border-radius:6px;
+	    background:#fff;
+	    cursor:pointer;
+	    display:flex;
+	    align-items:center;
+	    gap:8px;
+	    font-size:15px;
+	    color:#374151;
+	}
+
+	.filter-button:hover{
+	    background:#f8fafc;
+	}
+
+	/* TABLE */
+
+	.approval-table-wrapper{
+	    width:100%;
+	    border:1px solid #9ca3af;
+	    background:#fff;
+	}
+
+	.approval-table-header{
+	    display:grid;
+	    grid-template-columns:
+	        2fr
+	        2fr
+	        4fr
+	        1fr
+	        1.5fr;
+
+	    padding:16px 20px;
+
+	    border-bottom:1px solid #9ca3af;
+
+	    font-size:16px;
+	    font-weight:600;
+	    color:#111827;
+	}
+
+	.approval-table-body{
+	    width:100%;
+	}
+
+	.approval-row{
+	    display:grid;
+	    grid-template-columns:
+	        2fr
+	        2fr
+	        4fr
+	        1fr
+	        1.5fr;
+
+	    align-items:center;
+
+	    padding:14px 14px;
+
+	    border-bottom:1px solid #d1d5db;
+
+	    min-height:58px;
+	}
+
+	.approval-row:last-child{
+	    border-bottom:none;
+	}
+
+	/* EMPLOYEE */
+
+	.employee-info{
+	    display:flex;
+	    align-items:center;
+	    gap:12px;
+	}
+
+	.employee-avatar{
+	    width:42px;
+	    height:42px;
+	    border-radius:50%;
+	    object-fit:cover;
+	    flex-shrink:0;
+	}
+
+	.employee-details{
+	    display:flex;
+	    flex-direction:column;
+	}
+
+	.employee-name{
+	    font-size:16px;
+	    font-weight:700;
+	    color:#111827;
+	    line-height:1.2;
+	}
+
+	.employee-designation{
+	    font-size:13px;
+	    color:#6b7280;
+	    margin-top:2px;
+	}
+
+	/* REQUEST */
+
+	.request-column{
+	    font-size:15px;
+	    color:#1f2937;
+	}
+
+	.subject-column{
+	    font-size:15px;
+	    color:#1f2937;
+	}
+
+	/* PRIORITY */
+
+	.priority-badge{
+	    font-size:15px;
+	    font-weight:600;
+	}
+
+	.priority-high{
+	    color:#ef4444;
+	}
+
+	.priority-medium{
+	    color:#f59e0b;
+	}
+
+	.priority-low{
+	    color:#16a34a;
+	}
+
+	/* STATUS */
+
+	.status-badge{
+	    font-size:15px;
+	    font-weight:600;
+	}
+
+	.status-progress{
+	    color:#2563eb;
+	}
+
+	.status-approved{
+	    color:#16a34a;
+	}
+
+	.status-resolved{
+	    color:#16a34a;
+	}
+
+	.status-pending{
+	    color:#f97316;
+	}
+
+	/* EMPTY STATE */
+
+	.empty-state{
+	    text-align:center;
+	    padding:40px;
+	    color:#6b7280;
+	    font-size:15px;
+	}
+	
+	.approvals-container{
+	    padding-top:10px;
+	}
+
+	.approvals-title{
+	    font-size:26px;
+	    font-weight:700;
+	    margin-bottom:14px;
+	}
+
+	.approvals-count{
+	    display:flex;
+	    align-items:center;
+	    gap:8px;
+	    width:max-content;
+	    color:#2563eb;
+	    border-bottom:2px solid #2563eb;
+	    padding-bottom:5px;
+	    margin-bottom:20px;
+	}
+
+	.filters-section{
+	    display:flex;
+	    align-items:center;
+	    gap:25px;
+	    margin-bottom:12px;
+	}
+
+	.date-filter-wrapper{
+	    position:relative;
+	}
+
+	.date-filter-wrapper i{
+	    position:absolute;
+	    right:12px;
+	    top:50%;
+	    transform:translateY(-50%);
+	}
+
+	.approval-table-wrapper{
+	    border:1px solid #8f8f8f;
+	}
+
+	.approval-table-header{
+	    background:#fff;
+	    min-height:58px;
+	}
+
+	.approval-row{
+	    min-height:72px;
+	}
+
+	.priority-column{
+	    color:#ef4444;
+	    font-weight:600;
+	}
+
+	.status-column{
+	    color:#2563eb;
+	    font-weight:600;
+	}
+
+	/* RESPONSIVE */
+
+	@media(max-width:1200px){
+
+	    .filters-section{
+	        flex-wrap:wrap;
+	    }
+
+	    .filter-select,
+	    .date-range-input{
+	        width:100%;
+	    }
+
+	    .approval-table-wrapper{
+	        overflow-x:auto;
+	    }
+
+	    .approval-table-header,
+	    .approval-row{
+	        min-width:1100px;
+	    }
+	}
+
+	@media(max-width:768px){
+
+	    .approvals-title{
+	        font-size:22px;
+	    }
+
+	    .filters-section{
+	        flex-direction:column;
+	        align-items:stretch;
+	    }
+
+	    .filter-button{
+	        justify-content:center;
+	    }
+	}
+</style>
+</head>
+<body>
+
+<div class="learning-dashboard">
+
+    <!-- SAME SIDEBAR -->
+	<aside class="sidebar">
+
+        <div class="sidebar-header">
+
+            <img src="/images/wcg-logo.jpg"
+                 alt="WCG Logo"
+                 class="company-logo">
+
+            <div class="company-details">
+                <h3>WhiteCircle</h3>
+                <span>Learning Admin</span>
+            </div>
+
+        </div>
+
+        <nav class="sidebar-menu">
+
+            <a href="/space/lnd/dashboard"
+               class="menu-item ">
+
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+
+            </a>
+
+            <a href="/space/lnd/approvals"
+               class="menu-item active">
+
+                <i class="fa-regular fa-square-check"></i>
+                <span>Approvals</span>
+
+            </a>
+
+            <a href="/space/lnd/course-addition"
+               class="menu-item">
+
+                <i class="fa-solid fa-book-open"></i>
+                <span>Course Addition</span>
+
+            </a>
+
+			<a href="/space/lnd/upcoming-training"
+			   class="menu-item">
+
+			    <i class="fa-regular fa-calendar-days"></i>
+
+			    <span>Upcoming Training</span>
+
+			</a>
+
+        </nav>
+
+    </aside>
+
+    <!-- SAME HEADER -->
+
+    <main class="dashboard-content">
+		
+		<header class="dashboard-header">
+
+		    <div class="header-email">
+
+		        <i class="fa-regular fa-envelope"></i>
+
+		        <span th:text="${loggedInEmail}">
+		        </span>
+
+		    </div>
+
+		    <div class="header-profile">
+
+		        <img src="/images/wcg-logo.jpg"
+		             class="profile-image"
+		             alt="Profile">
+
+		        <div class="profile-info">
+
+		            <div class="profile-name"
+		                 th:text="${loggedInUserName}">
+		            </div>
+
+		            <div class="profile-role">
+		                Learning Admin
+		            </div>
+
+		        </div>
+
+		    </div>
+
+		</header>
+
+		<!-- APPROVALS PAGE CONTENT -->
+
+		<div class="approvals-container">
+
+		    <!-- Page Title -->
+			<div class="approvals-header-section">
+
+			    <h1 class="approvals-title">
+			        Approvals
+			    </h1>
+
+			    <div class="approvals-count">
+
+			        <i class="fa-regular fa-clipboard-check"></i>
+
+			        <span>Approvals</span>
+
+			        <span class="count-badge"
+			              th:text="${approvalCount}">
+			            0
+			        </span>
+
+			    </div>
+
+			</div>
+
+		    <!-- Filters -->
+
+			<div class="filters-section">
+
+			    <select class="filter-select">
+			        <option>All Departments</option>
+			    </select>
+
+			    <select class="filter-select">
+			        <option>Status: All</option>
+			    </select>
+
+			    <div class="date-filter-wrapper">
+
+			        <input type="text"
+			               class="date-range-input"
+			               placeholder="01 June 2026 - 30 June 2026">
+
+			        <i class="fa-regular fa-calendar"></i>
+
+			    </div>
+
+			    <button class="filter-button">
+
+			        <i class="fa-solid fa-filter"></i>
+
+			        Filters
+
+			    </button>
+
+			</div>
+
+		    <!-- Approval Table -->
+
+		    <div class="approval-table-wrapper">
+
+		        <!-- Header -->
+
+				<div class="approval-table-header">
+
+				    <div>Employee</div>
+
+				    <div>Request Type</div>
+
+				    <div>Subject</div>
+
+				    <div>Priority</div>
+
+				    <div>My Status</div>
+
+				</div>
+
+		        <!-- Data -->
+
+				<div class="approval-table-body">
+
+				    <div class="approval-row"
+				         th:each="approval : ${approvals}">
+
+				        <div class="employee-column">
+
+				            <div class="employee-info">
+
+				                <img class="employee-avatar"
+				                     th:src="@{/images/default-profile.png}">
+
+				                <div>
+
+				                    <div class="employee-name"
+				                         th:text="${approval.employee.user.fullName}">
+				                    </div>
+
+				                    <div class="employee-designation"
+				                         th:text="${approval.employee.designation}">
+				                    </div>
+
+				                </div>
+
+				            </div>
+
+				        </div>
+
+				        <div class="request-column"
+				             th:text="'Course Enrollment'">
+				        </div>
+
+						<div class="subject-column"
+						     th:text="${approval.course.courseName}">
+						</div>
+
+				        <div class="priority-column">
+
+							<span class="priority-badge priority-high">
+							    High
+							</span>
+
+				        </div>
+
+				        <div class="status-column">
+
+				            <span class="status-badge"
+				                  th:text="${approval.status}">
+				            </span>
+
+				        </div>
+
+				    </div>
+
+				</div>
+
+		            <!-- Empty State -->
+
+		            <div class="empty-state"
+		                 th:if="${approvals == null || approvals.isEmpty()}">
+
+		                No Approval Requests Found
+
+		            </div>
+
+		        </div>
+
+		    </div>
+
+		</div>
+
+    </main>
+
+</div>
+
+</body>
+</html>
