@@ -3,109 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteCircle Group | Workspace</title>
+    <title>WhiteCircle Group | Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background-color: #f8f9fa;
             min-height: 100vh;
             font-family: 'Poppins', sans-serif;
-            padding-bottom: 50px;
-        }
-
-        .service-card {
-            border: none;
-            border-radius: 16px;
-            transition: all 0.3s ease;
-            height: 100%;
-            background: white;
-            overflow: hidden;
-            position: relative;
-        }
-        .service-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
-        }
-        .service-icon-wrapper {
-            height: 130px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f8f9fa;
-        }
-        .btn-service {
-            border-radius: 25px;
-            padding: 10px 30px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .feature-box {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 25px;
-            color: white;
-            transition: transform 0.3s;
-            height: 100%;
-        }
-        .feature-box:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .feature-icon {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            color: #4facfe;
-        }
-
-        .alert-danger {
-            animation: shake 0.5s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% {transform: translateX(0);}
-            25% {transform: translateX(-5px);}
-            75% {transform: translateX(5px);}
+            margin: 0;
+            padding: 20px;
         }
 
         #login-container {
-            display: none;
-            min-height: 70vh;
-            align-items: center;
-            animation: fadeIn 0.4s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            width: 100%;
+            max-width: 1200px;
+            height: 80vh;
+            min-height: 600px;
+            background-color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            /* Fine edge square shape */
+            border-radius: 0;
+            border: 1px solid #dee2e6;
         }
 
-        /* --- NEW: FORM REFINEMENTS --- */
-        /* Make placeholders noticeably lighter */
+        .left-side {
+            height: 100%;
+            padding: 0;
+        }
+        
+        .left-side img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .right-side {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 50px;
+            background-color: white;
+        }
+
         .form-control::placeholder {
             color: #adb5bd !important;
-            opacity: 0.6;
+            opacity: 0.8;
             font-weight: 400;
         }
+        
         .input-group > .input-group-text, .input-group > .form-control, .input-group > .btn {
-            border-color: #64748b;
+            border-color: #6c757d;
             padding-top: 0.75rem;
             padding-bottom: 0.75rem;
+            border-radius: 0 !important; /* Square edges */
         }
-        .input-group > .input-group-text {
-            border-top-left-radius: 8px;
-            border-bottom-left-radius: 8px;
-        }
-        .input-group > .btn {
-            border-top-right-radius: 8px;
-            border-bottom-right-radius: 8px;
-        }
+        
         .form-control:focus {
             box-shadow: none;
-            border-color: #64748b;
+            border-color: #0f172a;
         }
+        
         .btn-toggle-password {
             color: #6c757d;
         }
@@ -113,249 +76,107 @@
             background-color: #e9ecef;
             color: #343a40;
         }
+
+        .login-btn {
+            background-color: #0f172a;
+            color: white;
+            border-radius: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            border: none;
+        }
+        
+        .login-btn:hover {
+            background-color: #1e293b;
+            color: white;
+        }
+
+        .logo-img {
+            height: 120px; 
+            width: auto;
+        }
+
+        hr.divider {
+            width: 40%;
+            margin: 25px auto;
+            border-top: 1px solid #000;
+            opacity: 0.3;
+        }
     </style>
 </head>
 <body>
 
-<div class="container py-5">
-
-    <div id="landing-section">
-
-        <div class="text-center mb-5">
-            <div class="mb-3">
-                <img src="/images/wcg-logo.jpg" alt="WhiteCircle Group"
-                     style="height: 100px; width: auto; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-            </div>
-            <h1 class="text-white fw-bold mb-2">WhiteCircle Group</h1>
-            <p class="text-white-50 fs-5">Integrated Workspace & Client Connect</p>
-        </div>
-
-        <div class="row justify-content-center g-4 mb-5">
-            <div class="col-md-5 col-lg-4">
-                <div class="card service-card shadow">
-                    <div class="service-icon-wrapper">
-                        <i class="fas fa-id-card-alt fa-4x" style="color: #1e3c72;"></i>
-                    </div>
-                    <div class="card-body p-4 text-center">
-                        <h4 class="card-title fw-bold mb-3">Employee Portal</h4>
-                        <p class="card-text text-muted small mb-4">
-                            Access CRM, manage projects, apply for leave, and view internal updates.
-                        </p>
-                        <button class="btn btn-dark btn-service w-100" onclick="openPortal('employee')">
-                            Employee Login
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-5 col-lg-4">
-                <div class="card service-card shadow">
-                    <div class="service-icon-wrapper">
-                        <i class="fas fa-briefcase fa-4x" style="color: #1e3c72;"></i>
-                    </div>
-                    <div class="card-body p-4 text-center">
-                        <h4 class="card-title fw-bold mb-3">Client Portal</h4>
-                        <p class="card-text text-muted small mb-4">
-                            Track project milestones, view invoices, and communicate with the team.
-                        </p>
-                        <button class="btn btn-dark btn-service w-100" onclick="openPortal('client')">
-                            Client Login
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mt-5 pt-3">
-            <div class="col-12 text-center mb-4">
-                <h3 class="text-white fw-bold">Streamlining Operations & Delivery</h3>
-            </div>
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="feature-box">
-                    <i class="fas fa-tasks feature-icon"></i>
-                    <h5 class="fw-bold">Project Milestones</h5>
-                    <p class="small opacity-75">Real-time tracking of project phases.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="feature-box">
-                    <i class="fas fa-file-invoice-dollar feature-icon text-warning"></i>
-                    <h5 class="fw-bold">Smart Invoicing</h5>
-                    <p class="small opacity-75">Automated invoice generation.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="feature-box">
-                    <i class="fas fa-users-cog feature-icon text-success"></i>
-                    <h5 class="fw-bold">Role-Based Access</h5>
-                    <p class="small opacity-75">Secure dashboards for Admins & Staff.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div> <!-- End of container -->
-
-<!-- SPLIT SCREEN LOGIN OVERLAY -->
-<div class="row m-0 w-100 h-100" id="login-container" style="display: none; position: fixed; top: 0; left: 0; z-index: 1000; background: white;">
-    
+<div id="login-container" class="row g-0">
     <!-- LEFT SIDE: RECEPTION IMAGE -->
-    <div class="col-lg-7 p-0 d-none d-lg-block h-100" style="position: relative; background-color: white;">
-        <img src="/images/Reception.png" alt="Reception" style="width: 100%; height: 100%; object-fit: cover; object-position: center; background-color: white;">
+    <div class="col-lg-6 d-none d-lg-block left-side p-3 pe-0">
+        <img src="/images/Reception.png" alt="Reception">
     </div>
 
     <!-- RIGHT SIDE: LOGIN FORM -->
-    <div class="col-lg-5 col-md-12 p-0 h-100 d-flex align-items-center justify-content-center position-relative bg-white" style="overflow-y: auto;">
+    <div class="col-12 col-lg-6 right-side">
         
-        <div class="position-absolute top-0 end-0 p-4">
-             <button class="btn btn-outline-dark btn-sm rounded-pill px-4 fw-bold" onclick="showLanding()">
-                 <i class="fas fa-arrow-left me-2"></i>Back
-             </button>
+        <!-- Flash Messages -->
+        <div th:if="${param.error}" class="alert alert-danger rounded-0 border-0 mb-4" style="background-color: #fee2e2; color: #b91c1c;">
+            <i class="fas fa-exclamation-circle me-2"></i> Invalid credentials.
+        </div>
+        <div th:if="${param.logout}" class="alert alert-success rounded-0 border-0 mb-4" style="background-color: #dcfce7; color: #15803d;">
+            <i class="fas fa-check-circle me-2"></i> Logged out successfully.
         </div>
 
-        <div class="w-100" style="max-width: 420px; padding: 2rem;">
-            
-            <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center mb-4 border-0 shadow-sm"
-                 style="background-color: #fff5f5; border-left: 4px solid #dc3545 !important; border-radius: 8px;">
-                <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
-                <div style="color: #a94442; font-size: 0.85rem; font-weight: 500;">
-                    Invalid credentials or unauthorized portal access.
+        <div class="text-center mb-4">
+            <img src="/images/white_bg_logo.png" alt="WhiteCircle Group" class="logo-img">
+            <hr class="divider">
+        </div>
+
+        <div class="px-xl-5 px-md-4">
+            <form action="/perform_login" method="post">
+                <input type="hidden" name="portalType" value="employee">
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-dark fs-6">User ID</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="fas fa-user text-muted"></i></span>
+                        <input type="text" name="username" class="form-control border-start-0 ps-0 fw-semibold" placeholder="e.g. EMP114 or EMP002" required>
+                    </div>
                 </div>
-            </div>
 
-            <div class="text-center mb-4">
-                <img src="/images/wcg-logo.jpg" alt="Logo" style="height: 70px; border-radius: 12px; margin-bottom: 20px;">
-                <h3 class="fw-bold" style="color: #0b2471;" id="login-title">Welcome to Whitecircle Group</h3>
-                <p class="text-dark fs-5 fw-semibold mt-3" id="login-subtitle">Please login your account</p>
-            </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-dark fs-6">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="fas fa-lock text-muted"></i></span>
+                        <input type="password" name="password" id="employeePassword" class="form-control border-start-0 border-end-0 ps-0 fw-semibold" placeholder="••••••••••" required>
+                        <button class="btn border border-start-0 bg-white text-muted btn-toggle-password" type="button" onclick="togglePassword('employeePassword', 'eyeIconEmp')">
+                            <i class="fas fa-eye-slash" id="eyeIconEmp"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-5 mt-3">
+                    <div class="form-check">
+                        <input class="form-check-input border-dark rounded-0" type="checkbox" id="rememberMe">
+                        <label class="form-check-label text-dark fw-semibold small" for="rememberMe">
+                            Remember me
+                        </label>
+                    </div>
+                    <a href="/forgot-password" class="text-decoration-none small" style="color: #ef4444;">Forgot Password?</a>
+                </div>
 
-            <!-- Employee Form -->
-            <div id="employee-form-section">
-                <form action="/perform_login" method="post">
-                    <input type="hidden" name="portalType" value="employee">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-dark fs-6">User ID</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white"><i class="fas fa-user text-muted"></i></span>
-                            <input type="text" name="username" class="form-control border-start-0 ps-0 fw-semibold" placeholder="e.g. EMP114 or EMP002" required>
-                        </div>
-                    </div>
+                <button type="submit" class="btn w-100 py-2 fw-bold fs-5 shadow-sm login-btn">
+                    Login <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-dark fs-6">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white"><i class="fas fa-lock text-muted"></i></span>
-                            <input type="password" name="password" id="employeePassword" class="form-control border-start-0 border-end-0 ps-0 fw-semibold" placeholder="••••••••" required>
-                            <button class="btn border border-start-0 bg-white text-muted btn-toggle-password" type="button" onclick="togglePassword('employeePassword', 'eyeIconEmp')">
-                                <i class="fas fa-eye-slash" id="eyeIconEmp"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
-                        <div class="form-check">
-                            <input class="form-check-input border-dark" type="checkbox" id="rememberMe">
-                            <label class="form-check-label text-dark fw-semibold small" for="rememberMe">
-                                Remember me
-                            </label>
-                        </div>
-                        <a href="/forgot-password" class="text-decoration-none small" style="color: #ef4444;">Forgot Password?</a>
-                    </div>
-
-                    <button type="submit" class="btn w-100 py-2 fw-bold fs-5 shadow-sm text-white rounded-3" style="background-color: #1e3a8a; display: flex; justify-content: center; align-items: center; gap: 10px;">
-                        Login <i class="fas fa-arrow-right"></i>
-                    </button>
-                    <div class="text-muted small mt-3 lh-sm text-center" style="font-size: 0.75rem;">
-                        By logging in, you agree to the company's policies & privacy guidelines.
-                    </div>
-                </form>
-            </div>
-
-            <!-- Client Form -->
-            <div id="client-form-section" style="display: none;">
-                <form action="/perform_login" method="post">
-                    <input type="hidden" name="portalType" value="client">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-dark fs-6">Client ID</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white"><i class="fas fa-user-tie text-muted"></i></span>
-                            <input type="text" name="username" class="form-control border-start-0 ps-0 fw-semibold" placeholder="e.g. CLI001" required>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-dark fs-6">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white"><i class="fas fa-lock text-muted"></i></span>
-                            <input type="password" name="password" id="clientPassword" class="form-control border-start-0 border-end-0 ps-0 fw-semibold" placeholder="••••••••" required>
-                            <button class="btn border border-start-0 bg-white text-muted btn-toggle-password" type="button" onclick="togglePassword('clientPassword', 'eyeIconCli')">
-                                <i class="fas fa-eye-slash" id="eyeIconCli"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
-                        <div class="form-check">
-                            <input class="form-check-input border-dark" type="checkbox" id="rememberMeCli">
-                            <label class="form-check-label text-dark fw-semibold small" for="rememberMeCli">
-                                Remember me
-                            </label>
-                        </div>
-                        <a href="/forgot-password" class="text-decoration-none small" style="color: #ef4444;">Forgot Password?</a>
-                    </div>
-
-                    <button type="submit" class="btn w-100 py-2 fw-bold fs-5 shadow-sm text-white rounded-3" style="background-color: #1e3a8a; display: flex; justify-content: center; align-items: center; gap: 10px;">
-                        Login <i class="fas fa-arrow-right"></i>
-                    </button>
-                    <div class="text-muted small mt-3 lh-sm text-center" style="font-size: 0.75rem;">
-                        By logging in, you agree to the company's policies & privacy guidelines.
-                    </div>
-                </form>
-            </div>
-
-            <div class="text-center mt-5">
-                <small class="text-muted">Need help? Contact <a href="#" class="text-decoration-none" style="color: #1e3a8a; font-weight: 600;">IT Support</a></small>
-            </div>
+        <div class="text-center mt-5">
+            <small class="text-muted">Need help? Contact <a href="#" class="text-decoration-none" style="color: #2563eb; font-weight: 600;">IT Support</a></small>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-
-    window.onload = function() {
-    const urlParams = new URLSearchParams(window.location.search);
-
-    if (urlParams.has('error')) {
-        openPortal('employee');
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }};
-
-    function openPortal(type) {
-        document.getElementById('landing-section').style.display = 'none';
-        document.getElementById('login-container').style.display = 'flex';
-
-        document.getElementById('employee-form-section').style.display = 'none';
-        document.getElementById('client-form-section').style.display = 'none';
-
-        if (type === 'employee') {
-            document.getElementById('employee-form-section').style.display = 'block';
-            document.getElementById('login-title').innerText = "Employee Portal";
-            document.getElementById('login-subtitle').innerText = "Authorized personnel only.";
-        }
-        else if (type === 'client') {
-            document.getElementById('client-form-section').style.display = 'block';
-            document.getElementById('login-title').innerText = "Client Connect";
-            document.getElementById('login-subtitle').innerText = "View project status and invoices.";
-        }
-    }
-
-    function showLanding() {
-        document.getElementById('login-container').style.display = 'none';
-        document.getElementById('landing-section').style.display = 'block';
-    }
-
-    // NEW: Function to toggle password visibility
     function togglePassword(inputId, iconId) {
         const passwordInput = document.getElementById(inputId);
         const eyeIcon = document.getElementById(iconId);
