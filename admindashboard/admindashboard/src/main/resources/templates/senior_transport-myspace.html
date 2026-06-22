@@ -618,12 +618,12 @@
                             </thead>
                             <tbody>
                                 <tr th:each="booking : ${pendingBookings}">
-                                    <td><input type="checkbox" class="form-check-input booking-checkbox" th:value="${booking.id}" th:data-name="${booking.user != null and booking.user.employeeProfile != null ? booking.user.employeeProfile.firstName + ' ' + booking.user.employeeProfile.lastName : 'Unknown User'}"></td>
+                                    <td><input type="checkbox" class="form-check-input booking-checkbox" th:value="${booking.id}" th:data-name="${booking.user != null ? booking.user.fullName : 'Unknown User'}"></td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width:36px; height:36px; font-weight:bold; font-size:0.9rem;" th:text="${booking.user != null and booking.user.employeeProfile != null and booking.user.employeeProfile.firstName != null ? booking.user.employeeProfile.firstName.substring(0,1) : 'U'}">N</div>
+                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width:36px; height:36px; font-weight:bold; font-size:0.9rem;" th:text="${booking.user != null and booking.user.fullName != null and !booking.user.fullName.isEmpty() ? booking.user.fullName.substring(0,1).toUpperCase() : 'U'}">N</div>
                                             <div>
-                                                <div class="fw-bold text-dark" style="font-size:0.9rem;" th:text="${booking.user != null and booking.user.employeeProfile != null ? booking.user.employeeProfile.firstName + ' ' + booking.user.employeeProfile.lastName : 'Unknown User'}">Neha Sharma</div>
+                                                <div class="fw-bold text-dark" style="font-size:0.9rem;" th:text="${booking.user != null ? booking.user.fullName : 'Unknown User'}">Neha Sharma</div>
                                                 <div class="text-muted" style="font-size:0.75rem;" th:text="${booking.user != null and booking.user.employeeProfile != null ? booking.user.employeeProfile.designation : 'Employee'}">UI Designer</div>
                                             </div>
                                         </div>
