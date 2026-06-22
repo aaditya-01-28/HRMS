@@ -553,12 +553,46 @@ public class DashboardController {
     }
 
     @GetMapping("/employee/dashboard")
-    public String showEmployeeDashboard(org.springframework.ui.Model model, java.security.Principal principal) {
+    public String showEmployeeDashboard(Model model, Principal principal) {
+
         String currentUserId = principal.getName();
-        java.util.List<com.example.admindashboard.model.ServiceRequest> recentTickets =
+
+        List<ServiceRequest> recentTickets =
                 serviceRequestRepository.findTop3ByEmployeeIdOrderByIdDesc(currentUserId);
+
         model.addAttribute("recentTickets", recentTickets);
-        model.addAttribute("pendingMeetingInvites", getPendingMeetingInvites(currentUserId));
+        model.addAttribute("pendingMeetingInvites",
+                getPendingMeetingInvites(currentUserId));
+
+        User currentUser = userRepository.findByUsername(currentUserId)
+                .orElse(null);
+
+        boolean showMySpace = true;
+
+        if (currentUser != null && currentUser.getRole() != null) {
+
+            String roleName = currentUser.getRole().getRoleName();
+
+            showMySpace =
+                    "SENIOR_MANAGER".equals(roleName)
+                    || "SENIOR_HR".equals(roleName)
+                    || "SENIOR_LND_HEAD".equals(roleName)
+                    || "SENIOR_ACCOUNTS_HEAD".equals(roleName)
+                    || "SENIOR_TRANSPORT_HEAD".equals(roleName)
+                    || "SENIOR_REWARDS_HEAD".equals(roleName);
+        }
+        System.out.println("================================");
+        System.out.println("USERNAME = " + currentUserId);
+
+        if(currentUser != null && currentUser.getRole() != null){
+            System.out.println("ROLE = " + currentUser.getRole().getRoleName());
+        }
+
+        System.out.println("SHOW_MY_SPACE = " + showMySpace);
+        System.out.println("================================");
+
+        model.addAttribute("showMySpace", showMySpace);
+
         return "employee-dashboard";
     }
 

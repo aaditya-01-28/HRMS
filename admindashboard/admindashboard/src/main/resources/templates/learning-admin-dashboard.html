@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Administration</title>
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+
+	*{
+	    margin:0;
+	    padding:0;
+	    box-sizing:border-box;
+	    font-family:Arial,sans-serif;
+	}
+
+	body{
+	    background:#f7f7f7;
+	    color:#222;
+	    font-size:14px;
+	    overflow-x:hidden;
+	}
+
+	/* =========================
+	   LAYOUT
+	========================= */
+
+	.learning-dashboard{
+	    display:flex;
+	    min-height:100vh;
+	}
+
+	.sidebar{
+	    width:230px;
+	    background:#ffffff;
+	    border-right:1px solid #d8d8d8;
+	    display:flex;
+	    flex-direction:column;
+	}
+
+	.dashboard-content{
+	    flex:1;
+	    padding:15px 38px;
+	}
+
+	/* =========================
+	   SIDEBAR
+	========================= */
+
+	.sidebar-header{
+	    padding:16px 15px;
+	    display:flex;
+	    align-items:center;
+	    gap:12px;
+	    border-bottom:1px solid #ececec;
+	}
+
+	.company-logo{
+	    width:42px;
+	    height:42px;
+	    object-fit:contain;
+	}
+
+	.company-details h3{
+	    font-size:14px;
+	    font-weight:700;
+	    margin-bottom:2px;
+	}
+
+	.company-details span{
+	    font-size:11px;
+	    color:#666;
+	}
+
+	.sidebar-menu{
+	    margin-top:12px;
+	}
+
+	.menu-item{
+	    display:flex;
+	    align-items:center;
+	    gap:10px;
+	    text-decoration:none;
+	    color:#333;
+	    padding:12px 15px;
+	    font-size:13px;
+	    transition:.2s;
+	}
+
+	.menu-item:hover{
+	    background:#f4f6fb;
+	}
+
+	.menu-item.active{
+	    background:#2d62ea;
+	    color:#fff;
+	}
+
+	.menu-item i{
+	    width:16px;
+	}
+
+	/* =========================
+	   HEADER
+	========================= */
+
+	.dashboard-header{
+	    display:flex;
+	    justify-content:flex-end;
+	    align-items:center;
+	    gap:25px;
+	    margin-bottom:15px;
+	}
+
+	.header-email{
+	    display:flex;
+	    align-items:center;
+	    gap:8px;
+	    color:#1f3f95;
+	    font-size:14px;
+	    font-weight:600;
+	}
+
+	.header-email i{
+	    color:#333;
+	    font-size:15px;
+	}
+
+	.header-profile{
+	    display:flex;
+	    align-items:center;
+	    gap:12px;
+	}
+
+	.profile-image{
+	    width:42px;
+	    height:42px;
+	    border-radius:50%;
+	    object-fit:cover;
+	    flex-shrink:0;
+	}
+
+	.profile-info{
+	    display:flex;
+	    flex-direction:column;
+	    justify-content:center;
+	}
+
+	.profile-name{
+	    font-size:14px;
+	    font-weight:700;
+	    line-height:1.2;
+	    color:#222;
+	}
+
+	.profile-role{
+	    font-size:12px;
+	    color:#888;
+	    margin-top:3px;
+	    line-height:1.2;
+	}
+
+	/* =========================
+	   STATS
+	========================= */
+
+	.stats-section{
+	    display:grid;
+	    grid-template-columns:repeat(5,1fr);
+	    gap:25px;
+		margin-top: 10px;
+	    margin-bottom:25px;
+	}
+
+	.stat-card{
+	    display:flex;
+	    align-items:center;
+	    gap:12px;
+	}
+
+	.icon-box{
+	    width:42px;
+	    height:42px;
+	    border-radius:10px;
+	    display:flex;
+	    align-items:center;
+	    justify-content:center;
+	    font-size:18px;
+	}
+
+	.blue{
+	    background:#ebf2ff;
+	    color:#2563eb;
+	}
+
+	.green{
+	    background:#ebfaef;
+	    color:#16a34a;
+	}
+
+	.purple{
+	    background:#f3ecff;
+	    color:#8b5cf6;
+	}
+
+	.orange{
+	    background:#fff3e7;
+	    color:#f97316;
+	}
+
+	.cyan{
+	    background:#edf7ff;
+	    color:#2563eb;
+	}
+
+	.stat-card p{
+	    font-size:14px;
+	    color:#444;
+	    margin-bottom:3px;
+	}
+
+	.stat-card h2{
+	    font-size:22px;
+	    font-weight:700;
+	}
+
+	/* =========================
+	   TITLES
+	========================= */
+
+	.section-title{
+	    font-size:18px;
+	    font-weight:700;
+	    margin-bottom:18px;
+	}
+
+	/* =========================
+	   OVERVIEW
+	========================= */
+
+	.overview-grid{
+	    display:grid;
+	    grid-template-columns:1.7fr 1fr 1fr;
+	    gap:30px;
+	    align-items:start;
+	}
+
+	.overview-card{
+	    padding:0;
+	    background:transparent;
+	    border:none;
+	    box-shadow:none;
+	}
+
+	.activity-card{
+	    background:transparent;
+	    border:none;
+	    padding:0;
+	}
+
+	.card-header{
+	    margin-bottom:18px;
+	}
+
+	.card-header h3{
+	    font-size:18px;
+	    font-weight:700;
+	}
+
+	/* =========================
+	   CHART
+	========================= */
+
+	.chart-wrapper{
+	    height:260px;
+	}
+
+	#courseChart{
+	    width:100% !important;
+	    height:260px !important;
+	}
+
+	#courseChart{
+	    width:100% !important;
+	    height:100% !important;
+	}
+
+	.category-chart-wrapper{
+	    height:300px;
+	    display:flex;
+	    justify-content:center;
+	    align-items:center;
+	}
+
+	#categoryChart{
+	    width:220px !important;
+	    height:220px !important;
+	}
+
+	/* =========================
+	   APPROVALS
+	========================= */
+	
+	.approval-card{
+	    padding-top:2px;
+	}
+
+	.approval-list{
+	    margin-top:25px;
+	}
+	.approval-list{
+	    display:flex;
+	    flex-direction:column;
+	    gap:18px;
+	}
+
+	.approval-item{
+	    display:flex;
+	    justify-content:space-between;
+	    align-items:center;
+	}
+
+	.approval-user{
+	    display:flex;
+	    gap:12px;
+	    align-items:center;
+	}
+
+	.approval-user img{
+	    width:42px;
+	    height:42px;
+	    border-radius:50%;
+	    object-fit:cover;
+	}
+
+	.employee-name{
+	    font-size:14px;
+	    font-weight:700;
+	    margin-bottom:2px;
+	}
+
+	.employee-designation{
+	    font-size:12px;
+	    color:#666;
+	}
+
+	.course-name{
+	    font-size:12px;
+	    color:#777;
+	}
+
+	.status.pending{
+	    color:#ff6600;
+	    font-weight:600;
+	    font-size:13px;
+	}
+
+	.approval-empty{
+	    color:#777;
+	    text-align:center;
+	    padding:20px;
+	}
+
+	/* =========================
+	   ACTIVITY
+	========================= */
+
+	.activity-section{
+	    margin-top:50px;
+	}
+
+	.activity-grid{
+	    display:grid;
+	    grid-template-columns:repeat(4,180px);
+	    gap:70px;
+	}
+
+	.activity-card{
+	    width:220px;
+	}
+
+	.activity-card h4{
+	    font-size:15px;
+	    font-weight:400;
+	    margin-bottom:8px;
+	}
+
+	.activity-value{
+	    font-size:32px;
+	    font-weight:700;
+	    margin:10px 0;
+	    color:#000;
+	}
+
+	.progress-bar{
+	    width:120px;
+	    height:14px;
+	    background:#d1d5db;
+	    overflow:hidden;
+	}
+
+	.progress-fill{
+	    height:100%;
+	}
+
+	.blue-fill{
+	    background:#2563eb;
+	}
+
+	.green-fill{
+	    background:#16a34a;
+	}
+
+	.red-fill{
+	    background:#ef4444;
+	}
+
+	/* =========================
+	   RESPONSIVE
+	========================= */
+
+	@media(max-width:1200px){
+
+	    .stats-section{
+	        grid-template-columns:repeat(2,1fr);
+	    }
+
+	    .overview-grid{
+	        grid-template-columns:1fr;
+	    }
+
+	    .activity-grid{
+	        grid-template-columns:repeat(2,1fr);
+	    }
+	}
+
+	@media(max-width:768px){
+
+	    .sidebar{
+	        display:none;
+	    }
+
+	    .dashboard-content{
+	        padding:15px;
+	    }
+
+	    .dashboard-header{
+	        flex-direction:column;
+	        align-items:flex-start;
+	    }
+
+	    .stats-section{
+	        grid-template-columns:1fr;
+	    }
+
+	    .activity-grid{
+	        grid-template-columns:1fr;
+	    }
+	}
+</style>
+</head>
+
+<body>
+
+<div class="learning-dashboard">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-header">
+
+            <img src="/images/wcg-logo.jpg"
+                 alt="WCG Logo"
+                 class="company-logo">
+
+            <div class="company-details">
+                <h3>WhiteCircle</h3>
+                <span>Learning Admin</span>
+            </div>
+
+        </div>
+
+        <nav class="sidebar-menu">
+
+            <a href="/space/lnd/dashboard"
+               class="menu-item active">
+
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+
+            </a>
+
+            <a href="/space/lnd/approvals"
+               class="menu-item">
+
+                <i class="fa-regular fa-square-check"></i>
+                <span>Approvals</span>
+
+            </a>
+
+            <a href="/space/lnd/course-addition"
+               class="menu-item">
+
+                <i class="fa-solid fa-book-open"></i>
+                <span>Course Addition</span>
+
+            </a>
+
+			<a href="/space/lnd/upcoming-training"
+			   class="menu-item">
+
+			    <i class="fa-regular fa-calendar-days"></i>
+
+			    <span>Upcoming Training</span>
+
+			</a>
+
+        </nav>
+
+    </aside>
+
+    <!-- Main Content -->
+
+    <main class="dashboard-content">
+
+        <!-- Header -->
+
+        <header class="dashboard-header">
+
+            <div class="header-email">
+
+                <i class="fa-regular fa-envelope"></i>
+
+				<span th:text="${loggedInEmail}">
+				</span>
+
+            </div>
+
+			<div class="header-profile">
+
+			    <img src="/images/wcg-logo.jpg"
+			         class="profile-image"
+			         alt="Profile">
+
+			    <div class="profile-info">
+
+					<div class="profile-name"
+					     th:text="${loggedInUserName}">
+					</div>
+
+			        <div class="profile-role">
+			            Learning Admin
+			        </div>
+
+			    </div>
+
+			</div>
+
+        </header>
+
+        <!-- Stats -->
+
+        <section class="stats-section">
+
+            <div class="stat-card">
+
+                <div class="icon-box blue">
+
+                    <i class="fa-solid fa-graduation-cap"></i>
+
+                </div>
+
+                <div>
+
+                    <p>Total Courses</p>
+
+                    <h2 th:text="${stats.totalCourses}">
+                        0
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div class="stat-card">
+
+                <div class="icon-box green">
+
+                    <i class="fa-solid fa-users"></i>
+
+                </div>
+
+                <div>
+
+                    <p>Active Learners</p>
+
+                    <h2 th:text="${stats.activeLearners}">
+                        0
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div class="stat-card">
+
+                <div class="icon-box purple">
+
+                    <i class="fa-regular fa-clipboard"></i>
+
+                </div>
+
+                <div>
+
+                    <p>Pending Approvals</p>
+
+                    <h2 th:text="${stats.pendingApprovals}">
+                        0
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div class="stat-card">
+
+                <div class="icon-box orange">
+
+                    <i class="fa-solid fa-chart-line"></i>
+
+                </div>
+
+                <div>
+
+                    <p>Courses Completed</p>
+
+                    <h2 th:text="${stats.completedCourses}">
+                        0
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div class="stat-card">
+
+                <div class="icon-box cyan">
+
+                    <i class="fa-solid fa-trophy"></i>
+
+                </div>
+
+                <div>
+
+                    <p>Certificates Issued</p>
+
+                    <h2 th:text="${stats.certificatesIssued}">
+                        0
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Overview -->
+
+        <section class="overview-section">
+
+            <h2 class="section-title">
+                Learning Overview
+            </h2>
+
+            <div class="overview-grid">
+
+                <!-- Enrollment Chart -->
+
+                <div class="overview-card chart-card">
+
+                    <div class="card-header">
+
+                        <h3>Course Enrollments</h3>
+
+                    </div>
+
+                    <div class="chart-wrapper">
+
+                        <canvas id="courseChart"></canvas>
+
+                    </div>
+
+                </div>
+
+                <!-- Category Chart -->
+
+                <div class="overview-card category-card">
+
+                    <div class="card-header">
+
+                        <h3>Top Course Categories</h3>
+
+                    </div>
+
+                    <div class="category-chart-wrapper">
+
+                        <canvas id="categoryChart"></canvas>
+
+                    </div>
+
+                </div>
+
+                <!-- Pending Approval -->
+
+                <div class="overview-card approval-card">
+
+                    <div class="card-header">
+
+                        <h3>Pending Approvals</h3>
+
+                    </div>
+
+                    <div class="approval-list">
+
+                        <div class="approval-empty"
+                             th:if="${pendingApprovals == null || pendingApprovals.isEmpty()}">
+
+                            No Pending Approvals
+
+                        </div>
+
+                        <div class="approval-item"
+                             th:each="approval : ${pendingApprovals}">
+
+							 <div class="approval-user">
+
+							     <img th:src="@{/images/default-profile.png}"
+							          alt="Employee">
+
+							     <div>
+
+							         <div class="employee-name"
+							               th:text="${approval.employee.user.fullName}">
+							         </div>
+
+							         <div class="employee-designation"
+							              th:text="${approval.employee.designation}">
+							         </div>
+
+							         <div class="course-name"
+							              th:text="${approval.course.courseName}">
+							         </div>
+
+							     </div>
+
+							 </div>
+
+                            <span class="status pending">
+                                Pending
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Activity -->
+
+        <section class="activity-section">
+
+            <h2 class="section-title">
+                Learning Activity
+            </h2>
+
+            <div class="activity-grid">
+
+                <div class="activity-card">
+
+                    <h4>New Enrollments</h4>
+
+                    <div class="activity-value"
+                         th:text="${activity.newEnrollments}">
+                        0
+                    </div>
+
+                    <div class="progress-bar">
+
+                        <div class="progress-fill blue-fill"
+                             th:style="'width:' + ${(activity.newEnrollments * 5)} + '%'">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="activity-card">
+
+                    <h4>In Progress</h4>
+
+                    <div class="activity-value"
+                         th:text="${activity.inProgress}">
+                        0
+                    </div>
+
+                    <div class="progress-bar">
+
+                        <div class="progress-fill blue-fill"
+                             th:style="'width:' + ${(activity.inProgress * 10)} + '%'">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="activity-card">
+
+                    <h4>Completed</h4>
+
+                    <div class="activity-value"
+                         th:text="${activity.completed}">
+                        0
+                    </div>
+
+                    <div class="progress-bar">
+
+                        <div class="progress-fill green-fill"
+                             th:style="'width:' + ${(activity.completed * 10)} + '%'">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="activity-card">
+
+                    <h4>Overdue</h4>
+
+                    <div class="activity-value"
+                         th:text="${activity.overdue}">
+                        0
+                    </div>
+
+                    <div class="progress-bar">
+
+                        <div class="progress-fill red-fill"
+                             th:style="'width:' + ${(activity.overdue * 10)} + '%'">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+
+// COURSE ENROLLMENT CHART
+
+const courseCtx = document.getElementById('courseChart');
+
+if(courseCtx){
+
+new Chart(courseCtx, {
+
+    type: 'line',
+
+	data: {
+	    labels: [
+	        '01 Jun',
+	        '05 Jun',
+	        '08 Jun',
+	        '10 Jun',
+	        '15 Jun',
+	        '20 Jun',
+	        '22 Jun',
+	        '28 Jun',
+	        '30 Jun'
+	    ],
+
+		datasets: [{
+		    label: 'Enrollments',
+		    data: [[${enrollmentData}]],
+
+		    borderColor: '#2563eb',
+		    borderWidth: 3,
+
+		    tension: 0,
+
+			pointRadius: 3,
+			pointHoverRadius: 4,
+
+		    fill:false
+		}]
+    },
+
+    options: {
+
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+
+        scales: {
+
+            x: {
+                grid: {
+                    display: false
+                }
+            },
+
+			y:{
+			    beginAtZero:true,
+			    ticks:{
+			        stepSize:2
+			    }
+			}
+
+        }
+    }
+
+});
+
+}
+
+// CATEGORY CHART
+
+const categoryCtx =
+document.getElementById('categoryChart');
+
+if(categoryCtx){
+
+new Chart(categoryCtx, {
+
+    type: 'doughnut',
+
+    data: {
+
+		labels: [[${categoryData.keySet()}]],
+
+		datasets: [{
+		    data: [[${categoryData.values()}]],
+            backgroundColor: [
+                '#2563eb',
+                '#22c55e',
+                '#facc15',
+                '#fb923c',
+                '#ec4899'
+            ]
+        }]
+    },
+
+    options: {
+
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+
+            
+
+        }
+
+    }
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
