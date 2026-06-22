@@ -30,14 +30,7 @@
             flex-direction: column;
         }
 
-        .top-header {
-            background: #ffffff; /* White background */
-            border-bottom: 2px solid var(--border-color);
-            padding: 22px 40px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
-            z-index: 10;
-        }
+
 
         .header-logo-img {
             height: 60px;
@@ -62,23 +55,8 @@
             text-transform: uppercase;
         }
 
-        .btn-back-home {
-            background-color: var(--bs-primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 9px 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-decoration: none;
-            display: flex; align-items: center; transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(30, 58, 138, 0.15);
-        }
-        .btn-back-home:hover {
-            background-color: var(--bs-primary-hover);
-            color: white;
-            transform: translateY(-1px);
-        }
+
+
 
         /* 1. OVERALL CHAT LAYOUT (FLOATING PANELS)  */
         .chat-container {
@@ -321,13 +299,13 @@
         @media (max-width: 991px) {
             /* 1. GLOBAL LAYOUT FIXES */
             body { height: 100dvh; overflow: hidden; }
-            .top-header { padding: 12px 15px !important; height: 65px !important; }
+
             .header-title { font-size: 1.1rem !important; letter-spacing: 0; }
             .top-header i.fa-comments { font-size: 1.5rem !important; }
             .top-header .header-separator { display: none !important; }
 
             /* Compact Header Button */
-            .btn-back-home { padding: 6px 12px !important; font-size: 0 !important; border-radius: 8px !important; }
+
             .btn-back-home i { font-size: 0.85rem !important; margin: 0 !important; }
             .btn-back-home::after { content: "Home"; font-size: 0.85rem; margin-left: 5px; font-weight: 700; font-family: 'Inter'; }
 

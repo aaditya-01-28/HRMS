@@ -174,3 +174,69 @@ i, .fas, .far, .fab, .fa, .fa-solid, .fa-regular {
 .fab-container.active .fab-action-wrapper:nth-child(2) { transition-delay: 0.05s; }
 .fab-container.active .fab-action-wrapper:nth-child(3) { transition-delay: 0.1s; }
 .fab-container.active .fab-action-wrapper:nth-child(4) { transition-delay: 0.15s; }
+
+/* =========================================
+   8. FORM FIELDS (SHARP SQUARE EDGES)
+   ========================================= */
+input, textarea, select, 
+.form-control, .form-select, .form-check-input, .input-group-text,
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    border-radius: 0 !important;
+}
+
+/* =========================================
+   9. TOP NAVBAR (STANDARDIZED DESIGN)
+   ========================================= */
+.top-header {
+    background: white;
+    border-bottom: 2px solid #cbd5e1;
+    padding: 22px 40px;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+.page-title {
+    display: flex; align-items: center;
+}
+.page-title i {
+    font-size: 2.5rem;
+}
+.page-title span {
+    border-left: 2px solid #cbd5e1; padding-left: 17px; margin-left: 15px; font-size: 1.5rem; letter-spacing: 0.5px;
+}
+.btn-back-home {
+    background-color: var(--bs-primary); color: white;
+    border-radius: 10px; padding: 10px 24px; font-weight: 600;
+    font-size: 0.9rem; text-decoration: none; display: flex; align-items: center;
+    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2); transition: all 0.3s ease;
+}
+.btn-back-home:hover { background-color: #172554; transform: translateY(-2px); color: white; }
+
+[data-bs-theme="dark"] .top-header {
+    background-color: #1e293b !important;
+    border-bottom-color: #334155 !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+[data-bs-theme="dark"] .top-header .text-dark {
+    color: #f8fafc !important;
+}
+[data-bs-theme="dark"] .top-header .page-title span {
+    border-left-color: #334155;
+}
+
+@media (max-width: 991px) {
+    .top-header { padding: 12px 15px !important; }
+    .page-title i { font-size: 1.7rem !important; }
+    .page-title span {
+        font-size: 1.1rem !important;
+        margin-left: 10px !important;
+        padding-left: 10px !important;
+    }
+    .btn-back-home {
+        padding: 6px 12px !important;
+        font-size: 0.75rem !important;
+        border-radius: 8px !important;
+        white-space: nowrap !important;
+    }
+}

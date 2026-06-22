@@ -42,29 +42,12 @@
         .text-primary { color: #00236F !important; }
 
         /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• FIXED HEADER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-        .top-header {
-            background: white; border-bottom: 2px solid var(--bs-primary);
-            padding: 18px 40px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            backdrop-filter: blur(10px);
-        }
+
         .page-title { display: flex; align-items: center; }
-        .page-title i { font-size: 2rem; color: var(--bs-primary); }
-        .page-title span {
-            font-weight: 800; color: var(--text-primary); font-size: 1.35rem;
-            letter-spacing: 0.5px; margin-left: 14px; padding-left: 14px;
-            border-left: 2px solid #cbd5e1;
-        }
-        .btn-back-home {
-            background-color: var(--bs-primary); color: white;
-            border-radius: 10px; padding: 10px 24px; font-weight: 600;
-            font-size: 0.9rem; text-decoration: none; display: flex; align-items: center;
-            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2); transition: all 0.3s ease; border: none;
-        }
-        .btn-back-home:hover {
-            background-color: #172554; transform: translateY(-2px); color: white;
-        }
+
+
+
+
 
         /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• CONTAINER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         .main-container {
@@ -386,13 +369,10 @@
         @media (max-width: 991px) {
             html, body { padding-top: 0 !important; margin-top: 0 !important; overflow-x: hidden !important; width: 100% !important; }
             body { padding-top: 70px !important; }
-            .top-header {
-                height: auto !important; padding: 12px 15px !important;
-                display: flex !important; justify-content: space-between !important; align-items: center !important;
-            }
-            .page-title i { font-size: 1.4rem !important; }
-            .page-title span { font-size: 0.95rem !important; margin-left: 8px !important; padding-left: 8px !important; }
-            .btn-back-home { padding: 7px 14px !important; font-size: 0.75rem !important; }
+
+
+
+
             .main-container { margin-top: 15px !important; padding: 0 12px !important; }
             .app-card { margin-bottom: 15px !important; border-radius: 12px !important; }
             .app-card-header { padding: 10px 15px !important; font-size: 0.75rem !important; }
@@ -409,8 +389,8 @@
 
         /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• DARK MODE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
         [data-bs-theme="dark"] body { background-color: #0f172a; color: #e2e8f0; }
-        [data-bs-theme="dark"] .top-header { background: #1e293b; border-bottom-color: #334155; }
-        [data-bs-theme="dark"] .top-header .page-title span { color: #e2e8f0; }
+
+
         [data-bs-theme="dark"] .top-header .page-title i { color: #93c5fd; }
         [data-bs-theme="dark"] .app-card { background: #1e293b; border-color: #334155; }
         [data-bs-theme="dark"] .app-card-body { background: #1e293b; }
