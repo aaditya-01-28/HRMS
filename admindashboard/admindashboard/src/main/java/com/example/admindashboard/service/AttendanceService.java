@@ -18,7 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
-
+import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AttendanceService {
 
@@ -334,7 +334,7 @@ public class AttendanceService {
                             currentDate
                     );
 
-            String recordedHours = "0hr 00min";
+            String recordedHours = "0 hr 00 min";
 
             List<AttendanceRegularization> dayRecords =
                     attendanceRegularizationRepository
@@ -395,7 +395,9 @@ public class AttendanceService {
             int mins = totalMinutes % 60;
 
             recordedHours =
-                    hrs + "hr " + mins + "min";
+                    hrs + " hr " +
+                    String.format("%02d", mins) +
+                    " min";
 
             int recordings =
                     attendanceRegularizationRepository
@@ -416,8 +418,8 @@ public class AttendanceService {
             		        ),
 
             		        currentDate.getDayOfWeek() == DayOfWeek.SUNDAY
-            		                ? "0hr 00min"
-            		                : "9hr 00min",
+            		                ? "0 hr 00 min"
+            		                : "9 hr 00 min",
 
             		        recordedHours,
 
@@ -455,9 +457,16 @@ public class AttendanceService {
                             );
 
             attendanceRegularizationRepository.deleteAll(records);
+            System.out.println(
+            	    "Date = " + currentDate +
+            	    " Records Found = " + records.size()
+            	);
+            System.out.println(
+            	    "Deleted for " + currentDate
+            	);
         }
 
-        attendance.setTotalHours("0hr 00min");
+        attendance.setTotalHours("0 hr 00 min");
 
         attendance.setPresentDays(0);
 
@@ -756,7 +765,9 @@ public class AttendanceService {
                 totalMinutes % 60;
 
         attendance.setTotalHours(
-                hrs + "hr " + mins + "min"
+        		hrs + " hr " +
+        				String.format("%02d", mins) +
+        				" min"
         );
         attendance.setMondayHours(mondayHours);
         attendance.setTuesdayHours(tuesdayHours);
@@ -769,6 +780,7 @@ public class AttendanceService {
 
         attendanceRepository.save(attendance);
     }
+    @Transactional
     public void discardCurrentWeekAttendance(
             String username) {
 
@@ -776,45 +788,50 @@ public class AttendanceService {
                 userRepository
                         .findByUsername(username)
                         .orElseThrow(
-                                () -> new RuntimeException("User not found")
+                                () -> new RuntimeException(
+                                        "User not found"
+                                )
                         );
 
         LocalDate monday =
                 LocalDate.now()
                          .with(DayOfWeek.MONDAY);
 
+        LocalDate sunday =
+                monday.plusDays(6);
+
+        /*
+         * Find current week attendance record
+         */
         List<Attendance> attendanceList =
                 attendanceRepository
                         .findByUserAndWeekStartDateAndWeekEndDate(
                                 user,
                                 monday.toString(),
-                                monday.plusDays(6).toString()
+                                sunday.toString()
                         );
 
-        if (attendanceList.isEmpty()) {
-            return;
-        }
+        if (!attendanceList.isEmpty()) {
 
-        Attendance attendance = attendanceList.stream()
-                .max((a, b) -> Long.compare(a.getId(), b.getId()))
-                .orElseThrow();
+            Attendance latestAttendance =
+                    attendanceList.stream()
+                            .max((a, b) ->
+                                    Long.compare(
+                                            a.getId(),
+                                            b.getId()
+                                    ))
+                            .orElseThrow();
 
-        /*
-         * If Pending → Discard not allowed
-         */
-        if ("Pending".equalsIgnoreCase(attendance.getApprovalStatus())) {
+            
 
-            throw new RuntimeException(
-                    "Cannot discard submitted attendance."
-            );
+            attendanceRepository.delete(latestAttendance);
         }
 
         /*
-         * Approved → remove only editable days
-         * Draft → remove everything
+         * Delete ALL attendance regularizations
+         * for the current week
          */
-
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 7; i++) {
 
             LocalDate currentDate =
                     monday.plusDays(i);
@@ -826,31 +843,15 @@ public class AttendanceService {
                                     currentDate
                             );
 
-            boolean approvedDay =
-                    "Approved".equalsIgnoreCase(
-                            attendance.getApprovalStatus()
-                    )
-                    && !records.isEmpty();
+            if (!records.isEmpty()) {
 
-            /*
-             * Keep approved days intact
-             */
-            if (approvedDay) {
-                continue;
+                attendanceRegularizationRepository
+                        .deleteAll(records);
             }
-
-            attendanceRegularizationRepository
-                    .deleteAll(records);
         }
 
-        /*
-         * Recalculate summary
-         */
-        submitCurrentWeekAttendanceInternal(
-                attendance,
-                user,
-                monday
-        );
+        attendanceRegularizationRepository.flush();
+        attendanceRepository.flush();
     }
     private void submitCurrentWeekAttendanceInternal(
             Attendance attendance,

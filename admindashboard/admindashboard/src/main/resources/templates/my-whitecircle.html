@@ -18,7 +18,9 @@
 		}
 
 		body {
-		    font-family: 'Inter', sans-serif;
+			
+			font-family: Arial, sans-serif;
+			font-size: 14px;
 		    background-color: var(--bg-color);
 		    color: #000000;
 		    overflow-x: hidden;
@@ -28,22 +30,80 @@
 
 		/* --- MOCKUP HEADER BAR --- */
 		/* --- SINGLE CARD HEADER NAVIGATION FIX --- */
-
-
+		.top-header {
+		    background: white;
+		    padding: 15px 40px;
+		    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+		    display: flex; justify-content: flex-start; align-items: center;
+		    height: 90px;
+		}
 		.btn-circular-back-hub {
-		    width: 44px;
-		    height: 44px;
+		    margin-left: auto;
+		    
+		}
+		.btn-back-hub {
+		    margin-left: auto;
 		    background-color: #0066ff;
 		    color: #ffffff !important;
-		    border-radius: 50%;
+		    text-decoration: none;
+		    padding: 8px 16px;
+		    border-radius: 6px;
+		    font-family: Arial, sans-serif;
+		    font-size: 14px;
+		    font-weight: 600;
+		    display: flex;
+		    align-items: center;
+		    gap: 6px;
+		}
+
+		.btn-back-hub:hover {
+		    background-color: #0052cc;
+		    color: #ffffff !important;
+		}
+		
+		.top-header {
+		    background: white;
+		    padding: 15px 40px;
+		    position: fixed;
+		    top: 0;
+		    left: 0;
+		    right: 0;
+		    z-index: 1000;
+
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+
+		    height: 90px;
+		}
+
+		.header-left {
+		    display: flex;
+		    align-items: center;
+		}
+
+		.mockup-badge-container {
 		    display: flex;
 		    align-items: center;
 		    justify-content: center;
-		    font-size: 1.2rem;
-		    text-decoration: none;
-		    border: none;
-		    margin-right: 25px; 
-		    flex-shrink: 0;
+
+		    padding-right: 15px;
+		    margin-right: 15px;
+
+		    border-right: 2px solid #000;
+		    height: 42px;
+		}
+
+		.mockup-icon-card-only {
+		    font-size: 1.7rem !important;
+		    color: #000 !important;
+		}
+
+		.header-title-text {
+		    font-family: Arial, sans-serif;
+		    font-size: 20px;
+		    font-weight: 700;
+		    color: #000;
 		}
 
 		/* Sizing wrapper for the single card and divider line */
@@ -60,19 +120,17 @@
 
 		/* Bold layout for the single card icon */
 		.mockup-icon-card-only {
-		    font-size: 2.3rem !important; /* Made larger and bolder to fill out the workspace layout */
+		    font-size: 1.8rem !important; /* Made larger and bolder to fill out the workspace layout */
 		    color: #000000 !important;
 		    display: inline-block;
 		    line-height: 1;
 		}
 
-		.header-title-text {
-		    font-size: 2.4rem;
+		
+		.header-title-text,
+		.section-headline-title {
+		    font-size: 20px;
 		    font-weight: 700;
-		    color: #000000;
-		    letter-spacing: -0.5px;
-		    padding-left: 25px; /* Equal spacing after the vertical line */
-		    line-height: 1;
 		}
 		/* --- CONTENT MAIN WRAPPER CANVAS --- */
 		.main-content-canvas {
@@ -84,8 +142,8 @@
 		}
 
 		.section-headline-title {
-		    font-size: 1.6rem;
-		    font-weight: 700;
+			font-size: 20px;
+			font-weight: 700;
 		    color: #000000;
 		    margin-bottom: 35px;
 		    position: relative;
@@ -138,11 +196,15 @@
 		}
 
 		.box-title {
-		    font-weight: 600;
+			font-size: 14px;
+			font-weight: 600;
 		    color: #000000;
-		    font-size: 0.85rem;
+		    
 		    line-height: 1.2;
 		}
+		
+
+		
     </style>
 
     <style>
@@ -165,15 +227,19 @@
 <body>
 
 <header class="top-header">
-    <a href="/my-whitecircle/login" class="btn-circular-back-hub" title="Back to Dashboard">
-        <i class="fa-solid fa-arrow-left"></i>
-    </a>
-    
-    <div class="mockup-badge-container">
-        <i class="fa-solid fa-address-card mockup-icon-card-only"></i>
+
+    <div class="header-left">
+        <div class="mockup-badge-container">
+            <i class="fa-solid fa-address-card mockup-icon-card-only"></i>
+        </div>
+
+        <div class="header-title-text">My WhiteCircle</div>
     </div>
-    
-    <div class="header-title-text">My WhiteCircle</div>
+
+    <a href="/my-whitecircle/login" class="btn-back-hub">
+        <i class="fa-solid fa-arrow-left"></i> Back
+    </a>
+
 </header>
 <main class="main-content-canvas">
     <h5 class="section-headline-title">Quick Actions</h5>
@@ -187,7 +253,7 @@
         </div>
 
         <div class="col">
-            <div class="action-box" onclick="window.location.href='/employee/full-profile'">
+            <div class="action-box" onclick="window.location.href='/employee/profile'">
                 <div class="icon-wrapper-flat"><i class="fa-solid fa-user-gear"></i></div>
                 <div class="box-title">View Profile</div>
             </div>

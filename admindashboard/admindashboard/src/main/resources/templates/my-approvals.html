@@ -21,6 +21,32 @@
 		body{
 		    background:#f8f8f8;
 		    font-family:Arial,sans-serif;
+		    font-size:14px;
+		}
+		
+		body,
+		button,
+		input,
+		select,
+		textarea,
+		a,
+		span,
+		p,
+		td,
+		th,
+		label{
+		    font-family:Arial,sans-serif;
+		    font-size:14px;
+		}
+
+		h1,
+		h2,
+		h3,
+		.page-title,
+		.approval-title span{
+		    font-family:Arial,sans-serif;
+		    font-size:20px;
+		    font-weight:700;
 		}
 
 		.approval-header{
@@ -44,8 +70,8 @@
 		}
 
 		.approval-title span{
-		    font-size:22px;
-		    font-weight:700;
+			font-size:20px;
+			font-weight:700;
 		    color:#082b7a;
 		}
 
@@ -86,6 +112,7 @@
 		    border:none;
 		    border-radius:20px;
 		    padding:10px 34px;
+			font-size:14px;
 		    font-weight:600;
 		    cursor:pointer;
 		    transition:all 0.25s ease;
@@ -121,18 +148,36 @@
 		    box-shadow:0 2px 6px rgba(0,0,0,0.15);
 		}
 
-		.request-item{
-		    display:flex;
-		    align-items:flex-start;
-		    gap:18px;
-		    margin-bottom:25px;
-		}
-
-		.request-content{
+		.approval-table{
 		    width:100%;
-		    max-width:700px;
+		    border-collapse:collapse;
+		    background:#fff;
+		    margin-top:20px;
 		}
 
+		.approval-table th{
+		    background:#f5f5f5;
+		    border:1px solid #ddd;
+		    padding:12px;
+		    font-size:14px;
+		    font-weight:600;
+		    text-align:left;
+		}
+
+		.approval-table td{
+		    border:1px solid #ddd;
+		    padding:12px;
+		    font-size:14px;
+		}
+
+		.view-btn{
+		    background:#2f66e0;
+		    color:#fff;
+		    border:none;
+		    padding:6px 12px;
+		    border-radius:4px;
+		    cursor:pointer;
+		}
 		.request-icon img {
 		    width: 42px;
 		    height: 42px;
@@ -155,14 +200,7 @@
 		    margin-top: 6px;
 		}
 
-		.view-details{
-		    display:inline-block;
-		    margin-top:6px;
-		    color:#1e3a8a;
-		    font-size:13px;
-		    font-weight:600;
-		    text-decoration:none;
-		}
+		
 
 		.req-icon{
 		    width:42px;
@@ -192,15 +230,7 @@
 		    font-weight:600;
 		    font-size:14px;
 		}
-		.details-section{
-		    display:none;
-		    margin-top:12px;
-		    padding:0;
-		    background:transparent;
-		    border:none;
-		    box-shadow:none;
-		}
-
+		
 		.details-section.show{
 		    display:block;
 		}
@@ -301,6 +331,8 @@
 		    width:100%;
 		    margin-top:40px;
 		    padding-left:90px;
+		    padding-right:90px;
+		    box-sizing:border-box;
 		}
 		.timesheet-grid{
 		    display:grid;
@@ -345,7 +377,7 @@
 		.filter-option{
 		    padding:12px 20px;
 		    cursor:pointer;
-		    font-size:15px;
+		    font-size:14px;
 		    font-weight:500;
 		}
 
@@ -614,7 +646,7 @@
 	        <div>
 
 	            <h2 style="
-	                font-size:22px;
+	                font-size:20px;
 	                font-weight:700;
 	                color:#111827;
 	                margin-bottom:10px;">
@@ -623,7 +655,7 @@
 
 	            <p style="
 	                color:#7b7b7b;
-	                font-size:16px;
+	                font-size:14px;
 	                line-height:1.5;
 	                margin:0;">
 	                Track your leaves, timesheets and
@@ -648,7 +680,7 @@
 			        </div>
 
 			        <div class="filter-option"
-			             onclick="filterRequests('leave')">
+			             onclick="setFilter(this,'leave')">
 			            <i class="fas fa-plane"></i> Leave Requests
 			           
 			        </div>
@@ -692,270 +724,194 @@
 	
 	<div id="pending-section">
 
-	    <!-- LEAVES -->
-	    <div class="request-card leave-request request-item"
-			th:each="leave : ${pendingLeaves}">
+	<table class="approval-table">
 
-			 <div class="request-icon">
-			     <img th:src="${leave.leaveIcon}" alt="Leave">
-			 </div>
+	    <thead>
+	        <tr>
+	            <th>Type</th>
+	            <th>Date Range</th>
+	            <th>Mode</th>
+	            <th>Reason</th>
+	            <th>View Details</th>
+	        </tr>
+	    </thead>
 
-	        <div class="request-content">
+	    <tbody>
 
-	            <div class="request-title"
-	                 th:text="${leave.leaveType}">
-	            </div>
+	        <!-- LEAVE -->
+			<tr th:each="leave : ${pendingLeaves}"
+			    class="leave-request">
+	            <td th:text="${leave.leaveType}"></td>
 
-	            <div class="request-date">
-	                Submitted:
-	                <span th:text="${leave.createdAt}"></span>
-	            </div>
+	            <td>
+	                <span th:text="${leave.fromDate}"></span>
+	                -
+	                <span th:text="${leave.toDate}"></span>
+	            </td>
 
-				<a href="javascript:void(0)"
-				   class="view-details"
-				   onclick="toggleDetails(this)">
-				    View Details ▼
-				</a>
+	            <td th:text="${leave.leaveMode}"></td>
 
-				<div class="details-section">
+	            <td th:text="${leave.reason}"></td>
 
-					<div class="details-grid">
+				<td>
+					<button class="view-btn"
+					        onclick="showDetails(this)">
+					    View
+					</button>
 
-					    <!-- Row 1 -->
-					    <div class="detail-item">
-					        <div class="detail-label">
-					            <i class="fa-regular fa-comment"></i>
-					            Reason for Leave
-					        </div>
-					        <div class="detail-value"
-					             th:text="${leave.reason}">
-					        </div>
-					    </div>
+					<div class="hidden-details"
+					     style="display:none;">
 
-					    <div class="detail-item">
-					        <div class="detail-label">
-					            <i class="fa-regular fa-calendar"></i>
-					            Date Range
-					        </div>
-					        <div class="detail-value">
-					            <span th:text="${leave.fromDate}"></span>
-					            to
-					            <span th:text="${leave.toDate}"></span>
-					        </div>
-					    </div>
+					    <h6>Leave Details</h6>
 
-					    <!-- Row 2 -->
-					    <div class="detail-item">
-					        <div class="detail-label">
-					            Leave Type
-					        </div>
-					        <div class="detail-value"
-					             th:text="${leave.leaveType}">
-					        </div>
-					    </div>
+					    <table class="table table-bordered">
 
-					    <div class="detail-item">
-					        <div class="detail-label">
-					            Total Days
-					        </div>
-					        <div class="detail-value"
-					             th:text="${leave.totalDays}">
-					        </div>
-					    </div>
+					        <tr>
+					            <th>Leave Type</th>
+					            <td th:text="${leave.leaveType}"></td>
+					        </tr>
 
-					    <!-- Row 3 -->
-					    <div class="detail-item">
-					        <div class="detail-label">
-					            Leave Mode
-					        </div>
-					        <div class="detail-value"
-					             th:text="${leave.leaveMode}">
-					        </div>
-					    </div>
+					        <tr>
+					            <th>Date Range</th>
+					            <td>
+					                <span th:text="${leave.fromDate}"></span>
+					                -
+					                <span th:text="${leave.toDate}"></span>
+					            </td>
+					        </tr>
+
+					        <tr>
+					            <th>Leave Mode</th>
+					            <td th:text="${leave.leaveMode}"></td>
+					        </tr>
+
+					        <tr>
+					            <th>Reason</th>
+					            <td th:text="${leave.reason}"></td>
+					        </tr>
+
+					    </table>
 
 					</div>
 
-				</div>
+				   
+				</td>
+	        </tr>
 
-	        </div>
+	        <!-- TIMESHEET -->
+			<tr th:each="timesheet : ${pendingTimesheets}" class="timesheet-request">
+			    <td>Timesheet</td>
 
-	    </div>
+			    <td th:text="${timesheet.weekStartDate}"></td>
 
-	    <!-- TIMESHEETS -->
-	    <div class="request-card timesheet-request request-item" 
-			th:each="timesheet : ${pendingTimesheets}">
+			    <td>Regular Shift</td>
 
-	        <div class="request-icon">
-	            <img src="/images/timesheet-approval.jpeg"
-	                 alt="Timesheet">
-	        </div>
+			    <td th:text="${timesheet.overallComments}"></td>
 
-	        <div class="request-content">
+			    <td>
+			        <button class="view-btn"
+			                onclick="showDetails(this)">
+			            View
+			        </button>
 
-	            <div class="request-title">
-	                Timesheet Submission
-	            </div>
+			        <div class="hidden-details" style="display:none;">
 
-	            <div class="request-date">
-	                Submitted:
-	                <span th:text="${timesheet.submissionDate}">
-	                </span>
-	            </div>
+			            <h6>Timesheet Details</h6>
 
-	            <a href="javascript:void(0)"
-	               class="view-details"
-	               onclick="toggleDetails(this)">
-	                View Details ▼
-	            </a>
-				<div class="details-section">
+			            <table class="table table-bordered">
 
-				    <div class="detail-row">
-						<span class="detail-label">
-						    <i class="fa-regular fa-calendar"></i> Week Starting
-						</span>
-				        <span class="detail-value"
-				              th:text="${timesheet.weekStartDate}">
-				        </span>
-				    </div>
+			                <tr>
+			                    <th>Week Starting</th>
+			                    <td th:text="${timesheet.weekStartDate}"></td>
+			                </tr>
 
-				    <div class="detail-row">
-						<span class="detail-label">
-						    <i class="fa-regular fa-clock"></i> Total Hours
-						</span>
+			                <tr>
+			                    <th>Total Hours</th>
+			                    <td th:text="${timesheet.totalWeekHours + ' hrs'}"></td>
+			                </tr>
 
-				        <span class="detail-value"
-				              th:text="${timesheet.totalWeekHours + ' hrs'}">
-				        </span>
-				    </div>
+			                <tr>
+			                    <th>Employee Notes</th>
+			                    <td th:text="${timesheet.overallComments}"></td>
+			                </tr>
 
-				    <div class="detail-row">
-						<span class="detail-label">
-						    <i class="fa-regular fa-clipboard"></i> Logged Tasks
-						</span>
+			            </table>
 
-				        <span class="detail-value">
-				            Project Id: 1 | Task Id: 2
-				        </span>
+			        </div>
 
-				        <span class="shift-badge">
-				            Regular Shift
-				        </span>
-				    </div>
+			    </td>
+			</tr>
 
-				    <div class="detail-row">
-						<span class="detail-label">
-						    <i class="fa-regular fa-file-lines"></i> Employee Notes
-						</span>				        
-						<span class="detail-value"
-				              th:text="${timesheet.overallComments}">
-				        </span>
-				    </div>
+	        <!-- ATTENDANCE -->
+			<tr th:each="attendance : ${pendingAttendances}" class="attendance-request">
+			    <td>Attendance</td>
 
-				</div>
+			    <td>
+			        <span th:text="${attendance.weekStartDate}"></span>
+			        -
+			        <span th:text="${attendance.weekEndDate}"></span>
+			    </td>
 
-	        </div>
+			    <td>Regularization</td>
 
-	    </div>
+			    <td th:text="${attendance.reason}"></td>
 
-	    <!-- ATTENDANCE -->
-	    <div class="request-card attendance-request request-item"
-			th:each="attendance : ${pendingAttendances}">
+			    <td>
+			        <button class="view-btn"
+			                onclick="showDetails(this)">
+			            View
+			        </button>
 
-	        <div class="request-icon">
-	            <img src="/images/attendence-approval.jpeg"
-	                 alt="Attendance">
-	        </div>
+			        <div class="hidden-details" style="display:none;">
 
-	        <div class="request-content">
+			            <h6>Attendance Details</h6>
 
-	            <div class="request-title">
-	                Attendance Regularization
-	            </div>
+			            <table class="table table-bordered">
 
-	            <div class="request-date">
-	                Submitted:
-	                <span th:text="${attendance.submittedOn}">
-	                </span>
-	            </div>
+			                <tr>
+			                    <th>Week Duration</th>
+			                    <td>
+			                        <span th:text="${attendance.weekStartDate}"></span>
+			                        -
+			                        <span th:text="${attendance.weekEndDate}"></span>
+			                    </td>
+			                </tr>
 
-	            <a href="javascript:void(0)"
-	               class="view-details"
-	               onclick="toggleDetails(this)">
-	                View Details ▼
-	            </a>
-				<div class="details-section">
+			                <tr>
+			                    <th>Submitted On</th>
+			                    <td th:text="${attendance.submittedOn}"></td>
+			                </tr>
 
-				    <div class="details-grid">
+			                <tr>
+			                    <th>Total Hours</th>
+			                    <td th:text="${attendance.totalHours}"></td>
+			                </tr>
 
-				        <div class="detail-item">
-				            <div class="detail-label">
-				                <i class="fa-regular fa-calendar"></i>
-				                Week Duration
-				            </div>
-				            <div class="detail-value">
-				                <span th:text="${attendance.weekStartDate}"></span>
-				                to
-				                <span th:text="${attendance.weekEndDate}"></span>
-				            </div>
-				        </div>
+			                <tr>
+			                    <th>Days Present</th>
+			                    <td th:text="${attendance.presentDays}"></td>
+			                </tr>
 
-				        <div class="detail-item">
-				            <div class="detail-label">
-				                <i class="fa-regular fa-clock"></i>
-				                Submitted On
-				            </div>
-				            <div class="detail-value"
-				                 th:text="${attendance.submittedOn}">
-				            </div>
-				        </div>
+			                <tr>
+			                    <th>Days Absent</th>
+			                    <td th:text="${attendance.absentDays}"></td>
+			                </tr>
 
-				        <div class="detail-item">
-				            <div class="detail-label">
-				                <i class="fa-regular fa-clipboard"></i>
-				                Total Recorded Hours
-				            </div>
-				            <div class="detail-value text-primary">
-				                <span th:text="${attendance.totalHours}"></span>
-				            </div>
-				        </div>
+			                <tr>
+			                    <th>Reason</th>
+			                    <td th:text="${attendance.reason}"></td>
+			                </tr>
 
-				        <div class="detail-item">
-				            <div class="detail-label">
-				                <i class="fa-regular fa-user"></i>
-				                Days Present
-				            </div>
-				            <div class="detail-value text-success"
-				                 th:text="${attendance.presentDays}">
-				            </div>
-				        </div>
+			            </table>
 
-				        <div class="detail-item">
-				            <div class="detail-label">
-				                <i class="fa-regular fa-user"></i>
-				                Days Absent/Leave
-				            </div>
-				            <div class="detail-value text-danger"
-				                 th:text="${attendance.absentDays}">
-				            </div>
-				        </div>
+			        </div>
 
-				        <div class="detail-item">
-				            <div class="detail-label">
-				                <i class="fa-regular fa-comment"></i>
-				                Reason
-				            </div>
-				            <div class="detail-value"
-				                 th:text="${attendance.reason}">
-				            </div>
-				        </div>
+			    </td>
+			</tr>
 
-				    </div>
+	    </tbody>
 
-				</div>
-
-	        </div>
-
-	    </div>
+	</table>
 
 	</div>
 	
@@ -963,244 +919,194 @@
 	<div id="approved-section" style="display:none;">
 
 	    <!-- APPROVED LEAVES -->
-		<div th:each="leave : ${approvedLeaves}"
-		     class="request-card leave-request request-item">
+		<table class="approval-table">
 
-	        <div class="request-icon">
-	            <img th:src="${leave.leaveIcon}" alt="Leave">
-	        </div>
+		    <thead>
+		        <tr>
+		            <th>Type</th>
+		            <th>Date Range</th>
+		            <th>Mode</th>
+		            <th>Reason</th>
+		            <th>View Details</th>
+		        </tr>
+		    </thead>
 
-	        <div class="request-content">
+		    <tbody>
 
-	            <div class="request-title"
-	                 th:text="${leave.leaveType}">
-	            </div>
+		        <!-- APPROVED LEAVES -->
+		        <tr th:each="leave : ${approvedLeaves}" class="leave-request">
+		            <td th:text="${leave.leaveType}"></td>
 
-	            <div class="request-date">
-	                Approved:
-	                <span th:text="${leave.createdAt}"></span>
-	            </div>
+		            <td>
+		                <span th:text="${leave.fromDate}"></span>
+		                -
+		                <span th:text="${leave.toDate}"></span>
+		            </td>
 
-	            <a href="javascript:void(0)"
-	               class="view-details"
-	               onclick="toggleDetails(this)">
-	                View Details ▼
-	            </a>
+		            <td th:text="${leave.leaveMode}"></td>
 
-	            <div class="details-section">
+		            <td th:text="${leave.reason}"></td>
 
-	                <div class="details-grid">
+		            <td>
+		                <button class="view-btn"
+		                        onclick="showDetails(this)">
+		                    View
+		                </button>
 
-	                    <div class="detail-item">
-	                        <div class="detail-label">
-	                            Reason for Leave
-	                        </div>
-	                        <div class="detail-value"
-	                             th:text="${leave.reason}">
-	                        </div>
-	                    </div>
+		                <div class="hidden-details" style="display:none;">
 
-	                    <div class="detail-item">
-	                        <div class="detail-label">
-	                            Date Range
-	                        </div>
-	                        <div class="detail-value">
-	                            <span th:text="${leave.fromDate}"></span>
-	                            to
-	                            <span th:text="${leave.toDate}"></span>
-	                        </div>
-	                    </div>
+		                    <h6>Approved Leave Details</h6>
 
-	                    <div class="detail-item">
-	                        <div class="detail-label">
-	                            Leave Type
-	                        </div>
-	                        <div class="detail-value"
-	                             th:text="${leave.leaveType}">
-	                        </div>
-	                    </div>
+		                    <table class="table table-bordered">
 
-	                    <div class="detail-item">
-	                        <div class="detail-label">
-	                            Total Days
-	                        </div>
-	                        <div class="detail-value"
-	                             th:text="${leave.totalDays}">
-	                        </div>
-	                    </div>
+		                        <tr>
+		                            <th>Leave Type</th>
+		                            <td th:text="${leave.leaveType}"></td>
+		                        </tr>
 
-	                    <div class="detail-item">
-	                        <div class="detail-label">
-	                            Leave Mode
-	                        </div>
-	                        <div class="detail-value"
-	                             th:text="${leave.leaveMode}">
-	                        </div>
-	                    </div>
+		                        <tr>
+		                            <th>Date Range</th>
+		                            <td>
+		                                <span th:text="${leave.fromDate}"></span>
+		                                -
+		                                <span th:text="${leave.toDate}"></span>
+		                            </td>
+		                        </tr>
 
-	                </div>
+		                        <tr>
+		                            <th>Leave Mode</th>
+		                            <td th:text="${leave.leaveMode}"></td>
+		                        </tr>
 
-	            </div>
+		                        <tr>
+		                            <th>Reason</th>
+		                            <td th:text="${leave.reason}"></td>
+		                        </tr>
 
-	        </div>
+		                    </table>
 
-	    </div>
+		                </div>
 
-	    <!-- APPROVED TIMESHEETS -->
-		<div th:each="timesheet : ${approvedTimesheets}"
-		     class="request-card timesheet-request request-item">
+		            </td>
+		        </tr>
 
-	        <div class="request-icon">
-	            <img src="/images/timesheet-approval.jpeg"
-	                 alt="Timesheet">
-	        </div>
+		        <!-- APPROVED TIMESHEETS -->
+		        <tr th:each="timesheet : ${approvedTimesheets}" class="timesheet-request">
+		            <td>Timesheet</td>
 
-	        <div class="request-content">
+		            <td th:text="${timesheet.weekStartDate}"></td>
 
-	            <div class="request-title">
-	                Timesheet Submission
-	            </div>
+		            <td>Regular Shift</td>
 
-	            <div class="request-date">
-	                Approved:
-	                <span th:text="${timesheet.submissionDate}">
-	                </span>
-	            </div>
+		            <td th:text="${timesheet.overallComments}"></td>
 
-	            <a href="javascript:void(0)"
-	               class="view-details"
-	               onclick="toggleDetails(this)">
-	                View Details ▼
-	            </a>
+		            <td>
 
-	            <div class="details-section">
+		                <button class="view-btn"
+		                        onclick="showDetails(this)">
+		                    View
+		                </button>
 
-	                <div class="detail-row">
-	                    <span class="detail-label"><i class="fa-regular fa-calendar"></i> Week Starting</span>
-	                    <span class="detail-value"
-	                          th:text="${timesheet.weekStartDate}">
-	                    </span>
-	                </div>
+		                <div class="hidden-details" style="display:none;">
 
-	                <div class="detail-row">
-						<span class="detail-label">
-						    <i class="fa-regular fa-clock"></i> Total Hours
-						</span>
+		                    <h6>Approved Timesheet Details</h6>
 
-	                    <span class="detail-value"
-	                          th:text="${timesheet.totalWeekHours + ' hrs'}">
-	                    </span>
-	                </div>
+		                    <table class="table table-bordered">
 
-	                <div class="detail-row">
+		                        <tr>
+		                            <th>Week Starting</th>
+		                            <td th:text="${timesheet.weekStartDate}"></td>
+		                        </tr>
 
-	                    <span class="detail-label"><i class="fa-regular fa-file-lines"></i>Employee Notes</span>
+		                        <tr>
+		                            <th>Total Hours</th>
+		                            <td th:text="${timesheet.totalWeekHours + ' hrs'}"></td>
+		                        </tr>
 
-	                    <span class="detail-value"
-	                          th:text="${timesheet.overallComments}">
-	                    </span>
-	                </div>
+		                        <tr>
+		                            <th>Employee Notes</th>
+		                            <td th:text="${timesheet.overallComments}"></td>
+		                        </tr>
 
-	            </div>
+		                    </table>
 
-	        </div>
+		                </div>
 
-	    </div>
+		            </td>
+		        </tr>
 
-	    <!-- APPROVED ATTENDANCE -->
-		<div th:each="attendance : ${approvedAttendances}"
-		     class="request-card attendance-request request-item">
+		        <!-- APPROVED ATTENDANCE -->
+				<tr th:each="attendance : ${approvedAttendances}"
+				    class="attendance-request">
+		            <td>Attendance</td>
 
-	        <div class="request-icon">
-	            <img src="/images/attendence-approval.jpeg"
-	                 alt="Attendance">
-	        </div>
+		            <td>
+		                <span th:text="${attendance.weekStartDate}"></span>
+		                -
+		                <span th:text="${attendance.weekEndDate}"></span>
+		            </td>
 
-	        <div class="request-content">
+		            <td>Regularization</td>
 
-	            <div class="request-title">
-	                Attendance Regularization
-	            </div>
+		            <td th:text="${attendance.reason}"></td>
 
-	            <div class="request-date">
-	                Approved:
-	                <span th:text="${attendance.submittedOn}">
-	                </span>
-	            </div>
+		            <td>
 
-	            <a href="javascript:void(0)"
-	               class="view-details"
-	               onclick="toggleDetails(this)">
-	                View Details ▼
-	            </a>
+		                <button class="view-btn"
+		                        onclick="showDetails(this)">
+		                    View
+		                </button>
 
-	            <div class="details-section">
+		                <div class="hidden-details" style="display:none;">
 
-	                <div class="details-grid">
+		                    <h6>Approved Attendance Details</h6>
 
-	                    <div class="detail-item">
-	                        <div class="detail-label">
-	                            Week Duration
-	                        </div>
-	                        <div class="detail-value">
-	                            <span th:text="${attendance.weekStartDate}"></span>
-	                            to
-	                            <span th:text="${attendance.weekEndDate}"></span>
-	                        </div>
-	                    </div>
+		                    <table class="table table-bordered">
 
-	                    <div class="detail-item">
-	                        <div class="detail-label">
-	                            Submitted On
-	                        </div>
-	                        <div class="detail-value"
-	                             th:text="${attendance.submittedOn}">
-	                        </div>
-	                    </div>
+		                        <tr>
+		                            <th>Week Duration</th>
+		                            <td>
+		                                <span th:text="${attendance.weekStartDate}"></span>
+		                                -
+		                                <span th:text="${attendance.weekEndDate}"></span>
+		                            </td>
+		                        </tr>
 
-	                    <div class="detail-item">
-	                        <div class="detail-label">
-	                            Total Hours
-	                        </div>
-	                        <div class="detail-value"
-	                             th:text="${attendance.totalHours}">
-	                        </div>
-	                    </div>
+		                        <tr>
+		                            <th>Submitted On</th>
+		                            <td th:text="${attendance.submittedOn}"></td>
+		                        </tr>
 
-	                    <div class="detail-item">
-	                        <div class="detail-label">
-	                            Days Present
-	                        </div>
-	                        <div class="detail-value"
-	                             th:text="${attendance.presentDays}">
-	                        </div>
-	                    </div>
+		                        <tr>
+		                            <th>Total Hours</th>
+		                            <td th:text="${attendance.totalHours}"></td>
+		                        </tr>
 
-	                    <div class="detail-item">
-	                        <div class="detail-label">
-	                            Days Absent/Leave
-	                        </div>
-	                        <div class="detail-value"
-	                             th:text="${attendance.absentDays}">
-	                        </div>
-	                    </div>
+		                        <tr>
+		                            <th>Days Present</th>
+		                            <td th:text="${attendance.presentDays}"></td>
+		                        </tr>
 
-	                    <div class="detail-item">
-	                        <div class="detail-label">
-	                            Reason
-	                        </div>
-	                        <div class="detail-value"
-	                             th:text="${attendance.reason}">
-	                        </div>
-	                    </div>
+		                        <tr>
+		                            <th>Days Absent</th>
+		                            <td th:text="${attendance.absentDays}"></td>
+		                        </tr>
 
-	                </div>
+		                        <tr>
+		                            <th>Reason</th>
+		                            <td th:text="${attendance.reason}"></td>
+		                        </tr>
 
-	            </div>
+		                    </table>
 
-	        </div>
+		                </div>
 
-	    </div>
+		            </td>
+		        </tr>
+
+		    </tbody>
+
+		</table>
 
 	</div>
 	
@@ -1208,269 +1114,242 @@
 	<div id="denied-section" style="display:none;">
 
 	    <!-- REJECTED LEAVES -->
-		<div th:each="leave : ${deniedLeaves}"
-		     class="request-card leave-request request-item">
+		<table class="approval-table">
 
-	        <div class="request-icon">
-	            <img th:src="${leave.leaveIcon}" alt="Leave">
-	        </div>
+		    <thead>
+		        <tr>
+		            <th>Type</th>
+		            <th>Date Range</th>
+		            <th>Mode</th>
+		            <th>Reason</th>
+		            <th>View Details</th>
+		        </tr>
+		    </thead>
 
-	        <div class="request-content">
+		    <tbody>
 
-	            <div class="request-title"
-	                 th:text="${leave.leaveType}">
+		        <!-- REJECTED LEAVES -->
+		        <tr th:each="leave : ${deniedLeaves}" class="leave-request">
+		            <td th:text="${leave.leaveType}"></td>
+
+		            <td>
+		                <span th:text="${leave.fromDate}"></span>
+		                -
+		                <span th:text="${leave.toDate}"></span>
+		            </td>
+
+		            <td th:text="${leave.leaveMode}"></td>
+
+		            <td th:text="${leave.reason}"></td>
+
+		            <td>
+
+		                <button class="view-btn"
+		                        onclick="showDetails(this)">
+		                    View
+		                </button>
+
+		                <div class="hidden-details" style="display:none;">
+
+		                    <h6>Rejected Leave Details</h6>
+
+		                    <table class="table table-bordered">
+
+		                        <tr>
+		                            <th>Leave Type</th>
+		                            <td th:text="${leave.leaveType}"></td>
+		                        </tr>
+
+		                        <tr>
+		                            <th>Date Range</th>
+		                            <td>
+		                                <span th:text="${leave.fromDate}"></span>
+		                                -
+		                                <span th:text="${leave.toDate}"></span>
+		                            </td>
+		                        </tr>
+
+		                        <tr>
+		                            <th>Leave Mode</th>
+		                            <td th:text="${leave.leaveMode}"></td>
+		                        </tr>
+
+		                        <tr>
+		                            <th>Reason</th>
+		                            <td th:text="${leave.reason}"></td>
+		                        </tr>
+
+		                        <tr>
+		                            <th>Manager Comments</th>
+		                            <td th:text="${leave.adminComments}"></td>
+		                        </tr>
+
+		                    </table>
+
+		                </div>
+
+		            </td>
+		        </tr>
+
+		        <!-- REJECTED TIMESHEETS -->
+		        <tr th:each="timesheet : ${deniedTimesheets}" class="timesheet-request">
+		            <td>Timesheet</td>
+
+		            <td th:text="${timesheet.weekStartDate}"></td>
+
+		            <td>Regular Shift</td>
+
+		            <td th:text="${timesheet.overallComments}"></td>
+
+		            <td>
+
+		                <button class="view-btn"
+		                        onclick="showDetails(this)">
+		                    View
+		                </button>
+
+		                <div class="hidden-details" style="display:none;">
+
+		                    <h6>Rejected Timesheet Details</h6>
+
+		                    <table class="table table-bordered">
+
+		                        <tr>
+		                            <th>Week Starting</th>
+		                            <td th:text="${timesheet.weekStartDate}"></td>
+		                        </tr>
+
+		                        <tr>
+		                            <th>Total Hours</th>
+		                            <td th:text="${timesheet.totalWeekHours + ' hrs'}"></td>
+		                        </tr>
+
+		                        <tr>
+		                            <th>Employee Notes</th>
+		                            <td th:text="${timesheet.overallComments}"></td>
+		                        </tr>
+
+		                        <tr>
+		                            <th>Manager Comments</th>
+		                            <td th:text="${timesheet.managerComment}"></td>
+		                        </tr>
+
+		                    </table>
+
+		                </div>
+
+		            </td>
+		        </tr>
+
+		        <!-- REJECTED ATTENDANCE -->
+				<tr th:each="attendance : ${deniedAttendances}"
+				    class="attendance-request">
+		            <td>Attendance</td>
+
+		            <td>
+		                <span th:text="${attendance.weekStartDate}"></span>
+		                -
+		                <span th:text="${attendance.weekEndDate}"></span>
+		            </td>
+
+		            <td>Regularization</td>
+
+		            <td th:text="${attendance.reason}"></td>
+
+		            <td>
+
+		                <button class="view-btn"
+		                        onclick="showDetails(this)">
+		                    View
+		                </button>
+
+		                <div class="hidden-details" style="display:none;">
+
+		                    <h6>Rejected Attendance Details</h6>
+
+		                    <table class="table table-bordered">
+
+		                        <tr>
+		                            <th>Week Duration</th>
+		                            <td>
+		                                <span th:text="${attendance.weekStartDate}"></span>
+		                                -
+		                                <span th:text="${attendance.weekEndDate}"></span>
+		                            </td>
+		                        </tr>
+
+		                        <tr>
+		                            <th>Submitted On</th>
+		                            <td th:text="${attendance.submittedOn}"></td>
+		                        </tr>
+
+		                        <tr>
+		                            <th>Total Hours</th>
+		                            <td th:text="${attendance.totalHours}"></td>
+		                        </tr>
+
+		                        <tr>
+		                            <th>Days Present</th>
+		                            <td th:text="${attendance.presentDays}"></td>
+		                        </tr>
+
+		                        <tr>
+		                            <th>Days Absent</th>
+		                            <td th:text="${attendance.absentDays}"></td>
+		                        </tr>
+
+		                        <tr>
+		                            <th>Reason</th>
+		                            <td th:text="${attendance.reason}"></td>
+		                        </tr>
+
+		                        <tr>
+		                            <th>Manager Comments</th>
+		                            <td th:text="${attendance.reason}"></td>
+		                        </tr>
+
+		                    </table>
+
+		                </div>
+
+		            </td>
+		        </tr>
+
+		    </tbody>
+
+		</table>
+
+	</div>
+	<div class="modal fade"
+	     id="detailsModal"
+	     tabindex="-1">
+
+	    <div class="modal-dialog modal-lg">
+
+	        <div class="modal-content">
+
+	            <div class="modal-header">
+
+	                <h5 class="modal-title">
+	                    Request Details
+	                </h5>
+
+	                <button type="button"
+	                        class="btn-close"
+	                        data-bs-dismiss="modal">
+	                </button>
+
 	            </div>
 
-	            <div class="request-date">
-	                Rejected:
-	                <span th:text="${leave.createdAt}"></span>
+	            <div class="modal-body"
+	                 id="modalContent">
 	            </div>
-
-	            <a href="javascript:void(0)"
-	               class="view-details"
-	               onclick="toggleDetails(this)">
-	                View Details ▼
-	            </a>
-
-	            <div class="details-section">
-
-	                <div class="details-grid">
-
-	                    <div class="detail-item">
-	                        <div class="detail-label">Reason for Leave</div>
-	                        <div class="detail-value"
-	                             th:text="${leave.reason}">
-	                        </div>
-	                    </div>
-
-	                    <div class="detail-item">
-	                        <div class="detail-label">Date Range</div>
-	                        <div class="detail-value">
-	                            <span th:text="${leave.fromDate}"></span>
-	                            to
-	                            <span th:text="${leave.toDate}"></span>
-	                        </div>
-	                    </div>
-						
-
-	                    <div class="detail-item">
-	                        <div class="detail-label">Leave Type</div>
-	                        <div class="detail-value"
-	                             th:text="${leave.leaveType}">
-	                        </div>
-	                    </div>
-
-	                    <div class="detail-item">
-	                        <div class="detail-label">Total Days</div>
-	                        <div class="detail-value"
-	                             th:text="${leave.totalDays}">
-	                        </div>
-	                    </div>
-
-	                    <div class="detail-item">
-	                        <div class="detail-label">Leave Mode</div>
-	                        <div class="detail-value"
-	                             th:text="${leave.leaveMode}">
-	                        </div>
-	                    </div>
-
-	                </div>
-					<div class="rejection-notes">
-
-						<div class="detail-item rejection-notes">
-
-						    <div class="detail-label text-danger">
-						        Manager's Rejection Notes
-						    </div>
-
-						    <div class="detail-value"
-						         th:text="${leave.adminComments}">
-						    </div>
-
-						</div>
-
-					</div>
-	            </div>
-
-	        </div>
-
-	    </div>
-
-	    <!-- REJECTED TIMESHEETS -->
-		<div th:each="timesheet : ${deniedTimesheets}"
-		     class="request-card timesheet-request request-item">
-
-	        <div class="request-icon">
-	            <img src="/images/timesheet-approval.jpeg"
-	                 alt="Timesheet">
-	        </div>
-
-	        <div class="request-content">
-
-	            <div class="request-title">
-	                Timesheet Submission
-	            </div>
-
-	            <div class="request-date">
-	                Rejected:
-	                <span th:text="${timesheet.submissionDate}">
-	                </span>
-	            </div>
-
-	            <a href="javascript:void(0)"
-	               class="view-details"
-	               onclick="toggleDetails(this)">
-	                View Details ▼
-	            </a>
-
-				<div class="details-section">
-
-				    <div class="detail-row">
-				        <span class="detail-label"><i class="fa-regular fa-calendar"></i> Week Starting</span>
-
-				        <span class="detail-value"
-				              th:text="${timesheet.weekStartDate}">
-				        </span>
-				    </div>
-
-				    <div class="detail-row">
-						<span class="detail-label">
-						    <i class="fa-regular fa-clock"></i> Total Hours
-						</span>
-
-				        <span class="detail-value"
-				              th:text="${timesheet.totalWeekHours + ' hrs'}">
-				        </span>
-				    </div>
-
-				    <div class="detail-row">
-				        <span class="detail-label"><i class="fa-regular fa-file-lines"></i> Employee Notes</span>
-
-				        <span class="detail-value"
-				              th:text="${timesheet.overallComments}">
-				        </span>
-				    </div>
-
-				    <div class="rejection-notes">
-
-				        <div class="rejection-title">
-				            Manager's Rejection Notes
-
-				        </div>
-
-				        <div class="rejection-message"
-				             th:text="${timesheet.managerComment}">
-				            Rejected by manager
-				        </div>
-
-				    </div>
-
-				</div>
-				
-			</div>
-			
-	    </div>
-
-	    <!-- REJECTED ATTENDANCE -->
-		<div th:each="attendance : ${deniedAttendances}"
-		     class="request-card attendance-request request-item">
-
-	        <div class="request-icon">
-	            <img src="/images/attendence-approval.jpeg"
-	                 alt="Attendance">
-	        </div>
-
-	        <div class="request-content">
-
-	            <div class="request-title">
-	                Attendance Regularization
-	            </div>
-
-	            <div class="request-date">
-	                Rejected:
-	                <span th:text="${attendance.submittedOn}">
-	                </span>
-	            </div>
-
-	            <a href="javascript:void(0)"
-	               class="view-details"
-	               onclick="toggleDetails(this)">
-	                View Details ▼
-	            </a>
-
-				<div class="details-section">
-
-				    <div class="details-grid">
-
-				        <div class="detail-item">
-				            <div class="detail-label">Week Duration</div>
-				            <div class="detail-value">
-				                <span th:text="${attendance.weekStartDate}"></span>
-				                to
-				                <span th:text="${attendance.weekEndDate}"></span>
-				            </div>
-				        </div>
-
-				        <div class="detail-item">
-				            <div class="detail-label">Submitted On</div>
-				            <div class="detail-value"
-				                 th:text="${attendance.submittedOn}">
-				            </div>
-				        </div>
-
-				        <div class="detail-item">
-				            <div class="detail-label">Total Hours</div>
-				            <div class="detail-value"
-				                 th:text="${attendance.totalHours}">
-				            </div>
-				        </div>
-
-				        <div class="detail-item">
-				            <div class="detail-label">Days Present</div>
-				            <div class="detail-value"
-				                 th:text="${attendance.presentDays}">
-				            </div>
-				        </div>
-
-				        <div class="detail-item">
-				            <div class="detail-label">Days Absent/Leave</div>
-				            <div class="detail-value"
-				                 th:text="${attendance.absentDays}">
-				            </div>
-				        </div>
-
-				        <div class="detail-item">
-				            <div class="detail-label">Reason</div>
-				            <div class="detail-value"
-				                 th:text="${attendance.reason}">
-				            </div>
-				        </div>
-
-				    </div>
-
-				    <div class="rejection-notes">
-
-				        <div class="rejection-title">
-
-				            <i class="fa-regular fa-note-sticky"></i> Manager's Rejection Notes
-
-				        </div>
-
-				        <div class="rejection-message"
-				            th:text="${attendance.reason}">
-				            Rejected by manager
-				        </div>
-
-				    </div>
-
-				</div>
 
 	        </div>
 
 	    </div>
 
 	</div>
-
 	
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -1591,35 +1470,62 @@
 
 	function filterRequests(type) {
 
-	    const activeSection = document.querySelector(
-	        '#pending-section:not([style*="display: none"]), ' +
-	        '#approved-section:not([style*="display: none"]), ' +
-	        '#denied-section:not([style*="display: none"])'
-	    );
+	    let activeSection;
 
-	    if (!activeSection) return;
-
-	    activeSection.querySelectorAll('.request-card')
-	        .forEach(card => card.style.display = 'flex');
-
-	    if (type !== 'all') {
-
-	        activeSection.querySelectorAll('.request-card')
-	            .forEach(card => {
-
-	                if (!card.classList.contains(type + '-request')) {
-	                    card.style.display = 'none';
-	                }
-
-	            });
+	    if (document.getElementById("pending-section").style.display !== "none") {
+	        activeSection = document.getElementById("pending-section");
+	    } else if (document.getElementById("approved-section").style.display !== "none") {
+	        activeSection = document.getElementById("approved-section");
+	    } else {
+	        activeSection = document.getElementById("denied-section");
 	    }
 
-	    document.querySelectorAll('.filter-option')
-	        .forEach(opt => opt.classList.remove('active'));
+	    const rows = activeSection.querySelectorAll("tbody tr");
 
-	    filterDropdown.classList.remove('show');
+	    rows.forEach(row => {
+
+	        row.style.display = "";
+
+	        if(type !== "all" &&
+	           !row.classList.contains(type + "-request")) {
+
+	            row.style.display = "none";
+	        }
+	    });
+
+	    document
+	        .querySelectorAll(".filter-option")
+	        .forEach(opt => opt.classList.remove("active"));
+
+	    filterDropdown.classList.remove("show");
 	}
-	
+	function showDetails(button){
+
+	    const detailsDiv =
+	        button.nextElementSibling;
+
+	    if(!detailsDiv) return;
+
+	    document.getElementById("modalContent").innerHTML =
+	        detailsDiv.innerHTML;
+
+	    const modal =
+	        new bootstrap.Modal(
+	            document.getElementById("detailsModal")
+	        );
+
+	    modal.show();
+	}
+	function setFilter(element,type){
+
+	    document
+	        .querySelectorAll(".filter-option")
+	        .forEach(opt => opt.classList.remove("active"));
+
+	    element.classList.add("active");
+
+	    filterRequests(type);
+	}
 	
 </script>
 

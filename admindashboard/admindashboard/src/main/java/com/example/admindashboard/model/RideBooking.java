@@ -36,6 +36,12 @@ public class RideBooking {
 
     private LocalDateTime createdAt;
 
+    private String pickupLocation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicle_id")
+    private TransportVehicle vehicle;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -112,4 +118,21 @@ public class RideBooking {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public String getPickupLocation() {
+        return pickupLocation;
+    }
+
+    public void setPickupLocation(String pickupLocation) {
+        this.pickupLocation = pickupLocation;
+    }
+
+    public TransportVehicle getVehicle() {
+        return vehicle;
+    }
+
+    public void setVehicle(TransportVehicle vehicle) {
+        this.vehicle = vehicle;
+    }
 }
+

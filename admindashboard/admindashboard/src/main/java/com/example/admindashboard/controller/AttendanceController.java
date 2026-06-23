@@ -179,11 +179,22 @@ public class AttendanceController {
     public ResponseEntity<?> discardCurrentWeek(
             Principal principal) {
 
-        attendanceService.discardCurrentWeekAttendance(
-                principal.getName()
-        );
+        try {
 
-        return ResponseEntity.ok("Discarded");
+            attendanceService.discardCurrentWeekAttendance(
+                    principal.getName()
+            );
+
+            return ResponseEntity.ok("Discarded");
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(ex.getMessage());
+        }
     }
     
     //  Get My Attendance History
