@@ -678,12 +678,10 @@
                 Planned Working Time
             </div>
 
-            <div class="summary-value"
-                 id="plannedWorkingHours">
-
-                56h 00m
-
-            </div>
+			<div class="summary-value"
+			     id="plannedWorkingHours">
+			    0h 00m
+			</div>
 
         </div>
 
@@ -1139,44 +1137,19 @@
 
 	    try {
 
-			const weekStart =
-			    currentMonday.toISOString()
-			                 .split('T')[0];
+	        const weekStart =
+	            currentMonday.toISOString()
+	                         .split('T')[0];
 
-			const response =
-			    await fetch(
-			        `/api/attendance/week?weekStart=${weekStart}`
-			    );
+	        const response =
+	            await fetch(
+	                `/api/attendance/week?weekStart=${weekStart}`
+	            );
 
 	        const data =
 	            await response.json();
-				let disableBottomActions = !isCurrentWeek();
+			console.log(data);
 
-				if (status === 'Pending') {
-
-				    disableBottomActions = true;
-
-				} else if (status === 'Approved') {
-
-				    const hasEditableDays = data.some(day =>
-				        day.plannedHours !== '0hr 00min' &&
-				        day.recordings === 0
-				    );
-
-				    disableBottomActions = !hasEditableDays;
-				}
-
-				document.getElementById(
-				    'submitAttendanceBtn'
-				).disabled = disableBottomActions;
-
-				document.getElementById(
-				    'saveDraftBtn'
-				).disabled = disableBottomActions;
-
-				document.getElementById(
-				    'discardAttendanceBtn'
-				).disabled = disableBottomActions;
 	        const tbody =
 	            document.getElementById(
 	                'attendanceTableBody'
@@ -1187,36 +1160,49 @@
 	        let plannedTotal = 0;
 	        let recordedTotal = 0;
 
+	        const today = new Date();
+	        today.setHours(0,0,0,0);
+
+	        let status = "Draft";
+
 	        data.forEach(day => {
-				const status =
-				    day.approvalStatus || 'Draft';
+
+	            status =
+	                day.approvalStatus || status;
+
+	            const rowDate =
+	                new Date(day.actualDate);
+
+	            rowDate.setHours(0,0,0,0);
+
+	            const isFutureDate =
+	                rowDate > today;
 
 				const isDayLocked =
-				    status === 'Pending'
-				    || (
-				        status === 'Approved'
-				        && day.recordings > 0
-				    );
+					    isFutureDate;
 
-	            if(day.plannedHours !== '0hr 00min'){
-	                plannedTotal += 9;
+	            /* Planned Total */
+
+				const plannedHours =
+				    parseInt(day.plannedHours) || 0;
+
+				plannedTotal += plannedHours * 60;
+
+	            /* Recorded Total */
+
+	            const recordedMatch =
+	                day.recordedHours.match(
+	                    /(\d+)hr\s*(\d+)min/i
+	                );
+
+	            if (recordedMatch) {
+
+	                recordedTotal +=
+	                    (
+	                        parseInt(recordedMatch[1]) * 60
+	                    ) +
+	                    parseInt(recordedMatch[2]);
 	            }
-				const recordedMatch =
-				    day.recordedHours.match(
-				        /(\d+)hr\s*(\d+)min/
-				    );
-
-				if (recordedMatch) {
-
-				    const hrs =
-				        parseInt(recordedMatch[1]);
-
-				    const mins =
-				        parseInt(recordedMatch[2]);
-
-				    recordedTotal +=
-				        (hrs * 60) + mins;
-				}
 
 	            const row = `
 	                <tr>
@@ -1229,13 +1215,11 @@
 	                        ${day.plannedHours}
 	                    </td>
 
-						<td class="${getTimeClass(
-						    day.recordedHours,
-						    day.plannedHours
-						)}">
-
+	                    <td class="${getTimeClass(
+	                        day.recordedHours,
+	                        day.plannedHours
+	                    )}">
 	                        ${day.recordedHours}
-
 	                    </td>
 
 	                    <td>
@@ -1243,18 +1227,18 @@
 	                        ${day.recordings}
 
 	                        ${
-								day.plannedHours === '0hr 00min'
-								    ? ''
-								    : `
-								    <button
-								        class="record-btn"
-								        ${isDayLocked ? 'disabled' : ''}
-								        onclick="openAttendanceModal('${day.actualDate}','${day.date}')">
+	                            day.plannedHours === '0hr 00min'
+	                                ? ''
+	                                : `
+	                                <button
+	                                    class="record-btn"
+	                                    ${isDayLocked ? 'disabled' : ''}
+	                                    onclick="openAttendanceModal('${day.actualDate}','${day.date}')">
 
-								        <i class="fas fa-chevron-right"></i>
+	                                    <i class="fas fa-chevron-right"></i>
 
-								    </button>
-								`
+	                                </button>
+	                            `
 	                        }
 
 	                    </td>
@@ -1268,27 +1252,58 @@
 	            );
 	        });
 
-			document.getElementById(
-			    'plannedWorkingHours'
-			).innerText =
-			    plannedTotal + 'h 00m';
+	        const plannedHours =
+	            Math.floor(plannedTotal / 60);
 
-			const totalHours =
-			    Math.floor(
-			        recordedTotal / 60
-			    );
+	        const plannedMinutes =
+	            plannedTotal % 60;
 
-			const totalMinutes =
-			    recordedTotal % 60;
+	        document.getElementById(
+	            'plannedWorkingHours'
+	        ).innerText =
+	            plannedHours +
+	            'h ' +
+	            String(plannedMinutes)
+	                .padStart(2, '0') +
+	            'm';
 
-			document.getElementById(
-			    'recordedWorkingHours'
-			).innerText =
-			    totalHours +
-			    'h ' +
-			    String(totalMinutes)
-			        .padStart(2, '0') +
-			    'm';
+	        const totalHours =
+	            Math.floor(recordedTotal / 60);
+
+	        const totalMinutes =
+	            recordedTotal % 60;
+
+	        document.getElementById(
+	            'recordedWorkingHours'
+	        ).innerText =
+	            totalHours +
+	            'h ' +
+	            String(totalMinutes)
+	                .padStart(2, '0') +
+	            'm';
+
+	        document.getElementById(
+	            'weeklyStatus'
+	        ).innerText =
+	            status;
+
+			let disableBottomActions =
+				    !isCurrentWeek();
+
+	        document.getElementById(
+	            'submitAttendanceBtn'
+	        ).disabled =
+	            disableBottomActions;
+
+	        document.getElementById(
+	            'saveDraftBtn'
+	        ).disabled =
+	            disableBottomActions;
+
+	        document.getElementById(
+	            'discardAttendanceBtn'
+	        ).disabled =
+	            disableBottomActions;
 
 	    } catch (error) {
 
@@ -1572,17 +1587,21 @@
 
 	    try {
 
-	        const response =
-	            await fetch(
-	                '/api/attendance/discard-current-week',
-	                {
-	                    method: 'POST'
-	                }
-	            );
+			const response =
+			    await fetch(
+			        '/api/attendance/discard-current-week',
+			        {
+			            method: 'POST'
+			        }
+			    );
 
-	        if (!response.ok) {
-	            throw new Error();
-	        }
+			if (!response.ok) {
+
+			    const errorMessage =
+			        await response.text();
+
+			    throw new Error(errorMessage);
+			}
 
 	        Swal.fire(
 	            'Success',
@@ -1592,14 +1611,15 @@
 
 	        await loadAttendanceWeek();
 
-	    } catch (e) {
+	    } 		
+		catch (e) {
 
-	        Swal.fire(
-	            'Error',
-	            'Unable to discard attendance.',
-	            'error'
-	        );
-	    }
+		    Swal.fire(
+		        'Error',
+		        e.message,
+		        'error'
+		    );
+		}
 	}
 	let currentMonday =
 	    getMonday(new Date());
