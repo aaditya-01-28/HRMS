@@ -26,6 +26,15 @@ public class SeniorDashboardController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private com.example.admindashboard.repository.RideBookingRepository rideBookingRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.TransportVendorRepository transportVendorRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.TransportVehicleRepository transportVehicleRepository;
+
     // --- Helper: Get pending meeting invites (same logic as DashboardController) ---
     private List<Meeting> getPendingMeetingInvites(String username) {
         com.example.admindashboard.model.User currentUser = userRepository.findByUsername(username).orElse(null);
@@ -98,6 +107,18 @@ public class SeniorDashboardController {
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_transport/my_space")
     public String showSeniorTransportMySpace(Model model, Principal principal) {
+        model.addAttribute("vendors", transportVendorRepository.findAll());
+        model.addAttribute("vehicles", transportVehicleRepository.findAll());
+        
+        List<com.example.admindashboard.model.RideBooking> pendingBookings = rideBookingRepository.findAll().stream()
+                .filter(b -> "SCHEDULED".equals(b.getStatus()) || "Pending".equalsIgnoreCase(b.getStatus()))
+                .collect(Collectors.toList());
+        
+        List<com.example.admindashboard.model.RideBooking> allBookings = rideBookingRepository.findAll();
+        
+        model.addAttribute("pendingBookings", pendingBookings);
+        model.addAttribute("allBookings", allBookings);
+        
         return "senior_transport-myspace";
     }
 

@@ -562,10 +562,168 @@
 
         <!-- MANAGE BOOKING SECTION (hidden by default) -->
         <div id="section-manage-booking" style="display: none;">
-            <div class="coming-soon">
-                <i class="fas fa-clipboard-list"></i>
-                <h4>Manage Booking</h4>
-                <p>Booking management module is under development. Coming soon!</p>
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <!-- Filters -->
+                <div class="d-flex gap-3 flex-wrap w-100">
+                    <div style="width: 180px;">
+                        <label class="form-label text-dark fw-bold" style="font-size:0.8rem;">Date</label>
+                        <input type="date" class="form-control bg-white" style="border-radius:4px;">
+                    </div>
+                    <div style="flex:1; min-width: 250px;">
+                        <label class="form-label text-dark fw-bold" style="font-size:0.8rem;">Search</label>
+                        <div class="position-relative">
+                            <i class="fas fa-search position-absolute text-muted" style="left:12px; top:50%; transform:translateY(-50%); font-size:0.85rem;"></i>
+                            <input type="text" class="form-control bg-white" placeholder="Search by employees name, department..." style="padding-left:35px; border-radius:4px;">
+                        </div>
+                    </div>
+                    <div style="width: 180px;">
+                        <label class="form-label text-dark fw-bold" style="font-size:0.8rem;">Pickup location</label>
+                        <select class="form-select bg-white" style="border-radius:4px;"><option>All location</option></select>
+                    </div>
+                    <div style="width: 150px;">
+                        <label class="form-label text-dark fw-bold" style="font-size:0.8rem;">Status</label>
+                        <select class="form-select bg-white" style="border-radius:4px;"><option>All</option></select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabs -->
+            <ul class="nav nav-tabs mb-3" style="border-bottom: 2px solid #e2e8f0; font-weight:600; font-size:1.1rem;">
+                <li class="nav-item">
+                    <a class="nav-link active text-primary" href="#" style="border:none; border-bottom: 3px solid var(--primary); padding: 10px 0; margin-right: 25px; background:transparent;">
+                        Pending Assignments (<span th:text="${pendingBookings.size()}">03</span>)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-muted" href="#" style="border:none; padding: 10px 0; background:transparent;">
+                        All Requests (<span th:text="${allBookings.size()}">05</span>)
+                    </a>
+                </li>
+            </ul>
+
+            <div class="row position-relative">
+                <!-- Main Table Area -->
+                <div class="col-12" id="booking-table-area" style="transition: width 0.3s ease;">
+                    <div class="content-card mb-3">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;"><input type="checkbox" class="form-check-input" id="selectAllBookings"></th>
+                                    <th>Employee Details</th>
+                                    <th>Pickup Location</th>
+                                    <th>Login Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="booking : ${pendingBookings}">
+                                    <td><input type="checkbox" class="form-check-input booking-checkbox" th:value="${booking.id}" th:data-name="${booking.user != null ? booking.user.fullName : 'Unknown User'}"></td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width:36px; height:36px; font-weight:bold; font-size:0.9rem;" th:text="${booking.user != null and booking.user.fullName != null and !booking.user.fullName.isEmpty() ? booking.user.fullName.substring(0,1).toUpperCase() : 'U'}">N</div>
+                                            <div>
+                                                <div class="fw-bold text-dark" style="font-size:0.9rem;" th:text="${booking.user != null ? booking.user.fullName : 'Unknown User'}">Neha Sharma</div>
+                                                <div class="text-muted" style="font-size:0.75rem;" th:text="${booking.user != null and booking.user.employeeProfile != null ? booking.user.employeeProfile.designation : 'Employee'}">UI Designer</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td th:text="${booking.pickupLocation != null ? booking.pickupLocation : 'Subhash Chowk'}">Subhash Chowk</td>
+                                    <td th:text="${booking.loginTime}">10:00 AM</td>
+                                    <td><span class="text-danger fw-bold" style="font-size:0.85rem;" th:text="${booking.status}">Pending</span></td>
+                                </tr>
+                                <!-- Static Fallbacks if empty -->
+                                <tr th:if="${#lists.isEmpty(pendingBookings)}">
+                                    <td colspan="5" class="text-center py-4 text-muted">No pending bookings found.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="text-muted" style="font-size:0.85rem;">Showing 1 to <span th:text="${pendingBookings.size()}">10</span> entries</div>
+                        <div>
+                            <ul class="pagination pagination-sm m-0">
+                                <li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="text-end mt-4">
+                        <button class="btn btn-primary fw-bold" id="btnAssignSelected" onclick="toggleAssignSidebar()" style="background:var(--primary); padding: 10px 24px; font-size: 1rem; border-radius: 6px; box-shadow: 0 4px 10px rgba(30,58,138,0.3);">
+                            Assign Selected (<span id="selectedCount">0</span>)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar for Assignment -->
+                <div id="assign-sidebar" style="position: absolute; right: 0; top: 0; width: 350px; background: white; border-left: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0; height: 100%; display: none; padding: 0; box-shadow: -5px 0 15px rgba(0,0,0,0.05); z-index: 10;">
+                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 fw-bold text-dark fs-5">Assign to Vehicle</h6>
+                        <button class="btn-close" onclick="toggleAssignSidebar()"></button>
+                    </div>
+                    
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label text-dark fw-bold m-0" style="font-size:0.85rem;">Selected employees</label>
+                            <a href="#" class="text-primary text-decoration-none" style="font-size:0.75rem;">View all vehicles</a>
+                        </div>
+                        <div id="selectedEmployeesTags" class="d-flex flex-wrap gap-2 mb-3">
+                            <!-- Tags will be dynamically inserted here -->
+                        </div>
+                        <div class="position-relative">
+                            <i class="fas fa-search position-absolute text-muted" style="left:12px; top:50%; transform:translateY(-50%); font-size:0.8rem;"></i>
+                            <input type="text" class="form-control form-control-sm bg-light" placeholder="Search vehicles by no." style="padding-left:32px;">
+                        </div>
+                    </div>
+                    
+                    <div class="p-3 overflow-auto" style="max-height: calc(100% - 200px);">
+                        <!-- Vehicle List from Backend -->
+                        <div th:each="vehicle : ${vehicles}" class="content-card mb-3 p-3 position-relative cursor-pointer vehicle-select-card" th:onclick="'selectVehicle(this, ' + ${vehicle.id} + ')'" style="border: 2px solid transparent; transition: all 0.2s;">
+                            <div class="form-check position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%);">
+                                <input class="form-check-input" type="radio" name="assignedVehicle" th:value="${vehicle.id}">
+                            </div>
+                            <div style="padding-left: 35px;">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <div class="fw-bold text-dark" th:text="${vehicle.vehicleNo}">MP-04-UD-0007</div>
+                                    <span class="fw-bold" style="font-size:0.75rem;" th:classappend="${vehicle.status == 'On-Trip' ? 'text-success' : (vehicle.status == 'Assigned' ? 'text-primary' : 'text-danger')}" th:text="${vehicle.status}">On-Trip</span>
+                                </div>
+                                <div class="text-muted mb-1" style="font-size:0.8rem;">
+                                    Driver: <span class="fw-bold text-dark" th:text="${vehicle.driver != null ? vehicle.driver.name : 'Unassigned'}">Suresh Mishra</span>
+                                </div>
+                                <div class="text-muted" style="font-size:0.75rem;">
+                                    Available Seats: <span class="fw-bold text-dark" th:text="${vehicle.availableSeats + '/' + vehicle.totalSeats}">3/4</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fallback static vehicles if empty -->
+                        <div th:if="${#lists.isEmpty(vehicles)}" class="content-card mb-3 p-3 position-relative cursor-pointer vehicle-select-card" style="border: 2px solid #3b82f6;" onclick="selectVehicle(this, 1)">
+                            <div class="form-check position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%);">
+                                <input class="form-check-input" type="radio" name="assignedVehicle" value="1" checked>
+                            </div>
+                            <div style="padding-left: 35px;">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <div class="fw-bold text-dark">MP-04-UD-0007</div>
+                                    <span class="text-success fw-bold" style="font-size:0.75rem;">On-Trip</span>
+                                </div>
+                                <div class="text-muted mb-1" style="font-size:0.8rem;">
+                                    Driver: <span class="fw-bold text-dark">Suresh Mishra</span>
+                                </div>
+                                <div class="text-muted" style="font-size:0.75rem;">
+                                    Available Seats: <span class="fw-bold text-dark">3/4</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="position-absolute bottom-0 w-100 p-3 bg-white border-top text-center">
+                        <button class="btn btn-success fw-bold w-50" onclick="submitAssignment()" style="border-radius: 6px; font-size: 1.1rem; padding: 8px;">Done</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1156,6 +1314,130 @@
             alert("Vehicle assigned successfully!");
             document.getElementById('vendor-list-view').style.display = 'block';
             document.getElementById('add-vendor-wizard').style.display = 'none';
+        }
+
+        // --- MANAGE BOOKING LOGIC ---
+        let selectedBookingIds = [];
+
+        // Select All Checkbox
+        const selectAllCb = document.getElementById('selectAllBookings');
+        if (selectAllCb) {
+            selectAllCb.addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('.booking-checkbox');
+                checkboxes.forEach(cb => {
+                    cb.checked = this.checked;
+                });
+                updateSelectedCount();
+            });
+        }
+
+        // Individual Checkboxes
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.classList.contains('booking-checkbox')) {
+                updateSelectedCount();
+            }
+        });
+
+        function updateSelectedCount() {
+            const checkboxes = document.querySelectorAll('.booking-checkbox:checked');
+            selectedBookingIds = Array.from(checkboxes).map(cb => cb.value);
+            document.getElementById('selectedCount').textContent = selectedBookingIds.length;
+            
+            // Update the sidebar tags if it's open
+            if (document.getElementById('assign-sidebar').style.display === 'block') {
+                updateSidebarTags(checkboxes);
+            }
+        }
+
+        function toggleAssignSidebar() {
+            const sidebar = document.getElementById('assign-sidebar');
+            const tableArea = document.getElementById('booking-table-area');
+            
+            if (sidebar.style.display === 'none') {
+                if (selectedBookingIds.length === 0) {
+                    alert("Please select at least one booking to assign.");
+                    return;
+                }
+                sidebar.style.display = 'block';
+                tableArea.classList.remove('col-12');
+                tableArea.classList.add('col-8');
+                
+                // Populate tags
+                const checkboxes = document.querySelectorAll('.booking-checkbox:checked');
+                updateSidebarTags(checkboxes);
+            } else {
+                sidebar.style.display = 'none';
+                tableArea.classList.remove('col-8');
+                tableArea.classList.add('col-12');
+            }
+        }
+        
+        function updateSidebarTags(checkboxes) {
+            const container = document.getElementById('selectedEmployeesTags');
+            container.innerHTML = '';
+            checkboxes.forEach(cb => {
+                const name = cb.getAttribute('data-name');
+                const tag = document.createElement('span');
+                tag.className = 'badge text-primary fw-normal d-flex align-items-center gap-2';
+                tag.style.backgroundColor = '#dbeafe'; // light blue
+                tag.style.padding = '6px 10px';
+                tag.style.fontSize = '0.75rem';
+                tag.innerHTML = name + ' <i class="fas fa-times cursor-pointer" onclick="removeSelection(\'' + cb.value + '\')"></i>';
+                container.appendChild(tag);
+            });
+        }
+        
+        function removeSelection(id) {
+            const cb = document.querySelector('.booking-checkbox[value="' + id + '"]');
+            if (cb) {
+                cb.checked = false;
+                updateSelectedCount();
+                if (selectedBookingIds.length === 0) {
+                    toggleAssignSidebar(); // close if empty
+                }
+            }
+        }
+
+        function selectVehicle(card, vehicleId) {
+            // Remove highlight from all cards
+            document.querySelectorAll('.vehicle-select-card').forEach(c => {
+                c.style.borderColor = 'transparent';
+                c.querySelector('input[type="radio"]').checked = false;
+            });
+            // Highlight selected
+            card.style.borderColor = '#3b82f6';
+            card.querySelector('input[type="radio"]').checked = true;
+        }
+
+        function submitAssignment() {
+            const selectedVehicleRadio = document.querySelector('input[name="assignedVehicle"]:checked');
+            if (!selectedVehicleRadio) {
+                alert("Please select a vehicle.");
+                return;
+            }
+            
+            const vehicleId = selectedVehicleRadio.value;
+            
+            // Call API
+            fetch('/api/transport/bookings/assign', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    bookingIds: selectedBookingIds.map(id => parseInt(id)),
+                    vehicleId: parseInt(vehicleId)
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message || "Vehicles assigned successfully!");
+                window.location.reload();
+            })
+            .catch(err => {
+                console.error(err);
+                alert("An error occurred during assignment.");
+            });
         }
         /*]]>*/
     </script>
