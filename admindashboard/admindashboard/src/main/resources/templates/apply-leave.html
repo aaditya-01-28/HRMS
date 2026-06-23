@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -22,24 +22,12 @@
         }
 
         /* HEADER  */
-        .top-header {
-            background: white; border-bottom: 1px solid #e2e8f0;
-            padding: 22px 40px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
-        }
+
         .page-title {
             display: flex; align-items: center;
         }
-        .btn-back-home {
-            background-color: var(--bs-primary); color: white;
-            border-radius: 10px; padding: 10px 24px; font-weight: 600;
-            font-size: 0.9rem; text-decoration: none; display: flex; align-items: center;
-            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2); transition: all 0.3s ease;
-        }
-        .btn-back-home:hover {
-            background-color: #172554; transform: translateY(-2px); color: white;
-        }
+
+
 
         /* CONTAINER */
         .main-container {
@@ -153,26 +141,12 @@
             }
 
             /* 2. SHRINK THE TOP NAV BAR */
-            .top-header {
-                height: auto !important;
-                padding: 12px 15px !important;
-                display: flex !important;
-                flex-direction: row !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                flex-wrap: nowrap !important;
-            }
+
             .page-title { min-width: 0 !important; width: auto !important; flex: 1 !important; }
-            .page-title i { font-size: 1.6rem !important; margin-top: 2px !important; }
-            .page-title span {
-                font-size: 1.1rem !important; margin-left: 8px !important;
-                padding-left: 8px !important; line-height: 1.1 !important; white-space: nowrap !important;
-            }
+
+
             .top-header > div:last-child { flex: 0 0 auto !important; margin-left: auto !important; }
-            .btn-back-home {
-                width: auto !important; padding: 6px 12px !important; font-size: 0.75rem !important;
-                border-radius: 8px !important; white-space: nowrap !important; margin: 0 !important;
-            }
+
 
             /* 3. ADJUST MAIN CONTAINER MARGINS */
             .main-container { margin-top: 75px !important; padding: 0 12px !important; }
@@ -268,14 +242,8 @@
             }
 
             /* Fix Top Header for Dark Mode Mobile */
-            .dark-mode .top-header {
-                background: #0f172a !important;
-                border-bottom-color: #1e3a8a !important;
-            }
-            .dark-mode .top-header span,
-            .dark-mode .top-header i {
-                color: #ffffff !important;
-            }
+
+
 
             /* =========================================================
                9. MOBILE-ONLY DARK MODE PATCH
@@ -299,13 +267,8 @@
             }
 
             /* Fix Mobile Top Header */
-            [data-bs-theme="dark"] .top-header {
-                background-color: #121212 !important;
-                border-bottom-color: #2d2d2d !important;
-            }
-            [data-bs-theme="dark"] .top-header .text-dark {
-                color: #ffffff !important;
-            }
+
+
 
             /* Ensure all standard inputs and dropdowns are dark */
             [data-bs-theme="dark"] .form-control,
@@ -699,6 +662,12 @@
                 text: 'Please fill in all required fields before submitting.',
                 confirmButtonColor: '#1e3a8a'
             });
+            return;
+        }
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        if (fromDate < todayStr) {
+            Swal.fire({ icon: 'error', title: 'Submission Failed', text: 'You cannot select a past date for leave application.', confirmButtonColor: '#1e3a8a' });
             return;
         }
 

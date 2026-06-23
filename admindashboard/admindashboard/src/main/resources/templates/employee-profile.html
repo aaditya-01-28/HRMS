@@ -394,47 +394,49 @@
 
     <!-- MAIN CONTENT -->
     <div class="profile-main">
-		<div class="top-nav">
-
-		    <div class="top-nav-title">
-		        <i class="fas fa-user-circle text-primary"></i>
-		        My Profile
+		<header class="top-header">
+		    <div class="page-title d-flex align-items-center">
+		        <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.fullName} + '&background=1e3a8a&color=fff&size=50'}"
+                     class="rounded-circle shadow-sm" alt="User" style="width: 40px; height: 40px;">
+		        <span class="fw-bold text-dark" style="border-left: 2px solid #cbd5e1; padding-left: 17px; margin-left: 15px; font-size: 1.5rem; letter-spacing: 0.5px;">
+		            My Profile
+		        </span>
 		    </div>
 
-		    <div class="top-nav-actions">
+		    <div class="d-flex align-items-center gap-3">
 
 				<button type="button"
-				        class="top-nav-btn edit-btn"
+				        class="btn btn-primary fw-bold px-4"
 				        id="editProfileBtn">
 				    Edit Details
 				</button>
 
 				<button type="submit"
 				        form="masterProfileForm"
-				        class="top-nav-btn edit-btn"
+				        class="btn btn-success fw-bold px-4"
 				        id="saveProfileBtn"
 				        style="display:none;">
 				    Save Changes
 				</button>
 
 				<button type="button"
-				        class="top-nav-btn home-btn"
+				        class="btn btn-secondary fw-bold px-4"
 				        id="cancelEditBtn"
 				        style="display:none;">
 				    Cancel
 				</button>
 
-				<a href="javascript:history.back()"
-				   class="top-nav-btn home-btn"
+				<a href="/default-redirect"
+				   class="btn-back-home"
 				   id="backHomeBtn">
-				    Back to Home
+				    <i class="fas fa-arrow-left me-2"></i> Back to Home
 				</a>
 
 		    </div>
 
-		</div>
+		</header>
 
-		<div class="profile-tabs">
+		<div class="profile-tabs" style="margin-top: 120px;">
 
 		    <button class="tab-btn active"
 		            onclick="showProfileTab('v-pills-personal',this)">

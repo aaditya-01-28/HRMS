@@ -568,10 +568,7 @@
             body { padding-top: 80px !important; }
 
             /* 2. SHRINK THE TOP NAV BAR */
-            .top-header {
-                height: auto !important; padding: 12px 15px !important; flex-direction: row !important;
-                justify-content: space-between !important; align-items: center !important; flex-wrap: nowrap !important;
-            }
+
 
             .top-header > .d-flex { min-width: 0 !important; width: auto !important; justify-content: flex-start !important; }
             .top-header i.fa-check-double { font-size: 1.6rem !important; }
@@ -579,10 +576,7 @@
             .top-header span { font-size: 1.1rem !important; line-height: 1 !important; }
             .top-header small { font-size: 0.85rem !important; }
 
-            .btn-back-home {
-                width: auto !important; padding: 6px 12px !important; font-size: 0.75rem !important;
-                border-radius: 8px !important; display: inline-flex !important; white-space: nowrap !important; margin: 0 !important;
-            }
+
 
             /* 3. MAIN CONTAINER & FILTER AREA */
             .main-container { padding: 0 15px !important; margin-bottom: 20px !important; }
@@ -634,18 +628,18 @@
 </head>
 <body>
 
-	<div class="approval-header">
-	    <div class="approval-title">
-	        <img src="/images/approval_header.jpeg" alt="approval">
-	        <span>My Approvals</span>
+	<header class="top-header">
+	    <div class="page-title d-flex align-items-center">
+	        <i class="fas fa-clipboard-check text-dark" style="font-size: 2.5rem;"></i>
+	        <span class="fw-bold text-dark" style="border-left: 2px solid #cbd5e1; padding-left: 17px; margin-left: 15px; font-size: 1.5rem; letter-spacing: 0.5px;">
+	            My Approvals
+	        </span>
 	    </div>
-
-		<button class="home-btn"
-		        onclick="window.location.href='/employee/dashboard'">
-		    Back to Dashboard
-		</button>
-	</div>
-	<div class="page-content">
+	    <a href="/default-redirect" class="btn-back-home">
+	        <i class="fas fa-arrow-left me-2"></i> Back to My Home
+	    </a>
+	</header>
+	<div class="page-content" style="margin-top: 140px;">
 
 	    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
 
