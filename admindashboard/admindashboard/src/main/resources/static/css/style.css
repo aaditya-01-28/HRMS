@@ -240,3 +240,31 @@ input, textarea, select,
         white-space: nowrap !important;
     }
 }
+
+/* =========================================
+   10. GLOBAL EMPTY STATE
+   ========================================= */
+.global-empty-state {
+    text-align: center;
+    padding: 30px 20px;
+    background: #f8fafc;
+    border-radius: 8px;
+    color: #64748b;
+    font-size: 0.95rem;
+    font-weight: 500;
+    font-style: italic;
+    width: 100%;
+    margin: 10px 0;
+    border: 1px dashed #cbd5e1;
+}
+.global-empty-state i {
+    font-size: 2.5rem;
+    color: #94a3b8;
+    margin-bottom: 15px;
+    display: block;
+}
+[data-bs-theme="dark"] .global-empty-state {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}

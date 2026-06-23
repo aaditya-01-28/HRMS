@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -662,6 +662,12 @@
                 text: 'Please fill in all required fields before submitting.',
                 confirmButtonColor: '#1e3a8a'
             });
+            return;
+        }
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        if (fromDate < todayStr) {
+            Swal.fire({ icon: 'error', title: 'Submission Failed', text: 'You cannot select a past date for leave application.', confirmButtonColor: '#1e3a8a' });
             return;
         }
 
