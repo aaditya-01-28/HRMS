@@ -508,18 +508,24 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label text-dark fw-bold" style="font-size: 0.85rem;">Leave Type <span class="text-danger">*</span></label>
-                                <select class="form-select bg-white" id="leaveType" onchange="calculateDays()" required style="border-radius: 20px;">
-                                    <option selected disabled value="">Select Leave Type</option>
-                                    <option value="Casual">Casual Leave (CL)</option>
-                                    <option value="Sick">Sick Leave (SL)</option>
-                                    <option value="Earned">Earned Leave (EL)</option>
-                                    <option value="CompOff">Comp Off</option>
-                                    <option value="Maternity">Maternity Leave</option>
-                                    <option value="Paternity">Paternity Leave</option>
-                                    <option value="Marriage">Marriage Leave</option>
-                                    <option value="Bereavement">Bereavement Leave</option>
-                                    <option value="LOP">Loss of Pay (LOP)</option>
-                                </select>
+                                <div class="dropdown w-100">
+                                    <button class="form-select bg-white text-start d-flex align-items-center justify-content-between w-100" type="button" id="leaveTypeDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px; border-color: #dee2e6; color: #212529;">
+                                        <span id="leaveTypeSelectedText">Select Leave Type</span>
+                                    </button>
+                                    <ul class="dropdown-menu w-100 shadow-sm" style="border-radius: 12px; padding: 8px; max-height: 250px; overflow-y: auto;">
+                                        <li><a class="dropdown-item d-flex align-items-center gap-2 rounded py-2" href="#" onclick="selectLeaveTypeOption('Casual', 'Casual Leave (CL)')"><div style="width: 36px; height: 36px; overflow: hidden; border-radius: 8px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"><img src="/images/leave-types/CL.jpeg" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.3);"></div> Casual Leave (CL)</a></li>
+                                        <li><a class="dropdown-item d-flex align-items-center gap-2 rounded py-2" href="#" onclick="selectLeaveTypeOption('Sick', 'Sick Leave (SL)')"><div style="width: 36px; height: 36px; overflow: hidden; border-radius: 8px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"><img src="/images/leave-types/SL.jpeg" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.3);"></div> Sick Leave (SL)</a></li>
+                                        <li><a class="dropdown-item d-flex align-items-center gap-2 rounded py-2" href="#" onclick="selectLeaveTypeOption('Earned', 'Earned Leave (EL)')"><div style="width: 36px; height: 36px; overflow: hidden; border-radius: 8px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"><img src="/images/leave-types/EL.jpeg" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.3);"></div> Earned Leave (EL)</a></li>
+                                        <li><a class="dropdown-item d-flex align-items-center gap-2 rounded py-2" href="#" onclick="selectLeaveTypeOption('CompOff', 'Comp Off')"><div style="width: 36px; height: 36px; overflow: hidden; border-radius: 8px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"><img src="/images/leave-types/comp-off.jpeg" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.3);"></div> Comp Off</a></li>
+                                        <li><a class="dropdown-item d-flex align-items-center gap-2 rounded py-2" href="#" onclick="selectLeaveTypeOption('Maternity', 'Maternity Leave')"><div style="width: 36px; height: 36px; overflow: hidden; border-radius: 8px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"><img src="/images/leave-types/maternity leave.jpeg" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.3);"></div> Maternity Leave</a></li>
+                                        <li><a class="dropdown-item d-flex align-items-center gap-2 rounded py-2" href="#" onclick="selectLeaveTypeOption('Paternity', 'Paternity Leave')"><div style="width: 36px; height: 36px; overflow: hidden; border-radius: 8px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"><img src="/images/leave-types/paternity leave.jpeg" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.3);"></div> Paternity Leave</a></li>
+                                        <li><a class="dropdown-item d-flex align-items-center gap-2 rounded py-2" href="#" onclick="selectLeaveTypeOption('Marriage', 'Marriage Leave')"><div style="width: 36px; height: 36px; overflow: hidden; border-radius: 8px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"><img src="/images/leave-types/marriage leave.jpeg" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.3);"></div> Marriage Leave</a></li>
+                                        <li><a class="dropdown-item d-flex align-items-center gap-2 rounded py-2" href="#" onclick="selectLeaveTypeOption('Bereavement', 'Bereavement Leave')"><div style="width: 36px; height: 36px; overflow: hidden; border-radius: 8px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"><img src="/images/leave-types/bereavement leave.jpeg" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.3);"></div> Bereavement Leave</a></li>
+                                        <li><a class="dropdown-item d-flex align-items-center gap-2 rounded py-2" href="#" onclick="selectLeaveTypeOption('LOP', 'Loss of Pay (LOP)')"><div style="width: 36px; height: 36px; overflow: hidden; border-radius: 8px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"><img src="/images/leave-types/LOP.jpeg" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.3);"></div> Loss of Pay (LOP)</a></li>
+                                    </ul>
+                                </div>
+                                <input type="hidden" id="leaveType" required>
+                                <input type="hidden" id="leaveTypeText">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label text-dark fw-bold" style="font-size: 0.85rem;">Reason <span class="text-danger">*</span></label>
@@ -839,59 +845,57 @@
             '<tr style="background:#f8fafc; border-bottom:2px solid #e2e8f0; position:sticky; top:0;">' +
             '<th style="padding:8px 6px; text-align:left; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f8fafc; white-space:nowrap;">Leave Type</th>' +
             '<th style="padding:8px 6px; text-align:center; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f8fafc; white-space:nowrap;">Balance</th>' +
-            '<th style="padding:8px 6px; text-align:center; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f8fafc; white-space:nowrap;">Used</th>' +
+            '<th style="padding:8px 6px; text-align:center; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f8fafc; white-space:nowrap;">Credit/Debit</th>' +
+            '<th style="padding:8px 6px; text-align:left; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f8fafc; white-space:nowrap;">Date</th>' +
             '</tr></thead><tbody>';
 
         const displayTypes = ['CL', 'SL', 'EL', 'COMP_OFF', 'LOP'];
 
+        let totalBalance = 0;
+
         walletData.forEach(w => {
             if (!displayTypes.includes(w.leaveCode)) return;
-            const usedTotal = (w.used || 0) + (w.encashed || 0);
+            
+            totalBalance += parseFloat(w.balance || 0);
+            
+            let lastCreditDebit = '\u2014';
+            let lastDate = '\u2014';
+            let color = '#475569';
+            
+            if (ledgerData && ledgerData.length > 0) {
+                const lastTransaction = ledgerData.find(t => t.leaveType === w.leaveType);
+                if (lastTransaction) {
+                    if (lastTransaction.debit) {
+                        lastCreditDebit = '-' + lastTransaction.debit;
+                        color = '#dc2626';
+                    } else if (lastTransaction.credit) {
+                        lastCreditDebit = '+' + lastTransaction.credit;
+                        color = '#16a34a';
+                    }
+                    
+                    if (lastTransaction.date) {
+                        const dateObj = new Date(lastTransaction.date);
+                        lastDate = dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                    }
+                }
+            }
             
             tableHTML += '<tr style="border-bottom:1px solid #f1f5f9;">' +
                 '<td style="padding:10px 6px; font-weight:700; color:#1e293b; white-space:nowrap; text-align:left;">' + w.leaveType + '</td>' +
                 '<td style="padding:10px 6px; text-align:center; font-weight:600; color:#475569;">' + (w.balance || 0) + '</td>' +
-                '<td style="padding:10px 6px; text-align:center; font-weight:700; color:#dc2626;">-' + usedTotal + '</td>' +
+                '<td style="padding:10px 6px; text-align:center; font-weight:700; color:' + color + ';">' + lastCreditDebit + '</td>' +
+                '<td style="padding:10px 6px; text-align:left; font-weight:500; color:#475569;">' + lastDate + '</td>' +
                 '</tr>';
         });
 
-        tableHTML += '</tbody></table>';
+        
+        tableHTML += '<tr style="border-top:2px solid #e2e8f0; background:#f8f9fa;">' +
+            '<td style="padding:12px 6px; font-weight:800; color:#1e3a8a; text-align:left; font-size: 0.85rem;">Total Available Leaves</td>' +
+            '<td style="padding:12px 6px; text-align:center; font-weight:800; color:#1e3a8a; font-size: 0.85rem;">' + totalBalance + '</td>' +
+            '<td colspan="2"></td>' +
+            '</tr>';
 
-        if (ledgerData && ledgerData.length > 0) {
-            tableHTML += '<div style="margin-top:20px; text-align:center; font-size:1.3rem; font-weight:bold; color:#1e3a8a; margin-bottom:8px;">Leave Transaction History</div>' +
-            '<div style="font-size:0.72rem; color:#64748b; background:#f8fafc; border-radius:8px; padding:8px 12px; margin-bottom:10px; line-height:1.6; text-align:center;">' +
-            'Each row shows a leave deduction (-) from your account with the resulting balance.</div>' +
-            '<table style="width:100%; border-collapse:collapse; font-size:0.78rem; font-family:Inter,sans-serif;">' +
-            '<thead>' +
-            '<tr style="background:#f8fafc; border-bottom:2px solid #e2e8f0; position:sticky; top:0;">' +
-            '<th style="padding:8px 6px; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Date & Time</th>' +
-            '<th style="padding:8px 6px; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Leave Type</th>' +
-            '<th style="padding:8px 6px; text-align:center; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Debit (-)</th>' +
-            '<th style="padding:8px 6px; text-align:center; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Balance</th>' +
-            '<th style="padding:8px 6px; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; min-width:140px;">Reason</th>' +
-            '<th style="padding:8px 6px; font-size:0.68rem; color:#475569; text-transform:uppercase; background:#f8fafc; white-space:nowrap;">Approved By</th>' +
-            '</tr></thead><tbody>';
-
-            ledgerData.forEach(t => {
-                const dateObj = t.date ? new Date(t.date) : null;
-                const dateFmt = dateObj ? dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '\u2014';
-                const timeFmt = dateObj ? dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : '';
-                const debit = t.debit ? ('<span style="color:#dc2626; font-weight:700;">-' + t.debit + '</span>') : '<span style="color:#cbd5e1;">\u2014</span>';
-
-                tableHTML += '<tr style="border-bottom:1px solid #f1f5f9;">' +
-                    '<td style="padding:7px 6px; text-align:left;"><div style="font-weight:600; white-space:nowrap;">' + dateFmt + '</div><div style="font-size:0.62rem; color:#94a3b8;">' + timeFmt + '</div></td>' +
-                    '<td style="padding:7px 6px; font-weight:600; text-align:left;">' + (t.leaveType || '\u2014') + '</td>' +
-                    '<td style="padding:7px 6px; text-align:center;">' + debit + '</td>' +
-                    '<td style="padding:7px 6px; text-align:center; font-weight:700;">' + (t.balanceAfter != null ? t.balanceAfter : '\u2014') + '</td>' +
-                    '<td style="padding:7px 6px; word-break:break-word; max-width:180px; text-align:left;">' + (t.reason || '\u2014') + '</td>' +
-                    '<td style="padding:7px 6px; text-align:left;">' + (t.approvedBy || '\u2014') + '</td>' +
-                    '</tr>';
-            });
-
-            tableHTML += '</tbody></table>';
-        }
-
-        tableHTML += '</div>';
+        tableHTML += '</tbody></table></div>';
 
         Swal.fire({
             title: 'Leave Wallet Details',
@@ -985,6 +989,13 @@
                 '<td style="padding:7px 6px;">' + (t.approvedBy || '\u2014') + '</td>' +
                 '</tr>';
         });
+
+        
+        tableHTML += '<tr style="border-top:2px solid #e2e8f0; background:#f8f9fa;">' +
+            '<td style="padding:12px 6px; font-weight:800; color:#1e3a8a; text-align:left; font-size: 0.85rem;">Total Available Leaves</td>' +
+            '<td style="padding:12px 6px; text-align:center; font-weight:800; color:#1e3a8a; font-size: 0.85rem;">' + totalBalance + '</td>' +
+            '<td colspan="2"></td>' +
+            '</tr>';
 
         tableHTML += '</tbody></table></div>';
 
@@ -1095,6 +1106,14 @@
     }
 
     // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 8. CALCULATE DAYS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    
+    function selectLeaveTypeOption(value, textStr) {
+        document.getElementById('leaveType').value = value;
+        document.getElementById('leaveTypeText').value = textStr;
+        document.getElementById('leaveTypeSelectedText').innerText = textStr;
+        calculateDays(); // Trigger original onchange
+    }
+
     function calculateDays() {
         const leaveType = document.getElementById('leaveType').value;
         const startInput = document.getElementById('fromDate');
@@ -1205,7 +1224,7 @@
         let previewHTML = '<div style="text-align:left; font-family:Inter,sans-serif;">' +
             '<div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">' +
             '<div><div style="font-size:0.65rem; font-weight:700; color:#94a3b8; text-transform:uppercase;">Leave Type</div>' +
-            '<div style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-top:2px;">' + leaveType.options[leaveType.selectedIndex].text + '</div></div>' +
+            '<div style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-top:2px;">' + document.getElementById('leaveTypeText').value + '</div></div>' +
             '<div><div style="font-size:0.65rem; font-weight:700; color:#94a3b8; text-transform:uppercase;">Total Days</div>' +
             '<div style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-top:2px;">' + totalDays + ' day(s)</div></div>' +
             '<div><div style="font-size:0.65rem; font-weight:700; color:#94a3b8; text-transform:uppercase;">From Date</div>' +
