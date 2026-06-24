@@ -720,7 +720,7 @@
             const holidays = await res.json();
             window.upcomingHolidays = holidays || [];
             if (!holidays || holidays.length === 0) {
-                container.innerHTML = '<div class="empty-state"><i class="fas fa-umbrella-beach d-block"></i><p>No upcoming holidays</p></div>';
+                container.innerHTML = '<div class="empty-state"><img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data"></div>';
                 return;
             }
 
@@ -758,7 +758,7 @@
             });
             container.innerHTML = html;
         } catch (e) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-xmark d-block"></i><p>Unable to load holidays</p></div>';
+            container.innerHTML = '<div class="empty-state"><img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data"><p>Unable to load holidays</p></div>';
         }
     }
 
@@ -771,7 +771,7 @@
             walletData = await res.json();
 
             if (!walletData || walletData.length === 0) {
-                grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-wallet d-block"></i><p>No wallet data</p></div>';
+                grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data"></div>';
                 return;
             }
 
@@ -825,7 +825,7 @@
 
             grid.innerHTML = html;
         } catch (e) {
-            grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-exclamation-circle d-block"></i><p>Unable to load wallet</p></div>';
+            grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data"><p>Unable to load wallet</p></div>';
         }
     }
 
@@ -915,7 +915,7 @@
             ledgerData = await res.json();
 
             if (!ledgerData || ledgerData.length === 0) {
-                container.innerHTML = '<div class="empty-state"><i class="fas fa-receipt d-block"></i><p>No transactions yet. Your leave transactions will appear here.</p></div>';
+                container.innerHTML = '<div class="empty-state"><img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data"></div>';
                 return;
             }
 
@@ -949,7 +949,7 @@
 
             container.innerHTML = html;
         } catch (e) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle d-block"></i><p>Unable to load transactions</p></div>';
+            container.innerHTML = '<div class="empty-state"><img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data"><p>Unable to load transactions</p></div>';
         }
     }
 
@@ -1378,7 +1378,7 @@
             absenceData = await res.json();
 
             if (!absenceData || absenceData.length === 0) {
-                container.innerHTML = '<div class="empty-state"><i class="fas fa-clipboard-check d-block"></i><p>No leave requests found. Apply for your first leave above!</p></div>';
+                container.innerHTML = '<div class="empty-state"><img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data"><p>No leave requests found. Apply for your first leave above!</p></div>';
                 return;
             }
 
@@ -1427,7 +1427,7 @@
             html += '</div>';
             container.innerHTML = html;
         } catch (e) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle d-block"></i><p>Unable to load absence requests</p></div>';
+            container.innerHTML = '<div class="empty-state"><img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data"><p>Unable to load absence requests</p></div>';
         }
     }
 

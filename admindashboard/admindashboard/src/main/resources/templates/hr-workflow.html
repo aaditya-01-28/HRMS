@@ -113,6 +113,25 @@
             padding-top: 100px;
         }
 
+        
+        /* --- GLOBAL NAVBAR --- */
+        .top-navbar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: 70px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px;
+            z-index: 1050;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+        }
+        .nav-brand {
+            display: flex; align-items: center; gap: 15px;
+            font-size: 1.6rem; font-weight: 800; color: #1e3a8a;
+            letter-spacing: -0.5px;
+        }
+
         /* === TOP HEADER === */
 
         .header-title {
@@ -328,18 +347,18 @@
     </div>
 </div>
 
-<header class="top-header" th:classappend="${isItSupport ? 'it-main-margin' : ''}">
-    <div class="page-title d-flex align-items-center gap-3">
-        <button th:if="${isItSupport}" class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
-        <i class="fas fa-tasks text-dark" style="font-size: 2.5rem;"></i>
-        <span class="fw-bold text-dark" style="border-left: 2px solid #cbd5e1; padding-left: 17px; margin-left: 15px; font-size: 1.5rem; letter-spacing: 0.5px;">
-            MANAGE WORKFLOW
-        </span>
+<!-- GLOBAL NAVBAR -->
+<nav class="top-navbar">
+    <div class="nav-brand">
+        <img src="/images/wcg-logo.jpg" alt="Logo" style="height: 50px; border-radius: 6px;">
+        Manage Workflow
     </div>
-    <a th:href="@{/HR/dashboard}" class="btn-back-home">
-        <i class="fas fa-arrow-left me-2"></i> Back
-    </a>
-</header>
+    <div class="nav-actions d-flex align-items-center gap-3">
+        <a th:href="@{/hr/dashboard}" class="btn btn-light text-dark fw-bold" style="border-radius: 6px; padding: 8px 20px; text-decoration: none;">
+            <i class="fas fa-arrow-left me-2"></i> Back
+        </a>
+    </div>
+</nav>
 
 <div class="main-container" th:classappend="${isItSupport ? 'it-main-margin' : ''}">
 
@@ -912,23 +931,23 @@
                 </div>
 
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Priority:</div>
+                    <div class="text-muted" style="width: 250px;">Priority:</div>
                     <div class="fw-bold text-danger" id="detailTicketPriority">High</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Ticket Type:</div>
+                    <div class="text-muted" style="width: 250px;">Ticket Type:</div>
                     <div class="fw-bold text-dark" id="detailTicketType">Software Request</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Subject:</div>
+                    <div class="text-muted" style="width: 250px;">Subject:</div>
                     <div class="fw-bold text-dark" id="detailTicketSubject">Request for Figma Pro Access</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Description:</div>
+                    <div class="text-muted" style="width: 250px;">Description:</div>
                     <div class="fw-bold text-dark" id="detailTicketDesc"></div>
                 </div>
                 <div class="d-flex mb-4" id="detailTicketAttachmentRow">
-                    <div class="text-muted" style="width: 120px;">Attachments:</div>
+                    <div class="text-muted" style="width: 250px;">Attachments:</div>
                     <div class="fw-bold text-primary d-flex align-items-center">
                         <a href="#" id="detailTicketAttachmentLink" class="text-primary text-decoration-none" download>
                             <span id="detailTicketAttachment"></span>
@@ -937,7 +956,7 @@
                     </div>
                 </div>
                 <div class="d-flex mb-5">
-                    <div class="text-muted" style="width: 120px;">Raised On:</div>
+                    <div class="text-muted" style="width: 250px;">Raised On:</div>
                     <div class="fw-bold text-dark" id="detailTicketApplied"></div>
                 </div>
 
@@ -960,7 +979,7 @@
 
             <!-- Empty State -->
             <div id="ticket-empty-state" class="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
-                <i class="fas fa-ticket-alt fs-1 mb-3 opacity-25"></i>
+                <img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data">
                 <h5>Select a ticket to view details</h5>
             </div>
         </div>
@@ -1065,23 +1084,23 @@
                 </div>
 
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Priority:</div>
+                    <div class="text-muted" style="width: 250px;">Priority:</div>
                     <div class="fw-bold text-danger" id="detailMyAssignPriority">High</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Ticket Type:</div>
+                    <div class="text-muted" style="width: 250px;">Ticket Type:</div>
                     <div class="fw-bold text-dark" id="detailMyAssignType">Software Request</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Subject:</div>
+                    <div class="text-muted" style="width: 250px;">Subject:</div>
                     <div class="fw-bold text-dark" id="detailMyAssignSubject">Request for Figma Pro Access</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Description:</div>
+                    <div class="text-muted" style="width: 250px;">Description:</div>
                     <div class="fw-bold text-dark" id="detailMyAssignDesc"></div>
                 </div>
                 <div class="d-flex mb-4" id="detailMyAssignAttachmentRow">
-                    <div class="text-muted" style="width: 120px;">Attachments:</div>
+                    <div class="text-muted" style="width: 250px;">Attachments:</div>
                     <div class="fw-bold text-primary d-flex align-items-center">
                         <a href="#" id="detailMyAssignAttachmentLink" class="text-primary text-decoration-none" download>
                             <span id="detailMyAssignAttachment"></span>
@@ -1090,7 +1109,7 @@
                     </div>
                 </div>
                 <div class="d-flex mb-5">
-                    <div class="text-muted" style="width: 120px;">Raised On:</div>
+                    <div class="text-muted" style="width: 250px;">Raised On:</div>
                     <div class="fw-bold text-dark" id="detailMyAssignApplied"></div>
                 </div>
 
@@ -1113,7 +1132,7 @@
 
             <!-- Empty State -->
             <div id="myassign-empty-state" class="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
-                <i class="fas fa-ticket-alt fs-1 mb-3 opacity-25"></i>
+                <img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data">
                 <h5>Select a ticket to view details</h5>
             </div>
         </div>
@@ -1357,7 +1376,7 @@
 
             <!-- Empty State -->
             <div id="timesheet-empty-state" class="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
-                <i class="far fa-clock fs-1 mb-3 opacity-25"></i>
+                <img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data">
                 <h5>Select a timesheet to view details</h5>
             </div>
         </div>
@@ -1465,23 +1484,23 @@
                 </div>
 
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Priority:</div>
+                    <div class="text-muted" style="width: 250px;">Priority:</div>
                     <div class="fw-bold text-danger" id="detailOtherPriority">High</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Ticket Type:</div>
+                    <div class="text-muted" style="width: 250px;">Ticket Type:</div>
                     <div class="fw-bold text-dark" id="detailOtherType">Software Request</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Subject:</div>
+                    <div class="text-muted" style="width: 250px;">Subject:</div>
                     <div class="fw-bold text-dark" id="detailOtherSubject">Request for Figma Pro Access</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Description:</div>
+                    <div class="text-muted" style="width: 250px;">Description:</div>
                     <div class="fw-bold text-dark" id="detailOtherDesc"></div>
                 </div>
                 <div class="d-flex mb-4" id="detailOtherAttachmentRow">
-                    <div class="text-muted" style="width: 120px;">Attachments:</div>
+                    <div class="text-muted" style="width: 250px;">Attachments:</div>
                     <div class="fw-bold text-primary d-flex align-items-center">
                         <a href="#" id="detailOtherAttachmentLink" class="text-primary text-decoration-none" download>
                             <span id="detailOtherAttachment"></span>
@@ -1490,7 +1509,7 @@
                     </div>
                 </div>
                 <div class="d-flex mb-5">
-                    <div class="text-muted" style="width: 120px;">Raised On:</div>
+                    <div class="text-muted" style="width: 250px;">Raised On:</div>
                     <div class="fw-bold text-dark" id="detailOtherApplied"></div>
                 </div>
 
@@ -1513,7 +1532,7 @@
 
             <!-- Empty State -->
             <div id="other-empty-state" class="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
-                <i class="fas fa-ticket-alt fs-1 mb-3 opacity-25"></i>
+                <img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data">
                 <h5>Select a ticket to view details</h5>
             </div>
         </div>
