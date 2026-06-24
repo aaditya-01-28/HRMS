@@ -66,8 +66,8 @@ public class SeniorDashboardController {
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_hr/dashboard")
     public String showSeniorHrDashboard(Model model, Principal principal, HttpServletRequest request) {
-    	loadDashboardData(model);
-    	return "employee-dashboard";
+    	model.addAttribute("showMySpace", true);
+    	return "senior_hr-dashboard";
     }
 
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
@@ -120,6 +120,28 @@ public class SeniorDashboardController {
         model.addAttribute("allBookings", allBookings);
         
         return "senior_transport-myspace";
+    }
+
+    // --- MY SPACE ROUTE (HR Payroll) ---
+
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @GetMapping("/senior_hr/my_space")
+    public String showSeniorHrMySpace(Model model, Principal principal) {
+        // Pass mock data representing the screenshot tabs until we have JPA entities for Payroll
+        
+        // Example dynamic summary stats (Mock)
+        model.addAttribute("totalEmployees", 100);
+        model.addAttribute("totalNetPay", "3,88,000");
+        model.addAttribute("deductionsCount", 2);
+        model.addAttribute("totalDaysPresent", "30");
+        
+        // Mock lists for the tables
+        model.addAttribute("salaryStructures", java.util.List.of(
+            new java.util.HashMap<String, Object>() {{ put("empName", "Aakash Sharma"); put("dept", "Engineering"); put("salary", "12,00,000"); put("deductions", 0); put("bonus", 0); }},
+            new java.util.HashMap<String, Object>() {{ put("empName", "Rohan Gupta"); put("dept", "HR"); put("salary", "8,50,000"); put("deductions", 5000); put("bonus", 10000); }}
+        ));
+        
+        return "senior_hr-myspace";
     }
 
     // --- WORKFLOW ROUTES ---
