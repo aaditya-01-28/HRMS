@@ -144,6 +144,29 @@ public class SeniorDashboardController {
         return "senior_hr-myspace";
     }
 
+    // --- MY SPACE ROUTE (HR Employee) ---
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @GetMapping("/senior_hr/employee")
+    public String showSeniorHrEmployee(Model model, Principal principal) {
+        // Mock candidates for Onboarding table
+        model.addAttribute("candidates", java.util.List.of(
+            new java.util.HashMap<String, Object>() {{ put("name", "Neha Sharma"); put("dept", "Engineering"); put("desig", "Sr. Developer"); put("loc", "Delhi, India"); put("join", "20/11/2026"); put("prog", 85); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Amit Sharma"); put("dept", "Engineering"); put("desig", "Sr. Developer"); put("loc", "Delhi, India"); put("join", "20/11/2026"); put("prog", 85); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Pihu Sharma"); put("dept", "Engineering"); put("desig", "Sr. Developer"); put("loc", "Delhi, India"); put("join", "20/11/2026"); put("prog", 85); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Shub Sharma"); put("dept", "Engineering"); put("desig", "Sr. Developer"); put("loc", "Delhi, India"); put("join", "20/11/2026"); put("prog", 85); }}
+        ));
+
+        // Mock employees for All Employees table
+        model.addAttribute("employees", java.util.List.of(
+            new java.util.HashMap<String, Object>() {{ put("name", "Neha Sharma"); put("id", "EMP114"); put("dept", "Engineering"); put("desig", "Full-stack developer"); put("loc", "Delhi, India"); put("type", "Full-time"); put("join", "7 May, 2026"); put("status", "Active"); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Amit Sharma"); put("id", "EMP110"); put("dept", "Product"); put("desig", "Product Manager"); put("loc", "Raipur, India"); put("type", "Full-time"); put("join", "15 May, 2026"); put("status", "Active"); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Pihu Sharma"); put("id", "EMP114"); put("dept", "Engineering"); put("desig", "Software Engineer"); put("loc", "Ooty, India"); put("type", "Full-time"); put("join", "7 May, 2026"); put("status", "On Notice"); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Shub Sharma"); put("id", "EMP114"); put("dept", "Engineering"); put("desig", "Junior developer"); put("loc", "Pune, India"); put("type", "Full-time"); put("join", "7 May, 2026"); put("status", "Active"); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Neha Patel"); put("id", "EMP114"); put("dept", "HR"); put("desig", "Hr Executive"); put("loc", "Delhi, India"); put("type", "Full-time"); put("join", "7 May, 2026"); put("status", "Exited"); }}
+        ));
+
+        return "senior_hr-employee";
+    }
     // --- WORKFLOW ROUTES ---
 
     @PreAuthorize("hasAuthority('admin_dashboard_view')")

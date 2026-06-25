@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteCircle | HR Admin - Employee</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --sidebar-width: 220px;
+            --header-height: 70px;
+        }
+
+        body {
+            background-color: #f8fafc;
+            overflow-x: hidden;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* --- SIDEBAR --- */
+        .myspace-sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1051;
+            transition: transform 0.3s ease;
+        }
+        body.sidebar-toggled .myspace-sidebar { transform: translateX(-100%); }
+
+        .myspace-sidebar .brand-area {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: var(--header-height);
+        }
+        .myspace-sidebar .brand-area img {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+        }
+        .myspace-sidebar .brand-area .brand-text {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+        .myspace-sidebar .brand-area .brand-sub {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .myspace-sidebar .nav-links {
+            padding: 15px 0;
+            flex: 1;
+        }
+        .myspace-sidebar .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .myspace-sidebar .nav-link-item:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+        .myspace-sidebar .nav-link-item.active {
+            background: #3b82f6;
+            color: white;
+            border-left-color: #1e3a8a;
+        }
+        .myspace-sidebar .nav-link-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        /* --- GLOBAL NAVBAR --- */
+        .top-navbar {
+            position: fixed; top: 0; left: var(--sidebar-width); right: 0;
+            height: var(--header-height);
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px;
+            z-index: 1050;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            transition: left 0.3s ease;
+        }
+        body.sidebar-toggled .top-navbar { left: 0; }
+        
+        .nav-brand {
+            display: flex; align-items: center; gap: 15px;
+            font-size: 1.4rem; font-weight: 800; color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        .myspace-main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 30px;
+            min-height: calc(100vh - var(--header-height));
+            transition: margin-left 0.3s ease;
+        }
+        body.sidebar-toggled .myspace-main { margin-left: 0; }
+
+        /* --- NAV TABS --- */
+        .custom-tabs {
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 25px;
+        }
+        .custom-tabs .nav-link {
+            color: #64748b;
+            font-weight: 600;
+            padding: 12px 20px;
+            border: none;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -1px;
+            border-radius: 0;
+        }
+        .custom-tabs .nav-link:hover { color: var(--primary); }
+        .custom-tabs .nav-link.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: transparent;
+        }
+
+        /* --- STATS --- */
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .stat-item .icon {
+            font-size: 2rem;
+        }
+        .stat-item .label {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .stat-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        /* --- TABLES --- */
+        .card-custom {
+            background: white;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            overflow: hidden;
+            padding: 20px;
+        }
+        .table-custom thead th {
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .table-custom tbody td {
+            padding: 15px 20px;
+            vertical-align: middle;
+            color: #334155;
+            font-size: 0.85rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .emp-avatar {
+            width: 35px; height: 35px;
+            border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-weight: 700; color: white;
+            margin-right: 10px;
+            background-color: #020617; /* Default fallback */
+        }
+        
+        .progress-custom { height: 8px; border-radius: 4px; width: 100%; margin-top: 5px; }
+
+        /* WIZARD STEPPER */
+        .stepper-wrapper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .stepper-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 15px; left: 0; right: 0;
+            height: 2px; background: #e2e8f0;
+            z-index: 1;
+        }
+        .stepper-item {
+            position: relative; z-index: 2;
+            display: flex; align-items: center; gap: 8px;
+            background: white; padding: 0 10px;
+        }
+        .stepper-circle {
+            width: 30px; height: 30px; border-radius: 50%;
+            border: 2px solid #3b82f6; background: white; color: #3b82f6;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold;
+        }
+        .stepper-item.active .stepper-circle { background: #3b82f6; color: white; }
+        .stepper-item.completed .stepper-circle { border-color: #10b981; background: #10b981; color: white; }
+        .stepper-label { font-weight: 600; color: #64748b; font-size: 0.9rem; }
+        .stepper-item.active .stepper-label { color: #1e293b; }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="myspace-sidebar shadow-sm">
+        <div class="brand-area">
+            <img src="/images/wcg-logo.jpg" alt="Logo">
+            <div>
+                <div class="brand-text">WhiteCircle</div>
+                <div class="brand-sub">HR Admin</div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a href="/senior_hr/employee" class="nav-link-item active"><i class="fas fa-users"></i> Employee</a>
+            <a href="#" class="nav-link-item" onclick="alert('LMS Module Under Development')"><i class="fas fa-graduation-cap"></i> LMS</a>
+            <a href="/senior_hr/my_space" class="nav-link-item"><i class="fas fa-money-check-alt"></i> Payroll</a>
+            <a href="#" class="nav-link-item" onclick="alert('Attendance Module Under Development')"><i class="fas fa-calendar-check"></i> Attendance</a>
+            <a href="#" class="nav-link-item" onclick="alert('Performance Module Under Development')"><i class="fas fa-chart-line"></i> Performance</a>
+            <a href="#" class="nav-link-item" onclick="alert('Recruitment Module Under Development')"><i class="fas fa-user-plus"></i> Recruitment</a>
+        </div>
+    </div>
+
+    <!-- GLOBAL NAVBAR -->
+    <nav class="top-navbar">
+        <div class="nav-brand">
+            <button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
+            <div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
+                <span style="color: #002D72; font-weight: 700; font-size: 1.3rem;">WhiteCircle Group - Shahdol</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: #333; margin-top: 2px;">Payroll</span>
+            </div>
+        </div>
+        <div class="nav-actions d-flex align-items-center gap-3">
+            <a href="/senior_hr/dashboard" class="btn btn-light text-dark fw-bold" style="border-radius: 6px; padding: 8px 20px; text-decoration: none;">
+                <i class="fas fa-arrow-left me-2"></i> Back
+            </a>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="myspace-main">
+        
+        <!-- TABS -->
+        <ul class="nav custom-tabs" id="employeeTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="all-emp-tab" data-bs-toggle="tab" data-bs-target="#all-emp-pane" type="button" role="tab">All Employees</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="onboarding-tab" data-bs-toggle="tab" data-bs-target="#onboarding-pane" type="button" role="tab">Onboarding</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="offboarding-tab" data-bs-toggle="tab" data-bs-target="#offboarding-pane" type="button" role="tab">Offboarding</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="docs-tab" data-bs-toggle="tab" data-bs-target="#docs-pane" type="button" role="tab">Employee Documents</button>
+            </li>
+        </ul>
+
+        <!-- TAB CONTENT -->
+        <div class="tab-content">
+            
+            <!-- 1. ALL EMPLOYEES PANE -->
+            <div class="tab-pane fade show active" id="all-emp-pane" role="tabpanel">
+                
+                <!-- Metrics Row -->
+                <div class="d-flex justify-content-between align-items-center mb-5 mt-3 px-3">
+                    <div class="stat-item">
+                        <div class="icon text-primary"><i class="fas fa-users"></i></div>
+                        <div>
+                            <div class="label">Total Employees</div>
+                            <div class="value">100</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="icon text-success"><i class="far fa-calendar-check"></i></div>
+                        <div>
+                            <div class="label">Active Employee</div>
+                            <div class="value">85</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="icon text-primary"><i class="fas fa-user-plus"></i></div>
+                        <div>
+                            <div class="label">Onboarding</div>
+                            <div class="value">7</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="icon text-warning"><i class="far fa-calendar-alt"></i></div>
+                        <div>
+                            <div class="label">Notice Period</div>
+                            <div class="value">4</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="icon text-danger"><i class="fas fa-user-minus"></i></div>
+                        <div>
+                            <div class="label">Offboarded</div>
+                            <div class="value">5</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="row mb-5">
+                    <div class="col-md-5">
+                        <h6 class="text-center text-primary fw-bold mb-4">Employees by Department</h6>
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div style="width: 200px; height: 200px;">
+                                <canvas id="deptDonutChart"></canvas>
+                            </div>
+                            <div class="ms-4">
+                                <ul class="list-unstyled mb-0" style="font-size: 0.75rem; font-weight: 600;">
+                                    <li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #3b82f6;"></span>Engineering <span class="float-end ms-4">36%</span></li>
+                                    <li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #10b981;"></span>Product <span class="float-end ms-4">16%</span></li>
+                                    <li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #f59e0b;"></span>Design <span class="float-end ms-4">8%</span></li>
+                                    <li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #06b6d4;"></span>Marketing <span class="float-end ms-4">5%</span></li>
+                                    <li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #8b5cf6;"></span>Sales <span class="float-end ms-4">8%</span></li>
+                                    <li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #ec4899;"></span>HR <span class="float-end ms-4">5%</span></li>
+                                    <li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #f43f5e;"></span>Finance <span class="float-end ms-4">5%</span></li>
+                                    <li class="mb-0"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #94a3b8;"></span>Others <span class="float-end ms-4">18%</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <h6 class="text-center text-primary fw-bold mb-4">Department Wise Headcount</h6>
+                        <div class="px-5">
+                            <!-- Progress Bars -->
+                            <div class="d-flex align-items-center mb-3">
+                                <div style="width: 100px; font-size: 0.8rem;">Engineering</div>
+                                <div class="progress flex-grow-1" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: 45%;"></div>
+                                </div>
+                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">45%</div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div style="width: 100px; font-size: 0.8rem;">Design</div>
+                                <div class="progress flex-grow-1" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: 27%;"></div>
+                                </div>
+                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">27%</div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div style="width: 100px; font-size: 0.8rem;">Product</div>
+                                <div class="progress flex-grow-1" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: 35%;"></div>
+                                </div>
+                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">35%</div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div style="width: 100px; font-size: 0.8rem;">HR</div>
+                                <div class="progress flex-grow-1" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: 20%;"></div>
+                                </div>
+                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">20%</div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div style="width: 100px; font-size: 0.8rem;">Finance</div>
+                                <div class="progress flex-grow-1" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: 29%;"></div>
+                                </div>
+                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">29%</div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div style="width: 100px; font-size: 0.8rem;">Sales</div>
+                                <div class="progress flex-grow-1" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: 36%;"></div>
+                                </div>
+                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">36%</div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div style="width: 100px; font-size: 0.8rem;">Marketing</div>
+                                <div class="progress flex-grow-1" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: 40%;"></div>
+                                </div>
+                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">40%</div>
+                            </div>
+                            <div class="d-flex align-items-center mb-0">
+                                <div style="width: 100px; font-size: 0.8rem;">Others</div>
+                                <div class="progress flex-grow-1" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: 33%;"></div>
+                                </div>
+                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">33%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table with Filters -->
+                <div class="card-custom">
+                    <div class="d-flex gap-3 mb-4">
+                        <div class="position-relative flex-grow-1" style="max-width: 300px;">
+                            <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 12px;"></i>
+                            <input type="text" class="form-control" placeholder="Search by employee name" style="padding-left: 40px;">
+                        </div>
+                        <select class="form-select w-auto"><option>All Departments</option></select>
+                        <select class="form-select w-auto"><option>All Location</option></select>
+                        <select class="form-select w-auto"><option>All Roles</option></select>
+                        <select class="form-select w-auto"><option>All Status</option></select>
+                        <button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> More Filters</button>
+                    </div>
+
+                    <div class="table-responsive border rounded">
+                        <table class="table table-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Employee ID</th>
+                                    <th>Department</th>
+                                    <th>Designation</th>
+                                    <th>Location</th>
+                                    <th>Employment type</th>
+                                    <th>Joined Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="emp, iterStat : ${employees}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <!-- Alternate image colors for mockup -->
+                                            <img th:src="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}" 
+                                                 class="emp-avatar border" style="object-fit: cover;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\' /></svg>'">
+                                            <div class="lh-1">
+                                                <div class="fw-bold text-dark mb-1" th:text="${emp.name}">Name</div>
+                                                <div style="font-size: 0.7rem; color: #94a3b8;" th:text="${#strings.toLowerCase(#strings.replace(emp.name,' ','')) + 'wcg@mail.com'}">email</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td th:text="${emp.id}">ID</td>
+                                    <td th:text="${emp.dept}">Dept</td>
+                                    <td th:text="${emp.desig}">Desig</td>
+                                    <td th:text="${emp.loc}">Loc</td>
+                                    <td th:text="${emp.type}">Type</td>
+                                    <td th:text="${emp.join}">Join Date</td>
+                                    <td>
+                                        <span th:class="${emp.status == 'Active' ? 'text-success fw-bold' : (emp.status == 'On Notice' ? 'text-warning fw-bold' : 'text-danger fw-bold')}" 
+                                              th:text="${emp.status}">Status</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
+                                        <button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="text-muted" style="font-size: 0.85rem;">Showing 1 to 10 entries</div>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item"><a class="page-link" href="#">4</a></li>
+                            <li class="page-item"><a class="page-link" href="#">5</a></li>
+                            <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. ONBOARDING PANE -->
+            <div class="tab-pane fade" id="onboarding-pane" role="tabpanel">
+                
+                <!-- LIST VIEW -->
+                <div id="onboarding-list-view" class="card-custom border-0 shadow-none p-0">
+                    <div class="d-flex gap-3 mb-4 mt-3">
+                        <div class="position-relative flex-grow-1" style="max-width: 300px;">
+                            <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 12px;"></i>
+                            <input type="text" class="form-control" placeholder="Search by employee name" style="padding-left: 40px;">
+                        </div>
+                        <select class="form-select w-auto"><option>All Departments</option></select>
+                        <select class="form-select w-auto"><option>All Location</option></select>
+                        <select class="form-select w-auto"><option>All Roles</option></select>
+                        <button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> More Filters</button>
+                        <button class="btn btn-primary fw-bold ms-auto" onclick="toggleOnboardingForm(true)">
+                            <i class="fas fa-plus me-1"></i> Add Candidate
+                        </button>
+                    </div>
+
+                    <div class="table-responsive border rounded">
+                        <table class="table table-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Candidate Name</th>
+                                    <th>Department</th>
+                                    <th>Designation</th>
+                                    <th>Location</th>
+                                    <th>Join Date</th>
+                                    <th>Progress</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="cand, iterStat : ${candidates}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img th:src="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}" 
+                                                 class="emp-avatar border" style="object-fit: cover;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\' /></svg>'">
+                                            <div class="lh-1">
+                                                <div class="fw-bold text-dark mb-1" th:text="${cand.name}">Name</div>
+                                                <div style="font-size: 0.7rem; color: #94a3b8;" th:text="${#strings.toLowerCase(#strings.replace(cand.name,' ','')) + 'wcg@mail.com'}">email</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td th:text="${cand.dept}">Dept</td>
+                                    <td th:text="${cand.desig}">Desig</td>
+                                    <td th:text="${cand.loc}">Loc</td>
+                                    <td th:text="${cand.join}">Join Date</td>
+                                    <td style="width: 120px;">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="progress flex-grow-1" style="height: 6px;">
+                                                <div class="progress-bar bg-success" th:style="'width: ' + ${cand.prog} + '%'"></div>
+                                            </div>
+                                            <span style="font-size: 0.75rem; font-weight: bold;" th:text="${cand.prog} + '%'"></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="text-primary fw-bold">In Progress</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
+                                        <button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- FORM WIZARD VIEW (Hidden by default) -->
+                <div id="onboarding-form-view" class="d-none mt-4">
+                    
+                    <!-- Stepper -->
+                    <div class="stepper-wrapper px-4">
+                        <div class="stepper-item active" id="step1-indicator">
+                            <div class="stepper-circle">1</div>
+                            <div class="stepper-label">General</div>
+                        </div>
+                        <div class="stepper-item" id="step2-indicator">
+                            <div class="stepper-circle">2</div>
+                            <div class="stepper-label">Classification</div>
+                        </div>
+                        <div class="stepper-item" id="step3-indicator">
+                            <div class="stepper-circle">3</div>
+                            <div class="stepper-label">Statutory</div>
+                        </div>
+                        <div class="stepper-item" id="step4-indicator">
+                            <div class="stepper-circle">4</div>
+                            <div class="stepper-label">HR Category</div>
+                        </div>
+                        <div class="stepper-item" id="step5-indicator">
+                            <div class="stepper-circle">5</div>
+                            <div class="stepper-label">Documents</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1 Form -->
+                    <div id="step1-form" class="px-3">
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Prefix <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Mr.</option><option>Ms.</option></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Employee ID <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" value="EMP114">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">First Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" value="Amit Kumar">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Middle Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" value="Kumar">
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Last Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" value="Sharma">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" value="amitwcg@mail">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Phone No. <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" value="987565266">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Emergency No. <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" value="987565266">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">DOB <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="DD-MM-YYYY">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Gender <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Male</option><option>Female</option></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Marital Status <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Single</option><option>Married</option></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Nationality <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" value="INDIAN">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Father's Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="Enter">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Mother's Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="Enter">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Spouse Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="Enter">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Date of Joining <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="DD-MM-YYYY">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Probation Period <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="Enter Days">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Probation Completion date <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="DD-MM-YYYY">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Blood Group <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>O +ve</option></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Physically Challenged <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>No</option><option>Yes</option></select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-3">
+                            <button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="toggleOnboardingForm(false)">Cancel</button>
+                            <button class="btn btn-primary px-5 py-2 fw-bold" onclick="goToStep2()">Save & Next <i class="fas fa-arrow-right ms-2"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 Form -->
+                    <div id="step2-form" class="px-3 d-none">
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Department <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Engineering</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Designation <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Senior</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Employment Type <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Full-Time</option></select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Job title <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Developer</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-primary border-bottom border-primary" style="font-size: 0.85rem;">Grade/Level <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Select Level</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Role <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Select Role</option></select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Reports To <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Amit Kumar</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Business Unit <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Business Unit</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Work Location <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Raipur</option></select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Work Shift <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>General</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Date of Confirmation <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="DD-MM-YYYY">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Probation Review Date <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="DD-MM-YYYY">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-3">
+                            <button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep1()">Back</button>
+                            <button class="btn btn-primary px-5 py-2 fw-bold" onclick="goToStep3()">Save & Next <i class="fas fa-arrow-right ms-2"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 Form -->
+                    <div id="step3-form" class="px-3 d-none">
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">PAN Number <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="Enter PAN">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">AADHAAR No <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="Enter">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">PF No <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="Full-Time">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">ESI No <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="Enter ESI">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">UAN No <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="Enter UAN">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Tax Regime <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Select Tax Regime</option></select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Professional Tax Applicable <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Yes/No</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">PT Registration No <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="Enter PT">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">PT State <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Select PT state</option></select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-3">
+                            <button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep2()">Cancel</button>
+                            <button class="btn btn-primary px-5 py-2 fw-bold" onclick="goToStep4()">Save & Next <i class="fas fa-arrow-right ms-2"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 Form -->
+                    <div id="step4-form" class="px-3 d-none">
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Employee Category <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Select Category</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Staffing Type <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Select</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Pay Type <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Select</option></select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Pay Frequency <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Select Freq</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Select Work Location Type <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>WFH</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Probation Applicable <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Yes/No</option></select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">OT Eligible <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Yes/No</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Travel Required <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Yes/N</option></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Department Head <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Arun Kumar</option></select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-3">
+                            <button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep3()">Cancel</button>
+                            <button class="btn btn-primary px-5 py-2 fw-bold" onclick="goToStep5()">Save & Next <i class="fas fa-arrow-right ms-2"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 5 Form -->
+                    <div id="step5-form" class="px-3 d-none">
+                        <div class="table-responsive border rounded mb-5">
+                            <table class="table table-custom mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Document Type</th>
+                                        <th>Required</th>
+                                        <th>Upload</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-bold">Passport Size Photo <span class="text-danger">*</span></td>
+                                        <td class="text-danger fw-bold">Yes</td>
+                                        <td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+                                        <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB & 500 x 500 resolution)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Resume/CV <span class="text-danger">*</span></td>
+                                        <td class="text-danger fw-bold">Yes</td>
+                                        <td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+                                        <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB & 500 x 500 resolution)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Aadhaar Card <span class="text-danger">*</span></td>
+                                        <td class="text-danger fw-bold">Yes</td>
+                                        <td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+                                        <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB & 500 x 500 resolution)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">PAN Card <span class="text-danger">*</span></td>
+                                        <td class="text-danger fw-bold">Yes</td>
+                                        <td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+                                        <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB & 500 x 500 resolution)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Educational Certificate <span class="text-danger">*</span></td>
+                                        <td class="text-danger fw-bold">Yes</td>
+                                        <td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+                                        <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB & 500 x 500 resolution)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Experience Letter <span class="text-danger">*</span></td>
+                                        <td class="text-success fw-bold">No</td>
+                                        <td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+                                        <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB & 500 x 500 resolution)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Offer Letter <span class="text-danger">*</span></td>
+                                        <td class="text-success fw-bold">No</td>
+                                        <td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+                                        <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB & 500 x 500 resolution)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-3">
+                            <button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep4()">Cancel</button>
+                            <button class="btn btn-success px-5 py-2 fw-bold" onclick="alert('Candidate Onboarded Successfully!'); toggleOnboardingForm(false);">Submit <i class="fas fa-arrow-right ms-2"></i></button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Placeholder Panes -->
+            <div class="tab-pane fade" id="offboarding-pane" role="tabpanel"><h5 class="mt-4 text-muted">Offboarding Module (Coming Soon)</h5></div>
+            <div class="tab-pane fade" id="docs-pane" role="tabpanel"><h5 class="mt-4 text-muted">Employee Documents (Coming Soon)</h5></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form Wizard Logic
+        function toggleOnboardingForm(showForm) {
+            if (showForm) {
+                document.getElementById('onboarding-list-view').classList.add('d-none');
+                document.getElementById('onboarding-form-view').classList.remove('d-none');
+                goToStep1();
+            } else {
+                document.getElementById('onboarding-form-view').classList.add('d-none');
+                document.getElementById('onboarding-list-view').classList.remove('d-none');
+            }
+        }
+
+        function goToStep1() {
+            ['step1-form', 'step2-form', 'step3-form', 'step4-form', 'step5-form'].forEach(id => document.getElementById(id).classList.add('d-none'));
+            document.getElementById('step1-form').classList.remove('d-none');
+            
+            document.getElementById('step1-indicator').classList.add('active');
+            document.getElementById('step1-indicator').classList.remove('completed');
+            ['step2-indicator', 'step3-indicator', 'step4-indicator', 'step5-indicator'].forEach(id => document.getElementById(id).classList.remove('active', 'completed'));
+        }
+
+        function goToStep2() {
+            ['step1-form', 'step2-form', 'step3-form', 'step4-form', 'step5-form'].forEach(id => document.getElementById(id).classList.add('d-none'));
+            document.getElementById('step2-form').classList.remove('d-none');
+            
+            document.getElementById('step1-indicator').classList.remove('active');
+            document.getElementById('step1-indicator').classList.add('completed');
+            document.getElementById('step2-indicator').classList.add('active');
+            document.getElementById('step2-indicator').classList.remove('completed');
+            ['step3-indicator', 'step4-indicator', 'step5-indicator'].forEach(id => document.getElementById(id).classList.remove('active', 'completed'));
+        }
+
+        function goToStep3() {
+            ['step1-form', 'step2-form', 'step3-form', 'step4-form', 'step5-form'].forEach(id => document.getElementById(id).classList.add('d-none'));
+            document.getElementById('step3-form').classList.remove('d-none');
+            
+            ['step1-indicator', 'step2-indicator'].forEach(id => {
+                document.getElementById(id).classList.remove('active');
+                document.getElementById(id).classList.add('completed');
+            });
+            document.getElementById('step3-indicator').classList.add('active');
+            document.getElementById('step3-indicator').classList.remove('completed');
+            ['step4-indicator', 'step5-indicator'].forEach(id => document.getElementById(id).classList.remove('active', 'completed'));
+        }
+
+        function goToStep4() {
+            ['step1-form', 'step2-form', 'step3-form', 'step4-form', 'step5-form'].forEach(id => document.getElementById(id).classList.add('d-none'));
+            document.getElementById('step4-form').classList.remove('d-none');
+            
+            ['step1-indicator', 'step2-indicator', 'step3-indicator'].forEach(id => {
+                document.getElementById(id).classList.remove('active');
+                document.getElementById(id).classList.add('completed');
+            });
+            document.getElementById('step4-indicator').classList.add('active');
+            document.getElementById('step4-indicator').classList.remove('completed');
+            document.getElementById('step5-indicator').classList.remove('active', 'completed');
+        }
+
+        function goToStep5() {
+            ['step1-form', 'step2-form', 'step3-form', 'step4-form', 'step5-form'].forEach(id => document.getElementById(id).classList.add('d-none'));
+            document.getElementById('step5-form').classList.remove('d-none');
+            
+            ['step1-indicator', 'step2-indicator', 'step3-indicator', 'step4-indicator'].forEach(id => {
+                document.getElementById(id).classList.remove('active');
+                document.getElementById(id).classList.add('completed');
+            });
+            document.getElementById('step5-indicator').classList.add('active');
+            document.getElementById('step5-indicator').classList.remove('completed');
+        }
+
+        // Chart.js Setup for Donut Chart
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('deptDonutChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Engineering', 'Product', 'Design', 'Marketing', 'Sales', 'HR', 'Finance', 'Others'],
+                    datasets: [{
+                        data: [36, 16, 8, 5, 8, 5, 5, 18],
+                        backgroundColor: [
+                            '#3b82f6', '#10b981', '#f59e0b', '#06b6d4',
+                            '#8b5cf6', '#ec4899', '#f43f5e', '#94a3b8'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true }
+                    }
+                },
+                plugins: [{
+                    id: 'textCenter',
+                    beforeDraw: function(chart) {
+                        var width = chart.width, height = chart.height, ctx = chart.ctx;
+                        ctx.restore();
+                        var fontSize = (height / 100).toFixed(2);
+                        ctx.font = "bold " + fontSize + "em sans-serif";
+                        ctx.textBaseline = "middle";
+                        ctx.fillStyle = "#1e293b";
+                        var text = "100",
+                            textX = Math.round((width - ctx.measureText(text).width) / 2),
+                            textY = height / 2 - 10;
+                        ctx.fillText(text, textX, textY);
+                        
+                        ctx.font = "600 " + (fontSize * 0.6) + "em sans-serif";
+                        ctx.fillStyle = "#3b82f6";
+                        var text2 = "Total",
+                            text2X = Math.round((width - ctx.measureText(text2).width) / 2),
+                            text2Y = height / 2 + 15;
+                        ctx.fillText(text2, text2X, text2Y);
+                        ctx.save();
+                    }
+                }]
+            });
+        });
+    </script>
+</body>
+</html>
