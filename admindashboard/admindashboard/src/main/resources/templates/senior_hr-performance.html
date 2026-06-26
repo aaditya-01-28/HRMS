@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteCircle | HR Admin - Performance</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #002D72;
+            --sidebar-width: 220px;
+            --header-height: 70px;
+        }
+
+        /* --- SIDEBAR --- */
+        .myspace-sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1051;
+            transition: transform 0.3s ease;
+        }
+        body.sidebar-toggled .myspace-sidebar { transform: translateX(-100%); }
+
+        .myspace-sidebar .brand-area {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: var(--header-height);
+        }
+        .myspace-sidebar .brand-area img {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+        }
+        .myspace-sidebar .brand-area .brand-text {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+        .myspace-sidebar .brand-area .brand-sub {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .myspace-sidebar .nav-links {
+            padding: 15px 0;
+            flex: 1;
+        }
+        .myspace-sidebar .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .myspace-sidebar .nav-link-item:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+        .myspace-sidebar .nav-link-item.active {
+            background: #002D72;
+            color: white;
+            border-left-color: #1e3a8a;
+        }
+        .myspace-sidebar .nav-link-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        /* --- GLOBAL NAVBAR --- */
+        .top-navbar {
+            position: fixed; top: 0; left: var(--sidebar-width); right: 0;
+            height: var(--header-height);
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px;
+            z-index: 1050;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            transition: left 0.3s ease;
+        }
+        body.sidebar-toggled .top-navbar { left: 0; }
+        
+        .nav-brand {
+            display: flex; align-items: center; gap: 15px;
+            font-size: 1.4rem; font-weight: 800; color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        .myspace-main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 30px;
+            min-height: calc(100vh - var(--header-height));
+            transition: margin-left 0.3s ease;
+            background-color: #ffffff;
+        }
+        body.sidebar-toggled .myspace-main { margin-left: 0; }
+.nav-tabs-custom {
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+        .nav-tabs-custom .nav-link {
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 0.5rem 1rem 0.75rem 1rem;
+            margin-right: 1rem;
+            font-size: 0.95rem;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .nav-tabs-custom .nav-link:hover {
+            color: var(--primary-blue);
+        }
+        .nav-tabs-custom .nav-link.active {
+            color: var(--primary-blue);
+            background-color: transparent;
+            border-bottom-color: var(--primary-blue);
+        }
+
+        /* Charts & Cards */
+        .card-custom {
+            border: none;
+            border-radius: 8px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .donut-inner-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+            display: inline-block;
+        }
+
+        /* Table Styles */
+        .table-custom {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .table-custom thead th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+        .table-custom tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            font-size: 0.85rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+        }
+        .table-custom tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        .table-custom tbody tr:last-child td {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+
+    
+    <!-- SIDEBAR -->
+    <div class="myspace-sidebar shadow-sm">
+        <div class="brand-area">
+            <img src="/images/wcg-logo.jpg" alt="Logo">
+            <div>
+                <div class="brand-text">WhiteCircle</div>
+                <div class="brand-sub">HR Admin</div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a href="/senior_hr/employee" class="nav-link-item"><i class="fas fa-users"></i> Employee</a>
+            <a href="#" class="nav-link-item" onclick="alert('LMS Module Under Development')"><i class="fas fa-graduation-cap"></i> LMS</a>
+            <a href="/senior_hr/my_space" class="nav-link-item"><i class="fas fa-money-check-alt"></i> Payroll</a>
+            <a href="/senior_hr/attendance" class="nav-link-item"><i class="fas fa-clock"></i> Attendance</a>
+            <a href="/senior_hr/performance" class="nav-link-item active"><i class="fas fa-chart-line"></i> Performance</a>
+            <a href="#" class="nav-link-item" onclick="alert('Recruitment Module Under Development')"><i class="fas fa-user-plus"></i> Recruitment</a>
+        </div>
+    </div>
+
+    <!-- GLOBAL NAVBAR -->
+    <nav class="top-navbar">
+        <div class="nav-brand">
+            <button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
+            <div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
+                <span style="color: #002D72; font-weight: 700; font-size: 1.3rem;">WhiteCircle Group - Shahdol</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: #333; margin-top: 2px;">Performance</span>
+            </div>
+        </div>
+        <div class="nav-actions d-flex align-items-center gap-3">
+            <a href="/senior_hr/dashboard" class="btn btn-light text-dark fw-bold" style="border-radius: 6px; padding: 8px 20px; text-decoration: none;">
+                <i class="fas fa-arrow-left me-2"></i> Back
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="myspace-main">
+        
+        <!-- Tabs -->
+        <ul class="nav nav-tabs nav-tabs-custom" id="performanceTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-pane" type="button" role="tab">Overview</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="goals-tab" data-bs-toggle="tab" data-bs-target="#goals-pane" type="button" role="tab">Goal & KPIs</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="cycles-tab" data-bs-toggle="tab" data-bs-target="#cycles-pane" type="button" role="tab">Appraisal Cycles</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="performanceTabsContent">
+            
+            <!-- OVERVIEW PANE -->
+            <div class="tab-pane fade show active" id="overview-pane" role="tabpanel">
+                
+                <div class="row mb-5">
+                    <!-- Performance Overview Donut -->
+                    <div class="col-md-5">
+                        <h5 class="fw-bold text-primary mb-4" style="font-size: 1.1rem;">Performance Overview</h5>
+                        <div class="d-flex align-items-center">
+                            <div class="chart-container" style="width: 220px; height: 220px;">
+                                <canvas id="performanceDonutChart"></canvas>
+                                <div class="donut-inner-text">
+                                    <div class="fw-bold" style="font-size: 1.5rem; color: #1e293b;">120</div>
+                                    <div style="font-size: 0.7rem; color: #64748b; line-height: 1;">Total<br>Employees</div>
+                                </div>
+                            </div>
+                            <div class="ms-4 flex-grow-1" style="max-width: 180px;">
+                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #002D72;"></span>Excellent</span> <span>36%</span></div>
+                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #10b981;"></span>Very Good</span> <span>34%</span></div>
+                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #fcd34d;"></span>Good</span> <span>25%</span></div>
+                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #f472b6;"></span>Average</span> <span>13%</span></div>
+                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #a78bfa;"></span>Below Average</span> <span>5%</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Rating Distribution Trend Line -->
+                    <div class="col-md-7">
+                        <h5 class="fw-bold text-primary mb-4 text-center" style="font-size: 1.1rem;">Rating Distribution Trend</h5>
+                        <div class="d-flex align-items-center">
+                            <div class="chart-container flex-grow-1" style="height: 220px;">
+                                <canvas id="ratingLineChart"></canvas>
+                            </div>
+                            <div class="ms-3" style="width: 140px;">
+                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #002D72;"></span>Excellent</span></div>
+                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #10b981;"></span>Very Good</span></div>
+                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #fcd34d;"></span>Good</span></div>
+                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #f472b6;"></span>Average</span></div>
+                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #a78bfa;"></span>Below Average</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appraisal Cycles Table -->
+                <div class="d-flex justify-content-end mb-3 gap-3">
+                    <button class="btn btn-outline-secondary btn-sm px-3 fw-bold"><i class="fas fa-filter"></i> More Filters</button>
+                    <button class="btn btn-primary btn-sm px-3 fw-bold"><i class="fas fa-plus"></i> Create Appraisal Cycle</button>
+                </div>
+                
+                <div class="table-responsive border rounded">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th>Cycle Name</th>
+                                <th>Cycle Type</th>
+                                <th>Duration</th>
+                                <th>Employees</th>
+                                <th>Progress</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="app, iterStat : ${appraisals}">
+                                <td class="text-dark" th:text="${app.name}">Name</td>
+                                <td th:text="${app.type}">Type</td>
+                                <td th:text="${app.duration}">Dur</td>
+                                <td th:text="${app.emp}">Emp</td>
+                                <td style="width: 120px;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" style="height: 6px;">
+                                            <div class="progress-bar bg-primary" th:style="'width: ' + ${app.prog} + '%'"></div>
+                                        </div>
+                                        <span style="font-size: 0.75rem; font-weight: bold;" th:text="${app.prog} + '%'"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span th:class="${app.status == 'Active' ? 'text-success fw-bold' : 'text-success fw-bold'}" th:text="${app.status}">Status</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
+                                    <button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mt-3 mb-5">
+                    <div class="text-muted" style="font-size: 0.85rem;">Showing 1 to 5 entries</div>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">4</a></li>
+                        <li class="page-item"><a class="page-link" href="#">5</a></li>
+                        <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Placeholder Panes -->
+            <div class="tab-pane fade" id="goals-pane" role="tabpanel"><h5 class="mt-4 text-muted">Goal & KPIs (Coming Soon)</h5></div>
+            <div class="tab-pane fade" id="cycles-pane" role="tabpanel"><h5 class="mt-4 text-muted">Appraisal Cycles (Coming Soon)</h5></div>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Sidebar Toggle
+        document.getElementById('sidebarToggleBtn')?.addEventListener('click', function() {
+            document.body.classList.toggle('sidebar-collapsed');
+        });
+
+        // Charts
+        document.addEventListener("DOMContentLoaded", function() {
+            // Donut Chart
+            const donutCtx = document.getElementById('performanceDonutChart').getContext('2d');
+            new Chart(donutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Excellent', 'Very Good', 'Good', 'Average', 'Below Average'],
+                    datasets: [{
+                        data: [36, 34, 25, 13, 5],
+                        backgroundColor: ['#002D72', '#10b981', '#fcd34d', '#f472b6', '#a78bfa'],
+                        borderWidth: 0,
+                        cutout: '75%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true }
+                    }
+                }
+            });
+
+            // Line Chart
+            const lineCtx = document.getElementById('ratingLineChart').getContext('2d');
+            new Chart(lineCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'],
+                    datasets: [
+                        {
+                            label: 'Excellent',
+                            data: [110, 120, 125, 160, 165, 140],
+                            borderColor: '#002D72',
+                            backgroundColor: '#002D72',
+                            tension: 0.4,
+                            pointRadius: 2,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Very Good',
+                            data: [75, 85, 90, 105, 110, 105],
+                            borderColor: '#10b981',
+                            backgroundColor: '#10b981',
+                            tension: 0.4,
+                            pointRadius: 2,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Good',
+                            data: [65, 80, 85, 100, 95, 100],
+                            borderColor: '#fcd34d',
+                            backgroundColor: '#fcd34d',
+                            tension: 0.4,
+                            pointRadius: 2,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Average',
+                            data: [60, 62, 60, 62, 62, 60],
+                            borderColor: '#f472b6',
+                            backgroundColor: '#f472b6',
+                            tension: 0.4,
+                            pointRadius: 2,
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 200,
+                            ticks: { stepSize: 50, font: {size: 10}, color: '#94a3b8' },
+                            border: { display: false },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            ticks: { font: {size: 10}, color: '#94a3b8' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

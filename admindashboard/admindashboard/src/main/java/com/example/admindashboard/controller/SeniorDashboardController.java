@@ -13,6 +13,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import com.example.admindashboard.model.User;
 
 @Controller
 public class SeniorDashboardController {
@@ -34,6 +38,34 @@ public class SeniorDashboardController {
 
     @Autowired
     private com.example.admindashboard.repository.TransportVehicleRepository transportVehicleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    // --- LOGIN ROUTE ---
+    @GetMapping("/senior_hr/login")
+    public String showSeniorHrLogin() {
+        return "senior_hr-login";
+    }
+
+    @PostMapping("/senior_hr/login")
+    public String processSeniorHrLogin(
+            @RequestParam String username,
+            @RequestParam String password,
+            Model model) {
+
+        User user = userRepository
+                .findByUsername(username.toUpperCase())
+                .orElse(null);
+
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+            model.addAttribute("authError", "Invalid username or password");
+            return "senior_hr-login";
+        }
+
+        // Redirect to employee dashboard by default after login
+        return "redirect:/senior_hr/employee";
+    }
 
     // --- Helper: Get pending meeting invites (same logic as DashboardController) ---
     private List<Meeting> getPendingMeetingInvites(String username) {
@@ -167,6 +199,43 @@ public class SeniorDashboardController {
 
         return "senior_hr-employee";
     }
+    // --- MY SPACE ROUTE (HR Performance) ---
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @GetMapping("/senior_hr/performance")
+    public String showSeniorHrPerformance(Model model, Principal principal) {
+        // Mock data for Appraisal Cycles
+        model.addAttribute("appraisals", java.util.List.of(
+            new java.util.HashMap<String, Object>() {{ put("name", "Performance Appraisal 2026"); put("type", "Annual"); put("duration", "01 Apr 2026 - 31 Mar 2027"); put("emp", 112); put("prog", 85); put("status", "Active"); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "H1 Appraisal 2026"); put("type", "Half-yearly"); put("duration", "01 Apr 2026 - 31 Mar 2027"); put("emp", 112); put("prog", 85); put("status", "Active"); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Q1 Appraisal 2026"); put("type", "Quarterly"); put("duration", "01 Apr 2026 - 31 Mar 2027"); put("emp", 112); put("prog", 100); put("status", "Completed"); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Annual Appraisal 2026"); put("type", "Annual"); put("duration", "01 Apr 2026 - 31 Mar 2027"); put("emp", 112); put("prog", 85); put("status", "Active"); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Q2 Appraisal 2026"); put("type", "Quarterly"); put("duration", "01 Apr 2026 - 31 Mar 2027"); put("emp", 112); put("prog", 85); put("status", "Active"); }}
+        ));
+        return "senior_hr-performance";
+    }
+
+    // --- MY SPACE ROUTE (HR Attendance) ---
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @GetMapping("/senior_hr/attendance")
+    public String showSeniorHrAttendance(Model model, Principal principal) {
+        // Mock data for Daily Attendance
+        model.addAttribute("dailyAttendance", java.util.List.of(
+            new java.util.HashMap<String, Object>() {{ put("name", "Aman Verma"); put("id", "EMP114"); put("dept", "Engineering"); put("shift", "10:00 AM - 07:00 PM"); put("in", "09:58 AM"); put("out", "07:02 PM"); put("hrs", "9 hrs 04 min"); put("status", "Present"); put("rem", "-"); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Neha Sharma"); put("id", "EMP114"); put("dept", "Engineering"); put("shift", "10:00 AM - 07:00 PM"); put("in", "10:15 AM"); put("out", "06:45 PM"); put("hrs", "8 hrs 30 min"); put("status", "Late"); put("rem", "Late by 15 min"); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Vikram Joshi"); put("id", "EMP114"); put("dept", "Product"); put("shift", "10:00 AM - 07:00 PM"); put("in", "10:02 AM"); put("out", "07:01 PM"); put("hrs", "8 hrs 59 min"); put("status", "Present"); put("rem", "-"); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Isha Patel"); put("id", "EMP114"); put("dept", "Design"); put("shift", "10:00 AM - 07:00 PM"); put("in", "10:05 AM"); put("out", "07:02 PM"); put("hrs", "8 hrs 57 min"); put("status", "Present"); put("rem", "-"); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Arjun Nair"); put("id", "EMP114"); put("dept", "Design"); put("shift", "10:00 AM - 07:00 PM"); put("in", "-"); put("out", "-"); put("hrs", "-"); put("status", "Absent"); put("rem", "-"); }}
+        ));
+        
+        // Mock data for Overrides
+        model.addAttribute("overrides", java.util.List.of(
+            new java.util.HashMap<String, Object>() {{ put("name", "Aman Verma"); put("id", "EMP114"); put("date", "25/05/2026"); put("type", "Update in/out Time"); put("orig", "10:15 AM - 06:45 PM"); put("upd", "09:15 AM - 07:00 PM"); put("reason", "Traffic Delay"); put("status", "Pending"); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Esha Verma"); put("id", "EMP114"); put("date", "30/05/2026"); put("type", "Mark Full Day"); put("orig", "Absent"); put("upd", "Present"); put("reason", "WFH"); put("status", "Approved"); }},
+            new java.util.HashMap<String, Object>() {{ put("name", "Arun Verma"); put("id", "EMP114"); put("date", "29/05/2026"); put("type", "Mark Full Day"); put("orig", "10:15 AM - 06:45 PM"); put("upd", "09:15 AM - 07:00 PM"); put("reason", "Health Issue"); put("status", "Pending"); }}
+        ));
+        return "senior_hr-attendance";
+    }
+
     // --- WORKFLOW ROUTES ---
 
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
