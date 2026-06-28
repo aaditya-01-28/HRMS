@@ -79,7 +79,7 @@ public class MySpaceController {
                 return "redirect:/space/manager/dashboard";
 
             case "SENIOR_HR":
-                return "redirect:/space/hr/dashboard";
+                return "redirect:/senior_hr/employee";
 
             case "SENIOR_ACCOUNTS_HEAD":
                 return "redirect:/space/accounts/dashboard";
