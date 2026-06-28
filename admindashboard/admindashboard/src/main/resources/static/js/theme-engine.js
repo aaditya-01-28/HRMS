@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 emptyRow.className = 'empty-state-row';
                 emptyRow.innerHTML = `<td colspan="${colCount}" style="padding: 0; border: none;">
                     <div class="global-empty-state" style="border: none; background: transparent;">
-                        <i class="fas fa-inbox"></i> No data found in this list
+                        <img src="/images/no data.png" style="width: 250px; opacity: 0.8; margin-bottom: 10px;" alt="No Data">
                     </div>
                 </td>`;
                 tbody.appendChild(emptyRow);
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (container.children.length === 0 && container.textContent.trim() === '') {
             container.innerHTML = `
                 <div class="global-empty-state">
-                    <i class="fas fa-folder-open"></i> No data found
+                    <img src="/images/no data.png" style="width: 250px; opacity: 0.8; margin-bottom: 10px;" alt="No Data">
                 </div>
             `;
             // Ensure container has some padding/display if it was collapsed
