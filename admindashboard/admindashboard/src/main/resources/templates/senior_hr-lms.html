@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteCircle Group - LMS</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #002D72;
+            --primary-light: #eff6ff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
+            --border-color: #e2e8f0;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            height: 60px;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 250px;
+            z-index: 1000;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Sidebar Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-logo {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid var(--border-color);
+            gap: 12px;
+        }
+
+        .sidebar-logo img {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+            flex-grow: 1;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .menu-item.active {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border-left-color: var(--primary-color);
+        }
+        
+        .menu-item.active i {
+            color: #ffffff;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* Main Content Area */
+        .myspace-main {
+            margin-top: 60px;
+            margin-left: 250px;
+            padding: 24px 32px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+
+        /* Custom Tabs */
+        .nav-tabs-custom {
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 24px;
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-tabs-custom .nav-link {
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 12px 0;
+            position: relative;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-tabs-custom .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-tabs-custom .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .nav-tabs-custom .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            border-radius: 2px 2px 0 0;
+        }
+        
+        /* Sub Tabs */
+        .sub-nav-tabs {
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .sub-nav-tabs .nav-link {
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 8px 0;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .sub-nav-tabs .nav-link.active {
+            color: var(--primary-color);
+        }
+        
+        .sub-nav-tabs .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        /* Stat Items */
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-item .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-item .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.1;
+        }
+
+        .stat-item .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Tables & Cards */
+        .card-custom {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            overflow: hidden;
+        }
+
+        .table-custom {
+            margin: 0;
+            width: 100%;
+        }
+
+        .table-custom th {
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: capitalize;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .table-custom td {
+            padding: 12px 16px;
+            font-size: 0.85rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .table-custom tr:last-child td {
+            border-bottom: none;
+        }
+
+        .emp-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 12px;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .leave-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .date-badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 6px;
+            border-radius: 4px;
+            text-align: center;
+            width: 45px;
+            font-weight: bold;
+        }
+        
+        .date-badge .month {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+        
+        .date-badge .day {
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .btn-primary-custom {
+            background-color: #3b82f6; /* Matching the mockup blue */
+            border-color: #3b82f6;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .btn-primary-custom:hover {
+            background-color: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+
+        .pagination .page-link {
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            margin: 0 2px;
+            border-radius: 4px;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <div style="background-color: #000; color: #fff; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: bold; font-family: serif;">W</div>
+            <div>
+                <div style="font-size: 0.85rem; font-weight: 700; color: #1e293b; line-height: 1.2;">WhiteCircle</div>
+                <div style="font-size: 0.7rem; color: #64748b;">HR Admin</div>
+            </div>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/senior_hr/employee" class="menu-item">
+                <i class="fas fa-users"></i> Employee
+            </a>
+            <a href="/senior_hr/lms" class="menu-item active">
+                <i class="fas fa-graduation-cap"></i> LMS
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-money-bill-wave"></i> Payroll
+            </a>
+            <a href="/senior_hr/attendance" class="menu-item">
+                <i class="fas fa-clock"></i> Attendance
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-chart-line"></i> Performance
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-user-plus"></i> Recruitment
+            </a>
+        </div>
+    </div>
+
+    <!-- Top Navbar -->
+    <div class="top-navbar">
+        <div class="nav-brand">
+            <span style="color: var(--primary-color); font-weight: 700;">WhiteCircle Group - Shahdol</span>
+            <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500; margin-left: -5px;" id="topNavSubtitle">LMS</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="myspace-main">
+        
+        <!-- Main Tabs -->
+        <ul class="nav nav-tabs-custom" id="lmsTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-pane" type="button" role="tab">Leave Overview</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="holiday-tab" data-bs-toggle="tab" data-bs-target="#holiday-pane" type="button" role="tab">Holiday & Comp Off</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="lmsTabsContent">
+            
+            <!-- 1. LEAVE OVERVIEW PANE -->
+            <div class="tab-pane fade show active" id="overview-pane" role="tabpanel">
+                
+                <!-- Metrics Row -->
+                <div class="d-flex justify-content-between align-items-center mb-5 mt-3 px-3">
+                    <div class="stat-item">
+                        <div class="icon text-primary" style="font-size: 2.2rem;"><i class="fas fa-user-friends" style="color: #60a5fa;"></i></div>
+                        <div>
+                            <div class="label" style="font-weight: 600; color: #1e293b;">Total Employees</div>
+                            <div class="value">32</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="icon text-primary" style="font-size: 2.2rem;"><i class="fas fa-umbrella-beach" style="color: #c084fc;"></i></div>
+                        <div>
+                            <div class="label" style="font-weight: 600; color: #1e293b;">Today On Leave</div>
+                            <div class="value" th:text="${todayOnLeaveCount}">18</div>
+                            <div style="font-size: 0.7rem; color: #64748b;">This Day</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="icon text-warning" style="font-size: 2.2rem;"><i class="far fa-clock" style="color: #fbbf24;"></i></div>
+                        <div>
+                            <div class="label" style="font-weight: 600; color: #1e293b;">Pending</div>
+                            <div class="value" th:text="${pendingCount}">12</div>
+                            <div style="font-size: 0.7rem; color: #64748b;">This Month</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="icon text-success" style="font-size: 2.2rem;"><i class="fas fa-clipboard-list" style="color: #34d399;"></i></div>
+                        <div>
+                            <div class="label" style="font-weight: 600; color: #1e293b;">Total Leave Types</div>
+                            <div class="value" th:text="${leaveTypes.size()}">5</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Left: Leave Balance Summary -->
+                    <div class="col-md-8">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0" style="color: #1d4ed8; text-decoration: underline; text-underline-offset: 4px;">Leave Balance Summary</h5>
+                            <button class="btn btn-primary-custom btn-sm px-3"><i class="fas fa-plus me-1"></i> Add Leave Type</button>
+                        </div>
+                        <div class="card-custom">
+                            <div class="table-responsive">
+                                <table class="table table-custom text-center">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-start">Leave Type</th>
+                                            <th>Annual Allocation</th>
+                                            <th>Eligible Employee</th>
+                                            <th>Exhausted Employee</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="lt, iterStat : ${leaveTypes}">
+                                            <td class="text-start">
+                                                <div class="d-flex align-items-center">
+                                                    <!-- Cycle through some colors based on index -->
+                                                    <span class="leave-dot" th:style="${iterStat.index % 4 == 0 ? 'background-color: #10b981;' : (iterStat.index % 4 == 1 ? 'background-color: #3b82f6;' : (iterStat.index % 4 == 2 ? 'background-color: #ef4444;' : 'background-color: #8b5cf6;'))}"></span>
+                                                    <span th:text="${lt.leaveTypeName}">Paid Leave</span>
+                                                </div>
+                                            </td>
+                                            <td th:text="${lt.maxAllowedDays + ' days'}">24 days</td>
+                                            <td>512</td>
+                                            <td>18</td>
+                                            <td>
+                                                <i class="fas fa-pen text-muted me-2" style="cursor: pointer;"></i>
+                                                <i class="fas fa-ellipsis-h text-muted" style="cursor: pointer;"></i>
+                                            </td>
+                                        </tr>
+                                        <tr th:if="${#lists.isEmpty(leaveTypes)}">
+                                            <td colspan="5" class="text-center text-muted">No Leave Types configured.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Today on Leave -->
+                    <div class="col-md-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0" style="color: #1e293b;" th:text="${'Today on Leave (' + #temporals.format(#temporals.createNow(), 'dd MMM yyyy') + ')'}">Today on Leave (26 Jun 2026)</h5>
+                            <a href="#" class="text-primary text-decoration-none" style="font-size: 0.85rem; font-weight: 600;">View All</a>
+                        </div>
+                        <div class="card-custom">
+                            <div class="table-responsive">
+                                <table class="table table-custom">
+                                    <thead>
+                                        <tr>
+                                            <th>Employee</th>
+                                            <th>Department</th>
+                                            <th>Leave Type</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="leave : ${todayLeaves}">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img th:if="${leave.user != null and leave.user.profileImage != null}" th:src="${leave.user.profileImage}" class="emp-avatar" alt="Avatar">
+                                                    <div th:unless="${leave.user != null and leave.user.profileImage != null}" class="emp-avatar bg-dark d-inline-flex align-items-center justify-content-center text-white" th:text="${leave.user != null and leave.user.fullName != null ? #strings.substring(leave.user.fullName, 0, 1) : 'U'}">A</div>
+                                                    <div>
+                                                        <div class="fw-bold text-dark" style="font-size: 0.85rem;" th:text="${leave.user != null ? leave.user.fullName : 'Unknown'}">Aman Verma</div>
+                                                        <div style="font-size: 0.7rem; color: #64748b;" th:text="${leave.user != null and leave.user.employeeProfile != null ? leave.user.employeeProfile.employeeCode : 'EMP000'}">EMP114</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td th:text="${leave.user != null and leave.user.employeeProfile != null ? leave.user.employeeProfile.businessUnit : 'General'}">Finance</td>
+                                            <td th:text="${leave.leaveType != null ? leave.leaveType.leaveTypeName : 'Leave'}" 
+                                                th:class="${leave.leaveType != null and leave.leaveType.leaveTypeName.contains('Sick') ? 'text-danger' : 'text-success'}">Earned Leave</td>
+                                        </tr>
+                                        <tr th:if="${#lists.isEmpty(todayLeaves)}">
+                                            <td colspan="3" class="text-center text-muted py-4">No employees on leave today.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Pagination mockup for screenshot accuracy -->
+                        <div class="d-flex justify-content-end mt-3">
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item"><a class="page-link" href="#">&lt;</a></li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#">4</a></li>
+                                <li class="page-item"><a class="page-link" href="#">5</a></li>
+                                <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 2. HOLIDAY & COMP OFF PANE -->
+            <div class="tab-pane fade" id="holiday-pane" role="tabpanel">
+                
+                <!-- Metrics Row -->
+                <div class="d-flex justify-content-between align-items-center mb-4 mt-2 px-3 pb-3 border-bottom">
+                    <div class="stat-item">
+                        <div class="icon text-primary" style="font-size: 2rem;"><i class="fas fa-calendar-alt" style="color: #a78bfa;"></i></div>
+                        <div>
+                            <div class="label" style="font-weight: 600; color: #1e293b;">Total Holidays</div>
+                            <div class="value" th:text="${holidays.size()}">32</div>
+                            <div style="font-size: 0.7rem; color: #64748b;">This Year</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="icon text-primary" style="font-size: 2rem;"><i class="fas fa-hand-holding-medical" style="color: #60a5fa;"></i></div>
+                        <div>
+                            <div class="label" style="font-weight: 600; color: #1e293b;">Compensation Off Earned</div>
+                            <div class="value">18</div>
+                            <div style="font-size: 0.7rem; color: #64748b;">This Year</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="icon text-success" style="font-size: 2rem;"><i class="fas fa-hand-holding" style="color: #34d399;"></i></div>
+                        <div>
+                            <div class="label" style="font-weight: 600; color: #1e293b;">Compensation Off Used</div>
+                            <div class="value">12</div>
+                            <div style="font-size: 0.7rem; color: #64748b;">This Year</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="icon text-warning" style="font-size: 2rem;"><i class="fas fa-user-clock" style="color: #fb923c;"></i></div>
+                        <div>
+                            <div class="label" style="font-weight: 600; color: #1e293b;">Compensation Off Available</div>
+                            <div class="value">5</div>
+                            <div style="font-size: 0.7rem; color: #64748b;">This Year</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub Tabs -->
+                <ul class="nav sub-nav-tabs" id="holidaySubTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="holidays-subtab" data-bs-toggle="tab" data-bs-target="#holidays-subpane" type="button" role="tab">Holidays</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="compoff-subtab" data-bs-toggle="tab" data-bs-target="#compoff-subpane" type="button" role="tab">Comp Off</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="holidaySubTabsContent">
+                    
+                    <!-- HOLIDAYS SUB-PANE -->
+                    <div class="tab-pane fade show active" id="holidays-subpane" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="input-group" style="width: 300px;">
+                                <span class="input-group-text bg-white text-muted border-end-0"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control border-start-0" placeholder="Search Holidays">
+                            </div>
+                            <button class="btn btn-primary-custom px-4 fw-bold"><i class="fas fa-plus me-1"></i> Add Holiday</button>
+                        </div>
+                        
+                        <div class="card-custom">
+                            <div class="table-responsive">
+                                <table class="table table-custom text-center align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Day</th>
+                                            <th>Holiday Name</th>
+                                            <th>Type</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="holiday : ${holidays}">
+                                            <td>
+                                                <div class="d-flex justify-content-center">
+                                                    <div class="date-badge">
+                                                        <div class="month" th:text="${#temporals.format(holiday.holidayDate, 'MMM')}">AUG</div>
+                                                        <div class="day" th:text="${#temporals.format(holiday.holidayDate, 'dd')}">15</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td th:text="${holiday.dayOfWeek}">Friday</td>
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-center fw-bold text-dark gap-2">
+                                                    <!-- Mocking an icon based on name, or default image -->
+                                                    <img th:if="${holiday.holidayName.contains('Independence')}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
+                                                    <img th:if="${holiday.holidayName.contains('Ganesh')}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
+                                                    <img th:if="${holiday.holidayName.contains('Gandhi')}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
+                                                    <img th:if="${holiday.holidayName.contains('Diwali')}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
+                                                    <img th:unless="${holiday.holidayName.contains('Independence') or holiday.holidayName.contains('Ganesh') or holiday.holidayName.contains('Gandhi') or holiday.holidayName.contains('Diwali')}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
+                                                    <span th:text="${holiday.holidayName}">Independence Day</span>
+                                                </div>
+                                            </td>
+                                            <td th:text="${holiday.holidayType}">Company Holiday</td>
+                                            <td>
+                                                <i class="fas fa-pen text-muted me-3" style="cursor: pointer;"></i>
+                                                <i class="fas fa-ellipsis-h text-muted" style="cursor: pointer;"></i>
+                                            </td>
+                                        </tr>
+                                        <tr th:if="${#lists.isEmpty(holidays)}">
+                                            <td colspan="5" class="text-center text-muted py-4">No holidays configured.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Pagination mockup -->
+                        <div class="d-flex justify-content-end mt-3">
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item"><a class="page-link" href="#">&lt;</a></li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#">4</a></li>
+                                <li class="page-item"><a class="page-link" href="#">5</a></li>
+                                <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- COMP OFF SUB-PANE -->
+                    <div class="tab-pane fade" id="compoff-subpane" role="tabpanel">
+                        
+                        <!-- List View -->
+                        <div id="compoff-list-view">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="d-flex gap-2">
+                                    <div class="input-group" style="width: 220px;">
+                                        <span class="input-group-text bg-white text-muted border-end-0"><i class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control border-start-0" style="font-size: 0.85rem;" placeholder="Search Employees by name">
+                                    </div>
+                                    <select class="form-select" style="width: 150px; font-size: 0.85rem;">
+                                        <option>All Departments</option>
+                                    </select>
+                                    <select class="form-select" style="width: 130px; font-size: 0.85rem;">
+                                        <option>Status: All</option>
+                                    </select>
+                                    <div class="input-group" style="width: 220px;">
+                                        <span class="input-group-text bg-white text-muted"><i class="far fa-calendar-alt"></i></span>
+                                        <input type="text" class="form-control" style="font-size: 0.85rem;" value="19/06/2026 - 30/06/2026">
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary-custom px-4 fw-bold" onclick="toggleGrantCompOff()"><i class="fas fa-plus me-1"></i> Grant Comp Off</button>
+                            </div>
+                            
+                            <div class="card-custom">
+                                <div class="table-responsive">
+                                    <table class="table table-custom text-center align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-start">Employee</th>
+                                                <th>Date of Work</th>
+                                                <th>Earned On</th>
+                                                <th>Comp Off Date</th>
+                                                <th>Reason</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="comp, iterStat : ${compOffEntries}">
+                                                <td class="text-start">
+                                                    <div class="d-flex align-items-center">
+                                                        <img th:if="${comp.user != null and comp.user.profileImage != null}" th:src="${comp.user.profileImage}" class="emp-avatar" alt="Avatar">
+                                                        <div th:unless="${comp.user != null and comp.user.profileImage != null}" class="emp-avatar bg-dark d-inline-flex align-items-center justify-content-center text-white" th:text="${comp.user != null and comp.user.fullName != null ? #strings.substring(comp.user.fullName, 0, 1) : 'U'}">A</div>
+                                                        <div>
+                                                            <div class="fw-bold text-dark" style="font-size: 0.85rem;" th:text="${comp.user != null ? comp.user.fullName : 'Unknown'}">Aman Verma</div>
+                                                            <div style="font-size: 0.7rem; color: #64748b;" th:text="${comp.user != null and comp.user.employeeProfile != null ? comp.user.employeeProfile.employeeCode : 'EMP000'}">EMP114</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td th:text="${comp.earnedDate != null ? #temporals.format(comp.earnedDate.minusDays(1), 'dd MMM, yyyy') : 'N/A'}">11 May, 2026</td>
+                                                <td th:text="${comp.earnedDate != null ? #temporals.format(comp.earnedDate, 'dd MMM, yyyy') : 'N/A'}">12 May, 2026</td>
+                                                <td th:class="${comp.expiryDate != null ? 'fw-bold' : 'text-success fw-bold'}" th:text="${comp.expiryDate != null ? #temporals.format(comp.expiryDate, 'dd MMMM, yyyy') : 'Available'}">01 June, 2026</td>
+                                                <td th:text="${comp.remarks != null ? comp.remarks : 'System Deployment'}">System Deployment</td>
+                                                <td th:text="${comp.status}" th:class="${comp.status == 'PENDING' ? 'text-warning fw-bold' : (comp.status == 'APPROVED' or comp.status == 'ACTIVE' ? 'text-success fw-bold' : 'text-dark fw-bold')}">Pending</td>
+                                                <td>
+                                                    <i class="fas fa-pen text-muted me-3" style="cursor: pointer;"></i>
+                                                    <i class="fas fa-ellipsis-h text-muted" style="cursor: pointer;"></i>
+                                                </td>
+                                            </tr>
+                                            <tr th:if="${#lists.isEmpty(compOffEntries)}">
+                                                <td colspan="7" class="text-center text-muted py-4">No Comp Off entries found.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Pagination mockup -->
+                            <div class="d-flex justify-content-end mt-3">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item"><a class="page-link" href="#">&lt;</a></li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Form View (Hidden by default) -->
+                        <div id="compoff-form-view" style="display: none;">
+                            <div class="mb-4">
+                                <h5 class="fw-bold" style="color: #1e293b; margin-bottom: 2px;">Grant Comp Off</h5>
+                                <div style="font-size: 0.8rem; color: #64748b;">Add Compensatory off for an employee</div>
+                            </div>
+                            
+                            <form>
+                                <h6 class="fw-bold mb-3 mt-4" style="font-size: 0.95rem;">1. Employee Details</h6>
+                                <div class="row mb-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Employee Name <span class="text-danger">*</span></label>
+                                        <select class="form-select" style="font-size: 0.85rem;">
+                                            <option>Neha Sharma (EMP114)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Department <span class="text-danger">*</span></label>
+                                        <select class="form-select" style="font-size: 0.85rem;">
+                                            <option>Engineering</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Location <span class="text-danger">*</span></label>
+                                        <select class="form-select" style="font-size: 0.85rem;">
+                                            <option>Raipur, India</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <h6 class="fw-bold mb-3 mt-4" style="font-size: 0.95rem;">2. Work Details</h6>
+                                <div class="row mb-4">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Date of Work <span class="text-danger">*</span></label>
+                                        <select class="form-select" style="font-size: 0.85rem;">
+                                            <option>Neha Sharma (EMP114)</option> <!-- Kept as in mockup -->
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Reason for work <span class="text-danger">*</span></label>
+                                        <select class="form-select" style="font-size: 0.85rem;">
+                                            <option>Worked on Project</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Worked From <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" style="font-size: 0.85rem;" value="09:30 AM">
+                                            <span class="input-group-text bg-white"><i class="far fa-clock"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Worked To <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" style="font-size: 0.85rem;" value="06:30 PM">
+                                            <span class="input-group-text bg-white"><i class="far fa-clock"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Total Hours Worked <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" style="font-size: 0.85rem;" value="9 h 00 m">
+                                            <span class="input-group-text bg-white"><i class="far fa-clock"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <h6 class="fw-bold mb-3 mt-4" style="font-size: 0.95rem;">3. Comp Off Details</h6>
+                                <div class="row mb-5">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Comp Off Earned On <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" style="font-size: 0.85rem;" value="10/05/2026">
+                                            <span class="input-group-text bg-white"><i class="far fa-calendar-alt"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Comp Off Valid Till <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" style="font-size: 0.85rem;" value="11/11/2026">
+                                            <span class="input-group-text bg-white"><i class="far fa-calendar-alt"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Additonal Note</label>
+                                        <input type="text" class="form-control" style="font-size: 0.85rem;" value="Enter">
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-center gap-4 mt-5 pb-5">
+                                    <button type="button" class="btn btn-outline-secondary px-5 py-2 fw-bold text-dark" onclick="toggleGrantCompOff()" style="border-radius: 6px;">Cancel</button>
+                                    <button type="button" class="btn btn-primary-custom px-5 py-2 fw-bold" onclick="toggleGrantCompOff()" style="border-radius: 6px;">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function toggleGrantCompOff() {
+            var list = document.getElementById('compoff-list-view');
+            var form = document.getElementById('compoff-form-view');
+            var title = document.getElementById('topNavSubtitle');
+            
+            if (list.style.display === 'none') {
+                list.style.display = 'block';
+                form.style.display = 'none';
+                title.textContent = 'LMS';
+            } else {
+                list.style.display = 'none';
+                form.style.display = 'block';
+                title.textContent = 'Attendance Override Form';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -40,6 +40,21 @@ public class SeniorDashboardController {
     private com.example.admindashboard.repository.TransportVehicleRepository transportVehicleRepository;
 
     @Autowired
+    private com.example.admindashboard.repository.LeaveRequestRepository leaveRequestRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.ShiftAssignmentRepository shiftAssignmentRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.HolidayRepository holidayRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.CompOffEntryRepository compOffEntryRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.LeaveTypeMasterRepository leaveTypeMasterRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     // --- LOGIN ROUTE ---
@@ -65,6 +80,37 @@ public class SeniorDashboardController {
 
         // Redirect to employee dashboard by default after login
         return "redirect:/senior_hr/employee";
+    }
+
+    // --- LMS ROUTE ---
+    @GetMapping("/senior_hr/lms")
+    public String showSeniorHrLms(Model model) {
+        List<com.example.admindashboard.model.LeaveRequest> leaveRequests = leaveRequestRepository.findAll();
+        
+        java.time.LocalDate today = java.time.LocalDate.now();
+        List<com.example.admindashboard.model.LeaveRequest> todayLeaves = leaveRequests.stream()
+            .filter(lr -> "APPROVED".equalsIgnoreCase(lr.getStatus()) && lr.getFromDate() != null && !lr.getFromDate().isAfter(today) && (lr.getToDate() == null ? lr.getFromDate().isEqual(today) : !lr.getToDate().isBefore(today)))
+            .collect(java.util.stream.Collectors.toList());
+            
+        long pendingCount = leaveRequests.stream().filter(lr -> "PENDING".equalsIgnoreCase(lr.getStatus())).count();
+        long todayOnLeaveCount = todayLeaves.size();
+        long totalCount = leaveRequests.size();
+
+        List<com.example.admindashboard.model.LeaveTypeMaster> leaveTypes = leaveTypeMasterRepository.findAll();
+        List<com.example.admindashboard.model.Holiday> holidays = holidayRepository.findAll();
+        List<com.example.admindashboard.model.CompOffEntry> compOffEntries = compOffEntryRepository.findAll();
+
+        model.addAttribute("leaveRequests", leaveRequests);
+        model.addAttribute("todayLeaves", todayLeaves);
+        model.addAttribute("pendingCount", pendingCount);
+        model.addAttribute("todayOnLeaveCount", todayOnLeaveCount);
+        model.addAttribute("totalCount", totalCount);
+        
+        model.addAttribute("leaveTypes", leaveTypes);
+        model.addAttribute("holidays", holidays);
+        model.addAttribute("compOffEntries", compOffEntries);
+        
+        return "senior_hr-lms";
     }
 
     // --- Helper: Get pending meeting invites (same logic as DashboardController) ---
