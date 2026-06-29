@@ -34,6 +34,9 @@ public class DashboardController {
 
     @Autowired
     private TimesheetRepository timesheetRepository;
+    
+    @Autowired
+    private ResignationRequestRepository resignationRequestRepository;
 
     @Autowired
     private WeeklyTimesheetRepository weeklyTimesheetRepository;
@@ -520,6 +523,9 @@ public class DashboardController {
             
             model.addAttribute("isItSupport", false); // HR workflow shows all tabs normally
 
+            java.util.List<ResignationRequest> pendingResignations = resignationRequestRepository.findByStatus("PENDING_L2");
+            model.addAttribute("pendingResignations", pendingResignations);
+
             return "hr-workflow";
         } else if (request.getRequestURI().contains("rewards-manager")) {
             java.util.List<ServiceRequest> rewardsTickets = serviceRequestRepository.findAll().stream()
@@ -592,8 +598,56 @@ public class DashboardController {
         System.out.println("================================");
 
         model.addAttribute("showMySpace", showMySpace);
-
         return "employee-dashboard";
+    }
+
+    @PostMapping("/HR/resignation/{id}/approve")
+    public String approveResignationL2(@PathVariable("id") Long id, @RequestParam("noticePeriodDays") Integer noticePeriodDays, Principal principal) {
+        if (principal != null) {
+            User l2Hr = userRepository.findByUsername(principal.getName()).orElse(null);
+            ResignationRequest req = resignationRequestRepository.findById(id).orElse(null);
+            if (req != null && l2Hr != null && "PENDING_L2".equals(req.getStatus())) {
+                req.setNoticePeriodDays(noticePeriodDays);
+                req.setStatus("PENDING_L3");
+                req.setL2ApprovedBy(l2Hr);
+                resignationRequestRepository.save(req);
+                
+                User employee = req.getEmployee();
+                employee.setStatus("ON NOTICE");
+                userRepository.save(employee);
+            }
+        }
+        return "redirect:/HR/workflow";
+    }
+
+    @PostMapping("/HR/resignation/{id}/reject")
+    public String rejectResignationL2(@PathVariable("id") Long id, Principal principal) {
+        if (principal != null) {
+            User l2Hr = userRepository.findByUsername(principal.getName()).orElse(null);
+            ResignationRequest req = resignationRequestRepository.findById(id).orElse(null);
+            if (req != null && l2Hr != null && "PENDING_L2".equals(req.getStatus())) {
+                req.setStatus("REJECTED");
+                req.setL2ApprovedBy(l2Hr);
+                resignationRequestRepository.save(req);
+            }
+        }
+        return "redirect:/HR/workflow";
+    }
+
+    @PostMapping("/employee/resignation/apply")
+    public String applyResignation(@RequestParam("reason") String reason, Principal principal) {
+        if (principal != null) {
+            User user = userRepository.findByUsername(principal.getName()).orElse(null);
+            if (user != null) {
+                ResignationRequest req = new ResignationRequest();
+                req.setEmployee(user);
+                req.setRequestDate(java.time.LocalDate.now());
+                req.setReason(reason);
+                req.setStatus("PENDING_L2");
+                resignationRequestRepository.save(req);
+            }
+        }
+        return "redirect:/employee/dashboard?resignationSuccess=true";
     }
 
     // --- EMPLOYEE PROFILE SECTION (Self-Service - No locks needed) ---

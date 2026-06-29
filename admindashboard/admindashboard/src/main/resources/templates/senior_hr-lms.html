@@ -239,7 +239,7 @@
             font-weight: 500;
         }
 
-        /* Tables & Cards */
+        /* Tables and Cards */
         .card-custom {
             background: #ffffff;
             border: 1px solid var(--border-color);
@@ -398,7 +398,7 @@
                 <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-pane" type="button" role="tab">Leave Overview</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="holiday-tab" data-bs-toggle="tab" data-bs-target="#holiday-pane" type="button" role="tab">Holiday & Comp Off</button>
+                <button class="nav-link" id="holiday-tab" data-bs-toggle="tab" data-bs-target="#holiday-pane" type="button" role="tab">Holiday &amp; Comp Off</button>
             </li>
         </ul>
 
@@ -461,15 +461,15 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:each="lt, iterStat : ${leaveTypes}">
+                                        <tr th:each="ltype : ${leaveTypes}">
                                             <td class="text-start">
                                                 <div class="d-flex align-items-center">
                                                     <!-- Cycle through some colors based on index -->
-                                                    <span class="leave-dot" th:style="${iterStat.index % 4 == 0 ? 'background-color: #10b981;' : (iterStat.index % 4 == 1 ? 'background-color: #3b82f6;' : (iterStat.index % 4 == 2 ? 'background-color: #ef4444;' : 'background-color: #8b5cf6;'))}"></span>
-                                                    <span th:text="${lt.leaveTypeName}">Paid Leave</span>
+                                                    <span class="leave-dot" style="background-color: #3b82f6;"></span>
+                                                    <span th:text="${ltype.leaveName}">Paid Leave</span>
                                                 </div>
                                             </td>
-                                            <td th:text="${lt.maxAllowedDays + ' days'}">24 days</td>
+                                            <td th:text="${ltype.maxBalance + ' days'}">24 days</td>
                                             <td>512</td>
                                             <td>18</td>
                                             <td>
@@ -489,7 +489,7 @@
                     <!-- Right: Today on Leave -->
                     <div class="col-md-4">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="fw-bold mb-0" style="color: #1e293b;" th:text="${'Today on Leave (' + #temporals.format(#temporals.createNow(), 'dd MMM yyyy') + ')'}">Today on Leave (26 Jun 2026)</h5>
+                            <h5 class="fw-bold mb-0" style="color: #1e293b;">Today on Leave</h5>
                             <a href="#" class="text-primary text-decoration-none" style="font-size: 0.85rem; font-weight: 600;">View All</a>
                         </div>
                         <div class="card-custom">
@@ -515,8 +515,8 @@
                                                 </div>
                                             </td>
                                             <td th:text="${leave.user != null and leave.user.employeeProfile != null ? leave.user.employeeProfile.businessUnit : 'General'}">Finance</td>
-                                            <td th:text="${leave.leaveType != null ? leave.leaveType.leaveTypeName : 'Leave'}" 
-                                                th:class="${leave.leaveType != null and leave.leaveType.leaveTypeName.contains('Sick') ? 'text-danger' : 'text-success'}">Earned Leave</td>
+                                            <td th:text="${leave.leaveType != null ? leave.leaveType : 'Leave'}" 
+                                                th:class="${leave.leaveType != null and leave.leaveType.contains('Sick') ? 'text-danger' : 'text-success'}">Earned Leave</td>
                                         </tr>
                                         <tr th:if="${#lists.isEmpty(todayLeaves)}">
                                             <td colspan="3" class="text-center text-muted py-4">No employees on leave today.</td>
@@ -543,7 +543,7 @@
 
             </div>
 
-            <!-- 2. HOLIDAY & COMP OFF PANE -->
+            <!-- 2. HOLIDAY and COMP OFF PANE -->
             <div class="tab-pane fade" id="holiday-pane" role="tabpanel">
                 
                 <!-- Metrics Row -->
@@ -630,11 +630,11 @@
                                             <td>
                                                 <div class="d-flex align-items-center justify-content-center fw-bold text-dark gap-2">
                                                     <!-- Mocking an icon based on name, or default image -->
-                                                    <img th:if="${holiday.holidayName.contains('Independence')}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
-                                                    <img th:if="${holiday.holidayName.contains('Ganesh')}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
-                                                    <img th:if="${holiday.holidayName.contains('Gandhi')}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
-                                                    <img th:if="${holiday.holidayName.contains('Diwali')}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
-                                                    <img th:unless="${holiday.holidayName.contains('Independence') or holiday.holidayName.contains('Ganesh') or holiday.holidayName.contains('Gandhi') or holiday.holidayName.contains('Diwali')}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
+                                                    <img th:if="${holiday.holidayName != null and holiday.holidayName.contains('Independence')}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
+                                                    <img th:if="${holiday.holidayName != null and holiday.holidayName.contains('Ganesh')}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
+                                                    <img th:if="${holiday.holidayName != null and holiday.holidayName.contains('Gandhi')}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
+                                                    <img th:if="${holiday.holidayName != null and holiday.holidayName.contains('Diwali')}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
+                                                    <img th:unless="${holiday.holidayName != null and (holiday.holidayName.contains('Independence') or holiday.holidayName.contains('Ganesh') or holiday.holidayName.contains('Gandhi') or holiday.holidayName.contains('Diwali'))}" src="https://cdn-icons-png.flaticon.com/128/330/330439.png" style="width: 24px;">
                                                     <span th:text="${holiday.holidayName}">Independence Day</span>
                                                 </div>
                                             </td>
@@ -717,7 +717,7 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td th:text="${comp.earnedDate != null ? #temporals.format(comp.earnedDate.minusDays(1), 'dd MMM, yyyy') : 'N/A'}">11 May, 2026</td>
+                                                <td th:text="${comp.earnedDate != null ? #temporals.format(comp.earnedDate, 'dd MMM, yyyy') : 'N/A'}">11 May, 2026</td>
                                                 <td th:text="${comp.earnedDate != null ? #temporals.format(comp.earnedDate, 'dd MMM, yyyy') : 'N/A'}">12 May, 2026</td>
                                                 <td th:class="${comp.expiryDate != null ? 'fw-bold' : 'text-success fw-bold'}" th:text="${comp.expiryDate != null ? #temporals.format(comp.expiryDate, 'dd MMMM, yyyy') : 'Available'}">01 June, 2026</td>
                                                 <td th:text="${comp.remarks != null ? comp.remarks : 'System Deployment'}">System Deployment</td>

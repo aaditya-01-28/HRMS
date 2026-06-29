@@ -326,6 +326,71 @@
             <i class="fas fa-ticket-alt"></i> Tickets
         </a>
     </div>
+    
+    <!-- ===== RESIGNATION VIEW ===== -->
+    <div id="view-resignation" style="display:none; overflow-x: hidden;">
+        <div class="row w-100 flex-grow-1 mx-0 h-100">
+            <div class="col-12 h-100 d-flex flex-column py-3 pe-3 ps-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0" style="color: #1e293b;"><i class="fas fa-sign-out-alt text-primary me-2"></i>Pending Resignations (L2 Approval)</h5>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light text-muted small">
+                            <tr>
+                                <th>Employee Name</th>
+                                <th>Reason</th>
+                                <th>Request Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="req : ${pendingResignations}">
+                                <td th:text="${req.employee.fullName}">Name</td>
+                                <td th:text="${req.reason}">Reason</td>
+                                <td th:text="${req.requestDate}">Date</td>
+                                <td>
+                                    <button class="btn btn-sm btn-success" data-bs-toggle="modal" th:data-bs-target="'#approveResignationModal' + ${req.id}">Approve</button>
+                                    <form th:action="@{'/HR/resignation/' + ${req.id} + '/reject'}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                    </form>
+                                    
+                                    <!-- Approve Modal -->
+                                    <div class="modal fade" th:id="'approveResignationModal' + ${req.id}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form th:action="@{'/HR/resignation/' + ${req.id} + '/approve'}" method="post">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Approve Resignation</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Assign notice period for <span th:text="${req.employee.fullName}"></span>.</p>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Notice Period (Days)</label>
+                                                            <input type="number" class="form-control" name="noticePeriodDays" value="30" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-success">Approve</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${pendingResignations == null or pendingResignations.empty}">
+                                <td colspan="4" class="text-center text-muted">No pending resignations</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <header class="top-header" th:classappend="${isItSupport ? 'it-main-margin' : ''}">
@@ -510,6 +575,9 @@
         </div>
         <div class="custom-tab" id="tab-accounts" onclick="switchTab('accounts')">
             <i class="fas fa-file-invoice-dollar"></i> Finance
+        </div>
+        <div class="custom-tab" id="tab-resignation" onclick="switchTab('resignation')">
+            <i class="fas fa-sign-out-alt"></i> Resignation
         </div>
         <div class="custom-tab" id="tab-other" onclick="switchTab('other')">
             <i class="far fa-folder"></i> Other
@@ -1564,7 +1632,7 @@
         const tabEl = document.getElementById('tab-' + tabId);
         if (tabEl) tabEl.classList.add('active');
         
-        ['leave', 'ticket', 'accounts', 'other', 'timesheet'].forEach(v => {
+        ['leave', 'ticket', 'accounts', 'other', 'timesheet', 'resignation'].forEach(v => {
             const el = document.getElementById('view-' + v);
             if(el) el.style.display = 'none';
         });

@@ -49,9 +49,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         System.out.println("User FOUND! Loaded Authorities: " + authorities);
 
+        boolean enabled = user.getStatus() == null || (!user.getStatus().equalsIgnoreCase("EXITED") && !user.getStatus().equalsIgnoreCase("INACTIVE"));
+
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
+                enabled,
+                true,
+                true,
+                true,
                 authorities
         );
     }

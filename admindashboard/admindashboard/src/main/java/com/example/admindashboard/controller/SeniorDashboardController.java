@@ -1,7 +1,9 @@
 package com.example.admindashboard.controller;
 
 import com.example.admindashboard.model.Meeting;
+import com.example.admindashboard.model.ResignationRequest;
 import com.example.admindashboard.repository.MeetingRepository;
+import com.example.admindashboard.repository.ResignationRequestRepository;
 import com.example.admindashboard.repository.ServiceRequestRepository;
 import com.example.admindashboard.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,9 @@ public class SeniorDashboardController {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private ResignationRequestRepository resignationRequestRepository;
 
     @Autowired
     private com.example.admindashboard.repository.RideBookingRepository rideBookingRepository;
@@ -53,6 +58,12 @@ public class SeniorDashboardController {
 
     @Autowired
     private com.example.admindashboard.repository.LeaveTypeMasterRepository leaveTypeMasterRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.SalaryStructureRepository salaryStructureRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.SalaryComponentRepository salaryComponentRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -213,11 +224,91 @@ public class SeniorDashboardController {
         model.addAttribute("deductionsCount", 2);
         model.addAttribute("totalDaysPresent", "30");
         
-        // Mock lists for the tables
-        model.addAttribute("salaryStructures", java.util.List.of(
-            new java.util.HashMap<String, Object>() {{ put("empName", "Aakash Sharma"); put("dept", "Engineering"); put("salary", "12,00,000"); put("deductions", 0); put("bonus", 0); }},
-            new java.util.HashMap<String, Object>() {{ put("empName", "Rohan Gupta"); put("dept", "HR"); put("salary", "8,50,000"); put("deductions", 5000); put("bonus", 10000); }}
-        ));
+        // Fetch existing salary structures
+        List<com.example.admindashboard.model.SalaryStructure> structures = salaryStructureRepository.findByActiveTrue();
+        
+        if (structures.isEmpty()) {
+            // Seed default structure based on standard formula if DB is empty
+            com.example.admindashboard.model.SalaryStructure std = new com.example.admindashboard.model.SalaryStructure();
+            std.setStructureName("Standard Template - Amit Sharma");
+            std.setEffectiveFrom(java.time.LocalDate.now());
+            std.setCtcAmount(960000.0);
+            
+            // Add components matching the screenshot
+            // 1. Basic Salary
+            com.example.admindashboard.model.SalaryComponent basic = new com.example.admindashboard.model.SalaryComponent();
+            basic.setComponentName("Basic Salary");
+            basic.setType("Earning");
+            basic.setCategory("Basic");
+            basic.setCalculationFormula("40% of CTC");
+            basic.setAmount(384000.0);
+            basic.setPercentageOfCtc(40.00);
+            basic.setTaxable(true);
+            std.addComponent(basic);
+            
+            // 2. HRA
+            com.example.admindashboard.model.SalaryComponent hra = new com.example.admindashboard.model.SalaryComponent();
+            hra.setComponentName("HRA");
+            hra.setType("Earning");
+            hra.setCategory("Allowance");
+            hra.setCalculationFormula("50% of Basic");
+            hra.setAmount(192000.0);
+            hra.setPercentageOfCtc(25.00); // from mockup
+            hra.setTaxable(true);
+            std.addComponent(hra);
+
+            // 3. Conveyance Allow.
+            com.example.admindashboard.model.SalaryComponent conv = new com.example.admindashboard.model.SalaryComponent();
+            conv.setComponentName("Conveyance Allow.");
+            conv.setType("Earning");
+            conv.setCategory("Statutory");
+            conv.setCalculationFormula("Fixed Amount");
+            conv.setAmount(1920.0);
+            conv.setPercentageOfCtc(20.00); // from mockup
+            conv.setTaxable(true);
+            std.addComponent(conv);
+
+            // 4. Professional Tax
+            com.example.admindashboard.model.SalaryComponent ptax = new com.example.admindashboard.model.SalaryComponent();
+            ptax.setComponentName("Professional Tax");
+            ptax.setType("Deduction");
+            ptax.setCategory("Statutory");
+            ptax.setCalculationFormula("Fixed Amount");
+            ptax.setAmount(200.0);
+            ptax.setPercentageOfCtc(4.00); // from mockup
+            ptax.setTaxable(true);
+            std.addComponent(ptax);
+
+            // 5. Provident Fund
+            com.example.admindashboard.model.SalaryComponent pf = new com.example.admindashboard.model.SalaryComponent();
+            pf.setComponentName("Provident Fund");
+            pf.setType("Deduction");
+            pf.setCategory("Allowance");
+            pf.setCalculationFormula("12% of Basic");
+            pf.setAmount(46000.0);
+            pf.setPercentageOfCtc(0.02); // from mockup
+            pf.setTaxable(true);
+            std.addComponent(pf);
+
+            // 6. TDS
+            com.example.admindashboard.model.SalaryComponent tds = new com.example.admindashboard.model.SalaryComponent();
+            tds.setComponentName("TDS");
+            tds.setType("Deduction");
+            tds.setCategory("Statutory");
+            tds.setCalculationFormula("As per rules");
+            tds.setAmount(0.0);
+            tds.setPercentageOfCtc(0.00);
+            tds.setTaxable(true);
+            std.addComponent(tds);
+
+            std.setTotalEarnings(384000.0 + 192000.0 + 19200.0);
+            std.setTotalDeductions(200.0 + 46000.0 + 0.0);
+            
+            salaryStructureRepository.save(std);
+            structures = salaryStructureRepository.findByActiveTrue();
+        }
+
+        model.addAttribute("salaryStructures", structures);
         
         return "senior_hr-myspace";
     }
@@ -226,25 +317,36 @@ public class SeniorDashboardController {
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_hr/employee")
     public String showSeniorHrEmployee(Model model, Principal principal) {
-        // Mock candidates for Onboarding table
-        model.addAttribute("candidates", java.util.List.of(
-            new java.util.HashMap<String, Object>() {{ put("name", "Neha Sharma"); put("dept", "Engineering"); put("desig", "Sr. Developer"); put("loc", "Delhi, India"); put("join", "20/11/2026"); put("prog", 85); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Amit Sharma"); put("dept", "Engineering"); put("desig", "Sr. Developer"); put("loc", "Delhi, India"); put("join", "20/11/2026"); put("prog", 85); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Pihu Sharma"); put("dept", "Engineering"); put("desig", "Sr. Developer"); put("loc", "Delhi, India"); put("join", "20/11/2026"); put("prog", 85); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Shub Sharma"); put("dept", "Engineering"); put("desig", "Sr. Developer"); put("loc", "Delhi, India"); put("join", "20/11/2026"); put("prog", 85); }}
-        ));
-
-        // Mock employees for All Employees table
-        model.addAttribute("employees", java.util.List.of(
-            new java.util.HashMap<String, Object>() {{ put("name", "Neha Sharma"); put("id", "EMP114"); put("dept", "Engineering"); put("desig", "Full-stack developer"); put("loc", "Delhi, India"); put("type", "Full-time"); put("join", "7 May, 2026"); put("status", "Active"); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Amit Sharma"); put("id", "EMP110"); put("dept", "Product"); put("desig", "Product Manager"); put("loc", "Raipur, India"); put("type", "Full-time"); put("join", "15 May, 2026"); put("status", "Active"); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Pihu Sharma"); put("id", "EMP114"); put("dept", "Engineering"); put("desig", "Software Engineer"); put("loc", "Ooty, India"); put("type", "Full-time"); put("join", "7 May, 2026"); put("status", "On Notice"); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Shub Sharma"); put("id", "EMP114"); put("dept", "Engineering"); put("desig", "Junior developer"); put("loc", "Pune, India"); put("type", "Full-time"); put("join", "7 May, 2026"); put("status", "Active"); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Neha Patel"); put("id", "EMP114"); put("dept", "HR"); put("desig", "Hr Executive"); put("loc", "Delhi, India"); put("type", "Full-time"); put("join", "7 May, 2026"); put("status", "Exited"); }}
-        ));
-
+        List<com.example.admindashboard.model.User> allUsers = userRepository.findAll();
+        model.addAttribute("allUsers", allUsers);
         return "senior_hr-employee";
     }
+    
+    // --- OFFBOARDING ROUTE ---
+    @PostMapping("/senior_hr/resignation/offboard")
+    public String completeOffboarding(@RequestParam("userId") Long userId, Principal principal) {
+        if (principal != null) {
+            User l3Hr = userRepository.findByUsername(principal.getName()).orElse(null);
+            User exitingUser = userRepository.findById(userId).orElse(null);
+            if (exitingUser != null && l3Hr != null) {
+                // Update ResignationRequest if exists
+                java.util.List<ResignationRequest> reqs = resignationRequestRepository.findByEmployee_Username(exitingUser.getUsername());
+                for (ResignationRequest req : reqs) {
+                    if ("PENDING_L3".equals(req.getStatus()) || "PENDING_L2".equals(req.getStatus())) {
+                        req.setStatus("OFFBOARDED");
+                        req.setL3ApprovedBy(l3Hr);
+                        resignationRequestRepository.save(req);
+                    }
+                }
+                
+                // Update User status to EXITED to prevent login
+                exitingUser.setStatus("EXITED");
+                userRepository.save(exitingUser);
+            }
+        }
+        return "redirect:/senior_hr/employee?offboarding=success";
+    }
+
     // --- MY SPACE ROUTE (HR Performance) ---
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_hr/performance")

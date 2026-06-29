@@ -238,8 +238,13 @@
         <div class="brand-area">
             <img src="/images/wcg-logo.jpg" alt="Logo">
             <div>
-                <div class="brand-text">WhiteCircle</div>
-                <div class="brand-sub">HR Admin</div>
+                    </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light border fw-bold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary fw-bold" onclick="document.getElementById('exitEmployeeForm').submit();">Complete Offboarding</button>
+                </div>and-sub">HR Admin</div>
             </div>
         </div>
         <div class="nav-links">
@@ -423,12 +428,34 @@
                     <div class="d-flex gap-3 mb-4">
                         <div class="position-relative flex-grow-1" style="max-width: 300px;">
                             <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 12px;"></i>
-                            <input type="text" class="form-control" placeholder="Search by employee name" style="padding-left: 40px;">
+                            <input type="text" id="allEmpSearch" class="form-control" placeholder="Search by employee name" style="padding-left: 40px;">
                         </div>
-                        <select class="form-select w-auto"><option>All Departments</option></select>
-                        <select class="form-select w-auto"><option>All Location</option></select>
-                        <select class="form-select w-auto"><option>All Roles</option></select>
-                        <select class="form-select w-auto"><option>All Status</option></select>
+                        <select id="allEmpDept" class="form-select w-auto">
+                            <option value="">All Departments</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="HR">HR</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Marketing">Marketing</option>
+                        </select>
+                        <select id="allEmpLoc" class="form-select w-auto">
+                            <option value="">All Location</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Pune">Pune</option>
+                            <option value="Raipur">Raipur</option>
+                            <option value="Ooty">Ooty</option>
+                        </select>
+                        <select id="allEmpRole" class="form-select w-auto">
+                            <option value="">All Roles</option>
+                            <option value="Sr. Developer">Sr. Developer</option>
+                            <option value="Software Engineer">Software Engineer</option>
+                            <option value="Product Manager">Product Manager</option>
+                        </select>
+                        <select id="allEmpStatus" class="form-select w-auto">
+                            <option value="">All Status</option>
+                            <option value="ACTIVE">Active</option>
+                            <option value="ON NOTICE">On Notice</option>
+                            <option value="EXITED">Exited</option>
+                        </select>
                         <button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> More Filters</button>
                     </div>
 
@@ -447,27 +474,27 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr th:each="emp, iterStat : ${employees}">
+                            <tbody id="all-emp-tbody">
+                                <tr th:each="emp, iterStat : ${allUsers}">
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <!-- Alternate image colors for mockup -->
                                             <img th:src="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}" 
                                                  class="emp-avatar border" style="object-fit: cover;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\' /></svg>'">
                                             <div class="lh-1">
-                                                <div class="fw-bold text-dark mb-1" th:text="${emp.name}">Name</div>
-                                                <div style="font-size: 0.7rem; color: #94a3b8;" th:text="${#strings.toLowerCase(#strings.replace(emp.name,' ','')) + 'wcg@mail.com'}">email</div>
+                                                <div class="fw-bold text-dark mb-1" th:text="${emp.fullName}">Name</div>
+                                                <div style="font-size: 0.7rem; color: #94a3b8;" th:text="${emp.email != null ? emp.email : (emp.username + '@mail.com')}">email</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td th:text="${emp.id}">ID</td>
-                                    <td th:text="${emp.dept}">Dept</td>
-                                    <td th:text="${emp.desig}">Desig</td>
-                                    <td th:text="${emp.loc}">Loc</td>
-                                    <td th:text="${emp.type}">Type</td>
-                                    <td th:text="${emp.join}">Join Date</td>
+                                    <td th:text="${emp.employeeProfile != null ? emp.employeeProfile.employeeCode : 'N/A'}">ID</td>
+                                    <td th:text="${emp.employeeProfile != null ? emp.employeeProfile.department : 'N/A'}">Dept</td>
+                                    <td th:text="${emp.designation}">Desig</td>
+                                    <td th:text="${emp.employeeProfile != null ? emp.employeeProfile.city : 'N/A'}">Loc</td>
+                                    <td th:text="${emp.role != null ? emp.role.roleName : 'Full-time'}">Type</td>
+                                    <td th:text="${emp.employeeProfile != null ? emp.employeeProfile.joiningDate : 'N/A'}">Join Date</td>
                                     <td>
-                                        <span th:class="${emp.status == 'Active' ? 'text-success fw-bold' : (emp.status == 'On Notice' ? 'text-warning fw-bold' : 'text-danger fw-bold')}" 
+                                        <span th:class="${emp.status == 'ACTIVE' ? 'text-success fw-bold' : (emp.status == 'ON NOTICE' ? 'text-warning fw-bold' : 'text-danger fw-bold')}" 
                                               th:text="${emp.status}">Status</span>
                                     </td>
                                     <td>
@@ -921,13 +948,29 @@
                     <div class="d-flex gap-3 mb-4">
                         <div class="position-relative flex-grow-1" style="max-width: 300px;">
                             <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 12px;"></i>
-                            <input type="text" class="form-control" placeholder="Search by employee name" style="padding-left: 40px;">
+                            <input type="text" id="offboardingSearch" class="form-control" placeholder="Search by employee name" style="padding-left: 40px;">
                         </div>
-                        <select class="form-select w-auto"><option>All Departments</option></select>
-                        <select class="form-select w-auto"><option>Status: All</option></select>
-                        <select class="form-select w-auto"><option>All Roles</option></select>
+                        <select id="offboardingDept" class="form-select w-auto">
+                            <option value="">All Departments</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="HR">HR</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Marketing">Marketing</option>
+                        </select>
+                        <select id="offboardingStatus" class="form-select w-auto">
+                            <option value="">Status: All</option>
+                            <option value="ACTIVE">Active</option>
+                            <option value="ON NOTICE">On Notice</option>
+                            <option value="EXITED">Exited</option>
+                        </select>
+                        <select id="offboardingRole" class="form-select w-auto">
+                            <option value="">All Roles</option>
+                            <option value="Sr. Developer">Sr. Developer</option>
+                            <option value="Software Engineer">Software Engineer</option>
+                            <option value="Junior developer">Junior developer</option>
+                        </select>
                         <button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> More Filters</button>
-                        <button class="btn btn-primary fw-bold ms-auto" data-bs-toggle="modal" data-bs-target="#exitEmployeeModal">
+                        <button class="btn btn-primary fw-bold ms-auto" onclick="openExitModal()">
                             <i class="fas fa-plus me-1"></i> Exit Candidate
                         </button>
                     </div>
@@ -936,7 +979,7 @@
                         <table class="table table-custom mb-0">
                             <thead>
                                 <tr>
-                                    <th><input class="form-check-input border-secondary" type="checkbox"></th>
+                                    <th>Select</th>
                                     <th>Candidate Name</th>
                                     <th>Department</th>
                                     <th>Designation</th>
@@ -947,29 +990,37 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr th:each="cand, iterStat : ${candidates}">
-                                    <td><input class="form-check-input border-secondary" type="checkbox"></td>
+                            <tbody id="offboarding-tbody">
+                                <tr th:each="cand, iterStat : ${allUsers}" th:if="${cand.status == 'EXITED' or cand.status == 'ON NOTICE'}">
+                                    <td>
+                                        <input type="radio" name="selectedCandidateRadio" class="form-check-input mt-2" 
+                                               th:value="${cand.id}" 
+                                               th:data-name="${cand.fullName}" 
+                                               th:data-empid="${cand.employeeProfile != null ? cand.employeeProfile.employeeId : 'N/A'}"
+                                               th:data-dept="${cand.employeeProfile != null ? cand.employeeProfile.department : 'N/A'}"
+                                               th:data-role="${cand.designation}"
+                                               th:data-avatar="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}">
+                                    </td>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <img th:src="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}" 
                                                  class="emp-avatar border" style="object-fit: cover;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\' /></svg>'">
                                             <div class="lh-1">
-                                                <div class="fw-bold text-dark mb-1" th:text="${cand.name}">Name</div>
-                                                <div style="font-size: 0.7rem; color: #94a3b8;" th:text="${#strings.toLowerCase(#strings.replace(cand.name,' ','')) + 'wcg@mail.com'}">email</div>
+                                                <div class="fw-bold text-dark mb-1" th:text="${cand.fullName}">Name</div>
+                                                <div style="font-size: 0.7rem; color: #94a3b8;" th:text="${cand.email != null ? cand.email : (cand.username + '@mail.com')}">email</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td th:text="${cand.dept}">Dept</td>
-                                    <td th:text="${cand.desig}">Desig</td>
-                                    <td th:text="${cand.loc}">Loc</td>
-                                    <td th:text="${cand.join}">Join Date</td>
+                                    <td th:text="${cand.employeeProfile != null ? cand.employeeProfile.department : 'N/A'}">Dept</td>
+                                    <td th:text="${cand.designation}">Desig</td>
+                                    <td th:text="${cand.employeeProfile != null ? cand.employeeProfile.city : 'N/A'}">Loc</td>
+                                    <td th:text="${cand.employeeProfile != null ? cand.employeeProfile.joiningDate : 'N/A'}">Join Date</td>
                                     <td style="width: 120px;">
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="progress flex-grow-1" style="height: 6px;">
-                                                <div class="progress-bar bg-success" th:style="'width: ' + ${cand.prog} + '%'"></div>
+                                                <div class="progress-bar bg-success" style="width: 85%"></div>
                                             </div>
-                                            <span style="font-size: 0.75rem; font-weight: bold;" th:text="${cand.prog} + '%'"></span>
+                                            <span style="font-size: 0.75rem; font-weight: bold;">85%</span>
                                         </div>
                                     </td>
                                     <td>
@@ -1125,6 +1176,121 @@
                 }]
             });
         });
+
+        // Filter functionality for Offboarding Table
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById("offboardingSearch");
+            const deptSelect = document.getElementById("offboardingDept");
+            const statusSelect = document.getElementById("offboardingStatus");
+            const roleSelect = document.getElementById("offboardingRole");
+            const tbody = document.getElementById("offboarding-tbody");
+
+            if(searchInput && tbody) {
+                const trs = tbody.getElementsByTagName("tr");
+                
+                function filterTable() {
+                    const searchVal = searchInput.value.toLowerCase();
+                    const deptVal = deptSelect.value.toLowerCase();
+                    const statusVal = statusSelect.value.toLowerCase();
+                    const roleVal = roleSelect.value.toLowerCase();
+
+                    for (let i = 0; i < trs.length; i++) {
+                        const tr = trs[i];
+                        const nameText = tr.cells[0].innerText.toLowerCase();
+                        const deptText = tr.cells[1].innerText.toLowerCase();
+                        const roleText = tr.cells[2].innerText.toLowerCase();
+                        const statusText = tr.cells[6].innerText.toLowerCase();
+
+                        const matchSearch = searchVal === "" || nameText.includes(searchVal);
+                        const matchDept = deptVal === "" || deptText.includes(deptVal);
+                        const matchStatus = statusVal === "" || statusText.includes(statusVal);
+                        const matchRole = roleVal === "" || roleText.includes(roleVal);
+
+                        if (matchSearch && matchDept && matchStatus && matchRole) {
+                            tr.style.display = "";
+                        } else {
+                            tr.style.display = "none";
+                        }
+                    }
+                }
+
+                searchInput.addEventListener("keyup", filterTable);
+                deptSelect.addEventListener("change", filterTable);
+                statusSelect.addEventListener("change", filterTable);
+                roleSelect.addEventListener("change", filterTable);
+            }
+
+            // Filter functionality for All Employees Table
+            const allEmpSearch = document.getElementById("allEmpSearch");
+            const allEmpDept = document.getElementById("allEmpDept");
+            const allEmpLoc = document.getElementById("allEmpLoc");
+            const allEmpRole = document.getElementById("allEmpRole");
+            const allEmpStatus = document.getElementById("allEmpStatus");
+            const allEmpTbody = document.getElementById("all-emp-tbody");
+
+            if (allEmpSearch && allEmpTbody) {
+                const allEmpTrs = allEmpTbody.getElementsByTagName("tr");
+                
+                function filterAllEmpTable() {
+                    const searchVal = allEmpSearch.value.toLowerCase();
+                    const deptVal = allEmpDept.value.toLowerCase();
+                    const locVal = allEmpLoc.value.toLowerCase();
+                    const roleVal = allEmpRole.value.toLowerCase();
+                    const statusVal = allEmpStatus.value.toLowerCase();
+
+                    for (let i = 0; i < allEmpTrs.length; i++) {
+                        const tr = allEmpTrs[i];
+                        const nameText = tr.cells[0].innerText.toLowerCase();
+                        const deptText = tr.cells[2].innerText.toLowerCase();
+                        const roleText = tr.cells[3].innerText.toLowerCase();
+                        const locText = tr.cells[4].innerText.toLowerCase();
+                        const statusText = tr.cells[7].innerText.toLowerCase();
+
+                        const matchSearch = searchVal === "" || nameText.includes(searchVal);
+                        const matchDept = deptVal === "" || deptText.includes(deptVal);
+                        const matchLoc = locVal === "" || locText.includes(locVal);
+                        const matchRole = roleVal === "" || roleText.includes(roleVal);
+                        const matchStatus = statusVal === "" || statusText.includes(statusVal);
+
+                        if (matchSearch && matchDept && matchLoc && matchRole && matchStatus) {
+                            tr.style.display = "";
+                        } else {
+                            tr.style.display = "none";
+                        }
+                    }
+                }
+
+                allEmpSearch.addEventListener("keyup", filterAllEmpTable);
+                allEmpDept.addEventListener("change", filterAllEmpTable);
+                allEmpLoc.addEventListener("change", filterAllEmpTable);
+                allEmpRole.addEventListener("change", filterAllEmpTable);
+                allEmpStatus.addEventListener("change", filterAllEmpTable);
+            }
+        });
+
+        function openExitModal() {
+            const selected = document.querySelector('input[name="selectedCandidateRadio"]:checked');
+            if (!selected) {
+                alert("Please select a candidate from the table first.");
+                return;
+            }
+            
+            const userId = selected.value;
+            const name = selected.getAttribute("data-name");
+            const empId = selected.getAttribute("data-empid");
+            const dept = selected.getAttribute("data-dept");
+            const role = selected.getAttribute("data-role");
+            const avatar = selected.getAttribute("data-avatar");
+            
+            document.getElementById("modalUserId").value = userId;
+            document.getElementById("modalEmpName").innerText = name;
+            document.getElementById("modalEmpId").innerText = empId;
+            document.getElementById("modalEmpDeptRole").innerText = dept + ": " + role;
+            document.getElementById("modalEmpAvatar").src = avatar;
+            
+            const modal = new bootstrap.Modal(document.getElementById('exitEmployeeModal'));
+            modal.show();
+        }
     </script>
 
     <!-- EXIT EMPLOYEE MODAL -->
@@ -1141,16 +1307,18 @@
                 <div class="modal-body">
                     
                     <div class="d-flex align-items-center mb-4 p-3 rounded" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
-                        <img src="/images/female-avatar.png" class="emp-avatar border" style="width: 45px; height: 45px; margin-right: 15px;">
+                        <img id="modalEmpAvatar" src="/images/female-avatar.png" class="emp-avatar border" style="width: 45px; height: 45px; margin-right: 15px;">
                         <div class="lh-1">
-                            <div class="fw-bold text-dark mb-1 fs-6">Neha Sharma</div>
+                            <div class="fw-bold text-dark mb-1 fs-6" id="modalEmpName">Neha Sharma</div>
                             <div style="font-size: 0.8rem; color: #64748b;">
-                                Employee ID: EMP114 <span class="mx-2">|</span> Engineering: Sr. Developer
+                                Employee ID: <span id="modalEmpId">EMP114</span> <span class="mx-2">|</span> <span id="modalEmpDeptRole">Engineering: Sr. Developer</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row g-3 mb-3">
+                    <form id="exitEmployeeForm" method="post" action="/senior_hr/resignation/offboard">
+                        <input type="hidden" id="modalUserId" name="userId" value="">
+                        <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold" style="font-size: 0.85rem;">Last Working Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" value="2026-05-30">
@@ -1168,12 +1336,30 @@
                             <textarea class="form-control" rows="2" placeholder="Add Comments"></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Handover To <span class="text-danger">*</span></label>
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Handover To</label>
                             <select class="form-select"><option>Amit Kumar</option></select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Handover Due Date <span class="text-danger">*</span></label>
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Handover Due Date</label>
                             <input type="date" class="form-control" value="2026-11-25">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Notice Period (Days) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" value="30">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Resignation Proof <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" style="font-size: 0.85rem;">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Assets & Accessories</label>
+                            <textarea class="form-control" rows="2" placeholder="List assets to be recovered (e.g. Laptop, ID Card)"></textarea>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="noDues">
+                                <label class="form-check-label fw-bold text-dark" for="noDues" style="font-size: 0.85rem;">No Dues Pending</label>
+                            </div>
                         </div>
                     </div>
 
@@ -1181,20 +1367,20 @@
                         <label class="form-label fw-bold" style="font-size: 0.85rem;">Clearances</label>
                         <div class="d-flex flex-wrap gap-3" style="font-size: 0.85rem; color: #334155;">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked id="itClear">
-                                <label class="form-check-label" for="itClear">IT Clearance</label>
+                                <input class="form-check-input" type="checkbox" disabled id="itClear">
+                                <label class="form-check-label text-muted" for="itClear">IT Clearance</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked id="hrClear">
-                                <label class="form-check-label" for="hrClear">HR Clearance</label>
+                                <input class="form-check-input" type="checkbox" disabled id="hrClear">
+                                <label class="form-check-label text-muted" for="hrClear">HR Clearance</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked id="finClear">
-                                <label class="form-check-label" for="finClear">Finance</label>
+                                <input class="form-check-input" type="checkbox" disabled id="finClear">
+                                <label class="form-check-label text-muted" for="finClear">Finance</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked id="adminClear">
-                                <label class="form-check-label" for="adminClear">Admin Clearance</label>
+                                <input class="form-check-input" type="checkbox" disabled id="adminClear">
+                                <label class="form-check-label text-muted" for="adminClear">Admin Clearance</label>
                             </div>
                         </div>
                     </div>

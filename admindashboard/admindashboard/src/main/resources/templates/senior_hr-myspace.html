@@ -252,8 +252,8 @@
     <div class="myspace-main">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold text-dark mb-0">Payroll Management</h4>
-            <button class="btn btn-primary fw-bold px-4" onclick="alert('Feature under development')">
-                <i class="fas fa-plus me-2"></i> Add Component
+            <button class="btn btn-primary fw-bold px-4" onclick="toggleCreateStructure()">
+                <i class="fas fa-plus me-2"></i> Create Structure
             </button>
         </div>
 
@@ -413,21 +413,106 @@
                                 <tr th:each="struct : ${salaryStructures}">
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="emp-avatar" th:text="${#strings.substring(struct.empName, 0, 1)}">A</div>
-                                            <div class="fw-semibold" th:text="${struct.empName}">Name</div>
+                                            <div th:if="${struct.user != null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold" th:text="${#strings.substring(struct.user.fullName, 0, 1)}">U</div>
+                                            <div th:if="${struct.user == null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold">S</div>
+                                            <div class="fw-semibold" th:text="${struct.user?.fullName ?: struct.structureName}">Name</div>
                                         </div>
                                     </td>
-                                    <td th:text="${struct.dept}">Dept</td>
-                                    <td class="fw-semibold text-dark">Rs. <span th:text="${struct.salary}">0</span></td>
-                                    <td class="text-danger">Rs. <span th:text="${struct.deductions}">0</span></td>
-                                    <td class="text-success">Rs. <span th:text="${struct.bonus}">0</span></td>
+                                    <td th:text="${struct.user?.employeeProfile?.department ?: 'All Departments'}">Dept</td>
+                                    <td class="fw-semibold text-dark">Rs. <span th:text="${#numbers.formatDecimal(struct.ctcAmount, 1, 'COMMA', 0, 'POINT')}">0</span></td>
+                                    <td class="text-danger">Rs. <span th:text="${#numbers.formatDecimal(struct.totalDeductions, 1, 'COMMA', 0, 'POINT')}">0</span></td>
+                                    <td class="text-success">Rs. <span th:text="${#numbers.formatDecimal(struct.totalEarnings, 1, 'COMMA', 0, 'POINT')}">0</span></td>
                                     <td>
-                                        <button class="btn btn-sm btn-light text-primary me-1" onclick="alert('Feature under development')"><i class="fas fa-edit"></i></button>
-                                        <button class="btn btn-sm btn-light text-secondary"><i class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-light text-primary me-1" onclick="toggleCreateStructure()"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-light text-danger"><i class="fas fa-trash"></i></button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- Create New Salary Structure View (Hidden by default) -->
+                <div id="create-structure-view" class="card-custom mt-4" style="display: none;">
+                    <div class="card-header-custom d-flex justify-content-between align-items-center">
+                        <span>Create New Salary Structure</span>
+                        <button class="btn btn-sm btn-light" onclick="toggleCreateStructure()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="p-4">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">Effective From <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control form-control-sm" value="2026-06-01">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">CTC (Cost To Company) <span class="text-danger">*</span></label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">₹</span>
+                                    <input type="number" id="ctc-amount-input" class="form-control" value="960000" onchange="recalculateAllAmounts()">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">Structure Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" value="Standard Template">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-bold mb-0">Components</h6>
+                            <button class="btn btn-outline-primary btn-sm fw-bold"><i class="fas fa-plus me-1"></i> Add Component</button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle text-center" style="font-size: 0.85rem;">
+                                <thead class="bg-light text-muted">
+                                    <tr>
+                                        <th class="text-start">Component Name</th>
+                                        <th>Type</th>
+                                        <th>Category</th>
+                                        <th>Calculation/Formula</th>
+                                        <th>Amount</th>
+                                        <th>% of CTC</th>
+                                        <th>Taxable</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <th:block th:if="${not #lists.isEmpty(salaryStructures)}">
+                                        <!-- Iterate over components of the first structure just to show the mockup data -->
+                                        <tr th:each="comp : ${salaryStructures[0].components}">
+                                            <td class="text-start">
+                                                <i class="fas fa-grip-vertical text-muted me-2" style="cursor: grab;"></i>
+                                                <span th:text="${comp.componentName}">Basic Salary</span>
+                                            </td>
+                                            <td th:class="${comp.type == 'Earning' ? 'text-success fw-semibold' : 'text-danger fw-semibold'}" th:text="${comp.type}">Earning</td>
+                                            <td th:text="${comp.category}">Basic</td>
+                                            <td th:text="${comp.calculationFormula}">40% of CTC</td>
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm text-center mx-auto amount-input" style="width: 100px;" th:value="${#numbers.formatDecimal(comp.amount, 1, 'COMMA', 0, 'POINT')}">
+                                            </td>
+                                            <td class="ctc-percent-cell">
+                                                <span class="ctc-percent-text" th:text="${#numbers.formatDecimal(comp.percentageOfCtc, 1, 2)} + '%'">40.00%</span>
+                                                <div class="input-group input-group-sm ctc-percent-input-group d-none" style="width: 90px; margin: 0 auto;">
+                                                    <input type="number" class="form-control text-center ctc-percent-input p-1" th:value="${comp.percentageOfCtc}" step="0.01">
+                                                    <span class="input-group-text p-1">%</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-success fw-semibold" th:if="${comp.taxable}">Yes</td>
+                                            <td class="text-muted fw-semibold" th:unless="${comp.taxable}">No</td>
+                                            <td>
+                                                <i class="fas fa-pen text-dark me-2 edit-comp-btn" style="cursor: pointer;" onclick="toggleEditComponent(this)"></i>
+                                                <i class="fas fa-trash-alt text-dark" style="cursor: pointer;"></i>
+                                            </td>
+                                        </tr>
+                                    </th:block>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-3 mt-4">
+                            <button class="btn btn-light border fw-bold px-4" onclick="toggleCreateStructure()">Cancel</button>
+                            <button class="btn btn-primary fw-bold px-4" onclick="toggleCreateStructure()">Save & Next</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -464,15 +549,16 @@
                                     <td><input type="checkbox" class="form-check-input"></td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="emp-avatar" th:text="${#strings.substring(struct.empName, 0, 1)}">A</div>
-                                            <div class="fw-semibold" th:text="${struct.empName}">Name</div>
+                                            <div th:if="${struct.user != null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold" th:text="${#strings.substring(struct.user.fullName, 0, 1)}">U</div>
+                                            <div th:if="${struct.user == null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold">S</div>
+                                            <div class="fw-semibold" th:text="${struct.user?.fullName ?: struct.structureName}">Name</div>
                                         </div>
                                     </td>
-                                    <td th:text="${struct.dept}">Dept</td>
-                                    <td>Rs. <span th:text="${struct.salary}">0</span></td>
+                                    <td th:text="${struct.user?.employeeProfile?.department ?: 'All Departments'}">Dept</td>
+                                    <td>Rs. <span th:text="${#numbers.formatDecimal(struct.ctcAmount, 1, 'COMMA', 0, 'POINT')}">0</span></td>
                                     <td>30/31</td>
                                     <td class="fw-semibold text-dark">Rs. 95,000</td>
-                                    <td class="text-danger">Rs. <span th:text="${struct.deductions}">0</span></td>
+                                    <td class="text-danger">Rs. <span th:text="${#numbers.formatDecimal(struct.totalDeductions, 1, 'COMMA', 0, 'POINT')}">0</span></td>
                                     <td class="fw-bold text-success">Rs. 90,000</td>
                                     <td>
                                         <button class="btn btn-sm btn-outline-primary fw-bold" onclick="alert('Feature under development')">Generate Slip</button>
@@ -513,14 +599,15 @@
                                 <tr th:each="struct : ${salaryStructures}">
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="emp-avatar" th:text="${#strings.substring(struct.empName, 0, 1)}">A</div>
-                                            <div class="fw-semibold" th:text="${struct.empName}">Name</div>
+                                            <div th:if="${struct.user != null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold" th:text="${#strings.substring(struct.user.fullName, 0, 1)}">U</div>
+                                            <div th:if="${struct.user == null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold">S</div>
+                                            <div class="fw-semibold" th:text="${struct.user?.fullName ?: struct.structureName}">Name</div>
                                         </div>
                                     </td>
-                                    <td th:text="${struct.dept}">Dept</td>
+                                    <td th:text="${struct.user?.employeeProfile?.department ?: 'All Departments'}">Dept</td>
                                     <td>May 2026</td>
-                                    <td class="text-success fw-semibold">Rs. <span th:text="${struct.bonus}">0</span></td>
-                                    <td class="text-danger fw-semibold">Rs. <span th:text="${struct.deductions}">0</span></td>
+                                    <td class="text-success fw-semibold">Rs. <span>0</span></td>
+                                    <td class="text-danger fw-semibold">Rs. <span th:text="${#numbers.formatDecimal(struct.totalDeductions, 1, 'COMMA', 0, 'POINT')}">0</span></td>
                                     <td class="text-muted">Standard adjust</td>
                                     <td>
                                         <button class="btn btn-sm btn-light text-primary me-1" onclick="alert('Feature under development')"><i class="fas fa-edit"></i></button>
@@ -565,11 +652,12 @@
                                 <tr th:each="struct : ${salaryStructures}">
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="emp-avatar" th:text="${#strings.substring(struct.empName, 0, 1)}">A</div>
-                                            <div class="fw-semibold" th:text="${struct.empName}">Name</div>
+                                            <div th:if="${struct.user != null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold" th:text="${#strings.substring(struct.user.fullName, 0, 1)}">U</div>
+                                            <div th:if="${struct.user == null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold">S</div>
+                                            <div class="fw-semibold" th:text="${struct.user?.fullName ?: struct.structureName}">Name</div>
                                         </div>
                                     </td>
-                                    <td th:text="${struct.dept}">Dept</td>
+                                    <td th:text="${struct.user?.employeeProfile?.department ?: 'All Departments'}">Dept</td>
                                     <td>May 2026</td>
                                     <td class="text-dark">Rs. 95,000</td>
                                     <td class="fw-bold text-dark">Rs. 90,000</td>
@@ -590,5 +678,70 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleCreateStructure() {
+            var listView = document.querySelector('#structure-pane > .card-custom:first-child');
+            var createView = document.getElementById('create-structure-view');
+            
+            if (createView.style.display === 'none') {
+                createView.style.display = 'block';
+                listView.style.display = 'none';
+            } else {
+                createView.style.display = 'none';
+                listView.style.display = 'block';
+            }
+        }
+
+        function toggleEditComponent(icon) {
+            const row = icon.closest('tr');
+            const textSpan = row.querySelector('.ctc-percent-text');
+            const inputGroup = row.querySelector('.ctc-percent-input-group');
+            const amountInput = row.querySelector('.amount-input');
+            
+            if (icon.classList.contains('fa-pen')) {
+                // Switch to edit mode
+                icon.classList.remove('fa-pen');
+                icon.classList.add('fa-check', 'text-success');
+                
+                textSpan.classList.add('d-none');
+                inputGroup.classList.remove('d-none');
+            } else {
+                // Save mode
+                icon.classList.remove('fa-check', 'text-success');
+                icon.classList.add('fa-pen');
+                
+                const newVal = row.querySelector('.ctc-percent-input').value || 0;
+                textSpan.textContent = parseFloat(newVal).toFixed(2) + '%';
+                
+                inputGroup.classList.add('d-none');
+                textSpan.classList.remove('d-none');
+                
+                // Recalculate Amount based on new CTC %
+                const ctc = parseFloat(document.getElementById('ctc-amount-input').value) || 0;
+                const calculatedAmount = Math.round(ctc * (parseFloat(newVal) / 100));
+                
+                if(calculatedAmount > 0) {
+                    amountInput.value = calculatedAmount.toLocaleString('en-IN');
+                }
+            }
+        }
+
+        function recalculateAllAmounts() {
+            const ctc = parseFloat(document.getElementById('ctc-amount-input').value) || 0;
+            const rows = document.querySelectorAll('#create-structure-view tbody tr');
+            
+            rows.forEach(row => {
+                const percentInput = row.querySelector('.ctc-percent-input');
+                const amountInput = row.querySelector('.amount-input');
+                if (percentInput && amountInput) {
+                    const percent = parseFloat(percentInput.value) || 0;
+                    const calculatedAmount = Math.round(ctc * (percent / 100));
+                    if (percent > 0) {
+                        amountInput.value = calculatedAmount.toLocaleString('en-IN');
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html>
