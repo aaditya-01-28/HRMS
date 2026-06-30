@@ -394,7 +394,7 @@
 
     <!-- MAIN CONTENT -->
     <div class="profile-main">
-		<header class="top-header">
+		<header class="top-header d-flex justify-content-between align-items-center px-4 py-3 bg-white w-100 shadow-sm" style="position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #e2e8f0;">
 		    <div class="page-title d-flex align-items-center">
 		        <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.fullName} + '&background=1e3a8a&color=fff&size=50'}"
                      class="rounded-circle shadow-sm" alt="User" style="width: 40px; height: 40px;">
@@ -436,7 +436,7 @@
 
 		</header>
 
-		<div class="profile-tabs" style="margin-top: 120px;">
+		<div class="profile-tabs" style="position: sticky; top: 68px; z-index: 999; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
 
 		    <button class="tab-btn active"
 		            onclick="showProfileTab('v-pills-personal',this)">

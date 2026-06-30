@@ -314,7 +314,7 @@
             MANAGE WORKFLOW
         </span>
     </div>
-    <a th:href="@{/transportation/dashboard}" class="btn-back-home">
+    <a th:href="${backUrl != null ? backUrl : '/transportation/dashboard'}" class="btn-back-home">
         <i class="fas fa-arrow-left me-2"></i> Back
     </a>
 </header>

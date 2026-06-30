@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -37,6 +37,10 @@
 		    border-bottom: 2px solid #c7d5ef;
 		    display: flex;
 		    align-items: center;
+		    justify-content: space-between;
+		    position: sticky;
+		    top: 0;
+		    z-index: 1000;
 		    padding: 0 18px;
 		}
 
@@ -58,7 +62,11 @@
 		    display: flex;
 		    align-items: center;
 		    background: #d9e3ef;
-		    border-top: 1px solid #d4d4d4;
+		    border-bottom: 1px solid #c7d5ef;
+		    position: sticky;
+		    top: 56px;
+		    z-index: 999;
+		    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 		    padding: 0 12px;
 		}
 

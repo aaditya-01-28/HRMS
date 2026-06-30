@@ -296,7 +296,19 @@ public class DashboardController {
         return "manager-dashboard";
     }
 
-    @GetMapping({"/manager/workflow", "/accounts/workflow", "/transportation/workflow", "/HR/workflow", "/rewards-manager/workflow"})
+    @GetMapping({
+        "/manager/workflow", 
+        "/accounts/workflow", 
+        "/transportation/workflow", 
+        "/HR/workflow", 
+        "/rewards-manager/workflow",
+        "/senior_manager/workflow",
+        "/senior_hr/workflow",
+        "/senior_lnd/workflow",
+        "/senior_accounts/workflow",
+        "/senior_transport/workflow",
+        "/senior_rewards/workflow"
+    })
     public String showManagerWorkflow(org.springframework.ui.Model model, java.security.Principal principal, jakarta.servlet.http.HttpServletRequest request) {
         String currentUserId = principal.getName();
         User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
@@ -457,7 +469,15 @@ public class DashboardController {
         model.addAttribute("user", currentUser);
         model.addAttribute("isItSupport", isItSupport);
 
-        if (request.getRequestURI().contains("accounts")) {
+        String uri = request.getRequestURI().toLowerCase();
+        if (uri.contains("/senior_")) {
+            String[] parts = request.getRequestURI().split("/");
+            if (parts.length >= 2) {
+                model.addAttribute("backUrl", "/" + parts[1] + "/dashboard");
+            }
+        }
+
+        if (uri.contains("accounts")) {
             java.util.List<ServiceRequest> allAccountsTickets = serviceRequestRepository.findAll().stream()
                     .filter(t -> "PAYROLL".equalsIgnoreCase(t.getType()) || "FINANCE".equalsIgnoreCase(t.getType()))
                     .collect(Collectors.toList());
@@ -472,7 +492,7 @@ public class DashboardController {
             model.addAttribute("isItSupport", true); // To trigger the UI list rendering correctly
 
             return "accounts-workflow";
-        } else if (request.getRequestURI().contains("transportation")) {
+        } else if (uri.contains("transportation") || uri.contains("transport")) {
             java.util.List<ServiceRequest> allTransportTickets = serviceRequestRepository.findAll().stream()
                     .filter(t -> "TRANSPORT".equalsIgnoreCase(t.getType()) || "TRANSPORTATION".equalsIgnoreCase(t.getType()) || "FACILITY".equalsIgnoreCase(t.getType()))
                     .collect(Collectors.toList());
@@ -487,7 +507,7 @@ public class DashboardController {
             model.addAttribute("isItSupport", true); // To trigger the UI list rendering correctly
 
             return "transport-workflow";
-        } else if (request.getRequestURI().contains("HR")) {
+        } else if (uri.contains("hr")) {
             
             // 1. HR Tickets (Pending) -> Used for 'HR Tickets' tab
             java.util.List<ServiceRequest> hrTickets = serviceRequestRepository.findAll().stream()
@@ -527,7 +547,7 @@ public class DashboardController {
             model.addAttribute("pendingResignations", pendingResignations);
 
             return "hr-workflow";
-        } else if (request.getRequestURI().contains("rewards-manager")) {
+        } else if (uri.contains("rewards")) {
             java.util.List<ServiceRequest> rewardsTickets = serviceRequestRepository.findAll().stream()
                     .filter(t -> "REWARDS".equalsIgnoreCase(t.getType()))
                     .collect(Collectors.toList());

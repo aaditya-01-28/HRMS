@@ -824,7 +824,13 @@
                     <a href="#" class="small fw-bold">View All</a>
                 </div>
                 <div class="widget-body">
-                    <div class="row g-2">
+                      <div class="row g-2">
+                        <div class="col-md-6" th:if="${isSeniorManager}">
+                            <a th:href="${workflowUrl}" class="app-btn" style="border: 2px solid #1e3a8a; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
+                                <i class="fas fa-project-diagram text-primary me-2 fs-5"></i>
+                                <span class="app-text fw-bold">Manage Workflow</span>
+                            </a>
+                        </div>
                         <div class="col-md-6">
                             <a href="/conference-room" class="app-btn">
                                 <i class="fas fa-handshake text-primary me-2 fs-5"></i>
