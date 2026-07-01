@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteCircle | HR Admin - Policy & Compliance</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --sidebar-width: 220px;
+            --header-height: 70px;
+        }
+
+        body {
+            background-color: #f8fafc;
+            overflow-x: hidden;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* --- SIDEBAR --- */
+        .myspace-sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1051;
+            transition: transform 0.3s ease;
+        }
+        body.sidebar-toggled .myspace-sidebar { transform: translateX(-100%); }
+
+        .myspace-sidebar .brand-area {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: var(--header-height);
+        }
+        .myspace-sidebar .brand-area img {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+        }
+        .myspace-sidebar .brand-area .brand-text {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.2;
+        }
+        .myspace-sidebar .brand-area .brand-sub {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .myspace-sidebar .nav-links {
+            padding: 15px 0;
+            flex: 1;
+        }
+        .myspace-sidebar .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .myspace-sidebar .nav-link-item:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+        .myspace-sidebar .nav-link-item.active {
+            background: var(--primary);
+            color: white;
+            border-left-color: var(--primary);
+        }
+        .myspace-sidebar .nav-link-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        /* --- GLOBAL NAVBAR --- */
+        .top-navbar {
+            position: fixed; top: 0; left: var(--sidebar-width); right: 0;
+            height: var(--header-height);
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px;
+            z-index: 1050;
+            transition: left 0.3s ease;
+        }
+        body.sidebar-toggled .top-navbar { left: 0; }
+        
+        .nav-brand {
+            display: flex; align-items: center; gap: 15px;
+            font-size: 1.4rem; font-weight: 800; color: #1e293b;
+            letter-spacing: -0.5px;
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        .myspace-main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 20px 30px;
+            min-height: calc(100vh - var(--header-height));
+            transition: margin-left 0.3s ease;
+        }
+        body.sidebar-toggled .myspace-main { margin-left: 0; }
+
+        /* --- NAV TABS --- */
+        .custom-tabs {
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 25px;
+        }
+        .custom-tabs .nav-link {
+            color: #1e293b;
+            font-weight: 600;
+            padding: 12px 25px;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            border-radius: 0;
+            background: transparent;
+        }
+        .custom-tabs .nav-link:hover { color: var(--primary); }
+        .custom-tabs .nav-link.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: transparent;
+        }
+
+        /* --- STATS CARDS --- */
+        .stat-card-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .stat-icon {
+            width: 45px; height: 45px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+        }
+        .stat-label { font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 2px; }
+        .stat-value { font-size: 1.6rem; color: #0f172a; font-weight: 700; line-height: 1; }
+        .stat-sub { font-size: 0.75rem; color: #64748b; margin-top: 4px; }
+
+        /* --- TABLES --- */
+        .card-custom {
+            background: white;
+            border: 1px solid #cbd5e1;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        .card-header-custom {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #cbd5e1;
+            font-weight: 700;
+            color: #1e3a8a;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .table-custom { margin-bottom: 0; }
+        .table-custom thead th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 12px 20px;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        .table-custom tbody td {
+            padding: 15px 20px;
+            vertical-align: middle;
+            color: #334155;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .status-badge {
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-badge.active { color: #16a34a; }
+        .status-badge.draft { color: #ea580c; }
+        .status-badge.archived { color: #64748b; }
+        .status-badge.compliant { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+        .status-badge.due-soon { background: #ffedd5; color: #ea580c; border: 1px solid #fed7aa; }
+        .status-badge.overdue { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
+        
+        .status-dot {
+            width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+        }
+        .status-dot.active { background: #16a34a; }
+        .status-dot.draft { background: #ea580c; }
+        .status-dot.archived { background: #64748b; }
+        
+        .btn-action {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .btn-action:hover { color: #3b82f6; }
+
+        .search-input {
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            padding: 8px 12px;
+            padding-left: 35px;
+            width: 250px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 10px;
+            color: #94a3b8;
+        }
+
+        .avatar-small {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        /* Create Policy View */
+        .create-policy-view { display: none; }
+        .policy-panel {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 20px;
+        }
+        .toggle-switch {
+            position: relative; display: inline-block; width: 44px; height: 24px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #cbd5e1; transition: .4s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #2563eb; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        
+        .upload-zone {
+            border: 1px dashed #cbd5e1;
+            border-radius: 4px;
+            background: #f8fafc;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        /* Compliance Chart */
+        .chart-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 20px auto;
+        }
+        .donut-hole {
+            position: absolute; top: 20%; left: 20%; right: 20%; bottom: 20%;
+            background: white; border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="myspace-sidebar shadow-sm">
+        <div class="brand-area">
+            <img src="/images/wcg-logo.jpg" alt="Logo">
+            <div>
+                <div class="brand-text">WhiteCircle</div>
+                <div class="brand-sub">HR Admin</div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a href="/senior_hr/dashboard" class="nav-link-item"><i class="fas fa-th-large text-muted"></i> Dashboard</a>
+            <a href="/senior_hr/employee" class="nav-link-item"><i class="fas fa-users text-muted"></i> Employee</a>
+            <a href="/senior_hr/lms" class="nav-link-item"><i class="fas fa-graduation-cap text-muted"></i> LMS</a>
+            <a href="/senior_hr/my_space" class="nav-link-item"><i class="fas fa-money-check-alt text-muted"></i> Payroll</a>
+            <a href="/senior_hr/attendance" class="nav-link-item"><i class="fas fa-clock text-muted"></i> Attendance</a>
+            <a href="/senior_hr/performance" class="nav-link-item"><i class="fas fa-chart-line text-muted"></i> Performance</a>
+            <a href="#" class="nav-link-item"><i class="fas fa-user-plus text-muted"></i> Recruitment</a>
+            <a href="#" class="nav-link-item"><i class="fas fa-file-alt text-muted"></i> Reports</a>
+            <a href="/senior_hr/roles" class="nav-link-item"><i class="fas fa-shield-alt text-muted"></i> Role & Permission</a>
+            <a href="/senior_hr/policies" class="nav-link-item active"><i class="fas fa-file-contract"></i> Policy & Compliance</a>
+            <a href="/senior_hr/organization" class="nav-link-item"><i class="fas fa-sitemap text-muted"></i> Organization Structure</a>
+        </div>
+    </div>
+
+    <!-- GLOBAL NAVBAR -->
+    <nav class="top-navbar">
+        <div class="nav-brand">
+            <div class="d-flex flex-column lh-1">
+                <span style="color: #1e3a8a; font-weight: 700; font-size: 1.2rem;">WhiteCircle Group - Shahdol</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: #64748b; margin-top: 4px;">HR MANAGEMENT SYSTEM</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="myspace-main">
+        
+        <div id="page-header">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="fw-bold mb-1" style="color: #1e293b;">Policy & Compliance</h4>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem;">Manage and maintain corporate HR policies and statutory compliance records.</p>
+                </div>
+                <button class="btn btn-primary fw-bold px-4" onclick="showCreatePolicy()">
+                    <i class="fas fa-plus me-2"></i> Create New Policy
+                </button>
+            </div>
+
+            <!-- TABS -->
+            <ul class="nav custom-tabs" id="policyTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="policies-tab" data-bs-toggle="tab" data-bs-target="#policies-pane" type="button" role="tab">Policies</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="compliance-tab" data-bs-toggle="tab" data-bs-target="#compliance-pane" type="button" role="tab">Compliance Overview</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="statutory-tab" data-bs-toggle="tab" data-bs-target="#statutory-pane" type="button" role="tab">Statutory Compliance</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="audits-tab" data-bs-toggle="tab" data-bs-target="#audits-pane" type="button" role="tab">Audits</button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- TAB CONTENT -->
+        <div class="tab-content" id="policyTabsContent">
+
+            <!-- 1. POLICIES -->
+            <div class="tab-pane fade show active" id="policies-pane" role="tabpanel">
+                
+                <!-- Stat Cards Row -->
+                <div class="stat-card-group">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;"><i class="fas fa-file-alt"></i></div>
+                        <div>
+                            <div class="stat-label">Total Policies</div>
+                            <div class="stat-value" th:text="${totalPolicies}">12</div>
+                        </div>
+                    </div>
+                    <div class="stat-card border-success" style="border-width: 1px;">
+                        <div class="stat-icon" style="background: #dcfce7; color: #16a34a;"><i class="far fa-check-circle"></i></div>
+                        <div>
+                            <div class="stat-label text-success">Active Policies</div>
+                            <div class="stat-value" th:text="${activePolicies}">9</div>
+                        </div>
+                    </div>
+                    <div class="stat-card border-warning" style="border-width: 1px;">
+                        <div class="stat-icon" style="background: #ffedd5; color: #ea580c;"><i class="fas fa-edit"></i></div>
+                        <div>
+                            <div class="stat-label text-warning">Draft Policies</div>
+                            <div class="stat-value" th:text="${draftPolicies}">2</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #f1f5f9; color: #64748b;"><i class="fas fa-archive"></i></div>
+                        <div>
+                            <div class="stat-label">Archived Policies</div>
+                            <div class="stat-value" th:text="${archivedPolicies}">1</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Policies Table -->
+                <div class="card-custom mb-5">
+                    <div class="card-header-custom">
+                        <div>Company Policies</div>
+                        <div class="d-flex gap-3 font-weight-normal">
+                            <div style="position: relative;">
+                                <i class="fas fa-search search-icon" style="top: 8px;"></i>
+                                <input type="text" class="search-input form-control-sm" placeholder="Search policy...">
+                            </div>
+                            <select class="form-select form-select-sm" style="width: 150px;"><option>All Categories</option></select>
+                        </div>
+                    </div>
+                    <table class="table table-custom table-hover">
+                        <thead>
+                            <tr>
+                                <th>Policy Name</th>
+                                <th>Category</th>
+                                <th>Effective From</th>
+                                <th>Status</th>
+                                <th>Last Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="policy : ${policies}">
+                                <td class="fw-bold" style="color: #1e3a8a;"><i class="far fa-file-alt text-muted me-2"></i> <span th:text="${policy.policyTitle}">Code of Conduct Policy</span></td>
+                                <td class="text-muted" th:text="${policy.policyCategory}">Workplace</td>
+                                <td th:text="${#temporals.format(policy.effectiveFrom, 'dd MMM yyyy')}">01 Jan 2025</td>
+                                <td>
+                                    <span class="status-badge" th:classappend="${policy.status == 'Active' ? 'active' : (policy.status == 'Draft' ? 'draft' : 'archived')}">
+                                        <span class="status-dot" th:classappend="${policy.status == 'Active' ? 'active' : (policy.status == 'Draft' ? 'draft' : 'archived')}"></span>
+                                        <span class="text-uppercase" th:text="${policy.status}">ACTIVE</span>
+                                    </span>
+                                </td>
+                                <td class="text-muted" th:text="${#temporals.format(policy.lastUpdated, 'dd MMMM yyyy')}">20 June 2026</td>
+                                <td>
+                                    <button class="btn-action"><i class="far fa-eye"></i></button>
+                                    <button class="btn-action"><i class="fas fa-pen"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="row g-4 mb-4">
+                    <!-- Statutory Compliance Summary -->
+                    <div class="col-md-6">
+                        <div class="card-custom">
+                            <div class="card-header-custom">
+                                <div>Statutory Compliance</div>
+                                <a href="#" class="text-primary text-decoration-none" style="font-size: 0.85rem;" onclick="document.getElementById('compliance-tab').click()">View All</a>
+                            </div>
+                            <table class="table table-custom">
+                                <thead>
+                                    <tr>
+                                        <th>Compliance Type</th>
+                                        <th>Status</th>
+                                        <th>Next Due</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="comp : ${compliances}">
+                                        <td class="fw-bold text-dark" th:text="${comp.complianceType}">PF (Provident Fund)</td>
+                                        <td>
+                                            <span class="status-dot active" th:if="${comp.status == 'Compliant'}"></span>
+                                            <span class="status-dot draft" th:if="${comp.status == 'Due Soon'}"></span>
+                                            <span class="status-dot" style="background: #ef4444;" th:if="${comp.status == 'Overdue'}"></span>
+                                            <span class="fw-bold" style="font-size: 0.8rem;" th:classappend="${comp.status == 'Compliant' ? 'text-success' : (comp.status == 'Due Soon' ? 'text-warning' : 'text-danger')}" th:text="${comp.status}">Compliant</span>
+                                        </td>
+                                        <td class="text-muted" th:text="${#temporals.format(comp.nextDueDate, 'dd MMM yyyy')}">15 Jun 2026</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Upcoming Audits Summary -->
+                    <div class="col-md-6">
+                        <div class="card-custom">
+                            <div class="card-header-custom">
+                                <div>Upcoming Audits</div>
+                                <a href="#" class="text-primary text-decoration-none" style="font-size: 0.85rem;">View All</a>
+                            </div>
+                            <table class="table table-custom">
+                                <thead>
+                                    <tr>
+                                        <th>Audit Name</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="audit : ${audits}">
+                                        <td class="fw-bold text-dark" th:text="${audit.auditName}">Internal HR Audit</td>
+                                        <td class="text-muted" th:text="${#temporals.format(audit.auditDate, 'dd MMM yyyy')}">15 Jun 2026</td>
+                                        <td><span class="fw-bold text-primary" style="font-size: 0.8rem; text-transform: uppercase;" th:text="${audit.status}">SCHEDULED</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2. COMPLIANCE OVERVIEW -->
+            <div class="tab-pane fade" id="compliance-pane" role="tabpanel">
+                <div class="mb-4">
+                    <h5 class="fw-bold mb-1" style="color: #1e293b;">Compliance Overview</h5>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem;">Monitor and track statutory compliance across the organization.</p>
+                </div>
+                
+                <div class="d-flex gap-3 mb-4">
+                    <div class="flex-fill">
+                        <label class="form-label" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Compliance Type</label>
+                        <select class="form-select"><option>All</option></select>
+                    </div>
+                    <div class="flex-fill">
+                        <label class="form-label" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Financial Year</label>
+                        <select class="form-select"><option>2025-26</option></select>
+                    </div>
+                    <div class="flex-fill">
+                        <label class="form-label" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Month</label>
+                        <select class="form-select"><option>May 2026</option></select>
+                    </div>
+                    <div class="flex-fill">
+                        <label class="form-label" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Status</label>
+                        <select class="form-select"><option>All Status</option></select>
+                    </div>
+                    <div class="d-flex align-items-end">
+                        <button class="btn btn-link text-primary text-decoration-none fw-bold"><i class="fas fa-undo me-1"></i> Reset Filters</button>
+                    </div>
+                </div>
+                
+                <!-- Stat Cards Row -->
+                <div class="stat-card-group">
+                    <div class="stat-card border-success" style="border-width: 1px;">
+                        <div class="stat-icon" style="background: #dcfce7; color: #16a34a;"><i class="far fa-file-alt"></i></div>
+                        <div>
+                            <div class="stat-label">Total Compliances</div>
+                            <div class="stat-value" th:text="${totalCompliances}">8</div>
+                            <div class="stat-sub">All statutory compliances</div>
+                        </div>
+                    </div>
+                    <div class="stat-card border-primary" style="border-width: 1px;">
+                        <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;"><i class="fas fa-check-circle"></i></div>
+                        <div>
+                            <div class="stat-label">Compliant</div>
+                            <div class="stat-value" th:text="${compliantCount}">5</div>
+                            <div class="stat-sub">62.5% of total</div>
+                        </div>
+                    </div>
+                    <div class="stat-card border-warning" style="border-width: 1px;">
+                        <div class="stat-icon" style="background: #ffedd5; color: #ea580c;"><i class="far fa-clock"></i></div>
+                        <div>
+                            <div class="stat-label text-warning">Due Soon</div>
+                            <div class="stat-value text-warning" th:text="${dueSoonCount}">2</div>
+                            <div class="stat-sub">Next 30 days</div>
+                        </div>
+                    </div>
+                    <div class="stat-card border-danger" style="border-width: 1px;">
+                        <div class="stat-icon" style="background: #fee2e2; color: #ef4444;"><i class="fas fa-exclamation-circle"></i></div>
+                        <div>
+                            <div class="stat-label text-danger">Overdue</div>
+                            <div class="stat-value text-danger" th:text="${overdueCount}">1</div>
+                            <div class="stat-sub">Requires immediate attention</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #f1f5f9; color: #64748b;"><i class="fas fa-id-badge"></i></div>
+                        <div>
+                            <div class="stat-label">Total Employees</div>
+                            <div class="stat-value">245</div>
+                            <div class="stat-sub">As on 31 May 2026</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row g-0 card-custom mb-5">
+                    <div class="col-md-9 border-end">
+                        <div class="p-3 border-bottom fw-bold" style="color: #1e3a8a; font-size: 1.1rem;">Compliance List</div>
+                        <table class="table table-custom table-hover m-0">
+                            <thead>
+                                <tr>
+                                    <th>Compliance Type</th>
+                                    <th>Applicable To</th>
+                                    <th>Frequency</th>
+                                    <th>Next Due Date</th>
+                                    <th>Status</th>
+                                    <th>Last Completed On</th>
+                                    <th>Responsible Person</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="comp : ${compliances}">
+                                    <td class="fw-bold" style="color: #1e293b;"><i class="far fa-file-alt text-muted me-2"></i> <span th:text="${comp.complianceType}">PF</span></td>
+                                    <td class="text-muted" th:text="${comp.applicableTo}">All Employees</td>
+                                    <td class="text-muted" th:text="${comp.frequency}">Monthly</td>
+                                    <td class="fw-bold" th:text="${#temporals.format(comp.nextDueDate, 'dd MMM yyyy')}">15 Jun 2026</td>
+                                    <td>
+                                        <span class="status-badge" th:classappend="${comp.status == 'Compliant' ? 'compliant' : (comp.status == 'Due Soon' ? 'due-soon' : 'overdue')}" th:text="${comp.status}">Compliant</span>
+                                    </td>
+                                    <td class="text-muted" th:text="${comp.lastCompletedOn != null ? #temporals.format(comp.lastCompletedOn, 'dd MMM yyyy') : '-'}">15 May 2026</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div style="width: 30px; height: 30px; border-radius: 50%; background: #e2e8f0; color: #1e3a8a; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.7rem; margin-right: 8px;">RK</div>
+                                            <div class="lh-1">
+                                                <div class="fw-bold" style="font-size: 0.85rem;" th:text="${comp.responsiblePerson != null ? comp.responsiblePerson.fullName : 'Rahul Kumar'}">Rahul Kumar</div>
+                                                <div class="text-muted" style="font-size: 0.7rem;" th:text="${comp.responsiblePerson != null ? comp.responsiblePerson.designation : 'HR Manager'}">HR Manager</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button class="btn-action"><i class="fas fa-pen"></i></button>
+                                        <button class="btn-action"><i class="fas fa-ellipsis-h"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="d-flex justify-content-center p-3">
+                            <div class="d-flex gap-1">
+                                <button class="btn btn-sm btn-light border"><i class="fas fa-chevron-left"></i></button>
+                                <button class="btn btn-sm btn-primary">1</button>
+                                <button class="btn btn-sm btn-light border">2</button>
+                                <button class="btn btn-sm btn-light border">3</button>
+                                <button class="btn btn-sm btn-light border">4</button>
+                                <button class="btn btn-sm btn-light border">5</button>
+                                <button class="btn btn-sm btn-light border"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 p-4">
+                        <div class="fw-bold mb-4" style="color: #1e3a8a; font-size: 1.1rem;">Compliance Status Overview</div>
+                        <div class="chart-container" style="background: conic-gradient(#16a34a 0% 62.5%, #ea580c 62.5% 87.5%, #ef4444 87.5% 100%); border-radius: 50%;">
+                            <div class="donut-hole">
+                                <div class="fw-bold" style="font-size: 1.5rem;" th:text="${totalCompliances}">8</div>
+                                <div class="text-muted" style="font-size: 0.7rem;">Total</div>
+                            </div>
+                        </div>
+                        <ul class="list-unstyled mt-5">
+                            <li class="d-flex justify-content-between mb-2" style="font-size: 0.85rem;">
+                                <div><span class="status-dot active me-2"></span>Compliant</div>
+                                <div class="fw-bold" th:text="${compliantCount} + ' (62.5%)'">5 (62.5%)</div>
+                            </li>
+                            <li class="d-flex justify-content-between mb-2" style="font-size: 0.85rem;">
+                                <div><span class="status-dot draft me-2"></span>Due Soon</div>
+                                <div class="fw-bold" th:text="${dueSoonCount} + ' (25.0%)'">2 (25.0%)</div>
+                            </li>
+                            <li class="d-flex justify-content-between mb-2" style="font-size: 0.85rem;">
+                                <div><span class="status-dot me-2" style="background: #ef4444;"></span>Overdue</div>
+                                <div class="fw-bold" th:text="${overdueCount} + ' (12.5%)'">1 (12.5%)</div>
+                            </li>
+                            <li class="d-flex justify-content-between mb-2 text-muted" style="font-size: 0.85rem;">
+                                <div><span class="status-dot me-2" style="background: #cbd5e1;"></span>Not Applicable</div>
+                                <div>0 (0%)</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. STATUTORY COMPLIANCE (Placeholder) -->
+            <div class="tab-pane fade" id="statutory-pane" role="tabpanel">
+                <div class="p-5 text-center text-muted">Statutory Compliance Detail View Coming Soon</div>
+            </div>
+
+            <!-- 4. AUDITS (Placeholder) -->
+            <div class="tab-pane fade" id="audits-pane" role="tabpanel">
+                <div class="p-5 text-center text-muted">Audits Management View Coming Soon</div>
+            </div>
+
+        </div>
+        
+        <!-- Create New Policy Sub-View -->
+        <div id="create-policy-view" class="create-policy-view">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <div>
+                    <div class="text-muted mb-2" style="font-size: 0.8rem;"><i class="fas fa-arrow-left me-1" style="cursor: pointer;" onclick="hideCreatePolicy()"></i> Policy & Compliance > Policies > <span class="fw-bold" style="color: #2563eb;">Create New Policy</span></div>
+                    <h4 class="fw-bold mb-1" style="color: #1e293b;">Create New Policy</h4>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem;">Create and manage company policies and institutional rules.</p>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <!-- Policy Details -->
+                    <div class="policy-panel mb-4">
+                        <h6 class="fw-bold mb-4" style="color: #64748b;">Policy Details</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Policy Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="Enter policy title (e.g. Work From Home Policy)">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Policy Category <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Select category</option></select>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Policy Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="Enter unique policy code (e.g. WFH-001)" style="width: 50%;">
+                                <div class="form-text" style="font-size: 0.7rem;">Policy code should be unique and cannot be changed later.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Effective From <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Review Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control">
+                                <div class="form-text" style="font-size: 0.7rem;">Policy review reminder will be set based on this date.</div>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Short Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" rows="3" placeholder="Enter a brief description of the policy..."></textarea>
+                                <div class="text-end text-muted mt-1" style="font-size: 0.7rem;">0/250</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Policy Content -->
+                    <div class="policy-panel">
+                        <h6 class="fw-bold mb-4" style="color: #64748b;">Policy Content</h6>
+                        <div class="d-flex gap-4 mb-4 pb-3 border-bottom">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="policyContentMode" id="uploadDoc" checked>
+                                <label class="form-check-label fw-bold" for="uploadDoc" style="font-size: 0.9rem;">Upload Document</label>
+                                <div class="text-muted" style="font-size: 0.75rem;">Upload policy document in PDF, DOC, DOCX format</div>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="policyContentMode" id="writePol">
+                                <label class="form-check-label fw-bold" for="writePol" style="font-size: 0.9rem;">Write Policy</label>
+                                <div class="text-muted" style="font-size: 0.75rem;">Write policy content in the editor</div>
+                            </div>
+                        </div>
+                        
+                        <div class="upload-zone mb-3">
+                            <i class="fas fa-cloud-upload-alt text-primary mb-3" style="font-size: 2rem;"></i>
+                            <div class="fw-bold" style="color: #1e293b;">Drag and drop files here or <span class="text-primary" style="cursor: pointer;">click to browse</span></div>
+                            <div class="text-muted mt-1" style="font-size: 0.8rem;">Supported formats: PDF, DOC, DOCX (Max. 10 MB)</div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <div class="fw-bold mb-1" style="font-size: 0.85rem;">Policy Content Preview</div>
+                            <div class="text-muted" style="font-size: 0.85rem; font-style: italic;">No document uploaded yet.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <!-- Policy Settings -->
+                    <div class="policy-panel mb-4">
+                        <h6 class="fw-bold mb-4" style="color: #64748b;">Policy Settings</h6>
+                        
+                        <label class="form-label fw-bold mb-3" style="font-size: 0.85rem;">Applies To <span class="text-danger">*</span></label>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="appliesTo" id="allEmp" checked>
+                            <label class="form-check-label fw-bold text-dark" for="allEmp" style="font-size: 0.85rem;">All Employees</label>
+                            <div class="text-muted" style="font-size: 0.75rem;">This policy will apply to all employees</div>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="appliesTo" id="specDept">
+                            <label class="form-check-label fw-bold text-dark" for="specDept" style="font-size: 0.85rem;">Specific Departments</label>
+                            <div class="text-muted" style="font-size: 0.75rem;">Apply policy to selected departments</div>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="appliesTo" id="specDesig">
+                            <label class="form-check-label fw-bold text-dark" for="specDesig" style="font-size: 0.85rem;">Specific Designations</label>
+                            <div class="text-muted" style="font-size: 0.75rem;">Apply policy to selected designations</div>
+                        </div>
+                        <div class="form-check mb-4 pb-3 border-bottom">
+                            <input class="form-check-input" type="radio" name="appliesTo" id="custSel">
+                            <label class="form-check-label fw-bold text-dark" for="custSel" style="font-size: 0.85rem;">Custom Selection</label>
+                            <div class="text-muted" style="font-size: 0.75rem;">Apply policy to a custom group of employees</div>
+                        </div>
+                        
+                        <div class="mb-4 pb-3 border-bottom">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Policy Priority</label>
+                            <select class="form-select"><option>Medium</option></select>
+                            <div class="text-muted mt-1" style="font-size: 0.75rem;">Set the priority level of this policy.</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label fw-bold mb-0" style="font-size: 0.85rem;">Status <span class="text-danger">*</span></label>
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="fw-bold text-primary" style="font-size: 0.85rem;">Active</span>
+                            </div>
+                        </div>
+                        <div class="text-muted" style="font-size: 0.75rem;">Inactive policies will not be visible to employees.</div>
+                    </div>
+                    
+                    <!-- Attachments -->
+                    <div class="policy-panel mb-4">
+                        <h6 class="fw-bold mb-3" style="color: #64748b;">Attachments <span class="text-muted fw-normal">(Optional)</span></h6>
+                        <div class="upload-zone py-4" style="background: white;">
+                            <i class="fas fa-cloud-upload-alt text-primary mb-2" style="font-size: 1.5rem;"></i>
+                            <div class="fw-bold" style="color: #1e293b; font-size: 0.8rem;">Drag and drop files here or <span class="text-primary" style="cursor: pointer;">click to browse</span></div>
+                            <div class="text-muted mt-1" style="font-size: 0.7rem;">Supported formats: PDF, DOC, DOCX, JPG, PNG (Max. 10 MB)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="policy-panel p-3" style="background: #f8fafc;">
+                        <h6 class="fw-bold mb-3" style="color: #1e293b; font-size: 0.9rem;">Policy Guidelines</h6>
+                        <ul class="text-primary ps-3 mb-0" style="font-size: 0.8rem; line-height: 1.6;">
+                            <li class="mb-2"><span class="text-dark">Ensure the policy is clear, fair and easy to understand.</span></li>
+                            <li><span class="text-dark">Attach all relevant documents and...</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-end gap-3 mt-4 mb-5 pt-3 border-top">
+                <button class="btn btn-outline-dark fw-bold px-4 py-2" onclick="hideCreatePolicy()">Cancel</button>
+                <button class="btn btn-primary fw-bold px-5 py-2">Save Policy</button>
+            </div>
+        </div>
+        
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showCreatePolicy() {
+            document.getElementById('page-header').style.display = 'none';
+            document.getElementById('policyTabsContent').style.display = 'none';
+            document.getElementById('create-policy-view').style.display = 'block';
+        }
+        
+        function hideCreatePolicy() {
+            document.getElementById('page-header').style.display = 'block';
+            document.getElementById('policyTabsContent').style.display = 'block';
+            document.getElementById('create-policy-view').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

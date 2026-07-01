@@ -22,7 +22,13 @@ public class ResignationRequest {
     @Column(length = 1000)
     private String reason;
 
-    // Status: PENDING_L2, PENDING_L3, REJECTED, OFFBOARDED
+    @Column(length = 2000)
+    private String comments;
+
+    @Column(length = 2000)
+    private String hrComments;
+
+    // Status: DRAFT, PENDING_L2, PENDING_L3, APPROVED, REJECTED, OFFBOARDED
     @Column(nullable = false)
     private String status = "PENDING_L2";
 
@@ -53,6 +59,12 @@ public class ResignationRequest {
 
     public String getReason() { return reason; }
     public void setReason(String reason) { this.reason = reason; }
+
+    public String getComments() { return comments; }
+    public void setComments(String comments) { this.comments = comments; }
+
+    public String getHrComments() { return hrComments; }
+    public void setHrComments(String hrComments) { this.hrComments = hrComments; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

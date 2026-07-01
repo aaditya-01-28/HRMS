@@ -66,6 +66,12 @@ public class SeniorDashboardController {
     private com.example.admindashboard.repository.SalaryComponentRepository salaryComponentRepository;
 
     @Autowired
+    private com.example.admindashboard.repository.PayslipRepository payslipRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.BonusDeductionRepository bonusDeductionRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     // --- LOGIN ROUTE ---
@@ -321,7 +327,80 @@ public class SeniorDashboardController {
         }
 
         model.addAttribute("salaryStructures", structures);
+
+        // Fetch and seed Payslips
+        List<com.example.admindashboard.model.Payslip> payslips = payslipRepository.findAll();
+        if (payslips.isEmpty()) {
+            com.example.admindashboard.model.Payslip p1 = new com.example.admindashboard.model.Payslip();
+            p1.setPayMonth("May");
+            p1.setPayYear(2026);
+            p1.setCtcAnnual(500000.0);
+            p1.setGrossPay(125000.0);
+            p1.setTotalDeductions(10000.0);
+            p1.setNetPay(100000.0);
+            p1.setStatus("Processed");
+            p1.setPaymentDate(java.time.LocalDate.of(2026, 6, 20));
+            p1.setDepartment("Engineering");
+            
+            // Dummy user Neha
+            com.example.admindashboard.model.User neha = userRepository.findAll().stream().filter(u -> u.getFullName() != null && u.getFullName().contains("Neha")).findFirst().orElse(null);
+            p1.setUser(neha);
+            payslipRepository.save(p1);
+
+            com.example.admindashboard.model.Payslip p2 = new com.example.admindashboard.model.Payslip();
+            p2.setPayMonth("May");
+            p2.setPayYear(2026);
+            p2.setCtcAnnual(500000.0);
+            p2.setGrossPay(125000.0);
+            p2.setTotalDeductions(10000.0);
+            p2.setNetPay(100000.0);
+            p2.setStatus("Not Processed");
+            p2.setDepartment("Engineering");
+            payslipRepository.save(p2);
+
+            payslips = payslipRepository.findAll();
+        }
+        model.addAttribute("payslips", payslips);
+
+        // Fetch and seed BonusDeductions
+        List<com.example.admindashboard.model.BonusDeduction> bonuses = bonusDeductionRepository.findAll();
+        if (bonuses.isEmpty()) {
+            com.example.admindashboard.model.BonusDeduction b1 = new com.example.admindashboard.model.BonusDeduction();
+            b1.setType("Bonus");
+            b1.setCategory("Performance Bonus");
+            b1.setDescription("Success of a project");
+            b1.setAmount(25000.0);
+            b1.setImpact("Increase");
+            b1.setStatus("Approved");
+            b1.setEffectiveMonth("May 2026");
+            bonusDeductionRepository.save(b1);
+
+            com.example.admindashboard.model.BonusDeduction d1 = new com.example.admindashboard.model.BonusDeduction();
+            d1.setType("Deduct");
+            d1.setCategory("Late Coming");
+            d1.setDescription("Late Coming deduct");
+            d1.setAmount(25000.0);
+            d1.setImpact("Decrease");
+            d1.setStatus("Approved");
+            d1.setEffectiveMonth("May 2026");
+            bonusDeductionRepository.save(d1);
+
+            com.example.admindashboard.model.BonusDeduction d2 = new com.example.admindashboard.model.BonusDeduction();
+            d2.setType("Deduct");
+            d2.setCategory("Income Tax");
+            d2.setDescription("TDS for May 2026");
+            d2.setAmount(25000.0);
+            d2.setImpact("Decrease");
+            d2.setStatus("Pending");
+            d2.setEffectiveMonth("May 2026");
+            bonusDeductionRepository.save(d2);
+
+            bonuses = bonusDeductionRepository.findAll();
+        }
+        model.addAttribute("bonusDeductions", bonuses);
         
+        // Pass common data for dropdowns, etc.
+        model.addAttribute("allUsers", userRepository.findAll());
         return "senior_hr-myspace";
     }
 

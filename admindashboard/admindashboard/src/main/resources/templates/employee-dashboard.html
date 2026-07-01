@@ -874,7 +874,7 @@
                             </a>
                         </div>
                         <div class="col-md-6">
-                            <a href="#" class="app-btn" data-bs-toggle="modal" data-bs-target="#resignationModal">
+                            <a href="/employee/resignation" class="app-btn">
                                 <i class="fas fa-sign-out-alt text-primary me-2 fs-5"></i>
                                 <span class="app-text">Resignation</span>
                             </a>
@@ -1526,29 +1526,6 @@
     }
 </script>
 
-<!-- Resignation Modal -->
-<div class="modal fade" id="resignationModal" tabindex="-1" aria-labelledby="resignationModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="/employee/resignation/apply" method="post">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="resignationModalLabel">Apply for Resignation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to apply for resignation? This request will be sent to HR for approval.</p>
-                    <div class="mb-3">
-                        <label for="reason" class="form-label">Reason for Resignation</label>
-                        <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Submit Resignation</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+
 </body>
 </html>

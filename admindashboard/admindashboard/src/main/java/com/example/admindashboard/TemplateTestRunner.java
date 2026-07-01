@@ -19,6 +19,7 @@ public class TemplateTestRunner implements CommandLineRunner {
         System.out.println("TESTING TEMPLATE PARSING...");
         try {
             Context ctx = new Context();
+            ctx.setVariable("isItSupport", false);
             templateEngine.process("manager-workflow", ctx);
             System.out.println("TEMPLATE PARSED SUCCESSFULLY!");
         } catch (Exception e) {

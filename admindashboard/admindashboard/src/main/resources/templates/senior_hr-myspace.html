@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteCircle | HR Admin - My Space</title>
+    <title>WhiteCircle | HR Admin - Payroll</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e3a8a;
-            --primary-light: #002D72;
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
             --sidebar-width: 220px;
             --header-height: 70px;
         }
@@ -53,7 +53,7 @@
         .myspace-sidebar .brand-area .brand-text {
             font-size: 0.9rem;
             font-weight: 700;
-            color: var(--primary);
+            color: #1e293b;
             line-height: 1.2;
         }
         .myspace-sidebar .brand-area .brand-sub {
@@ -83,8 +83,8 @@
             color: var(--primary);
         }
         .myspace-sidebar .nav-link-item.active {
-            background: #eff6ff;
-            color: var(--primary);
+            background: var(--primary);
+            color: white;
             border-left-color: var(--primary);
         }
         .myspace-sidebar .nav-link-item i {
@@ -102,14 +102,13 @@
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 30px;
             z-index: 1050;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             transition: left 0.3s ease;
         }
         body.sidebar-toggled .top-navbar { left: 0; }
         
         .nav-brand {
             display: flex; align-items: center; gap: 15px;
-            font-size: 1.4rem; font-weight: 800; color: var(--primary);
+            font-size: 1.4rem; font-weight: 800; color: #1e293b;
             letter-spacing: -0.5px;
         }
 
@@ -117,45 +116,26 @@
         .myspace-main {
             margin-left: var(--sidebar-width);
             margin-top: var(--header-height);
-            padding: 30px;
+            padding: 20px 30px;
             min-height: calc(100vh - var(--header-height));
             transition: margin-left 0.3s ease;
         }
         body.sidebar-toggled .myspace-main { margin-left: 0; }
 
-        /* --- STATS CARDS --- */
-        .stat-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            border: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .stat-icon {
-            width: 50px; height: 50px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem;
-        }
-        .stat-label { font-size: 0.85rem; color: #64748b; font-weight: 600; margin-bottom: 5px; }
-        .stat-value { font-size: 1.4rem; color: #1e293b; font-weight: 700; }
-
         /* --- NAV TABS --- */
         .custom-tabs {
-            border-bottom: 2px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
             margin-bottom: 25px;
         }
         .custom-tabs .nav-link {
-            color: #64748b;
+            color: #1e293b;
             font-weight: 600;
-            padding: 12px 20px;
+            padding: 12px 25px;
             border: none;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
             border-radius: 0;
+            background: transparent;
         }
         .custom-tabs .nav-link:hover { color: var(--primary); }
         .custom-tabs .nav-link.active {
@@ -164,50 +144,180 @@
             background: transparent;
         }
 
+        /* --- STATS CARDS --- */
+        .stat-card {
+            background: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-right: 1px solid #e2e8f0;
+        }
+        .stat-card:last-child {
+            border-right: none;
+        }
+        .stat-icon {
+            font-size: 2rem;
+        }
+        .stat-label { font-size: 0.8rem; color: #64748b; font-weight: 600; margin-bottom: 2px; }
+        .stat-value { font-size: 1.5rem; color: #0f172a; font-weight: 500; }
+
         /* --- TABLES --- */
         .card-custom {
             background: white;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            border: 1px solid #94a3b8;
             overflow: hidden;
+            border-radius: 4px;
         }
         .card-header-custom {
             background: white;
             padding: 15px 20px;
             border-bottom: 1px solid #e2e8f0;
-            font-weight: 700;
+            font-weight: 600;
             color: #1e293b;
-            font-size: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-size: 1.1rem;
         }
         .table-custom { margin-bottom: 0; }
         .table-custom thead th {
             background: #f8fafc;
-            color: #64748b;
+            color: #334155;
             font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 0.9rem;
             padding: 12px 20px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #94a3b8;
         }
         .table-custom tbody td {
             padding: 15px 20px;
             vertical-align: middle;
             color: #334155;
             font-size: 0.9rem;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
         }
-        .emp-avatar {
-            width: 35px; height: 35px;
+        
+        .avatar-small {
+            width: 30px; height: 30px;
             border-radius: 50%;
-            background: #e2e8f0;
-            display: inline-flex; align-items: center; justify-content: center;
-            font-weight: 700; color: #475569;
+            object-fit: cover;
             margin-right: 10px;
+        }
+
+        .status-badge {
+            color: #16a34a;
+            font-weight: 500;
+        }
+        .status-badge.pending {
+            color: #d97706;
+        }
+        .status-badge.not-processed {
+            color: #ef4444;
+        }
+        
+        .type-badge.bonus { color: #16a34a; }
+        .type-badge.deduct { color: #ef4444; }
+        
+        .impact-badge.increase { color: #16a34a; }
+        .impact-badge.decrease { color: #ef4444; }
+
+        .btn-action {
+            background: none;
+            border: none;
+            color: #3b82f6;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        /* Modal Customization */
+        .modal-content {
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .modal-header {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .modal-footer {
+            border-top: none;
+        }
+        
+        /* Payslip Detail View */
+        .payslip-doc {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 40px;
+            margin: 20px auto;
+            max-width: 900px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .payslip-header h4 {
+            color: #1e3a8a;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .payslip-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .ps-label { font-size: 0.75rem; color: #64748b; font-weight: 600; margin-bottom: 4px; }
+        .ps-val { font-size: 0.9rem; color: #1e293b; font-weight: 700; }
+        .payslip-table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .payslip-table th {
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+        .payslip-table td {
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+        
+        .search-input {
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            padding: 8px 12px;
+            padding-left: 35px;
+            width: 250px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 10px;
+            color: #94a3b8;
+        }
+        
+        .select-filter {
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            padding: 8px 12px;
+            color: #334155;
+            background-color: white;
+        }
+        
+        .sub-tab {
+            color: #64748b;
+            font-weight: 600;
+            padding: 10px 0;
+            margin-right: 25px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            display: inline-block;
+        }
+        .sub-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .create-structure-view {
+            display: none;
+        }
+        .payslip-detail-view {
+            display: none;
         }
     </style>
 </head>
@@ -223,524 +333,941 @@
             </div>
         </div>
         <div class="nav-links">
-            <a href="/senior_hr/employee" class="nav-link-item"><i class="fas fa-users"></i> Employee</a>
-            <a href="/senior_hr/lms" class="nav-link-item"><i class="fas fa-graduation-cap"></i> LMS</a>
+            <a href="/senior_hr/employee" class="nav-link-item"><i class="fas fa-users" style="color: #60a5fa;"></i> Employee</a>
+            <a href="/senior_hr/lms" class="nav-link-item"><i class="fas fa-graduation-cap" style="color: #4ade80;"></i> LMS</a>
             <a href="/senior_hr/my_space" class="nav-link-item active"><i class="fas fa-money-check-alt"></i> Payroll</a>
-            <a href="/senior_hr/attendance" class="nav-link-item"><i class="fas fa-clock"></i> Attendance</a>
-            <a href="/senior_hr/performance" class="nav-link-item"><i class="fas fa-chart-line"></i> Performance</a>
-            <a href="#" class="nav-link-item" onclick="alert('Recruitment Module Under Development')"><i class="fas fa-user-plus"></i> Recruitment</a>
+            <a href="/senior_hr/attendance" class="nav-link-item"><i class="fas fa-clock" style="color: #fca5a5;"></i> Attendance</a>
+            <a href="/senior_hr/performance" class="nav-link-item"><i class="fas fa-chart-line" style="color: #38bdf8;"></i> Performance</a>
+            <a href="#" class="nav-link-item" onclick="alert('Recruitment Module Under Development')"><i class="fas fa-user-plus" style="color: #818cf8;"></i> Recruitment</a>
         </div>
     </div>
 
     <!-- GLOBAL NAVBAR -->
     <nav class="top-navbar">
         <div class="nav-brand">
-            <button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
-            <div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
-                <span style="color: #002D72; font-weight: 700; font-size: 1.3rem;">WhiteCircle Group - Shahdol</span>
-                <span style="font-size: 0.85rem; font-weight: 500; color: #333; margin-top: 2px;">Payroll</span>
+            <div class="d-flex flex-column lh-1">
+                <span style="color: #1e3a8a; font-weight: 700; font-size: 1.2rem;">WhiteCircle Group - Shahdol</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: #64748b; margin-top: 4px;">Payroll</span>
             </div>
-        </div>
-        <div class="nav-actions d-flex align-items-center gap-3">
-            <a href="/senior_hr/dashboard" class="btn btn-light text-dark fw-bold" style="border-radius: 6px; padding: 8px 20px; text-decoration: none;">
-                <i class="fas fa-arrow-left me-2"></i> Back
-            </a>
         </div>
     </nav>
 
     <!-- MAIN CONTENT -->
     <div class="myspace-main">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold text-dark mb-0">Payroll Management</h4>
-            <button class="btn btn-primary fw-bold px-4" onclick="toggleCreateStructure()">
-                <i class="fas fa-plus me-2"></i> Create Structure
-            </button>
-        </div>
-
+        
         <!-- TABS -->
         <ul class="nav custom-tabs" id="payrollTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="dash-tab" data-bs-toggle="tab" data-bs-target="#dash-pane" type="button" role="tab">Dashboard</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="structure-tab" data-bs-toggle="tab" data-bs-target="#structure-pane" type="button" role="tab">Salary Structure</button>
+                <button class="nav-link" id="structure-tab" data-bs-toggle="tab" data-bs-target="#structure-pane" type="button" role="tab" onclick="hideCreateStructure()">Salary Structure</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="generate-tab" data-bs-toggle="tab" data-bs-target="#generate-pane" type="button" role="tab">Generate Salary</button>
+                <button class="nav-link" id="payslips-tab" data-bs-toggle="tab" data-bs-target="#payslips-pane" type="button" role="tab" onclick="hidePayslipDetail()">Payslips</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="bonus-tab" data-bs-toggle="tab" data-bs-target="#bonus-pane" type="button" role="tab">Bonus & Deductions</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="payslips-tab" data-bs-toggle="tab" data-bs-target="#payslips-pane" type="button" role="tab">Payslips</button>
+                <button class="nav-link" id="bonus-tab" data-bs-toggle="tab" data-bs-target="#bonus-pane" type="button" role="tab">Bonuses & Deductions</button>
             </li>
         </ul>
 
         <!-- TAB CONTENT -->
-        <div class="tab-content">
-            
-            <!-- 1. DASHBOARD PANE -->
+        <div class="tab-content" id="payrollTabsContent">
+
+            <!-- 1. DASHBOARD -->
             <div class="tab-pane fade show active" id="dash-pane" role="tabpanel">
-                <div class="row g-4 mb-4">
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon bg-primary bg-opacity-10 text-primary"><i class="fas fa-users"></i></div>
-                            <div>
-                                <div class="stat-label">Total Employees</div>
-                                <div class="stat-value" th:text="${totalEmployees}">100</div>
-                            </div>
+                
+                <!-- Stat Cards Row -->
+                <div class="d-flex bg-white rounded border mb-4" style="border-color: #e2e8f0 !important;">
+                    <div class="stat-card flex-fill">
+                        <div class="stat-icon" style="color: #38bdf8;"><i class="fas fa-users"></i></div>
+                        <div>
+                            <div class="stat-label">Total Employees</div>
+                            <div class="stat-value" th:text="${totalEmployees}">100</div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon bg-success bg-opacity-10 text-success"><i class="fas fa-rupee-sign"></i></div>
-                            <div>
-                                <div class="stat-label">Total Net Pay</div>
-                                <div class="stat-value">Rs. <span th:text="${totalNetPay}">3,88,000</span></div>
-                            </div>
+                    <div class="stat-card flex-fill">
+                        <div class="stat-icon" style="color: #3b82f6;"><i class="fas fa-briefcase"></i></div>
+                        <div>
+                            <div class="stat-label">Total Payroll (May)</div>
+                            <div class="stat-value" th:text="'RS. ' + ${totalNetPay}">RS. 3,00,000</div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon bg-danger bg-opacity-10 text-danger"><i class="fas fa-minus-circle"></i></div>
-                            <div>
-                                <div class="stat-label">Total Deductions</div>
-                                <div class="stat-value" th:text="${deductionsCount}">2</div>
-                            </div>
+                    <div class="stat-card flex-fill">
+                        <div class="stat-icon" style="color: #f59e0b;"><i class="fas fa-clipboard-check"></i></div>
+                        <div>
+                            <div class="stat-label">Approvals Pending</div>
+                            <div class="stat-value" th:text="${deductionsCount}">2</div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon bg-warning bg-opacity-10 text-warning"><i class="fas fa-calendar-check"></i></div>
-                            <div>
-                                <div class="stat-label">Total Days</div>
-                                <div class="stat-value" th:text="${totalDaysPresent}">30</div>
-                            </div>
+                    <div class="stat-card flex-fill border-0">
+                        <div class="stat-icon" style="color: #8b5cf6;"><i class="fas fa-chart-pie"></i></div>
+                        <div>
+                            <div class="stat-label">Payroll Status</div>
+                            <div class="stat-value">Draft</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="row g-4">
-                    <div class="col-lg-8">
-                        <div class="card-custom">
-                            <div class="card-header-custom">Payroll overview by Department</div>
-                            <div class="table-responsive">
-                                <table class="table table-custom">
-                                    <thead>
-                                        <tr>
-                                            <th>Department</th>
-                                            <th>Employees</th>
-                                            <th>Gross Payroll</th>
-                                            <th>Deductions</th>
-                                            <th>Net Payroll</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Engineering</td><td>45</td><td>Rs. 4,50,000</td><td>Rs. 25,000</td><td>Rs. 4,25,000</td>
-                                            <td><span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">Generated</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>HR</td><td>10</td><td>Rs. 1,00,000</td><td>Rs. 5,000</td><td>Rs. 95,000</td>
-                                            <td><span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">Generated</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Marketing</td><td>25</td><td>Rs. 2,50,000</td><td>Rs. 15,000</td><td>Rs. 2,35,000</td>
-                                            <td><span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill">Pending</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="card-custom">
-                            <div class="card-header-custom">Recent payroll Activities</div>
-                            <div class="table-responsive">
-                                <table class="table table-custom">
-                                    <thead>
-                                        <tr>
-                                            <th>Activity</th>
-                                            <th>Date & Time</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Generated Engineering</td><td>24 May, 10:00 AM</td>
-                                            <td><span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">Completed</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Approved HR</td><td>23 May, 4:30 PM</td>
-                                            <td><span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">Completed</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                <h5 class="fw-bold mb-3" style="color: #1e293b;">Payroll Summary by Department</h5>
+                <div class="card-custom mb-5">
+                    <table class="table table-custom table-borderless">
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Employees</th>
+                                <th>Gross Payroll</th>
+                                <th>Deductions</th>
+                                <th>Net Payroll</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Engineering</td>
+                                <td>165</td>
+                                <td>2,48,500</td>
+                                <td>50,000</td>
+                                <td>1,29,000</td>
+                                <td><span class="status-badge">Generated</span></td>
+                            </tr>
+                            <tr>
+                                <td>Product</td>
+                                <td>58</td>
+                                <td>1,48,500</td>
+                                <td>89,000</td>
+                                <td>1,36,000</td>
+                                <td><span class="status-badge">Generated</span></td>
+                            </tr>
+                            <tr>
+                                <td>Marketing</td>
+                                <td>51</td>
+                                <td>3,48,500</td>
+                                <td>58,000</td>
+                                <td>1,58,000</td>
+                                <td><span class="status-badge">Generated</span></td>
+                            </tr>
+                            <tr>
+                                <td>Finance</td>
+                                <td>31</td>
+                                <td>5,48,500</td>
+                                <td>25,000</td>
+                                <td>1,57,000</td>
+                                <td><span class="status-badge">Generated</span></td>
+                            </tr>
+                            <tr>
+                                <td>Operations</td>
+                                <td>21</td>
+                                <td>6,48,500</td>
+                                <td>36,000</td>
+                                <td>1,14,000</td>
+                                <td><span class="status-badge">Generated</span></td>
+                            </tr>
+                            <tr style="border-top: 1px solid #94a3b8; font-weight: 700;">
+                                <td>Total</td>
+                                <td>326</td>
+                                <td>1,942,500</td>
+                                <td>2,58,000</td>
+                                <td>694,000</td>
+                                <td>----------------</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h5 class="fw-bold mb-3" style="color: #1e293b;">Recent Payroll Activities</h5>
+                <div class="card-custom">
+                    <table class="table table-custom table-borderless">
+                        <thead>
+                            <tr>
+                                <th>Activity</th>
+                                <th>Payroll Month</th>
+                                <th>Date & Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Bonus added for 5 emp</td>
+                                <td>May 2026</td>
+                                <td>20 May, 10:15 AM</td>
+                                <td><span class="status-badge">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>Deductions on 8 emp</td>
+                                <td>May 2026</td>
+                                <td>20 May, 10:15 AM</td>
+                                <td><span class="status-badge">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>Payroll Draft Created</td>
+                                <td>May 2026</td>
+                                <td>20 May, 10:15 AM</td>
+                                <td><span class="status-badge">Completed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- 2. SALARY STRUCTURE PANE -->
+            <!-- 2. SALARY STRUCTURE -->
             <div class="tab-pane fade" id="structure-pane" role="tabpanel">
-                <div class="card-custom">
-                    <div class="card-header-custom">
-                        Salary Structure
-                        <div class="d-flex gap-2">
-                            <input type="text" class="form-control form-control-sm" placeholder="Search Employee...">
-                            <select class="form-select form-select-sm" style="width: 150px;">
-                                <option>All Departments</option>
-                                <option>Engineering</option>
-                                <option>HR</option>
-                            </select>
+                
+                <!-- Main Structure View -->
+                <div id="main-structure-view">
+                    <h5 class="fw-bold" style="color: #1e293b;">Salary Structures</h5>
+                    <p class="text-muted" style="font-size: 0.9rem;">Create manage and assign salary structures for different roles and departments.</p>
+                    
+                    <!-- Search & Select -->
+                    <div class="d-flex align-items-end gap-4 mb-4">
+                        <div style="position: relative;">
+                            <label class="fw-bold mb-2" style="font-size: 0.9rem; color: #1e293b;">Search & Select Employee <span class="text-danger">*</span></label>
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" placeholder="Amit Sharma">
                         </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-custom">
-                            <thead>
-                                <tr>
-                                    <th>Employee Name</th>
-                                    <th>Department</th>
-                                    <th>Applicable Salary (CTC)</th>
-                                    <th>Deductions</th>
-                                    <th>Bonus</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="struct : ${salaryStructures}">
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div th:if="${struct.user != null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold" th:text="${#strings.substring(struct.user.fullName, 0, 1)}">U</div>
-                                            <div th:if="${struct.user == null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold">S</div>
-                                            <div class="fw-semibold" th:text="${struct.user?.fullName ?: struct.structureName}">Name</div>
-                                        </div>
-                                    </td>
-                                    <td th:text="${struct.user?.employeeProfile?.department ?: 'All Departments'}">Dept</td>
-                                    <td class="fw-semibold text-dark">Rs. <span th:text="${#numbers.formatDecimal(struct.ctcAmount, 1, 'COMMA', 0, 'POINT')}">0</span></td>
-                                    <td class="text-danger">Rs. <span th:text="${#numbers.formatDecimal(struct.totalDeductions, 1, 'COMMA', 0, 'POINT')}">0</span></td>
-                                    <td class="text-success">Rs. <span th:text="${#numbers.formatDecimal(struct.totalEarnings, 1, 'COMMA', 0, 'POINT')}">0</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-light text-primary me-1" onclick="toggleCreateStructure()"><i class="fas fa-edit"></i></button>
-                                        <button class="btn btn-sm btn-light text-danger"><i class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Create New Salary Structure View (Hidden by default) -->
-                <div id="create-structure-view" class="card-custom mt-4" style="display: none;">
-                    <div class="card-header-custom d-flex justify-content-between align-items-center">
-                        <span>Create New Salary Structure</span>
-                        <button class="btn btn-sm btn-light" onclick="toggleCreateStructure()"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div class="p-4">
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold small">Effective From <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control form-control-sm" value="2026-06-01">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold small">CTC (Cost To Company) <span class="text-danger">*</span></label>
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-text">₹</span>
-                                    <input type="number" id="ctc-amount-input" class="form-control" value="960000" onchange="recalculateAllAmounts()">
+                        
+                        <!-- Employee Info Card -->
+                        <div class="d-flex align-items-center gap-4 ms-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="/images/avatar-1.jpg" alt="A" class="avatar-small mb-0" onerror="this.src='https://ui-avatars.com/api/?name=Amit+Sharma&amp;background=random'">
+                                <div class="lh-1">
+                                    <div class="fw-bold" style="font-size: 0.95rem;">Amit Sharma</div>
+                                    <div class="text-muted" style="font-size: 0.75rem; margin-top: 4px;">EMP114 • Software Engineer</div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold small">Structure Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-sm" value="Standard Template">
+                            
+                            <div class="lh-1">
+                                <div class="text-muted" style="font-size: 0.75rem; margin-bottom: 4px;">Date of Joining</div>
+                                <div class="fw-bold" style="font-size: 0.85rem;">15 Jan 2026</div>
+                            </div>
+                            <div class="lh-1">
+                                <div class="text-muted" style="font-size: 0.75rem; margin-bottom: 4px;">Employment Type</div>
+                                <div class="fw-bold" style="font-size: 0.85rem;">Full-time</div>
+                            </div>
+                            <div class="lh-1">
+                                <div class="text-muted" style="font-size: 0.75rem; margin-bottom: 4px;">Current CTC</div>
+                                <div class="fw-bold" style="font-size: 0.85rem;">6,00,000</div>
+                            </div>
+                            <div class="lh-1">
+                                <div class="text-muted" style="font-size: 0.75rem; margin-bottom: 4px;">Pay Frequency</div>
+                                <div class="fw-bold" style="font-size: 0.85rem;">Monthly</div>
                             </div>
                         </div>
-
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="fw-bold mb-0">Components</h6>
-                            <button class="btn btn-outline-primary btn-sm fw-bold"><i class="fas fa-plus me-1"></i> Add Component</button>
+                    </div>
+                    
+                    <!-- Action Cards -->
+                    <div class="d-flex gap-3 mb-5">
+                        <div class="border rounded p-3 d-flex align-items-center justify-content-between flex-fill bg-white" style="border-color: #cbd5e1 !important;">
+                            <div class="d-flex align-items-center gap-3">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #eff6ff; display: flex; align-items: center; justify-content: center; color: #3b82f6; font-size: 1.2rem;">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div class="lh-1">
+                                    <div class="fw-bold" style="color: #1e293b; margin-bottom: 4px;">New Employee</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">Create a new salary structure for this employee.</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm fw-bold" onclick="showCreateStructure()">Create New Structure</button>
                         </div>
-
-                        <div class="table-responsive">
-                            <table class="table table-bordered align-middle text-center" style="font-size: 0.85rem;">
-                                <thead class="bg-light text-muted">
-                                    <tr>
-                                        <th class="text-start">Component Name</th>
-                                        <th>Type</th>
-                                        <th>Category</th>
-                                        <th>Calculation/Formula</th>
-                                        <th>Amount</th>
-                                        <th>% of CTC</th>
-                                        <th>Taxable</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <th:block th:if="${not #lists.isEmpty(salaryStructures)}">
-                                        <!-- Iterate over components of the first structure just to show the mockup data -->
-                                        <tr th:each="comp : ${salaryStructures[0].components}">
-                                            <td class="text-start">
-                                                <i class="fas fa-grip-vertical text-muted me-2" style="cursor: grab;"></i>
-                                                <span th:text="${comp.componentName}">Basic Salary</span>
-                                            </td>
-                                            <td th:class="${comp.type == 'Earning' ? 'text-success fw-semibold' : 'text-danger fw-semibold'}" th:text="${comp.type}">Earning</td>
-                                            <td th:text="${comp.category}">Basic</td>
-                                            <td th:text="${comp.calculationFormula}">40% of CTC</td>
-                                            <td>
-                                                <input type="text" class="form-control form-control-sm text-center mx-auto amount-input" style="width: 100px;" th:value="${#numbers.formatDecimal(comp.amount, 1, 'COMMA', 0, 'POINT')}">
-                                            </td>
-                                            <td class="ctc-percent-cell">
-                                                <span class="ctc-percent-text" th:text="${#numbers.formatDecimal(comp.percentageOfCtc, 1, 2)} + '%'">40.00%</span>
-                                                <div class="input-group input-group-sm ctc-percent-input-group d-none" style="width: 90px; margin: 0 auto;">
-                                                    <input type="number" class="form-control text-center ctc-percent-input p-1" th:value="${comp.percentageOfCtc}" step="0.01">
-                                                    <span class="input-group-text p-1">%</span>
-                                                </div>
-                                            </td>
-                                            <td class="text-success fw-semibold" th:if="${comp.taxable}">Yes</td>
-                                            <td class="text-muted fw-semibold" th:unless="${comp.taxable}">No</td>
-                                            <td>
-                                                <i class="fas fa-pen text-dark me-2 edit-comp-btn" style="cursor: pointer;" onclick="toggleEditComponent(this)"></i>
-                                                <i class="fas fa-trash-alt text-dark" style="cursor: pointer;"></i>
-                                            </td>
-                                        </tr>
-                                    </th:block>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="d-flex justify-content-end gap-3 mt-4">
-                            <button class="btn btn-light border fw-bold px-4" onclick="toggleCreateStructure()">Cancel</button>
-                            <button class="btn btn-primary fw-bold px-4" onclick="toggleCreateStructure()">Save & Next</button>
+                        
+                        <div class="border rounded p-3 d-flex align-items-center justify-content-between flex-fill bg-white" style="border-color: #cbd5e1 !important;">
+                            <div class="d-flex align-items-center gap-3">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #dcfce7; display: flex; align-items: center; justify-content: center; color: #22c55e; font-size: 1.2rem;">
+                                    <i class="fas fa-user-edit"></i>
+                                </div>
+                                <div class="lh-1">
+                                    <div class="fw-bold" style="color: #1e293b; margin-bottom: 4px;">Existing Employee</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">Update or redefine existing employee.</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm fw-bold">Update Existing Structure</button>
                         </div>
                     </div>
+                    
+                    <h5 class="fw-bold mb-3" style="color: #1e3a8a;">Salary Structure History</h5>
+                    <div class="card-custom">
+                        <table class="table table-custom table-borderless">
+                            <thead>
+                                <tr>
+                                    <th>Structure Name</th>
+                                    <th>Effective From</th>
+                                    <th>CTC <i class="far fa-question-circle text-muted"></i></th>
+                                    <th>Gross Salary</th>
+                                    <th>Status</th>
+                                    <th>Last Updated</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="struct : ${salaryStructures}">
+                                    <td th:text="${struct.structureName}">Aman Verma Structure</td>
+                                    <td th:text="${#temporals.format(struct.effectiveFrom, 'dd/MM/yyyy')}">30/06/2026</td>
+                                    <td th:text="${#numbers.formatDecimal(struct.ctcAmount, 0, 'COMMA', 0, 'POINT')}">6,00,000</td>
+                                    <td th:text="${#numbers.formatDecimal(struct.totalEarnings, 0, 'COMMA', 0, 'POINT')}">50,000</td>
+                                    <td><span class="status-badge" th:text="${struct.active ? 'Active' : 'Inactive'}">Active</span></td>
+                                    <td>20 June, 2026</td>
+                                    <td>
+                                        <button class="btn-action"><i class="far fa-eye"></i></button>
+                                        <button class="btn-action"><i class="fas fa-ellipsis-h"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Neha Verma Structure</td>
+                                    <td>01/06/2026</td>
+                                    <td>7,20,000</td>
+                                    <td>40,000</td>
+                                    <td><span class="status-badge">Active</span></td>
+                                    <td>30 June, 2026</td>
+                                    <td>
+                                        <button class="btn-action"><i class="far fa-eye"></i></button>
+                                        <button class="btn-action"><i class="fas fa-ellipsis-h"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
-            <!-- 3. GENERATE SALARY PANE -->
-            <div class="tab-pane fade" id="generate-pane" role="tabpanel">
-                <div class="card-custom">
-                    <div class="card-header-custom">
+                <!-- Create New Structure Sub-View -->
+                <div id="create-structure-view" class="create-structure-view">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
-                            Generate Salary 
-                            <span class="badge bg-primary ms-2 px-3 py-2 rounded-pill">May 2026</span>
+                            <h4 class="fw-bold" style="color: #1e293b;">Create New Salary Structure</h4>
+                            <p class="text-muted mb-0" style="font-size: 0.85rem;">Create a new salary structure for this employee.</p>
                         </div>
-                        <button class="btn btn-primary btn-sm fw-bold px-3" onclick="alert('Feature under development')">
-                            Generate Selected
+                        <button class="btn btn-outline-dark fw-bold px-3" onclick="hideCreateStructure()"><i class="fas fa-arrow-left me-2"></i> Back to Salary Structure</button>
+                    </div>
+                    
+                    <hr class="mb-4 text-muted">
+                    
+                    <div class="d-flex gap-5 mb-5 align-items-center">
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="/images/avatar-1.jpg" alt="A" style="width: 50px; height: 50px; border-radius: 50%;" onerror="this.src='https://ui-avatars.com/api/?name=Amit+Sharma&amp;background=random'">
+                            <div class="lh-1">
+                                <div class="fw-bold" style="font-size: 1.1rem; margin-bottom: 8px;">Amit Sharma</div>
+                                <div class="text-muted" style="font-size: 0.8rem;"><span class="me-3">Employee ID <strong>EMP114</strong></span> Department <strong>Engineering</strong></div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex flex-wrap gap-4">
+                            <div>
+                                <label class="form-label text-muted" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Date of Joining</label>
+                                <select class="form-select form-select-sm" style="width: 150px;"><option>20/05/2026</option></select>
+                            </div>
+                            <div>
+                                <label class="form-label text-muted" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Employment Type</label>
+                                <select class="form-select form-select-sm" style="width: 150px;"><option>Full-Time</option></select>
+                            </div>
+                            <div>
+                                <label class="form-label text-muted" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Location</label>
+                                <select class="form-select form-select-sm" style="width: 150px;"><option>Raipur, India</option></select>
+                            </div>
+                            <div>
+                                <label class="form-label text-muted" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Designation</label>
+                                <select class="form-select form-select-sm" style="width: 150px;"><option>SR. Developer</option></select>
+                            </div>
+                            <div>
+                                <label class="form-label text-muted" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Pay Frequency <span class="text-danger">*</span></label>
+                                <select class="form-select form-select-sm" style="width: 150px;"><option>Monthly</option></select>
+                            </div>
+                            <div>
+                                <label class="form-label text-muted" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Currency</label>
+                                <select class="form-select form-select-sm" style="width: 150px;"><option>INR</option></select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5 class="fw-bold mb-3" style="color: #1e3a8a;">Salary Structure Details</h5>
+                    <div class="d-flex gap-4 mb-4">
+                        <div style="width: 200px;">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem; color: #334155;">Effective From <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" value="2026-06-30">
+                        </div>
+                        <div style="width: 250px;">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem; color: #334155;">CTC (Cost To Company) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" value="6,00,000" style="border: 2px solid #3b82f6;">
+                        </div>
+                        <div style="width: 250px;">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem; color: #334155;">Structure Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" value="Aman-Verma's Structure">
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info d-flex align-items-center gap-2 py-2" style="background: #eff6ff; border: none; color: #1e3a8a; border-radius: 4px;">
+                        <i class="fas fa-info-circle" style="color: #60a5fa;"></i>
+                        <span style="font-size: 0.9rem;">Enter values for editable components. Auto calculated components will update based on the defined rules.</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+                        <h5 class="fw-bold" style="color: #1e3a8a;">Salary Components</h5>
+                        <button class="btn btn-outline-dark fw-bold btn-sm" data-bs-toggle="modal" data-bs-target="#addComponentModal">
+                            <i class="fas fa-plus me-1"></i> Add Component
                         </button>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-custom">
+                    
+                    <div class="card-custom mb-4">
+                        <table class="table table-custom table-borderless">
                             <thead>
                                 <tr>
-                                    <th><input type="checkbox" class="form-check-input"></th>
-                                    <th>Employee Name</th>
+                                    <th>Component Name</th>
+                                    <th>Type</th>
+                                    <th>Category</th>
+                                    <th>Calculation/Formula</th>
+                                    <th>Amount</th>
+                                    <th>% of CTC</th>
+                                    <th>Taxable</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${not #lists.isEmpty(salaryStructures)}" th:each="comp : ${salaryStructures[0].components}">
+                                    <td><i class="fas fa-grip-vertical text-muted me-2" style="font-size: 0.8rem;"></i> <span th:text="${comp.componentName}">Basic Salary</span></td>
+                                    <td><span class="type-badge" th:classappend="${comp.type == 'Earning' ? 'bonus' : 'deduct'}" th:text="${comp.type}">Earning</span></td>
+                                    <td th:text="${comp.category}">Basic</td>
+                                    <td th:text="${comp.calculationFormula}">40% of CTC</td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" th:value="${comp.amount}" style="width: 100px;">
+                                    </td>
+                                    <td th:text="${#numbers.formatDecimal(comp.percentageOfCtc, 1, 2) + '%'}">40.00%</td>
+                                    <td th:text="${comp.taxable ? 'Yes' : 'No'}" class="text-success fw-bold">Yes</td>
+                                    <td>
+                                        <i class="fas fa-pen text-muted mx-1" style="cursor: pointer;"></i>
+                                        <i class="fas fa-trash text-muted mx-1" style="cursor: pointer;"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center gap-3 my-5">
+                        <button class="btn btn-outline-dark fw-bold px-5 py-2" onclick="hideCreateStructure()">Cancel</button>
+                        <button class="btn btn-primary fw-bold px-5 py-2">Save & Next <i class="fas fa-arrow-right ms-2"></i></button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 3. PAYSLIPS -->
+            <div class="tab-pane fade" id="payslips-pane" role="tabpanel">
+                
+                <!-- Main Payslips View -->
+                <div id="main-payslips-view">
+                    <!-- Filters -->
+                    <div class="d-flex gap-3 mb-4">
+                        <div style="position: relative;">
+                            <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Search</label><br>
+                            <i class="fas fa-search search-icon" style="top: 32px;"></i>
+                            <input type="text" class="search-input" placeholder="Search Employees by name">
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Pay Period</label><br>
+                            <select class="select-filter"><option>01 May-31 May 2026</option></select>
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Payroll Type</label><br>
+                            <select class="select-filter"><option>Monthly Payroll</option></select>
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Department</label><br>
+                            <select class="select-filter"><option>All Departments</option></select>
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Payment Date</label><br>
+                            <input type="text" class="select-filter" value="20 June 2026">
+                        </div>
+                    </div>
+                    
+                    <div class="card-custom">
+                        <table class="table table-custom table-borderless table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
                                     <th>Department</th>
                                     <th>CTC (Annual)</th>
-                                    <th>Days Present</th>
-                                    <th>Gross Pay</th>
-                                    <th>Deductions</th>
-                                    <th>Net Pay</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="struct : ${salaryStructures}">
-                                    <td><input type="checkbox" class="form-check-input"></td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div th:if="${struct.user != null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold" th:text="${#strings.substring(struct.user.fullName, 0, 1)}">U</div>
-                                            <div th:if="${struct.user == null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold">S</div>
-                                            <div class="fw-semibold" th:text="${struct.user?.fullName ?: struct.structureName}">Name</div>
-                                        </div>
-                                    </td>
-                                    <td th:text="${struct.user?.employeeProfile?.department ?: 'All Departments'}">Dept</td>
-                                    <td>Rs. <span th:text="${#numbers.formatDecimal(struct.ctcAmount, 1, 'COMMA', 0, 'POINT')}">0</span></td>
-                                    <td>30/31</td>
-                                    <td class="fw-semibold text-dark">Rs. 95,000</td>
-                                    <td class="text-danger">Rs. <span th:text="${#numbers.formatDecimal(struct.totalDeductions, 1, 'COMMA', 0, 'POINT')}">0</span></td>
-                                    <td class="fw-bold text-success">Rs. 90,000</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary fw-bold" onclick="alert('Feature under development')">Generate Slip</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. BONUS & DEDUCTIONS PANE -->
-            <div class="tab-pane fade" id="bonus-pane" role="tabpanel">
-                <div class="card-custom">
-                    <div class="card-header-custom">
-                        Bonus & Deductions
-                        <div class="d-flex gap-2">
-                            <select class="form-select form-select-sm" style="width: 150px;">
-                                <option>May 2026</option>
-                                <option>April 2026</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-custom">
-                            <thead>
-                                <tr>
-                                    <th>Employee Name</th>
-                                    <th>Department</th>
                                     <th>Month</th>
-                                    <th>Bonus Amount</th>
-                                    <th>Deduction Amount</th>
-                                    <th>Reason</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="struct : ${salaryStructures}">
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div th:if="${struct.user != null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold" th:text="${#strings.substring(struct.user.fullName, 0, 1)}">U</div>
-                                            <div th:if="${struct.user == null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold">S</div>
-                                            <div class="fw-semibold" th:text="${struct.user?.fullName ?: struct.structureName}">Name</div>
-                                        </div>
-                                    </td>
-                                    <td th:text="${struct.user?.employeeProfile?.department ?: 'All Departments'}">Dept</td>
-                                    <td>May 2026</td>
-                                    <td class="text-success fw-semibold">Rs. <span>0</span></td>
-                                    <td class="text-danger fw-semibold">Rs. <span th:text="${#numbers.formatDecimal(struct.totalDeductions, 1, 'COMMA', 0, 'POINT')}">0</span></td>
-                                    <td class="text-muted">Standard adjust</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-light text-primary me-1" onclick="alert('Feature under development')"><i class="fas fa-edit"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 5. PAYSLIPS PANE -->
-            <div class="tab-pane fade" id="payslips-pane" role="tabpanel">
-                <div class="card-custom">
-                    <div class="card-header-custom">
-                        Generated Payslips
-                        <div class="d-flex gap-2">
-                            <input type="text" class="form-control form-control-sm" placeholder="Search...">
-                            <select class="form-select form-select-sm" style="width: 150px;">
-                                <option>May 2026</option>
-                                <option>April 2026</option>
-                            </select>
-                            <button class="btn btn-primary btn-sm fw-bold px-3" onclick="alert('Feature under development')">
-                                <i class="fas fa-file-export me-1"></i> Export All
-                            </button>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-custom">
-                            <thead>
-                                <tr>
-                                    <th>Employee Name</th>
-                                    <th>Department</th>
-                                    <th>Month</th>
-                                    <th>Gross Pay</th>
-                                    <th>Net Pay</th>
+                                    <th>Gross Pay <i class="far fa-question-circle text-muted"></i></th>
+                                    <th>Deductions <i class="far fa-question-circle text-muted"></i></th>
+                                    <th>Net Pay <i class="far fa-question-circle text-muted"></i></th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="struct : ${salaryStructures}">
+                                <tr th:each="slip : ${payslips}">
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div th:if="${struct.user != null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold" th:text="${#strings.substring(struct.user.fullName, 0, 1)}">U</div>
-                                            <div th:if="${struct.user == null}" class="emp-avatar bg-dark text-white d-flex align-items-center justify-content-center fw-bold">S</div>
-                                            <div class="fw-semibold" th:text="${struct.user?.fullName ?: struct.structureName}">Name</div>
+                                            <img src="/images/avatar-1.jpg" alt="A" class="avatar-small mb-0" th:onerror="|this.src='https://ui-avatars.com/api/?name=${slip.user != null ? slip.user.fullName : 'A'}&amp;background=random'|">
+                                            <div class="lh-1">
+                                                <div class="fw-bold" style="font-size: 0.9rem;" th:text="${slip.user != null ? slip.user.fullName : 'Employee Name'}">Neha Sharma</div>
+                                                <div class="text-muted" style="font-size: 0.7rem; margin-top: 2px;" th:text="'EMP' + ${slip.user != null ? slip.user.id : '114'}">EMP114</div>
+                                            </div>
                                         </div>
                                     </td>
-                                    <td th:text="${struct.user?.employeeProfile?.department ?: 'All Departments'}">Dept</td>
-                                    <td>May 2026</td>
-                                    <td class="text-dark">Rs. 95,000</td>
-                                    <td class="fw-bold text-dark">Rs. 90,000</td>
-                                    <td><span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">Paid</span></td>
+                                    <td th:text="${slip.department}">Engineering</td>
+                                    <td th:text="'Rs. ' + ${#numbers.formatDecimal(slip.ctcAnnual, 0, 'COMMA', 0, 'POINT')}">Rs. 5,00,000</td>
+                                    <td th:text="${slip.payMonth} + ', ' + ${slip.payYear}">May, 2026</td>
+                                    <td th:text="'Rs. ' + ${#numbers.formatDecimal(slip.grossPay, 0, 'COMMA', 0, 'POINT')}">Rs. 1,25,000</td>
+                                    <td th:text="'Rs. ' + ${#numbers.formatDecimal(slip.totalDeductions, 0, 'COMMA', 0, 'POINT')}">Rs. 10,000</td>
+                                    <td th:text="'Rs. ' + ${#numbers.formatDecimal(slip.netPay, 0, 'COMMA', 0, 'POINT')}">Rs. 1,00,000</td>
+                                    <td><span class="status-badge" th:classappend="${slip.status == 'Not Processed' ? 'not-processed' : ''}" th:text="${slip.status}">Processed</span></td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-secondary fw-bold" onclick="alert('Feature under development')">
-                                            <i class="fas fa-download me-1"></i> Download
-                                        </button>
+                                        <button class="btn-action" onclick="showPayslipDetail()"><i class="far fa-eye"></i></button>
+                                        <button class="btn-action"><i class="fas fa-download"></i></button>
+                                        <button class="btn-action"><i class="fas fa-ellipsis-h"></i></button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+                
+                <!-- Payslip Detail View (Provisional) -->
+                <div id="payslip-detail-view" class="payslip-detail-view">
+                    <button class="btn btn-light fw-bold mb-3 border shadow-sm" onclick="hidePayslipDetail()"><i class="fas fa-arrow-left me-2"></i> Back</button>
+                    
+                    <div class="payslip-doc">
+                        <div class="d-flex justify-content-between mb-4 pb-2 border-bottom border-dark">
+                            <div class="payslip-header">
+                                <h4><span style="color: #0f172a;">Provisional Payslip</span> May 2026</h4>
+                                <div style="font-size: 0.9rem; margin-top: 10px;">
+                                    <div>Whitecircle Group</div>
+                                    <div>Shahdol, Madhya Pradesh 484001</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h6 class="fw-bold mb-3 pb-1 border-bottom border-dark">Neha Verma</h6>
+                        
+                        <div class="payslip-grid pb-2 border-bottom border-dark">
+                            <div>
+                                <div class="ps-label">Employee ID</div>
+                                <div class="ps-val">EMP601</div>
+                            </div>
+                            <div>
+                                <div class="ps-label">Date Joined</div>
+                                <div class="ps-val">2 Mar 2018</div>
+                            </div>
+                            <div>
+                                <div class="ps-label">Department</div>
+                                <div class="ps-val">HR</div>
+                            </div>
+                            <div>
+                                <div class="ps-label">Sub-Department</div>
+                                <div class="ps-val">N/A</div>
+                            </div>
+                            
+                            <div>
+                                <div class="ps-label">Designation</div>
+                                <div class="ps-val">HR Manager</div>
+                            </div>
+                            <div>
+                                <div class="ps-label">Payment Mode</div>
+                                <div class="ps-val">Cheque</div>
+                            </div>
+                            <div>
+                                <div class="ps-label">PAN</div>
+                                <div class="ps-val">PANQW1100S</div>
+                            </div>
+                            <div>
+                                <div class="ps-label">UAN</div>
+                                <div class="ps-val">10599890812</div>
+                            </div>
+                            
+                            <div>
+                                <div class="ps-label">PF No.</div>
+                                <div class="ps-val">MP/SHA/000/12345/2132134</div>
+                            </div>
+                            <div>
+                                <div class="ps-label">ESI No.</div>
+                                <div class="ps-val">ESISHA125678</div>
+                            </div>
+                            <div>
+                                <div class="ps-label">Location</div>
+                                <div class="ps-val">Shahdol</div>
+                            </div>
+                            <div></div>
+                            
+                            <div>
+                                <div class="ps-label">Monthly Salary</div>
+                                <div class="ps-val">291666.67</div>
+                            </div>
+                        </div>
+                        
+                        <h6 class="fw-bold mt-4 mb-3 pb-1 border-bottom border-dark">Salary Details</h6>
+                        <div class="d-flex justify-content-between mb-4 pb-3 border-bottom border-dark">
+                            <div>
+                                <div class="ps-label">Actual Payable Days</div>
+                                <div class="ps-val">26.0</div>
+                            </div>
+                            <div>
+                                <div class="ps-label">Total Working Days</div>
+                                <div class="ps-val">26.0</div>
+                            </div>
+                            <div>
+                                <div class="ps-label">Loss of Pay Days</div>
+                                <div class="ps-val">0.0</div>
+                            </div>
+                            <div>
+                                <div class="ps-label">Days Payable</div>
+                                <div class="ps-val">26</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-0 mb-4 pb-4 border-bottom border-dark">
+                            <div class="col-md-7 pe-4 border-end">
+                                <table class="payslip-table table-borderless">
+                                    <thead>
+                                        <tr>
+                                            <th>Earnings</th>
+                                            <th class="text-end">Amount</th>
+                                            <th class="text-end">Gross</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>Basic</td><td class="text-end">1,06,658.67</td><td class="text-end">1,06,658.67</td></tr>
+                                        <tr><td>HRA</td><td class="text-end">53,329.33</td><td class="text-end">53,329.33</td></tr>
+                                        <tr><td>Medical Allowance</td><td class="text-end">1,250.00</td><td class="text-end">1,250.00</td></tr>
+                                        <tr><td>Conveyance Allowance</td><td class="text-end">1,666.67</td><td class="text-end">1,666.67</td></tr>
+                                        <tr><td>Special Allowance</td><td class="text-end">83,242.00</td><td class="text-end">74,908.67</td></tr>
+                                        <tr><td>Professional Allowance</td><td class="text-end">1,000.00</td><td class="text-end">1,000.00</td></tr>
+                                        <tr><td>Children Education Allowance</td><td class="text-end">2,000.00</td><td class="text-end">2,000.00</td></tr>
+                                        <tr><td>Motor Cycle Allowance</td><td class="text-end">3,000.00</td><td class="text-end">3,000.00</td></tr>
+                                        <tr class="fw-bold"><td class="pt-3">Total Earnings (A)</td><td class="pt-3 text-end">2,52,146.67</td><td class="pt-3 text-end">2,43,813.33</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-5 ps-4">
+                                <table class="payslip-table table-borderless mb-4">
+                                    <thead>
+                                        <tr>
+                                            <th>Contributions</th>
+                                            <th class="text-end"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>PF - Employee</td><td class="text-end">12,799.00</td></tr>
+                                        <tr><td>PF - Employer</td><td class="text-end">12,799.00</td></tr>
+                                        <tr class="fw-bold"><td class="pt-3">Total Contributions (B)</td><td class="pt-3 text-end">25,598.00</td></tr>
+                                    </tbody>
+                                </table>
+                                
+                                <table class="payslip-table table-borderless">
+                                    <thead>
+                                        <tr>
+                                            <th>Taxes & Deductions</th>
+                                            <th class="text-end"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>Professional Tax</td><td class="text-end">200.00</td></tr>
+                                        <tr><td>Loan EMI</td><td class="text-end">12,735.00</td></tr>
+                                        <tr><td>Total Income Tax</td><td class="text-end">51,501.00</td></tr>
+                                        <tr class="fw-bold"><td class="pt-3">Total Deductions (C)</td><td class="pt-3 text-end">64,436.00</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-2">
+                            <div style="width: 200px;" class="fw-bold">Net Salary Payable (A - B - C)</div>
+                            <div>1,62,113.00</div>
+                        </div>
+                        <div class="d-flex mb-4">
+                            <div style="width: 200px;">Net Salary in words</div>
+                            <div class="fw-bold">One Lakh Sixty Two Thousand One Hundred and Thirteen only</div>
+                        </div>
+                        
+                        <div class="fw-bold border-top border-dark pt-3 pb-4 mb-2">
+                            Note: <span class="fw-normal">All amounts displayed in this payslip are in INR</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 4. BONUSES & DEDUCTIONS -->
+            <div class="tab-pane fade" id="bonus-pane" role="tabpanel">
+                
+                <!-- Stat Cards Row -->
+                <div class="d-flex bg-white rounded border mb-4" style="border-color: #e2e8f0 !important;">
+                    <div class="stat-card flex-fill">
+                        <div class="stat-icon" style="color: #3b82f6;"><i class="fas fa-gift"></i></div>
+                        <div>
+                            <div class="stat-label">Total Bonuses</div>
+                            <div class="stat-value" style="font-size: 1.2rem;">₹1,25,000</div>
+                            <div class="text-muted mt-1" style="font-size: 0.75rem;">This Month</div>
+                        </div>
+                    </div>
+                    <div class="stat-card flex-fill">
+                        <div class="stat-icon" style="color: #ef4444;"><i class="fas fa-money-bill-wave"></i></div>
+                        <div>
+                            <div class="stat-label" style="color: #ef4444;">Total Deduction</div>
+                            <div class="stat-value" style="font-size: 1.2rem;">₹2,25,000</div>
+                            <div class="text-muted mt-1" style="font-size: 0.75rem;">This Month</div>
+                        </div>
+                    </div>
+                    <div class="stat-card flex-fill">
+                        <div class="stat-icon" style="color: #10b981;"><i class="fas fa-chart-line"></i></div>
+                        <div>
+                            <div class="stat-label">Net Impact (May)</div>
+                            <div class="stat-value" style="font-size: 1.2rem;">₹5,25,000</div>
+                            <div class="text-muted mt-1" style="font-size: 0.75rem;">Deduction > Bonus</div>
+                        </div>
+                    </div>
+                    <div class="stat-card flex-fill border-0">
+                        <div class="stat-icon" style="color: #f59e0b;"><i class="fas fa-clipboard-check"></i></div>
+                        <div>
+                            <div class="stat-label">Pending Approvals</div>
+                            <div class="stat-value" style="font-size: 1.2rem;">20</div>
+                            <div class="text-muted mt-1" style="font-size: 0.75rem;">This Month</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="d-flex gap-3 mb-4">
+                    <div style="position: relative; flex: 1;">
+                        <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Search</label><br>
+                        <i class="fas fa-search search-icon" style="top: 32px;"></i>
+                        <input type="text" class="search-input w-100" placeholder="Search Employees by name">
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Select Month</label><br>
+                        <select class="select-filter"><option>May 2026</option></select>
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Department</label><br>
+                        <select class="select-filter"><option>All Departments</option></select>
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Types</label><br>
+                        <select class="select-filter"><option>All Types</option></select>
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Status</label><br>
+                        <select class="select-filter"><option>All Status</option></select>
+                    </div>
+                </div>
+
+                <!-- Sub-tabs and Button -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <div class="sub-tab active">All (58)</div>
+                        <div class="sub-tab">Bonus (41)</div>
+                        <div class="sub-tab">Deductions (20)</div>
+                        <div class="sub-tab">Pending Approvals (3)</div>
+                    </div>
+                    <button class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#addBonusModal">
+                        <i class="fas fa-plus me-1"></i> Add Bonus/Deduction
+                    </button>
+                </div>
+
+                <!-- Table -->
+                <div class="card-custom">
+                    <table class="table table-custom table-borderless table-hover">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Department</th>
+                                <th>Type</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Amount <i class="far fa-question-circle text-muted"></i></th>
+                                <th>Impact</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="bd : ${bonusDeductions}">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="/images/avatar-1.jpg" alt="A" class="avatar-small mb-0" onerror="this.src='https://ui-avatars.com/api/?name=User&amp;background=random'">
+                                        <div class="lh-1">
+                                            <div class="fw-bold" style="font-size: 0.9rem;">Neha Sharma</div>
+                                            <div class="text-muted" style="font-size: 0.7rem; margin-top: 2px;">EMP114</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Engineering</td>
+                                <td><span class="type-badge" th:classappend="${bd.type == 'Bonus' ? 'bonus' : 'deduct'}" th:text="${bd.type}">Bonus</span></td>
+                                <td th:text="${bd.category}">Performance Bonus</td>
+                                <td th:text="${bd.description}">Success of a project</td>
+                                <td th:text="'Rs. ' + ${#numbers.formatDecimal(bd.amount, 0, 'COMMA', 0, 'POINT')}">Rs. 25,000</td>
+                                <td><span class="impact-badge" th:classappend="${bd.impact == 'Increase' ? 'increase' : 'decrease'}" th:text="${bd.impact}">Increase</span></td>
+                                <td><span class="status-badge" th:classappend="${bd.status == 'Pending' ? 'pending' : ''}" th:text="${bd.status}">Approved</span></td>
+                                <td>
+                                    <button class="btn-action"><i class="far fa-eye"></i></button>
+                                    <button class="btn-action"><i class="fas fa-download"></i></button>
+                                    <button class="btn-action"><i class="fas fa-ellipsis-h"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
 
         </div>
     </div>
 
+    <!-- Modals -->
+    
+    <!-- Add Component Modal -->
+    <div class="modal fade" id="addComponentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="w-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="modal-title fw-bold">Add New Component</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="text-muted" style="font-size: 0.85rem;">Adding new component to this specific employee.</div>
+                    </div>
+                </div>
+                <div class="modal-body pt-4">
+                    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                        <img src="/images/avatar-1.jpg" alt="A" class="avatar-small mb-0" onerror="this.src='https://ui-avatars.com/api/?name=Neha&amp;background=random'">
+                        <div class="lh-1">
+                            <div class="fw-bold" style="font-size: 0.95rem;">Neha Sharma</div>
+                            <div class="text-muted mt-1" style="font-size: 0.75rem;">Employee ID: EMP114 <span class="mx-2">|</span> Engineering: Sr. Developer</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Component Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" value="Transport Allowance">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Component Type <span class="text-danger">*</span></label>
+                            <select class="form-select"><option>Earning</option><option>Deduction</option></select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Category <span class="text-danger">*</span></label>
+                            <select class="form-select"><option>Allowance</option><option>Basic</option><option>Statutory</option></select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Calculation Formula <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" placeholder="(e.g. 15% of basic)">
+                        </div>
+                        <div class="col-6 mt-3">
+                            <label class="form-label fw-bold mb-2" style="font-size: 0.85rem;">Is Variable? <span class="text-danger">*</span></label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="isVar" id="isVarYes" checked>
+                                    <label class="form-check-label" for="isVarYes">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="isVar" id="isVarNo">
+                                    <label class="form-check-label" for="isVarNo">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 mt-3">
+                            <label class="form-label fw-bold mb-2" style="font-size: 0.85rem;">Is Taxable? <span class="text-danger">*</span></label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="isTax" id="isTaxYes" checked>
+                                    <label class="form-check-label" for="isTaxYes">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="isTax" id="isTaxNo">
+                                    <label class="form-check-label" for="isTaxNo">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Description</label>
+                            <textarea class="form-control" rows="3" placeholder="Add description"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between pt-0 pb-3 px-3 mt-2">
+                    <button type="button" class="btn btn-outline-dark fw-bold px-4 py-2" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary fw-bold px-4 py-2">Save Component</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Bonus/Deduction Modal -->
+    <div class="modal fade" id="addBonusModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="w-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="modal-title fw-bold">Add Bonus/Deduction</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="text-muted" style="font-size: 0.85rem;">Add bonus/deduction to any specific employee.</div>
+                    </div>
+                </div>
+                <div class="modal-body pt-4">
+                    <h6 class="fw-bold mb-3" style="font-size: 0.95rem; color: #1e293b;">Employee Details</h6>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Employee Name <span class="text-danger">*</span></label>
+                        <select class="form-select"><option>Amit Sharma (EMP 114)</option></select>
+                    </div>
+                    
+                    <h6 class="fw-bold mb-3 border-top pt-3" style="font-size: 0.95rem; color: #1e293b;">Transaction Details</h6>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Type <span class="text-danger">*</span></label>
+                            <select class="form-select"><option>Deduction</option><option>Bonus</option></select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Category <span class="text-danger">*</span></label>
+                            <select class="form-select"><option>TDS for May 2026</option></select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Amount <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" value="15,000">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Impact <span class="text-danger">*</span></label>
+                            <select class="form-select"><option>Decrease</option><option>Increase</option></select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Effective Month <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" value="May, 2026" style="width: 50%;">
+                        </div>
+                        <div class="col-12 mt-3">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Description</label>
+                            <textarea class="form-control" rows="3" placeholder="Write from here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between pt-0 pb-3 px-3 mt-2">
+                    <button type="button" class="btn btn-outline-dark fw-bold px-4 py-2" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary fw-bold px-5 py-2">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function toggleCreateStructure() {
-            var listView = document.querySelector('#structure-pane > .card-custom:first-child');
-            var createView = document.getElementById('create-structure-view');
-            
-            if (createView.style.display === 'none') {
-                createView.style.display = 'block';
-                listView.style.display = 'none';
-            } else {
-                createView.style.display = 'none';
-                listView.style.display = 'block';
-            }
+        function showCreateStructure() {
+            document.getElementById('main-structure-view').style.display = 'none';
+            document.getElementById('create-structure-view').style.display = 'block';
         }
-
-        function toggleEditComponent(icon) {
-            const row = icon.closest('tr');
-            const textSpan = row.querySelector('.ctc-percent-text');
-            const inputGroup = row.querySelector('.ctc-percent-input-group');
-            const amountInput = row.querySelector('.amount-input');
-            
-            if (icon.classList.contains('fa-pen')) {
-                // Switch to edit mode
-                icon.classList.remove('fa-pen');
-                icon.classList.add('fa-check', 'text-success');
-                
-                textSpan.classList.add('d-none');
-                inputGroup.classList.remove('d-none');
-            } else {
-                // Save mode
-                icon.classList.remove('fa-check', 'text-success');
-                icon.classList.add('fa-pen');
-                
-                const newVal = row.querySelector('.ctc-percent-input').value || 0;
-                textSpan.textContent = parseFloat(newVal).toFixed(2) + '%';
-                
-                inputGroup.classList.add('d-none');
-                textSpan.classList.remove('d-none');
-                
-                // Recalculate Amount based on new CTC %
-                const ctc = parseFloat(document.getElementById('ctc-amount-input').value) || 0;
-                const calculatedAmount = Math.round(ctc * (parseFloat(newVal) / 100));
-                
-                if(calculatedAmount > 0) {
-                    amountInput.value = calculatedAmount.toLocaleString('en-IN');
-                }
-            }
+        
+        function hideCreateStructure() {
+            document.getElementById('main-structure-view').style.display = 'block';
+            document.getElementById('create-structure-view').style.display = 'none';
         }
-
-        function recalculateAllAmounts() {
-            const ctc = parseFloat(document.getElementById('ctc-amount-input').value) || 0;
-            const rows = document.querySelectorAll('#create-structure-view tbody tr');
-            
-            rows.forEach(row => {
-                const percentInput = row.querySelector('.ctc-percent-input');
-                const amountInput = row.querySelector('.amount-input');
-                if (percentInput && amountInput) {
-                    const percent = parseFloat(percentInput.value) || 0;
-                    const calculatedAmount = Math.round(ctc * (percent / 100));
-                    if (percent > 0) {
-                        amountInput.value = calculatedAmount.toLocaleString('en-IN');
-                    }
-                }
-            });
+        
+        function showPayslipDetail() {
+            document.getElementById('main-payslips-view').style.display = 'none';
+            document.getElementById('payslip-detail-view').style.display = 'block';
+        }
+        
+        function hidePayslipDetail() {
+            document.getElementById('main-payslips-view').style.display = 'block';
+            document.getElementById('payslip-detail-view').style.display = 'none';
         }
     </script>
 </body>

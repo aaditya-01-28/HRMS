@@ -377,11 +377,11 @@
                                 th:data-name="${leave.user?.fullName}"
                                 th:data-role="${leave.user?.employeeProfile?.designation}"
                                 th:data-type="${leave.leaveType}"
-                                th:data-start="${leave.startDate}"
-                                th:data-end="${leave.endDate}"
+                                th:data-start="${leave.fromDate}"
+                                th:data-end="${leave.toDate}"
                                 th:data-duration="${leave.duration}"
                                 th:data-reason="${leave.reason}"
-                                th:data-applied="${leave.appliedOn}"
+                                th:data-applied="${leave.createdAt}"
                                 th:data-comments="${leave.adminComments != null ? leave.adminComments : ''}"
                                 th:data-actiondate="${leave.actionDate != null ? leave.actionDate : ''}"
                                 th:data-docname="${leave.documentName}"
@@ -398,7 +398,7 @@
                                 </td>
                                 <td class="text-dark fw-medium" th:text="${leave.leaveType}"></td>
                                 <td class="text-dark" th:text="${leave.duration} + ' Days'"></td>
-                                <td class="text-muted" th:text="${#temporals.format(leave.startDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.endDate, 'MMM dd, yyyy')}"></td>
+                                <td class="text-muted" th:text="${#temporals.format(leave.fromDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.toDate, 'MMM dd, yyyy')}"></td>
                                 <td class="text-muted text-truncate" style="max-width: 150px;" th:text="${leave.reason}"></td>
                                 <td class="text-end"><span class="badge bg-warning text-dark border border-warning px-3 py-2 rounded-pill">Pending</span></td>
                             </tr>
@@ -410,11 +410,11 @@
                                 th:data-name="${leave.user?.fullName}"
                                 th:data-role="${leave.user?.employeeProfile?.designation}"
                                 th:data-type="${leave.leaveType}"
-                                th:data-start="${leave.startDate}"
-                                th:data-end="${leave.endDate}"
+                                th:data-start="${leave.fromDate}"
+                                th:data-end="${leave.toDate}"
                                 th:data-duration="${leave.duration}"
                                 th:data-reason="${leave.reason}"
-                                th:data-applied="${leave.appliedOn}"
+                                th:data-applied="${leave.createdAt}"
                                 th:data-comments="${leave.adminComments != null ? leave.adminComments : ''}"
                                 th:data-actiondate="${leave.actionDate != null ? leave.actionDate : ''}"
                                 th:data-docname="${leave.documentName}"
@@ -431,7 +431,7 @@
                                 </td>
                                 <td class="text-dark fw-medium" th:text="${leave.leaveType}"></td>
                                 <td class="text-dark" th:text="${leave.duration} + ' Days'"></td>
-                                <td class="text-muted" th:text="${#temporals.format(leave.startDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.endDate, 'MMM dd, yyyy')}"></td>
+                                <td class="text-muted" th:text="${#temporals.format(leave.fromDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.toDate, 'MMM dd, yyyy')}"></td>
                                 <td class="text-muted text-truncate" style="max-width: 150px;" th:text="${leave.reason}"></td>
                                 <td class="text-end"><span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill">Approved</span></td>
                             </tr>
@@ -443,11 +443,11 @@
                                 th:data-name="${leave.user?.fullName}"
                                 th:data-role="${leave.user?.employeeProfile?.designation}"
                                 th:data-type="${leave.leaveType}"
-                                th:data-start="${leave.startDate}"
-                                th:data-end="${leave.endDate}"
+                                th:data-start="${leave.fromDate}"
+                                th:data-end="${leave.toDate}"
                                 th:data-duration="${leave.duration}"
                                 th:data-reason="${leave.reason}"
-                                th:data-applied="${leave.appliedOn}"
+                                th:data-applied="${leave.createdAt}"
                                 th:data-comments="${leave.adminComments != null ? leave.adminComments : ''}"
                                 th:data-actiondate="${leave.actionDate != null ? leave.actionDate : ''}"
                                 th:data-docname="${leave.documentName}"
@@ -464,7 +464,7 @@
                                 </td>
                                 <td class="text-dark fw-medium" th:text="${leave.leaveType}"></td>
                                 <td class="text-dark" th:text="${leave.duration} + ' Days'"></td>
-                                <td class="text-muted" th:text="${#temporals.format(leave.startDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.endDate, 'MMM dd, yyyy')}"></td>
+                                <td class="text-muted" th:text="${#temporals.format(leave.fromDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.toDate, 'MMM dd, yyyy')}"></td>
                                 <td class="text-muted text-truncate" style="max-width: 150px;" th:text="${leave.reason}"></td>
                                 <td class="text-end"><span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill">Rejected</span></td>
                             </tr>

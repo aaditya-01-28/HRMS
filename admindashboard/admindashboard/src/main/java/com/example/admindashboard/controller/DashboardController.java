@@ -92,6 +92,9 @@ public class DashboardController {
     @Autowired
     private com.example.admindashboard.repository.AttendanceRepository attendanceRepository;
 
+    @Autowired
+    private com.example.admindashboard.repository.EmployeeProfileRepository employeeProfileRepository;
+
     // --- 1. LOGIN PAGE MAPPINGS ---
 
     @GetMapping("/")
@@ -330,6 +333,7 @@ public class DashboardController {
         List<LeaveRequest> pendingLeaves = new ArrayList<>();
         List<WeeklyTimesheet> pendingTimesheets = new ArrayList<>();
         List<ServiceRequest> pendingTickets = new ArrayList<>();
+        List<ResignationRequest> pendingResignations = new ArrayList<>();
         List<ServiceRequest> approvedTickets = new ArrayList<>();
         List<ServiceRequest> rejectedTickets = new ArrayList<>();
 
@@ -429,6 +433,12 @@ public class DashboardController {
             pendingTickets = serviceRequestRepository.findAll().stream()
                     .filter(t -> teamUsernames.contains(t.getEmployeeId()) && ("Open".equalsIgnoreCase(t.getStatus()) || "In Progress".equalsIgnoreCase(t.getStatus())))
                     .collect(Collectors.toList());
+            
+            // Resignations
+            pendingResignations = resignationRequestRepository.findAll().stream()
+                    .filter(r -> r.getEmployee() != null && teamUsernames.contains(r.getEmployee().getUsername()) && "PENDING_MANAGER".equals(r.getStatus()))
+                    .collect(Collectors.toList());
+            
             approvedTickets = serviceRequestRepository.findAll().stream()
                     .filter(t -> teamUsernames.contains(t.getEmployeeId()) && ("Approved".equalsIgnoreCase(t.getStatus()) || "Resolved".equalsIgnoreCase(t.getStatus())))
                     .collect(Collectors.toList());
@@ -444,6 +454,7 @@ public class DashboardController {
         model.addAttribute("pendingLeaves", pendingLeaves);
         model.addAttribute("pendingTimesheets", pendingTimesheets);
         model.addAttribute("pendingTickets", pendingTickets);
+        model.addAttribute("pendingResignations", pendingResignations);
         model.addAttribute("approvedLeaves", approvedLeaves);
         model.addAttribute("approvedTimesheets", approvedTimesheets);
         model.addAttribute("approvedTickets", approvedTickets);
@@ -548,8 +559,8 @@ public class DashboardController {
             model.addAttribute("otherTickets", new java.util.ArrayList<>());
             
             model.addAttribute("isItSupport", false); // HR workflow shows all tabs normally
-
-            java.util.List<ResignationRequest> pendingResignations = resignationRequestRepository.findByStatus("PENDING_L2");
+            // For HR managers, resignation approvals are routed to them after reporting manager
+            pendingResignations = resignationRequestRepository.findByStatus("PENDING_HR");
             model.addAttribute("pendingResignations", pendingResignations);
 
             return "hr-workflow";
@@ -632,9 +643,9 @@ public class DashboardController {
         if (principal != null) {
             User l2Hr = userRepository.findByUsername(principal.getName()).orElse(null);
             ResignationRequest req = resignationRequestRepository.findById(id).orElse(null);
-            if (req != null && l2Hr != null && "PENDING_L2".equals(req.getStatus())) {
+            if (req != null && l2Hr != null && "PENDING_MANAGER".equals(req.getStatus())) {
                 req.setNoticePeriodDays(noticePeriodDays);
-                req.setStatus("PENDING_L3");
+                req.setStatus("PENDING_HR");
                 req.setL2ApprovedBy(l2Hr);
                 resignationRequestRepository.save(req);
                 
@@ -651,7 +662,7 @@ public class DashboardController {
         if (principal != null) {
             User l2Hr = userRepository.findByUsername(principal.getName()).orElse(null);
             ResignationRequest req = resignationRequestRepository.findById(id).orElse(null);
-            if (req != null && l2Hr != null && "PENDING_L2".equals(req.getStatus())) {
+            if (req != null && l2Hr != null && "PENDING_MANAGER".equals(req.getStatus())) {
                 req.setStatus("REJECTED");
                 req.setL2ApprovedBy(l2Hr);
                 resignationRequestRepository.save(req);
@@ -660,21 +671,54 @@ public class DashboardController {
         return "redirect:/HR/workflow";
     }
 
-    @PostMapping("/employee/resignation/apply")
-    public String applyResignation(@RequestParam("reason") String reason, Principal principal, RedirectAttributes redirectAttributes) {
+    @GetMapping("/employee/resignation")
+    public String showResignationPage(Model model, Principal principal) {
         if (principal != null) {
             User employee = userRepository.findByUsername(principal.getName()).orElse(null);
             if (employee != null) {
-                ResignationRequest req = new ResignationRequest();
-                req.setEmployee(employee);
-                req.setReason(reason);
-                req.setRequestDate(java.time.LocalDate.now());
-                req.setStatus("PENDING_L2");
-                resignationRequestRepository.save(req);
-                redirectAttributes.addFlashAttribute("successMessage", "Resignation applied successfully. It has been forwarded to HR.");
+                com.example.admindashboard.model.EmployeeProfile profile = employeeProfileRepository.findByUser_Username(employee.getUsername()).orElse(null);
+                model.addAttribute("profile", profile);
+                
+                // Find existing resignation if any
+                java.util.List<ResignationRequest> reqs = resignationRequestRepository.findByEmployee_Username(employee.getUsername());
+                ResignationRequest latestReq = null;
+                if (!reqs.isEmpty()) {
+                    // Assuming ordered by ID desc or just taking the first one
+                    latestReq = reqs.get(0);
+                }
+                model.addAttribute("resignation", latestReq);
             }
         }
-        return "redirect:/employee/dashboard";
+        return "employee-resignation";
+    }
+
+    @PostMapping("/employee/resignation/submit")
+    public String submitResignation(@RequestParam("reason") String reason, 
+                                    @RequestParam(value = "comments", required = false) String comments,
+                                    @RequestParam("action") String action,
+                                    Principal principal, RedirectAttributes redirectAttributes) {
+        if (principal != null) {
+            User employee = userRepository.findByUsername(principal.getName()).orElse(null);
+            if (employee != null) {
+                java.util.List<ResignationRequest> existingReqs = resignationRequestRepository.findByEmployee_Username(employee.getUsername());
+                ResignationRequest req = existingReqs.isEmpty() ? new ResignationRequest() : existingReqs.get(0);
+                
+                req.setEmployee(employee);
+                req.setReason(reason);
+                req.setComments(comments);
+                req.setRequestDate(java.time.LocalDate.now());
+                
+                if ("draft".equals(action)) {
+                    req.setStatus("DRAFT");
+                    redirectAttributes.addFlashAttribute("successMessage", "Resignation saved as draft.");
+                } else {
+                    req.setStatus("PENDING_MANAGER");
+                    redirectAttributes.addFlashAttribute("successMessage", "Resignation submitted successfully. Forwarded to Manager.");
+                }
+                resignationRequestRepository.save(req);
+            }
+        }
+        return "redirect:/employee/resignation";
     }
 
     @GetMapping("/employee/referral")

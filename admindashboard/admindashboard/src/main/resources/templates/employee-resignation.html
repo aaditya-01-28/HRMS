@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resignation - WhiteCircle</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-bg: #0b1120;
+            --text-main: #0f172a;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            background: #efefef;
+            margin: 0; padding: 0;
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-back-home {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            padding: 6px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-back-home:hover {
+            background-color: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .content-area {
+            padding: 25px;
+            flex-grow: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .card-custom {
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .card-header-custom {
+            background: #f8fafc;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: bold;
+            font-size: 1.05rem;
+            color: #1e3a8a;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .info-item {
+            background: #f1f5f9;
+            padding: 10px 15px;
+            border-radius: 6px;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        
+        .status-DRAFT { background: #e2e8f0; color: #475569; }
+        .status-PENDING_MANAGER { background: #fef3c7; color: #d97706; }
+        .status-PENDING_HR { background: #dbeafe; color: #1e40af; }
+        .status-APPROVED { background: #d1fae5; color: #059669; }
+        .status-REJECTED { background: #fee2e2; color: #dc2626; }
+    </style>
+</head>
+<body>
+
+<div class="main-content">
+    
+    <!-- Success/Error Messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show m-3 shadow-sm" role="alert" style="position:fixed; top:20px; right:20px; z-index:9999;">
+        <i class="fas fa-check-circle me-2"></i> <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    
+    <!-- Header -->
+    <header class="top-header">
+        <div class="page-title">
+            <i class="fas fa-sign-out-alt text-danger me-2"></i> Apply for Resignation
+        </div>
+        <a href="/employee/dashboard" class="btn-back-home">
+            <i class="fas fa-arrow-left me-2"></i> Back
+        </a>
+    </header>
+
+    <div class="content-area">
+        
+        <!-- Employee Info Section -->
+        <div class="card-custom">
+            <div class="card-header-custom">
+                <i class="fas fa-user-circle me-2"></i> Employee Info
+            </div>
+            <div class="p-4 info-grid">
+                <div class="info-item">
+                    <div class="info-label">Employee ID</div>
+                    <div class="info-value" th:text="${profile != null ? profile.user.username : 'N/A'}"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Employee Name</div>
+                    <div class="info-value" th:text="${profile != null ? profile.user.fullName : 'N/A'}"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Department</div>
+                    <div class="info-value" th:text="${profile != null ? profile.department : 'N/A'}"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Designation</div>
+                    <div class="info-value" th:text="${profile != null ? profile.designation : 'N/A'}"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Reporting Manager</div>
+                    <div class="info-value" th:text="${profile != null ? profile.reportingManager : 'N/A'}"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Date of Joining</div>
+                    <div class="info-value" th:text="${profile != null and profile.joiningDate != null ? #temporals.format(profile.joiningDate, 'dd/MM/yyyy') : 'N/A'}"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Status Section (Only show if resignation exists) -->
+        <div class="card-custom" th:if="${resignation != null}">
+            <div class="card-header-custom bg-light">
+                <i class="fas fa-info-circle me-2"></i> Current Resignation Status
+            </div>
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.8rem;">Current Status</h6>
+                        <span th:class="'status-badge status-' + ${resignation.status}">
+                            <i class="fas fa-circle me-1" style="font-size: 0.6rem;"></i>
+                            <span th:text="${resignation.status == 'PENDING_MANAGER' ? 'Pending Manager Approval' : (resignation.status == 'PENDING_HR' ? 'Pending HR Approval' : resignation.status)}"></span>
+                        </span>
+                    </div>
+                    <div class="text-end">
+                        <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.8rem;">Submitted Date</h6>
+                        <strong th:text="${resignation.requestDate != null ? #temporals.format(resignation.requestDate, 'dd/MM/yyyy') : 'N/A'}"></strong>
+                    </div>
+                </div>
+                
+                <div class="bg-light p-3 rounded border">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <span class="text-muted fw-bold" style="font-size: 0.85rem;">Manager Approved By:</span><br>
+                            <span th:text="${resignation.l2ApprovedBy != null ? resignation.l2ApprovedBy.fullName : 'Pending'}"></span>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <span class="text-muted fw-bold" style="font-size: 0.85rem;">HR Approved By:</span><br>
+                            <span th:text="${resignation.l3ApprovedBy != null ? resignation.l3ApprovedBy.fullName : 'Pending'}"></span>
+                        </div>
+                        <div class="col-md-12 mt-2" th:if="${resignation.hrComments != null and !resignation.hrComments.isEmpty()}">
+                            <span class="text-muted fw-bold" style="font-size: 0.85rem;">HR Comments:</span><br>
+                            <div class="p-2 bg-white border rounded mt-1" th:text="${resignation.hrComments}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submission Form (Only show if no resignation or it's a DRAFT) -->
+        <div class="card-custom" th:if="${resignation == null or resignation.status == 'DRAFT'}">
+            <div class="card-header-custom">
+                <i class="fas fa-edit me-2"></i> Application Form
+            </div>
+            <div class="p-4">
+                <form action="/employee/resignation/submit" method="post">
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Reason for Resignation <span class="text-danger">*</span></label>
+                        <select class="form-select" name="reason" required>
+                            <option value="" disabled th:selected="${resignation == null or resignation.reason == null}">Select a reason</option>
+                            <option value="Career Growth" th:selected="${resignation != null and resignation.reason == 'Career Growth'}">Career Growth</option>
+                            <option value="Higher Studies" th:selected="${resignation != null and resignation.reason == 'Higher Studies'}">Higher Studies</option>
+                            <option value="Personal Reasons" th:selected="${resignation != null and resignation.reason == 'Personal Reasons'}">Personal Reasons</option>
+                            <option value="Relocation" th:selected="${resignation != null and resignation.reason == 'Relocation'}">Relocation</option>
+                            <option value="Health Issues" th:selected="${resignation != null and resignation.reason == 'Health Issues'}">Health Issues</option>
+                            <option value="Better Opportunity" th:selected="${resignation != null and resignation.reason == 'Better Opportunity'}">Better Opportunity</option>
+                            <option value="Work Environment" th:selected="${resignation != null and resignation.reason == 'Work Environment'}">Work Environment</option>
+                            <option value="Other" th:selected="${resignation != null and resignation.reason == 'Other'}">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Additional Comments (Optional)</label>
+                        <textarea class="form-control" name="comments" rows="4" placeholder="Enter any specific details..." th:text="${resignation != null ? resignation.comments : ''}"></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2 border-top pt-4">
+                        <button type="submit" name="action" value="submit" class="btn btn-danger px-4 fw-bold shadow-sm">Submit Resignation</button>
+                        <button type="submit" name="action" value="draft" class="btn btn-outline-secondary px-4 fw-bold">Save as Draft</button>
+                        <a href="/employee/dashboard" class="btn btn-light px-4 border">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

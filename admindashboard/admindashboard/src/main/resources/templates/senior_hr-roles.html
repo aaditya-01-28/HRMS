@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteCircle | HR Admin - Role & Permission</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --sidebar-width: 220px;
+            --header-height: 70px;
+        }
+
+        body {
+            background-color: #f8fafc;
+            overflow-x: hidden;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* --- SIDEBAR --- */
+        .myspace-sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1051;
+            transition: transform 0.3s ease;
+        }
+        body.sidebar-toggled .myspace-sidebar { transform: translateX(-100%); }
+
+        .myspace-sidebar .brand-area {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: var(--header-height);
+        }
+        .myspace-sidebar .brand-area img {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+        }
+        .myspace-sidebar .brand-area .brand-text {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.2;
+        }
+        .myspace-sidebar .brand-area .brand-sub {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .myspace-sidebar .nav-links {
+            padding: 15px 0;
+            flex: 1;
+        }
+        .myspace-sidebar .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .myspace-sidebar .nav-link-item:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+        .myspace-sidebar .nav-link-item.active {
+            background: var(--primary);
+            color: white;
+            border-left-color: var(--primary);
+        }
+        .myspace-sidebar .nav-link-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        /* --- GLOBAL NAVBAR --- */
+        .top-navbar {
+            position: fixed; top: 0; left: var(--sidebar-width); right: 0;
+            height: var(--header-height);
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px;
+            z-index: 1050;
+            transition: left 0.3s ease;
+        }
+        body.sidebar-toggled .top-navbar { left: 0; }
+        
+        .nav-brand {
+            display: flex; align-items: center; gap: 15px;
+            font-size: 1.4rem; font-weight: 800; color: #1e293b;
+            letter-spacing: -0.5px;
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        .myspace-main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 20px 30px;
+            min-height: calc(100vh - var(--header-height));
+            transition: margin-left 0.3s ease;
+        }
+        body.sidebar-toggled .myspace-main { margin-left: 0; }
+
+        /* --- NAV TABS --- */
+        .custom-tabs {
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 25px;
+        }
+        .custom-tabs .nav-link {
+            color: #1e293b;
+            font-weight: 600;
+            padding: 12px 25px;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            border-radius: 0;
+            background: transparent;
+        }
+        .custom-tabs .nav-link:hover { color: var(--primary); }
+        .custom-tabs .nav-link.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: transparent;
+        }
+
+        /* --- TABLES --- */
+        .card-custom {
+            background: white;
+            border: 1px solid #cbd5e1;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+        .table-custom { margin-bottom: 0; }
+        .table-custom thead th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 12px 20px;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        .table-custom tbody td {
+            padding: 15px 20px;
+            vertical-align: middle;
+            color: #334155;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .status-badge {
+            color: #16a34a;
+            font-weight: 500;
+            background: #dcfce7;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .access-badge {
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        .access-badge.view { background: #eff6ff; color: #3b82f6; }
+        .access-badge.create { background: #dcfce7; color: #16a34a; }
+        .access-badge.manage { background: #ffedd5; color: #ea580c; }
+        
+        .btn-action {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .btn-action:hover { color: #3b82f6; }
+
+        .search-input {
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            padding: 8px 12px;
+            padding-left: 35px;
+            width: 250px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 10px;
+            color: #94a3b8;
+        }
+        
+        .role-details-panel {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 20px;
+            height: 100%;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #cbd5e1; transition: .4s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #2563eb; }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Create Role view */
+        .create-role-view { display: none; }
+        
+        .permissions-matrix th {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        .permissions-matrix td {
+            font-size: 0.85rem;
+            padding: 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .perm-check {
+            width: 18px; height: 18px;
+            cursor: pointer;
+        }
+        .perm-check.view { accent-color: #3b82f6; }
+        .perm-check.create { accent-color: #16a34a; }
+        .perm-check.edit { accent-color: #f97316; }
+        .perm-check.delete { accent-color: #ef4444; }
+
+        .avatar-small {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="myspace-sidebar shadow-sm">
+        <div class="brand-area">
+            <img src="/images/wcg-logo.jpg" alt="Logo">
+            <div>
+                <div class="brand-text">WhiteCircle</div>
+                <div class="brand-sub">HR Admin</div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a href="/senior_hr/dashboard" class="nav-link-item"><i class="fas fa-th-large text-muted"></i> Dashboard</a>
+            <a href="/senior_hr/employee" class="nav-link-item"><i class="fas fa-users text-muted"></i> Employee</a>
+            <a href="/senior_hr/lms" class="nav-link-item"><i class="fas fa-graduation-cap text-muted"></i> LMS</a>
+            <a href="/senior_hr/my_space" class="nav-link-item"><i class="fas fa-money-check-alt text-muted"></i> Payroll</a>
+            <a href="/senior_hr/attendance" class="nav-link-item"><i class="fas fa-clock text-muted"></i> Attendance</a>
+            <a href="/senior_hr/performance" class="nav-link-item"><i class="fas fa-chart-line text-muted"></i> Performance</a>
+            <a href="#" class="nav-link-item"><i class="fas fa-user-plus text-muted"></i> Recruitment</a>
+            <a href="#" class="nav-link-item"><i class="fas fa-file-alt text-muted"></i> Reports</a>
+            <a href="/senior_hr/roles" class="nav-link-item active"><i class="fas fa-shield-alt"></i> Role & Permission</a>
+            <a href="/senior_hr/policies" class="nav-link-item"><i class="fas fa-file-contract text-muted"></i> Policy & Compliance</a>
+            <a href="/senior_hr/organization" class="nav-link-item"><i class="fas fa-sitemap text-muted"></i> Organization Structure</a>
+        </div>
+    </div>
+
+    <!-- GLOBAL NAVBAR -->
+    <nav class="top-navbar">
+        <div class="nav-brand">
+            <div class="d-flex flex-column lh-1">
+                <span style="color: #1e3a8a; font-weight: 700; font-size: 1.2rem;">WhiteCircle Group - Shahdol</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: #64748b; margin-top: 4px;">HR MANAGEMENT SYSTEM</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="myspace-main">
+        
+        <div class="mb-4" id="page-header">
+            <h4 class="fw-bold mb-1" style="color: #1e293b;">Role & Permission Management</h4>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">Manage roles, assign roles to employees and configure permissions.</p>
+        </div>
+
+        <!-- TABS -->
+        <ul class="nav custom-tabs" id="roleTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="roles-tab" data-bs-toggle="tab" data-bs-target="#roles-pane" type="button" role="tab" onclick="hideCreateRole()">Role Management</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="assign-tab" data-bs-toggle="tab" data-bs-target="#assign-pane" type="button" role="tab">Employee Role Assignment</button>
+            </li>
+        </ul>
+
+        <!-- TAB CONTENT -->
+        <div class="tab-content" id="roleTabsContent">
+
+            <!-- 1. ROLE MANAGEMENT -->
+            <div class="tab-pane fade show active" id="roles-pane" role="tabpanel">
+                
+                <!-- Main Role View -->
+                <div id="main-role-view">
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-8">
+                            <div class="card-custom">
+                                <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                                    <h6 class="fw-bold mb-0 text-uppercase" style="font-size: 0.85rem; color: #475569;">Roles In The System</h6>
+                                    <div class="d-flex gap-3">
+                                        <button class="btn btn-primary btn-sm fw-bold px-3" onclick="showCreateRole()"><i class="fas fa-plus me-1"></i> Create New Role</button>
+                                        <div style="position: relative;">
+                                            <i class="fas fa-search search-icon" style="top: 8px;"></i>
+                                            <input type="text" class="search-input form-control-sm" placeholder="Search role...">
+                                        </div>
+                                    </div>
+                                </div>
+                                <table class="table table-custom table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Role Name</th>
+                                            <th>Description</th>
+                                            <th>Users</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="fw-bold" style="color: #1e293b;">Super Admin</td>
+                                            <td class="text-muted">Full access to all modules and settings</td>
+                                            <td>512</td>
+                                            <td><span class="status-badge">Active</span></td>
+                                            <td>
+                                                <button class="btn-action"><i class="fas fa-pen"></i></button>
+                                                <button class="btn-action"><i class="fas fa-minus"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold" style="color: #1e293b;">HR Manager</td>
+                                            <td class="text-muted">Manage HR operations and employee data</td>
+                                            <td>425</td>
+                                            <td><span class="status-badge">Active</span></td>
+                                            <td>
+                                                <button class="btn-action"><i class="fas fa-pen"></i></button>
+                                                <button class="btn-action"><i class="fas fa-minus"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold" style="color: #1e293b;">Accounts Admin</td>
+                                            <td class="text-muted">Manage payroll, salary and related activities</td>
+                                            <td>400</td>
+                                            <td><span class="status-badge">Active</span></td>
+                                            <td>
+                                                <button class="btn-action"><i class="fas fa-pen"></i></button>
+                                                <button class="btn-action"><i class="fas fa-minus"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="role-details-panel">
+                                <div class="d-flex align-items-center gap-2 mb-4 pb-2 border-bottom">
+                                    <i class="fas fa-shield-alt text-primary"></i>
+                                    <h6 class="fw-bold mb-0 text-uppercase" style="font-size: 0.85rem;">Role Details</h6>
+                                </div>
+                                
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <h5 class="fw-bold mb-0 text-dark">Super Admin</h5>
+                                    <span class="status-badge" style="font-size: 0.7rem; padding: 1px 6px;">Active</span>
+                                </div>
+                                <p class="text-muted" style="font-size: 0.85rem; line-height: 1.4;">Full access to all modules, system configurations, and security settings.</p>
+                                
+                                <div class="d-flex justify-content-between mb-4">
+                                    <div>
+                                        <div class="text-muted text-uppercase" style="font-size: 0.7rem; font-weight: 600;">Created By</div>
+                                        <div class="fw-bold" style="font-size: 0.85rem; color: #1e293b;">HR Admin</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted text-uppercase" style="font-size: 0.7rem; font-weight: 600;">Created On</div>
+                                        <div class="fw-bold" style="font-size: 0.85rem; color: #1e293b;">01 Jun 2026</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <div class="text-muted text-uppercase mb-1" style="font-size: 0.7rem; font-weight: 600;">Total Users</div>
+                                    <div class="fw-bold text-dark" style="font-size: 1.2rem;">2</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <div class="text-muted text-uppercase mb-2" style="font-size: 0.7rem; font-weight: 600;">Assigned Modules</div>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="access-badge view border border-primary text-primary bg-white">Employee</span>
+                                        <span class="access-badge view border border-primary text-primary bg-white">Payroll</span>
+                                        <span class="access-badge view border border-primary text-primary bg-white">LMS</span>
+                                        <span class="access-badge view border border-primary text-primary bg-white">Reports</span>
+                                        <span class="access-badge view border border-primary text-primary bg-white">Settings</span>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-outline-dark w-100 fw-bold"><i class="fas fa-pen me-2"></i> Edit Role</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Permissions Table -->
+                    <div class="card-custom mb-5">
+                        <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                            <h6 class="fw-bold mb-0 text-uppercase" style="font-size: 0.85rem; color: #1e293b;">Permissions (Super Admin)</h6>
+                            <div class="d-flex gap-3">
+                                <input type="text" class="form-control form-control-sm" placeholder="Search permission..." style="width: 200px;">
+                                <select class="form-select form-select-sm" style="width: 150px;"><option>All Modules</option></select>
+                            </div>
+                        </div>
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Module</th>
+                                    <th>Permission</th>
+                                    <th>Access Level</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold">Employee</td>
+                                    <td>View Employees</td>
+                                    <td><span class="access-badge view">VIEW</span></td>
+                                    <td>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Employee</td>
+                                    <td>Add Employee</td>
+                                    <td><span class="access-badge create">CREATE</span></td>
+                                    <td>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Payroll</td>
+                                    <td>View Salary</td>
+                                    <td><span class="access-badge view">VIEW</span></td>
+                                    <td>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Reports</td>
+                                    <td>View Reports</td>
+                                    <td><span class="access-badge view">VIEW</span></td>
+                                    <td>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Settings</td>
+                                    <td>Configure Roles</td>
+                                    <td><span class="access-badge manage">MANAGE</span></td>
+                                    <td>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="d-flex justify-content-between p-3" style="background: white; border-top: 1px solid #cbd5e1;">
+                            <span class="text-muted" style="font-size: 0.8rem; font-weight: 600;">Showing 5 of 42 permissions</span>
+                            <div class="d-flex gap-1">
+                                <button class="btn btn-sm btn-light border"><i class="fas fa-chevron-left"></i></button>
+                                <button class="btn btn-sm btn-primary">1</button>
+                                <button class="btn btn-sm btn-light border">2</button>
+                                <button class="btn btn-sm btn-light border"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Create New Role Sub-View -->
+                <div id="create-role-view" class="create-role-view">
+                    <button class="btn btn-link text-primary p-0 fw-bold mb-2 text-decoration-none" onclick="hideCreateRole()"><i class="fas fa-arrow-left me-1"></i> Back to Role Management</button>
+                    <h4 class="fw-bold mb-1" style="color: #1e293b;">Create New Role</h4>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem;">Define role details and configure permissions.</p>
+
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="role-details-panel">
+                                <h6 class="fw-bold mb-4">Role Details</h6>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size: 0.85rem; font-weight: 600;">Role Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" placeholder="Enter role name (e.g. HR Manager)">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size: 0.85rem; font-weight: 600;">Role Code <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" placeholder="Enter unique role code (e.g. HR_MGR)">
+                                    <div class="form-text" style="font-size: 0.7rem;">Role code should be unique and cannot be changed later.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size: 0.85rem; font-weight: 600;">Description</label>
+                                    <textarea class="form-control" rows="3" placeholder="Enter role description"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size: 0.85rem; font-weight: 600;">Role Category</label>
+                                    <select class="form-select"><option>Select category</option></select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size: 0.85rem; font-weight: 600;">Role Type</label>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="roleType" id="sysRole" checked>
+                                        <label class="form-check-label fw-bold" for="sysRole" style="font-size: 0.85rem;">System Role</label>
+                                        <div class="text-muted" style="font-size: 0.75rem;">Predefined or standard role</div>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="roleType" id="custRole">
+                                        <label class="form-check-label fw-bold" for="custRole" style="font-size: 0.85rem;">Custom Role</label>
+                                        <div class="text-muted" style="font-size: 0.75rem;">Custom role created for specific needs</div>
+                                    </div>
+                                </div>
+                                <div class="mb-4 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <label class="form-label mb-0 fw-bold" style="font-size: 0.85rem;">Status</label>
+                                        <div class="text-muted" style="font-size: 0.75rem;">Inactive roles cannot be assigned to employees.</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="alert alert-primary d-flex gap-2 p-3" style="background: #eff6ff; border: none; font-size: 0.8rem;">
+                                    <i class="far fa-clock mt-1 text-primary"></i>
+                                    <span style="color: #1e3a8a;">After creating the role, you can assign it to employees from the Employee Role Assignment tab.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="role-details-panel">
+                                <div class="d-flex justify-content-between mb-4">
+                                    <div>
+                                        <h6 class="fw-bold mb-1">Configure Permissions</h6>
+                                        <p class="text-muted mb-0" style="font-size: 0.85rem;">Set access permissions for modules and actions.</p>
+                                    </div>
+                                    <div class="d-flex gap-3 align-items-center" style="font-size: 0.75rem; font-weight: 700;">
+                                        <span class="text-muted">ACCESS LEVEL LEGEND:</span>
+                                        <span style="color: #3b82f6;">VIEW</span>
+                                        <span style="color: #16a34a;">CREATE</span>
+                                        <span style="color: #f97316;">EDIT</span>
+                                        <span style="color: #ef4444;">DELETE</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex gap-3 mb-3">
+                                    <div style="position: relative; flex: 1;">
+                                        <i class="fas fa-search search-icon" style="top: 8px;"></i>
+                                        <input type="text" class="search-input w-100 form-control-sm" placeholder="Search module or permission...">
+                                    </div>
+                                    <select class="form-select form-select-sm" style="width: 200px;"><option>All Modules</option></select>
+                                </div>
+                                
+                                <table class="table table-borderless permissions-matrix w-100">
+                                    <thead>
+                                        <tr style="border-bottom: 2px solid #cbd5e1;">
+                                            <th class="text-uppercase w-50">Module / Permission</th>
+                                            <th colspan="4" class="text-center text-uppercase border-start">Access Level</th>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                                            <th></th>
+                                            <th class="text-center w-10">VIEW</th>
+                                            <th class="text-center w-10">CREATE</th>
+                                            <th class="text-center w-10">EDIT</th>
+                                            <th class="text-center w-10">DELETE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Module Group: Employee Management -->
+                                        <tr>
+                                            <td colspan="5" class="fw-bold text-dark pt-3 pb-2 bg-light"><i class="fas fa-chevron-down me-2 text-muted"></i> <i class="fas fa-users-cog text-primary me-2"></i> Employee Management</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-4">View Employees</td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check view" checked></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check create"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check edit"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check delete"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-4">Add Employee</td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check view"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check create" checked></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check edit"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check delete"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-4">Edit Employee</td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check view"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check create"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check edit" checked></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check delete"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-4">Delete Employee</td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check view"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check create"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check edit"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check delete" checked></td>
+                                        </tr>
+                                        
+                                        <!-- Module Group: Payroll -->
+                                        <tr>
+                                            <td colspan="5" class="fw-bold text-dark pt-3 pb-2 bg-light"><i class="fas fa-chevron-down me-2 text-muted"></i> <i class="fas fa-money-check-alt text-primary me-2"></i> Payroll</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-4">View Salary</td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check view" checked></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check create"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check edit"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check delete"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-4">Generate Salary</td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check view"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check create" checked></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check edit"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check delete"></td>
+                                        </tr>
+                                        
+                                        <!-- Module Group: Attendance -->
+                                        <tr>
+                                            <td colspan="5" class="fw-bold text-dark pt-3 pb-2 bg-light"><i class="fas fa-chevron-down me-2 text-muted"></i> <i class="far fa-clock text-primary me-2"></i> Attendance</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-4">View Attendance</td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check view" checked></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check create"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check edit"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check delete"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-4">Approve / Reject Attendance</td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check view"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check create"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check edit" checked></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check delete"></td>
+                                        </tr>
+                                        
+                                        <!-- Module Group: Performance -->
+                                        <tr>
+                                            <td colspan="5" class="fw-bold text-dark pt-3 pb-2 bg-light"><i class="fas fa-chevron-down me-2 text-muted"></i> <i class="fas fa-chart-line text-primary me-2"></i> Performance</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-4">View Performance</td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check view" checked></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check create"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check edit"></td>
+                                            <td class="text-center"><input type="checkbox" class="perm-check delete"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
+                                <button class="btn btn-outline-dark fw-bold px-4 py-2" onclick="hideCreateRole()">Cancel</button>
+                                <button class="btn btn-primary fw-bold px-5 py-2">Save Role</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 2. EMPLOYEE ROLE ASSIGNMENT -->
+            <div class="tab-pane fade" id="assign-pane" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="card-custom p-4 bg-white d-flex align-items-center gap-5">
+                            <div style="width: 300px;">
+                                <label class="form-label fw-bold mb-2" style="font-size: 0.9rem;">Search Employee <span class="text-danger">*</span></label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" class="search-input w-100" placeholder="Search by name, employee ID, email" value="Amit Sharma">
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex align-items-center justify-content-between flex-fill border rounded p-3" style="border-color: #cbd5e1 !important;">
+                                <div class="d-flex align-items-center">
+                                    <img src="/images/avatar-1.jpg" alt="A" class="avatar-small" onerror="this.src='https://ui-avatars.com/api/?name=Amit+Sharma&background=random'">
+                                    <div class="lh-1">
+                                        <div class="fw-bold mb-1" style="font-size: 1.1rem; color: #1e293b;">Amit Sharma</div>
+                                        <div class="text-muted" style="font-size: 0.85rem;">EMP114 &nbsp;•&nbsp; Software Engineer</div>
+                                    </div>
+                                </div>
+                                <div class="lh-1">
+                                    <div class="text-muted mb-2" style="font-size: 0.85rem;">Employment Type</div>
+                                    <div class="fw-bold text-dark">Full-time</div>
+                                </div>
+                                <div style="width: 40px; height: 40px; background: #2563eb; color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="role-details-panel">
+                            <h6 class="fw-bold mb-4" style="color: #1e3a8a;">Assign New Role</h6>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Select Role <span class="text-danger">*</span></label>
+                                <select class="form-select"><option>Select role</option><option>Payroll Approver</option></select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Role Category</label>
+                                <input type="text" class="form-control bg-light" placeholder="Select role first" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Description</label>
+                                <textarea class="form-control bg-light" rows="3" placeholder="Role description will appear here" disabled></textarea>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Effective From <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" value="2026-07-01">
+                            </div>
+                            
+                            <div class="alert alert-primary d-flex gap-2 p-3" style="background: #eff6ff; border: none; font-size: 0.8rem;">
+                                <i class="fas fa-info-circle mt-1 text-primary"></i>
+                                <div>
+                                    <strong class="d-block mb-1" style="color: #1e3a8a;">Important</strong>
+                                    <span class="text-muted">The selected role and its permissions will be assigned to the employee from the effective date.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-8">
+                        <div class="role-details-panel p-0 overflow-hidden">
+                            <div class="p-4 border-bottom">
+                                <h6 class="fw-bold mb-1" style="color: #1e3a8a;">Assigned Roles</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.85rem;">Roles assigned to this employee.</p>
+                            </div>
+                            <table class="table table-custom table-hover m-0">
+                                <thead style="background: white;">
+                                    <tr>
+                                        <th>Role Name</th>
+                                        <th>Role Code</th>
+                                        <th>Category</th>
+                                        <th>Assigned On</th>
+                                        <th>Effective From</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-bold">HR Manager</td>
+                                        <td class="text-muted">HR_MGR</td>
+                                        <td>Management</td>
+                                        <td>18 Jun 2026</td>
+                                        <td>18 Jun 2026</td>
+                                        <td><span class="status-badge">Active</span></td>
+                                        <td>
+                                            <button class="btn-action"><i class="far fa-eye"></i></button>
+                                            <button class="btn-action"><i class="far fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Payroll Approver</td>
+                                        <td class="text-muted">PAY_APPROVER</td>
+                                        <td>Operations</td>
+                                        <td>10 Jun 2026</td>
+                                        <td>10 Jun 2026</td>
+                                        <td><span class="status-badge">Active</span></td>
+                                        <td>
+                                            <button class="btn-action"><i class="far fa-eye"></i></button>
+                                            <button class="btn-action"><i class="far fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Leave Approver</td>
+                                        <td class="text-muted">LEAVE_APPROVER</td>
+                                        <td>Operations</td>
+                                        <td>10 Jun 2026</td>
+                                        <td>10 Jun 2026</td>
+                                        <td><span class="status-badge">Active</span></td>
+                                        <td>
+                                            <button class="btn-action"><i class="far fa-eye"></i></button>
+                                            <button class="btn-action"><i class="far fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="d-flex justify-content-between align-items-center p-3" style="background: white;">
+                                <span class="text-muted" style="font-size: 0.8rem; font-weight: 600;">Showing 1 to 3 of 3 entries</span>
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-sm btn-light border"><i class="fas fa-chevron-left"></i></button>
+                                    <button class="btn btn-sm btn-primary">1</button>
+                                    <button class="btn btn-sm btn-light border"><i class="fas fa-chevron-right"></i></button>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4" style="background: #fafaf9;">
+                                <div class="alert alert-warning d-flex gap-2 p-3 mb-0" style="background: #fefce8; border: 1px solid #fef08a; font-size: 0.8rem; color: #854d0e;">
+                                    <i class="fas fa-exclamation-triangle mt-1"></i>
+                                    <div>
+                                        <strong class="d-block mb-1">Note</strong>
+                                        <span>If multiple roles have conflicting permissions, system will follow the highest priority access.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
+                            <button class="btn btn-outline-dark fw-bold px-4 py-2">Cancel</button>
+                            <button class="btn btn-primary fw-bold px-5 py-2">Assign Role <i class="fas fa-arrow-right ms-2"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showCreateRole() {
+            document.getElementById('main-role-view').style.display = 'none';
+            document.getElementById('create-role-view').style.display = 'block';
+            document.getElementById('page-header').style.display = 'none';
+            document.getElementById('roleTabs').style.display = 'none';
+        }
+        
+        function hideCreateRole() {
+            document.getElementById('main-role-view').style.display = 'block';
+            document.getElementById('create-role-view').style.display = 'none';
+            document.getElementById('page-header').style.display = 'block';
+            document.getElementById('roleTabs').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
