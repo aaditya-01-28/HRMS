@@ -113,8 +113,34 @@
             padding-top: 100px;
         }
 
-        /* === TOP HEADER === */
+        
+        /* --- GLOBAL NAVBAR --- */
+        .top-navbar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: 70px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px;
+            z-index: 1050;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .nav-brand {
+            display: flex; align-items: center; gap: 15px;
+            font-size: 1.6rem; font-weight: 800; color: #1e3a8a;
+            letter-spacing: 1px;
+            min-width: 220px;
+        }
+        .nav-actions { display: flex; align-items: center; gap: 20px; }
 
+        /* === TOP HEADER === */
+        .top-header {
+            background: #ffffff;
+            padding: 0 36px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            height: 85px;
+            border-bottom: 1px solid #e2e8f0;
+        }
         .header-title {
             color: var(--bs-primary); font-size: 1.5rem; font-weight: 700;
             display: flex; align-items: center; letter-spacing: -0.5px; margin: 0;
@@ -328,13 +354,18 @@
     </div>
 </div>
 
-<header class="top-header" th:classappend="${isItSupport ? 'it-main-margin' : ''}">
-    <div class="page-title d-flex align-items-center gap-3">
+<!-- GLOBAL NAVBAR -->
+<nav class="top-navbar" th:classappend="${isItSupport ? 'it-main-margin' : ''}">
+    <div class="nav-brand">
         <button th:if="${isItSupport}" class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
-        <i class="fas fa-tasks text-dark" style="font-size: 2.5rem;"></i>
-        <span class="fw-bold text-dark" style="border-left: 2px solid #cbd5e1; padding-left: 17px; margin-left: 15px; font-size: 1.5rem; letter-spacing: 0.5px;">
-            MANAGE WORKFLOW
-        </span>
+        <img src="/images/wcg-logo.jpg" alt="Logo" style="height: 50px; border-radius: 6px;">
+        Manage Workflow
+    </div>
+    <div class="nav-actions d-flex align-items-center gap-3">
+        <a th:href="${isItSupport ? '/itsupport/dashboard' : '/manager/dashboard'}" class="btn btn-light text-dark fw-bold" style="border-radius: 6px; padding: 8px 20px;">
+            <i class="fas fa-arrow-left me-2"></i> Back
+        </a>
+        
     </div>
     <a th:href="${backUrl != null ? backUrl : (isItSupport ? '/itsupport/dashboard' : '/manager/dashboard')}" class="btn btn-light text-dark fw-bold">
         <i class="fas fa-arrow-left me-2"></i> Back
@@ -565,11 +596,11 @@
                                 th:data-name="${leave.user?.fullName}"
                                 th:data-role="${leave.user?.employeeProfile?.designation}"
                                 th:data-type="${leave.leaveType}"
-                                th:data-start="${leave.startDate}"
-                                th:data-end="${leave.endDate}"
+                                th:data-start="${leave.fromDate}"
+                                th:data-end="${leave.toDate}"
                                 th:data-days="${leave.totalDays}"
                                 th:data-reason="${leave.reason}"
-                                th:data-applied="${leave.appliedOn}"
+                                th:data-applied="${leave.createdAt}"
                                 th:data-comments="${leave.adminComments != null ? leave.adminComments : ''}"
                                 th:data-actiondate="${leave.actionDate != null ? leave.actionDate : ''}"
                                 th:data-docname="${leave.documentName}"
@@ -586,7 +617,7 @@
                                 </td>
                                 <td class="text-dark fw-medium" th:text="${leave.leaveType}"></td>
                                 <td class="text-dark" th:text="${leave.totalDays} + ' Days'"></td>
-                                <td class="text-muted" th:text="${#temporals.format(leave.startDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.endDate, 'MMM dd, yyyy')}"></td>
+                                <td class="text-muted" th:text="${#temporals.format(leave.fromDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.toDate, 'MMM dd, yyyy')}"></td>
                                 <td class="text-muted text-truncate" style="max-width: 150px;" th:text="${leave.reason}"></td>
                                 <td class="text-end"><span class="badge bg-warning text-dark border border-warning px-3 py-2 rounded-pill">Pending</span></td>
                             </tr>
@@ -598,11 +629,11 @@
                                 th:data-name="${leave.user?.fullName}"
                                 th:data-role="${leave.user?.employeeProfile?.designation}"
                                 th:data-type="${leave.leaveType}"
-                                th:data-start="${leave.startDate}"
-                                th:data-end="${leave.endDate}"
+                                th:data-start="${leave.fromDate}"
+                                th:data-end="${leave.toDate}"
                                 th:data-days="${leave.totalDays}"
                                 th:data-reason="${leave.reason}"
-                                th:data-applied="${leave.appliedOn}"
+                                th:data-applied="${leave.createdAt}"
                                 th:data-comments="${leave.adminComments != null ? leave.adminComments : ''}"
                                 th:data-actiondate="${leave.actionDate != null ? leave.actionDate : ''}"
                                 th:data-docname="${leave.documentName}"
@@ -619,7 +650,7 @@
                                 </td>
                                 <td class="text-dark fw-medium" th:text="${leave.leaveType}"></td>
                                 <td class="text-dark" th:text="${leave.totalDays} + ' Days'"></td>
-                                <td class="text-muted" th:text="${#temporals.format(leave.startDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.endDate, 'MMM dd, yyyy')}"></td>
+                                <td class="text-muted" th:text="${#temporals.format(leave.fromDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.toDate, 'MMM dd, yyyy')}"></td>
                                 <td class="text-muted text-truncate" style="max-width: 150px;" th:text="${leave.reason}"></td>
                                 <td class="text-end"><span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill">Approved</span></td>
                             </tr>
@@ -631,11 +662,11 @@
                                 th:data-name="${leave.user?.fullName}"
                                 th:data-role="${leave.user?.employeeProfile?.designation}"
                                 th:data-type="${leave.leaveType}"
-                                th:data-start="${leave.startDate}"
-                                th:data-end="${leave.endDate}"
+                                th:data-start="${leave.fromDate}"
+                                th:data-end="${leave.toDate}"
                                 th:data-days="${leave.totalDays}"
                                 th:data-reason="${leave.reason}"
-                                th:data-applied="${leave.appliedOn}"
+                                th:data-applied="${leave.createdAt}"
                                 th:data-comments="${leave.adminComments != null ? leave.adminComments : ''}"
                                 th:data-actiondate="${leave.actionDate != null ? leave.actionDate : ''}"
                                 th:data-docname="${leave.documentName}"
@@ -652,7 +683,7 @@
                                 </td>
                                 <td class="text-dark fw-medium" th:text="${leave.leaveType}"></td>
                                 <td class="text-dark" th:text="${leave.totalDays} + ' Days'"></td>
-                                <td class="text-muted" th:text="${#temporals.format(leave.startDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.endDate, 'MMM dd, yyyy')}"></td>
+                                <td class="text-muted" th:text="${#temporals.format(leave.fromDate, 'MMM dd, yyyy')} + ' to ' + ${#temporals.format(leave.toDate, 'MMM dd, yyyy')}"></td>
                                 <td class="text-muted text-truncate" style="max-width: 150px;" th:text="${leave.reason}"></td>
                                 <td class="text-end"><span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill">Rejected</span></td>
                             </tr>
@@ -918,23 +949,23 @@
                 </div>
 
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Priority:</div>
+                    <div class="text-muted" style="width: 250px;">Priority:</div>
                     <div class="fw-bold text-danger" id="detailTicketPriority">High</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Ticket Type:</div>
+                    <div class="text-muted" style="width: 250px;">Ticket Type:</div>
                     <div class="fw-bold text-dark" id="detailTicketType">Software Request</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Subject:</div>
+                    <div class="text-muted" style="width: 250px;">Subject:</div>
                     <div class="fw-bold text-dark" id="detailTicketSubject">Request for Figma Pro Access</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Description:</div>
+                    <div class="text-muted" style="width: 250px;">Description:</div>
                     <div class="fw-bold text-dark" id="detailTicketDesc"></div>
                 </div>
                 <div class="d-flex mb-4" id="detailTicketAttachmentRow">
-                    <div class="text-muted" style="width: 120px;">Attachments:</div>
+                    <div class="text-muted" style="width: 250px;">Attachments:</div>
                     <div class="fw-bold text-primary d-flex align-items-center">
                         <a href="#" id="detailTicketAttachmentLink" class="text-primary text-decoration-none" download>
                             <span id="detailTicketAttachment"></span>
@@ -943,7 +974,7 @@
                     </div>
                 </div>
                 <div class="d-flex mb-5">
-                    <div class="text-muted" style="width: 120px;">Raised On:</div>
+                    <div class="text-muted" style="width: 250px;">Raised On:</div>
                     <div class="fw-bold text-dark" id="detailTicketApplied"></div>
                 </div>
 
@@ -966,7 +997,7 @@
 
             <!-- Empty State -->
             <div id="ticket-empty-state" class="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
-                <i class="fas fa-ticket-alt fs-1 mb-3 opacity-25"></i>
+                <img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data">
                 <h5>Select a ticket to view details</h5>
             </div>
         </div>
@@ -1072,23 +1103,23 @@
                 </div>
 
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Priority:</div>
+                    <div class="text-muted" style="width: 250px;">Priority:</div>
                     <div class="fw-bold text-danger" id="detailMyAssignPriority">High</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Ticket Type:</div>
+                    <div class="text-muted" style="width: 250px;">Ticket Type:</div>
                     <div class="fw-bold text-dark" id="detailMyAssignType">Software Request</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Subject:</div>
+                    <div class="text-muted" style="width: 250px;">Subject:</div>
                     <div class="fw-bold text-dark" id="detailMyAssignSubject">Request for Figma Pro Access</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Description:</div>
+                    <div class="text-muted" style="width: 250px;">Description:</div>
                     <div class="fw-bold text-dark" id="detailMyAssignDesc"></div>
                 </div>
                 <div class="d-flex mb-4" id="detailMyAssignAttachmentRow">
-                    <div class="text-muted" style="width: 120px;">Attachments:</div>
+                    <div class="text-muted" style="width: 250px;">Attachments:</div>
                     <div class="fw-bold text-primary d-flex align-items-center">
                         <a href="#" id="detailMyAssignAttachmentLink" class="text-primary text-decoration-none" download>
                             <span id="detailMyAssignAttachment"></span>
@@ -1097,7 +1128,7 @@
                     </div>
                 </div>
                 <div class="d-flex mb-5">
-                    <div class="text-muted" style="width: 120px;">Raised On:</div>
+                    <div class="text-muted" style="width: 250px;">Raised On:</div>
                     <div class="fw-bold text-dark" id="detailMyAssignApplied"></div>
                 </div>
 
@@ -1120,7 +1151,7 @@
 
             <!-- Empty State -->
             <div id="myassign-empty-state" class="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
-                <i class="fas fa-ticket-alt fs-1 mb-3 opacity-25"></i>
+                <img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data">
                 <h5>Select a ticket to view details</h5>
             </div>
         </div>
@@ -1364,7 +1395,7 @@
 
             <!-- Empty State -->
             <div id="timesheet-empty-state" class="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
-                <i class="far fa-clock fs-1 mb-3 opacity-25"></i>
+                <img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data">
                 <h5>Select a timesheet to view details</h5>
             </div>
         </div>
@@ -1472,23 +1503,23 @@
                 </div>
 
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Priority:</div>
+                    <div class="text-muted" style="width: 250px;">Priority:</div>
                     <div class="fw-bold text-danger" id="detailOtherPriority">High</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Ticket Type:</div>
+                    <div class="text-muted" style="width: 250px;">Ticket Type:</div>
                     <div class="fw-bold text-dark" id="detailOtherType">Software Request</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Subject:</div>
+                    <div class="text-muted" style="width: 250px;">Subject:</div>
                     <div class="fw-bold text-dark" id="detailOtherSubject">Request for Figma Pro Access</div>
                 </div>
                 <div class="d-flex mb-4">
-                    <div class="text-muted" style="width: 120px;">Description:</div>
+                    <div class="text-muted" style="width: 250px;">Description:</div>
                     <div class="fw-bold text-dark" id="detailOtherDesc"></div>
                 </div>
                 <div class="d-flex mb-4" id="detailOtherAttachmentRow">
-                    <div class="text-muted" style="width: 120px;">Attachments:</div>
+                    <div class="text-muted" style="width: 250px;">Attachments:</div>
                     <div class="fw-bold text-primary d-flex align-items-center">
                         <a href="#" id="detailOtherAttachmentLink" class="text-primary text-decoration-none" download>
                             <span id="detailOtherAttachment"></span>
@@ -1497,7 +1528,7 @@
                     </div>
                 </div>
                 <div class="d-flex mb-5">
-                    <div class="text-muted" style="width: 120px;">Raised On:</div>
+                    <div class="text-muted" style="width: 250px;">Raised On:</div>
                     <div class="fw-bold text-dark" id="detailOtherApplied"></div>
                 </div>
 
@@ -1520,7 +1551,7 @@
 
             <!-- Empty State -->
             <div id="other-empty-state" class="d-flex flex-column justify-content-center align-items-center h-100 text-muted">
-                <i class="fas fa-ticket-alt fs-1 mb-3 opacity-25"></i>
+                <img src="/images/no data.png" style="width: 250px; opacity: 0.7; margin-bottom: 15px;" alt="No Data">
                 <h5>Select a ticket to view details</h5>
             </div>
         </div>
@@ -1611,18 +1642,20 @@
         
         rightPane.classList.remove('pane-hidden');
 
+        document.getElementById('default-leave-state').classList.remove('d-flex');
+        document.getElementById('default-leave-state').classList.add('d-none');
         document.getElementById('leave-detail-content').style.display = 'block';
         window.currentSelectedLeaveId = id;
 
         // Populate detail fields
         const empName = card.getAttribute('data-name');
-        document.getElementById('detail-emp-name').innerText = empName;
-        document.getElementById('detail-emp-role').innerText = card.getAttribute('data-role');
+        document.getElementById('detail-name').innerText = empName || 'Unknown';
+        document.getElementById('detail-role').innerText = card.getAttribute('data-role') || 'Role';
         
         // Generate Initials for Avatar
-        const nameParts = empName.trim().split(' ');
+        const nameParts = (empName || 'U').trim().split(' ');
         const initials = nameParts.length > 1 ? nameParts[0][0] + nameParts[1][0] : nameParts[0][0];
-        document.getElementById('detail-avatar-text').innerText = initials.toUpperCase();
+        document.getElementById('detailInitials').innerText = initials.toUpperCase();
         
         const type = card.getAttribute('data-type');
         const typeEl = document.getElementById('detail-type');
@@ -1638,12 +1671,12 @@
         document.getElementById('detail-duration').innerText = card.getAttribute('data-days') + " days";
         
         // Format dates
-        const fromDate = new Date(card.getAttribute('data-from')).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
-        const toDate = new Date(card.getAttribute('data-to')).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+        const fromDate = new Date(card.getAttribute('data-start')).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+        const toDate = new Date(card.getAttribute('data-end')).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
         document.getElementById('detail-dates').innerText = `${fromDate} - ${toDate}`;
         
         document.getElementById('detail-reason').innerText = card.getAttribute('data-reason');
-        document.getElementById('detail-handed').innerText = card.getAttribute('data-handed');
+        // document.getElementById('detail-handed') removed
         
         // Applied On format
         const appliedOn = card.getAttribute('data-applied');
@@ -1747,6 +1780,8 @@
         setTimeout(() => {
             if (rightPane.classList.contains('pane-hidden')) {
                 document.getElementById('leave-detail-content').style.display = 'none';
+                document.getElementById('default-leave-state').classList.remove('d-none');
+                document.getElementById('default-leave-state').classList.add('d-flex');
             }
         }, 400); // Wait for transition to complete before hiding content
 
