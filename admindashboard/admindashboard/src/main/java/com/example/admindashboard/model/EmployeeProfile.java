@@ -138,6 +138,10 @@ public class EmployeeProfile {
 
     private String alternateEmail;
     
+    // Documents
+    private String photoDocPath;
+    private String resumeDocPath;
+    
 
     public String getPresentResidentialName() {
 		return presentResidentialName;
@@ -223,6 +227,18 @@ public class EmployeeProfile {
 	public void setAlternateEmail(String alternateEmail) {
 		this.alternateEmail = alternateEmail;
 	}
+    public String getPhotoDocPath() {
+        return photoDocPath;
+    }
+    public void setPhotoDocPath(String photoDocPath) {
+        this.photoDocPath = photoDocPath;
+    }
+    public String getResumeDocPath() {
+        return resumeDocPath;
+    }
+    public void setResumeDocPath(String resumeDocPath) {
+        this.resumeDocPath = resumeDocPath;
+    }
 	// GETTERS AND SETTERS
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

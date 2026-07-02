@@ -40,6 +40,8 @@ public class User {
     private Long departmentId; // Optional: For department-level filtering later
 
     private String status = "ACTIVE"; // ACTIVE, INACTIVE, SUSPENDED
+    @Column(columnDefinition = "boolean default false")
+    private boolean requiresPasswordChange = false;
 
     // LINK TO HR DATA
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
@@ -68,6 +70,9 @@ public class User {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+    
+    public boolean isRequiresPasswordChange() { return requiresPasswordChange; }
+    public void setRequiresPasswordChange(boolean requiresPasswordChange) { this.requiresPasswordChange = requiresPasswordChange; }
 
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }

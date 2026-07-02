@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to WhiteCircle!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            color: #333333;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .header {
+            background-color: #002D72;
+            color: #ffffff;
+            text-align: center;
+            padding: 25px 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px;
+            line-height: 1.6;
+        }
+        .content p {
+            margin-bottom: 15px;
+        }
+        .highlight-box {
+            background-color: #f8fafc;
+            border-left: 4px solid #10b981;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .highlight-box p {
+            margin: 0;
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+        .highlight-box p:last-child {
+            margin-bottom: 0;
+        }
+        .footer {
+            background-color: #f8fafc;
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1 th:text="'Welcome to ' + ${companyName}">Welcome to WhiteCircle</h1>
+        </div>
+        <div class="content">
+            <p>Dear <strong th:text="${candidateName}">Employee</strong>,</p>
+            <p>Congratulations and welcome aboard! We are thrilled to have you join our team. Your onboarding process has been successfully completed, and your account has been provisioned.</p>
+            
+            <div class="highlight-box">
+                <p><strong>Employee ID:</strong> <span th:text="${empId}">EMPXXX</span></p>
+                <p><strong>Office Email:</strong> <span th:text="${officeEmail}">email@domain.com</span></p>
+                <p><strong>Temporary Password:</strong> <span th:text="${password}">Password123</span></p>
+            </div>
+            
+            <p><strong>Important:</strong> For security reasons, you will be required to change this temporary password the first time you log in to the portal.</p>
+            <p>If you have any questions or need assistance, please reach out to your HR representative or IT support.</p>
+            <p>Best regards,<br>The <span th:text="${companyName}">WhiteCircle</span> HR Team</p>
+        </div>
+        <div class="footer">
+            <p>&copy; <span th:text="${#dates.year(#dates.createNow())}">2026</span> <span th:text="${companyName}">WhiteCircle</span>. All rights reserved.</p>
+            <p>This is an automated message, please do not reply directly to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

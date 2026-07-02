@@ -64,6 +64,33 @@ public class EmailService {
         }
     }
 
+    @Async
+    public void sendOnboardingEmail(String toEmail, String fullName, String username, String tempPassword) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(toEmail);
+            helper.setFrom(systemEmail, "WhiteCircle HRMS");
+            helper.setSubject("Welcome to WhiteCircle HRMS - Your Account Details");
+
+            Context thymeleafContext = new Context();
+            thymeleafContext.setVariable("companyName", "WhiteCircle");
+            thymeleafContext.setVariable("candidateName", fullName);
+            thymeleafContext.setVariable("empId", username);
+            thymeleafContext.setVariable("officeEmail", toEmail);
+            thymeleafContext.setVariable("password", tempPassword);
+
+            String htmlBody = templateEngine.process("emails/onboarding-email", thymeleafContext);
+
+            helper.setText(htmlBody, true);
+            mailSender.send(message);
+
+            System.out.println("✅ Onboarding Email Sent Successfully to: " + toEmail);
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            System.err.println("❌ Failed to send onboarding email: " + e.getMessage());
+        }
+    }
 
     @Async
     public void sendTimesheetSubmissionToAdmin(String adminEmail, String employeeName, String employeeEmail, Map<String, Object> templateModel) {
@@ -357,6 +384,60 @@ public class EmailService {
 
         } catch (Exception e) {
             System.err.println("❌ Helpdesk Notification Delivery Error: " + e.getMessage());
+        }
+    }
+
+    @Async
+    public void sendReferralEmailToCandidate(String candidateEmail, String candidateName, String employeeName, Map<String, Object> templateModel) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(candidateEmail);
+            helper.setFrom(systemEmail, "WhiteCircle HRMS");
+            helper.setSubject(employeeName + " referred you for a role at WhiteCircle!");
+
+            Context thymeleafContext = new Context();
+            thymeleafContext.setVariables(templateModel);
+
+            String htmlBody = templateEngine.process("emails/referral-candidate-email", thymeleafContext);
+
+            helper.setText(htmlBody, true);
+            mailSender.send(message);
+
+            System.out.println("✅ Candidate Referral Email Sent Successfully to: " + candidateEmail);
+
+        } catch (Exception e) {
+            System.err.println("❌ Candidate Referral Email Delivery Error: " + e.getMessage());
+        }
+    }
+
+    @Async
+    public void sendOnboardingEmail(String personalEmail, String candidateName, String empId, String password, String officeEmail) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(personalEmail);
+            helper.setFrom(systemEmail, "WhiteCircle HRMS");
+            helper.setSubject("Welcome to WhiteCircle! Your Onboarding Details");
+
+            Context thymeleafContext = new Context();
+            thymeleafContext.setVariable("candidateName", candidateName);
+            thymeleafContext.setVariable("empId", empId);
+            thymeleafContext.setVariable("password", password);
+            thymeleafContext.setVariable("officeEmail", officeEmail);
+            thymeleafContext.setVariable("companyName", "WhiteCircle");
+
+            String htmlBody = templateEngine.process("emails/onboarding-email", thymeleafContext);
+
+            helper.setText(htmlBody, true);
+            mailSender.send(message);
+
+            System.out.println("✅ Onboarding Email Sent Successfully to: " + personalEmail);
+
+        } catch (Exception e) {
+            System.err.println("❌ Onboarding Email Delivery Error: " + e.getMessage());
         }
     }
 }

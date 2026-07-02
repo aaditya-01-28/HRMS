@@ -110,7 +110,14 @@ public class DashboardController {
     // --- 2. POST-LOGIN TRAFFIC COP ---
 
     @GetMapping("/default-redirect")
-    public String defaultRedirect(HttpServletRequest request) {
+    public String defaultRedirect(HttpServletRequest request, Principal principal) {
+        if (principal != null) {
+            User user = userRepository.findByUsername(principal.getName()).orElse(null);
+            if (user != null && user.isRequiresPasswordChange()) {
+                return "redirect:/change-password";
+            }
+        }
+        
         if (request.isUserInRole("SENIOR_MANAGER")) {
             return "redirect:/senior_manager/dashboard";
         } else if (request.isUserInRole("SENIOR_HR")) {
@@ -147,6 +154,26 @@ public class DashboardController {
         } else {
             return "redirect:/employee/dashboard";
         }
+    }
+
+    @GetMapping("/change-password")
+    public String showChangePasswordPage(Principal principal) {
+        if (principal == null) return "redirect:/login";
+        return "change-password";
+    }
+
+    @PostMapping("/change-password")
+    public String processChangePassword(@RequestParam("newPassword") String newPassword, Principal principal) {
+        if (principal != null) {
+            User user = userRepository.findByUsername(principal.getName()).orElse(null);
+            if (user != null) {
+                user.setPassword(passwordEncoder.encode(newPassword));
+                user.setRequiresPasswordChange(false);
+                userRepository.save(user);
+                return "redirect:/default-redirect";
+            }
+        }
+        return "redirect:/login";
     }
 
     // --- PROTECTED ROUTES ---
@@ -817,6 +844,21 @@ public class DashboardController {
             }
             
             referralRepository.save(ref);
+            
+            // --- EMAIL TRIGGER START ---
+            try {
+                java.util.Map<String, Object> emailData = new java.util.HashMap<>();
+                emailData.put("candidateName", firstName + " " + lastName);
+                emailData.put("employeeName", currentUser.getFullName());
+                emailData.put("jobTitle", job.getTitle());
+                emailData.put("companyName", "WhiteCircle");
+                
+                emailService.sendReferralEmailToCandidate(email, firstName + " " + lastName, currentUser.getFullName(), emailData);
+            } catch (Exception e) {
+                System.err.println("Warning: Could not trigger Candidate Referral email: " + e.getMessage());
+            }
+            // --- EMAIL TRIGGER END ---
+            
             redirectAttributes.addFlashAttribute("successMessage", "You have referred " + firstName + " " + lastName + " successfully!");
         }
         

@@ -587,6 +587,7 @@
 
                 <!-- FORM WIZARD VIEW (Hidden by default) -->
                 <div id="onboarding-form-view" class="d-none mt-4">
+                        <form id="onboardingForm" action="/senior_hr/employee/onboard" method="POST">
                     
                     <!-- Stepper -->
                     <div class="stepper-wrapper px-4">
@@ -617,36 +618,36 @@
                         <div class="row g-4 mb-5">
                             <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Prefix <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Mr.</option><option>Ms.</option></select>
+                                <select name="prefix" class="form-select"><option>Mr.</option><option>Ms.</option></select>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Employee ID <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" value="EMP114">
+                                <input type="text" name="empId" class="form-control" placeholder="Enter EMP ID">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">First Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" value="Amit Kumar">
+                                <input type="text" name="firstName" class="form-control" placeholder="First Name">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Middle Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" value="Kumar">
+                                <input type="text" name="middleName" class="form-control" placeholder="Middle Name">
                             </div>
                             
                             <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Last Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" value="Sharma">
+                                <input type="text" name="lastName" class="form-control" placeholder="Last Name">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Email Address <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control" value="amitwcg@mail">
+                                <input type="email" name="email" class="form-control" placeholder="Email Address">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Phone No. <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" value="987565266">
+                                <input type="text" name="mobileNumber" class="form-control" placeholder="Phone No.">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Emergency No. <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" value="987565266">
+                                <input type="text" name="mobileNumber" class="form-control" placeholder="Phone No.">
                             </div>
 
                             <div class="col-md-3">
@@ -655,15 +656,15 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Gender <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Male</option><option>Female</option></select>
+                                <select name="gender" class="form-select"><option>Male</option><option>Female</option></select>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Marital Status <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Single</option><option>Married</option></select>
+                                <select name="maritalStatus" class="form-select"><option>Single</option><option>Married</option></select>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Nationality <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" value="INDIAN">
+                                <input type="text" name="nationality" class="form-control" placeholder="Nationality">
                             </div>
 
                             <div class="col-md-3">
@@ -693,11 +694,11 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Blood Group <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>O +ve</option></select>
+                                <select name="bloodGroup" class="form-select"><option>O +ve</option><option>A +ve</option><option>B +ve</option><option>AB +ve</option><option>O -ve</option><option>A -ve</option><option>B -ve</option><option>AB -ve</option></select>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Physically Challenged <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>No</option><option>Yes</option></select>
+                                <select name="physicallyChallenged" class="form-select"><option>No</option><option>Yes</option></select>
                             </div>
                         </div>
 
