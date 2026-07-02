@@ -367,7 +367,10 @@
         </a>
         
     </div>
-</nav>
+    <a th:href="${backUrl != null ? backUrl : (isItSupport ? '/itsupport/dashboard' : '/manager/dashboard')}" class="btn btn-light text-dark fw-bold">
+        <i class="fas fa-arrow-left me-2"></i> Back
+    </a>
+</header>
 
 <div class="main-container" th:classappend="${isItSupport ? 'it-main-margin' : ''}">
 

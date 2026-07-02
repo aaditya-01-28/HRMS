@@ -42,6 +42,12 @@ public class DashboardController {
     private WeeklyTimesheetRepository weeklyTimesheetRepository;
 
     @Autowired
+    private JobPostingRepository jobPostingRepository;
+
+    @Autowired
+    private ReferralRepository referralRepository;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -296,7 +302,19 @@ public class DashboardController {
         return "manager-dashboard";
     }
 
-    @GetMapping({"/manager/workflow", "/accounts/workflow", "/transportation/workflow", "/HR/workflow", "/rewards-manager/workflow"})
+    @GetMapping({
+        "/manager/workflow", 
+        "/accounts/workflow", 
+        "/transportation/workflow", 
+        "/HR/workflow", 
+        "/rewards-manager/workflow",
+        "/senior_manager/workflow",
+        "/senior_hr/workflow",
+        "/senior_lnd/workflow",
+        "/senior_accounts/workflow",
+        "/senior_transport/workflow",
+        "/senior_rewards/workflow"
+    })
     public String showManagerWorkflow(org.springframework.ui.Model model, java.security.Principal principal, jakarta.servlet.http.HttpServletRequest request) {
         String currentUserId = principal.getName();
         User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
@@ -457,7 +475,15 @@ public class DashboardController {
         model.addAttribute("user", currentUser);
         model.addAttribute("isItSupport", isItSupport);
 
-        if (request.getRequestURI().contains("accounts")) {
+        String uri = request.getRequestURI().toLowerCase();
+        if (uri.contains("/senior_")) {
+            String[] parts = request.getRequestURI().split("/");
+            if (parts.length >= 2) {
+                model.addAttribute("backUrl", "/" + parts[1] + "/dashboard");
+            }
+        }
+
+        if (uri.contains("accounts")) {
             java.util.List<ServiceRequest> allAccountsTickets = serviceRequestRepository.findAll().stream()
                     .filter(t -> "PAYROLL".equalsIgnoreCase(t.getType()) || "FINANCE".equalsIgnoreCase(t.getType()))
                     .collect(Collectors.toList());
@@ -472,7 +498,7 @@ public class DashboardController {
             model.addAttribute("isItSupport", true); // To trigger the UI list rendering correctly
 
             return "accounts-workflow";
-        } else if (request.getRequestURI().contains("transportation")) {
+        } else if (uri.contains("transportation") || uri.contains("transport")) {
             java.util.List<ServiceRequest> allTransportTickets = serviceRequestRepository.findAll().stream()
                     .filter(t -> "TRANSPORT".equalsIgnoreCase(t.getType()) || "TRANSPORTATION".equalsIgnoreCase(t.getType()) || "FACILITY".equalsIgnoreCase(t.getType()))
                     .collect(Collectors.toList());
@@ -487,7 +513,7 @@ public class DashboardController {
             model.addAttribute("isItSupport", true); // To trigger the UI list rendering correctly
 
             return "transport-workflow";
-        } else if (request.getRequestURI().contains("HR")) {
+        } else if (uri.contains("hr")) {
             
             // 1. HR Tickets (Pending) -> Used for 'HR Tickets' tab
             java.util.List<ServiceRequest> hrTickets = serviceRequestRepository.findAll().stream()
@@ -527,7 +553,7 @@ public class DashboardController {
             model.addAttribute("pendingResignations", pendingResignations);
 
             return "hr-workflow";
-        } else if (request.getRequestURI().contains("rewards-manager")) {
+        } else if (uri.contains("rewards")) {
             java.util.List<ServiceRequest> rewardsTickets = serviceRequestRepository.findAll().stream()
                     .filter(t -> "REWARDS".equalsIgnoreCase(t.getType()))
                     .collect(Collectors.toList());
@@ -635,19 +661,122 @@ public class DashboardController {
     }
 
     @PostMapping("/employee/resignation/apply")
-    public String applyResignation(@RequestParam("reason") String reason, Principal principal) {
+    public String applyResignation(@RequestParam("reason") String reason, Principal principal, RedirectAttributes redirectAttributes) {
         if (principal != null) {
-            User user = userRepository.findByUsername(principal.getName()).orElse(null);
-            if (user != null) {
+            User employee = userRepository.findByUsername(principal.getName()).orElse(null);
+            if (employee != null) {
                 ResignationRequest req = new ResignationRequest();
-                req.setEmployee(user);
-                req.setRequestDate(java.time.LocalDate.now());
+                req.setEmployee(employee);
                 req.setReason(reason);
+                req.setRequestDate(java.time.LocalDate.now());
                 req.setStatus("PENDING_L2");
                 resignationRequestRepository.save(req);
+                redirectAttributes.addFlashAttribute("successMessage", "Resignation applied successfully. It has been forwarded to HR.");
             }
         }
-        return "redirect:/employee/dashboard?resignationSuccess=true";
+        return "redirect:/employee/dashboard";
+    }
+
+    @GetMapping("/employee/referral")
+    public String showReferralPage(org.springframework.ui.Model model, Principal principal) {
+        User currentUser = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (currentUser == null) return "redirect:/login";
+        
+        // Seed some mock data if job postings are empty
+        if (jobPostingRepository.count() == 0) {
+            JobPosting p1 = new JobPosting();
+            p1.setJobId("J001");
+            p1.setTitle("Associate Engineer - Product and Platform Engineering");
+            p1.setDepartment("Product and Platform Engineering");
+            p1.setExperienceRequired("0 - 2 years");
+            p1.setLocation("Bangalore");
+            p1.setPostingDate(java.time.LocalDate.now());
+            p1.setDescription("Extensive experience in Java programming, demonstrating advanced proficiency in developing scalable applications...");
+            p1.setPrimarySkills("Java Backend, Java, Python");
+            p1.setSecondarySkills("Java + spring boot + Microservices, SQL");
+            p1.setJobOverview("JD Focus: Strong CS fundamentals, coding, and data structures skills - Freshers from IITs, NITs, BITS, IIITs, and Other Premier Institutes only.");
+            p1.setEligibilityCriteria("Candidates must have a CGPA of 7.5 and above. CGPA score is mandatory on the resume. Profiles without CGPA mentioned will not be considered.");
+            jobPostingRepository.save(p1);
+            
+            JobPosting p2 = new JobPosting();
+            p2.setJobId("J002");
+            p2.setTitle("Senior Frontend Developer");
+            p2.setDepartment("UI/UX Engineering");
+            p2.setExperienceRequired("4 - 6 years");
+            p2.setLocation("Pune / Remote");
+            p2.setPostingDate(java.time.LocalDate.now().minusDays(5));
+            p2.setDescription("Looking for an experienced React/Angular developer to lead our frontend initiatives.");
+            p2.setPrimarySkills("React, Angular, TypeScript");
+            p2.setSecondarySkills("Redux, RxJS, HTML/CSS");
+            p2.setJobOverview("Lead the development of next-gen web applications.");
+            p2.setEligibilityCriteria("B.Tech/MCA with minimum 4 years of frontend experience.");
+            jobPostingRepository.save(p2);
+        }
+
+        java.util.List<JobPosting> activeJobs = jobPostingRepository.findByIsActiveTrue();
+        java.util.List<Referral> myReferrals = referralRepository.findByReferredByIdOrderByIdDesc(currentUser.getId());
+        
+        model.addAttribute("activeJobs", activeJobs);
+        model.addAttribute("myReferrals", myReferrals);
+        model.addAttribute("user", currentUser);
+        model.addAttribute("backUrl", "/employee/dashboard");
+        return "employee-referral";
+    }
+
+    @PostMapping("/employee/referral/submit")
+    public String submitReferral(
+            @RequestParam("jobPostingId") Long jobPostingId,
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
+            @RequestParam("email") String email,
+            @RequestParam("countryCode") String countryCode,
+            @RequestParam("mobileNumber") String mobileNumber,
+            @RequestParam("relationship") String relationship,
+            @RequestParam("resumeFile") org.springframework.web.multipart.MultipartFile resumeFile,
+            Principal principal,
+            RedirectAttributes redirectAttributes) {
+
+        User currentUser = userRepository.findByUsername(principal.getName()).orElse(null);
+        JobPosting job = jobPostingRepository.findById(jobPostingId).orElse(null);
+
+        if (currentUser != null && job != null) {
+            Referral ref = new Referral();
+            ref.setJobPosting(job);
+            ref.setReferredBy(currentUser);
+            ref.setFirstName(firstName);
+            ref.setLastName(lastName);
+            ref.setEmail(email);
+            ref.setCountryCode(countryCode);
+            ref.setMobileNumber(mobileNumber);
+            ref.setRelationship(relationship);
+            ref.setReferralDate(java.time.LocalDateTime.now());
+            
+            if (!resumeFile.isEmpty()) {
+                try {
+                    String uploadsDir = "uploads/resumes/";
+                    java.io.File dir = new java.io.File(uploadsDir);
+                    if (!dir.exists()) dir.mkdirs();
+                    
+                    String originalName = resumeFile.getOriginalFilename();
+                    String ext = originalName.substring(originalName.lastIndexOf("."));
+                    String newFilename = java.util.UUID.randomUUID().toString() + ext;
+                    
+                    java.nio.file.Path path = java.nio.file.Paths.get(uploadsDir + newFilename);
+                    java.nio.file.Files.copy(resumeFile.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    
+                    ref.setResumeFilename(newFilename);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    redirectAttributes.addFlashAttribute("errorMessage", "Failed to upload resume.");
+                    return "redirect:/employee/referral";
+                }
+            }
+            
+            referralRepository.save(ref);
+            redirectAttributes.addFlashAttribute("successMessage", "You have referred " + firstName + " " + lastName + " successfully!");
+        }
+        
+        return "redirect:/employee/referral";
     }
 
     // --- EMPLOYEE PROFILE SECTION (Self-Service - No locks needed) ---
