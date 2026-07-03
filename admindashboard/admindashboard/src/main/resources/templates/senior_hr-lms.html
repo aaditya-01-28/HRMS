@@ -368,7 +368,7 @@
             <a href="/senior_hr/lms" class="menu-item active">
                 <i class="fas fa-graduation-cap"></i> LMS
             </a>
-            <a href="#" class="menu-item">
+            <a href="/senior_hr/payroll" class="menu-item">
                 <i class="fas fa-money-bill-wave"></i> Payroll
             </a>
             <a href="/senior_hr/attendance" class="menu-item">
@@ -899,17 +899,21 @@
                 <div class="d-flex justify-content-center align-items-center mb-4 gap-3">
                     <div class="input-group" style="width: 250px;">
                         <span class="input-group-text bg-white text-muted border-end-0"><i class="fas fa-search"></i></span>
-                        <input type="text" class="form-control border-start-0" placeholder="Search Employees by name">
+                        <input type="text" class="form-control border-start-0" id="requestsSearch" placeholder="Search Employees by name">
                     </div>
-                    <select class="form-select" style="width: 200px;">
-                        <option>All Departments</option>
+                    <select class="form-select" id="requestsDeptFilter" style="width: 200px;">
+                        <option value="">All Departments</option>
+                        <option th:each="dept : ${departments}" th:value="${dept}" th:text="${dept}">Engineering</option>
                     </select>
-                    <select class="form-select" style="width: 150px;">
-                        <option>Status: All</option>
+                    <select class="form-select" id="requestsStatusFilter" style="width: 150px;">
+                        <option value="">Status: All</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="REJECTED">Rejected</option>
                     </select>
                     <div class="input-group" style="width: 250px;">
                         <span class="input-group-text bg-white text-muted"><i class="far fa-calendar-alt"></i></span>
-                        <input type="text" class="form-control" value="19/06/2026 - 30/06/2026">
+                        <input type="text" class="form-control" id="requestsDateRange" value="19/06/2026 - 30/06/2026" placeholder="Select Date Range">
                     </div>
                 </div>
 

@@ -46,6 +46,13 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+                // Always update existing seeded users to ensure they have correct employeeCode and department
+        updateSeededEmployee("EMP114", "Engineering", "Marketing Lead");
+        updateSeededEmployee("EMP187", "Product", "Project Manager");
+        updateSeededEmployee("EMP129", "Engineering", "IOS Developer");
+        updateSeededEmployee("EMP201", "HR", "HR Director");
+        updateSeededEmployee("ADMIN001", "IT", "Company Admin / IT Admin");
+
         System.out.println("=========================================================");
         System.out.println("🔄 Checking database for roles, permissions, and default accounts...");
 
@@ -1151,7 +1158,14 @@ public class DatabaseSeeder implements CommandLineRunner {
 	        }
 	    }
 	
-	    System.out.println("=========================================================");
+	            // Always update existing seeded users to ensure they have correct employeeCode and department
+        updateSeededEmployee("EMP114", "Engineering", "Marketing Lead");
+        updateSeededEmployee("EMP187", "Product", "Project Manager");
+        updateSeededEmployee("EMP129", "Engineering", "IOS Developer");
+        updateSeededEmployee("EMP201", "HR", "HR Director");
+        updateSeededEmployee("ADMIN001", "IT", "Company Admin / IT Admin");
+
+        System.out.println("=========================================================");
 	        
         
     
@@ -1225,6 +1239,26 @@ public class DatabaseSeeder implements CommandLineRunner {
             lr.setStatus(status);
             lr.setCreatedAt(LocalDate.now());
             leaveRequestRepository.save(lr);
+        }
+    }
+
+
+    private void updateSeededEmployee(String username, String department, String designation) {
+        User u = userRepository.findByUsername(username).orElse(null);
+        if (u != null) {
+            EmployeeProfile p = u.getEmployeeProfile();
+            if (p == null) {
+                p = new EmployeeProfile();
+                p.setUser(u);
+            }
+            p.setDepartment(department);
+            p.setEmployeeCode(username);
+            if (designation != null) {
+                p.setDesignation(designation);
+            }
+            u.setEmployeeProfile(p);
+            userRepository.save(u);
+            System.out.println("✏️ Updated existing user fields for " + username);
         }
     }
 }

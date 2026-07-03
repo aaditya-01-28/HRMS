@@ -270,7 +270,7 @@ public class SeniorDashboardController {
     // --- MY SPACE ROUTE (HR Payroll) ---
 
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
-    @GetMapping("/senior_hr/my_space")
+    @GetMapping("/senior_hr/payroll")
     public String showSeniorHrMySpace(Model model, Principal principal) {
         // Fetch existing salary structures, seed if empty
         List<com.example.admindashboard.model.SalaryStructure> structures = salaryStructureRepository.findByActiveTrue();
@@ -509,7 +509,7 @@ public class SeniorDashboardController {
         model.addAttribute("bonusDeductions", bonuses);
         model.addAttribute("allUsers", allUsers);
         
-        return "senior_hr-myspace";
+        return "senior_hr-payroll";
     }
 
     // --- MY SPACE ROUTE (HR Employee) ---
