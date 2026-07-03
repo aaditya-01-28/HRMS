@@ -498,6 +498,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             EmployeeProfile profile2 = new EmployeeProfile();
             profile2.setDesignation("Project Manager");
+            profile2.setDepartment("Product");
             profile2.setMobileNumber("+91 75879 57916");
             profile2.setExperience("3.5 Years");
             profile2.setJoiningDate(LocalDate.of(2022, 5, 7));

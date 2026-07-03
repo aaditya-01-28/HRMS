@@ -513,12 +513,47 @@ public class SeniorDashboardController {
             .filter(u -> u.getEmployeeProfile() != null && u.getEmployeeProfile().getDepartment() != null)
             .collect(Collectors.groupingBy(u -> u.getEmployeeProfile().getDepartment(), Collectors.counting()));
             
+        // Calculate department stats
+        long totalWithDept = allUsers.stream()
+            .filter(u -> u.getEmployeeProfile() != null && u.getEmployeeProfile().getDepartment() != null)
+            .count();
+        double totalD = totalWithDept > 0 ? (double)totalWithDept : 1.0;
+
+        long eng = deptCounts.getOrDefault("Engineering", 0L);
+        long prod = deptCounts.getOrDefault("Product", 0L);
+        long des = deptCounts.getOrDefault("Design", 0L);
+        long mkt = deptCounts.getOrDefault("Marketing", 0L);
+        long sales = deptCounts.getOrDefault("Sales", 0L);
+        long hr = deptCounts.getOrDefault("HR", 0L);
+        long fin = deptCounts.getOrDefault("Finance", 0L);
+        long others = totalWithDept - (eng + prod + des + mkt + sales + hr + fin);
+        if (others < 0) others = 0;
+
+        long engPct = Math.round((eng / totalD) * 100);
+        long prodPct = Math.round((prod / totalD) * 100);
+        long desPct = Math.round((des / totalD) * 100);
+        long mktPct = Math.round((mkt / totalD) * 100);
+        long salesPct = Math.round((sales / totalD) * 100);
+        long hrPct = Math.round((hr / totalD) * 100);
+        long finPct = Math.round((fin / totalD) * 100);
+        long othersPct = 100 - (engPct + prodPct + desPct + mktPct + salesPct + hrPct + finPct);
+        if (othersPct < 0) othersPct = 0;
+
         model.addAttribute("totalEmployees", totalEmp);
         model.addAttribute("activeEmployees", activeEmp);
         model.addAttribute("noticePeriodEmployees", noticeEmp);
         model.addAttribute("offboardedEmployees", offboardedEmp);
         model.addAttribute("onboardingEmployees", onboardingEmp);
         model.addAttribute("deptCounts", deptCounts);
+
+        model.addAttribute("engPct", engPct);
+        model.addAttribute("prodPct", prodPct);
+        model.addAttribute("desPct", desPct);
+        model.addAttribute("mktPct", mktPct);
+        model.addAttribute("salesPct", salesPct);
+        model.addAttribute("hrPct", hrPct);
+        model.addAttribute("finPct", finPct);
+        model.addAttribute("othersPct", othersPct);
         
         model.addAttribute("allUsers", allUsers);
         return "senior_hr-employee";

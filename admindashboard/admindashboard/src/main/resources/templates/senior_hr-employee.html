@@ -293,35 +293,35 @@
 <div class="icon text-primary"><i class="fas fa-users"></i></div>
 <div>
 <div class="label">Total Employees</div>
-<div class="value">100</div>
+<div class="value" th:text="${totalEmployees}">100</div>
 </div>
 </div>
 <div class="stat-item">
 <div class="icon text-success"><i class="far fa-calendar-check"></i></div>
 <div>
 <div class="label">Active Employee</div>
-<div class="value">85</div>
+<div class="value" th:text="${activeEmployees}">85</div>
 </div>
 </div>
 <div class="stat-item">
 <div class="icon text-primary"><i class="fas fa-user-plus"></i></div>
 <div>
 <div class="label">Onboarding</div>
-<div class="value">7</div>
+<div class="value" th:text="${onboardingEmployees}">7</div>
 </div>
 </div>
 <div class="stat-item">
 <div class="icon text-warning"><i class="far fa-calendar-alt"></i></div>
 <div>
 <div class="label">Notice Period</div>
-<div class="value">4</div>
+<div class="value" th:text="${noticePeriodEmployees}">4</div>
 </div>
 </div>
 <div class="stat-item">
 <div class="icon text-danger"><i class="fas fa-user-minus"></i></div>
 <div>
 <div class="label">Offboarded</div>
-<div class="value">5</div>
+<div class="value" th:text="${offboardedEmployees}">5</div>
 </div>
 </div>
 </div>
@@ -335,14 +335,14 @@
 </div>
 <div class="ms-4">
 <ul class="list-unstyled mb-0" style="font-size: 0.75rem; font-weight: 600;">
-<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #002D72;"></span>Engineering <span class="float-end ms-4">36%</span></li>
-<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #10b981;"></span>Product <span class="float-end ms-4">16%</span></li>
-<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #f59e0b;"></span>Design <span class="float-end ms-4">8%</span></li>
-<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #06b6d4;"></span>Marketing <span class="float-end ms-4">5%</span></li>
-<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #8b5cf6;"></span>Sales <span class="float-end ms-4">8%</span></li>
-<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #ec4899;"></span>HR <span class="float-end ms-4">5%</span></li>
-<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #f43f5e;"></span>Finance <span class="float-end ms-4">5%</span></li>
-<li class="mb-0"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #94a3b8;"></span>Others <span class="float-end ms-4">18%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #002D72;"></span>Engineering <span class="float-end ms-4" th:text="${engPct} + '%'">36%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #10b981;"></span>Product <span class="float-end ms-4" th:text="${prodPct} + '%'">16%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #f59e0b;"></span>Design <span class="float-end ms-4" th:text="${desPct} + '%'">8%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #06b6d4;"></span>Marketing <span class="float-end ms-4" th:text="${mktPct} + '%'">5%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #8b5cf6;"></span>Sales <span class="float-end ms-4" th:text="${salesPct} + '%'">8%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #ec4899;"></span>HR <span class="float-end ms-4" th:text="${hrPct} + '%'">5%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #f43f5e;"></span>Finance <span class="float-end ms-4" th:text="${finPct} + '%'">5%</span></li>
+<li class="mb-0"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #94a3b8;"></span>Others <span class="float-end ms-4" th:text="${othersPct} + '%'">18%</span></li>
 </ul>
 </div>
 </div>
@@ -354,58 +354,58 @@
 <div class="d-flex align-items-center mb-3">
 <div style="width: 100px; font-size: 0.8rem;">Engineering</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" style="width: 45%;"></div>
+<div class="progress-bar bg-success" th:style="'width: ' + ${engPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;">45%</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${engPct} + '%'">45%</div>
 </div>
 <div class="d-flex align-items-center mb-3">
 <div style="width: 100px; font-size: 0.8rem;">Design</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" style="width: 27%;"></div>
+<div class="progress-bar bg-success" th:style="'width: ' + ${desPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;">27%</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${desPct} + '%'">27%</div>
 </div>
 <div class="d-flex align-items-center mb-3">
 <div style="width: 100px; font-size: 0.8rem;">Product</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" style="width: 35%;"></div>
+<div class="progress-bar bg-success" th:style="'width: ' + ${prodPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;">35%</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${prodPct} + '%'">35%</div>
 </div>
 <div class="d-flex align-items-center mb-3">
 <div style="width: 100px; font-size: 0.8rem;">HR</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" style="width: 20%;"></div>
+<div class="progress-bar bg-success" th:style="'width: ' + ${hrPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;">20%</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${hrPct} + '%'">20%</div>
 </div>
 <div class="d-flex align-items-center mb-3">
 <div style="width: 100px; font-size: 0.8rem;">Finance</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" style="width: 29%;"></div>
+<div class="progress-bar bg-success" th:style="'width: ' + ${finPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;">29%</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${finPct} + '%'">29%</div>
 </div>
 <div class="d-flex align-items-center mb-3">
 <div style="width: 100px; font-size: 0.8rem;">Sales</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" style="width: 36%;"></div>
+<div class="progress-bar bg-success" th:style="'width: ' + ${salesPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;">36%</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${salesPct} + '%'">36%</div>
 </div>
 <div class="d-flex align-items-center mb-3">
 <div style="width: 100px; font-size: 0.8rem;">Marketing</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" style="width: 40%;"></div>
+<div class="progress-bar bg-success" th:style="'width: ' + ${mktPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;">40%</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${mktPct} + '%'">40%</div>
 </div>
 <div class="d-flex align-items-center mb-0">
 <div style="width: 100px; font-size: 0.8rem;">Others</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" style="width: 33%;"></div>
+<div class="progress-bar bg-success" th:style="'width: ' + ${othersPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;">33%</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${othersPct} + '%'">33%</div>
 </div>
 </div>
 </div>
@@ -1107,6 +1107,20 @@
 </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const chartData = {
+        eng: /*[[${engPct}]]*/ 36,
+        prod: /*[[${prodPct}]]*/ 16,
+        des: /*[[${desPct}]]*/ 8,
+        mkt: /*[[${mktPct}]]*/ 5,
+        sales: /*[[${salesPct}]]*/ 8,
+        hr: /*[[${hrPct}]]*/ 5,
+        fin: /*[[${finPct}]]*/ 5,
+        others: /*[[${othersPct}]]*/ 18
+    };
+    /*]]>*/
+</script>
 <script>
         // Form Wizard Logic
           document.addEventListener('DOMContentLoaded', function() {
@@ -1292,7 +1306,7 @@
                 data: {
                     labels: ['Engineering', 'Product', 'Design', 'Marketing', 'Sales', 'HR', 'Finance', 'Others'],
                     datasets: [{
-                        data: [36, 16, 8, 5, 8, 5, 5, 18],
+                        data: [chartData.eng, chartData.prod, chartData.des, chartData.mkt, chartData.sales, chartData.hr, chartData.fin, chartData.others],
                         backgroundColor: [
                             '#002D72', '#10b981', '#f59e0b', '#06b6d4',
                             '#8b5cf6', '#ec4899', '#f43f5e', '#94a3b8'
