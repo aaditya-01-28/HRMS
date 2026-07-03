@@ -149,6 +149,36 @@ public class EmployeeProfile {
     // Documents
     private String photoDocPath;
     private String resumeDocPath;
+
+    private String aadhaarDocPath;
+    private String panDocPath;
+    private String educationalDocPath;
+    private String experienceDocPath;
+    private String offerDocPath;
+    private String workShift;
+    private String dateOfConfirmation;
+    private String probationReviewDate;
+
+    private String reportsTo;
+    private String workLocationType;
+    private String payType;
+    private String payFrequency;
+    private String roleName;
+    private String ptState;
+    private String staffingType;
+    private String taxRegime;
+    private String travelRequired;
+    private String employmentType;
+    private String ptApplicable;
+    private String probationApplicable;
+    private String gradeLevel;
+    private String departmentHead;
+    private String jobTitle;
+    private String ptRegistrationNo;
+    private String otEligible;
+    private String probationPeriodStr;
+
+
     
 
     public String getPresentResidentialName() {
@@ -606,5 +636,117 @@ public class EmployeeProfile {
 
     public String getPhysicallyChallenged() { return physicallyChallenged; }
     public void setPhysicallyChallenged(String physicallyChallenged) { this.physicallyChallenged = physicallyChallenged; }
+
+
+    public String getAadhaarDocPath() { return aadhaarDocPath; }
+    public void setAadhaarDocPath(String aadhaarDocPath) { this.aadhaarDocPath = aadhaarDocPath; }
+
+    public String getPanDocPath() { return panDocPath; }
+    public void setPanDocPath(String panDocPath) { this.panDocPath = panDocPath; }
+
+    public String getEducationalDocPath() { return educationalDocPath; }
+    public void setEducationalDocPath(String educationalDocPath) { this.educationalDocPath = educationalDocPath; }
+
+    public String getExperienceDocPath() { return experienceDocPath; }
+    public void setExperienceDocPath(String experienceDocPath) { this.experienceDocPath = experienceDocPath; }
+
+    public String getOfferDocPath() { return offerDocPath; }
+    public void setOfferDocPath(String offerDocPath) { this.offerDocPath = offerDocPath; }
+
+    // Calculate Onboarding Progress
+    public int getOnboardingProgress() {
+        int totalFields = 20; // approximate number of important fields
+        int filledFields = 0;
+        
+        if (firstName != null && !firstName.isEmpty()) filledFields++;
+        if (lastName != null && !lastName.isEmpty()) filledFields++;
+        if (mobileNumber != null && !mobileNumber.isEmpty()) filledFields++;
+        if (emergencyPhone != null && !emergencyPhone.isEmpty()) filledFields++;
+        if (dob != null) filledFields++;
+        if (gender != null && !gender.isEmpty()) filledFields++;
+        if (maritalStatus != null && !maritalStatus.isEmpty()) filledFields++;
+        if (nationality != null && !nationality.isEmpty()) filledFields++;
+        if (fatherName != null && !fatherName.isEmpty()) filledFields++;
+        if (department != null && !department.isEmpty()) filledFields++;
+        if (designation != null && !designation.isEmpty()) filledFields++;
+        if (workLocation != null && !workLocation.isEmpty()) filledFields++;
+        if (probationPeriod != null) filledFields++;
+        if (bloodGroup != null && !bloodGroup.isEmpty()) filledFields++;
+        if (physicallyChallenged != null && !physicallyChallenged.isEmpty()) filledFields++;
+        
+        if (photoDocPath != null && !photoDocPath.isEmpty()) filledFields++;
+        if (resumeDocPath != null && !resumeDocPath.isEmpty()) filledFields++;
+        if (aadhaarDocPath != null && !aadhaarDocPath.isEmpty()) filledFields++;
+        if (panDocPath != null && !panDocPath.isEmpty()) filledFields++;
+        if (educationalDocPath != null && !educationalDocPath.isEmpty()) filledFields++;
+        
+        return Math.min(100, Math.round(((float)filledFields / totalFields) * 100));
+    }
+
+
+    public String getReportsTo() { return reportsTo; }
+    public void setReportsTo(String reportsTo) { this.reportsTo = reportsTo; }
+
+    public String getWorkLocationType() { return workLocationType; }
+    public void setWorkLocationType(String workLocationType) { this.workLocationType = workLocationType; }
+
+    public String getPayType() { return payType; }
+    public void setPayType(String payType) { this.payType = payType; }
+
+    public String getPayFrequency() { return payFrequency; }
+    public void setPayFrequency(String payFrequency) { this.payFrequency = payFrequency; }
+
+    public String getRoleName() { return roleName; }
+    public void setRoleName(String roleName) { this.roleName = roleName; }
+
+    public String getPtState() { return ptState; }
+    public void setPtState(String ptState) { this.ptState = ptState; }
+
+    public String getStaffingType() { return staffingType; }
+    public void setStaffingType(String staffingType) { this.staffingType = staffingType; }
+
+    public String getTaxRegime() { return taxRegime; }
+    public void setTaxRegime(String taxRegime) { this.taxRegime = taxRegime; }
+
+    public String getTravelRequired() { return travelRequired; }
+    public void setTravelRequired(String travelRequired) { this.travelRequired = travelRequired; }
+
+    public String getEmploymentType() { return employmentType; }
+    public void setEmploymentType(String employmentType) { this.employmentType = employmentType; }
+
+    public String getPtApplicable() { return ptApplicable; }
+    public void setPtApplicable(String ptApplicable) { this.ptApplicable = ptApplicable; }
+
+    public String getProbationApplicable() { return probationApplicable; }
+    public void setProbationApplicable(String probationApplicable) { this.probationApplicable = probationApplicable; }
+
+    public String getGradeLevel() { return gradeLevel; }
+    public void setGradeLevel(String gradeLevel) { this.gradeLevel = gradeLevel; }
+
+    public String getDepartmentHead() { return departmentHead; }
+    public void setDepartmentHead(String departmentHead) { this.departmentHead = departmentHead; }
+
+    public String getJobTitle() { return jobTitle; }
+    public void setJobTitle(String jobTitle) { this.jobTitle = jobTitle; }
+
+    public String getPtRegistrationNo() { return ptRegistrationNo; }
+    public void setPtRegistrationNo(String ptRegistrationNo) { this.ptRegistrationNo = ptRegistrationNo; }
+
+    public String getOtEligible() { return otEligible; }
+    public void setOtEligible(String otEligible) { this.otEligible = otEligible; }
+
+    public String getProbationPeriodStr() { return probationPeriodStr; }
+    public void setProbationPeriodStr(String probationPeriodStr) { this.probationPeriodStr = probationPeriodStr; }
+
+
+    public String getWorkShift() { return workShift; }
+    public void setWorkShift(String workShift) { this.workShift = workShift; }
+
+    public String getDateOfConfirmation() { return dateOfConfirmation; }
+    public void setDateOfConfirmation(String dateOfConfirmation) { this.dateOfConfirmation = dateOfConfirmation; }
+
+    public String getProbationReviewDate() { return probationReviewDate; }
+    public void setProbationReviewDate(String probationReviewDate) { this.probationReviewDate = probationReviewDate; }
+
 
 }

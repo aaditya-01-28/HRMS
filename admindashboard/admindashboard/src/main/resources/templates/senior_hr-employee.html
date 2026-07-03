@@ -546,12 +546,12 @@
 <td th:text="${cand.employeeProfile != null ? cand.employeeProfile.designation : '-'}">Desig</td>
 <td th:text="${cand.employeeProfile != null ? cand.employeeProfile.workLocation : '-'}">Loc</td>
 <td th:text="${cand.employeeProfile != null ? cand.employeeProfile.joiningDate : '-'}">Join Date</td>
-<td style="width: 120px;">
+<td style="width: 120px;" th:with="prog=${cand.employeeProfile != null ? cand.employeeProfile.onboardingProgress : 0}">
 <div class="d-flex align-items-center gap-2">
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" th:style="'width: ' + 20 + '%'"></div>
+<div class="progress-bar bg-success" th:style="'width: ' + ${prog} + '%'"></div>
 </div>
-<span style="font-size: 0.75rem; font-weight: bold;" th:text="20 + '%'"></span>
+<span style="font-size: 0.75rem; font-weight: bold;" th:text="${prog} + '%'"></span>
 </div>
 </td>
 <td>
@@ -601,7 +601,7 @@
 </div>
 <div class="col-md-3">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Employee ID <span class="text-danger">*</span></label>
-<input class="form-control" name="empId" type="text"/>
+<input class="form-control" name="employeeCode" type="text"/>
 </div>
 <div class="col-md-3">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">First Name <span class="text-danger">*</span></label>
@@ -617,11 +617,11 @@
 </div>
 <div class="col-md-3">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Personal Email <span class="text-danger">*</span></label>
-<input class="form-control" name="email" type="email"/>
+<input class="form-control" name="personalEmail" type="email"/>
 </div>
 <div class="col-md-3">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Office Email <span class="text-danger">*</span></label>
-<input class="form-control" name="officeEmail" type="email"/>
+<input class="form-control" name="officialEmail" type="email"/>
 </div>
 <div class="col">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Phone No. <span class="text-danger">*</span></label>
@@ -681,7 +681,7 @@
 </div>
 </div>
 <div class="d-flex justify-content-center gap-3">
-<button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="toggleOnboardingForm(false)">Back</button>
+<button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="toggleOnboardingForm(false)" type="button">Back</button>
 <button class="btn btn-primary px-5 py-2 fw-bold" onclick="goToStep2()" type="button">Save &amp; Next <i class="fas fa-arrow-right ms-2"></i></button>
 </div>
 </div>
@@ -726,21 +726,21 @@
 </div>
 <div class="col-md-4">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Work Shift <span class="text-danger">*</span></label>
-<select class="form-select">
+<select class="form-select" name="workShift">
 <option disabled="" selected="" value="">Select...</option>
-<option>General</option></select>
+<option value="General">General</option></select>
 </div>
 <div class="col-md-4">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Date of Confirmation <span class="text-danger">*</span></label>
-<input class="form-control" type="date"/>
+<input class="form-control" name="dateOfConfirmation" type="date"/>
 </div>
 <div class="col-md-4">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Probation Review Date <span class="text-danger">*</span></label>
-<input class="form-control" type="date"/>
+<input class="form-control" name="probationReviewDate" type="date"/>
 </div>
 </div>
 <div class="d-flex justify-content-center gap-3">
-<button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep1()">Back</button>
+<button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep1()" type="button">Back</button>
 <button class="btn btn-primary px-5 py-2 fw-bold" onclick="goToStep3()" type="button">Save &amp; Next <i class="fas fa-arrow-right ms-2"></i></button>
 </div>
 </div>
@@ -852,43 +852,43 @@
 <tr>
 <td class="fw-bold">Passport Size Photo <span class="text-danger">*</span></td>
 <td class="text-danger fw-bold">Yes</td>
-<td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+<td><button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('photoDocInput').click()" type="button"><i class="fas fa-upload me-1"></i> Upload File</button><input id="photoDocInput" name="photoDoc" onchange="document.getElementById('photoDocLabel').innerText = this.files[0] ? this.files[0].name : 'Uploaded'" style="display:none;" type="file"/><span class="ms-2 text-success fw-bold" id="photoDocLabel" style="font-size: 0.8rem;"></span></td>
 <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB &amp; 500 x 500 resolution)</td>
 </tr>
 <tr>
 <td class="fw-bold">Resume/CV <span class="text-danger">*</span></td>
 <td class="text-danger fw-bold">Yes</td>
-<td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+<td><button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('resumeDocInput').click()" type="button"><i class="fas fa-upload me-1"></i> Upload File</button><input id="resumeDocInput" name="resumeDoc" onchange="document.getElementById('resumeDocLabel').innerText = this.files[0] ? this.files[0].name : 'Uploaded'" style="display:none;" type="file"/><span class="ms-2 text-success fw-bold" id="resumeDocLabel" style="font-size: 0.8rem;"></span></td>
 <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB &amp; 500 x 500 resolution)</td>
 </tr>
 <tr>
 <td class="fw-bold">Aadhaar Card <span class="text-danger">*</span></td>
 <td class="text-danger fw-bold">Yes</td>
-<td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+<td><button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('aadhaarDocInput').click()" type="button"><i class="fas fa-upload me-1"></i> Upload File</button><input id="aadhaarDocInput" name="aadhaarDoc" onchange="document.getElementById('aadhaarDocLabel').innerText = this.files[0] ? this.files[0].name : 'Uploaded'" style="display:none;" type="file"/><span class="ms-2 text-success fw-bold" id="aadhaarDocLabel" style="font-size: 0.8rem;"></span></td>
 <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB &amp; 500 x 500 resolution)</td>
 </tr>
 <tr>
 <td class="fw-bold">PAN Card <span class="text-danger">*</span></td>
 <td class="text-danger fw-bold">Yes</td>
-<td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+<td><button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('panDocInput').click()" type="button"><i class="fas fa-upload me-1"></i> Upload File</button><input id="panDocInput" name="panDoc" onchange="document.getElementById('panDocLabel').innerText = this.files[0] ? this.files[0].name : 'Uploaded'" style="display:none;" type="file"/><span class="ms-2 text-success fw-bold" id="panDocLabel" style="font-size: 0.8rem;"></span></td>
 <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB &amp; 500 x 500 resolution)</td>
 </tr>
 <tr>
 <td class="fw-bold">Educational Certificate <span class="text-danger">*</span></td>
 <td class="text-danger fw-bold">Yes</td>
-<td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+<td><button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('educationalDocInput').click()" type="button"><i class="fas fa-upload me-1"></i> Upload File</button><input id="educationalDocInput" name="educationalDoc" onchange="document.getElementById('educationalDocLabel').innerText = this.files[0] ? this.files[0].name : 'Uploaded'" style="display:none;" type="file"/><span class="ms-2 text-success fw-bold" id="educationalDocLabel" style="font-size: 0.8rem;"></span></td>
 <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB &amp; 500 x 500 resolution)</td>
 </tr>
 <tr>
 <td class="fw-bold">Experience Letter <span class="text-danger">*</span></td>
 <td class="text-success fw-bold">No</td>
-<td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+<td><button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('experienceDocInput').click()" type="button"><i class="fas fa-upload me-1"></i> Upload File</button><input id="experienceDocInput" name="experienceDoc" onchange="document.getElementById('experienceDocLabel').innerText = this.files[0] ? this.files[0].name : 'Uploaded'" style="display:none;" type="file"/><span class="ms-2 text-success fw-bold" id="experienceDocLabel" style="font-size: 0.8rem;"></span></td>
 <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB &amp; 500 x 500 resolution)</td>
 </tr>
 <tr>
 <td class="fw-bold">Offer Letter <span class="text-danger">*</span></td>
 <td class="text-success fw-bold">No</td>
-<td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+<td><button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('offerDocInput').click()" type="button"><i class="fas fa-upload me-1"></i> Upload File</button><input id="offerDocInput" name="offerDoc" onchange="document.getElementById('offerDocLabel').innerText = this.files[0] ? this.files[0].name : 'Uploaded'" style="display:none;" type="file"/><span class="ms-2 text-success fw-bold" id="offerDocLabel" style="font-size: 0.8rem;"></span></td>
 <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB &amp; 500 x 500 resolution)</td>
 </tr>
 </tbody>
@@ -1012,6 +1012,23 @@
                           e.preventDefault();
                       }
                   });
+              }
+              
+              // Handle tab activation via URL query parameter
+              const urlParams = new URLSearchParams(window.location.search);
+              const tabParam = urlParams.get('tab');
+              if (tabParam === 'onboarding') {
+                  const tabEl = document.getElementById('onboarding-tab');
+                  if (tabEl) {
+                      const tab = bootstrap.Tab.getOrCreateInstance(tabEl);
+                      tab.show();
+                  }
+              } else if (tabParam === 'offboarding') {
+                  const tabEl = document.getElementById('offboarding-tab');
+                  if (tabEl) {
+                      const tab = bootstrap.Tab.getOrCreateInstance(tabEl);
+                      tab.show();
+                  }
               }
           });
 
@@ -1485,7 +1502,7 @@
                 setVal('middleName', data.middleName);
                 setVal('lastName', data.lastName);
                 setVal('prefix', data.prefix);
-                setVal('email', data.email);
+                setVal('personalEmail', data.email);
                 setVal('employeeCode', data.employeeCode);
                 setVal('mobileNumber', data.mobileNumber);
                 setVal('emergencyPhone', data.emergencyPhone);
@@ -1497,7 +1514,7 @@
                 setVal('motherName', data.motherName);
                 setVal('spouseName', data.spouseName);
                 setVal('joiningDate', data.joiningDate);
-                setVal('probationPeriodStr', data.probationPeriod);
+                setVal('probationPeriodStr', data.probationPeriodStr);
                 setVal('probationCompletionDate', data.probationCompletionDate);
                 setVal('bloodGroup', data.bloodGroup);
                 setVal('physicallyChallenged', data.physicallyChallenged);
@@ -1505,6 +1522,57 @@
                 setVal('designation', data.designation);
                 setVal('officialEmail', data.officialEmail);
                 setVal('workLocation', data.workLocation);
+                setVal('reportsTo', data.reportsTo);
+                setVal('workLocationType', data.workLocationType);
+                setVal('payType', data.payType);
+                setVal('payFrequency', data.payFrequency);
+                setVal('roleName', data.roleName);
+                setVal('ptState', data.ptState);
+                setVal('staffingType', data.staffingType);
+                setVal('taxRegime', data.taxRegime);
+                setVal('travelRequired', data.travelRequired);
+                setVal('employmentType', data.employmentType);
+                setVal('ptApplicable', data.ptApplicable);
+                setVal('probationApplicable', data.probationApplicable);
+                setVal('gradeLevel', data.gradeLevel);
+                setVal('departmentHead', data.departmentHead);
+                setVal('jobTitle', data.jobTitle);
+                setVal('ptRegistrationNo', data.ptRegistrationNo);
+                setVal('otEligible', data.otEligible);
+                setVal('businessUnit', data.businessUnit);
+                setVal('panNo', data.panNo);
+                setVal('aadharNo', data.aadharNo);
+                setVal('pfNumber', data.pfNumber);
+                setVal('esiNumber', data.esiNumber);
+                setVal('uanNumber', data.uanNumber);
+                setVal('category', data.category);
+                setVal('workShift', data.workShift);
+                setVal('dateOfConfirmation', data.dateOfConfirmation);
+                setVal('probationReviewDate', data.probationReviewDate);
+                
+                // Helper to display files link next to the Upload buttons
+                const setFileLabel = (id, path) => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        if (path) {
+                            const filename = path.substring(path.lastIndexOf('/') + 1);
+                            el.innerHTML = `<a href="/${path}" target="_blank" class="text-success"><i class="fas fa-file-alt me-1"></i> ${filename}</a>`;
+                        } else {
+                            el.innerHTML = '';
+                        }
+                    }
+                };
+
+                setFileLabel('photoDocLabel', data.photoDocPath);
+                setFileLabel('resumeDocLabel', data.resumeDocPath);
+                setFileLabel('aadhaarDocLabel', data.aadhaarDocPath);
+                setFileLabel('panDocLabel', data.panDocPath);
+                setFileLabel('educationalDocLabel', data.educationalDocPath);
+                setFileLabel('experienceDocLabel', data.experienceDocPath);
+                setFileLabel('offerDocLabel', data.offerDocPath);
+                
+                // Recalculate probation period on prefill
+                calculateProbation();
 
                 // Open the form
                 toggleOnboardingForm(true);
@@ -1514,6 +1582,58 @@
                 alert("Error fetching candidate details.");
             });
     }
+
+    function calculateProgress() {
+        const form = document.getElementById('onboardingForm');
+        if(!form) return;
+        const inputs = form.querySelectorAll('input, select, textarea');
+        let total = 0;
+        let filled = 0;
+        for(let i=0; i<inputs.length; i++) {
+            const el = inputs[i];
+            if(el.type === 'hidden' || el.type === 'button' || el.type === 'submit') continue;
+            // Let's only count inputs with 'required' or '*' in label to simplify
+            let label = el.previousElementSibling;
+            if(!label || label.tagName !== 'LABEL') {
+                const div = el.closest('div');
+                if(div) label = div.querySelector('label');
+            }
+            if(label && label.innerText.includes('*') || el.hasAttribute('required')) {
+                total++;
+                if(el.type === 'file') {
+                    if(el.files && el.files.length > 0) filled++;
+                } else {
+                    if(el.value && el.value.trim() !== '') filled++;
+                }
+            }
+        }
+        if(total === 0) total = 1; // avoid div by 0
+        const percentage = Math.round((filled / total) * 100);
+        return percentage;
+    }
+    
+    // Add event listeners to all inputs to update progress on change
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('onboardingForm');
+        if(form) {
+            form.addEventListener('change', function() {
+                // In a real app we'd update a UI progress bar if it existed in the form wizard.
+                // Since the progress bar is only in the list view, we just calculate it here and maybe save to a hidden field if needed.
+                // We'll put it in a hidden field called 'calculatedProgress' just in case.
+                let p = calculateProgress();
+                let pInput = document.getElementById('calculatedProgress');
+                if(!pInput) {
+                    pInput = document.createElement('input');
+                    pInput.type = 'hidden';
+                    pInput.name = 'onboardingProgress';
+                    pInput.id = 'calculatedProgress';
+                    form.appendChild(pInput);
+                }
+                pInput.value = p;
+            });
+        }
+    });
+
 </script>
 </body>
 </html>

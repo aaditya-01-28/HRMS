@@ -1,4 +1,9 @@
 package com.example.admindashboard.controller;
+import org.springframework.web.multipart.MultipartFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import com.example.admindashboard.model.Meeting;
 import com.example.admindashboard.model.ResignationRequest;
@@ -29,8 +34,11 @@ public class SeniorDashboardController {
     @Autowired
     private MeetingRepository meetingRepository;
 
-    @Autowired
+        @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private com.example.admindashboard.repository.RoleRepository roleRepository;
     
     @Autowired
     private ResignationRequestRepository resignationRequestRepository;
@@ -99,7 +107,7 @@ public class SeniorDashboardController {
         }
 
         // Redirect to employee dashboard by default after login
-        return "redirect:/senior_hr/employee";
+        return "redirect:/senior_hr/employee?tab=onboarding";
     }
 
     // --- LMS ROUTE ---
@@ -519,6 +527,13 @@ public class SeniorDashboardController {
                                    @RequestParam(required=false) String employeeCode,
                                    @RequestParam(required=false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate probationCompletionDate,
                                    @RequestParam(required=false) String physicallyChallenged,
+                                   @RequestParam(required=false) MultipartFile photoDoc,
+                                   @RequestParam(required=false) MultipartFile resumeDoc,
+                                   @RequestParam(required=false) MultipartFile aadhaarDoc,
+                                   @RequestParam(required=false) MultipartFile panDoc,
+                                   @RequestParam(required=false) MultipartFile educationalDoc,
+                                   @RequestParam(required=false) MultipartFile experienceDoc,
+                                   @RequestParam(required=false) MultipartFile offerDoc,
                                    org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttrs) {
         
         User user;
@@ -530,11 +545,18 @@ public class SeniorDashboardController {
         } else {
             user = new User();
             isNew = true;
-            randomPassword = java.util.UUID.randomUUID().toString().substring(0, 8);
             user.setUsername(employeeCode != null && !employeeCode.isEmpty() ? employeeCode.toUpperCase() : "TEMP" + (int)(Math.random() * 1000));
-            user.setPassword(passwordEncoder.encode(randomPassword));
-            user.setStatus("ONBOARDING");
         }
+
+        // Set role to EMPLOYEE if not set
+        if (user.getRole() == null) {
+            roleRepository.findByRoleName("EMPLOYEE").ifPresent(user::setRole);
+        }
+
+        // Generate temporary password for the email and set status to ACTIVE (Complete Onboarding)
+        randomPassword = java.util.UUID.randomUUID().toString().substring(0, 8);
+        user.setPassword(passwordEncoder.encode(randomPassword));
+        user.setStatus("ACTIVE");
 
         // Build full name
         String fullName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
@@ -547,45 +569,76 @@ public class SeniorDashboardController {
             existingProfile.setUser(user);
             user.setEmployeeProfile(existingProfile);
         } else if (employeeProfile != null) {
-            // Update fields manually (we map the important ones from the form)
-            existingProfile.setPrefix(prefix);
-            existingProfile.setFirstName(firstName);
-            existingProfile.setMiddleName(middleName);
-            existingProfile.setLastName(lastName);
-            existingProfile.setEmployeeCode(employeeCode);
-            existingProfile.setMobileNumber(employeeProfile.getMobileNumber());
-            existingProfile.setEmergencyPhone(employeeProfile.getEmergencyPhone());
-            existingProfile.setDob(employeeProfile.getDob());
-            existingProfile.setGender(employeeProfile.getGender());
-            existingProfile.setMaritalStatus(employeeProfile.getMaritalStatus());
-            existingProfile.setNationality(employeeProfile.getNationality());
-            existingProfile.setFatherName(employeeProfile.getFatherName());
-            existingProfile.setMotherName(employeeProfile.getMotherName());
-            existingProfile.setSpouseName(employeeProfile.getSpouseName());
-            existingProfile.setJoiningDate(employeeProfile.getJoiningDate());
-            existingProfile.setProbationCompletionDate(probationCompletionDate);
-            existingProfile.setBloodGroup(employeeProfile.getBloodGroup());
-            existingProfile.setPhysicallyChallenged(physicallyChallenged);
-            existingProfile.setDepartment(employeeProfile.getDepartment());
-            existingProfile.setDesignation(employeeProfile.getDesignation());
-            existingProfile.setOfficialEmail(employeeProfile.getOfficialEmail());
-            existingProfile.setWorkLocation(employeeProfile.getWorkLocation());
-            // Map more as needed...
+            org.springframework.beans.BeanUtils.copyProperties(employeeProfile, existingProfile, "id", "user", "photoDocPath", "resumeDocPath", "aadhaarDocPath", "panDocPath", "educationalDocPath", "experienceDocPath", "offerDocPath");
+            if (prefix != null) existingProfile.setPrefix(prefix);
+            if (firstName != null) existingProfile.setFirstName(firstName);
+            if (middleName != null) existingProfile.setMiddleName(middleName);
+            if (lastName != null) existingProfile.setLastName(lastName);
+            if (employeeCode != null) existingProfile.setEmployeeCode(employeeCode);
+            if (probationCompletionDate != null) existingProfile.setProbationCompletionDate(probationCompletionDate);
+            if (physicallyChallenged != null) existingProfile.setPhysicallyChallenged(physicallyChallenged);
         }
         
+        // Handle file uploads
+        String uploadDir = "uploads/documents/";
+        try {
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+            
+            if (photoDoc != null && !photoDoc.isEmpty()) {
+                String fileName = user.getUsername() + "_photo_" + photoDoc.getOriginalFilename();
+                Files.copy(photoDoc.getInputStream(), uploadPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+                existingProfile.setPhotoDocPath(uploadDir + fileName);
+            }
+            if (resumeDoc != null && !resumeDoc.isEmpty()) {
+                String fileName = user.getUsername() + "_resume_" + resumeDoc.getOriginalFilename();
+                Files.copy(resumeDoc.getInputStream(), uploadPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+                existingProfile.setResumeDocPath(uploadDir + fileName);
+            }
+            if (aadhaarDoc != null && !aadhaarDoc.isEmpty()) {
+                String fileName = user.getUsername() + "_aadhaar_" + aadhaarDoc.getOriginalFilename();
+                Files.copy(aadhaarDoc.getInputStream(), uploadPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+                existingProfile.setAadhaarDocPath(uploadDir + fileName);
+            }
+            if (panDoc != null && !panDoc.isEmpty()) {
+                String fileName = user.getUsername() + "_pan_" + panDoc.getOriginalFilename();
+                Files.copy(panDoc.getInputStream(), uploadPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+                existingProfile.setPanDocPath(uploadDir + fileName);
+            }
+            if (educationalDoc != null && !educationalDoc.isEmpty()) {
+                String fileName = user.getUsername() + "_edu_" + educationalDoc.getOriginalFilename();
+                Files.copy(educationalDoc.getInputStream(), uploadPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+                existingProfile.setEducationalDocPath(uploadDir + fileName);
+            }
+            if (experienceDoc != null && !experienceDoc.isEmpty()) {
+                String fileName = user.getUsername() + "_exp_" + experienceDoc.getOriginalFilename();
+                Files.copy(experienceDoc.getInputStream(), uploadPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+                existingProfile.setExperienceDocPath(uploadDir + fileName);
+            }
+            if (offerDoc != null && !offerDoc.isEmpty()) {
+                String fileName = user.getUsername() + "_offer_" + offerDoc.getOriginalFilename();
+                Files.copy(offerDoc.getInputStream(), uploadPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+                existingProfile.setOfferDocPath(uploadDir + fileName);
+            }
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+
         userRepository.save(user);
         
-        // Send email ONLY if it's a new user
-        if (isNew && personalEmail != null && !personalEmail.isEmpty() && randomPassword != null) {
+        // Send email
+        if (personalEmail != null && !personalEmail.isEmpty()) {
             emailService.sendOnboardingEmail(personalEmail, user.getFullName(), user.getUsername(), randomPassword, existingProfile.getOfficialEmail());
         }
         
-        redirectAttrs.addFlashAttribute("successMessage", isNew ? "Candidate Onboarded Successfully!" : "Candidate Updated Successfully!");
-        return "redirect:/senior_hr/employee";
+        redirectAttrs.addFlashAttribute("successMessage", "Onboarding Completed Successfully! Login credentials sent via email.");
+        return "redirect:/senior_hr/employee?tab=onboarding";
     }
 
     
-    
+
     // --- DELETE EMPLOYEE ROUTE ---
     @PostMapping("/senior_hr/employee/delete/{id}")
     public String deleteEmployee(@org.springframework.web.bind.annotation.PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttrs) {
@@ -593,7 +646,7 @@ public class SeniorDashboardController {
             userRepository.deleteById(id);
             redirectAttrs.addFlashAttribute("successMessage", "Candidate deleted successfully!");
         }
-        return "redirect:/senior_hr/employee";
+        return "redirect:/senior_hr/employee?tab=onboarding";
     }
 
     // --- GET EMPLOYEE API (For Edit) ---
@@ -634,7 +687,41 @@ public class SeniorDashboardController {
             map.put("designation", ep.getDesignation());
             map.put("officialEmail", ep.getOfficialEmail());
             map.put("workLocation", ep.getWorkLocation());
-            // Add other necessary fields
+            map.put("reportsTo", ep.getReportsTo());
+            map.put("workLocationType", ep.getWorkLocationType());
+            map.put("payType", ep.getPayType());
+            map.put("payFrequency", ep.getPayFrequency());
+            map.put("roleName", ep.getRoleName());
+            map.put("ptState", ep.getPtState());
+            map.put("staffingType", ep.getStaffingType());
+            map.put("taxRegime", ep.getTaxRegime());
+            map.put("travelRequired", ep.getTravelRequired());
+            map.put("employmentType", ep.getEmploymentType());
+            map.put("ptApplicable", ep.getPtApplicable());
+            map.put("probationApplicable", ep.getProbationApplicable());
+            map.put("gradeLevel", ep.getGradeLevel());
+            map.put("departmentHead", ep.getDepartmentHead());
+            map.put("jobTitle", ep.getJobTitle());
+            map.put("ptRegistrationNo", ep.getPtRegistrationNo());
+            map.put("otEligible", ep.getOtEligible());
+            map.put("probationPeriodStr", ep.getProbationPeriodStr());
+            map.put("businessUnit", ep.getBusinessUnit());
+            map.put("photoDocPath", ep.getPhotoDocPath());
+            map.put("resumeDocPath", ep.getResumeDocPath());
+            map.put("aadhaarDocPath", ep.getAadhaarDocPath());
+            map.put("panDocPath", ep.getPanDocPath());
+            map.put("educationalDocPath", ep.getEducationalDocPath());
+            map.put("experienceDocPath", ep.getExperienceDocPath());
+            map.put("offerDocPath", ep.getOfferDocPath());
+            map.put("panNo", ep.getPanNo());
+            map.put("aadharNo", ep.getAadharNo());
+            map.put("pfNumber", ep.getPfNumber());
+            map.put("esiNumber", ep.getEsiNumber());
+            map.put("uanNumber", ep.getUanNumber());
+            map.put("category", ep.getCategory());
+            map.put("workShift", ep.getWorkShift());
+            map.put("dateOfConfirmation", ep.getDateOfConfirmation());
+            map.put("probationReviewDate", ep.getProbationReviewDate());
         }
         return map;
     }
