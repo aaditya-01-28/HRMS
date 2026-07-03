@@ -117,6 +117,7 @@ public class SeniorDashboardController {
     }
 
     // --- LMS ROUTE ---
+    // --- LMS ROUTE ---
     @GetMapping("/senior_hr/lms")
     public String showSeniorHrLms(Model model) {
         List<com.example.admindashboard.model.LeaveRequest> leaveRequests = leaveRequestRepository.findAll();
@@ -134,12 +135,32 @@ public class SeniorDashboardController {
         List<com.example.admindashboard.model.Holiday> holidays = holidayRepository.findAll();
         List<com.example.admindashboard.model.CompOffEntry> compOffEntries = compOffEntryRepository.findAll();
 
+        // Calculate dynamic stats
+        long totalRequestsCount = leaveRequests.size();
+        long pendingRequestsCount = leaveRequests.stream().filter(lr -> "PENDING".equalsIgnoreCase(lr.getStatus())).count();
+        long approvedRequestsCount = leaveRequests.stream().filter(lr -> "APPROVED".equalsIgnoreCase(lr.getStatus()) || "ACTIVE".equalsIgnoreCase(lr.getStatus())).count();
+        long rejectedRequestsCount = leaveRequests.stream().filter(lr -> "REJECTED".equalsIgnoreCase(lr.getStatus())).count();
+
+        // Fetch distinct departments
+        List<String> departments = userRepository.findAll().stream()
+            .map(u -> u.getEmployeeProfile() != null ? u.getEmployeeProfile().getDepartment() : null)
+            .filter(d -> d != null && !d.trim().isEmpty())
+            .distinct()
+            .sorted()
+            .collect(java.util.stream.Collectors.toList());
+
         model.addAttribute("leaveRequests", leaveRequests);
         model.addAttribute("todayLeaves", todayLeaves);
         model.addAttribute("pendingCount", pendingCount);
         model.addAttribute("todayOnLeaveCount", todayOnLeaveCount);
         model.addAttribute("totalCount", totalCount);
         
+        model.addAttribute("totalRequestsCount", totalRequestsCount);
+        model.addAttribute("pendingRequestsCount", pendingRequestsCount);
+        model.addAttribute("approvedRequestsCount", approvedRequestsCount);
+        model.addAttribute("rejectedRequestsCount", rejectedRequestsCount);
+        model.addAttribute("departments", departments);
+
         model.addAttribute("leaveTypes", leaveTypes);
         model.addAttribute("holidays", holidays);
         model.addAttribute("compOffEntries", compOffEntries);

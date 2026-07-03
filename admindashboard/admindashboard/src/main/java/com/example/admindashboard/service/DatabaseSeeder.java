@@ -20,6 +20,9 @@ import java.util.Optional;
 public class DatabaseSeeder implements CommandLineRunner {
 
     @Autowired
+    private com.example.admindashboard.repository.LeaveRequestRepository leaveRequestRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -468,6 +471,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             EmployeeProfile profile1 = new EmployeeProfile();
             profile1.setDesignation("Marketing Lead");
+            profile1.setEmployeeCode("EMP114");
             profile1.setMobileNumber("6265147016");
             profile1.setExperience("05 Years");
             profile1.setJoiningDate(LocalDate.of(2023, 3, 5));
@@ -529,6 +533,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             EmployeeProfile profile3 = new EmployeeProfile();
             profile3.setDesignation("IOS Developer");
+            profile3.setEmployeeCode("EMP129");
             profile3.setMobileNumber("+91 7724051300");
             profile3.setExperience("4.8 Years");
             profile3.setJoiningDate(LocalDate.of(2022, 5, 7));
@@ -568,6 +573,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             EmployeeProfile profile = new EmployeeProfile();
 
             profile.setDesignation("Company Admin / IT Admin");
+            profile.setEmployeeCode("ADMIN001");
             profile.setJoiningDate(LocalDate.now());
 
             profile.setUser(user);
@@ -587,6 +593,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             EmployeeProfile hrProfile = new EmployeeProfile();
             hrProfile.setDesignation("HR Director");
+            hrProfile.setEmployeeCode("EMP201");
             hrProfile.setJoiningDate(LocalDate.of(2021, 1, 15));
             hrProfile.setBusinessUnit("Head Office");
 
@@ -1175,6 +1182,16 @@ public class DatabaseSeeder implements CommandLineRunner {
             System.out.println("✅ Seeded Candidate for Onboarding -> Name: Ajit Prabhakar");
         }
 
+    
+        // Seed Leave Requests
+        if (leaveRequestRepository.count() == 0) {
+            seedLeaveRequest("EMP114", "Casual Leave", LocalDate.of(2026, 6, 19), LocalDate.of(2026, 6, 19), 1.0, "Personal Work", "Pending");
+            seedLeaveRequest("EMP187", "Annual Leave", LocalDate.of(2026, 6, 20), LocalDate.of(2026, 6, 22), 3.0, "Family Trip", "Pending");
+            seedLeaveRequest("EMP129", "Sick Leave", LocalDate.of(2026, 6, 18), LocalDate.of(2026, 6, 18), 1.0, "Fever & Cold", "Approved");
+            seedLeaveRequest("EMP114", "Annual Leave", LocalDate.of(2026, 6, 25), LocalDate.of(2026, 6, 29), 5.0, "Vacation", "Pending");
+            seedLeaveRequest("EMP187", "Casual Leave", LocalDate.of(2026, 6, 16), LocalDate.of(2026, 6, 16), 1.0, "Personal Work", "Rejected");
+            System.out.println("✅ Seeded Leave Requests.");
+        }
     }
 
 
@@ -1192,5 +1209,22 @@ public class DatabaseSeeder implements CommandLineRunner {
             newPermission.setPermissionName(permissionName);
             return permissionRepository.save(newPermission);
         });
+    }
+
+
+    private void seedLeaveRequest(String username, String type, LocalDate from, LocalDate to, Double days, String reason, String status) {
+        User u = userRepository.findByUsername(username).orElse(null);
+        if (u != null) {
+            LeaveRequest lr = new LeaveRequest();
+            lr.setUser(u);
+            lr.setLeaveType(type);
+            lr.setFromDate(from);
+            lr.setToDate(to);
+            lr.setTotalDays(days);
+            lr.setReason(reason);
+            lr.setStatus(status);
+            lr.setCreatedAt(LocalDate.now());
+            leaveRequestRepository.save(lr);
+        }
     }
 }
