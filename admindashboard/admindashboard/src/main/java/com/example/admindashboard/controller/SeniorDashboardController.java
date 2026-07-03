@@ -497,7 +497,8 @@ public class SeniorDashboardController {
         long offboardedEmp = allUsers.stream().filter(u -> "EXITED".equalsIgnoreCase(u.getStatus())).count();
         // Since candidates are hardcoded in the frontend or managed separately, we'll keep onboarding to a dummy count for now, or you can calculate it based on a candidate table if it exists.
         List<com.example.admindashboard.model.User> onboardingList = allUsers.stream()
-            .filter(u -> "ONBOARDING".equalsIgnoreCase(u.getStatus()))
+            .filter(u -> "ONBOARDING".equalsIgnoreCase(u.getStatus()) || 
+                         ("ACTIVE".equalsIgnoreCase(u.getStatus()) && u.getEmployeeProfile() != null && u.getEmployeeProfile().isOnboardingCompleted()))
             .collect(Collectors.toList());
         long onboardingEmp = onboardingList.size();
         model.addAttribute("candidates", onboardingList); 
@@ -626,6 +627,7 @@ public class SeniorDashboardController {
             e.printStackTrace();
         }
 
+        existingProfile.setOnboardingCompleted(true);
         userRepository.save(user);
         
         // Send email

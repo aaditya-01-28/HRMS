@@ -156,6 +156,8 @@ public class EmployeeProfile {
     private String experienceDocPath;
     private String offerDocPath;
     private String workShift;
+    private boolean onboardingCompleted = false;
+
     private String dateOfConfirmation;
     private String probationReviewDate;
 
@@ -655,6 +657,7 @@ public class EmployeeProfile {
 
     // Calculate Onboarding Progress
     public int getOnboardingProgress() {
+        if (onboardingCompleted) return 100;
         int totalFields = 20; // approximate number of important fields
         int filledFields = 0;
         
@@ -747,6 +750,10 @@ public class EmployeeProfile {
 
     public String getProbationReviewDate() { return probationReviewDate; }
     public void setProbationReviewDate(String probationReviewDate) { this.probationReviewDate = probationReviewDate; }
+
+
+    public boolean isOnboardingCompleted() { return onboardingCompleted; }
+    public void setOnboardingCompleted(boolean onboardingCompleted) { this.onboardingCompleted = onboardingCompleted; }
 
 
 }

@@ -257,7 +257,7 @@
 <button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
 <div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
 <span style="color: #002D72; font-weight: 700; font-size: 1.3rem;">WhiteCircle Group - Shahdol</span>
-<span style="font-size: 0.85rem; font-weight: 500; color: #333; margin-top: 2px;">Payroll</span>
+<span style="font-size: 0.85rem; font-weight: 500; color: #333; margin-top: 2px;">Employee Directory</span>
 </div>
 </div>
 <div class="nav-actions d-flex align-items-center gap-3">
@@ -555,7 +555,8 @@
 </div>
 </td>
 <td>
-<span class="text-primary fw-bold">In Progress</span>
+<span th:class="${cand.status == 'ACTIVE' ? 'text-success fw-bold' : 'text-primary fw-bold'}" 
+      th:text="${cand.status == 'ACTIVE' ? 'Completed' : 'In Progress'}">In Progress</span>
 </td>
 <td>
 <button class="btn btn-sm btn-link text-dark p-0 me-2" th:onclick="'editCandidate(' + ${cand.id} + ')'" type="button"><i class="fas fa-pen"></i></button>
@@ -975,7 +976,8 @@
 </div>
 </td>
 <td>
-<span class="text-primary fw-bold">In Progress</span>
+<span th:class="${cand.status == 'ACTIVE' ? 'text-success fw-bold' : 'text-primary fw-bold'}" 
+      th:text="${cand.status == 'ACTIVE' ? 'Completed' : 'In Progress'}">In Progress</span>
 </td>
 <td>
 <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
