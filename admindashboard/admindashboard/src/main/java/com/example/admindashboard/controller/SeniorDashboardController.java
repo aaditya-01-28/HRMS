@@ -59,6 +59,12 @@ public class SeniorDashboardController {
     private com.example.admindashboard.repository.ShiftAssignmentRepository shiftAssignmentRepository;
 
     @Autowired
+    private com.example.admindashboard.repository.AttendanceRepository attendanceRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.AttendanceRegularizationRepository attendanceRegularizationRepository;
+
+    @Autowired
     private com.example.admindashboard.repository.HolidayRepository holidayRepository;
 
     @Autowired
@@ -750,7 +756,7 @@ public class SeniorDashboardController {
                 userRepository.save(exitingUser);
             }
         }
-        return "redirect:/senior_hr/employee?offboarding=success";
+        return "redirect:/senior_hr/employee?tab=offboarding&offboarding=success";
     }
 
     // --- MY SPACE ROUTE (HR Performance) ---
@@ -772,21 +778,82 @@ public class SeniorDashboardController {
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_hr/attendance")
     public String showSeniorHrAttendance(Model model, Principal principal) {
-        // Mock data for Daily Attendance
-        model.addAttribute("dailyAttendance", java.util.List.of(
-            new java.util.HashMap<String, Object>() {{ put("name", "Aman Verma"); put("id", "EMP114"); put("dept", "Engineering"); put("shift", "10:00 AM - 07:00 PM"); put("in", "09:58 AM"); put("out", "07:02 PM"); put("hrs", "9 hrs 04 min"); put("status", "Present"); put("rem", "-"); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Neha Sharma"); put("id", "EMP114"); put("dept", "Engineering"); put("shift", "10:00 AM - 07:00 PM"); put("in", "10:15 AM"); put("out", "06:45 PM"); put("hrs", "8 hrs 30 min"); put("status", "Late"); put("rem", "Late by 15 min"); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Vikram Joshi"); put("id", "EMP114"); put("dept", "Product"); put("shift", "10:00 AM - 07:00 PM"); put("in", "10:02 AM"); put("out", "07:01 PM"); put("hrs", "8 hrs 59 min"); put("status", "Present"); put("rem", "-"); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Isha Patel"); put("id", "EMP114"); put("dept", "Design"); put("shift", "10:00 AM - 07:00 PM"); put("in", "10:05 AM"); put("out", "07:02 PM"); put("hrs", "8 hrs 57 min"); put("status", "Present"); put("rem", "-"); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Arjun Nair"); put("id", "EMP114"); put("dept", "Design"); put("shift", "10:00 AM - 07:00 PM"); put("in", "-"); put("out", "-"); put("hrs", "-"); put("status", "Absent"); put("rem", "-"); }}
-        ));
         
-        // Mock data for Overrides
-        model.addAttribute("overrides", java.util.List.of(
-            new java.util.HashMap<String, Object>() {{ put("name", "Aman Verma"); put("id", "EMP114"); put("date", "25/05/2026"); put("type", "Update in/out Time"); put("orig", "10:15 AM - 06:45 PM"); put("upd", "09:15 AM - 07:00 PM"); put("reason", "Traffic Delay"); put("status", "Pending"); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Esha Verma"); put("id", "EMP114"); put("date", "30/05/2026"); put("type", "Mark Full Day"); put("orig", "Absent"); put("upd", "Present"); put("reason", "WFH"); put("status", "Approved"); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Arun Verma"); put("id", "EMP114"); put("date", "29/05/2026"); put("type", "Mark Full Day"); put("orig", "10:15 AM - 06:45 PM"); put("upd", "09:15 AM - 07:00 PM"); put("reason", "Health Issue"); put("status", "Pending"); }}
-        ));
+        // 1. Fetch Daily Attendance
+        java.util.List<com.example.admindashboard.model.Attendance> allAttendance = attendanceRepository.findAll();
+        java.util.List<java.util.Map<String, Object>> dailyList = new java.util.ArrayList<>();
+        for (com.example.admindashboard.model.Attendance a : allAttendance) {
+            if (a.getUser() != null) {
+                java.util.Map<String, Object> map = new java.util.HashMap<>();
+                map.put("name", a.getUser().getFullName());
+                map.put("id", a.getUser().getEmployeeProfile() != null ? a.getUser().getEmployeeProfile().getEmployeeCode() : "N/A");
+                map.put("dept", a.getUser().getEmployeeProfile() != null ? a.getUser().getEmployeeProfile().getDepartment() : "N/A");
+                map.put("shift", a.getUser().getEmployeeProfile() != null ? a.getUser().getEmployeeProfile().getWorkShift() : "N/A");
+                map.put("in", a.getCheckInTime() != null ? a.getCheckInTime().toString() : "-");
+                map.put("out", a.getCheckOutTime() != null ? a.getCheckOutTime().toString() : "-");
+                map.put("hrs", a.getTotalHours() != null ? a.getTotalHours() : "-");
+                map.put("status", a.getStatus() != null ? a.getStatus() : "-");
+                map.put("rem", a.getReason() != null ? a.getReason() : "-");
+                dailyList.add(map);
+            }
+        }
+        model.addAttribute("dailyAttendance", dailyList);
+        
+        // 2. Fetch Regularizations (Overrides)
+        java.util.List<com.example.admindashboard.model.AttendanceRegularization> allReg = attendanceRegularizationRepository.findAll();
+        java.util.List<java.util.Map<String, Object>> regList = new java.util.ArrayList<>();
+        for (com.example.admindashboard.model.AttendanceRegularization r : allReg) {
+            if (r.getUser() != null) {
+                java.util.Map<String, Object> map = new java.util.HashMap<>();
+                map.put("name", r.getUser().getFullName());
+                map.put("id", r.getUser().getEmployeeProfile() != null ? r.getUser().getEmployeeProfile().getEmployeeCode() : "N/A");
+                
+                // Format date manually if needed, or rely on Thymeleaf
+                java.time.format.DateTimeFormatter dtf = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                map.put("date", r.getDate() != null ? r.getDate().format(dtf) : "");
+                map.put("type", r.getType() != null ? r.getType() : "-");
+                map.put("orig", "-"); // DB schema lacks this, placing default
+                map.put("upd", r.getDuration() != null ? r.getDuration() : "-"); // Putting duration as updated or reason
+                map.put("reason", r.getReason() != null ? r.getReason() : "-");
+                map.put("status", r.getStatus() != null ? r.getStatus() : "Pending");
+                regList.add(map);
+            }
+        }
+        model.addAttribute("overrides", regList);
+
+        // 3. Fetch Shift Assignments
+        java.util.List<com.example.admindashboard.model.ShiftAssignment> allShifts = shiftAssignmentRepository.findAll();
+        model.addAttribute("shiftAssignments", allShifts);
+
+        // 4. Calculate Shift Metrics
+        long totalActive = userRepository.count(); 
+        long assigned = allShifts.stream().filter(s -> s.getUser() != null).map(s -> s.getUser().getId()).distinct().count();
+        long unassigned = totalActive - assigned;
+        long otAssigned = allShifts.stream().filter(com.example.admindashboard.model.ShiftAssignment::isOtAllowed).count();
+        
+        model.addAttribute("totalEmployees", totalActive);
+        model.addAttribute("assignedEmployees", assigned);
+        model.addAttribute("unassignedEmployees", unassigned > 0 ? unassigned : 0);
+        model.addAttribute("otAssigned", otAssigned);
+        
+        // 5. Extract Distinct Shifts for the Shift List Sidebar
+        java.util.List<java.util.Map<String, Object>> distinctShifts = new java.util.ArrayList<>();
+        java.util.Set<String> shiftNames = new java.util.HashSet<>();
+        for (com.example.admindashboard.model.ShiftAssignment sa : allShifts) {
+            if (sa.getShiftName() != null && !shiftNames.contains(sa.getShiftName())) {
+                shiftNames.add(sa.getShiftName());
+                java.util.Map<String, Object> shiftMap = new java.util.HashMap<>();
+                shiftMap.put("shiftName", sa.getShiftName());
+                shiftMap.put("shiftTiming", sa.getShiftTiming());
+                shiftMap.put("otAllowed", sa.isOtAllowed());
+                
+                long empCount = allShifts.stream().filter(s -> sa.getShiftName().equals(s.getShiftName())).count();
+                shiftMap.put("empCount", empCount);
+                distinctShifts.add(shiftMap);
+            }
+        }
+        model.addAttribute("distinctShifts", distinctShifts);
+
         return "senior_hr-attendance";
     }
 

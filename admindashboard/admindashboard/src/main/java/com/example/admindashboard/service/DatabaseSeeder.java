@@ -1146,7 +1146,36 @@ public class DatabaseSeeder implements CommandLineRunner {
 	    System.out.println("=========================================================");
 	        
         
+    
+        // Seed candidate for Onboarding Tab testing
+        Role employeeRoleCand = getOrCreateRole("EMPLOYEE");
+        if (userRepository.findByUsername("AJITP1972").isEmpty()) {
+            User cand = new User();
+            cand.setUsername("AJITP1972");
+            cand.setPassword("{noop}welcome123");
+            cand.setRole(employeeRoleCand);
+            cand.setFullName("Ajit Prabhakar");
+            cand.setEmail("ajit.prabhakar1972@gmail.com");
+            cand.setStatus("ONBOARDING");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setFirstName("Ajit");
+            profile.setLastName("Prabhakar");
+            profile.setDepartment("Design");
+            profile.setDesignation("Senior");
+            profile.setWorkLocation("Raipur");
+            profile.setJoiningDate(LocalDate.now());
+            profile.setMobileNumber("+91 98765 43210");
+            profile.setDob(LocalDate.of(1972, 8, 15));
+            profile.setUser(cand);
+            cand.setEmployeeProfile(profile);
+
+            userRepository.save(cand);
+            System.out.println("✅ Seeded Candidate for Onboarding -> Name: Ajit Prabhakar");
+        }
+
     }
+
 
     private Role getOrCreateRole(String roleName) {
         return roleRepository.findByRoleName(roleName).orElseGet(() -> {

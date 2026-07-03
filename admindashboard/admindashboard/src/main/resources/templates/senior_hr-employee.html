@@ -555,8 +555,8 @@
 </div>
 </td>
 <td>
-<span th:class="${cand.status == 'ACTIVE' ? 'text-success fw-bold' : 'text-primary fw-bold'}" 
-      th:text="${cand.status == 'ACTIVE' ? 'Completed' : 'In Progress'}">In Progress</span>
+<span th:class="${cand.status == 'ACTIVE' ? 'text-success fw-bold' : (cand.status == 'ON NOTICE' ? 'text-warning fw-bold' : 'text-danger fw-bold')}" 
+      th:text="${cand.status}">Status</span>
 </td>
 <td>
 <button class="btn btn-sm btn-link text-dark p-0 me-2" th:onclick="'editCandidate(' + ${cand.id} + ')'" type="button"><i class="fas fa-pen"></i></button>
@@ -950,9 +950,9 @@
 </tr>
 </thead>
 <tbody id="offboarding-tbody">
-<tr th:each="cand, iterStat : ${allUsers}" th:if="${cand.status == 'EXITED' or cand.status == 'ON NOTICE'}">
+<tr th:each="cand, iterStat : ${allUsers}" th:if="${cand.username != 'admin' and cand.status != 'ONBOARDING'}">
 <td>
-<input class="form-check-input mt-2" name="selectedCandidateRadio" th:data-avatar="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}" th:data-dept="${cand.employeeProfile != null ? cand.employeeProfile.department : 'N/A'}" th:data-empid="${cand.employeeProfile != null ? cand.employeeProfile.employeeId : 'N/A'}" th:data-name="${cand.fullName}" th:data-role="${cand.designation}" th:value="${cand.id}" type="radio"/>
+<input class="form-check-input mt-2" name="selectedCandidateRadio" th:data-avatar="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}" th:data-dept="${cand.employeeProfile != null ? cand.employeeProfile.department : 'N/A'}" th:data-empid="${cand.employeeProfile != null ? cand.employeeProfile.employeeCode : 'N/A'}" th:data-name="${cand.fullName}" th:data-role="${cand.designation}" th:value="${cand.id}" type="radio"/>
 </td>
 <td>
 <div class="d-flex align-items-center">
@@ -976,8 +976,8 @@
 </div>
 </td>
 <td>
-<span th:class="${cand.status == 'ACTIVE' ? 'text-success fw-bold' : 'text-primary fw-bold'}" 
-      th:text="${cand.status == 'ACTIVE' ? 'Completed' : 'In Progress'}">In Progress</span>
+<span th:class="${cand.status == 'ACTIVE' ? 'text-success fw-bold' : (cand.status == 'ON NOTICE' ? 'text-warning fw-bold' : 'text-danger fw-bold')}" 
+      th:text="${cand.status}">Status</span>
 </td>
 <td>
 <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>

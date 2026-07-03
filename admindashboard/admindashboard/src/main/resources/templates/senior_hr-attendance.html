@@ -583,27 +583,7 @@
                                         <button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td class="text-start">
-                                        <div class="d-flex align-items-center">
-                                            <img src="/images/male-avatar.png" class="emp-avatar border">
-                                            <div class="lh-1">
-                                                <div class="fw-bold text-dark mb-1">Aman Verma</div>
-                                                <div style="font-size: 0.65rem; color: #94a3b8;">EMP114</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>25/05/2026</td>
-                                    <td class="text-danger fw-bold">Change Status</td>
-                                    <td class="text-danger">Absent</td>
-                                    <td class="text-success">Present</td>
-                                    <td>Forgot to Punch</td>
-                                    <td class="text-warning fw-bold">Pending</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
-                                        <button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
-                                    </td>
-                                </tr>
+
                             </tbody>
                         </table>
                     </div>
@@ -737,28 +717,28 @@
                             <div class="icon text-primary" style="border: none; font-size: 2.5rem;"><i class="fas fa-users"></i></div>
                             <div>
                                 <div class="label" style="font-weight: 600; color: #1e293b;">Total Employees</div>
-                                <div class="value">24</div>
+                                <div class="value" th:text="${totalEmployees}">0</div>
                             </div>
                         </div>
                         <div class="stat-item">
                             <div class="icon text-success" style="border: none; font-size: 2.5rem;"><i class="fas fa-user-check"></i></div>
                             <div>
                                 <div class="label" style="font-weight: 600; color: #1e293b;">Assigned Employees</div>
-                                <div class="value">14</div>
+                                <div class="value" th:text="${assignedEmployees}">0</div>
                             </div>
                         </div>
                         <div class="stat-item">
                             <div class="icon text-warning" style="border: none; font-size: 2.5rem;"><i class="far fa-clock"></i></div>
                             <div>
                                 <div class="label" style="font-weight: 600; color: #1e293b;">Unassigned Employee</div>
-                                <div class="value">6</div>
+                                <div class="value" th:text="${unassignedEmployees}">0</div>
                             </div>
                         </div>
                         <div class="stat-item">
                             <div class="icon text-primary" style="border: none; font-size: 2.5rem;"><i class="fas fa-business-time"></i></div>
                             <div>
                                 <div class="label" style="font-weight: 600; color: #1e293b;">OT Assigned</div>
-                                <div class="value">4</div>
+                                <div class="value" th:text="${otAssigned}">0</div>
                             </div>
                         </div>
                     </div>
@@ -814,39 +794,20 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
+                                            <tr th:each="sa, iterStat : ${shiftAssignments}">
                                                 <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="emp-avatar bg-dark text-white text-center" style="display:inline-block; line-height:35px;">A</div>
+                                                    <div class="d-flex align-items-center" th:if="${sa.user != null}">
+                                                        <div class="emp-avatar bg-dark text-white text-center" style="display:inline-block; line-height:35px;" th:text="${#strings.substring(sa.user.fullName,0,1)}">A</div>
                                                         <div>
-                                                            <div class="fw-bold text-dark">Aman Verma</div>
-                                                            <div style="font-size: 0.75rem; color: #64748b;">EMP114</div>
+                                                            <div class="fw-bold text-dark" th:text="${sa.user.fullName}">Name</div>
+                                                            <div style="font-size: 0.75rem; color: #64748b;" th:text="${sa.user.employeeProfile != null ? sa.user.employeeProfile.employeeCode : ''}">EMP</div>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td>Engineering</td>
-                                                <td class="text-primary fw-bold">General</td>
-                                                <td>10:00 AM - 07:00 PM</td>
-                                                <td class="text-success fw-bold">Yes</td>
-                                                <td>
-                                                    <i class="fas fa-pen text-muted me-2" style="cursor: pointer;"></i>
-                                                    <i class="fas fa-ellipsis-h text-muted" style="cursor: pointer;"></i>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="emp-avatar bg-dark text-white text-center" style="display:inline-block; line-height:35px;">N</div>
-                                                        <div>
-                                                            <div class="fw-bold text-dark">Neha Verma</div>
-                                                            <div style="font-size: 0.75rem; color: #64748b;">EMP115</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>Engineering</td>
-                                                <td class="text-primary fw-bold">General</td>
-                                                <td>10:00 AM - 07:00 PM</td>
-                                                <td class="text-success fw-bold">Yes</td>
+                                                <td th:text="${sa.department}">Department</td>
+                                                <td class="text-primary fw-bold" th:text="${sa.shiftName}">Shift Name</td>
+                                                <td th:text="${sa.shiftTiming}">Timing</td>
+                                                <td th:class="${sa.otAllowed ? 'text-success fw-bold' : 'text-danger fw-bold'}" th:text="${sa.otAllowed ? 'Yes' : 'No'}">Yes/No</td>
                                                 <td>
                                                     <i class="fas fa-pen text-muted me-2" style="cursor: pointer;"></i>
                                                     <i class="fas fa-ellipsis-h text-muted" style="cursor: pointer;"></i>
@@ -864,48 +825,18 @@
                                     <a href="#" class="text-primary fw-bold text-decoration-none" style="font-size: 0.85rem;"><i class="fas fa-plus me-1"></i> Add list</a>
                                 </div>
 
-                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                <!-- Dynamic Shift List -->
+                                <div class="d-flex justify-content-between align-items-center mb-4" th:each="ds, iterStat : ${distinctShifts}">
                                     <div class="d-flex align-items-start">
-                                        <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #3b82f6; margin-top: 4px; margin-right: 10px;"></div>
+                                        <!-- rotate colors based on index -->
+                                        <div style="width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; margin-right: 10px;" 
+                                             th:styleappend="${iterStat.index % 4 == 0 ? 'background-color: #3b82f6;' : (iterStat.index % 4 == 1 ? 'background-color: #8b5cf6;' : (iterStat.index % 4 == 2 ? 'background-color: #10b981;' : 'background-color: #f59e0b;'))}"></div>
                                         <div>
-                                            <div class="fw-bold" style="font-size: 0.9rem;">General Shift</div>
-                                            <div style="font-size: 0.7rem; color: #64748b;">10:00 AM - 07:00 PM</div>
+                                            <div class="fw-bold" style="font-size: 0.9rem;" th:text="${ds.shiftName}">Shift Name</div>
+                                            <div style="font-size: 0.7rem; color: #64748b;" th:text="${ds.shiftTiming}">Timing</div>
                                         </div>
                                     </div>
-                                    <div class="text-success fw-bold" style="font-size: 0.8rem;">OT Allowed</div>
-                                </div>
-
-                                <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <div class="d-flex align-items-start">
-                                        <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #8b5cf6; margin-top: 4px; margin-right: 10px;"></div>
-                                        <div>
-                                            <div class="fw-bold" style="font-size: 0.9rem;">Flexible Shift</div>
-                                            <div style="font-size: 0.7rem; color: #64748b;">02:00 PM - 10:00 PM</div>
-                                        </div>
-                                    </div>
-                                    <div class="text-success fw-bold" style="font-size: 0.8rem;">OT Allowed</div>
-                                </div>
-
-                                <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <div class="d-flex align-items-start">
-                                        <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #10b981; margin-top: 4px; margin-right: 10px;"></div>
-                                        <div>
-                                            <div class="fw-bold" style="font-size: 0.9rem;">Night Shift</div>
-                                            <div style="font-size: 0.7rem; color: #64748b;">10:00 PM - 07:00 AM</div>
-                                        </div>
-                                    </div>
-                                    <div class="text-success fw-bold" style="font-size: 0.8rem;">OT Allowed</div>
-                                </div>
-
-                                <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <div class="d-flex align-items-start">
-                                        <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #64748b; margin-top: 4px; margin-right: 10px;"></div>
-                                        <div>
-                                            <div class="fw-bold" style="font-size: 0.9rem;">Half-day Shift</div>
-                                            <div style="font-size: 0.7rem; color: #64748b;">10:00 AM - 02:00 PM</div>
-                                        </div>
-                                    </div>
-                                    <div class="text-danger fw-bold" style="font-size: 0.8rem;">OT Not Allowed</div>
+                                    <div th:class="${ds.otAllowed ? 'text-success fw-bold' : 'text-danger fw-bold'}" style="font-size: 0.8rem;" th:text="${ds.otAllowed ? 'OT Allowed' : 'OT Not Allowed'}">OT Status</div>
                                 </div>
 
                                 <div class="text-center mt-4 pt-3" style="border-top: 1px dashed #e2e8f0;">

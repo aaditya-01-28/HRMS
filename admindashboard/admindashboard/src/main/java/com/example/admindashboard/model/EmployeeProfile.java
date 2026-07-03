@@ -156,6 +156,7 @@ public class EmployeeProfile {
     private String experienceDocPath;
     private String offerDocPath;
     private String workShift;
+    @Column(columnDefinition = "boolean default false")
     private boolean onboardingCompleted = false;
 
     private String dateOfConfirmation;
