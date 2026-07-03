@@ -74,6 +74,9 @@ public class SeniorDashboardController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private com.example.admindashboard.service.EmailService emailService;
+
     // --- LOGIN ROUTE ---
     @GetMapping("/senior_hr/login")
     public String showSeniorHrLogin() {
@@ -234,15 +237,7 @@ public class SeniorDashboardController {
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_hr/my_space")
     public String showSeniorHrMySpace(Model model, Principal principal) {
-        // Pass mock data representing the screenshot tabs until we have JPA entities for Payroll
-        
-        // Example dynamic summary stats (Mock)
-        model.addAttribute("totalEmployees", 100);
-        model.addAttribute("totalNetPay", "3,88,000");
-        model.addAttribute("deductionsCount", 2);
-        model.addAttribute("totalDaysPresent", "30");
-        
-        // Fetch existing salary structures
+        // Fetch existing salary structures, seed if empty
         List<com.example.admindashboard.model.SalaryStructure> structures = salaryStructureRepository.findByActiveTrue();
         
         if (structures.isEmpty()) {
@@ -252,7 +247,6 @@ public class SeniorDashboardController {
             std.setEffectiveFrom(java.time.LocalDate.now());
             std.setCtcAmount(960000.0);
             
-            // Add components matching the screenshot
             // 1. Basic Salary
             com.example.admindashboard.model.SalaryComponent basic = new com.example.admindashboard.model.SalaryComponent();
             basic.setComponentName("Basic Salary");
@@ -271,7 +265,7 @@ public class SeniorDashboardController {
             hra.setCategory("Allowance");
             hra.setCalculationFormula("50% of Basic");
             hra.setAmount(192000.0);
-            hra.setPercentageOfCtc(25.00); // from mockup
+            hra.setPercentageOfCtc(25.00);
             hra.setTaxable(true);
             std.addComponent(hra);
 
@@ -282,7 +276,7 @@ public class SeniorDashboardController {
             conv.setCategory("Statutory");
             conv.setCalculationFormula("Fixed Amount");
             conv.setAmount(1920.0);
-            conv.setPercentageOfCtc(20.00); // from mockup
+            conv.setPercentageOfCtc(20.00);
             conv.setTaxable(true);
             std.addComponent(conv);
 
@@ -293,7 +287,7 @@ public class SeniorDashboardController {
             ptax.setCategory("Statutory");
             ptax.setCalculationFormula("Fixed Amount");
             ptax.setAmount(200.0);
-            ptax.setPercentageOfCtc(4.00); // from mockup
+            ptax.setPercentageOfCtc(4.00);
             ptax.setTaxable(true);
             std.addComponent(ptax);
 
@@ -304,7 +298,7 @@ public class SeniorDashboardController {
             pf.setCategory("Allowance");
             pf.setCalculationFormula("12% of Basic");
             pf.setAmount(46000.0);
-            pf.setPercentageOfCtc(0.02); // from mockup
+            pf.setPercentageOfCtc(0.02);
             pf.setTaxable(true);
             std.addComponent(pf);
 
@@ -326,8 +320,6 @@ public class SeniorDashboardController {
             structures = salaryStructureRepository.findByActiveTrue();
         }
 
-        model.addAttribute("salaryStructures", structures);
-
         // Fetch and seed Payslips
         List<com.example.admindashboard.model.Payslip> payslips = payslipRepository.findAll();
         if (payslips.isEmpty()) {
@@ -341,8 +333,6 @@ public class SeniorDashboardController {
             p1.setStatus("Processed");
             p1.setPaymentDate(java.time.LocalDate.of(2026, 6, 20));
             p1.setDepartment("Engineering");
-            
-            // Dummy user Neha
             com.example.admindashboard.model.User neha = userRepository.findAll().stream().filter(u -> u.getFullName() != null && u.getFullName().contains("Neha")).findFirst().orElse(null);
             p1.setUser(neha);
             payslipRepository.save(p1);
@@ -360,7 +350,6 @@ public class SeniorDashboardController {
 
             payslips = payslipRepository.findAll();
         }
-        model.addAttribute("payslips", payslips);
 
         // Fetch and seed BonusDeductions
         List<com.example.admindashboard.model.BonusDeduction> bonuses = bonusDeductionRepository.findAll();
@@ -397,10 +386,94 @@ public class SeniorDashboardController {
 
             bonuses = bonusDeductionRepository.findAll();
         }
-        model.addAttribute("bonusDeductions", bonuses);
+
+        // --- DASHBOARD REAL DATA AGGREGATION ---
+        List<com.example.admindashboard.model.User> allUsers = userRepository.findAll();
+        long totalEmployees = allUsers.stream().filter(u -> "ACTIVE".equalsIgnoreCase(u.getStatus()) && !"admin".equals(u.getUsername())).count();
+        double totalNetPay = payslips.stream().mapToDouble(p -> p.getNetPay() != null ? p.getNetPay() : 0.0).sum();
+        long pendingApprovals = bonuses.stream().filter(b -> "Pending".equalsIgnoreCase(b.getStatus())).count();
         
-        // Pass common data for dropdowns, etc.
-        model.addAttribute("allUsers", userRepository.findAll());
+        model.addAttribute("totalEmployees", totalEmployees > 0 ? totalEmployees : allUsers.size());
+        model.addAttribute("totalNetPay", totalNetPay);
+        model.addAttribute("pendingApprovals", pendingApprovals);
+        model.addAttribute("payrollStatus", "Draft");
+        
+        // Department Summary
+        java.util.Map<String, java.util.Map<String, Object>> deptSummary = new java.util.HashMap<>();
+        for (com.example.admindashboard.model.Payslip p : payslips) {
+            String dept = p.getDepartment() != null ? p.getDepartment() : "Unassigned";
+            deptSummary.putIfAbsent(dept, new java.util.HashMap<>());
+            java.util.Map<String, Object> stats = deptSummary.get(dept);
+            stats.put("employees", (Long) stats.getOrDefault("employees", 0L) + 1L);
+            stats.put("gross", (Double) stats.getOrDefault("gross", 0.0) + (p.getGrossPay() != null ? p.getGrossPay() : 0.0));
+            stats.put("deductions", (Double) stats.getOrDefault("deductions", 0.0) + (p.getTotalDeductions() != null ? p.getTotalDeductions() : 0.0));
+            stats.put("net", (Double) stats.getOrDefault("net", 0.0) + (p.getNetPay() != null ? p.getNetPay() : 0.0));
+            
+            boolean allProcessed = "Processed".equalsIgnoreCase(p.getStatus());
+            boolean existingProcessed = (Boolean) stats.getOrDefault("allProcessed", true);
+            stats.put("allProcessed", allProcessed && existingProcessed);
+        }
+        
+        List<java.util.Map<String, Object>> deptList = new java.util.ArrayList<>();
+        double totalGrossAll = 0;
+        double totalDedAll = 0;
+        double totalNetAll = 0;
+        long totalEmpAll = 0;
+        
+        for (java.util.Map.Entry<String, java.util.Map<String, Object>> entry : deptSummary.entrySet()) {
+            java.util.Map<String, Object> row = new java.util.HashMap<>(entry.getValue());
+            row.put("department", entry.getKey());
+            row.put("status", (Boolean) row.get("allProcessed") ? "Generated" : "Draft");
+            deptList.add(row);
+            
+            totalGrossAll += (Double) row.get("gross");
+            totalDedAll += (Double) row.get("deductions");
+            totalNetAll += (Double) row.get("net");
+            totalEmpAll += (Long) row.get("employees");
+        }
+        
+        // Ensure some mockup data if empty
+        if (deptList.isEmpty()) {
+            java.util.Map<String, Object> m = new java.util.HashMap<>();
+            m.put("department", "Engineering"); m.put("employees", 165L); m.put("gross", 248500.0); m.put("deductions", 50000.0); m.put("net", 129000.0); m.put("status", "Generated");
+            deptList.add(m);
+            totalGrossAll += 248500.0; totalDedAll += 50000.0; totalNetAll += 129000.0; totalEmpAll += 165L;
+        }
+
+        model.addAttribute("deptSummary", deptList);
+        model.addAttribute("totalGrossAll", totalGrossAll);
+        model.addAttribute("totalDedAll", totalDedAll);
+        model.addAttribute("totalNetAll", totalNetAll);
+        model.addAttribute("totalEmpAll", totalEmpAll);
+
+        // Recent activities
+        List<java.util.Map<String, String>> activities = new java.util.ArrayList<>();
+        if (!payslips.isEmpty()) {
+            java.util.Map<String, String> a1 = new java.util.HashMap<>();
+            a1.put("activity", "Payroll Draft Created");
+            a1.put("month", payslips.get(0).getPayMonth() + " " + payslips.get(0).getPayYear());
+            a1.put("time", "20 May, 10:15 AM");
+            a1.put("status", "Completed");
+            activities.add(a1);
+        } else {
+            java.util.Map<String, String> a1 = new java.util.HashMap<>();
+            a1.put("activity", "Payroll Draft Created"); a1.put("month", "May 2026"); a1.put("time", "20 May, 10:15 AM"); a1.put("status", "Completed");
+            activities.add(a1);
+        }
+        model.addAttribute("recentActivities", activities);
+        
+        // Bonuses Stats
+        double totalBonusAmt = bonuses.stream().filter(b -> "Bonus".equalsIgnoreCase(b.getType()) || "Increase".equalsIgnoreCase(b.getImpact())).mapToDouble(b -> b.getAmount() != null ? b.getAmount() : 0.0).sum();
+        double totalDeductAmt = bonuses.stream().filter(b -> "Deduct".equalsIgnoreCase(b.getType()) || "Decrease".equalsIgnoreCase(b.getImpact())).mapToDouble(b -> b.getAmount() != null ? b.getAmount() : 0.0).sum();
+        model.addAttribute("totalBonusAmt", totalBonusAmt);
+        model.addAttribute("totalDeductAmt", totalDeductAmt);
+
+        // Pass common data
+        model.addAttribute("salaryStructures", structures);
+        model.addAttribute("payslips", payslips);
+        model.addAttribute("bonusDeductions", bonuses);
+        model.addAttribute("allUsers", allUsers);
+        
         return "senior_hr-myspace";
     }
 
@@ -409,10 +482,163 @@ public class SeniorDashboardController {
     @GetMapping("/senior_hr/employee")
     public String showSeniorHrEmployee(Model model, Principal principal) {
         List<com.example.admindashboard.model.User> allUsers = userRepository.findAll();
+        
+        long totalEmp = allUsers.size();
+        long activeEmp = allUsers.stream().filter(u -> "ACTIVE".equalsIgnoreCase(u.getStatus())).count();
+        long noticeEmp = allUsers.stream().filter(u -> "ON NOTICE".equalsIgnoreCase(u.getStatus())).count();
+        long offboardedEmp = allUsers.stream().filter(u -> "EXITED".equalsIgnoreCase(u.getStatus())).count();
+        // Since candidates are hardcoded in the frontend or managed separately, we'll keep onboarding to a dummy count for now, or you can calculate it based on a candidate table if it exists.
+        List<com.example.admindashboard.model.User> onboardingList = allUsers.stream()
+            .filter(u -> "ONBOARDING".equalsIgnoreCase(u.getStatus()))
+            .collect(Collectors.toList());
+        long onboardingEmp = onboardingList.size();
+        model.addAttribute("candidates", onboardingList); 
+        
+        java.util.Map<String, Long> deptCounts = allUsers.stream()
+            .filter(u -> u.getEmployeeProfile() != null && u.getEmployeeProfile().getDepartment() != null)
+            .collect(Collectors.groupingBy(u -> u.getEmployeeProfile().getDepartment(), Collectors.counting()));
+            
+        model.addAttribute("totalEmployees", totalEmp);
+        model.addAttribute("activeEmployees", activeEmp);
+        model.addAttribute("noticePeriodEmployees", noticeEmp);
+        model.addAttribute("offboardedEmployees", offboardedEmp);
+        model.addAttribute("onboardingEmployees", onboardingEmp);
+        model.addAttribute("deptCounts", deptCounts);
+        
         model.addAttribute("allUsers", allUsers);
         return "senior_hr-employee";
     }
+    @PostMapping("/senior_hr/onboard")
+    public String submitOnboarding(@org.springframework.web.bind.annotation.ModelAttribute com.example.admindashboard.model.EmployeeProfile employeeProfile,
+                                   @RequestParam(required=false) Long id,
+                                   @RequestParam(required=false) String prefix,
+                                   @RequestParam(required=false) String firstName,
+                                   @RequestParam(required=false) String middleName,
+                                   @RequestParam(required=false) String lastName,
+                                   @RequestParam(required=false) String personalEmail,
+                                   @RequestParam(required=false) String employeeCode,
+                                   @RequestParam(required=false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate probationCompletionDate,
+                                   @RequestParam(required=false) String physicallyChallenged,
+                                   org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttrs) {
+        
+        User user;
+        boolean isNew = false;
+        String randomPassword = null;
+        
+        if (id != null) {
+            user = userRepository.findById(id).orElse(new User());
+        } else {
+            user = new User();
+            isNew = true;
+            randomPassword = java.util.UUID.randomUUID().toString().substring(0, 8);
+            user.setUsername(employeeCode != null && !employeeCode.isEmpty() ? employeeCode.toUpperCase() : "TEMP" + (int)(Math.random() * 1000));
+            user.setPassword(passwordEncoder.encode(randomPassword));
+            user.setStatus("ONBOARDING");
+        }
+
+        // Build full name
+        String fullName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+        user.setFullName(fullName.trim());
+        if(personalEmail != null) user.setEmail(personalEmail);
+        
+        com.example.admindashboard.model.EmployeeProfile existingProfile = user.getEmployeeProfile();
+        if (existingProfile == null) {
+            existingProfile = employeeProfile != null ? employeeProfile : new com.example.admindashboard.model.EmployeeProfile();
+            existingProfile.setUser(user);
+            user.setEmployeeProfile(existingProfile);
+        } else if (employeeProfile != null) {
+            // Update fields manually (we map the important ones from the form)
+            existingProfile.setPrefix(prefix);
+            existingProfile.setFirstName(firstName);
+            existingProfile.setMiddleName(middleName);
+            existingProfile.setLastName(lastName);
+            existingProfile.setEmployeeCode(employeeCode);
+            existingProfile.setMobileNumber(employeeProfile.getMobileNumber());
+            existingProfile.setEmergencyPhone(employeeProfile.getEmergencyPhone());
+            existingProfile.setDob(employeeProfile.getDob());
+            existingProfile.setGender(employeeProfile.getGender());
+            existingProfile.setMaritalStatus(employeeProfile.getMaritalStatus());
+            existingProfile.setNationality(employeeProfile.getNationality());
+            existingProfile.setFatherName(employeeProfile.getFatherName());
+            existingProfile.setMotherName(employeeProfile.getMotherName());
+            existingProfile.setSpouseName(employeeProfile.getSpouseName());
+            existingProfile.setJoiningDate(employeeProfile.getJoiningDate());
+            existingProfile.setProbationCompletionDate(probationCompletionDate);
+            existingProfile.setBloodGroup(employeeProfile.getBloodGroup());
+            existingProfile.setPhysicallyChallenged(physicallyChallenged);
+            existingProfile.setDepartment(employeeProfile.getDepartment());
+            existingProfile.setDesignation(employeeProfile.getDesignation());
+            existingProfile.setOfficialEmail(employeeProfile.getOfficialEmail());
+            existingProfile.setWorkLocation(employeeProfile.getWorkLocation());
+            // Map more as needed...
+        }
+        
+        userRepository.save(user);
+        
+        // Send email ONLY if it's a new user
+        if (isNew && personalEmail != null && !personalEmail.isEmpty() && randomPassword != null) {
+            emailService.sendOnboardingEmail(personalEmail, user.getFullName(), user.getUsername(), randomPassword, existingProfile.getOfficialEmail());
+        }
+        
+        redirectAttrs.addFlashAttribute("successMessage", isNew ? "Candidate Onboarded Successfully!" : "Candidate Updated Successfully!");
+        return "redirect:/senior_hr/employee";
+    }
+
     
+    
+    // --- DELETE EMPLOYEE ROUTE ---
+    @PostMapping("/senior_hr/employee/delete/{id}")
+    public String deleteEmployee(@org.springframework.web.bind.annotation.PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttrs) {
+        if(userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+            redirectAttrs.addFlashAttribute("successMessage", "Candidate deleted successfully!");
+        }
+        return "redirect:/senior_hr/employee";
+    }
+
+    // --- GET EMPLOYEE API (For Edit) ---
+    @GetMapping("/senior_hr/api/employee/{id}")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public java.util.Map<String, Object> getEmployeeApi(@org.springframework.web.bind.annotation.PathVariable Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) return java.util.Collections.emptyMap();
+        
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
+        map.put("id", user.getId());
+        map.put("username", user.getUsername());
+        map.put("fullName", user.getFullName());
+        map.put("email", user.getEmail());
+        
+        com.example.admindashboard.model.EmployeeProfile ep = user.getEmployeeProfile();
+        if (ep != null) {
+            map.put("prefix", ep.getPrefix());
+            map.put("firstName", ep.getFirstName());
+            map.put("middleName", ep.getMiddleName());
+            map.put("lastName", ep.getLastName());
+            map.put("employeeCode", ep.getEmployeeCode());
+            map.put("mobileNumber", ep.getMobileNumber());
+            map.put("emergencyPhone", ep.getEmergencyPhone());
+            if(ep.getDob() != null) map.put("dob", ep.getDob().toString());
+            map.put("gender", ep.getGender());
+            map.put("maritalStatus", ep.getMaritalStatus());
+            map.put("nationality", ep.getNationality());
+            map.put("fatherName", ep.getFatherName());
+            map.put("motherName", ep.getMotherName());
+            map.put("spouseName", ep.getSpouseName());
+            if(ep.getJoiningDate() != null) map.put("joiningDate", ep.getJoiningDate().toString());
+            map.put("probationPeriod", ep.getProbationPeriod());
+            if(ep.getProbationCompletionDate() != null) map.put("probationCompletionDate", ep.getProbationCompletionDate().toString());
+            map.put("bloodGroup", ep.getBloodGroup());
+            map.put("physicallyChallenged", ep.getPhysicallyChallenged());
+            map.put("department", ep.getDepartment());
+            map.put("designation", ep.getDesignation());
+            map.put("officialEmail", ep.getOfficialEmail());
+            map.put("workLocation", ep.getWorkLocation());
+            // Add other necessary fields
+        }
+        return map;
+    }
+
     // --- OFFBOARDING ROUTE ---
     @PostMapping("/senior_hr/resignation/offboard")
     public String completeOffboarding(@RequestParam("userId") Long userId, Principal principal) {

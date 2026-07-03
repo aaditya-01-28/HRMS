@@ -18,6 +18,14 @@ public class EmployeeProfile {
     // SECTION 1: IDENTITY & JOB (Moved from User)
     @Column(name = "employee_code")
     private String employeeCode;
+
+    private String prefix;
+    private String firstName;
+    private String middleName;
+    private String lastName;
+    private LocalDate probationCompletionDate;
+    private String physicallyChallenged;
+
     
     private String designation;
     private String experience;
@@ -580,4 +588,23 @@ public class EmployeeProfile {
     public void setNationality(String nationality) {
         this.nationality = nationality;
     }
+
+    public String getPrefix() { return prefix; }
+    public void setPrefix(String prefix) { this.prefix = prefix; }
+
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getMiddleName() { return middleName; }
+    public void setMiddleName(String middleName) { this.middleName = middleName; }
+
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public LocalDate getProbationCompletionDate() { return probationCompletionDate; }
+    public void setProbationCompletionDate(LocalDate probationCompletionDate) { this.probationCompletionDate = probationCompletionDate; }
+
+    public String getPhysicallyChallenged() { return physicallyChallenged; }
+    public void setPhysicallyChallenged(String physicallyChallenged) { this.physicallyChallenged = physicallyChallenged; }
+
 }

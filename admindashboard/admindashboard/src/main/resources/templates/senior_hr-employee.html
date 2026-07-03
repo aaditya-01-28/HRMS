@@ -1,13 +1,14 @@
 <!DOCTYPE html>
+
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteCircle | HR Admin - Employee</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WhiteCircle | HR Admin - Employee</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
         :root {
             --primary: #1e3a8a;
             --primary-light: #002D72;
@@ -232,826 +233,788 @@
     </style>
 </head>
 <body>
-
-    <!-- SIDEBAR -->
-    <div class="myspace-sidebar shadow-sm">
-        <div class="brand-area">
-            <img src="/images/wcg-logo.jpg" alt="Logo">
-            <div>
-                <div class="brand-title">WhiteCircle</div>
-                <div class="brand-sub">HR Admin</div>
-            </div>
-        </div>
-        <div class="nav-links">
-            <a href="/senior_hr/employee" class="nav-link-item active"><i class="fas fa-users"></i> Employee</a>
-            <a href="/senior_hr/lms" class="nav-link-item"><i class="fas fa-graduation-cap"></i> LMS</a>
-            <a href="/senior_hr/my_space" class="nav-link-item"><i class="fas fa-money-check-alt"></i> Payroll</a>
-            <a href="/senior_hr/attendance" class="nav-link-item"><i class="fas fa-clock"></i> Attendance</a>
-            <a href="/senior_hr/performance" class="nav-link-item"><i class="fas fa-chart-line"></i> Performance</a>
-            <a href="#" class="nav-link-item" onclick="alert('Recruitment Module Under Development')"><i class="fas fa-user-plus"></i> Recruitment</a>
-        </div>
-    </div>
-
-    <!-- GLOBAL NAVBAR -->
-    <nav class="top-navbar">
-        <div class="nav-brand">
-            <button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
-            <div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
-                <span style="color: #002D72; font-weight: 700; font-size: 1.3rem;">WhiteCircle Group - Shahdol</span>
-                <span style="font-size: 0.85rem; font-weight: 500; color: #333; margin-top: 2px;">Payroll</span>
-            </div>
-        </div>
-        <div class="nav-actions d-flex align-items-center gap-3">
-            <a href="/senior_hr/dashboard" class="btn btn-light text-dark fw-bold" style="border-radius: 6px; padding: 8px 20px; text-decoration: none;">
-                <i class="fas fa-arrow-left me-2"></i> Back
+<!-- SIDEBAR -->
+<div class="myspace-sidebar shadow-sm">
+<div class="brand-area">
+<img alt="Logo" src="/images/wcg-logo.jpg"/>
+<div>
+<div class="brand-title">WhiteCircle</div>
+<div class="brand-sub">HR Admin</div>
+</div>
+</div>
+<div class="nav-links">
+<a class="nav-link-item active" href="/senior_hr/employee"><i class="fas fa-users"></i> Employee</a>
+<a class="nav-link-item" href="/senior_hr/lms"><i class="fas fa-graduation-cap"></i> LMS</a>
+<a class="nav-link-item" href="/senior_hr/my_space"><i class="fas fa-money-check-alt"></i> Payroll</a>
+<a class="nav-link-item" href="/senior_hr/attendance"><i class="fas fa-clock"></i> Attendance</a>
+<a class="nav-link-item" href="/senior_hr/performance"><i class="fas fa-chart-line"></i> Performance</a>
+<a class="nav-link-item" href="#" onclick="alert('Recruitment Module Under Development')"><i class="fas fa-user-plus"></i> Recruitment</a>
+</div>
+</div>
+<!-- GLOBAL NAVBAR -->
+<nav class="top-navbar">
+<div class="nav-brand">
+<button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
+<div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
+<span style="color: #002D72; font-weight: 700; font-size: 1.3rem;">WhiteCircle Group - Shahdol</span>
+<span style="font-size: 0.85rem; font-weight: 500; color: #333; margin-top: 2px;">Payroll</span>
+</div>
+</div>
+<div class="nav-actions d-flex align-items-center gap-3">
+<a class="btn btn-light text-dark fw-bold" href="/senior_hr/dashboard" style="border-radius: 6px; padding: 8px 20px; text-decoration: none;">
+<i class="fas fa-arrow-left me-2"></i> Back
             </a>
-        </div>
-    </nav>
-
-    <!-- MAIN CONTENT -->
-    <div class="myspace-main">
-        
-        <!-- TABS -->
-        <ul class="nav custom-tabs" id="employeeTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="all-emp-tab" data-bs-toggle="tab" data-bs-target="#all-emp-pane" type="button" role="tab">All Employees</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="onboarding-tab" data-bs-toggle="tab" data-bs-target="#onboarding-pane" type="button" role="tab">Onboarding</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="offboarding-tab" data-bs-toggle="tab" data-bs-target="#offboarding-pane" type="button" role="tab">Offboarding</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="docs-tab" data-bs-toggle="tab" data-bs-target="#docs-pane" type="button" role="tab">Employee Documents</button>
-            </li>
-        </ul>
-
-        <!-- TAB CONTENT -->
-        <div class="tab-content">
-            
-            <!-- 1. ALL EMPLOYEES PANE -->
-            <div class="tab-pane fade show active" id="all-emp-pane" role="tabpanel">
-                
-                <!-- Metrics Row -->
-                <div class="d-flex justify-content-between align-items-center mb-5 mt-3 px-3">
-                    <div class="stat-item">
-                        <div class="icon text-primary"><i class="fas fa-users"></i></div>
-                        <div>
-                            <div class="label">Total Employees</div>
-                            <div class="value">100</div>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="icon text-success"><i class="far fa-calendar-check"></i></div>
-                        <div>
-                            <div class="label">Active Employee</div>
-                            <div class="value">85</div>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="icon text-primary"><i class="fas fa-user-plus"></i></div>
-                        <div>
-                            <div class="label">Onboarding</div>
-                            <div class="value">7</div>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="icon text-warning"><i class="far fa-calendar-alt"></i></div>
-                        <div>
-                            <div class="label">Notice Period</div>
-                            <div class="value">4</div>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="icon text-danger"><i class="fas fa-user-minus"></i></div>
-                        <div>
-                            <div class="label">Offboarded</div>
-                            <div class="value">5</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts Row -->
-                <div class="row mb-5">
-                    <div class="col-md-5">
-                        <h6 class="text-center text-primary fw-bold mb-4">Employees by Department</h6>
-                        <div class="d-flex align-items-center justify-content-center">
-                            <div style="width: 200px; height: 200px;">
-                                <canvas id="deptDonutChart"></canvas>
-                            </div>
-                            <div class="ms-4">
-                                <ul class="list-unstyled mb-0" style="font-size: 0.75rem; font-weight: 600;">
-                                    <li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #002D72;"></span>Engineering <span class="float-end ms-4">36%</span></li>
-                                    <li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #10b981;"></span>Product <span class="float-end ms-4">16%</span></li>
-                                    <li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #f59e0b;"></span>Design <span class="float-end ms-4">8%</span></li>
-                                    <li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #06b6d4;"></span>Marketing <span class="float-end ms-4">5%</span></li>
-                                    <li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #8b5cf6;"></span>Sales <span class="float-end ms-4">8%</span></li>
-                                    <li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #ec4899;"></span>HR <span class="float-end ms-4">5%</span></li>
-                                    <li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #f43f5e;"></span>Finance <span class="float-end ms-4">5%</span></li>
-                                    <li class="mb-0"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #94a3b8;"></span>Others <span class="float-end ms-4">18%</span></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-7">
-                        <h6 class="text-center text-primary fw-bold mb-4">Department Wise Headcount</h6>
-                        <div class="px-5">
-                            <!-- Progress Bars -->
-                            <div class="d-flex align-items-center mb-3">
-                                <div style="width: 100px; font-size: 0.8rem;">Engineering</div>
-                                <div class="progress flex-grow-1" style="height: 6px;">
-                                    <div class="progress-bar bg-success" style="width: 45%;"></div>
-                                </div>
-                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">45%</div>
-                            </div>
-                            <div class="d-flex align-items-center mb-3">
-                                <div style="width: 100px; font-size: 0.8rem;">Design</div>
-                                <div class="progress flex-grow-1" style="height: 6px;">
-                                    <div class="progress-bar bg-success" style="width: 27%;"></div>
-                                </div>
-                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">27%</div>
-                            </div>
-                            <div class="d-flex align-items-center mb-3">
-                                <div style="width: 100px; font-size: 0.8rem;">Product</div>
-                                <div class="progress flex-grow-1" style="height: 6px;">
-                                    <div class="progress-bar bg-success" style="width: 35%;"></div>
-                                </div>
-                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">35%</div>
-                            </div>
-                            <div class="d-flex align-items-center mb-3">
-                                <div style="width: 100px; font-size: 0.8rem;">HR</div>
-                                <div class="progress flex-grow-1" style="height: 6px;">
-                                    <div class="progress-bar bg-success" style="width: 20%;"></div>
-                                </div>
-                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">20%</div>
-                            </div>
-                            <div class="d-flex align-items-center mb-3">
-                                <div style="width: 100px; font-size: 0.8rem;">Finance</div>
-                                <div class="progress flex-grow-1" style="height: 6px;">
-                                    <div class="progress-bar bg-success" style="width: 29%;"></div>
-                                </div>
-                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">29%</div>
-                            </div>
-                            <div class="d-flex align-items-center mb-3">
-                                <div style="width: 100px; font-size: 0.8rem;">Sales</div>
-                                <div class="progress flex-grow-1" style="height: 6px;">
-                                    <div class="progress-bar bg-success" style="width: 36%;"></div>
-                                </div>
-                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">36%</div>
-                            </div>
-                            <div class="d-flex align-items-center mb-3">
-                                <div style="width: 100px; font-size: 0.8rem;">Marketing</div>
-                                <div class="progress flex-grow-1" style="height: 6px;">
-                                    <div class="progress-bar bg-success" style="width: 40%;"></div>
-                                </div>
-                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">40%</div>
-                            </div>
-                            <div class="d-flex align-items-center mb-0">
-                                <div style="width: 100px; font-size: 0.8rem;">Others</div>
-                                <div class="progress flex-grow-1" style="height: 6px;">
-                                    <div class="progress-bar bg-success" style="width: 33%;"></div>
-                                </div>
-                                <div class="ms-3" style="font-size: 0.8rem; width: 30px;">33%</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Table with Filters -->
-                <div class="card-custom">
-                    <div class="d-flex gap-3 mb-4">
-                        <div class="position-relative flex-grow-1" style="max-width: 300px;">
-                            <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 12px;"></i>
-                            <input type="text" id="allEmpSearch" class="form-control" placeholder="Search by employee name" style="padding-left: 40px;">
-                        </div>
-                        <select id="allEmpDept" class="form-select w-auto">
-                            <option value="">All Departments</option>
-                            <option value="Engineering">Engineering</option>
-                            <option value="HR">HR</option>
-                            <option value="Sales">Sales</option>
-                            <option value="Marketing">Marketing</option>
-                        </select>
-                        <select id="allEmpLoc" class="form-select w-auto">
-                            <option value="">All Location</option>
-                            <option value="Delhi">Delhi</option>
-                            <option value="Pune">Pune</option>
-                            <option value="Raipur">Raipur</option>
-                            <option value="Ooty">Ooty</option>
-                        </select>
-                        <select id="allEmpRole" class="form-select w-auto">
-                            <option value="">All Roles</option>
-                            <option value="Sr. Developer">Sr. Developer</option>
-                            <option value="Software Engineer">Software Engineer</option>
-                            <option value="Product Manager">Product Manager</option>
-                        </select>
-                        <select id="allEmpStatus" class="form-select w-auto">
-                            <option value="">All Status</option>
-                            <option value="ACTIVE">Active</option>
-                            <option value="ON NOTICE">On Notice</option>
-                            <option value="EXITED">Exited</option>
-                        </select>
-                        <button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> More Filters</button>
-                    </div>
-
-                    <div class="table-responsive border rounded">
-                        <table class="table table-custom mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Employee</th>
-                                    <th>Employee ID</th>
-                                    <th>Department</th>
-                                    <th>Designation</th>
-                                    <th>Location</th>
-                                    <th>Employment type</th>
-                                    <th>Joined Date</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="all-emp-tbody">
-                                <tr th:each="emp, iterStat : ${allUsers}">
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <!-- Alternate image colors for mockup -->
-                                            <img th:src="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}" 
-                                                 class="emp-avatar border" style="object-fit: cover;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\' /></svg>'">
-                                            <div class="lh-1">
-                                                <div class="fw-bold text-dark mb-1" th:text="${emp.fullName}">Name</div>
-                                                <div style="font-size: 0.7rem; color: #94a3b8;" th:text="${emp.email != null ? emp.email : (emp.username + '@mail.com')}">email</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td th:text="${emp.employeeProfile != null ? emp.employeeProfile.employeeCode : 'N/A'}">ID</td>
-                                    <td th:text="${emp.employeeProfile != null ? emp.employeeProfile.department : 'N/A'}">Dept</td>
-                                    <td th:text="${emp.designation}">Desig</td>
-                                    <td th:text="${emp.employeeProfile != null ? emp.employeeProfile.city : 'N/A'}">Loc</td>
-                                    <td th:text="${emp.role != null ? emp.role.roleName : 'Full-time'}">Type</td>
-                                    <td th:text="${emp.employeeProfile != null ? emp.employeeProfile.joiningDate : 'N/A'}">Join Date</td>
-                                    <td>
-                                        <span th:class="${emp.status == 'ACTIVE' ? 'text-success fw-bold' : (emp.status == 'ON NOTICE' ? 'text-warning fw-bold' : 'text-danger fw-bold')}" 
-                                              th:text="${emp.status}">Status</span>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
-                                        <button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="text-muted" style="font-size: 0.85rem;">Showing 1 to 10 entries</div>
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">4</a></li>
-                            <li class="page-item"><a class="page-link" href="#">5</a></li>
-                            <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. ONBOARDING PANE -->
-            <div class="tab-pane fade" id="onboarding-pane" role="tabpanel">
-                
-                <!-- LIST VIEW -->
-                <div id="onboarding-list-view" class="card-custom border-0 shadow-none p-0">
-                    <div class="d-flex gap-3 mb-4 mt-3">
-                        <div class="position-relative flex-grow-1" style="max-width: 300px;">
-                            <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 12px;"></i>
-                            <input type="text" class="form-control" placeholder="Search by employee name" style="padding-left: 40px;">
-                        </div>
-                        <select class="form-select w-auto"><option>All Departments</option></select>
-                        <select class="form-select w-auto"><option>All Location</option></select>
-                        <select class="form-select w-auto"><option>All Roles</option></select>
-                        <button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> More Filters</button>
-                        <button class="btn btn-primary fw-bold ms-auto" onclick="toggleOnboardingForm(true)">
-                            <i class="fas fa-plus me-1"></i> Add Candidate
+</div>
+</nav>
+<!-- MAIN CONTENT -->
+<div class="myspace-main">
+<!-- TABS -->
+<ul class="nav custom-tabs" id="employeeTabs" role="tablist">
+<li class="nav-item" role="presentation">
+<button class="nav-link active" data-bs-target="#all-emp-pane" data-bs-toggle="tab" id="all-emp-tab" role="tab" type="button">All Employees</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" data-bs-target="#onboarding-pane" data-bs-toggle="tab" id="onboarding-tab" role="tab" type="button">Onboarding</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" data-bs-target="#offboarding-pane" data-bs-toggle="tab" id="offboarding-tab" role="tab" type="button">Offboarding</button>
+</li>
+</ul>
+<!-- TAB CONTENT -->
+<div class="tab-content">
+<!-- 1. ALL EMPLOYEES PANE -->
+<div class="tab-pane fade show active" id="all-emp-pane" role="tabpanel">
+<!-- Metrics Row -->
+<div class="d-flex justify-content-between align-items-center mb-5 mt-3 px-3">
+<div class="stat-item">
+<div class="icon text-primary"><i class="fas fa-users"></i></div>
+<div>
+<div class="label">Total Employees</div>
+<div class="value">100</div>
+</div>
+</div>
+<div class="stat-item">
+<div class="icon text-success"><i class="far fa-calendar-check"></i></div>
+<div>
+<div class="label">Active Employee</div>
+<div class="value">85</div>
+</div>
+</div>
+<div class="stat-item">
+<div class="icon text-primary"><i class="fas fa-user-plus"></i></div>
+<div>
+<div class="label">Onboarding</div>
+<div class="value">7</div>
+</div>
+</div>
+<div class="stat-item">
+<div class="icon text-warning"><i class="far fa-calendar-alt"></i></div>
+<div>
+<div class="label">Notice Period</div>
+<div class="value">4</div>
+</div>
+</div>
+<div class="stat-item">
+<div class="icon text-danger"><i class="fas fa-user-minus"></i></div>
+<div>
+<div class="label">Offboarded</div>
+<div class="value">5</div>
+</div>
+</div>
+</div>
+<!-- Charts Row -->
+<div class="row mb-5">
+<div class="col-md-5">
+<h6 class="text-center text-primary fw-bold mb-4">Employees by Department</h6>
+<div class="d-flex align-items-center justify-content-center">
+<div style="width: 200px; height: 200px;">
+<canvas id="deptDonutChart"></canvas>
+</div>
+<div class="ms-4">
+<ul class="list-unstyled mb-0" style="font-size: 0.75rem; font-weight: 600;">
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #002D72;"></span>Engineering <span class="float-end ms-4">36%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #10b981;"></span>Product <span class="float-end ms-4">16%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #f59e0b;"></span>Design <span class="float-end ms-4">8%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #06b6d4;"></span>Marketing <span class="float-end ms-4">5%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #8b5cf6;"></span>Sales <span class="float-end ms-4">8%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #ec4899;"></span>HR <span class="float-end ms-4">5%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #f43f5e;"></span>Finance <span class="float-end ms-4">5%</span></li>
+<li class="mb-0"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #94a3b8;"></span>Others <span class="float-end ms-4">18%</span></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="col-md-7">
+<h6 class="text-center text-primary fw-bold mb-4">Department Wise Headcount</h6>
+<div class="px-5">
+<!-- Progress Bars -->
+<div class="d-flex align-items-center mb-3">
+<div style="width: 100px; font-size: 0.8rem;">Engineering</div>
+<div class="progress flex-grow-1" style="height: 6px;">
+<div class="progress-bar bg-success" style="width: 45%;"></div>
+</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;">45%</div>
+</div>
+<div class="d-flex align-items-center mb-3">
+<div style="width: 100px; font-size: 0.8rem;">Design</div>
+<div class="progress flex-grow-1" style="height: 6px;">
+<div class="progress-bar bg-success" style="width: 27%;"></div>
+</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;">27%</div>
+</div>
+<div class="d-flex align-items-center mb-3">
+<div style="width: 100px; font-size: 0.8rem;">Product</div>
+<div class="progress flex-grow-1" style="height: 6px;">
+<div class="progress-bar bg-success" style="width: 35%;"></div>
+</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;">35%</div>
+</div>
+<div class="d-flex align-items-center mb-3">
+<div style="width: 100px; font-size: 0.8rem;">HR</div>
+<div class="progress flex-grow-1" style="height: 6px;">
+<div class="progress-bar bg-success" style="width: 20%;"></div>
+</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;">20%</div>
+</div>
+<div class="d-flex align-items-center mb-3">
+<div style="width: 100px; font-size: 0.8rem;">Finance</div>
+<div class="progress flex-grow-1" style="height: 6px;">
+<div class="progress-bar bg-success" style="width: 29%;"></div>
+</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;">29%</div>
+</div>
+<div class="d-flex align-items-center mb-3">
+<div style="width: 100px; font-size: 0.8rem;">Sales</div>
+<div class="progress flex-grow-1" style="height: 6px;">
+<div class="progress-bar bg-success" style="width: 36%;"></div>
+</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;">36%</div>
+</div>
+<div class="d-flex align-items-center mb-3">
+<div style="width: 100px; font-size: 0.8rem;">Marketing</div>
+<div class="progress flex-grow-1" style="height: 6px;">
+<div class="progress-bar bg-success" style="width: 40%;"></div>
+</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;">40%</div>
+</div>
+<div class="d-flex align-items-center mb-0">
+<div style="width: 100px; font-size: 0.8rem;">Others</div>
+<div class="progress flex-grow-1" style="height: 6px;">
+<div class="progress-bar bg-success" style="width: 33%;"></div>
+</div>
+<div class="ms-3" style="font-size: 0.8rem; width: 30px;">33%</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Table with Filters -->
+<div class="card-custom">
+<div class="d-flex gap-3 mb-4">
+<div class="position-relative flex-grow-1" style="max-width: 300px;">
+<i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 12px;"></i>
+<input class="form-control" id="allEmpSearch" placeholder="Search by employee name" style="padding-left: 40px;" type="text"/>
+</div>
+<select class="form-select w-auto" id="allEmpDept"><option disabled="" selected="" value="">Select...</option>
+<option value="">All Departments</option>
+<option value="Engineering">Engineering</option>
+<option value="HR">HR</option>
+<option value="Sales">Sales</option>
+<option value="Marketing">Marketing</option>
+</select>
+<select class="form-select w-auto" id="allEmpLoc"><option disabled="" selected="" value="">Select...</option>
+<option value="">All Location</option>
+<option value="Delhi">Delhi</option>
+<option value="Pune">Pune</option>
+<option value="Raipur">Raipur</option>
+<option value="Ooty">Ooty</option>
+</select>
+<select class="form-select w-auto" id="allEmpRole"><option disabled="" selected="" value="">Select...</option>
+<option value="">All Roles</option>
+<option value="Sr. Developer">Sr. Developer</option>
+<option value="Software Engineer">Software Engineer</option>
+<option value="Product Manager">Product Manager</option>
+</select>
+<select class="form-select w-auto" id="allEmpStatus"><option disabled="" selected="" value="">Select...</option>
+<option value="">All Status</option>
+<option value="ACTIVE">Active</option>
+<option value="ON NOTICE">On Notice</option>
+<option value="EXITED">Exited</option>
+</select>
+<button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> More Filters</button>
+</div>
+<div class="table-responsive border rounded">
+<table class="table table-custom mb-0">
+<thead>
+<tr>
+<th>Employee</th>
+<th>Employee ID</th>
+<th>Department</th>
+<th>Designation</th>
+<th>Location</th>
+<th>Employment type</th>
+<th>Joined Date</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="all-emp-tbody">
+<tr th:each="emp, iterStat : ${allUsers}">
+<td>
+<div class="d-flex align-items-center">
+<!-- Alternate image colors for mockup -->
+<img class="emp-avatar border" onerror="this.src='data:image/svg+xml;utf8,&lt;svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'&gt;&lt;path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\' /&gt;&lt;/svg&gt;'" style="object-fit: cover;" th:src="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}"/>
+<div class="lh-1">
+<div class="fw-bold text-dark mb-1" th:text="${emp.fullName}">Name</div>
+<div style="font-size: 0.7rem; color: #94a3b8;" th:text="${emp.email != null ? emp.email : (emp.username + '@mail.com')}">email</div>
+</div>
+</div>
+</td>
+<td th:text="${emp.employeeProfile != null ? emp.employeeProfile.employeeCode : 'N/A'}">ID</td>
+<td th:text="${emp.employeeProfile != null ? emp.employeeProfile.department : 'N/A'}">Dept</td>
+<td th:text="${emp.designation}">Desig</td>
+<td th:text="${emp.employeeProfile != null ? emp.employeeProfile.city : 'N/A'}">Loc</td>
+<td th:text="${emp.role != null ? emp.role.roleName : 'Full-time'}">Type</td>
+<td th:text="${emp.employeeProfile != null ? emp.employeeProfile.joiningDate : 'N/A'}">Join Date</td>
+<td>
+<span th:class="${emp.status == 'ACTIVE' ? 'text-success fw-bold' : (emp.status == 'ON NOTICE' ? 'text-warning fw-bold' : 'text-danger fw-bold')}" th:text="${emp.status}">Status</span>
+</td>
+<td>
+<button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
+<button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="d-flex justify-content-between align-items-center mt-3">
+<div class="text-muted" style="font-size: 0.85rem;">Showing 1 to 10 entries</div>
+<ul class="pagination pagination-sm mb-0">
+<li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
+<li class="page-item active"><a class="page-link" href="#">1</a></li>
+<li class="page-item"><a class="page-link" href="#">2</a></li>
+<li class="page-item"><a class="page-link" href="#">3</a></li>
+<li class="page-item"><a class="page-link" href="#">4</a></li>
+<li class="page-item"><a class="page-link" href="#">5</a></li>
+<li class="page-item"><a class="page-link" href="#">&gt;</a></li>
+</ul>
+</div>
+</div>
+</div>
+<!-- 2. ONBOARDING PANE -->
+<div class="tab-pane fade" id="onboarding-pane" role="tabpanel">
+<!-- LIST VIEW -->
+<div class="card-custom border-0 shadow-none p-0" id="onboarding-list-view">
+<div class="d-flex gap-3 mb-4 mt-3">
+<div class="position-relative flex-grow-1" style="max-width: 300px;">
+<i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 12px;"></i>
+<input class="form-control" id="onboardSearch" placeholder="Search by employee name" style="padding-left: 40px;" type="text"/>
+</div>
+<select class="form-select w-auto" id="onboardDept"><option disabled="" selected="" value="">Select...</option><option value="">All Departments</option></select>
+<select class="form-select w-auto" id="onboardLoc"><option disabled="" selected="" value="">Select...</option><option value="">All Location</option></select>
+<select class="form-select w-auto" id="onboardRole"><option disabled="" selected="" value="">Select...</option><option value="">All Roles</option></select>
+<button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> More Filters</button>
+<button class="btn btn-primary fw-bold ms-auto" onclick="toggleOnboardingForm(true)">
+<i class="fas fa-plus me-1"></i> Add Candidate
                         </button>
-                    </div>
-
-                    <div class="table-responsive border rounded">
-                        <table class="table table-custom mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Candidate Name</th>
-                                    <th>Department</th>
-                                    <th>Designation</th>
-                                    <th>Location</th>
-                                    <th>Join Date</th>
-                                    <th>Progress</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="cand, iterStat : ${candidates}">
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img th:src="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}" 
-                                                 class="emp-avatar border" style="object-fit: cover;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\' /></svg>'">
-                                            <div class="lh-1">
-                                                <div class="fw-bold text-dark mb-1" th:text="${cand.name}">Name</div>
-                                                <div style="font-size: 0.7rem; color: #94a3b8;" th:text="${#strings.toLowerCase(#strings.replace(cand.name,' ','')) + 'wcg@mail.com'}">email</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td th:text="${cand.dept}">Dept</td>
-                                    <td th:text="${cand.desig}">Desig</td>
-                                    <td th:text="${cand.loc}">Loc</td>
-                                    <td th:text="${cand.join}">Join Date</td>
-                                    <td style="width: 120px;">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="progress flex-grow-1" style="height: 6px;">
-                                                <div class="progress-bar bg-success" th:style="'width: ' + ${cand.prog} + '%'"></div>
-                                            </div>
-                                            <span style="font-size: 0.75rem; font-weight: bold;" th:text="${cand.prog} + '%'"></span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="text-primary fw-bold">In Progress</span>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
-                                        <button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- FORM WIZARD VIEW (Hidden by default) -->
-                <div id="onboarding-form-view" class="d-none mt-4">
-                        <form id="onboardingForm" action="/senior_hr/employee/onboard" method="POST">
-                    
-                    <!-- Stepper -->
-                    <div class="stepper-wrapper px-4">
-                        <div class="stepper-item active" id="step1-indicator">
-                            <div class="stepper-circle">1</div>
-                            <div class="stepper-label">General</div>
-                        </div>
-                        <div class="stepper-item" id="step2-indicator">
-                            <div class="stepper-circle">2</div>
-                            <div class="stepper-label">Classification</div>
-                        </div>
-                        <div class="stepper-item" id="step3-indicator">
-                            <div class="stepper-circle">3</div>
-                            <div class="stepper-label">Statutory</div>
-                        </div>
-                        <div class="stepper-item" id="step4-indicator">
-                            <div class="stepper-circle">4</div>
-                            <div class="stepper-label">HR Category</div>
-                        </div>
-                        <div class="stepper-item" id="step5-indicator">
-                            <div class="stepper-circle">5</div>
-                            <div class="stepper-label">Documents</div>
-                        </div>
-                    </div>
-
-                    <!-- Step 1 Form -->
-                    <div id="step1-form" class="px-3">
-                        <div class="row g-4 mb-5">
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Prefix <span class="text-danger">*</span></label>
-                                <select name="prefix" class="form-select"><option>Mr.</option><option>Ms.</option></select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Employee ID <span class="text-danger">*</span></label>
-                                <input type="text" name="empId" class="form-control" placeholder="Enter EMP ID">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">First Name <span class="text-danger">*</span></label>
-                                <input type="text" name="firstName" class="form-control" placeholder="First Name">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Middle Name <span class="text-danger">*</span></label>
-                                <input type="text" name="middleName" class="form-control" placeholder="Middle Name">
-                            </div>
-                            
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Last Name <span class="text-danger">*</span></label>
-                                <input type="text" name="lastName" class="form-control" placeholder="Last Name">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Email Address <span class="text-danger">*</span></label>
-                                <input type="email" name="email" class="form-control" placeholder="Email Address">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Phone No. <span class="text-danger">*</span></label>
-                                <input type="text" name="mobileNumber" class="form-control" placeholder="Phone No.">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Emergency No. <span class="text-danger">*</span></label>
-                                <input type="text" name="mobileNumber" class="form-control" placeholder="Phone No.">
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">DOB <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="DD-MM-YYYY">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Gender <span class="text-danger">*</span></label>
-                                <select name="gender" class="form-select"><option>Male</option><option>Female</option></select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Marital Status <span class="text-danger">*</span></label>
-                                <select name="maritalStatus" class="form-select"><option>Single</option><option>Married</option></select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Nationality <span class="text-danger">*</span></label>
-                                <input type="text" name="nationality" class="form-control" placeholder="Nationality">
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Father's Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="Enter">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Mother's Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="Enter">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Spouse Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="Enter">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Date of Joining <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="DD-MM-YYYY">
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Probation Period <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="Enter Days">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Probation Completion date <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="DD-MM-YYYY">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Blood Group <span class="text-danger">*</span></label>
-                                <select name="bloodGroup" class="form-select"><option>O +ve</option><option>A +ve</option><option>B +ve</option><option>AB +ve</option><option>O -ve</option><option>A -ve</option><option>B -ve</option><option>AB -ve</option></select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Physically Challenged <span class="text-danger">*</span></label>
-                                <select name="physicallyChallenged" class="form-select"><option>No</option><option>Yes</option></select>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-center gap-3">
-                            <button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="toggleOnboardingForm(false)">Cancel</button>
-                            <button class="btn btn-primary px-5 py-2 fw-bold" onclick="goToStep2()">Save & Next <i class="fas fa-arrow-right ms-2"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- Step 2 Form -->
-                    <div id="step2-form" class="px-3 d-none">
-                        <div class="row g-4 mb-5">
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Department <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Engineering</option></select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Designation <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Senior</option></select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Employment Type <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Full-Time</option></select>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Job title <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Developer</option></select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold text-primary border-bottom border-primary" style="font-size: 0.85rem;">Grade/Level <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Select Level</option></select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Role <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Select Role</option></select>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Reports To <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Amit Kumar</option></select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Business Unit <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Business Unit</option></select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Work Location <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Raipur</option></select>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Work Shift <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>General</option></select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Date of Confirmation <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="DD-MM-YYYY">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Probation Review Date <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="DD-MM-YYYY">
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-center gap-3">
-                            <button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep1()">Back</button>
-                            <button class="btn btn-primary px-5 py-2 fw-bold" onclick="goToStep3()">Save & Next <i class="fas fa-arrow-right ms-2"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- Step 3 Form -->
-                    <div id="step3-form" class="px-3 d-none">
-                        <div class="row g-4 mb-5">
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">PAN Number <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="Enter PAN">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">AADHAAR No <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="Enter">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">PF No <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="Full-Time">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">ESI No <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="Enter ESI">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">UAN No <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="Enter UAN">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Tax Regime <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Select Tax Regime</option></select>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Professional Tax Applicable <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Yes/No</option></select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">PT Registration No <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="Enter PT">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">PT State <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Select PT state</option></select>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-center gap-3">
-                            <button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep2()">Cancel</button>
-                            <button class="btn btn-primary px-5 py-2 fw-bold" onclick="goToStep4()">Save & Next <i class="fas fa-arrow-right ms-2"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- Step 4 Form -->
-                    <div id="step4-form" class="px-3 d-none">
-                        <div class="row g-4 mb-5">
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Employee Category <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Select Category</option></select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Staffing Type <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Select</option></select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Pay Type <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Select</option></select>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Pay Frequency <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Select Freq</option></select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Select Work Location Type <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>WFH</option></select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Probation Applicable <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Yes/No</option></select>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">OT Eligible <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Yes/No</option></select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Travel Required <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Yes/N</option></select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Department Head <span class="text-danger">*</span></label>
-                                <select class="form-select"><option>Arun Kumar</option></select>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-center gap-3">
-                            <button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep3()">Cancel</button>
-                            <button class="btn btn-primary px-5 py-2 fw-bold" onclick="goToStep5()">Save & Next <i class="fas fa-arrow-right ms-2"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- Step 5 Form -->
-                    <div id="step5-form" class="px-3 d-none">
-                        <div class="table-responsive border rounded mb-5">
-                            <table class="table table-custom mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Document Type</th>
-                                        <th>Required</th>
-                                        <th>Upload</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="fw-bold">Passport Size Photo <span class="text-danger">*</span></td>
-                                        <td class="text-danger fw-bold">Yes</td>
-                                        <td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
-                                        <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB & 500 x 500 resolution)</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">Resume/CV <span class="text-danger">*</span></td>
-                                        <td class="text-danger fw-bold">Yes</td>
-                                        <td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
-                                        <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB & 500 x 500 resolution)</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">Aadhaar Card <span class="text-danger">*</span></td>
-                                        <td class="text-danger fw-bold">Yes</td>
-                                        <td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
-                                        <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB & 500 x 500 resolution)</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">PAN Card <span class="text-danger">*</span></td>
-                                        <td class="text-danger fw-bold">Yes</td>
-                                        <td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
-                                        <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB & 500 x 500 resolution)</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">Educational Certificate <span class="text-danger">*</span></td>
-                                        <td class="text-danger fw-bold">Yes</td>
-                                        <td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
-                                        <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB & 500 x 500 resolution)</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">Experience Letter <span class="text-danger">*</span></td>
-                                        <td class="text-success fw-bold">No</td>
-                                        <td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
-                                        <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB & 500 x 500 resolution)</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">Offer Letter <span class="text-danger">*</span></td>
-                                        <td class="text-success fw-bold">No</td>
-                                        <td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
-                                        <td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB & 500 x 500 resolution)</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="d-flex justify-content-center gap-3">
-                            <button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep4()">Cancel</button>
-                            <button class="btn btn-success px-5 py-2 fw-bold" onclick="alert('Candidate Onboarded Successfully!'); toggleOnboardingForm(false);">Submit <i class="fas fa-arrow-right ms-2"></i></button>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- 3. OFFBOARDING PANE -->
-            <div class="tab-pane fade" id="offboarding-pane" role="tabpanel">
-                
-                <div class="card-custom border-0 shadow-none p-0 mt-3">
-                    <div class="d-flex gap-3 mb-4">
-                        <div class="position-relative flex-grow-1" style="max-width: 300px;">
-                            <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 12px;"></i>
-                            <input type="text" id="offboardingSearch" class="form-control" placeholder="Search by employee name" style="padding-left: 40px;">
-                        </div>
-                        <select id="offboardingDept" class="form-select w-auto">
-                            <option value="">All Departments</option>
-                            <option value="Engineering">Engineering</option>
-                            <option value="HR">HR</option>
-                            <option value="Sales">Sales</option>
-                            <option value="Marketing">Marketing</option>
-                        </select>
-                        <select id="offboardingStatus" class="form-select w-auto">
-                            <option value="">Status: All</option>
-                            <option value="ACTIVE">Active</option>
-                            <option value="ON NOTICE">On Notice</option>
-                            <option value="EXITED">Exited</option>
-                        </select>
-                        <select id="offboardingRole" class="form-select w-auto">
-                            <option value="">All Roles</option>
-                            <option value="Sr. Developer">Sr. Developer</option>
-                            <option value="Software Engineer">Software Engineer</option>
-                            <option value="Junior developer">Junior developer</option>
-                        </select>
-                        <button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> More Filters</button>
-                        <button class="btn btn-primary fw-bold ms-auto" onclick="openExitModal()">
-                            <i class="fas fa-plus me-1"></i> Exit Candidate
+</div>
+<div class="table-responsive border rounded">
+<table class="table table-custom mb-0">
+<thead>
+<tr>
+<th>Candidate Name</th>
+<th>Department</th>
+<th>Designation</th>
+<th>Location</th>
+<th>Join Date</th>
+<th>Progress</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="cand, iterStat : ${candidates}">
+<td>
+<div class="d-flex align-items-center">
+<img class="emp-avatar border" onerror="this.src='data:image/svg+xml;utf8,&lt;svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'&gt;&lt;path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\' /&gt;&lt;/svg&gt;'" style="object-fit: cover;" th:src="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}"/>
+<div class="lh-1">
+<div class="fw-bold text-dark mb-1" th:text="${cand.fullName}">Name</div>
+<div style="font-size: 0.7rem; color: #94a3b8;" th:text="${cand.email}">email</div>
+</div>
+</div>
+</td>
+<td th:text="${cand.employeeProfile != null ? cand.employeeProfile.department : '-'}">Dept</td>
+<td th:text="${cand.employeeProfile != null ? cand.employeeProfile.designation : '-'}">Desig</td>
+<td th:text="${cand.employeeProfile != null ? cand.employeeProfile.workLocation : '-'}">Loc</td>
+<td th:text="${cand.employeeProfile != null ? cand.employeeProfile.joiningDate : '-'}">Join Date</td>
+<td style="width: 120px;">
+<div class="d-flex align-items-center gap-2">
+<div class="progress flex-grow-1" style="height: 6px;">
+<div class="progress-bar bg-success" th:style="'width: ' + 20 + '%'"></div>
+</div>
+<span style="font-size: 0.75rem; font-weight: bold;" th:text="20 + '%'"></span>
+</div>
+</td>
+<td>
+<span class="text-primary fw-bold">In Progress</span>
+</td>
+<td>
+<button class="btn btn-sm btn-link text-dark p-0 me-2" th:onclick="'editCandidate(' + ${cand.id} + ')'" type="button"><i class="fas fa-pen"></i></button>
+<form class="d-inline" method="POST" onsubmit="return confirm('Are you sure you want to delete this candidate?');" th:action="@{/senior_hr/employee/delete/{id}(id=${cand.id})}"><button class="btn btn-sm btn-link text-danger p-0" type="submit"><i class="fas fa-trash"></i></button></form>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- FORM WIZARD VIEW (Hidden by default) -->
+<div class="d-none mt-4" id="onboarding-form-view">
+<form action="/senior_hr/onboard" id="onboardingForm" method="POST"><input id="onboardUserId" name="id" type="hidden"/>
+<!-- Stepper -->
+<div class="stepper-wrapper px-4">
+<div class="stepper-item active" id="step1-indicator">
+<div class="stepper-circle">1</div>
+<div class="stepper-label">General</div>
+</div>
+<div class="stepper-item" id="step2-indicator">
+<div class="stepper-circle">2</div>
+<div class="stepper-label">Classification</div>
+</div>
+<div class="stepper-item" id="step3-indicator">
+<div class="stepper-circle">3</div>
+<div class="stepper-label">Statutory</div>
+</div>
+<div class="stepper-item" id="step4-indicator">
+<div class="stepper-circle">4</div>
+<div class="stepper-label">HR Category</div>
+</div>
+<div class="stepper-item" id="step5-indicator">
+<div class="stepper-circle">5</div>
+<div class="stepper-label">Documents</div>
+</div>
+</div>
+<!-- Step 1 Form -->
+<div class="px-3" id="step1-form">
+<div class="row g-4 mb-5">
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Prefix <span class="text-danger">*</span></label>
+<select class="form-select" name="prefix"><option disabled="" selected="" value="">Select...</option><option>Mr.</option><option>Ms.</option><option>Mrs.</option></select>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Employee ID <span class="text-danger">*</span></label>
+<input class="form-control" name="empId" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">First Name <span class="text-danger">*</span></label>
+<input class="form-control" name="firstName" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Middle Name </label>
+<input class="form-control" name="middleName" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Last Name <span class="text-danger">*</span></label>
+<input class="form-control" name="lastName" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Personal Email <span class="text-danger">*</span></label>
+<input class="form-control" name="email" type="email"/>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Office Email <span class="text-danger">*</span></label>
+<input class="form-control" name="officeEmail" type="email"/>
+</div>
+<div class="col">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Phone No. <span class="text-danger">*</span></label>
+<input class="form-control" maxlength="10" name="mobileNumber" oninput="this.value = this.value.replace(/[^0-9]/g, \'\').slice(0, 10);" type="text"/>
+</div>
+<div class="col">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Emergency No. <span class="text-danger">*</span></label>
+<input class="form-control" maxlength="10" name="emergencyPhone" oninput="this.value = this.value.replace(/[^0-9]/g, \'\').slice(0, 10);" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">DOB <span class="text-danger">*</span></label>
+<input class="form-control" name="dob" type="date"/>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Gender <span class="text-danger">*</span></label>
+<select class="form-select" name="gender"><option disabled="" selected="" value="">Select...</option><option>Male</option><option>Female</option></select>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Marital Status <span class="text-danger">*</span></label>
+<select class="form-select" name="maritalStatus"><option disabled="" selected="" value="">Select...</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Nationality <span class="text-danger">*</span></label>
+<input class="form-control" name="nationality" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Father's Name <span class="text-danger">*</span></label>
+<input class="form-control" name="fatherName" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Mother's Name <span class="text-danger">*</span></label>
+<input class="form-control" name="motherName" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Spouse Name </label>
+<input class="form-control" name="spouseName" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Date of Joining <span class="text-danger">*</span></label>
+<input class="form-control" id="joinDate" name="joiningDate" type="date"/>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Probation Completion date <span class="text-danger">*</span></label>
+<input class="form-control" id="probationCompletionDate" name="probationCompletionDate" type="date"/>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Probation Period <span class="text-danger">*</span></label>
+<input class="form-control" id="probationPeriod" name="probationPeriodStr" readonly="readonly" style="background-color: #f8f9fa;" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Blood Group <span class="text-danger">*</span></label>
+<select class="form-select" name="bloodGroup"><option disabled="" selected="" value="">Select...</option><option>A +ve</option><option>A -ve</option><option>B +ve</option><option>B -ve</option><option>O +ve</option><option>O -ve</option><option>AB +ve</option><option>AB -ve</option></select>
+</div>
+<div class="col-md-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Physically Challenged <span class="text-danger">*</span></label>
+<select class="form-select" name="physicallyChallenged"><option disabled="" selected="" value="">Select...</option><option>No</option><option>Yes</option></select>
+</div>
+</div>
+<div class="d-flex justify-content-center gap-3">
+<button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="toggleOnboardingForm(false)">Back</button>
+<button class="btn btn-primary px-5 py-2 fw-bold" onclick="goToStep2()" type="button">Save &amp; Next <i class="fas fa-arrow-right ms-2"></i></button>
+</div>
+</div>
+<!-- Step 2 Form -->
+<div class="px-3 d-none" id="step2-form">
+<div class="row g-4 mb-5">
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Department <span class="text-danger">*</span></label>
+<select class="form-select" name="department"><option disabled="" selected="" value="">Select...</option><option value="Engineering">Engineering</option><option value="Design">Design</option><option value="Human Resources">Human Resources</option><option value="Finance">Finance</option><option value="Operations">Operations</option><option value="Sales &amp; Marketing">Sales &amp; Marketing</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Designation <span class="text-danger">*</span></label>
+<select class="form-select" name="designation"><option disabled="" selected="" value="">Select...</option><option value="Intern">Intern</option><option value="Junior">Junior</option><option value="Associate">Associate</option><option value="Senior">Senior</option><option value="Team Lead">Team Lead</option><option value="Manager">Manager</option><option value="Full Stack">Full Stack</option><option value="Ui/Ux">Ui/Ux</option><option value="Tester">Tester</option><option value="HR">HR</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Employment Type <span class="text-danger">*</span></label>
+<select class="form-select" name="employmentType"><option disabled="" selected="" value="">Select...</option><option value="Full-Time">Full-Time</option><option value="Part-Time">Part-Time</option><option value="Contract">Contract</option><option value="Internship">Internship</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Job title <span class="text-danger">*</span></label>
+<select class="form-select" name="jobTitle"><option disabled="" selected="" value="">Select...</option><option value="Frontend Developer">Frontend Developer</option><option value="Backend Developer">Backend Developer</option><option value="Full Stack Developer">Full Stack Developer</option><option value="UI/UX Designer">UI/UX Designer</option><option value="HR Executive">HR Executive</option><option value="Accountant">Accountant</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold text-primary border-bottom border-primary" style="font-size: 0.85rem;">Grade/Level <span class="text-danger">*</span></label>
+<select class="form-select" name="gradeLevel"><option disabled="" selected="" value="">Select...</option><option value="L1">L1</option><option value="L2">L2</option><option value="L3">L3</option><option value="L4">L4</option><option value="L5">L5</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Role <span class="text-danger">*</span></label>
+<select class="form-select" name="roleName"><option disabled="" selected="" value="">Select...</option><option value="Employee">Employee</option><option value="Team Lead">Team Lead</option><option value="Manager">Manager</option><option value="HR Admin">HR Admin</option><option value="Super Admin">Super Admin</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Reports To <span class="text-danger">*</span></label>
+<select class="form-select" name="reportsTo"><option disabled="" selected="" value="">Select...</option><option value="Amit Kumar">Amit Kumar</option><option value="Neha Sharma">Neha Sharma</option><option value="Vikram Mehta">Vikram Mehta</option><option value="Pooja Desai">Pooja Desai</option><option value="Sanjay Tiwari">Sanjay Tiwari</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Business Unit <span class="text-danger">*</span></label>
+<select class="form-select" name="businessUnit"><option disabled="" selected="" value="">Select...</option><option value="Engineering">Engineering</option><option value="Product">Product</option><option value="Design">Design</option><option value="HR">HR</option><option value="Finance">Finance</option><option value="Operations">Operations</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Work Location <span class="text-danger">*</span></label>
+<select class="form-select" name="workLocation"><option disabled="" selected="" value="">Select...</option><option value="Raipur">Raipur</option><option value="Shahdol">Shahdol</option><option value="Remote">Remote</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Work Shift <span class="text-danger">*</span></label>
+<select class="form-select">
+<option disabled="" selected="" value="">Select...</option>
+<option>General</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Date of Confirmation <span class="text-danger">*</span></label>
+<input class="form-control" type="date"/>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Probation Review Date <span class="text-danger">*</span></label>
+<input class="form-control" type="date"/>
+</div>
+</div>
+<div class="d-flex justify-content-center gap-3">
+<button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep1()">Back</button>
+<button class="btn btn-primary px-5 py-2 fw-bold" onclick="goToStep3()" type="button">Save &amp; Next <i class="fas fa-arrow-right ms-2"></i></button>
+</div>
+</div>
+<!-- Step 3 Form -->
+<div class="px-3 d-none" id="step3-form">
+<div class="row g-4 mb-5">
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">PAN Number <span class="text-danger">*</span></label>
+<input class="form-control" name="panNo" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">AADHAAR No <span class="text-danger">*</span></label>
+<input class="form-control" name="aadharNo" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">PF No <span class="text-danger">*</span></label>
+<input class="form-control" name="pfNumber" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">ESI No <span class="text-danger">*</span></label>
+<input class="form-control" name="esiNumber" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">UAN No <span class="text-danger">*</span></label>
+<input class="form-control" name="uanNumber" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Tax Regime <span class="text-danger">*</span></label>
+<select class="form-select" name="taxRegime"><option disabled="" selected="" value="">Select...</option><option value="Old Regime">Old Regime</option><option value="New Regime">New Regime</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Professional Tax Applicable <span class="text-danger">*</span></label>
+<select class="form-select" name="ptApplicable"><option disabled="" selected="" value="">Select...</option><option value="Yes">Yes</option><option value="No">No</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">PT Registration No <span class="text-danger">*</span></label>
+<input class="form-control" name="ptRegistrationNo" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">PT State <span class="text-danger">*</span></label>
+<select class="form-select" name="ptState"><option disabled="" selected="" value="">Select...</option><option value="Chhattisgarh">Chhattisgarh</option><option value="Maharashtra">Maharashtra</option><option value="Karnataka">Karnataka</option><option value="Gujarat">Gujarat</option><option value="Tamil Nadu">Tamil Nadu</option><option value="West Bengal">West Bengal</option><option value="Andhra Pradesh">Andhra Pradesh</option><option value="Telangana">Telangana</option><option value="Kerala">Kerala</option><option value="Madhya Pradesh">Madhya Pradesh</option></select>
+</div>
+</div>
+<div class="d-flex justify-content-center gap-3">
+<button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep1()" type="button">Back</button>
+<button class="btn btn-primary px-5 py-2 fw-bold" onclick="goToStep4()" type="button">Save &amp; Next <i class="fas fa-arrow-right ms-2"></i></button>
+</div>
+</div>
+<!-- Step 4 Form -->
+<div class="px-3 d-none" id="step4-form">
+<div class="row g-4 mb-5">
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Employee Category <span class="text-danger">*</span></label>
+<select class="form-select" name="category"><option disabled="" selected="" value="">Select...</option><option value="Permanent">Permanent</option><option value="Probation">Probation</option><option value="Contract">Contract</option><option value="Intern">Intern</option><option value="Consultant">Consultant</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Staffing Type <span class="text-danger">*</span></label>
+<select class="form-select" name="staffingType"><option disabled="" selected="" value="">Select...</option><option value="On-roll">On-roll</option><option value="Off-roll">Off-roll</option><option value="Contract">Contract</option><option value="Outsourced">Outsourced</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Pay Type <span class="text-danger">*</span></label>
+<select class="form-select" name="payType"><option disabled="" selected="" value="">Select...</option><option value="Salaried">Salaried</option><option value="Hourly">Hourly</option><option value="Daily Wage">Daily Wage</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Pay Frequency <span class="text-danger">*</span></label>
+<select class="form-select" name="payFrequency"><option disabled="" selected="" value="">Select...</option><option value="Monthly">Monthly</option><option value="Bi-Weekly">Bi-Weekly</option><option value="Weekly">Weekly</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Select Work Location Type <span class="text-danger">*</span></label>
+<select class="form-select" name="workLocationType"><option disabled="" selected="" value="">Select...</option><option value="Work From Office (WFO)">Work From Office (WFO)</option><option value="Work From Home (WFH)">Work From Home (WFH)</option><option value="Hybrid">Hybrid</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Probation Applicable <span class="text-danger">*</span></label>
+<select class="form-select" name="probationApplicable"><option disabled="" selected="" value="">Select...</option><option value="Yes">Yes</option><option value="No">No</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">OT Eligible <span class="text-danger">*</span></label>
+<select class="form-select" name="otEligible"><option disabled="" selected="" value="">Select...</option><option value="Yes">Yes</option><option value="No">No</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Travel Required <span class="text-danger">*</span></label>
+<select class="form-select" name="travelRequired"><option disabled="" selected="" value="">Select...</option><option value="Yes">Yes</option><option value="No">No</option></select>
+</div>
+<div class="col-md-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Department Head <span class="text-danger">*</span></label>
+<select class="form-select" name="departmentHead">
+<option disabled="" selected="" value="">Select...</option>
+<option>Arun Kumar</option></select>
+</div>
+</div>
+<div class="d-flex justify-content-center gap-3">
+<button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep2()" type="button">Back</button>
+<button class="btn btn-primary px-5 py-2 fw-bold" onclick="goToStep5()" type="button">Save &amp; Next <i class="fas fa-arrow-right ms-2"></i></button>
+</div>
+</div>
+<!-- Step 5 Form -->
+<div class="px-3 d-none" id="step5-form">
+<div class="table-responsive border rounded mb-5">
+<table class="table table-custom mb-0">
+<thead>
+<tr>
+<th>Document Type</th>
+<th>Required</th>
+<th>Upload</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="fw-bold">Passport Size Photo <span class="text-danger">*</span></td>
+<td class="text-danger fw-bold">Yes</td>
+<td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+<td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB &amp; 500 x 500 resolution)</td>
+</tr>
+<tr>
+<td class="fw-bold">Resume/CV <span class="text-danger">*</span></td>
+<td class="text-danger fw-bold">Yes</td>
+<td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+<td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB &amp; 500 x 500 resolution)</td>
+</tr>
+<tr>
+<td class="fw-bold">Aadhaar Card <span class="text-danger">*</span></td>
+<td class="text-danger fw-bold">Yes</td>
+<td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+<td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB &amp; 500 x 500 resolution)</td>
+</tr>
+<tr>
+<td class="fw-bold">PAN Card <span class="text-danger">*</span></td>
+<td class="text-danger fw-bold">Yes</td>
+<td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+<td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB &amp; 500 x 500 resolution)</td>
+</tr>
+<tr>
+<td class="fw-bold">Educational Certificate <span class="text-danger">*</span></td>
+<td class="text-danger fw-bold">Yes</td>
+<td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+<td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB &amp; 500 x 500 resolution)</td>
+</tr>
+<tr>
+<td class="fw-bold">Experience Letter <span class="text-danger">*</span></td>
+<td class="text-success fw-bold">No</td>
+<td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+<td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB &amp; 500 x 500 resolution)</td>
+</tr>
+<tr>
+<td class="fw-bold">Offer Letter <span class="text-danger">*</span></td>
+<td class="text-success fw-bold">No</td>
+<td><button class="btn btn-sm btn-outline-secondary"><i class="fas fa-upload me-1"></i> Upload File</button></td>
+<td class="text-muted" style="font-size:0.75rem;">JPG, PNG (Max 2 MB &amp; 500 x 500 resolution)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="d-flex justify-content-center gap-3">
+<button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep3()" type="button">Back</button>
+<button class="btn btn-success px-5 py-2 fw-bold" type="submit">Submit <i class="fas fa-check ms-2"></i></button>
+</div>
+</div>
+</form></div>
+</div>
+<!-- 3. OFFBOARDING PANE -->
+<div class="tab-pane fade" id="offboarding-pane" role="tabpanel">
+<div class="card-custom border-0 shadow-none p-0 mt-3">
+<div class="d-flex gap-3 mb-4">
+<div class="position-relative flex-grow-1" style="max-width: 300px;">
+<i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 12px;"></i>
+<input class="form-control" id="offboardingSearch" placeholder="Search by employee name" style="padding-left: 40px;" type="text"/>
+</div>
+<select class="form-select w-auto" id="offboardingDept"><option disabled="" selected="" value="">Select...</option>
+<option value="">All Departments</option>
+<option value="Engineering">Engineering</option>
+<option value="HR">HR</option>
+<option value="Sales">Sales</option>
+<option value="Marketing">Marketing</option>
+</select>
+<select class="form-select w-auto" id="offboardingStatus"><option disabled="" selected="" value="">Select...</option>
+<option value="">Status: All</option>
+<option value="ACTIVE">Active</option>
+<option value="ON NOTICE">On Notice</option>
+<option value="EXITED">Exited</option>
+</select>
+<select class="form-select w-auto" id="offboardingRole"><option disabled="" selected="" value="">Select...</option>
+<option value="">All Roles</option>
+<option value="Sr. Developer">Sr. Developer</option>
+<option value="Software Engineer">Software Engineer</option>
+<option value="Junior developer">Junior developer</option>
+</select>
+<button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> More Filters</button>
+<button class="btn btn-primary fw-bold ms-auto" onclick="openExitModal()">
+<i class="fas fa-plus me-1"></i> Exit Candidate
                         </button>
-                    </div>
-
-                    <div class="table-responsive border rounded">
-                        <table class="table table-custom mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Select</th>
-                                    <th>Candidate Name</th>
-                                    <th>Department</th>
-                                    <th>Designation</th>
-                                    <th>Location</th>
-                                    <th>Exit Date</th>
-                                    <th>Progress</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="offboarding-tbody">
-                                <tr th:each="cand, iterStat : ${allUsers}" th:if="${cand.status == 'EXITED' or cand.status == 'ON NOTICE'}">
-                                    <td>
-                                        <input type="radio" name="selectedCandidateRadio" class="form-check-input mt-2" 
-                                               th:value="${cand.id}" 
-                                               th:data-name="${cand.fullName}" 
-                                               th:data-empid="${cand.employeeProfile != null ? cand.employeeProfile.employeeId : 'N/A'}"
-                                               th:data-dept="${cand.employeeProfile != null ? cand.employeeProfile.department : 'N/A'}"
-                                               th:data-role="${cand.designation}"
-                                               th:data-avatar="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}">
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img th:src="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}" 
-                                                 class="emp-avatar border" style="object-fit: cover;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\' /></svg>'">
-                                            <div class="lh-1">
-                                                <div class="fw-bold text-dark mb-1" th:text="${cand.fullName}">Name</div>
-                                                <div style="font-size: 0.7rem; color: #94a3b8;" th:text="${cand.email != null ? cand.email : (cand.username + '@mail.com')}">email</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td th:text="${cand.employeeProfile != null ? cand.employeeProfile.department : 'N/A'}">Dept</td>
-                                    <td th:text="${cand.designation}">Desig</td>
-                                    <td th:text="${cand.employeeProfile != null ? cand.employeeProfile.city : 'N/A'}">Loc</td>
-                                    <td th:text="${cand.employeeProfile != null ? cand.employeeProfile.joiningDate : 'N/A'}">Join Date</td>
-                                    <td style="width: 120px;">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="progress flex-grow-1" style="height: 6px;">
-                                                <div class="progress-bar bg-success" style="width: 85%"></div>
-                                            </div>
-                                            <span style="font-size: 0.75rem; font-weight: bold;">85%</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="text-primary fw-bold">In Progress</span>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
-                                        <button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="text-muted" style="font-size: 0.85rem;">Showing 1 to 10 entries</div>
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">4</a></li>
-                            <li class="page-item"><a class="page-link" href="#">5</a></li>
-                            <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-            <div class="tab-pane fade" id="docs-pane" role="tabpanel"><h5 class="mt-4 text-muted">Employee Documents (Coming Soon)</h5></div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+</div>
+<div class="table-responsive border rounded">
+<table class="table table-custom mb-0">
+<thead>
+<tr>
+<th>Select</th>
+<th>Candidate Name</th>
+<th>Department</th>
+<th>Designation</th>
+<th>Location</th>
+<th>Exit Date</th>
+<th>Progress</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="offboarding-tbody">
+<tr th:each="cand, iterStat : ${allUsers}" th:if="${cand.status == 'EXITED' or cand.status == 'ON NOTICE'}">
+<td>
+<input class="form-check-input mt-2" name="selectedCandidateRadio" th:data-avatar="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}" th:data-dept="${cand.employeeProfile != null ? cand.employeeProfile.department : 'N/A'}" th:data-empid="${cand.employeeProfile != null ? cand.employeeProfile.employeeId : 'N/A'}" th:data-name="${cand.fullName}" th:data-role="${cand.designation}" th:value="${cand.id}" type="radio"/>
+</td>
+<td>
+<div class="d-flex align-items-center">
+<img class="emp-avatar border" onerror="this.src='data:image/svg+xml;utf8,&lt;svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'&gt;&lt;path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\' /&gt;&lt;/svg&gt;'" style="object-fit: cover;" th:src="${iterStat.index % 2 == 0 ? '/images/female-avatar.png' : '/images/male-avatar.png'}"/>
+<div class="lh-1">
+<div class="fw-bold text-dark mb-1" th:text="${cand.fullName}">Name</div>
+<div style="font-size: 0.7rem; color: #94a3b8;" th:text="${cand.email != null ? cand.email : (cand.username + '@mail.com')}">email</div>
+</div>
+</div>
+</td>
+<td th:text="${cand.employeeProfile != null ? cand.employeeProfile.department : 'N/A'}">Dept</td>
+<td th:text="${cand.designation}">Desig</td>
+<td th:text="${cand.employeeProfile != null ? cand.employeeProfile.city : 'N/A'}">Loc</td>
+<td th:text="${cand.employeeProfile != null ? cand.employeeProfile.joiningDate : 'N/A'}">Join Date</td>
+<td style="width: 120px;">
+<div class="d-flex align-items-center gap-2">
+<div class="progress flex-grow-1" style="height: 6px;">
+<div class="progress-bar bg-success" style="width: 85%"></div>
+</div>
+<span style="font-size: 0.75rem; font-weight: bold;">85%</span>
+</div>
+</td>
+<td>
+<span class="text-primary fw-bold">In Progress</span>
+</td>
+<td>
+<button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
+<button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="d-flex justify-content-between align-items-center mt-3">
+<div class="text-muted" style="font-size: 0.85rem;">Showing 1 to 10 entries</div>
+<ul class="pagination pagination-sm mb-0">
+<li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
+<li class="page-item active"><a class="page-link" href="#">1</a></li>
+<li class="page-item"><a class="page-link" href="#">2</a></li>
+<li class="page-item"><a class="page-link" href="#">3</a></li>
+<li class="page-item"><a class="page-link" href="#">4</a></li>
+<li class="page-item"><a class="page-link" href="#">5</a></li>
+<li class="page-item"><a class="page-link" href="#">&gt;</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
         // Form Wizard Logic
+          document.addEventListener('DOMContentLoaded', function() {
+              const form = document.getElementById('onboardingForm');
+              if(form) {
+                  form.addEventListener('submit', function(e) {
+                      if(!validateStep('step5-form')) {
+                          e.preventDefault();
+                      }
+                  });
+              }
+          });
+
         function toggleOnboardingForm(showForm) {
             if (showForm) {
                 document.getElementById('onboarding-list-view').classList.add('d-none');
@@ -1072,7 +1035,46 @@
             ['step2-indicator', 'step3-indicator', 'step4-indicator', 'step5-indicator'].forEach(id => document.getElementById(id).classList.remove('active', 'completed'));
         }
 
-        function goToStep2() {
+        
+          function validateStep(stepId) {
+              const step = document.getElementById(stepId);
+              if(!step) return true;
+              
+              const inputs = step.querySelectorAll('input, select, textarea');
+              let isValid = true;
+              for(let i = 0; i < inputs.length; i++) {
+                  const input = inputs[i];
+                  
+                  if(input.type === 'hidden' || input.type === 'button' || input.type === 'submit' || input.type === 'file') continue;
+                  
+                  let label = input.previousElementSibling;
+                  if(!label || label.tagName !== 'LABEL') {
+                       const div = input.closest('div');
+                       if(div) label = div.querySelector('label');
+                  }
+                  
+                  let isMandatory = input.hasAttribute('required');
+                  if(label && label.innerText.includes('*')) {
+                       isMandatory = true;
+                  }
+                  
+                  if(isMandatory && !input.value.trim()) {
+                      input.style.border = '1px solid red';
+                      isValid = false;
+                  } else {
+                      input.style.border = '';
+                  }
+              }
+              
+              if(!isValid) {
+                  alert("Please fill all mandatory fields marked with * before proceeding.");
+              }
+              
+              return isValid;
+          }
+
+          function goToStep2() {
+              if(!validateStep('step1-form')) return;
             ['step1-form', 'step2-form', 'step3-form', 'step4-form', 'step5-form'].forEach(id => document.getElementById(id).classList.add('d-none'));
             document.getElementById('step2-form').classList.remove('d-none');
             
@@ -1084,6 +1086,7 @@
         }
 
         function goToStep3() {
+              if(!validateStep('step2-form')) return;
             ['step1-form', 'step2-form', 'step3-form', 'step4-form', 'step5-form'].forEach(id => document.getElementById(id).classList.add('d-none'));
             document.getElementById('step3-form').classList.remove('d-none');
             
@@ -1097,6 +1100,7 @@
         }
 
         function goToStep4() {
+              if(!validateStep('step3-form')) return;
             ['step1-form', 'step2-form', 'step3-form', 'step4-form', 'step5-form'].forEach(id => document.getElementById(id).classList.add('d-none'));
             document.getElementById('step4-form').classList.remove('d-none');
             
@@ -1110,6 +1114,7 @@
         }
 
         function goToStep5() {
+              if(!validateStep('step4-form')) return;
             ['step1-form', 'step2-form', 'step3-form', 'step4-form', 'step5-form'].forEach(id => document.getElementById(id).classList.add('d-none'));
             document.getElementById('step5-form').classList.remove('d-none');
             
@@ -1120,6 +1125,36 @@
             document.getElementById('step5-indicator').classList.add('active');
             document.getElementById('step5-indicator').classList.remove('completed');
         }
+
+        
+        // Calculate Probation Period
+        function calculateProbation() {
+            let join = document.getElementById('joinDate');
+            let completion = document.getElementById('probationCompletionDate');
+            let period = document.getElementById('probationPeriod');
+            if (join && completion && period && join.value && completion.value) {
+                let d1 = new Date(join.value);
+                let d2 = new Date(completion.value);
+                let timeDiff = d2.getTime() - d1.getTime();
+                if (timeDiff >= 0) {
+                    let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                    period.value = diffDays + " Days";
+                } else {
+                    period.value = "0 Days";
+                }
+            }
+        }
+        document.addEventListener("DOMContentLoaded", function() {
+            let join = document.getElementById('joinDate');
+            let completion = document.getElementById('probationCompletionDate');
+            if (join) join.addEventListener('change', calculateProbation);
+            if (completion) completion.addEventListener('change', calculateProbation);
+            if (join) {
+                let today = new Date().toISOString().split('T')[0];
+                join.setAttribute('min', today);
+            }
+
+        });
 
         // Chart.js Setup for Donut Chart
         document.addEventListener("DOMContentLoaded", function() {
@@ -1146,31 +1181,7 @@
                         legend: { display: false },
                         tooltip: { enabled: true }
                     }
-                },
-                plugins: [{
-                    id: 'textCenter',
-                    beforeDraw: function(chart) {
-                        var width = chart.width, height = chart.height, ctx = chart.ctx;
-                        ctx.restore();
-                        var fontSize = (height / 100).toFixed(2);
-                        ctx.font = "bold " + fontSize + "em sans-serif";
-                        ctx.textBaseline = "middle";
-                        ctx.fillStyle = "#1e293b";
-                        var text = "100",
-                            textX = Math.round((width - ctx.measureText(text).width) / 2),
-                            textY = height / 2 - 10;
-                        ctx.fillText(text, textX, textY);
-                        
-                        ctx.font = "600 " + (fontSize * 0.6) + "em sans-serif";
-                        ctx.fillStyle = "#002D72";
-                        var text2 = "Total",
-                            text2X = Math.round((width - ctx.measureText(text2).width) / 2),
-                            text2Y = height / 2 + 15;
-                        ctx.fillText(text2, text2X, text2Y);
-                        ctx.save();
-                    }
-                }]
-            });
+                }});
         });
 
         // Filter functionality for Offboarding Table
@@ -1216,7 +1227,49 @@
                 roleSelect.addEventListener("change", filterTable);
             }
 
-            // Filter functionality for All Employees Table
+            
+            // Filter functionality for Onboarding Table
+            const onboardSearch = document.getElementById("onboardSearch");
+            const onboardDept = document.getElementById("onboardDept");
+            const onboardLoc = document.getElementById("onboardLoc");
+            const onboardRole = document.getElementById("onboardRole");
+            const onboardTbody = document.getElementById("onboard-tbody");
+
+            if (onboardSearch && onboardTbody) {
+                const trs = onboardTbody.getElementsByTagName("tr");
+                
+                function filterOnboardTable() {
+                    const searchVal = onboardSearch.value.toLowerCase();
+                    const deptVal = onboardDept.value.toLowerCase();
+                    const locVal = onboardLoc.value.toLowerCase();
+                    const roleVal = onboardRole.value.toLowerCase();
+
+                    for (let i = 0; i < trs.length; i++) {
+                        const tr = trs[i];
+                        const nameText = tr.cells[0].innerText.toLowerCase();
+                        const deptText = tr.cells[1].innerText.toLowerCase();
+                        const roleText = tr.cells[2].innerText.toLowerCase(); // Designation/Role
+                        const locText = tr.cells[3].innerText.toLowerCase();
+
+                        const matchSearch = searchVal === "" || nameText.includes(searchVal);
+                        const matchDept = deptVal === "" || deptText.includes(deptVal);
+                        const matchLoc = locVal === "" || locText.includes(locVal);
+                        const matchRole = roleVal === "" || roleText.includes(roleVal);
+
+                        if (matchSearch && matchDept && matchLoc && matchRole) {
+                            tr.style.display = "";
+                        } else {
+                            tr.style.display = "none";
+                        }
+                    }
+                }
+
+                onboardSearch.addEventListener("keyup", filterOnboardTable);
+                onboardDept.addEventListener("change", filterOnboardTable);
+                onboardLoc.addEventListener("change", filterOnboardTable);
+                onboardRole.addEventListener("change", filterOnboardTable);
+            }
+// Filter functionality for All Employees Table
             const allEmpSearch = document.getElementById("allEmpSearch");
             const allEmpDept = document.getElementById("allEmpDept");
             const allEmpLoc = document.getElementById("allEmpLoc");
@@ -1288,123 +1341,179 @@
             modal.show();
         }
     </script>
-
-    <!-- EXIT EMPLOYEE MODAL -->
-    <div class="modal fade" id="exitEmployeeModal" tabindex="-1" aria-labelledby="exitEmployeeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 550px;">
-            <div class="modal-content border-0 shadow-lg p-3">
-                <div class="modal-header border-0 pb-0">
-                    <div>
-                        <h5 class="modal-title fw-bold" id="exitEmployeeModalLabel">Exit Employees</h5>
-                        <p class="text-muted mb-0" style="font-size: 0.85rem;">Confirm exit details for the selected employee.</p>
-                    </div>
-                    <button type="button" class="btn-close mb-auto" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    
-                    <div class="d-flex align-items-center mb-4 p-3 rounded" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
-                        <img id="modalEmpAvatar" src="/images/female-avatar.png" class="emp-avatar border" style="width: 45px; height: 45px; margin-right: 15px;">
-                        <div class="lh-1">
-                            <div class="fw-bold text-dark mb-1 fs-6" id="modalEmpName">Neha Sharma</div>
-                            <div style="font-size: 0.8rem; color: #64748b;">
+<!-- EXIT EMPLOYEE MODAL -->
+<div aria-hidden="true" aria-labelledby="exitEmployeeModalLabel" class="modal fade" id="exitEmployeeModal" tabindex="-1">
+<div class="modal-dialog modal-dialog-centered" style="max-width: 550px;">
+<div class="modal-content border-0 shadow-lg p-3">
+<div class="modal-header border-0 pb-0">
+<div>
+<h5 class="modal-title fw-bold" id="exitEmployeeModalLabel">Exit Employees</h5>
+<p class="text-muted mb-0" style="font-size: 0.85rem;">Confirm exit details for the selected employee.</p>
+</div>
+<button aria-label="Close" class="btn-close mb-auto" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<div class="d-flex align-items-center mb-4 p-3 rounded" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
+<img class="emp-avatar border" id="modalEmpAvatar" src="/images/female-avatar.png" style="width: 45px; height: 45px; margin-right: 15px;"/>
+<div class="lh-1">
+<div class="fw-bold text-dark mb-1 fs-6" id="modalEmpName">Neha Sharma</div>
+<div style="font-size: 0.8rem; color: #64748b;">
                                 Employee ID: <span id="modalEmpId">EMP114</span> <span class="mx-2">|</span> <span id="modalEmpDeptRole">Engineering: Sr. Developer</span>
-                            </div>
-                        </div>
-                    </div>
+</div>
+</div>
+</div>
+<form action="/senior_hr/resignation/offboard" id="exitEmployeeForm" method="post">
+<input id="modalUserId" name="userId" type="hidden" value=""/>
+<div class="row g-3 mb-3">
+<div class="col-md-6">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Last Working Date <span class="text-danger">*</span></label>
+<input class="form-control" type="date" value="2026-05-30"/>
+</div>
+<div class="col-md-6">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Exit Type <span class="text-danger">*</span></label>
+<select class="form-select"><option disabled="" selected="" value="">Select...</option><option>Resignation</option></select>
+</div>
+<div class="col-12">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Reason for Exit <span class="text-danger">*</span></label>
+<select class="form-select"><option disabled="" selected="" value="">Select...</option><option>Career Growth</option></select>
+</div>
+<div class="col-12">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Exit Note (Optional)</label>
+<textarea class="form-control" placeholder="Add Comments" rows="2"></textarea>
+</div>
+<div class="col-md-6">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Handover To</label>
+<select class="form-select"><option disabled="" selected="" value="">Select...</option><option>Amit Kumar</option></select>
+</div>
+<div class="col-md-6">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Handover Due Date</label>
+<input class="form-control" type="date" value="2026-11-25"/>
+</div>
+<div class="col-md-6">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Notice Period (Days) <span class="text-danger">*</span></label>
+<input class="form-control" type="number" value="30"/>
+</div>
+<div class="col-md-6">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Resignation Proof <span class="text-danger">*</span></label>
+<input class="form-control" style="font-size: 0.85rem;" type="file"/>
+</div>
+<div class="col-12">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Assets &amp; Accessories</label>
+<textarea class="form-control" placeholder="List assets to be recovered (e.g. Laptop, ID Card)" rows="2"></textarea>
+</div>
+<div class="col-12 mt-2">
+<div class="form-check">
+<input class="form-check-input" id="noDues" type="checkbox"/>
+<label class="form-check-label fw-bold text-dark" for="noDues" style="font-size: 0.85rem;">No Dues Pending</label>
+</div>
+</div>
+</div>
+<div class="mb-3">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Clearances</label>
+<div class="d-flex flex-wrap gap-3" style="font-size: 0.85rem; color: #334155;">
+<div class="form-check">
+<input class="form-check-input" disabled="" id="itClear" type="checkbox"/>
+<label class="form-check-label text-muted" for="itClear">IT Clearance</label>
+</div>
+<div class="form-check">
+<input class="form-check-input" disabled="" id="hrClear" type="checkbox"/>
+<label class="form-check-label text-muted" for="hrClear">HR Clearance</label>
+</div>
+<div class="form-check">
+<input class="form-check-input" disabled="" id="finClear" type="checkbox"/>
+<label class="form-check-label text-muted" for="finClear">Finance</label>
+</div>
+<div class="form-check">
+<input class="form-check-input" disabled="" id="adminClear" type="checkbox"/>
+<label class="form-check-label text-muted" for="adminClear">Admin Clearance</label>
+</div>
+</div>
+</div>
+<div class="mb-4">
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Deactivate User Access</label>
+<div class="d-flex gap-4" style="font-size: 0.85rem; color: #334155;">
+<div class="form-check">
+<input checked="" class="form-check-input" id="deactImm" name="deactivateRadio" type="radio"/>
+<label class="form-check-label" for="deactImm">Immediately</label>
+</div>
+<div class="form-check">
+<input class="form-check-input" id="deactLWD" name="deactivateRadio" type="radio"/>
+<label class="form-check-label" for="deactLWD">On last Working date</label>
+</div>
+</div>
+</div>
+<div class="d-flex justify-content-center gap-3 mt-4">
+<button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep4()" type="button">Back</button>
+<button class="btn btn-danger px-5 py-2 fw-bold" onclick="document.getElementById('exitEmployeeForm').submit();" type="button">Complete Offboarding</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+<script>
+    function editCandidate(id) {
+        fetch(`/senior_hr/api/employee/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                if(!data.id) {
+                    alert("Failed to load candidate details.");
+                    return;
+                }
+                // Pre-fill hidden ID
+                const idInput = document.getElementById('onboardUserId');
+                if(idInput) idInput.value = data.id;
 
-                    <form id="exitEmployeeForm" method="post" action="/senior_hr/resignation/offboard">
-                        <input type="hidden" id="modalUserId" name="userId" value="">
-                        <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Last Working Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" value="2026-05-30">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Exit Type <span class="text-danger">*</span></label>
-                            <select class="form-select"><option>Resignation</option></select>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Reason for Exit <span class="text-danger">*</span></label>
-                            <select class="form-select"><option>Career Growth</option></select>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Exit Note (Optional)</label>
-                            <textarea class="form-control" rows="2" placeholder="Add Comments"></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Handover To</label>
-                            <select class="form-select"><option>Amit Kumar</option></select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Handover Due Date</label>
-                            <input type="date" class="form-control" value="2026-11-25">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Notice Period (Days) <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" value="30">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Resignation Proof <span class="text-danger">*</span></label>
-                            <input type="file" class="form-control" style="font-size: 0.85rem;">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Assets & Accessories</label>
-                            <textarea class="form-control" rows="2" placeholder="List assets to be recovered (e.g. Laptop, ID Card)"></textarea>
-                        </div>
-                        <div class="col-12 mt-2">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="noDues">
-                                <label class="form-check-label fw-bold text-dark" for="noDues" style="font-size: 0.85rem;">No Dues Pending</label>
-                            </div>
-                        </div>
-                    </div>
+                // Helper function to set value if input exists
+                const setVal = (name, val) => {
+                    const el = document.querySelector(`#onboardingForm [name="${name}"]`);
+                    if (el && val !== undefined && val !== null) {
+                        el.value = val;
+                    }
+                };
 
-                    <div class="mb-3">
-                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Clearances</label>
-                        <div class="d-flex flex-wrap gap-3" style="font-size: 0.85rem; color: #334155;">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" disabled id="itClear">
-                                <label class="form-check-label text-muted" for="itClear">IT Clearance</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" disabled id="hrClear">
-                                <label class="form-check-label text-muted" for="hrClear">HR Clearance</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" disabled id="finClear">
-                                <label class="form-check-label text-muted" for="finClear">Finance</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" disabled id="adminClear">
-                                <label class="form-check-label text-muted" for="adminClear">Admin Clearance</label>
-                            </div>
-                        </div>
-                    </div>
+                // Split name
+                if(data.fullName && !data.firstName) {
+                    const parts = data.fullName.split(' ');
+                    setVal('firstName', parts[0]);
+                    if(parts.length > 1) {
+                        setVal('lastName', parts.slice(1).join(' '));
+                    }
+                }
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Deactivate User Access</label>
-                        <div class="d-flex gap-4" style="font-size: 0.85rem; color: #334155;">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="deactivateRadio" id="deactImm" checked>
-                                <label class="form-check-label" for="deactImm">Immediately</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="deactivateRadio" id="deactLWD">
-                                <label class="form-check-label" for="deactLWD">On last Working date</label>
-                            </div>
-                        </div>
-                    </div>
+                setVal('firstName', data.firstName);
+                setVal('middleName', data.middleName);
+                setVal('lastName', data.lastName);
+                setVal('prefix', data.prefix);
+                setVal('email', data.email);
+                setVal('employeeCode', data.employeeCode);
+                setVal('mobileNumber', data.mobileNumber);
+                setVal('emergencyPhone', data.emergencyPhone);
+                setVal('dob', data.dob);
+                setVal('gender', data.gender);
+                setVal('maritalStatus', data.maritalStatus);
+                setVal('nationality', data.nationality);
+                setVal('fatherName', data.fatherName);
+                setVal('motherName', data.motherName);
+                setVal('spouseName', data.spouseName);
+                setVal('joiningDate', data.joiningDate);
+                setVal('probationPeriodStr', data.probationPeriod);
+                setVal('probationCompletionDate', data.probationCompletionDate);
+                setVal('bloodGroup', data.bloodGroup);
+                setVal('physicallyChallenged', data.physicallyChallenged);
+                setVal('department', data.department);
+                setVal('designation', data.designation);
+                setVal('officialEmail', data.officialEmail);
+                setVal('workLocation', data.workLocation);
 
-                    <div class="d-flex justify-content-center gap-3 mt-4">
-                        <button type="button" class="btn btn-outline-secondary px-5 py-2 fw-bold" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger px-5 py-2 fw-bold" onclick="document.getElementById('exitEmployeeForm').submit();">Complete Offboarding</button>
-                    </div>
-                    </form>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
+                // Open the form
+                toggleOnboardingForm(true);
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error fetching candidate details.");
+            });
+    }
+</script>
 </body>
 </html>
