@@ -86,6 +86,9 @@ public class SeniorDashboardController {
     private com.example.admindashboard.repository.BonusDeductionRepository bonusDeductionRepository;
 
     @Autowired
+    private com.example.admindashboard.repository.AppraisalCycleRepository appraisalCycleRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -1122,15 +1125,120 @@ public class SeniorDashboardController {
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_hr/performance")
     public String showSeniorHrPerformance(Model model, Principal principal) {
-        // Mock data for Appraisal Cycles
-        model.addAttribute("appraisals", java.util.List.of(
-            new java.util.HashMap<String, Object>() {{ put("name", "Performance Appraisal 2026"); put("type", "Annual"); put("duration", "01 Apr 2026 - 31 Mar 2027"); put("emp", 112); put("prog", 85); put("status", "Active"); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "H1 Appraisal 2026"); put("type", "Half-yearly"); put("duration", "01 Apr 2026 - 31 Mar 2027"); put("emp", 112); put("prog", 85); put("status", "Active"); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Q1 Appraisal 2026"); put("type", "Quarterly"); put("duration", "01 Apr 2026 - 31 Mar 2027"); put("emp", 112); put("prog", 100); put("status", "Completed"); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Annual Appraisal 2026"); put("type", "Annual"); put("duration", "01 Apr 2026 - 31 Mar 2027"); put("emp", 112); put("prog", 85); put("status", "Active"); }},
-            new java.util.HashMap<String, Object>() {{ put("name", "Q2 Appraisal 2026"); put("type", "Quarterly"); put("duration", "01 Apr 2026 - 31 Mar 2027"); put("emp", 112); put("prog", 85); put("status", "Active"); }}
-        ));
+        // Fetch real Appraisal Cycles, seed if empty
+        java.util.List<com.example.admindashboard.model.AppraisalCycle> cycles = appraisalCycleRepository.findAll();
+        if (cycles.isEmpty()) {
+            com.example.admindashboard.model.AppraisalCycle c1 = new com.example.admindashboard.model.AppraisalCycle();
+            c1.setCycleName("Performance Appraisal 2026");
+            c1.setCycleType("Annual");
+            c1.setCycleCode("PERF2026");
+            c1.setDurationType("Custom");
+            c1.setStartDate("2026-04-01");
+            c1.setEndDate("2027-03-31");
+            c1.setFrequency("Annual");
+            c1.setTimeZone("(GMT +5:30) Kolkata");
+            c1.setCycleOwner("Neha Sharma");
+            c1.setDescription("Annual performance cycle for FY 2026-2027.");
+            c1.setProgress(85);
+            c1.setStatus("Active");
+            c1.setEmpCount(112);
+            appraisalCycleRepository.save(c1);
+
+            com.example.admindashboard.model.AppraisalCycle c2 = new com.example.admindashboard.model.AppraisalCycle();
+            c2.setCycleName("H1 Appraisal 2026");
+            c2.setCycleType("Half-yearly");
+            c2.setCycleCode("H1PERF");
+            c2.setDurationType("Custom");
+            c2.setStartDate("2026-04-01");
+            c2.setEndDate("2027-03-31");
+            c2.setFrequency("Half-yearly");
+            c2.setTimeZone("(GMT +5:30) Kolkata");
+            c2.setCycleOwner("Neha Sharma");
+            c2.setDescription("H1 review.");
+            c2.setProgress(85);
+            c2.setStatus("Active");
+            c2.setEmpCount(112);
+            appraisalCycleRepository.save(c2);
+
+            com.example.admindashboard.model.AppraisalCycle c3 = new com.example.admindashboard.model.AppraisalCycle();
+            c3.setCycleName("Q1 Appraisal 2026");
+            c3.setCycleType("Quarterly");
+            c3.setCycleCode("Q1PERF");
+            c3.setDurationType("Custom");
+            c3.setStartDate("2026-04-01");
+            c3.setEndDate("2027-03-31");
+            c3.setFrequency("Quarterly");
+            c3.setTimeZone("(GMT +5:30) Kolkata");
+            c3.setCycleOwner("Neha Sharma");
+            c3.setDescription("Q1 review.");
+            c3.setProgress(100);
+            c3.setStatus("Completed");
+            c3.setEmpCount(112);
+            appraisalCycleRepository.save(c3);
+
+            cycles = appraisalCycleRepository.findAll();
+        }
+        
+        java.util.List<java.util.Map<String, Object>> list = new java.util.ArrayList<>();
+        for (com.example.admindashboard.model.AppraisalCycle c : cycles) {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("name", c.getCycleName());
+            map.put("type", c.getCycleType());
+            
+            // Format start/end date for duration display
+            String duration = "-";
+            if (c.getStartDate() != null && c.getEndDate() != null) {
+                try {
+                    java.time.LocalDate sd = java.time.LocalDate.parse(c.getStartDate());
+                    java.time.LocalDate ed = java.time.LocalDate.parse(c.getEndDate());
+                    java.time.format.DateTimeFormatter dtf = java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy");
+                    duration = sd.format(dtf) + " - " + ed.format(dtf);
+                } catch (Exception e) {
+                    duration = c.getStartDate() + " - " + c.getEndDate();
+                }
+            }
+            map.put("duration", duration);
+            map.put("emp", c.getEmpCount());
+            map.put("prog", c.getProgress());
+            map.put("status", c.getStatus());
+            list.add(map);
+        }
+        model.addAttribute("appraisals", list);
+        model.addAttribute("allUsers", userRepository.findAll());
         return "senior_hr-performance";
+    }
+
+    @PostMapping("/senior_hr/performance/create-cycle")
+    public String createAppraisalCycle(
+            @RequestParam("cycleName") String cycleName,
+            @RequestParam("cycleType") String cycleType,
+            @RequestParam(value = "cycleCode", required = false) String cycleCode,
+            @RequestParam("durationType") String durationType,
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate,
+            @RequestParam("frequency") String frequency,
+            @RequestParam("timeZone") String timeZone,
+            @RequestParam("cycleOwner") String cycleOwner,
+            @RequestParam("description") String description) {
+
+        com.example.admindashboard.model.AppraisalCycle cycle = new com.example.admindashboard.model.AppraisalCycle();
+        cycle.setCycleName(cycleName);
+        cycle.setCycleType(cycleType);
+        cycle.setCycleCode(cycleCode);
+        cycle.setDurationType(durationType);
+        cycle.setStartDate(startDate);
+        cycle.setEndDate(endDate);
+        cycle.setFrequency(frequency);
+        cycle.setTimeZone(timeZone);
+        cycle.setCycleOwner(cycleOwner);
+        cycle.setDescription(description);
+        cycle.setProgress(0); // starts at 0%
+        cycle.setStatus("Active");
+        cycle.setEmpCount(112); // match default count
+
+        appraisalCycleRepository.save(cycle);
+
+        return "redirect:/senior_hr/performance?tab=cycles";
     }
 
     // --- MY SPACE ROUTE (HR Attendance) ---

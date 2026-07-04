@@ -253,128 +253,271 @@
     <!-- Main Content -->
     <div class="myspace-main">
         
-        <!-- Tabs -->
-        <ul class="nav nav-tabs nav-tabs-custom" id="performanceTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-pane" type="button" role="tab">Overview</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="goals-tab" data-bs-toggle="tab" data-bs-target="#goals-pane" type="button" role="tab">Goal & KPIs</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="cycles-tab" data-bs-toggle="tab" data-bs-target="#cycles-pane" type="button" role="tab">Appraisal Cycles</button>
-            </li>
-        </ul>
+        <!-- Tabs Container -->
+        <div id="performance-tabs-container">
+            <!-- Tabs -->
+            <ul class="nav nav-tabs nav-tabs-custom" id="performanceTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-pane" type="button" role="tab">Overview</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="cycles-tab" data-bs-toggle="tab" data-bs-target="#cycles-pane" type="button" role="tab">Appraisal Cycles</button>
+                </li>
+            </ul>
 
-        <div class="tab-content" id="performanceTabsContent">
-            
-            <!-- OVERVIEW PANE -->
-            <div class="tab-pane fade show active" id="overview-pane" role="tabpanel">
+            <div class="tab-content" id="performanceTabsContent">
                 
-                <div class="row mb-5">
-                    <!-- Performance Overview Donut -->
-                    <div class="col-md-5">
-                        <h5 class="fw-bold text-primary mb-4" style="font-size: 1.1rem;">Performance Overview</h5>
-                        <div class="d-flex align-items-center">
-                            <div class="chart-container" style="width: 220px; height: 220px;">
-                                <canvas id="performanceDonutChart"></canvas>
-                                <div class="donut-inner-text">
-                                    <div class="fw-bold" style="font-size: 1.5rem; color: #1e293b;">120</div>
-                                    <div style="font-size: 0.7rem; color: #64748b; line-height: 1;">Total<br>Employees</div>
+                <!-- OVERVIEW PANE -->
+                <div class="tab-pane fade show active" id="overview-pane" role="tabpanel">
+                    
+                    <div class="row mb-5">
+                        <!-- Performance Overview Donut -->
+                        <div class="col-md-5">
+                            <h5 class="fw-bold text-primary mb-4" style="font-size: 1.1rem;">Performance Overview</h5>
+                            <div class="d-flex align-items-center">
+                                <div class="chart-container" style="width: 220px; height: 220px;">
+                                    <canvas id="performanceDonutChart"></canvas>
+                                    <div class="donut-inner-text">
+                                        <div class="fw-bold" style="font-size: 1.5rem; color: #1e293b;">120</div>
+                                        <div style="font-size: 0.7rem; color: #64748b; line-height: 1;">Total<br>Employees</div>
+                                    </div>
+                                </div>
+                                <div class="ms-4 flex-grow-1" style="max-width: 180px;">
+                                    <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #002D72;"></span>Excellent</span> <span>36%</span></div>
+                                    <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #10b981;"></span>Very Good</span> <span>34%</span></div>
+                                    <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #fcd34d;"></span>Good</span> <span>25%</span></div>
+                                    <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #f472b6;"></span>Average</span> <span>13%</span></div>
+                                    <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #a78bfa;"></span>Below Average</span> <span>5%</span></div>
                                 </div>
                             </div>
-                            <div class="ms-4 flex-grow-1" style="max-width: 180px;">
-                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #002D72;"></span>Excellent</span> <span>36%</span></div>
-                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #10b981;"></span>Very Good</span> <span>34%</span></div>
-                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #fcd34d;"></span>Good</span> <span>25%</span></div>
-                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #f472b6;"></span>Average</span> <span>13%</span></div>
-                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #a78bfa;"></span>Below Average</span> <span>5%</span></div>
+                        </div>
+                        
+                        <!-- Rating Distribution Trend Line -->
+                        <div class="col-md-7">
+                            <h5 class="fw-bold text-primary mb-4 text-center" style="font-size: 1.1rem;">Rating Distribution Trend</h5>
+                            <div class="d-flex align-items-center">
+                                <div class="chart-container flex-grow-1" style="height: 220px;">
+                                    <canvas id="ratingLineChart"></canvas>
+                                </div>
+                                <div class="ms-3" style="width: 140px;">
+                                    <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #002D72;"></span>Excellent</span></div>
+                                    <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #10b981;"></span>Very Good</span></div>
+                                    <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #fcd34d;"></span>Good</span></div>
+                                    <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #f472b6;"></span>Average</span></div>
+                                    <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #a78bfa;"></span>Below Average</span></div>
+                                </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Appraisal Cycles Table -->
+                    <div class="d-flex justify-content-end mb-3 gap-3">
+                        <button class="btn btn-outline-secondary btn-sm px-3 fw-bold"><i class="fas fa-filter"></i> More Filters</button>
+                        <button class="btn btn-primary btn-sm px-3 fw-bold" onclick="toggleCreateCycleView()"><i class="fas fa-plus"></i> Create Appraisal Cycle</button>
                     </div>
                     
-                    <!-- Rating Distribution Trend Line -->
-                    <div class="col-md-7">
-                        <h5 class="fw-bold text-primary mb-4 text-center" style="font-size: 1.1rem;">Rating Distribution Trend</h5>
-                        <div class="d-flex align-items-center">
-                            <div class="chart-container flex-grow-1" style="height: 220px;">
-                                <canvas id="ratingLineChart"></canvas>
-                            </div>
-                            <div class="ms-3" style="width: 140px;">
-                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #002D72;"></span>Excellent</span></div>
-                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #10b981;"></span>Very Good</span></div>
-                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #fcd34d;"></span>Good</span></div>
-                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #f472b6;"></span>Average</span></div>
-                                <div class="legend-item"><span class="d-flex align-items-center"><span class="legend-dot" style="background-color: #a78bfa;"></span>Below Average</span></div>
-                            </div>
-                        </div>
+                    <div class="table-responsive border rounded">
+                        <table class="table table-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Cycle Name</th>
+                                    <th>Cycle Type</th>
+                                    <th>Duration</th>
+                                    <th>Employees</th>
+                                    <th>Progress</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="app, iterStat : ${appraisals}">
+                                    <td class="text-dark" th:text="${app.name}">Name</td>
+                                    <td th:text="${app.type}">Type</td>
+                                    <td th:text="${app.duration}">Dur</td>
+                                    <td th:text="${app.emp}">Emp</td>
+                                    <td style="width: 120px;">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="progress flex-grow-1" style="height: 6px;">
+                                                <div class="progress-bar bg-primary" th:style="'width: ' + ${app.prog} + '%'"></div>
+                                            </div>
+                                            <span style="font-size: 0.75rem; font-weight: bold;" th:text="${app.prog} + '%'"></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span th:class="${app.status == 'Active' ? 'text-success fw-bold' : 'text-success fw-bold'}" th:text="${app.status}">Status</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
+                                        <button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3 mb-5">
+                        <div class="text-muted" style="font-size: 0.85rem;">Showing 1 to 5 entries</div>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item"><a class="page-link" href="#">4</a></li>
+                            <li class="page-item"><a class="page-link" href="#">5</a></li>
+                            <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
+                        </ul>
+                    </div>
+
                 </div>
 
-                <!-- Appraisal Cycles Table -->
-                <div class="d-flex justify-content-end mb-3 gap-3">
-                    <button class="btn btn-outline-secondary btn-sm px-3 fw-bold"><i class="fas fa-filter"></i> More Filters</button>
-                    <button class="btn btn-primary btn-sm px-3 fw-bold"><i class="fas fa-plus"></i> Create Appraisal Cycle</button>
-                </div>
-                
-                <div class="table-responsive border rounded">
-                    <table class="table table-custom mb-0">
-                        <thead>
-                            <tr>
-                                <th>Cycle Name</th>
-                                <th>Cycle Type</th>
-                                <th>Duration</th>
-                                <th>Employees</th>
-                                <th>Progress</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="app, iterStat : ${appraisals}">
-                                <td class="text-dark" th:text="${app.name}">Name</td>
-                                <td th:text="${app.type}">Type</td>
-                                <td th:text="${app.duration}">Dur</td>
-                                <td th:text="${app.emp}">Emp</td>
-                                <td style="width: 120px;">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="progress flex-grow-1" style="height: 6px;">
-                                            <div class="progress-bar bg-primary" th:style="'width: ' + ${app.prog} + '%'"></div>
+                <!-- APPRAISAL CYCLES PANE -->
+                <div class="tab-pane fade" id="cycles-pane" role="tabpanel">
+                    
+                    <!-- Appraisal Cycles Table -->
+                    <div class="d-flex justify-content-end mb-3 gap-3">
+                        <button class="btn btn-outline-secondary btn-sm px-3 fw-bold"><i class="fas fa-filter"></i> More Filters</button>
+                        <button class="btn btn-primary btn-sm px-3 fw-bold" onclick="toggleCreateCycleView()"><i class="fas fa-plus"></i> Create Appraisal Cycle</button>
+                    </div>
+                    
+                    <div class="table-responsive border rounded">
+                        <table class="table table-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Cycle Name</th>
+                                    <th>Cycle Type</th>
+                                    <th>Duration</th>
+                                    <th>Employees</th>
+                                    <th>Progress</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="app, iterStat : ${appraisals}">
+                                    <td class="text-dark" th:text="${app.name}">Name</td>
+                                    <td th:text="${app.type}">Type</td>
+                                    <td th:text="${app.duration}">Dur</td>
+                                    <td th:text="${app.emp}">Emp</td>
+                                    <td style="width: 120px;">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="progress flex-grow-1" style="height: 6px;">
+                                                <div class="progress-bar bg-primary" th:style="'width: ' + ${app.prog} + '%'"></div>
+                                            </div>
+                                            <span style="font-size: 0.75rem; font-weight: bold;" th:text="${app.prog} + '%'"></span>
                                         </div>
-                                        <span style="font-size: 0.75rem; font-weight: bold;" th:text="${app.prog} + '%'"></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span th:class="${app.status == 'Active' ? 'text-success fw-bold' : 'text-success fw-bold'}" th:text="${app.status}">Status</span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
-                                    <button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="d-flex justify-content-between align-items-center mt-3 mb-5">
-                    <div class="text-muted" style="font-size: 0.85rem;">Showing 1 to 5 entries</div>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">4</a></li>
-                        <li class="page-item"><a class="page-link" href="#">5</a></li>
-                        <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
-                    </ul>
+                                    </td>
+                                    <td>
+                                        <span th:class="${app.status == 'Active' ? 'text-success fw-bold' : 'text-success fw-bold'}" th:text="${app.status}">Status</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
+                                        <button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3 mb-5">
+                        <div class="text-muted" style="font-size: 0.85rem;">Showing 1 to 5 entries</div>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item"><a class="page-link" href="#">4</a></li>
+                            <li class="page-item"><a class="page-link" href="#">5</a></li>
+                            <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
+                        </ul>
+                    </div>
+
                 </div>
 
             </div>
+        </div>
 
-            <!-- Placeholder Panes -->
-            <div class="tab-pane fade" id="goals-pane" role="tabpanel"><h5 class="mt-4 text-muted">Goal & KPIs (Coming Soon)</h5></div>
-            <div class="tab-pane fade" id="cycles-pane" role="tabpanel"><h5 class="mt-4 text-muted">Appraisal Cycles (Coming Soon)</h5></div>
+        <!-- CREATE APPRAISAL CYCLE VIEW (hidden by default) -->
+        <div id="create-cycle-view" class="d-none">
+            <form th:action="@{/senior_hr/performance/create-cycle}" method="post">
+                <div class="d-flex align-items-center border-bottom pb-3 mb-4">
+                    <div>
+                        <h5 class="fw-bold text-primary mb-1">Appraisal Form</h5>
+                    </div>
+                </div>
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Cycle Name <span class="text-danger">*</span></label>
+                        <input type="text" name="cycleName" class="form-control" placeholder="H1 Performance" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Cycle Type <span class="text-danger">*</span></label>
+                        <select name="cycleType" class="form-select" required>
+                            <option value="Annual">Annual / Half Yearly</option>
+                            <option value="Half-yearly">Half-yearly</option>
+                            <option value="Quarterly">Quarterly</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Cycle Code</label>
+                        <input type="text" name="cycleCode" class="form-control" placeholder="H1APR">
+                    </div>
+                </div>
 
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Duration Type <span class="text-danger">*</span></label>
+                        <select name="durationType" class="form-select" required>
+                            <option value="Custom">Custom</option>
+                            <option value="Standard">Standard</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Start Date <span class="text-danger">*</span></label>
+                        <input type="date" name="startDate" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">End Date <span class="text-danger">*</span></label>
+                        <input type="date" name="endDate" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Frequency <span class="text-danger">*</span></label>
+                        <select name="frequency" class="form-select" required>
+                            <option value="Annual">Annual</option>
+                            <option value="Half-yearly">Half-yearly</option>
+                            <option value="Quarterly">Quarterly</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Time Zone <span class="text-danger">*</span></label>
+                        <select name="timeZone" class="form-select" required>
+                            <option value="(GMT +5:30) Kolkata">(GMT +5:30) Kolkata</option>
+                            <option value="(GMT +0:00) UTC">(GMT +0:00) UTC</option>
+                            <option value="(GMT -5:00) EST">(GMT -5:00) EST</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Cycle Owner <span class="text-danger">*</span></label>
+                        <select name="cycleOwner" class="form-select" required>
+                            <option value="Neha Sharma">Neha Sharma</option>
+                            <option th:each="u : ${allUsers}" th:value="${u.fullName}" th:text="${u.fullName}">Neha Sharma</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold" style="font-size: 0.85rem;">Description <span class="text-danger">*</span></label>
+                    <textarea name="description" class="form-control" rows="4" placeholder="Enter Description here" required></textarea>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 mt-5">
+                    <button type="button" class="btn btn-outline-secondary px-5 py-2 fw-bold text-dark" onclick="toggleCreateCycleView()">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-5 py-2 fw-bold" style="background-color: #002D72; border-color: #002D72;">Save & Next <i class="fas fa-arrow-right ms-1"></i></button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -387,8 +530,42 @@
             document.body.classList.toggle('sidebar-collapsed');
         });
 
+        function toggleCreateCycleView() {
+            const overviewEl = document.getElementById('performance-tabs-container');
+            const formEl = document.getElementById('create-cycle-view');
+            const subTitleEl = document.querySelector('.top-navbar .nav-brand span:nth-child(2)');
+            const backBtn = document.querySelector('.top-navbar .nav-actions a');
+
+            if (formEl.classList.contains('d-none')) {
+                overviewEl.classList.add('d-none');
+                formEl.classList.remove('d-none');
+                subTitleEl.innerHTML = 'Performance <i class="fas fa-chevron-right" style="font-size:0.8rem; margin:0 5px;"></i> Create Appraisal Cycle <i class="fas fa-chevron-right" style="font-size:0.8rem; margin:0 5px;"></i> Overview';
+                backBtn.setAttribute('data-orig-href', backBtn.getAttribute('href'));
+                backBtn.removeAttribute('href');
+                backBtn.setAttribute('onclick', 'toggleCreateCycleView()');
+            } else {
+                formEl.classList.add('d-none');
+                overviewEl.classList.remove('d-none');
+                subTitleEl.textContent = 'Performance';
+                const origHref = backBtn.getAttribute('data-orig-href') || '/senior_hr/dashboard';
+                backBtn.setAttribute('href', origHref);
+                backBtn.removeAttribute('onclick');
+            }
+        }
+
         // Charts
         document.addEventListener("DOMContentLoaded", function() {
+            // Activate tab from URL query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab');
+            if (tab) {
+                const tabButton = document.getElementById(tab + '-tab');
+                if (tabButton) {
+                    const tabObj = new bootstrap.Tab(tabButton);
+                    tabObj.show();
+                }
+            }
+
             // Donut Chart
             const donutCtx = document.getElementById('performanceDonutChart').getContext('2d');
             new Chart(donutCtx, {
