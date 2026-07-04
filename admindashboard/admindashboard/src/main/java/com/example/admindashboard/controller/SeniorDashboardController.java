@@ -1180,8 +1180,32 @@ public class SeniorDashboardController {
         }
         model.addAttribute("overrides", regList);
 
-        // 3. Fetch Shift Assignments
+        // 3. Fetch Shift Assignments (Seed if empty)
         java.util.List<com.example.admindashboard.model.ShiftAssignment> allShifts = shiftAssignmentRepository.findAll();
+        if (allShifts.isEmpty()) {
+            java.util.List<com.example.admindashboard.model.User> users = userRepository.findAll();
+            String[] shiftNames = {"General Shift", "Night Shift", "Flexible Shift", "Half-day Shift"};
+            String[] shiftTimings = {"10:00 AM - 07:00 PM", "10:00 PM - 07:00 AM", "02:00 PM - 10:00 PM", "10:00 AM - 02:00 PM"};
+            String[] breaks = {"01:00 PM - 02:00 PM", "02:00 AM - 03:00 AM", "05:00 PM - 06:00 PM", "12:00 PM - 12:30 PM"};
+            int count = 0;
+            for (com.example.admindashboard.model.User u : users) {
+                if (count >= 10) break;
+                com.example.admindashboard.model.ShiftAssignment sa = new com.example.admindashboard.model.ShiftAssignment();
+                sa.setUser(u);
+                sa.setDepartment(u.getEmployeeProfile() != null && u.getEmployeeProfile().getDepartment() != null ? u.getEmployeeProfile().getDepartment() : "Engineering");
+                sa.setLocation(u.getEmployeeProfile() != null && u.getEmployeeProfile().getWorkLocation() != null ? u.getEmployeeProfile().getWorkLocation() : "Raipur, India");
+                sa.setShiftName(shiftNames[count % 4]);
+                sa.setShiftTiming(shiftTimings[count % 4]);
+                sa.setBreakTime(breaks[count % 4]);
+                sa.setStartDate(java.time.LocalDate.now().minusDays(5));
+                sa.setEndDate(java.time.LocalDate.now().plusDays(30));
+                sa.setOtAllowed(count % 2 == 0);
+                sa.setOtCalculationRule("After Shift Hours");
+                shiftAssignmentRepository.save(sa);
+                count++;
+            }
+            allShifts = shiftAssignmentRepository.findAll();
+        }
         model.addAttribute("shiftAssignments", allShifts);
 
         // 4. Calculate Shift Metrics
@@ -1197,10 +1221,10 @@ public class SeniorDashboardController {
         
         // 5. Extract Distinct Shifts for the Shift List Sidebar
         java.util.List<java.util.Map<String, Object>> distinctShifts = new java.util.ArrayList<>();
-        java.util.Set<String> shiftNames = new java.util.HashSet<>();
+        java.util.Set<String> shiftNamesSet = new java.util.HashSet<>();
         for (com.example.admindashboard.model.ShiftAssignment sa : allShifts) {
-            if (sa.getShiftName() != null && !shiftNames.contains(sa.getShiftName())) {
-                shiftNames.add(sa.getShiftName());
+            if (sa.getShiftName() != null && !shiftNamesSet.contains(sa.getShiftName())) {
+                shiftNamesSet.add(sa.getShiftName());
                 java.util.Map<String, Object> shiftMap = new java.util.HashMap<>();
                 shiftMap.put("shiftName", sa.getShiftName());
                 shiftMap.put("shiftTiming", sa.getShiftTiming());
@@ -1213,7 +1237,59 @@ public class SeniorDashboardController {
         }
         model.addAttribute("distinctShifts", distinctShifts);
 
+        // 6. Pass allUsers and distinct departments for the UI
+        java.util.List<com.example.admindashboard.model.User> allUsers = userRepository.findAll();
+        model.addAttribute("allUsers", allUsers);
+
+        java.util.List<String> departments = allUsers.stream()
+            .map(u -> u.getEmployeeProfile() != null ? u.getEmployeeProfile().getDepartment() : null)
+            .filter(java.util.Objects::nonNull)
+            .distinct()
+            .collect(java.util.stream.Collectors.toList());
+        if (departments.isEmpty()) {
+            departments = java.util.Arrays.asList("Engineering", "Product", "Marketing", "Finance", "Operations", "HR");
+        }
+        model.addAttribute("departments", departments);
+
         return "senior_hr-attendance";
+    }
+
+    @PostMapping("/senior_hr/attendance/assign-shift")
+    public String assignShift(
+            @RequestParam("userId") Long userId,
+            @RequestParam("department") String department,
+            @RequestParam("location") String location,
+            @RequestParam("shiftName") String shiftName,
+            @RequestParam("shiftTiming") String shiftTiming,
+            @RequestParam("breakTime") String breakTime,
+            @RequestParam("startDate") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate startDate,
+            @RequestParam("endDate") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate endDate,
+            @RequestParam("otAllowed") boolean otAllowed,
+            @RequestParam("otCalculationRule") String otCalculationRule) {
+        
+        com.example.admindashboard.model.User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            // Find existing shift assignment for this user, or create new
+            com.example.admindashboard.model.ShiftAssignment sa = shiftAssignmentRepository.findAll().stream()
+                .filter(s -> s.getUser() != null && s.getUser().getId().equals(userId))
+                .findFirst()
+                .orElse(new com.example.admindashboard.model.ShiftAssignment());
+            
+            sa.setUser(user);
+            sa.setDepartment(department);
+            sa.setLocation(location);
+            sa.setShiftName(shiftName);
+            sa.setShiftTiming(shiftTiming);
+            sa.setBreakTime(breakTime);
+            sa.setStartDate(startDate);
+            sa.setEndDate(endDate);
+            sa.setOtAllowed(otAllowed);
+            sa.setOtCalculationRule(otCalculationRule);
+            
+            shiftAssignmentRepository.save(sa);
+        }
+        
+        return "redirect:/senior_hr/attendance?tab=shift-mgmt";
     }
 
     // --- WORKFLOW ROUTES HANDLED BY DASHBOARD CONTROLLER ---

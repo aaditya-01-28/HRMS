@@ -749,25 +749,29 @@
                             <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #64748b;">Search</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
-                                <input type="text" class="form-control" placeholder="Search Employees by name">
+                                <input type="text" id="searchShiftInput" class="form-control" placeholder="Search Employees by name" oninput="filterShifts()">
                             </div>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #64748b;">Department</label>
-                            <select class="form-select">
-                                <option>All Departments</option>
+                            <select id="filterDeptSelect" class="form-select" onchange="filterShifts()">
+                                <option value="all">All Departments</option>
+                                <option th:each="d : ${departments}" th:value="${d}" th:text="${d}">Engineering</option>
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #64748b;">Shift Type</label>
-                            <select class="form-select">
-                                <option>All types</option>
+                            <select id="filterShiftTypeSelect" class="form-select" onchange="filterShifts()">
+                                <option value="all">All types</option>
+                                <option th:each="ds : ${distinctShifts}" th:value="${ds.shiftName}" th:text="${ds.shiftName}">General</option>
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #64748b;">OT Allowed</label>
-                            <select class="form-select">
-                                <option>All</option>
+                            <select id="filterOtSelect" class="form-select" onchange="filterShifts()">
+                                <option value="all">All</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
                             </select>
                         </div>
                         <div class="col-md-3 text-end">
@@ -809,7 +813,7 @@
                                                 <td th:text="${sa.shiftTiming}">Timing</td>
                                                 <td th:class="${sa.otAllowed ? 'text-success fw-bold' : 'text-danger fw-bold'}" th:text="${sa.otAllowed ? 'Yes' : 'No'}">Yes/No</td>
                                                 <td>
-                                                    <i class="fas fa-pen text-muted me-2" style="cursor: pointer;"></i>
+                                                    <i class="fas fa-pen text-muted me-2" style="cursor: pointer;" th:onclick="'editShiftAssignment(' + ${sa.id} + ', ' + ${sa.user.id} + ', \'' + ${sa.department} + '\', \'' + ${sa.location} + '\', \'' + ${sa.shiftName} + '\', \'' + ${sa.shiftTiming} + '\', \'' + ${sa.breakTime} + '\', \'' + ${sa.startDate} + '\', \'' + ${sa.endDate} + '\', ' + ${sa.otAllowed} + ', \'' + ${sa.otCalculationRule} + '\')'"></i>
                                                     <i class="fas fa-ellipsis-h text-muted" style="cursor: pointer;"></i>
                                                 </td>
                                             </tr>
@@ -822,25 +826,27 @@
                             <div class="card-custom h-100 p-3" style="border-radius: 8px;">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <h6 class="fw-bold mb-0">Shift List</h6>
-                                    <a href="#" class="text-primary fw-bold text-decoration-none" style="font-size: 0.85rem;"><i class="fas fa-plus me-1"></i> Add list</a>
+                                    <a href="#" class="text-primary fw-bold text-decoration-none" style="font-size: 0.85rem;" data-bs-toggle="modal" data-bs-target="#addShiftModal"><i class="fas fa-plus me-1"></i> Add list</a>
                                 </div>
 
-                                <!-- Dynamic Shift List -->
-                                <div class="d-flex justify-content-between align-items-center mb-4" th:each="ds, iterStat : ${distinctShifts}">
-                                    <div class="d-flex align-items-start">
-                                        <!-- rotate colors based on index -->
-                                        <div style="width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; margin-right: 10px;" 
-                                             th:styleappend="${iterStat.index % 4 == 0 ? 'background-color: #3b82f6;' : (iterStat.index % 4 == 1 ? 'background-color: #8b5cf6;' : (iterStat.index % 4 == 2 ? 'background-color: #10b981;' : 'background-color: #f59e0b;'))}"></div>
-                                        <div>
-                                            <div class="fw-bold" style="font-size: 0.9rem;" th:text="${ds.shiftName}">Shift Name</div>
-                                            <div style="font-size: 0.7rem; color: #64748b;" th:text="${ds.shiftTiming}">Timing</div>
+                                <div id="shiftListContainer">
+                                    <!-- Dynamic Shift List -->
+                                    <div class="d-flex justify-content-between align-items-center mb-4" th:each="ds, iterStat : ${distinctShifts}">
+                                        <div class="d-flex align-items-start">
+                                            <!-- rotate colors based on index -->
+                                            <div style="width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; margin-right: 10px;" 
+                                                 th:styleappend="${iterStat.index % 4 == 0 ? 'background-color: #3b82f6;' : (iterStat.index % 4 == 1 ? 'background-color: #8b5cf6;' : (iterStat.index % 4 == 2 ? 'background-color: #10b981;' : 'background-color: #f59e0b;'))}"></div>
+                                            <div>
+                                                <div class="fw-bold" style="font-size: 0.9rem;" th:text="${ds.shiftName}">Shift Name</div>
+                                                <div style="font-size: 0.7rem; color: #64748b;" th:text="${ds.shiftTiming}">Timing</div>
+                                            </div>
                                         </div>
+                                        <div th:class="${ds.otAllowed ? 'text-success fw-bold' : 'text-danger fw-bold'}" style="font-size: 0.8rem;" th:text="${ds.otAllowed ? 'OT Allowed' : 'OT Not Allowed'}">OT Status</div>
                                     </div>
-                                    <div th:class="${ds.otAllowed ? 'text-success fw-bold' : 'text-danger fw-bold'}" style="font-size: 0.8rem;" th:text="${ds.otAllowed ? 'OT Allowed' : 'OT Not Allowed'}">OT Status</div>
                                 </div>
 
                                 <div class="text-center mt-4 pt-3" style="border-top: 1px dashed #e2e8f0;">
-                                    <a href="#" class="text-primary fw-bold text-decoration-none"><i class="fas fa-cog me-1"></i> Manage Shifts</a>
+                                    <a href="#" class="text-primary fw-bold text-decoration-none" data-bs-toggle="modal" data-bs-target="#manageShiftsModal"><i class="fas fa-cog me-1"></i> Manage Shifts</a>
                                 </div>
                             </div>
                         </div>
@@ -856,7 +862,7 @@
                             <p class="text-muted" style="font-size: 0.85rem;">Assign a shift and configure OT settings for employees.</p>
                         </div>
 
-                        <form>
+                        <form th:action="@{/senior_hr/attendance/assign-shift}" method="post">
                             <h6 class="fw-bold mb-3">1. Select Employee(s)</h6>
                             <div class="mb-4 d-flex gap-4">
                                 <div class="form-check">
@@ -872,21 +878,21 @@
                             <div class="row mb-5">
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold" style="font-size: 0.85rem;">Employee Name <span class="text-danger">*</span></label>
-                                    <select class="form-select">
-                                        <option>Neha Sharma (EMP114)</option>
+                                    <select name="userId" id="assignEmployeeSelect" class="form-select" onchange="loadEmployeeInfo(this)" required>
+                                        <option value="" disabled selected>Select Employee</option>
+                                        <option th:each="u : ${allUsers}" th:value="${u.id}" th:text="${u.fullName + ' (ID: ' + (u.employeeProfile != null ? u.employeeProfile.employeeCode : u.id) + ')'}"
+                                                th:data-dept="${u.employeeProfile != null ? u.employeeProfile.department : 'Engineering'}"
+                                                th:data-loc="${u.employeeProfile != null ? u.employeeProfile.workLocation : 'Raipur, India'}">
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold" style="font-size: 0.85rem;">Department <span class="text-danger">*</span></label>
-                                    <select class="form-select">
-                                        <option>Engineering</option>
-                                    </select>
+                                    <input type="text" name="department" id="assignDept" class="form-control" placeholder="e.g. Engineering" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold" style="font-size: 0.85rem;">Location <span class="text-danger">*</span></label>
-                                    <select class="form-select">
-                                        <option>Raipur, India</option>
-                                    </select>
+                                    <input type="text" name="location" id="assignLoc" class="form-control" placeholder="e.g. Raipur, India" required>
                                 </div>
                             </div>
 
@@ -894,20 +900,23 @@
                             <div class="row mb-5">
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold" style="font-size: 0.85rem;">Shift <span class="text-danger">*</span></label>
-                                    <select class="form-select">
-                                        <option>Night Shift</option>
+                                    <select name="shiftName" id="assignShiftName" class="form-select" onchange="updateShiftTimingOptions(this)" required>
+                                        <option value="General Shift">General Shift</option>
+                                        <option value="Night Shift">Night Shift</option>
+                                        <option value="Flexible Shift">Flexible Shift</option>
+                                        <option value="Half-day Shift">Half-day Shift</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold" style="font-size: 0.85rem;">Shift Timing <span class="text-danger">*</span></label>
-                                    <select class="form-select">
-                                        <option>(08:00 PM - 12:00 PM)</option>
+                                    <select name="shiftTiming" id="assignShiftTiming" class="form-select" required>
+                                        <option value="10:00 AM - 07:00 PM">10:00 AM - 07:00 PM</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold" style="font-size: 0.85rem;">Break Time <span class="text-danger">*</span></label>
-                                    <select class="form-select">
-                                        <option>(10:30 PM - 11:00 PM)</option>
+                                    <select name="breakTime" id="assignBreakTime" class="form-select" required>
+                                        <option value="01:00 PM - 02:00 PM">01:00 PM - 02:00 PM</option>
                                     </select>
                                 </div>
                             </div>
@@ -916,11 +925,11 @@
                             <div class="row mb-5">
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold" style="font-size: 0.85rem;">Start Date <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control" value="2026-06-19">
+                                    <input type="date" name="startDate" class="form-control" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold" style="font-size: 0.85rem;">End Date <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control" value="2026-06-25">
+                                    <input type="date" name="endDate" class="form-control" required>
                                 </div>
                             </div>
 
@@ -930,26 +939,27 @@
                                     <label class="form-label fw-bold" style="font-size: 0.85rem;">OT Allowed <span class="text-danger">*</span></label>
                                     <div class="d-flex gap-4 mt-2">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="otAllowed" id="otYes" checked>
+                                            <input class="form-check-input" type="radio" name="otAllowed" value="true" id="otYes" checked>
                                             <label class="form-check-label" style="font-size: 0.85rem;" for="otYes">Yes, OT is allowed</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="otAllowed" id="otNo">
+                                            <input class="form-check-input" type="radio" name="otAllowed" value="false" id="otNo">
                                             <label class="form-check-label text-muted" style="font-size: 0.85rem;" for="otNo">No, OT isn't allowed</label>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold" style="font-size: 0.85rem;">OT Calculation Rule <span class="text-danger">*</span></label>
-                                    <select class="form-select">
-                                        <option>After Shift Hours</option>
+                                    <select name="otCalculationRule" class="form-select" required>
+                                        <option value="After Shift Hours">After Shift Hours</option>
+                                        <option value="Flat Rate">Flat Rate</option>
                                     </select>
                                 </div>
                             </div>
 
                             <div class="d-flex justify-content-center gap-3 mt-4 border-top pt-4">
                                 <button type="button" class="btn btn-light px-5 fw-bold" onclick="toggleShiftView()" style="border: 1px solid #cbd5e1; color: #475569;">Cancel</button>
-                                <button type="button" class="btn btn-primary px-5 fw-bold" onclick="toggleShiftView()" style="background-color: #3b82f6; border-color: #3b82f6;">Assign Shift</button>
+                                <button type="submit" class="btn btn-primary px-5 fw-bold" style="background-color: #3b82f6; border-color: #3b82f6;">Assign Shift</button>
                             </div>
                         </form>
                     </div>
@@ -963,7 +973,89 @@
     </div>
 
     
-            <!-- Bootstrap JS -->
+    <!-- Add Shift Modal -->
+    <div class="modal fade" id="addShiftModal" tabindex="-1" aria-labelledby="addShiftModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 8px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="addShiftModalLabel">Add New Shift</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addShiftForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Shift Name</label>
+                            <input type="text" id="newShiftName" class="form-control" placeholder="e.g. Morning Shift" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Shift Timing</label>
+                            <input type="text" id="newShiftTiming" class="form-control" placeholder="e.g. 09:00 AM - 06:00 PM" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Break Time</label>
+                            <input type="text" id="newBreakTime" class="form-control" placeholder="e.g. 01:00 PM - 02:00 PM" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold d-block">OT Allowed</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="newShiftOt" id="newOtYes" value="true" checked>
+                                <label class="form-check-label" for="newOtYes">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="newShiftOt" id="newOtNo" value="false">
+                                <label class="form-check-label" for="newOtNo">No</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addNewShiftTemplate()" style="background-color: #3b82f6; border-color: #3b82f6;">Save Shift</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Shifts Modal -->
+    <div class="modal fade" id="manageShiftsModal" tabindex="-1" aria-labelledby="manageShiftsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border-radius: 8px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="manageShiftsModalLabel">Manage Shifts</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Shift Name</th>
+                                    <th>Timing</th>
+                                    <th>Break Time</th>
+                                    <th>OT Allowed</th>
+                                    <th>Employees Assigned</th>
+                                </tr>
+                            </thead>
+                            <tbody id="manageShiftsTableBody">
+                                <tr th:each="ds : ${distinctShifts}">
+                                    <td class="fw-bold" th:text="${ds.shiftName}">General Shift</td>
+                                    <td th:text="${ds.shiftTiming}">10:00 AM - 07:00 PM</td>
+                                    <td>01:00 PM - 02:00 PM</td> <!-- Default fallback break -->
+                                    <td><span th:class="${ds.otAllowed ? 'text-success fw-bold' : 'text-danger fw-bold'}" th:text="${ds.otAllowed ? 'Yes' : 'No'}">Yes</span></td>
+                                    <td th:text="${ds.empCount}">5</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
@@ -971,8 +1063,6 @@
         function showOverrideForm() {
             document.getElementById('override-list-view').classList.add('d-none');
             document.getElementById('override-form-view').classList.remove('d-none');
-            
-            // In the screenshot, the title is updated dynamically but we'll leave the UI static
         }
 
         function showOverrideList() {
@@ -980,8 +1070,19 @@
             document.getElementById('override-list-view').classList.remove('d-none');
         }
 
-        // Charts
+        // Charts & Query Params tab activation
         document.addEventListener("DOMContentLoaded", function() {
+            // Activate tab from URL query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab');
+            if (tab) {
+                const tabButton = document.getElementById(tab + '-tab');
+                if (tabButton) {
+                    const tabObj = new bootstrap.Tab(tabButton);
+                    tabObj.show();
+                }
+            }
+
             // Attendance Summary Donut Chart
             const donutCtx = document.getElementById('attendanceDonutChart').getContext('2d');
             new Chart(donutCtx, {
@@ -1005,27 +1106,170 @@
                 }
             });
         });
-    </script>
 
-    <script>
         function toggleShiftView() {
             var list = document.getElementById('shift-list-view');
             var form = document.getElementById('assign-shift-form');
             if (list.style.display === 'none') {
                 list.style.display = 'block';
                 form.style.display = 'none';
-                
-                // Update topbar title back
                 document.querySelector('.top-navbar .nav-brand span:nth-child(2)').textContent = 'Attendance';
             } else {
                 list.style.display = 'none';
                 form.style.display = 'block';
-                
-                // Update topbar title to indicate Assign Shift Form
                 document.querySelector('.top-navbar .nav-brand span:nth-child(2)').innerHTML = 'Assign Shift Form';
             }
         }
+
+        // --- SHIFT MANAGEMENT CLIENT-SIDE LOGIC ---
+        
+        const shiftData = {
+            "General Shift": { timing: "10:00 AM - 07:00 PM", break: "01:00 PM - 02:00 PM" },
+            "Night Shift": { timing: "10:00 PM - 07:00 AM", break: "02:00 AM - 03:00 AM" },
+            "Flexible Shift": { timing: "02:00 PM - 10:00 PM", break: "05:00 PM - 06:00 PM" },
+            "Half-day Shift": { timing: "10:00 AM - 02:00 PM", break: "12:00 PM - 12:30 PM" }
+        };
+
+        function updateShiftTimingOptions(select) {
+            const shift = select.value;
+            const data = shiftData[shift];
+            if (data) {
+                document.getElementById('assignShiftTiming').innerHTML = `<option value="${data.timing}">${data.timing}</option>`;
+                document.getElementById('assignBreakTime').innerHTML = `<option value="${data.break}">${data.break}</option>`;
+            }
+        }
+
+        function loadEmployeeInfo(select) {
+            const selectedOpt = select.options[select.selectedIndex];
+            const dept = selectedOpt.getAttribute('data-dept') || '';
+            const loc = selectedOpt.getAttribute('data-loc') || '';
+            document.getElementById('assignDept').value = dept;
+            document.getElementById('assignLoc').value = loc;
+        }
+
+        function filterShifts() {
+            const query = document.getElementById('searchShiftInput').value.toLowerCase();
+            const dept = document.getElementById('filterDeptSelect').value.toLowerCase();
+            const shiftType = document.getElementById('filterShiftTypeSelect').value.toLowerCase();
+            const ot = document.getElementById('filterOtSelect').value.toLowerCase();
+
+            const rows = document.querySelectorAll('#shift-mgmt-pane .table-custom tbody tr');
+            rows.forEach(row => {
+                const nameEl = row.querySelector('.fw-bold.text-dark');
+                const name = nameEl ? nameEl.textContent.toLowerCase() : '';
+                const deptEl = row.cells[1];
+                const rowDept = deptEl ? deptEl.textContent.toLowerCase().trim() : '';
+                const shiftEl = row.cells[2];
+                const rowShift = shiftEl ? shiftEl.textContent.toLowerCase().trim() : '';
+                const otEl = row.cells[4];
+                const rowOt = otEl ? otEl.textContent.toLowerCase().trim() : '';
+
+                const matchesQuery = !query || name.includes(query);
+                const matchesDept = dept === 'all' || rowDept === dept;
+                const matchesShift = shiftType === 'all' || rowShift === shiftType;
+                
+                let matchesOt = true;
+                if (ot === 'yes') {
+                    matchesOt = rowOt === 'yes';
+                } else if (ot === 'no') {
+                    matchesOt = rowOt === 'no';
+                }
+
+                if (matchesQuery && matchesDept && matchesShift && matchesOt) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function addNewShiftTemplate() {
+            const name = document.getElementById('newShiftName').value.trim();
+            const timing = document.getElementById('newShiftTiming').value.trim();
+            const breakTime = document.getElementById('newBreakTime').value.trim();
+            const otAllowed = document.querySelector('input[name="newShiftOt"]:checked').value === 'true';
+
+            if (!name || !timing || !breakTime) {
+                alert('Please fill out all fields.');
+                return;
+            }
+
+            // Add to shiftData
+            shiftData[name] = { timing: timing, break: breakTime };
+
+            // Add to assign shift form dropdown
+            const select = document.getElementById('assignShiftName');
+            const option = document.createElement('option');
+            option.value = name;
+            option.text = name;
+            select.add(option);
+
+            // Append to Sidebar Shift List
+            const container = document.getElementById('shiftListContainer');
+            const index = container.children.length;
+            const colors = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'];
+            const color = colors[index % colors.length];
+
+            const item = document.createElement('div');
+            item.className = 'd-flex justify-content-between align-items-center mb-4';
+            item.innerHTML = `
+                <div class="d-flex align-items-start">
+                    <div style="width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; margin-right: 10px; background-color: ${color};"></div>
+                    <div>
+                        <div class="fw-bold" style="font-size: 0.9rem;">${name}</div>
+                        <div style="font-size: 0.7rem; color: #64748b;">${timing}</div>
+                    </div>
+                </div>
+                <div class="${otAllowed ? 'text-success fw-bold' : 'text-danger fw-bold'}" style="font-size: 0.8rem;">
+                    ${otAllowed ? 'OT Allowed' : 'OT Not Allowed'}
+                </div>
+            `;
+            container.appendChild(item);
+
+            // Append to manage table body
+            const manageTableBody = document.getElementById('manageShiftsTableBody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="fw-bold">${name}</td>
+                <td>${timing}</td>
+                <td>${breakTime}</td>
+                <td><span class="${otAllowed ? 'text-success fw-bold' : 'text-danger fw-bold'}">${otAllowed ? 'Yes' : 'No'}</span></td>
+                <td>0</td>
+            `;
+            manageTableBody.appendChild(tr);
+
+            // Hide modal
+            const modalEl = document.getElementById('addShiftModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+
+            // Reset form
+            document.getElementById('addShiftForm').reset();
+        }
+
+        function editShiftAssignment(id, userId, dept, loc, shiftName, shiftTiming, breakTime, startDate, endDate, otAllowed, otCalculationRule) {
+            document.getElementById('assignEmployeeSelect').value = userId;
+            document.getElementById('assignDept').value = dept;
+            document.getElementById('assignLoc').value = loc;
+            document.getElementById('assignShiftName').value = shiftName;
+            
+            document.getElementById('assignShiftTiming').innerHTML = `<option value="${shiftTiming}">${shiftTiming}</option>`;
+            document.getElementById('assignBreakTime').innerHTML = `<option value="${breakTime}">${breakTime}</option>`;
+            
+            document.getElementsByName('startDate')[0].value = startDate;
+            document.getElementsByName('endDate')[0].value = endDate;
+            
+            if (otAllowed) {
+                document.getElementById('otYes').checked = true;
+            } else {
+                document.getElementById('otNo').checked = true;
+            }
+            
+            document.getElementsByName('otCalculationRule')[0].value = otCalculationRule;
+            
+            // Open form view
+            toggleShiftView();
+        }
     </script>
-    
 </body>
 </html>

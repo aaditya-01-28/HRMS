@@ -1212,7 +1212,7 @@
                     <div class="mb-4">
                         <label class="form-label fw-bold" style="font-size: 0.85rem;">Employee Name <span class="text-danger">*</span></label>
                         <input type="text" id="addBonusSearch" class="form-control mb-2" placeholder="Search employee by name or ID..." oninput="filterAddBonusEmployees()">
-                        <select name="userId" id="addBonusUserId" class="form-select" required size="4" style="height: auto;">
+                        <select name="userId" id="addBonusUserId" class="form-select" required size="4" style="display: none; height: auto;">
                             <option th:each="u : ${allUsers}" th:value="${u.id}" th:text="${u.fullName + ' (EMP ' + u.id + ')'}"></option>
                         </select>
                     </div>
@@ -1490,8 +1490,13 @@
         }
 
         function filterAddBonusEmployees() {
-            const searchVal = document.getElementById('addBonusSearch').value.toLowerCase();
+            const searchVal = document.getElementById('addBonusSearch').value.toLowerCase().trim();
             const select = document.getElementById('addBonusUserId');
+            if (searchVal.length === 0) {
+                select.style.display = "none";
+                return;
+            }
+            select.style.display = "block";
             const options = select.options;
             for (let i = 0; i < options.length; i++) {
                 const text = options[i].text.toLowerCase();
@@ -1516,6 +1521,17 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateBonusCounts();
             filterBonuses();
+
+            // Clear addBonusModal fields on show
+            const modalEl = document.getElementById('addBonusModal');
+            if (modalEl) {
+                modalEl.addEventListener('show.bs.modal', () => {
+                    document.getElementById('addBonusSearch').value = '';
+                    const select = document.getElementById('addBonusUserId');
+                    select.value = '';
+                    select.style.display = 'none';
+                });
+            }
         });
     </script>
 </body>
