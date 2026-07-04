@@ -1138,41 +1138,132 @@ public class SeniorDashboardController {
     @GetMapping("/senior_hr/attendance")
     public String showSeniorHrAttendance(Model model, Principal principal) {
         
-        // 1. Fetch Daily Attendance
+        // 1. Fetch & Seed Daily Attendance
         java.util.List<com.example.admindashboard.model.Attendance> allAttendance = attendanceRepository.findAll();
+        if (allAttendance.isEmpty()) {
+            java.util.List<com.example.admindashboard.model.User> users = userRepository.findAll();
+            java.time.LocalDate baseDate = java.time.LocalDate.of(2026, 5, 19);
+            for (com.example.admindashboard.model.User u : users) {
+                for (int i = 0; i < 5; i++) {
+                    java.time.LocalDate date = baseDate.minusDays(i);
+                    com.example.admindashboard.model.Attendance att = new com.example.admindashboard.model.Attendance();
+                    att.setUser(u);
+                    att.setDate(date);
+                    
+                    int hash = (u.getId().hashCode() + i) % 100;
+                    String status;
+                    java.time.LocalTime checkIn = null;
+                    java.time.LocalTime checkOut = null;
+                    String totalHours = "-";
+                    
+                    if (hash < 70) {
+                        status = "Present";
+                        checkIn = java.time.LocalTime.of(9, 0).plusMinutes(hash % 15);
+                        checkOut = java.time.LocalTime.of(18, 0).plusMinutes(hash % 30);
+                        totalHours = "9.0";
+                    } else if (hash < 80) {
+                        status = "Late";
+                        checkIn = java.time.LocalTime.of(10, 15).plusMinutes(hash % 10);
+                        checkOut = java.time.LocalTime.of(18, 0).plusMinutes(hash % 30);
+                        totalHours = "7.8";
+                    } else if (hash < 90) {
+                        status = "On Leave";
+                        totalHours = "-";
+                    } else if (hash < 95) {
+                        status = "Half Day";
+                        checkIn = java.time.LocalTime.of(9, 0).plusMinutes(hash % 15);
+                        checkOut = java.time.LocalTime.of(13, 0);
+                        totalHours = "4.0";
+                    } else {
+                        status = "Absent";
+                        totalHours = "-";
+                    }
+                    
+                    att.setStatus(status);
+                    att.setCheckInTime(checkIn);
+                    att.setCheckOutTime(checkOut);
+                    att.setTotalHours(totalHours);
+                    att.setReason(status.equals("Late") ? "Traffic delay" : (status.equals("On Leave") ? "Sick leave" : ""));
+                    
+                    attendanceRepository.save(att);
+                }
+            }
+            allAttendance = attendanceRepository.findAll();
+        }
+        
+        java.time.format.DateTimeFormatter timeFormatter = java.time.format.DateTimeFormatter.ofPattern("hh:mm a");
+        java.util.List<java.util.Map<String, Object>> rawList = new java.util.ArrayList<>();
         java.util.List<java.util.Map<String, Object>> dailyList = new java.util.ArrayList<>();
         for (com.example.admindashboard.model.Attendance a : allAttendance) {
             if (a.getUser() != null) {
                 java.util.Map<String, Object> map = new java.util.HashMap<>();
                 map.put("name", a.getUser().getFullName());
-                map.put("id", a.getUser().getEmployeeProfile() != null ? a.getUser().getEmployeeProfile().getEmployeeCode() : "N/A");
-                map.put("dept", a.getUser().getEmployeeProfile() != null ? a.getUser().getEmployeeProfile().getDepartment() : "N/A");
-                map.put("shift", a.getUser().getEmployeeProfile() != null ? a.getUser().getEmployeeProfile().getWorkShift() : "N/A");
-                map.put("in", a.getCheckInTime() != null ? a.getCheckInTime().toString() : "-");
-                map.put("out", a.getCheckOutTime() != null ? a.getCheckOutTime().toString() : "-");
+                map.put("id", a.getUser().getEmployeeProfile() != null ? a.getUser().getEmployeeProfile().getEmployeeCode() : "EMP" + a.getUser().getId());
+                map.put("dept", a.getUser().getEmployeeProfile() != null ? a.getUser().getEmployeeProfile().getDepartment() : "Engineering");
+                map.put("shift", a.getUser().getEmployeeProfile() != null ? a.getUser().getEmployeeProfile().getWorkShift() : "General Shift");
+                
+                String checkInStr = a.getCheckInTime() != null ? a.getCheckInTime().format(timeFormatter) : "-";
+                String checkOutStr = a.getCheckOutTime() != null ? a.getCheckOutTime().format(timeFormatter) : "-";
+                
+                map.put("in", checkInStr);
+                map.put("out", checkOutStr);
                 map.put("hrs", a.getTotalHours() != null ? a.getTotalHours() : "-");
-                map.put("status", a.getStatus() != null ? a.getStatus() : "-");
+                map.put("status", a.getStatus() != null ? a.getStatus() : "Absent");
                 map.put("rem", a.getReason() != null ? a.getReason() : "-");
+                map.put("date", a.getDate() != null ? a.getDate().toString() : "");
+                map.put("loc", a.getUser().getEmployeeProfile() != null ? a.getUser().getEmployeeProfile().getWorkLocation() : "Raipur, India");
+                
                 dailyList.add(map);
+                
+                java.util.Map<String, Object> rawMap = new java.util.HashMap<>();
+                rawMap.put("userId", a.getUser().getId());
+                rawMap.put("date", a.getDate() != null ? a.getDate().toString() : "");
+                rawMap.put("checkIn", checkInStr);
+                rawMap.put("checkOut", checkOutStr);
+                rawMap.put("hrs", a.getTotalHours() != null ? a.getTotalHours() : "-");
+                rawMap.put("status", a.getStatus() != null ? a.getStatus() : "Absent");
+                rawList.add(rawMap);
             }
         }
         model.addAttribute("dailyAttendance", dailyList);
+        model.addAttribute("dailyAttendanceRaw", rawList);
         
-        // 2. Fetch Regularizations (Overrides)
+        // 2. Fetch Regularizations (Overrides) (Seed if empty)
         java.util.List<com.example.admindashboard.model.AttendanceRegularization> allReg = attendanceRegularizationRepository.findAll();
+        if (allReg.isEmpty()) {
+            java.util.List<com.example.admindashboard.model.User> users = userRepository.findAll();
+            String[] types = {"Late Mark", "Forgot ID", "Work From Home"};
+            String[] reasons = {"Train delay", "Forgot card at home", "Power cut at residential area"};
+            String[] statuses = {"Approved", "Pending", "Declined"};
+            int count = 0;
+            for (com.example.admindashboard.model.User u : users) {
+                if (count >= 15) break;
+                com.example.admindashboard.model.AttendanceRegularization reg = new com.example.admindashboard.model.AttendanceRegularization();
+                reg.setUser(u);
+                reg.setDate(java.time.LocalDate.of(2026, 5, 19).minusDays(count % 5));
+                reg.setType(types[count % 3]);
+                reg.setDuration(count % 3 == 0 ? "1 hr" : "Full Day");
+                reg.setReason(reasons[count % 3]);
+                reg.setStatus(statuses[count % 3]);
+                reg.setHrComments(statuses[count % 3].equals("Approved") ? "Approved based on manager review." : "");
+                attendanceRegularizationRepository.save(reg);
+                count++;
+            }
+            allReg = attendanceRegularizationRepository.findAll();
+        }
+        
         java.util.List<java.util.Map<String, Object>> regList = new java.util.ArrayList<>();
         for (com.example.admindashboard.model.AttendanceRegularization r : allReg) {
             if (r.getUser() != null) {
                 java.util.Map<String, Object> map = new java.util.HashMap<>();
                 map.put("name", r.getUser().getFullName());
-                map.put("id", r.getUser().getEmployeeProfile() != null ? r.getUser().getEmployeeProfile().getEmployeeCode() : "N/A");
+                map.put("id", r.getUser().getEmployeeProfile() != null ? r.getUser().getEmployeeProfile().getEmployeeCode() : "EMP" + r.getUser().getId());
+                map.put("dept", r.getUser().getEmployeeProfile() != null ? r.getUser().getEmployeeProfile().getDepartment() : "Engineering");
                 
-                // Format date manually if needed, or rely on Thymeleaf
-                java.time.format.DateTimeFormatter dtf = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                map.put("date", r.getDate() != null ? r.getDate().format(dtf) : "");
+                map.put("date", r.getDate() != null ? r.getDate().toString() : "");
                 map.put("type", r.getType() != null ? r.getType() : "-");
-                map.put("orig", "-"); // DB schema lacks this, placing default
-                map.put("upd", r.getDuration() != null ? r.getDuration() : "-"); // Putting duration as updated or reason
+                map.put("orig", r.getType().equals("Late Mark") ? "10:15 AM" : "-"); 
+                map.put("upd", r.getDuration() != null ? r.getDuration() : "-"); 
                 map.put("reason", r.getReason() != null ? r.getReason() : "-");
                 map.put("status", r.getStatus() != null ? r.getStatus() : "Pending");
                 regList.add(map);
@@ -1251,6 +1342,16 @@ public class SeniorDashboardController {
         }
         model.addAttribute("departments", departments);
 
+        java.util.List<String> locations = allUsers.stream()
+            .map(u -> u.getEmployeeProfile() != null ? u.getEmployeeProfile().getWorkLocation() : null)
+            .filter(java.util.Objects::nonNull)
+            .distinct()
+            .collect(java.util.stream.Collectors.toList());
+        if (locations.isEmpty()) {
+            locations = java.util.Arrays.asList("Raipur, India", "Shahdol", "Bangalore, India");
+        }
+        model.addAttribute("locations", locations);
+
         return "senior_hr-attendance";
     }
 
@@ -1290,6 +1391,72 @@ public class SeniorDashboardController {
         }
         
         return "redirect:/senior_hr/attendance?tab=shift-mgmt";
+    }
+
+    @PostMapping("/senior_hr/attendance/override")
+    public String overrideAttendance(
+            @RequestParam("userId") Long userId,
+            @RequestParam("date") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date,
+            @RequestParam("overrideType") String overrideType,
+            @RequestParam("checkIn") String checkIn,
+            @RequestParam("checkOut") String checkOut,
+            @RequestParam("duration") String duration,
+            @RequestParam("reason") String reason) {
+        
+        com.example.admindashboard.model.User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            com.example.admindashboard.model.AttendanceRegularization reg = new com.example.admindashboard.model.AttendanceRegularization();
+            reg.setUser(user);
+            reg.setDate(date);
+            reg.setType(overrideType);
+            reg.setDuration(duration);
+            reg.setReason(reason);
+            reg.setStatus("Approved");
+            reg.setHrComments("Override performed directly by Senior HR");
+            attendanceRegularizationRepository.save(reg);
+            
+            com.example.admindashboard.model.Attendance att = attendanceRepository.findAll().stream()
+                .filter(a -> a.getUser() != null && a.getUser().getId().equals(userId) && date.equals(a.getDate()))
+                .findFirst()
+                .orElse(new com.example.admindashboard.model.Attendance());
+            
+            att.setUser(user);
+            att.setDate(date);
+            
+            java.time.LocalTime checkInTime = null;
+            java.time.LocalTime checkOutTime = null;
+            if (checkIn != null && !checkIn.trim().isEmpty() && !"-".equals(checkIn)) {
+                try {
+                    checkInTime = java.time.LocalTime.parse(checkIn);
+                } catch (Exception e) {}
+            }
+            if (checkOut != null && !checkOut.trim().isEmpty() && !"-".equals(checkOut)) {
+                try {
+                    checkOutTime = java.time.LocalTime.parse(checkOut);
+                } catch (Exception e) {}
+            }
+            
+            att.setCheckInTime(checkInTime);
+            att.setCheckOutTime(checkOutTime);
+            att.setTotalHours(duration);
+            
+            String status = "Present";
+            if (overrideType.contains("Half")) {
+                status = "Half Day";
+            } else if (overrideType.contains("Absent")) {
+                status = "Absent";
+            } else if (overrideType.contains("Leave")) {
+                status = "On Leave";
+            } else if (checkInTime != null && checkInTime.isAfter(java.time.LocalTime.of(10, 0))) {
+                status = "Late";
+            }
+            
+            att.setStatus(status);
+            att.setReason(reason);
+            attendanceRepository.save(att);
+        }
+        
+        return "redirect:/senior_hr/attendance?tab=override";
     }
 
     // --- WORKFLOW ROUTES HANDLED BY DASHBOARD CONTROLLER ---

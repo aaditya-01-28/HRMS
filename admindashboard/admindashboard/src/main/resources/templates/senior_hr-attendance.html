@@ -274,19 +274,31 @@
                         <div class="row g-3 mb-4">
                             <div class="col-md-3">
                                 <label class="form-label" style="font-size:0.75rem;">Date Range</label>
-                                <input type="date" class="form-control form-control-sm" value="2026-05-19">
+                                <input type="date" id="overviewDateFilter" class="form-control form-control-sm" value="2026-05-19" onchange="filterOverview()">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label" style="font-size:0.75rem;">Department</label>
-                                <select class="form-select form-select-sm"><option>All Departments</option></select>
+                                <select id="overviewDeptFilter" class="form-select form-select-sm" onchange="filterOverview()">
+                                    <option value="all departments">All Departments</option>
+                                    <option th:each="d : ${departments}" th:value="${d}" th:text="${d}">Engineering</option>
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label" style="font-size:0.75rem;">Leave types</label>
-                                <select class="form-select form-select-sm"><option>All locations</option></select>
+                                <select id="overviewLocationFilter" class="form-select form-select-sm" onchange="filterOverview()">
+                                    <option value="all locations">All locations</option>
+                                    <option th:each="l : ${locations}" th:value="${l}" th:text="${l}">Raipur, India</option>
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label" style="font-size:0.75rem;">Status</label>
-                                <select class="form-select form-select-sm"><option>All shift timings</option></select>
+                                <select id="overviewStatusFilter" class="form-select form-select-sm" onchange="filterOverview()">
+                                    <option value="all shift timings">All shift timings</option>
+                                    <option value="General Shift">General Shift</option>
+                                    <option value="Night Shift">Night Shift</option>
+                                    <option value="Flexible Shift">Flexible Shift</option>
+                                    <option value="Half-day Shift">Half-day Shift</option>
+                                </select>
                             </div>
                         </div>
 
@@ -299,7 +311,7 @@
                             </div>
                             <div class="position-relative mb-2" style="width: 200px;">
                                 <i class="fas fa-search position-absolute text-muted" style="left: 10px; top: 8px; font-size: 0.8rem;"></i>
-                                <input type="text" class="form-control form-control-sm" placeholder="Search Employees by name" style="padding-left: 30px;">
+                                <input type="text" id="overviewSearchInput" class="form-control form-control-sm" placeholder="Search Employees by name" style="padding-left: 30px;" oninput="filterOverview()">
                             </div>
                         </div>
 
@@ -320,7 +332,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="att, iterStat : ${dailyAttendance}">
+                                    <tr th:each="att, iterStat : ${dailyAttendance}" th:data-date="${att.date}" th:data-loc="${att.loc}">
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <img th:src="${iterStat.index % 2 == 0 ? '/images/male-avatar.png' : '/images/female-avatar.png'}" class="emp-avatar border" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\' /></svg>'">
@@ -513,24 +525,37 @@
                             <label class="form-label" style="font-size:0.75rem;">Search</label>
                             <div class="position-relative">
                                 <i class="fas fa-search position-absolute text-muted" style="left: 10px; top: 10px; font-size: 0.8rem;"></i>
-                                <input type="text" class="form-control form-control-sm py-2" placeholder="Search Employees by name" style="padding-left: 30px;">
+                                <input type="text" id="overrideSearchInput" class="form-control form-control-sm py-2" placeholder="Search Employees by name" style="padding-left: 30px;" oninput="filterOverrides()">
                             </div>
                         </div>
                         <div style="width: 150px;">
                             <label class="form-label" style="font-size:0.75rem;">Department</label>
-                            <select class="form-select form-select-sm py-2"><option>All Departments</option></select>
+                            <select id="overrideDeptSelect" class="form-select form-select-sm py-2" onchange="filterOverrides()">
+                                <option value="all departments">All Departments</option>
+                                <option th:each="d : ${departments}" th:value="${d}" th:text="${d}">Engineering</option>
+                            </select>
                         </div>
                         <div style="width: 150px;">
                             <label class="form-label" style="font-size:0.75rem;">Override Type</label>
-                            <select class="form-select form-select-sm py-2"><option>All types</option></select>
+                            <select id="overrideTypeSelect" class="form-select form-select-sm py-2" onchange="filterOverrides()">
+                                <option value="all types">All types</option>
+                                <option value="Late Mark">Late Mark</option>
+                                <option value="Forgot ID">Forgot ID</option>
+                                <option value="Work From Home">Work From Home</option>
+                            </select>
                         </div>
                         <div style="width: 100px;">
                             <label class="form-label" style="font-size:0.75rem;">Status</label>
-                            <select class="form-select form-select-sm py-2"><option>All</option></select>
+                            <select id="overrideStatusSelect" class="form-select form-select-sm py-2" onchange="filterOverrides()">
+                                <option value="all">All</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Declined">Declined</option>
+                            </select>
                         </div>
                         <div style="width: 150px;">
                             <label class="form-label" style="font-size:0.75rem;">Date Range</label>
-                            <input type="date" class="form-control form-control-sm py-2" value="2026-05-19">
+                            <input type="date" id="overrideDateFilter" class="form-control form-control-sm py-2" value="2026-05-19" onchange="filterOverrides()">
                         </div>
                         <div class="ms-auto d-flex align-items-end">
                             <button class="btn btn-primary fw-bold px-4" onclick="showOverrideForm()"><i class="fas fa-plus me-1"></i> New Override</button>
@@ -553,7 +578,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="ov, iterStat : ${overrides}">
+                                <tr th:each="ov, iterStat : ${overrides}" th:data-dept="${ov.dept}" th:data-date="${ov.date}">
                                     <td class="text-start">
                                         <div class="d-flex align-items-center">
                                             <img th:src="${iterStat.index % 2 == 0 ? '/images/male-avatar.png' : '/images/female-avatar.png'}" class="emp-avatar border" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\' /></svg>'">
@@ -604,107 +629,120 @@
 
                 <!-- Override Form View -->
                 <div id="override-form-view" class="d-none">
+                    <form th:action="@{/senior_hr/attendance/override}" method="post">
                     
-                    <div class="d-flex align-items-center border-bottom pb-3 mb-4">
-                        <div>
-                            <h5 class="fw-bold text-primary mb-1">Attendance Override</h5>
-                            <p class="text-muted mb-0" style="font-size: 0.85rem;">Manually Update or override attendance for an employee.</p>
+                        <div class="d-flex align-items-center border-bottom pb-3 mb-4">
+                            <div>
+                                <h5 class="fw-bold text-primary mb-1">Attendance Override</h5>
+                                <p class="text-muted mb-0" style="font-size: 0.85rem;">Manually Update or override attendance for an employee.</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <h6 class="fw-bold mb-3 text-primary" style="text-decoration: underline;">Select Employee & Date</h6>
-                    
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Employee Name <span class="text-danger">*</span></label>
-                            <select class="form-select"><option>Neha Sharma (EMP114)</option></select>
+                        <h6 class="fw-bold mb-3 text-primary" style="text-decoration: underline;">Select Employee & Date</h6>
+                        
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Employee Name <span class="text-danger">*</span></label>
+                                <select name="userId" id="overrideEmployeeSelect" class="form-select" onchange="fetchCurrentAttendance()" required>
+                                    <option value="" disabled selected>Select Employee</option>
+                                    <option th:each="u : ${allUsers}" th:value="${u.id}" th:text="${u.fullName + ' (EMP' + u.id + ')'}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Choose Date <span class="text-danger">*</span></label>
+                                <input type="date" name="date" id="overrideDateInput" class="form-control" value="2026-05-19" onchange="fetchCurrentAttendance()" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Shift <span class="text-danger">*</span></label>
+                                <select id="overrideShift" class="form-select" disabled>
+                                    <option>Select Employee first</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Choose Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" value="2026-05-19">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Shift <span class="text-danger">*</span></label>
-                            <select class="form-select"><option>General (10:00 AM - 07:00 PM)</option></select>
-                        </div>
-                    </div>
 
-                    <div class="override-form-box mb-4">
-                        <h6 class="fw-bold mb-3" style="font-size: 0.9rem;">Current Attendance Status</h6>
-                        <div class="row text-center" style="font-size: 0.85rem;">
-                            <div class="col-3">
-                                <div class="text-muted mb-1">Check in Time</div>
-                                <div class="text-danger fw-bold">10:30 AM</div>
-                            </div>
-                            <div class="col-3">
-                                <div class="text-muted mb-1">Check out Time</div>
-                                <div class="text-danger fw-bold">10:30 AM</div>
-                            </div>
-                            <div class="col-3">
-                                <div class="text-muted mb-1">Total Hours</div>
-                                <div class="fw-bold text-dark">08 h 00 m</div>
-                            </div>
-                            <div class="col-3">
-                                <div class="text-muted mb-1">Status</div>
-                                <div class="text-danger fw-bold">Late by 30 min</div>
+                        <div class="override-form-box mb-4">
+                            <h6 class="fw-bold mb-3" style="font-size: 0.9rem;">Current Attendance Status</h6>
+                            <div class="row text-center" style="font-size: 0.85rem;">
+                                <div class="col-3">
+                                    <div class="text-muted mb-1">Check in Time</div>
+                                    <div class="fw-bold text-danger" id="currCheckIn">-</div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="text-muted mb-1">Check out Time</div>
+                                    <div class="fw-bold text-danger" id="currCheckOut">-</div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="text-muted mb-1">Total Hours</div>
+                                    <div class="fw-bold text-dark" id="currTotalHours">-</div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="text-muted mb-1">Status</div>
+                                    <div class="fw-bold text-danger" id="currStatus">-</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <h6 class="fw-bold mb-3" style="text-decoration: underline; font-size: 0.9rem;">Override Details</h6>
-                    
-                    <div class="mb-4">
-                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Employee Name <span class="text-danger">*</span></label>
-                        <div class="d-flex gap-5 mt-2" style="font-size: 0.85rem; color: #334155;">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="ovType" id="ovType1" checked>
-                                <label class="form-check-label" for="ovType1">Update Check in/out Time</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="ovType" id="ovType2">
-                                <label class="form-check-label" for="ovType2">Mark Full Day</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="ovType" id="ovType3">
-                                <label class="form-check-label" for="ovType3">Mark Half Day</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="ovType" id="ovType4">
-                                <label class="form-check-label" for="ovType4">Change Status Only</label>
+                        <h6 class="fw-bold mb-3" style="text-decoration: underline; font-size: 0.9rem;">Override Details</h6>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Override Type <span class="text-danger">*</span></label>
+                            <div class="d-flex gap-5 mt-2" style="font-size: 0.85rem; color: #334155;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="overrideType" value="Forgot ID" id="ovType1" checked onchange="toggleOverrideTypeFields()">
+                                    <label class="form-check-label" for="ovType1">Update Check in/out Time</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="overrideType" value="Work From Home" id="ovType2" onchange="toggleOverrideTypeFields()">
+                                    <label class="form-check-label" for="ovType2">Mark Full Day</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="overrideType" value="Half Day Correction" id="ovType3" onchange="toggleOverrideTypeFields()">
+                                    <label class="form-check-label" for="ovType3">Mark Half Day</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="overrideType" value="Late Mark" id="ovType4" onchange="toggleOverrideTypeFields()">
+                                    <label class="form-check-label" for="ovType4">Change Status Only</label>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Check-in Time <span class="text-danger">*</span></label>
-                            <select class="form-select"><option>09:58 AM</option></select>
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Check-in Time <span class="text-danger">*</span></label>
+                                <input type="time" name="checkIn" id="overrideCheckIn" class="form-control" onchange="calculateOverrideHours()" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Check-out Time <span class="text-danger">*</span></label>
+                                <input type="time" name="checkOut" id="overrideCheckOut" class="form-control" onchange="calculateOverrideHours()" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Total Hours <span class="text-danger">*</span></label>
+                                <input type="text" name="duration" id="overrideDuration" class="form-control" readonly placeholder="Calculated automatically">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Reason for Override <span class="text-danger">*</span></label>
+                                <select name="reason" class="form-select" required>
+                                    <option value="Traffic Delay">Traffic Delay</option>
+                                    <option value="Forgot ID card">Forgot ID card</option>
+                                    <option value="Work from client location">Work from client location</option>
+                                    <option value="Medical emergency">Medical emergency</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold" style="font-size: 0.85rem;">Remarks <span class="text-danger">*</span></label>
+                                <textarea name="remarks" class="form-control" rows="2" placeholder="Employee informed me." oninput="updateRemarksCharCount(this)"></textarea>
+                                <div class="text-end text-muted" id="remarksCharCount" style="font-size: 0.7rem; margin-top: 2px;">0/200</div>
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Check-out Time <span class="text-danger">*</span></label>
-                            <select class="form-select"><option>07:00 PM</option></select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Total Hours <span class="text-danger">*</span></label>
-                            <select class="form-select"><option>9 h 00 m</option></select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Reason for Override <span class="text-danger">*</span></label>
-                            <select class="form-select"><option>Traffic Delay</option></select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold" style="font-size: 0.85rem;">Remarks <span class="text-danger">*</span></label>
-                            <textarea class="form-control" rows="2" placeholder="Employee informed me."></textarea>
-                            <div class="text-end text-muted" style="font-size: 0.7rem; margin-top: 2px;">0/200</div>
-                        </div>
-                    </div>
 
-                    <div class="d-flex justify-content-center gap-3 mt-5 pb-5">
-                        <button class="btn btn-outline-secondary px-5 py-2 fw-bold text-dark" onclick="showOverrideList()">Cancel</button>
-                        <button class="btn btn-primary px-5 py-2 fw-bold" onclick="alert('Override saved!'); showOverrideList();">Save Override</button>
-                    </div>
-
+                        <div class="d-flex justify-content-center gap-3 mt-5 pb-5">
+                            <button type="button" class="btn btn-outline-secondary px-5 py-2 fw-bold text-dark" onclick="showOverrideList()">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">Save Override</button>
+                        </div>
+                    </form>
                 </div>
+            </div> <!-- Close override-pane -->
 
 <!-- 3. SHIFT MANAGEMENT PANE -->
             <div class="tab-pane fade" id="shift-mgmt-pane" role="tabpanel">
@@ -813,7 +851,19 @@
                                                 <td th:text="${sa.shiftTiming}">Timing</td>
                                                 <td th:class="${sa.otAllowed ? 'text-success fw-bold' : 'text-danger fw-bold'}" th:text="${sa.otAllowed ? 'Yes' : 'No'}">Yes/No</td>
                                                 <td>
-                                                    <i class="fas fa-pen text-muted me-2" style="cursor: pointer;" th:onclick="'editShiftAssignment(' + ${sa.id} + ', ' + ${sa.user.id} + ', \'' + ${sa.department} + '\', \'' + ${sa.location} + '\', \'' + ${sa.shiftName} + '\', \'' + ${sa.shiftTiming} + '\', \'' + ${sa.breakTime} + '\', \'' + ${sa.startDate} + '\', \'' + ${sa.endDate} + '\', ' + ${sa.otAllowed} + ', \'' + ${sa.otCalculationRule} + '\')'"></i>
+                                                    <i class="fas fa-pen text-muted me-2" style="cursor: pointer;"
+                                                       th:data-id="${sa.id}"
+                                                       th:data-userid="${sa.user != null ? sa.user.id : ''}"
+                                                       th:data-dept="${sa.department}"
+                                                       th:data-loc="${sa.location}"
+                                                       th:data-shiftname="${sa.shiftName}"
+                                                       th:data-timing="${sa.shiftTiming}"
+                                                       th:data-break="${sa.breakTime}"
+                                                       th:data-start="${sa.startDate}"
+                                                       th:data-end="${sa.endDate}"
+                                                       th:data-ot="${sa.otAllowed}"
+                                                       th:data-otrule="${sa.otCalculationRule}"
+                                                       onclick="handleEditClick(this)"></i>
                                                     <i class="fas fa-ellipsis-h text-muted" style="cursor: pointer;"></i>
                                                 </td>
                                             </tr>
@@ -970,7 +1020,6 @@
 
             </div>
         </div>
-    </div>
 
     
     <!-- Add Shift Modal -->
@@ -1058,11 +1107,204 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <script>
-        // Form Toggle logic
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const attendanceData = /*[[${dailyAttendanceRaw}]]*/ [];
+        
+        const userShiftsMap = {};
+        /*[# th:each="u : ${allUsers}"]*/
+        userShiftsMap[[${u.id}]] = {
+            shiftName: [[${u.employeeProfile != null ? u.employeeProfile.workShift : 'General Shift'}]],
+            dept: [[${u.employeeProfile != null ? u.employeeProfile.department : 'Engineering'}]],
+            loc: [[${u.employeeProfile != null ? u.employeeProfile.workLocation : 'Raipur, India'}]],
+            fullName: [[${u.fullName}]]
+        };
+        /*[/]*/
+        /*]]>*/
+
+        // --- OVERVIEW CLIENT-SIDE FILTERS ---
+        function filterOverview() {
+            const query = document.getElementById('overviewSearchInput').value.toLowerCase();
+            const dateVal = document.getElementById('overviewDateFilter').value;
+            const dept = document.getElementById('overviewDeptFilter').value.toLowerCase();
+            const loc = document.getElementById('overviewLocationFilter').value.toLowerCase();
+            const statusVal = document.getElementById('overviewStatusFilter').value.toLowerCase();
+
+            const rows = document.querySelectorAll('.table-custom tbody tr');
+            rows.forEach(row => {
+                if (!row.closest('#overview-pane')) return;
+
+                const nameEl = row.querySelector('.fw-bold.text-dark');
+                const name = nameEl ? nameEl.textContent.toLowerCase() : '';
+                const idEl = row.querySelector('div[style*="font-size: 0.65rem"]');
+                const id = idEl ? idEl.textContent.toLowerCase() : '';
+                
+                const rowDept = row.cells[1] ? row.cells[1].textContent.trim().toLowerCase() : '';
+                const rowShift = row.cells[2] ? row.cells[2].textContent.trim().toLowerCase() : '';
+                
+                const rowDate = row.getAttribute('data-date') || '';
+                const rowLoc = row.getAttribute('data-loc') || '';
+
+                const matchesQuery = !query || name.includes(query) || id.includes(query);
+                const matchesDate = !dateVal || rowDate === dateVal;
+                const matchesDept = dept === 'all departments' || rowDept === dept;
+                const matchesLoc = loc === 'all locations' || rowLoc.toLowerCase() === loc;
+                const matchesStatus = statusVal === 'all shift timings' || rowShift === statusVal;
+
+                if (matchesQuery && matchesDate && matchesDept && matchesLoc && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            updateOverviewStats();
+        }
+
+        function updateOverviewStats() {
+            let total = 0, present = 0, absent = 0, onLeave = 0, late = 0, halfDay = 0;
+            const depts = ["engineering", "product", "design", "marketing", "sales", "hr"];
+            const deptStats = {};
+            depts.forEach(d => deptStats[d] = { total: 0, present: 0 });
+
+            const rows = document.querySelectorAll('#overview-pane .table-custom tbody tr');
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    total++;
+                    const statusEl = row.querySelector('td span.fw-bold, td span');
+                    const status = statusEl ? statusEl.textContent.trim() : '';
+                    if (status === 'Present') present++;
+                    else if (status === 'Absent') absent++;
+                    else if (status === 'On Leave') onLeave++;
+                    else if (status === 'Late') late++;
+                    else if (status === 'Half Day') halfDay++;
+
+                    const deptCell = row.cells[1];
+                    const dept = deptCell ? deptCell.textContent.trim().toLowerCase() : '';
+                    if (deptStats[dept] !== undefined) {
+                        deptStats[dept].total++;
+                        if (status === 'Present' || status === 'Late' || status === 'Half Day') {
+                            deptStats[dept].present++;
+                        }
+                    }
+                }
+            });
+
+            const totalEl = document.querySelector('#overview-pane .row.text-center.mb-4.border-bottom.pb-4 .col-3 .fs-4');
+            if (totalEl) totalEl.textContent = total;
+
+            const cols = document.querySelectorAll('#overview-pane .row.text-center.mb-4.border-bottom.pb-4 .col-2');
+            if (cols.length >= 4) {
+                cols[0].querySelector('.fs-4').textContent = present;
+                cols[0].querySelector('.text-muted').textContent = total > 0 ? Math.round((present / total) * 100) + '%' : '0%';
+                cols[1].querySelector('.fs-4').textContent = absent;
+                cols[1].querySelector('.text-muted').textContent = total > 0 ? Math.round((absent / total) * 100) + '%' : '0%';
+                cols[2].querySelector('.fs-4').textContent = onLeave;
+                cols[2].querySelector('.text-muted').textContent = total > 0 ? Math.round((onLeave / total) * 100) + '%' : '0%';
+                cols[3].querySelector('.fs-4').textContent = late;
+                cols[3].querySelector('.text-muted').textContent = total > 0 ? Math.round((late / total) * 100) + '%' : '0%';
+            }
+
+            const donutTotal = document.querySelector('.donut-inner-text .fs-5');
+            if (donutTotal) donutTotal.textContent = total;
+
+            if (window.attendanceChart) {
+                window.attendanceChart.data.datasets[0].data = [present, absent, onLeave, late, halfDay];
+                window.attendanceChart.update();
+            }
+
+            const legends = document.querySelectorAll('.chart-container + div div span:nth-child(2)');
+            if (legends.length >= 5) {
+                legends[0].textContent = `${present} (${total > 0 ? Math.round((present/total)*100) : 0}%)`;
+                legends[1].textContent = `${absent} (${total > 0 ? Math.round((absent/total)*100) : 0}%)`;
+                legends[2].textContent = `${onLeave} (${total > 0 ? Math.round((onLeave/total)*100) : 0}%)`;
+                legends[3].textContent = `${late} (${total > 0 ? Math.round((late/total)*100) : 0}%)`;
+                legends[4].textContent = `${halfDay} (${total > 0 ? Math.round((halfDay/total)*100) : 0}%)`;
+            }
+
+            depts.forEach(d => {
+                const stats = deptStats[d];
+                const pct = stats.total > 0 ? Math.round((stats.present / stats.total) * 100) : 0;
+                const absentPct = 100 - pct;
+
+                const deptDivs = document.querySelectorAll('.dept-item');
+                deptDivs.forEach(div => {
+                    const nameEl = div.querySelector('div:first-child');
+                    if (nameEl && nameEl.textContent.trim().toLowerCase() === d) {
+                        div.querySelector('.progress-bar').style.width = pct + '%';
+                        div.querySelector('span').textContent = pct + '%';
+                        div.querySelector('.text-danger').textContent = absentPct + '%';
+                    }
+                });
+            });
+        }
+
+        // --- OVERRIDE CLIENT-SIDE LOGIC ---
+        function filterOverrides() {
+            const query = document.getElementById('overrideSearchInput').value.toLowerCase();
+            const dept = document.getElementById('overrideDeptSelect').value.toLowerCase();
+            const type = document.getElementById('overrideTypeSelect').value.toLowerCase();
+            const status = document.getElementById('overrideStatusSelect').value.toLowerCase();
+            const dateVal = document.getElementById('overrideDateFilter').value;
+
+            const rows = document.querySelectorAll('#override-pane .table-custom tbody tr');
+            rows.forEach(row => {
+                const nameEl = row.querySelector('.fw-bold.text-dark');
+                const name = nameEl ? nameEl.textContent.toLowerCase() : '';
+                const idEl = row.querySelector('div[style*="font-size: 0.65rem"]');
+                const id = idEl ? idEl.textContent.toLowerCase() : '';
+                
+                const rowDept = row.getAttribute('data-dept') || '';
+                const rowDate = row.getAttribute('data-date') || '';
+                const rowType = row.cells[2] ? row.cells[2].textContent.trim().toLowerCase() : '';
+                const rowStatus = row.cells[6] ? row.cells[6].textContent.trim().toLowerCase() : '';
+
+                const matchesQuery = !query || name.includes(query) || id.includes(query);
+                const matchesDept = dept === 'all departments' || rowDept.toLowerCase() === dept;
+                const matchesType = type === 'all types' || rowType === type;
+                const matchesStatus = status === 'all' || rowStatus === status;
+                const matchesDate = !dateVal || rowDate === dateVal;
+
+                if (matchesQuery && matchesDept && matchesType && matchesStatus && matchesDate) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            updateOverrideStats();
+        }
+
+        function updateOverrideStats() {
+            let total = 0, approved = 0, pending = 0, declined = 0;
+            const rows = document.querySelectorAll('#override-pane .table-custom tbody tr');
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    total++;
+                    const statusEl = row.querySelector('td span');
+                    const status = statusEl ? statusEl.textContent.trim() : '';
+                    if (status === 'Approved') approved++;
+                    else if (status === 'Pending') pending++;
+                    else if (status === 'Declined') declined++;
+                }
+            });
+
+            const cols = document.querySelectorAll('#override-pane .row.text-center.mb-4.pb-4 .col-3');
+            if (cols.length >= 4) {
+                cols[0].querySelector('.fs-4').textContent = total;
+                cols[1].querySelector('.fs-4').textContent = approved;
+                cols[2].querySelector('.fs-4').textContent = pending;
+                cols[3].querySelector('.fs-4').textContent = declined;
+            }
+        }
+
+        // --- NEW OVERRIDE FORM ACTIONS ---
         function showOverrideForm() {
             document.getElementById('override-list-view').classList.add('d-none');
             document.getElementById('override-form-view').classList.remove('d-none');
+            document.getElementById('overrideEmployeeSelect').value = "";
+            document.getElementById('overrideShift').innerHTML = "<option>Select Employee first</option>";
+            resetCurrentAttendanceBox();
         }
 
         function showOverrideList() {
@@ -1070,9 +1312,117 @@
             document.getElementById('override-list-view').classList.remove('d-none');
         }
 
+        function resetCurrentAttendanceBox() {
+            document.getElementById('currCheckIn').textContent = "-";
+            document.getElementById('currCheckOut').textContent = "-";
+            document.getElementById('currTotalHours').textContent = "-";
+            document.getElementById('currStatus').textContent = "-";
+            document.getElementById('currCheckIn').className = "fw-bold text-dark";
+            document.getElementById('currCheckOut').className = "fw-bold text-dark";
+            document.getElementById('currStatus').className = "fw-bold text-dark";
+        }
+
+        function fetchCurrentAttendance() {
+            const userId = document.getElementById('overrideEmployeeSelect').value;
+            const date = document.getElementById('overrideDateInput').value;
+            
+            if (!userId) return;
+
+            const uData = userShiftsMap[userId];
+            if (uData) {
+                document.getElementById('overrideShift').innerHTML = `<option>${uData.shiftName}</option>`;
+            }
+
+            if (!date) {
+                resetCurrentAttendanceBox();
+                return;
+            }
+
+            const match = attendanceData.find(a => String(a.userId) === String(userId) && a.date === date);
+            if (match) {
+                document.getElementById('currCheckIn').textContent = match.checkIn || "-";
+                document.getElementById('currCheckOut').textContent = match.checkOut || "-";
+                document.getElementById('currTotalHours').textContent = match.hrs || "-";
+                document.getElementById('currStatus').textContent = match.status || "-";
+                
+                document.getElementById('currCheckIn').className = match.checkIn === '-' ? "fw-bold text-danger" : "fw-bold text-success";
+                document.getElementById('currCheckOut').className = match.checkOut === '-' ? "fw-bold text-danger" : "fw-bold text-success";
+                document.getElementById('currStatus').className = 
+                    match.status === 'Present' ? "fw-bold text-success" : 
+                    (match.status === 'Absent' ? "fw-bold text-danger" : "fw-bold text-warning");
+            } else {
+                document.getElementById('currCheckIn').textContent = "-";
+                document.getElementById('currCheckOut').textContent = "-";
+                document.getElementById('currTotalHours').textContent = "-";
+                document.getElementById('currStatus').textContent = "Absent";
+                document.getElementById('currCheckIn').className = "fw-bold text-danger";
+                document.getElementById('currCheckOut').className = "fw-bold text-danger";
+                document.getElementById('currStatus').className = "fw-bold text-danger";
+            }
+        }
+
+        function toggleOverrideTypeFields() {
+            const ovType = document.querySelector('input[name="overrideType"]:checked').value;
+            const inInput = document.getElementById('overrideCheckIn');
+            const outInput = document.getElementById('overrideCheckOut');
+            const durationInput = document.getElementById('overrideDuration');
+
+            if (ovType === 'Forgot ID') {
+                inInput.removeAttribute('disabled');
+                outInput.removeAttribute('disabled');
+                inInput.required = true;
+                outInput.required = true;
+            } else if (ovType === 'Work From Home') {
+                inInput.value = "09:00";
+                outInput.value = "18:00";
+                inInput.setAttribute('disabled', 'true');
+                outInput.setAttribute('disabled', 'true');
+                durationInput.value = "9.0 hrs";
+            } else if (ovType === 'Half Day Correction') {
+                inInput.value = "09:00";
+                outInput.value = "13:00";
+                inInput.setAttribute('disabled', 'true');
+                outInput.setAttribute('disabled', 'true');
+                durationInput.value = "4.0 hrs";
+            } else if (ovType === 'Late Mark') {
+                inInput.removeAttribute('disabled');
+                outInput.removeAttribute('disabled');
+                inInput.required = true;
+                outInput.required = true;
+            }
+        }
+
+        function calculateOverrideHours() {
+            const checkIn = document.getElementById('overrideCheckIn').value;
+            const checkOut = document.getElementById('overrideCheckOut').value;
+            const durationInput = document.getElementById('overrideDuration');
+
+            if (checkIn && checkOut) {
+                const inParts = checkIn.split(':');
+                const outParts = checkOut.split(':');
+                
+                const inMin = parseInt(inParts[0]) * 60 + parseInt(inParts[1]);
+                let outMin = parseInt(outParts[0]) * 60 + parseInt(outParts[1]);
+                
+                if (outMin < inMin) {
+                    outMin += 24 * 60; // Next day
+                }
+
+                const diffMin = outMin - inMin;
+                const hours = (diffMin / 60).toFixed(1);
+                durationInput.value = hours + " hrs";
+            } else {
+                durationInput.value = "";
+            }
+        }
+
+        function updateRemarksCharCount(textarea) {
+            const count = textarea.value.length;
+            document.getElementById('remarksCharCount').textContent = count + "/200";
+        }
+
         // Charts & Query Params tab activation
         document.addEventListener("DOMContentLoaded", function() {
-            // Activate tab from URL query parameter
             const urlParams = new URLSearchParams(window.location.search);
             const tab = urlParams.get('tab');
             if (tab) {
@@ -1085,12 +1435,12 @@
 
             // Attendance Summary Donut Chart
             const donutCtx = document.getElementById('attendanceDonutChart').getContext('2d');
-            new Chart(donutCtx, {
+            window.attendanceChart = new Chart(donutCtx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Present', 'Absent', 'On Leave', 'Late', 'Half Day'],
                     datasets: [{
-                        data: [68, 15, 10, 6, 5],
+                        data: [0, 0, 0, 0, 0],
                         backgroundColor: ['#10b981', '#ef4444', '#f97316', '#a855f7', '#002D72'],
                         borderWidth: 0,
                         cutout: '75%'
@@ -1105,6 +1455,10 @@
                     }
                 }
             });
+
+            // Perform initial client side filter run to calculate totals and percentages
+            filterOverview();
+            filterOverrides();
         });
 
         function toggleShiftView() {
@@ -1245,6 +1599,22 @@
 
             // Reset form
             document.getElementById('addShiftForm').reset();
+        }
+
+        function handleEditClick(btn) {
+            const id = btn.getAttribute('data-id');
+            const userId = btn.getAttribute('data-userid');
+            const dept = btn.getAttribute('data-dept');
+            const loc = btn.getAttribute('data-loc');
+            const shiftName = btn.getAttribute('data-shiftname');
+            const shiftTiming = btn.getAttribute('data-timing');
+            const breakTime = btn.getAttribute('data-break');
+            const startDate = btn.getAttribute('data-start');
+            const endDate = btn.getAttribute('data-end');
+            const otAllowed = btn.getAttribute('data-ot') === 'true';
+            const otCalculationRule = btn.getAttribute('data-otrule');
+
+            editShiftAssignment(id, userId, dept, loc, shiftName, shiftTiming, breakTime, startDate, endDate, otAllowed, otCalculationRule);
         }
 
         function editShiftAssignment(id, userId, dept, loc, shiftName, shiftTiming, breakTime, startDate, endDate, otAllowed, otCalculationRule) {
