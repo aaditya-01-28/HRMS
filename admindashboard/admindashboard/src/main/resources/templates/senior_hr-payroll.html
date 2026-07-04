@@ -397,14 +397,14 @@
                         <div class="stat-icon" style="color: #f59e0b;"><i class="fas fa-clipboard-check"></i></div>
                         <div>
                             <div class="stat-label">Approvals Pending</div>
-                            <div class="stat-value" th:text="${deductionsCount}">2</div>
+                            <div class="stat-value" th:text="${pendingApprovals != null ? pendingApprovals : 0}">2</div>
                         </div>
                     </div>
                     <div class="stat-card flex-fill border-0">
                         <div class="stat-icon" style="color: #8b5cf6;"><i class="fas fa-chart-pie"></i></div>
                         <div>
                             <div class="stat-label">Payroll Status</div>
-                            <div class="stat-value">Draft</div>
+                            <div class="stat-value" th:text="${payrollStatus != null ? payrollStatus : 'Draft'}">Draft</div>
                         </div>
                     </div>
                 </div>
@@ -423,52 +423,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Engineering</td>
-                                <td>165</td>
-                                <td>2,48,500</td>
-                                <td>50,000</td>
-                                <td>1,29,000</td>
-                                <td><span class="status-badge">Generated</span></td>
-                            </tr>
-                            <tr>
-                                <td>Product</td>
-                                <td>58</td>
-                                <td>1,48,500</td>
-                                <td>89,000</td>
-                                <td>1,36,000</td>
-                                <td><span class="status-badge">Generated</span></td>
-                            </tr>
-                            <tr>
-                                <td>Marketing</td>
-                                <td>51</td>
-                                <td>3,48,500</td>
-                                <td>58,000</td>
-                                <td>1,58,000</td>
-                                <td><span class="status-badge">Generated</span></td>
-                            </tr>
-                            <tr>
-                                <td>Finance</td>
-                                <td>31</td>
-                                <td>5,48,500</td>
-                                <td>25,000</td>
-                                <td>1,57,000</td>
-                                <td><span class="status-badge">Generated</span></td>
-                            </tr>
-                            <tr>
-                                <td>Operations</td>
-                                <td>21</td>
-                                <td>6,48,500</td>
-                                <td>36,000</td>
-                                <td>1,14,000</td>
-                                <td><span class="status-badge">Generated</span></td>
+                            <tr th:each="row : ${deptSummary}">
+                                <td th:text="${row.department}">Engineering</td>
+                                <td th:text="${row.employees}">165</td>
+                                <td th:text="'₹' + ${#numbers.formatDecimal(row.gross, 0, 'COMMA', 0, 'POINT')}">2,48,500</td>
+                                <td th:text="'₹' + ${#numbers.formatDecimal(row.deductions, 0, 'COMMA', 0, 'POINT')}">50,000</td>
+                                <td th:text="'₹' + ${#numbers.formatDecimal(row.net, 0, 'COMMA', 0, 'POINT')}">1,29,000</td>
+                                <td><span class="status-badge" th:classappend="${row.status == 'Draft' ? 'pending' : ''}" th:text="${row.status}">Generated</span></td>
                             </tr>
                             <tr style="border-top: 1px solid #94a3b8; font-weight: 700;">
                                 <td>Total</td>
-                                <td>326</td>
-                                <td>1,942,500</td>
-                                <td>2,58,000</td>
-                                <td>694,000</td>
+                                <td th:text="${totalEmpAll}">326</td>
+                                <td th:text="'₹' + ${#numbers.formatDecimal(totalGrossAll, 0, 'COMMA', 0, 'POINT')}">1,942,500</td>
+                                <td th:text="'₹' + ${#numbers.formatDecimal(totalDedAll, 0, 'COMMA', 0, 'POINT')}">2,58,000</td>
+                                <td th:text="'₹' + ${#numbers.formatDecimal(totalNetAll, 0, 'COMMA', 0, 'POINT')}">694,000</td>
                                 <td>----------------</td>
                             </tr>
                         </tbody>
@@ -487,23 +455,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Bonus added for 5 emp</td>
-                                <td>May 2026</td>
-                                <td>20 May, 10:15 AM</td>
-                                <td><span class="status-badge">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>Deductions on 8 emp</td>
-                                <td>May 2026</td>
-                                <td>20 May, 10:15 AM</td>
-                                <td><span class="status-badge">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>Payroll Draft Created</td>
-                                <td>May 2026</td>
-                                <td>20 May, 10:15 AM</td>
-                                <td><span class="status-badge">Completed</span></td>
+                            <tr th:each="act : ${recentActivities}">
+                                <td th:text="${act.activity}">Bonus added for 5 emp</td>
+                                <td th:text="${act.month}">May 2026</td>
+                                <td th:text="${act.time}">20 May, 10:15 AM</td>
+                                <td><span class="status-badge" th:text="${act.status}">Completed</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -772,23 +728,36 @@
                         <div style="position: relative;">
                             <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Search</label><br>
                             <i class="fas fa-search search-icon" style="top: 32px;"></i>
-                            <input type="text" class="search-input" placeholder="Search Employees by name">
+                            <input type="text" id="payslipSearchInput" class="search-input" placeholder="Search Employees by name" oninput="filterPayslips()">
                         </div>
                         <div>
                             <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Pay Period</label><br>
-                            <select class="select-filter"><option>01 May-31 May 2026</option></select>
+                            <select id="payslipPeriodSelect" class="select-filter" onchange="filterPayslips()">
+                                <option value="all">All Periods</option>
+                                <option value="May 2026">01 May-31 May 2026</option>
+                            </select>
                         </div>
                         <div>
                             <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Payroll Type</label><br>
-                            <select class="select-filter"><option>Monthly Payroll</option></select>
+                            <select id="payslipTypeSelect" class="select-filter" onchange="filterPayslips()">
+                                <option value="all">All Types</option>
+                                <option value="monthly">Monthly Payroll</option>
+                            </select>
                         </div>
                         <div>
                             <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Department</label><br>
-                            <select class="select-filter"><option>All Departments</option></select>
+                            <select id="payslipDeptSelect" class="select-filter" onchange="filterPayslips()">
+                                <option value="all">All Departments</option>
+                                <option value="engineering">Engineering</option>
+                                <option value="product">Product</option>
+                                <option value="marketing">Marketing</option>
+                                <option value="finance">Finance</option>
+                                <option value="operations">Operations</option>
+                            </select>
                         </div>
                         <div>
                             <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Payment Date</label><br>
-                            <input type="text" class="select-filter" value="20 June 2026">
+                            <input type="text" id="payslipDateInput" class="select-filter" placeholder="e.g. 20 June 2026" oninput="filterPayslips()">
                         </div>
                     </div>
                     
@@ -807,8 +776,22 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr th:each="slip : ${payslips}">
+                        <tbody id="payslipsTableBody">
+                                <tr th:each="slip : ${payslips}"
+                                    th:data-id="${slip.id}"
+                                    th:data-name="${slip.user != null ? slip.user.fullName : 'Employee Name'}"
+                                    th:data-empid="${'EMP' + (slip.user != null ? slip.user.id : '114')}"
+                                    th:data-doj="${slip.user != null and slip.user.employeeProfile != null ? #temporals.format(slip.user.employeeProfile.joiningDate, 'dd MMM yyyy') : 'N/A'}"
+                                    th:data-dept="${slip.department}"
+                                    th:data-desig="${slip.user != null and slip.user.employeeProfile != null ? slip.user.employeeProfile.designation : 'N/A'}"
+                                    th:data-loc="${slip.user != null and slip.user.employeeProfile != null ? slip.user.employeeProfile.workLocation : 'N/A'}"
+                                    th:data-pan="${slip.user != null and slip.user.employeeProfile != null ? slip.user.employeeProfile.panNo : 'N/A'}"
+                                    th:data-gross="${slip.grossPay}"
+                                    th:data-deductions="${slip.totalDeductions}"
+                                    th:data-net="${slip.netPay}"
+                                    th:data-month="${slip.payMonth}"
+                                    th:data-year="${slip.payYear}"
+                                    th:data-paymentdate="${slip.paymentDate != null ? #temporals.format(slip.paymentDate, 'dd MMMM yyyy') : 'N/A'}">
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <img src="/images/avatar-1.jpg" alt="A" class="avatar-small mb-0" th:data-name="${slip.user != null ? slip.user.fullName : 'A'}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent(this.getAttribute('data-name')) + '&amp;background=random';">
@@ -826,8 +809,8 @@
                                     <td th:text="'Rs. ' + ${#numbers.formatDecimal(slip.netPay, 0, 'COMMA', 0, 'POINT')}">Rs. 1,00,000</td>
                                     <td><span class="status-badge" th:classappend="${slip.status == 'Not Processed' ? 'not-processed' : ''}" th:text="${slip.status}">Processed</span></td>
                                     <td>
-                                        <button class="btn-action" onclick="showPayslipDetail()"><i class="far fa-eye"></i></button>
-                                        <button class="btn-action"><i class="fas fa-download"></i></button>
+                                        <button class="btn-action" onclick="showPayslipDetail(this)"><i class="far fa-eye"></i></button>
+                                        <a th:href="@{'/senior_hr/payslip/pdf/' + ${slip.id}}" class="btn-action"><i class="fas fa-download"></i></a>
                                         <button class="btn-action"><i class="fas fa-ellipsis-h"></i></button>
                                     </td>
                                 </tr>
@@ -839,11 +822,12 @@
                 <!-- Payslip Detail View (Provisional) -->
                 <div id="payslip-detail-view" class="payslip-detail-view">
                     <button class="btn btn-light fw-bold mb-3 border shadow-sm" onclick="hidePayslipDetail()"><i class="fas fa-arrow-left me-2"></i> Back</button>
+                    <a id="detail-pdf-download" href="#" class="btn btn-primary fw-bold mb-3 border shadow-sm ms-2"><i class="fas fa-download me-2"></i> Download PDF</a>
                     
                     <div class="payslip-doc">
                         <div class="d-flex justify-content-between mb-4 pb-2 border-bottom border-dark">
                             <div class="payslip-header">
-                                <h4><span style="color: #0f172a;">Provisional Payslip</span> May 2026</h4>
+                                <h4><span style="color: #0f172a;">Provisional Payslip</span> <span id="detail-payslip-month">May 2026</span></h4>
                                 <div style="font-size: 0.9rem; margin-top: 10px;">
                                     <div>Whitecircle Group</div>
                                     <div>Shahdol, Madhya Pradesh 484001</div>
@@ -851,20 +835,20 @@
                             </div>
                         </div>
                         
-                        <h6 class="fw-bold mb-3 pb-1 border-bottom border-dark">Neha Verma</h6>
+                        <h6 class="fw-bold mb-3 pb-1 border-bottom border-dark" id="detail-emp-name-header">Neha Verma</h6>
                         
                         <div class="payslip-grid pb-2 border-bottom border-dark">
                             <div>
                                 <div class="ps-label">Employee ID</div>
-                                <div class="ps-val">EMP601</div>
+                                <div id="detail-emp-id" class="ps-val">EMP601</div>
                             </div>
                             <div>
                                 <div class="ps-label">Date Joined</div>
-                                <div class="ps-val">2 Mar 2018</div>
+                                <div id="detail-emp-doj" class="ps-val">2 Mar 2018</div>
                             </div>
                             <div>
                                 <div class="ps-label">Department</div>
-                                <div class="ps-val">HR</div>
+                                <div id="detail-emp-dept" class="ps-val">HR</div>
                             </div>
                             <div>
                                 <div class="ps-label">Sub-Department</div>
@@ -873,7 +857,7 @@
                             
                             <div>
                                 <div class="ps-label">Designation</div>
-                                <div class="ps-val">HR Manager</div>
+                                <div id="detail-emp-desig" class="ps-val">HR Manager</div>
                             </div>
                             <div>
                                 <div class="ps-label">Payment Mode</div>
@@ -881,7 +865,7 @@
                             </div>
                             <div>
                                 <div class="ps-label">PAN</div>
-                                <div class="ps-val">PANQW1100S</div>
+                                <div id="detail-emp-pan" class="ps-val">PANQW1100S</div>
                             </div>
                             <div>
                                 <div class="ps-label">UAN</div>
@@ -898,13 +882,13 @@
                             </div>
                             <div>
                                 <div class="ps-label">Location</div>
-                                <div class="ps-val">Shahdol</div>
+                                <div id="detail-emp-loc" class="ps-val">Shahdol</div>
                             </div>
                             <div></div>
                             
                             <div>
                                 <div class="ps-label">Monthly Salary</div>
-                                <div class="ps-val">291666.67</div>
+                                <div id="detail-emp-gross-salary" class="ps-val">291666.67</div>
                             </div>
                         </div>
                         
@@ -934,62 +918,41 @@
                                     <thead>
                                         <tr>
                                             <th>Earnings</th>
-                                            <th class="text-end">Amount</th>
-                                            <th class="text-end">Gross</th>
+                                            <th class="text-end">Amount (INR)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr><td>Basic</td><td class="text-end">1,06,658.67</td><td class="text-end">1,06,658.67</td></tr>
-                                        <tr><td>HRA</td><td class="text-end">53,329.33</td><td class="text-end">53,329.33</td></tr>
-                                        <tr><td>Medical Allowance</td><td class="text-end">1,250.00</td><td class="text-end">1,250.00</td></tr>
-                                        <tr><td>Conveyance Allowance</td><td class="text-end">1,666.67</td><td class="text-end">1,666.67</td></tr>
-                                        <tr><td>Special Allowance</td><td class="text-end">83,242.00</td><td class="text-end">74,908.67</td></tr>
-                                        <tr><td>Professional Allowance</td><td class="text-end">1,000.00</td><td class="text-end">1,000.00</td></tr>
-                                        <tr><td>Children Education Allowance</td><td class="text-end">2,000.00</td><td class="text-end">2,000.00</td></tr>
-                                        <tr><td>Motor Cycle Allowance</td><td class="text-end">3,000.00</td><td class="text-end">3,000.00</td></tr>
-                                        <tr class="fw-bold"><td class="pt-3">Total Earnings (A)</td><td class="pt-3 text-end">2,52,146.67</td><td class="pt-3 text-end">2,43,813.33</td></tr>
+                                        <tr><td>Basic Salary (40% of Gross)</td><td class="text-end" id="detail-earn-basic">--</td></tr>
+                                        <tr><td>HRA (50% of Basic)</td><td class="text-end" id="detail-earn-hra">--</td></tr>
+                                        <tr><td>Special Allowance</td><td class="text-end" id="detail-earn-special">--</td></tr>
+                                        <tr class="fw-bold"><td class="pt-3">Total Earnings (A)</td><td class="pt-3 text-end" id="detail-earn-total">--</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                             <div class="col-md-5 ps-4">
-                                <table class="payslip-table table-borderless mb-4">
-                                    <thead>
-                                        <tr>
-                                            <th>Contributions</th>
-                                            <th class="text-end"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr><td>PF - Employee</td><td class="text-end">12,799.00</td></tr>
-                                        <tr><td>PF - Employer</td><td class="text-end">12,799.00</td></tr>
-                                        <tr class="fw-bold"><td class="pt-3">Total Contributions (B)</td><td class="pt-3 text-end">25,598.00</td></tr>
-                                    </tbody>
-                                </table>
-                                
                                 <table class="payslip-table table-borderless">
                                     <thead>
                                         <tr>
-                                            <th>Taxes & Deductions</th>
-                                            <th class="text-end"></th>
+                                            <th>Deductions & Taxes</th>
+                                            <th class="text-end">Amount (INR)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr><td>Professional Tax</td><td class="text-end">200.00</td></tr>
-                                        <tr><td>Loan EMI</td><td class="text-end">12,735.00</td></tr>
-                                        <tr><td>Total Income Tax</td><td class="text-end">51,501.00</td></tr>
-                                        <tr class="fw-bold"><td class="pt-3">Total Deductions (C)</td><td class="pt-3 text-end">64,436.00</td></tr>
+                                        <tr><td>Professional Tax</td><td class="text-end" id="detail-ded-pt">--</td></tr>
+                                        <tr><td>Total Income Tax (TDS)</td><td class="text-end" id="detail-ded-it">--</td></tr>
+                                        <tr class="fw-bold"><td class="pt-3">Total Deductions (B)</td><td class="pt-3 text-end" id="detail-ded-total">--</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                         
                         <div class="d-flex mb-2">
-                            <div style="width: 200px;" class="fw-bold">Net Salary Payable (A - B - C)</div>
-                            <div>1,62,113.00</div>
+                            <div style="width: 200px;" class="fw-bold">Net Salary Payable (A - B)</div>
+                            <div class="fw-bold" id="detail-net-payable">--</div>
                         </div>
                         <div class="d-flex mb-4">
                             <div style="width: 200px;">Net Salary in words</div>
-                            <div class="fw-bold">One Lakh Sixty Two Thousand One Hundred and Thirteen only</div>
+                            <div class="fw-bold" id="detail-net-words">--</div>
                         </div>
                         
                         <div class="fw-bold border-top border-dark pt-3 pb-4 mb-2">
@@ -1009,7 +972,7 @@
                         <div class="stat-icon" style="color: #3b82f6;"><i class="fas fa-gift"></i></div>
                         <div>
                             <div class="stat-label">Total Bonuses</div>
-                            <div class="stat-value" style="font-size: 1.2rem;">₹1,25,000</div>
+                            <div class="stat-value" style="font-size: 1.2rem;" th:text="'₹' + ${#numbers.formatDecimal(totalBonusAmt, 0, 'COMMA', 0, 'POINT')}">₹1,25,000</div>
                             <div class="text-muted mt-1" style="font-size: 0.75rem;">This Month</div>
                         </div>
                     </div>
@@ -1017,7 +980,7 @@
                         <div class="stat-icon" style="color: #ef4444;"><i class="fas fa-money-bill-wave"></i></div>
                         <div>
                             <div class="stat-label" style="color: #ef4444;">Total Deduction</div>
-                            <div class="stat-value" style="font-size: 1.2rem;">₹2,25,000</div>
+                            <div class="stat-value" style="font-size: 1.2rem;" th:text="'₹' + ${#numbers.formatDecimal(totalDeductAmt, 0, 'COMMA', 0, 'POINT')}">₹2,25,000</div>
                             <div class="text-muted mt-1" style="font-size: 0.75rem;">This Month</div>
                         </div>
                     </div>
@@ -1025,15 +988,15 @@
                         <div class="stat-icon" style="color: #10b981;"><i class="fas fa-chart-line"></i></div>
                         <div>
                             <div class="stat-label">Net Impact (May)</div>
-                            <div class="stat-value" style="font-size: 1.2rem;">₹5,25,000</div>
-                            <div class="text-muted mt-1" style="font-size: 0.75rem;">Deduction > Bonus</div>
+                            <div class="stat-value" style="font-size: 1.2rem;" th:text="'₹' + ${#numbers.formatDecimal(netImpactVal, 0, 'COMMA', 0, 'POINT')}">₹5,25,000</div>
+                            <div class="text-muted mt-1" style="font-size: 0.75rem;" th:text="${netImpactLabel}">Deduction > Bonus</div>
                         </div>
                     </div>
                     <div class="stat-card flex-fill border-0">
                         <div class="stat-icon" style="color: #f59e0b;"><i class="fas fa-clipboard-check"></i></div>
                         <div>
                             <div class="stat-label">Pending Approvals</div>
-                            <div class="stat-value" style="font-size: 1.2rem;">20</div>
+                            <div class="stat-value" style="font-size: 1.2rem;" th:text="${pendingBonusApprovals}">20</div>
                             <div class="text-muted mt-1" style="font-size: 0.75rem;">This Month</div>
                         </div>
                     </div>
@@ -1044,33 +1007,51 @@
                     <div style="position: relative; flex: 1;">
                         <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Search</label><br>
                         <i class="fas fa-search search-icon" style="top: 32px;"></i>
-                        <input type="text" class="search-input w-100" placeholder="Search Employees by name">
+                        <input type="text" id="bonusSearchInput" class="search-input w-100" placeholder="Search Employees by name" oninput="filterBonuses()">
                     </div>
                     <div>
                         <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Select Month</label><br>
-                        <select class="select-filter"><option>May 2026</option></select>
+                        <select id="bonusMonthSelect" class="select-filter" onchange="filterBonuses()">
+                            <option value="all">All Months</option>
+                            <option value="May 2026">May 2026</option>
+                        </select>
                     </div>
                     <div>
                         <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Department</label><br>
-                        <select class="select-filter"><option>All Departments</option></select>
+                        <select id="bonusDeptSelect" class="select-filter" onchange="filterBonuses()">
+                            <option value="all">All Departments</option>
+                            <option value="engineering">Engineering</option>
+                            <option value="product">Product</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="finance">Finance</option>
+                            <option value="operations">Operations</option>
+                        </select>
                     </div>
                     <div>
                         <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Types</label><br>
-                        <select class="select-filter"><option>All Types</option></select>
+                        <select id="bonusTypeSelect" class="select-filter" onchange="filterBonuses()">
+                            <option value="all">All Types</option>
+                            <option value="Bonus">Bonus</option>
+                            <option value="Deduct">Deduction</option>
+                        </select>
                     </div>
                     <div>
                         <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #1e293b; margin-bottom: 2px;">Status</label><br>
-                        <select class="select-filter"><option>All Status</option></select>
+                        <select id="bonusStatusSelect" class="select-filter" onchange="filterBonuses()">
+                            <option value="all">All Status</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Pending">Pending</option>
+                        </select>
                     </div>
                 </div>
 
                 <!-- Sub-tabs and Button -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
-                        <div class="sub-tab active">All (58)</div>
-                        <div class="sub-tab">Bonus (41)</div>
-                        <div class="sub-tab">Deductions (20)</div>
-                        <div class="sub-tab">Pending Approvals (3)</div>
+                        <div class="sub-tab active" onclick="switchBonusTab('all', this)">All (<span id="bonusCountAll">0</span>)</div>
+                        <div class="sub-tab" onclick="switchBonusTab('Bonus', this)">Bonus (<span id="bonusCountBonus">0</span>)</div>
+                        <div class="sub-tab" onclick="switchBonusTab('Deduct', this)">Deductions (<span id="bonusCountDeduct">0</span>)</div>
+                        <div class="sub-tab" onclick="switchBonusTab('Pending', this)">Pending Approvals (<span id="bonusCountPending">0</span>)</div>
                     </div>
                     <button class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#addBonusModal">
                         <i class="fas fa-plus me-1"></i> Add Bonus/Deduction
@@ -1093,18 +1074,24 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr th:each="bd : ${bonusDeductions}">
+                        <tbody id="bonusesTableBody">
+                            <tr th:each="bd : ${bonusDeductions}"
+                                th:data-name="${bd.user != null ? bd.user.fullName : 'Employee Name'}"
+                                th:data-empid="${'EMP' + (bd.user != null ? bd.user.id : '114')}"
+                                th:data-month="${bd.effectiveMonth}"
+                                th:data-dept="${bd.user != null and bd.user.employeeProfile != null ? bd.user.employeeProfile.businessUnit : 'Engineering'}"
+                                th:data-type="${bd.type}"
+                                th:data-status="${bd.status}">
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="/images/avatar-1.jpg" alt="A" class="avatar-small mb-0" onerror="this.src='https://ui-avatars.com/api/?name=User&amp;background=random'">
+                                        <img src="/images/avatar-1.jpg" alt="A" class="avatar-small mb-0" th:data-name="${bd.user != null ? bd.user.fullName : 'A'}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent(this.getAttribute('data-name')) + '&amp;background=random';">
                                         <div class="lh-1">
-                                            <div class="fw-bold" style="font-size: 0.9rem;">Neha Sharma</div>
-                                            <div class="text-muted" style="font-size: 0.7rem; margin-top: 2px;">EMP114</div>
+                                            <div class="fw-bold" style="font-size: 0.9rem;" th:text="${bd.user != null ? bd.user.fullName : 'Employee Name'}">Neha Sharma</div>
+                                            <div class="text-muted" style="font-size: 0.7rem; margin-top: 2px;" th:text="'EMP' + (bd.user != null ? bd.user.id : '114')">EMP114</div>
                                         </div>
                                     </div>
                                 </td>
-                                <td>Engineering</td>
+                                <td th:text="${bd.user != null and bd.user.employeeProfile != null ? bd.user.employeeProfile.businessUnit : 'Engineering'}">Engineering</td>
                                 <td><span class="type-badge" th:classappend="${bd.type == 'Bonus' ? 'bonus' : 'deduct'}" th:text="${bd.type}">Bonus</span></td>
                                 <td th:text="${bd.category}">Performance Bonus</td>
                                 <td th:text="${bd.description}">Success of a project</td>
@@ -1309,15 +1296,187 @@
             document.getElementById('create-structure-view').style.display = 'none';
         }
         
-        function showPayslipDetail() {
+        function showPayslipDetail(btn) {
             document.getElementById('main-payslips-view').style.display = 'none';
             document.getElementById('payslip-detail-view').style.display = 'block';
+
+            if (!btn) return;
+            const tr = btn.closest('tr');
+            if (!tr) return;
+
+            const name = tr.getAttribute('data-name');
+            const empid = tr.getAttribute('data-empid');
+            const doj = tr.getAttribute('data-doj');
+            const dept = tr.getAttribute('data-dept');
+            const desig = tr.getAttribute('data-desig');
+            const loc = tr.getAttribute('data-loc');
+            const pan = tr.getAttribute('data-pan');
+            const gross = parseFloat(tr.getAttribute('data-gross') || '0');
+            const deductions = parseFloat(tr.getAttribute('data-deductions') || '0');
+            const net = parseFloat(tr.getAttribute('data-net') || '0');
+            const month = tr.getAttribute('data-month');
+            const year = tr.getAttribute('data-year');
+
+            // Set simple details
+            document.getElementById('detail-payslip-month').innerText = (month || '') + ' ' + (year || '');
+            document.getElementById('detail-emp-name-header').innerText = name || 'Employee Name';
+            document.getElementById('detail-emp-id').innerText = empid || 'N/A';
+            document.getElementById('detail-emp-doj').innerText = doj || 'N/A';
+            document.getElementById('detail-emp-dept').innerText = dept || 'N/A';
+            document.getElementById('detail-emp-desig').innerText = desig || 'N/A';
+            document.getElementById('detail-emp-loc').innerText = loc || 'N/A';
+            document.getElementById('detail-emp-pan').innerText = pan || 'N/A';
+            document.getElementById('detail-emp-gross-salary').innerText = gross.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            // Set Earnings Breakdown (Basic 40%, HRA 20%, Special 40%)
+            const basic = gross * 0.4;
+            const hra = basic * 0.5;
+            const special = gross - basic - hra;
+            document.getElementById('detail-earn-basic').innerText = basic.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('detail-earn-hra').innerText = hra.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('detail-earn-special').innerText = special.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('detail-earn-total').innerText = gross.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            // Set Deductions Breakdown
+            const pt = deductions > 200 ? 200 : deductions;
+            const it = deductions - pt;
+            document.getElementById('detail-ded-pt').innerText = pt.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('detail-ded-it').innerText = it.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('detail-ded-total').innerText = deductions.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            // Net Payable
+            document.getElementById('detail-net-payable').innerText = net.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('detail-net-words').innerText = numberToWords(Math.round(net)) + ' only';
+            
+            // Set dynamic download link
+            const pdfDownloadBtn = document.getElementById('detail-pdf-download');
+            if (pdfDownloadBtn) {
+                const slipId = tr.getAttribute('data-id');
+                pdfDownloadBtn.href = '/senior_hr/payslip/pdf/' + slipId;
+            }
         }
         
         function hidePayslipDetail() {
             document.getElementById('main-payslips-view').style.display = 'block';
             document.getElementById('payslip-detail-view').style.display = 'none';
         }
+
+        function filterPayslips() {
+            const query = document.getElementById('payslipSearchInput').value.toLowerCase();
+            const period = document.getElementById('payslipPeriodSelect').value;
+            const type = document.getElementById('payslipTypeSelect').value;
+            const dept = document.getElementById('payslipDeptSelect').value;
+            const date = document.getElementById('payslipDateInput').value.toLowerCase();
+
+            const rows = document.querySelectorAll('#payslipsTableBody tr');
+            rows.forEach(row => {
+                const name = row.getAttribute('data-name').toLowerCase();
+                const empId = row.getAttribute('data-empid').toLowerCase();
+                const rowMonth = row.getAttribute('data-month');
+                const rowYear = row.getAttribute('data-year');
+                const rowPeriod = rowMonth + ' ' + rowYear;
+                const rowDept = row.getAttribute('data-dept');
+                const rowDate = row.getAttribute('data-paymentdate').toLowerCase();
+
+                const matchesQuery = !query || name.includes(query) || empId.includes(query);
+                const matchesPeriod = period === 'all' || rowPeriod.toLowerCase().includes(period.toLowerCase());
+                const matchesDept = dept === 'all' || rowDept.toLowerCase() === dept.toLowerCase();
+                const matchesDate = !date || rowDate.includes(date);
+
+                if (matchesQuery && matchesPeriod && matchesDept && matchesDate) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function numberToWords(num) {
+            const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+            const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            if ((num = num.toString()).length > 9) return 'overflow';
+            let n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+            if (!n) return ''; 
+            let str = '';
+            str += n[1] != 0 ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+            str += n[2] != 0 ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+            str += n[3] != 0 ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+            str += n[4] != 0 ? a[Number(n[4])] + 'Hundred ' : '';
+            str += n[5] != 0 ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
+            return str.trim();
+        }
+
+        let currentBonusSubTab = 'all';
+
+        function switchBonusTab(type, el) {
+            const siblings = el.parentNode.querySelectorAll('.sub-tab');
+            siblings.forEach(s => s.classList.remove('active'));
+            el.classList.add('active');
+
+            currentBonusSubTab = type;
+            filterBonuses();
+        }
+
+        function filterBonuses() {
+            const query = document.getElementById('bonusSearchInput').value.toLowerCase();
+            const month = document.getElementById('bonusMonthSelect').value;
+            const dept = document.getElementById('bonusDeptSelect').value;
+            const type = document.getElementById('bonusTypeSelect').value;
+            const status = document.getElementById('bonusStatusSelect').value;
+
+            const rows = document.querySelectorAll('#bonusesTableBody tr');
+            rows.forEach(row => {
+                const name = row.getAttribute('data-name').toLowerCase();
+                const empId = row.getAttribute('data-empid').toLowerCase();
+                const rowMonth = row.getAttribute('data-month');
+                const rowDept = row.getAttribute('data-dept');
+                const rowType = row.getAttribute('data-type');
+                const rowStatus = row.getAttribute('data-status');
+
+                const matchesQuery = !query || name.includes(query) || empId.includes(query);
+                const matchesMonth = month === 'all' || rowMonth === month;
+                const matchesDept = dept === 'all' || rowDept.toLowerCase() === dept.toLowerCase();
+                const matchesType = type === 'all' || rowType === type;
+                const matchesStatus = status === 'all' || rowStatus === status;
+
+                let matchesSubTab = true;
+                if (currentBonusSubTab === 'Bonus') {
+                    matchesSubTab = rowType === 'Bonus';
+                } else if (currentBonusSubTab === 'Deduct') {
+                    matchesSubTab = rowType === 'Deduct' || rowType === 'Deduction';
+                } else if (currentBonusSubTab === 'Pending') {
+                    matchesSubTab = rowStatus === 'Pending';
+                }
+
+                if (matchesQuery && matchesMonth && matchesDept && matchesType && matchesStatus && matchesSubTab) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function updateBonusCounts() {
+            const rows = document.querySelectorAll('#bonusesTableBody tr');
+            let total = 0, bonus = 0, deduct = 0, pending = 0;
+            rows.forEach(row => {
+                total++;
+                const rowType = row.getAttribute('data-type');
+                const rowStatus = row.getAttribute('data-status');
+                if (rowType === 'Bonus') bonus++;
+                else if (rowType === 'Deduct' || rowType === 'Deduction') deduct++;
+                if (rowStatus === 'Pending') pending++;
+            });
+            document.getElementById('bonusCountAll').innerText = total;
+            document.getElementById('bonusCountBonus').innerText = bonus;
+            document.getElementById('bonusCountDeduct').innerText = deduct;
+            document.getElementById('bonusCountPending').innerText = pending;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateBonusCounts();
+            filterBonuses();
+        });
     </script>
 </body>
 </html>

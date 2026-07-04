@@ -372,15 +372,17 @@ public class SeniorDashboardController {
             p1.setUser(neha);
             payslipRepository.save(p1);
 
+            com.example.admindashboard.model.User anil = userRepository.findAll().stream().filter(u -> u.getFullName() != null && u.getFullName().contains("Anil")).findFirst().orElse(null);
             com.example.admindashboard.model.Payslip p2 = new com.example.admindashboard.model.Payslip();
             p2.setPayMonth("May");
             p2.setPayYear(2026);
-            p2.setCtcAnnual(500000.0);
-            p2.setGrossPay(125000.0);
-            p2.setTotalDeductions(10000.0);
-            p2.setNetPay(100000.0);
+            p2.setCtcAnnual(600000.0);
+            p2.setGrossPay(150000.0);
+            p2.setTotalDeductions(15000.0);
+            p2.setNetPay(135000.0);
             p2.setStatus("Not Processed");
             p2.setDepartment("Engineering");
+            p2.setUser(anil);
             payslipRepository.save(p2);
 
             payslips = payslipRepository.findAll();
@@ -389,6 +391,9 @@ public class SeniorDashboardController {
         // Fetch and seed BonusDeductions
         List<com.example.admindashboard.model.BonusDeduction> bonuses = bonusDeductionRepository.findAll();
         if (bonuses.isEmpty()) {
+            com.example.admindashboard.model.User neha = userRepository.findAll().stream().filter(u -> u.getFullName() != null && u.getFullName().contains("Neha")).findFirst().orElse(null);
+            com.example.admindashboard.model.User anil = userRepository.findAll().stream().filter(u -> u.getFullName() != null && u.getFullName().contains("Anil")).findFirst().orElse(null);
+
             com.example.admindashboard.model.BonusDeduction b1 = new com.example.admindashboard.model.BonusDeduction();
             b1.setType("Bonus");
             b1.setCategory("Performance Bonus");
@@ -397,6 +402,7 @@ public class SeniorDashboardController {
             b1.setImpact("Increase");
             b1.setStatus("Approved");
             b1.setEffectiveMonth("May 2026");
+            b1.setUser(neha);
             bonusDeductionRepository.save(b1);
 
             com.example.admindashboard.model.BonusDeduction d1 = new com.example.admindashboard.model.BonusDeduction();
@@ -407,6 +413,7 @@ public class SeniorDashboardController {
             d1.setImpact("Decrease");
             d1.setStatus("Approved");
             d1.setEffectiveMonth("May 2026");
+            d1.setUser(neha);
             bonusDeductionRepository.save(d1);
 
             com.example.admindashboard.model.BonusDeduction d2 = new com.example.admindashboard.model.BonusDeduction();
@@ -417,6 +424,7 @@ public class SeniorDashboardController {
             d2.setImpact("Decrease");
             d2.setStatus("Pending");
             d2.setEffectiveMonth("May 2026");
+            d2.setUser(anil);
             bonusDeductionRepository.save(d2);
 
             bonuses = bonusDeductionRepository.findAll();
@@ -499,9 +507,15 @@ public class SeniorDashboardController {
         
         // Bonuses Stats
         double totalBonusAmt = bonuses.stream().filter(b -> "Bonus".equalsIgnoreCase(b.getType()) || "Increase".equalsIgnoreCase(b.getImpact())).mapToDouble(b -> b.getAmount() != null ? b.getAmount() : 0.0).sum();
-        double totalDeductAmt = bonuses.stream().filter(b -> "Deduct".equalsIgnoreCase(b.getType()) || "Decrease".equalsIgnoreCase(b.getImpact())).mapToDouble(b -> b.getAmount() != null ? b.getAmount() : 0.0).sum();
+        double totalDeductAmt = bonuses.stream().filter(b -> "Deduct".equalsIgnoreCase(b.getType()) || "Deduction".equalsIgnoreCase(b.getType()) || "Decrease".equalsIgnoreCase(b.getImpact())).mapToDouble(b -> b.getAmount() != null ? b.getAmount() : 0.0).sum();
+        double netImpactVal = totalBonusAmt - totalDeductAmt;
+        long pendingBonusApprovals = bonuses.stream().filter(b -> "Pending".equalsIgnoreCase(b.getStatus())).count();
+
         model.addAttribute("totalBonusAmt", totalBonusAmt);
         model.addAttribute("totalDeductAmt", totalDeductAmt);
+        model.addAttribute("netImpactVal", Math.abs(netImpactVal));
+        model.addAttribute("netImpactLabel", netImpactVal >= 0 ? "Bonus > Deduction" : "Deduction > Bonus");
+        model.addAttribute("pendingBonusApprovals", pendingBonusApprovals);
 
         // Pass common data
         model.addAttribute("salaryStructures", structures);
@@ -510,6 +524,268 @@ public class SeniorDashboardController {
         model.addAttribute("allUsers", allUsers);
         
         return "senior_hr-payroll";
+    }
+
+    @GetMapping("/senior_hr/payslip/pdf/{id}")
+    public void downloadPayslipPdf(@org.springframework.web.bind.annotation.PathVariable Long id, jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+        com.example.admindashboard.model.Payslip slip = payslipRepository.findById(id).orElse(null);
+        if (slip == null) {
+            response.sendError(404, "Payslip not found");
+            return;
+        }
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=payslip_" + id + ".pdf");
+
+        try {
+            com.lowagie.text.Document document = new com.lowagie.text.Document(com.lowagie.text.PageSize.A4, 30, 30, 30, 30);
+            com.lowagie.text.pdf.PdfWriter.getInstance(document, response.getOutputStream());
+            document.open();
+
+            // Colors
+            java.awt.Color primaryColor = new java.awt.Color(0, 45, 114); // Deep blue #002d72
+            java.awt.Color darkGray = new java.awt.Color(50, 50, 50);
+            java.awt.Color lightGray = new java.awt.Color(240, 240, 240);
+
+            // Fonts
+            com.lowagie.text.Font titleFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 18, com.lowagie.text.Font.BOLD, primaryColor);
+            com.lowagie.text.Font subTitleFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 9, com.lowagie.text.Font.NORMAL, java.awt.Color.GRAY);
+            com.lowagie.text.Font sectionHeaderFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 11, com.lowagie.text.Font.BOLD, darkGray);
+            com.lowagie.text.Font boldNameFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 11, com.lowagie.text.Font.BOLD, java.awt.Color.BLACK);
+            com.lowagie.text.Font labelFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 8, com.lowagie.text.Font.NORMAL, java.awt.Color.GRAY);
+            com.lowagie.text.Font valFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 9, com.lowagie.text.Font.BOLD, java.awt.Color.BLACK);
+            com.lowagie.text.Font tableHeaderFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 9, com.lowagie.text.Font.BOLD, darkGray);
+            com.lowagie.text.Font tableCellFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 9, com.lowagie.text.Font.NORMAL, java.awt.Color.BLACK);
+            com.lowagie.text.Font tableCellBoldFont = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 9, com.lowagie.text.Font.BOLD, java.awt.Color.BLACK);
+
+            // Header Section
+            com.lowagie.text.Paragraph title = new com.lowagie.text.Paragraph("Provisional Payslip " + slip.getPayMonth() + " " + slip.getPayYear(), titleFont);
+            title.setSpacingAfter(4);
+            document.add(title);
+            document.add(new com.lowagie.text.Paragraph("Whitecircle Group", valFont));
+            com.lowagie.text.Paragraph subHeader = new com.lowagie.text.Paragraph("Shahdol, Madhya Pradesh 484001", subTitleFont);
+            subHeader.setSpacingAfter(8);
+            document.add(subHeader);
+
+            // Separator Line
+            com.lowagie.text.pdf.draw.LineSeparator ls = new com.lowagie.text.pdf.draw.LineSeparator();
+            ls.setLineColor(new java.awt.Color(200, 200, 200));
+            document.add(ls);
+            document.add(new com.lowagie.text.Paragraph(" "));
+
+            // Employee Name
+            com.lowagie.text.Paragraph empNamePara = new com.lowagie.text.Paragraph(slip.getUser() != null ? slip.getUser().getFullName() : "Employee Name", boldNameFont);
+            empNamePara.setSpacingAfter(10);
+            document.add(empNamePara);
+
+            // Employee Profile Grid (4 Columns)
+            com.lowagie.text.pdf.PdfPTable profileTable = new com.lowagie.text.pdf.PdfPTable(4);
+            profileTable.setWidthPercentage(100);
+            profileTable.setSpacingAfter(15);
+            
+            addDetailCell(profileTable, "Employee ID", "EMP" + (slip.getUser() != null ? slip.getUser().getId() : "114"), labelFont, valFont);
+            addDetailCell(profileTable, "Date Joined", (slip.getUser() != null && slip.getUser().getEmployeeProfile() != null && slip.getUser().getEmployeeProfile().getJoiningDate() != null ? slip.getUser().getEmployeeProfile().getJoiningDate().format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy")) : "N/A"), labelFont, valFont);
+            addDetailCell(profileTable, "Department", (slip.getDepartment() != null ? slip.getDepartment() : "Engineering"), labelFont, valFont);
+            addDetailCell(profileTable, "Sub-Department", "N/A", labelFont, valFont);
+
+            addDetailCell(profileTable, "Designation", (slip.getUser() != null && slip.getUser().getEmployeeProfile() != null && slip.getUser().getEmployeeProfile().getDesignation() != null ? slip.getUser().getEmployeeProfile().getDesignation() : "N/A"), labelFont, valFont);
+            addDetailCell(profileTable, "Payment Mode", "Bank Transfer", labelFont, valFont);
+            addDetailCell(profileTable, "PAN", (slip.getUser() != null && slip.getUser().getEmployeeProfile() != null && slip.getUser().getEmployeeProfile().getPanNo() != null ? slip.getUser().getEmployeeProfile().getPanNo() : "N/A"), labelFont, valFont);
+            addDetailCell(profileTable, "UAN", "10599890812", labelFont, valFont);
+
+            addDetailCell(profileTable, "PF No.", "MP/SHA/000/12345/2132134", labelFont, valFont);
+            addDetailCell(profileTable, "ESI No.", "ESISHA125678", labelFont, valFont);
+            addDetailCell(profileTable, "Location", (slip.getUser() != null && slip.getUser().getEmployeeProfile() != null && slip.getUser().getEmployeeProfile().getWorkLocation() != null ? slip.getUser().getEmployeeProfile().getWorkLocation() : "Shahdol"), labelFont, valFont);
+            addDetailCell(profileTable, "Monthly Salary", String.format("%,.2f", slip.getGrossPay()), labelFont, valFont);
+
+            document.add(profileTable);
+            document.add(ls);
+            document.add(new com.lowagie.text.Paragraph(" "));
+
+            // Salary Details Header
+            com.lowagie.text.Paragraph salDetailsHeader = new com.lowagie.text.Paragraph("Salary Details", sectionHeaderFont);
+            salDetailsHeader.setSpacingAfter(10);
+            document.add(salDetailsHeader);
+
+            // Days Info Grid (4 Columns)
+            com.lowagie.text.pdf.PdfPTable daysTable = new com.lowagie.text.pdf.PdfPTable(4);
+            daysTable.setWidthPercentage(100);
+            daysTable.setSpacingAfter(15);
+            addDetailCell(daysTable, "Actual Payable Days", "26.0", labelFont, valFont);
+            addDetailCell(daysTable, "Total Working Days", "26.0", labelFont, valFont);
+            addDetailCell(daysTable, "Loss of Pay Days", "0.0", labelFont, valFont);
+            addDetailCell(daysTable, "Days Payable", "26", labelFont, valFont);
+            document.add(daysTable);
+
+            document.add(ls);
+            document.add(new com.lowagie.text.Paragraph(" "));
+
+            // Side-by-Side parent layout table
+            com.lowagie.text.pdf.PdfPTable mainLayoutTable = new com.lowagie.text.pdf.PdfPTable(2);
+            mainLayoutTable.setWidthPercentage(100);
+            mainLayoutTable.setSpacingAfter(20);
+
+            // Left Cell: Earnings Table
+            com.lowagie.text.pdf.PdfPCell leftCell = new com.lowagie.text.pdf.PdfPCell();
+            leftCell.setBorder(com.lowagie.text.pdf.PdfPCell.NO_BORDER);
+            leftCell.setPaddingRight(15f);
+
+            com.lowagie.text.pdf.PdfPTable earnTable = new com.lowagie.text.pdf.PdfPTable(2);
+            earnTable.setWidthPercentage(100);
+            
+            // Earnings Header
+            com.lowagie.text.pdf.PdfPCell eh1 = new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("Earnings", tableHeaderFont));
+            eh1.setBorder(com.lowagie.text.pdf.PdfPCell.BOTTOM);
+            eh1.setPaddingBottom(5f);
+            com.lowagie.text.pdf.PdfPCell eh2 = new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("Amount (INR)", tableHeaderFont));
+            eh2.setBorder(com.lowagie.text.pdf.PdfPCell.BOTTOM);
+            eh2.setPaddingBottom(5f);
+            eh2.setHorizontalAlignment(com.lowagie.text.Element.ALIGN_RIGHT);
+            earnTable.addCell(eh1);
+            earnTable.addCell(eh2);
+
+            // Earnings Rows
+            double gross = slip.getGrossPay() != null ? slip.getGrossPay() : 0.0;
+            double basic = gross * 0.4;
+            double hra = basic * 0.5;
+            double special = gross - basic - hra;
+
+            addTableCell(earnTable, "Basic Salary (40% of Gross)", String.format("%,.2f", basic), tableCellFont, false);
+            addTableCell(earnTable, "HRA (50% of Basic)", String.format("%,.2f", hra), tableCellFont, false);
+            addTableCell(earnTable, "Special Allowance", String.format("%,.2f", special), tableCellFont, false);
+            addTableCell(earnTable, "Total Earnings (A)", String.format("%,.2f", gross), tableCellBoldFont, true);
+
+            leftCell.addElement(earnTable);
+            mainLayoutTable.addCell(leftCell);
+
+            // Right Cell: Deductions Table
+            com.lowagie.text.pdf.PdfPCell rightCell = new com.lowagie.text.pdf.PdfPCell();
+            rightCell.setBorder(com.lowagie.text.pdf.PdfPCell.NO_BORDER);
+            rightCell.setPaddingLeft(15f);
+
+            com.lowagie.text.pdf.PdfPTable dedTable = new com.lowagie.text.pdf.PdfPTable(2);
+            dedTable.setWidthPercentage(100);
+
+            // Deductions Header
+            com.lowagie.text.pdf.PdfPCell dh1 = new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("Deductions & Taxes", tableHeaderFont));
+            dh1.setBorder(com.lowagie.text.pdf.PdfPCell.BOTTOM);
+            dh1.setPaddingBottom(5f);
+            com.lowagie.text.pdf.PdfPCell dh2 = new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph("Amount (INR)", tableHeaderFont));
+            dh2.setBorder(com.lowagie.text.pdf.PdfPCell.BOTTOM);
+            dh2.setPaddingBottom(5f);
+            dh2.setHorizontalAlignment(com.lowagie.text.Element.ALIGN_RIGHT);
+            dedTable.addCell(dh1);
+            dedTable.addCell(dh2);
+
+            // Deductions Rows
+            double totalDed = slip.getTotalDeductions() != null ? slip.getTotalDeductions() : 0.0;
+            double pt = totalDed > 200 ? 200 : totalDed;
+            double it = totalDed - pt;
+
+            addTableCell(dedTable, "Professional Tax", String.format("%,.2f", pt), tableCellFont, false);
+            addTableCell(dedTable, "Total Income Tax (TDS)", String.format("%,.2f", it), tableCellFont, false);
+            addTableCell(dedTable, "Total Deductions (B)", String.format("%,.2f", totalDed), tableCellBoldFont, true);
+
+            rightCell.addElement(dedTable);
+            mainLayoutTable.addCell(rightCell);
+
+            document.add(mainLayoutTable);
+            document.add(ls);
+            document.add(new com.lowagie.text.Paragraph(" "));
+
+            // Net salary payable footer
+            com.lowagie.text.pdf.PdfPTable footerTable = new com.lowagie.text.pdf.PdfPTable(2);
+            footerTable.setWidthPercentage(100);
+            footerTable.setWidths(new int[]{200, 400});
+            footerTable.setSpacingAfter(15);
+
+            addFooterCell(footerTable, "Net Salary Payable (A - B)", String.format("%,.2f", (slip.getNetPay() != null ? slip.getNetPay() : 0.0)), tableCellBoldFont);
+            addFooterCell(footerTable, "Net Salary in words", numberToWords(Math.round(slip.getNetPay() != null ? slip.getNetPay() : 0.0)) + " only", tableCellBoldFont);
+            
+            document.add(footerTable);
+            document.add(ls);
+            document.add(new com.lowagie.text.Paragraph(" "));
+
+            com.lowagie.text.Paragraph note = new com.lowagie.text.Paragraph("Note: All amounts displayed in this payslip are in INR", tableCellBoldFont);
+            document.add(note);
+
+            document.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addDetailCell(com.lowagie.text.pdf.PdfPTable table, String label, String value, com.lowagie.text.Font lFont, com.lowagie.text.Font vFont) {
+        com.lowagie.text.pdf.PdfPCell cell = new com.lowagie.text.pdf.PdfPCell();
+        cell.setBorder(com.lowagie.text.pdf.PdfPCell.NO_BORDER);
+        cell.setPaddingBottom(8f);
+        cell.addElement(new com.lowagie.text.Paragraph(label, lFont));
+        cell.addElement(new com.lowagie.text.Paragraph(value, vFont));
+        table.addCell(cell);
+    }
+
+    private void addTableCell(com.lowagie.text.pdf.PdfPTable table, String label, String value, com.lowagie.text.Font font, boolean isTotalRow) {
+        com.lowagie.text.pdf.PdfPCell cell1 = new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph(label, font));
+        com.lowagie.text.pdf.PdfPCell cell2 = new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph(value, font));
+        cell2.setHorizontalAlignment(com.lowagie.text.Element.ALIGN_RIGHT);
+
+        if (isTotalRow) {
+            cell1.setBorder(com.lowagie.text.pdf.PdfPCell.TOP);
+            cell2.setBorder(com.lowagie.text.pdf.PdfPCell.TOP);
+            cell1.setPaddingTop(5f);
+            cell2.setPaddingTop(5f);
+        } else {
+            cell1.setBorder(com.lowagie.text.pdf.PdfPCell.NO_BORDER);
+            cell2.setBorder(com.lowagie.text.pdf.PdfPCell.NO_BORDER);
+        }
+        cell1.setPaddingBottom(5f);
+        cell2.setPaddingBottom(5f);
+        table.addCell(cell1);
+        table.addCell(cell2);
+    }
+
+    private void addFooterCell(com.lowagie.text.pdf.PdfPTable table, String label, String value, com.lowagie.text.Font font) {
+        com.lowagie.text.pdf.PdfPCell cell1 = new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph(label, font));
+        com.lowagie.text.pdf.PdfPCell cell2 = new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Paragraph(value, font));
+        cell1.setBorder(com.lowagie.text.pdf.PdfPCell.NO_BORDER);
+        cell2.setBorder(com.lowagie.text.pdf.PdfPCell.NO_BORDER);
+        cell1.setPaddingBottom(4f);
+        cell2.setPaddingBottom(4f);
+        table.addCell(cell1);
+        table.addCell(cell2);
+    }
+
+    private static String numberToWords(long number) {
+        if (number == 0) return "Zero";
+        String[] units = {"", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"};
+        String[] tens = {"", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"};
+        
+        String words = "";
+        
+        if ((number / 10000000) > 0) {
+            words += numberToWords(number / 10000000) + " Crore ";
+            number %= 10000000;
+        }
+        if ((number / 100000) > 0) {
+            words += numberToWords(number / 100000) + " Lakh ";
+            number %= 100000;
+        }
+        if ((number / 1000) > 0) {
+            words += numberToWords(number / 1000) + " Thousand ";
+            number %= 1000;
+        }
+        if ((number / 100) > 0) {
+            words += numberToWords(number / 100) + " Hundred ";
+            number %= 100;
+        }
+        if (number > 0) {
+            if (number < 20) {
+                words += units[(int) number];
+            } else {
+                words += tens[(int) (number / 10)] + " " + units[(int) (number % 10)];
+            }
+        }
+        return words.trim();
     }
 
     // --- MY SPACE ROUTE (HR Employee) ---
