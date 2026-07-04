@@ -788,6 +788,33 @@ public class SeniorDashboardController {
         return words.trim();
     }
 
+    @PostMapping("/senior_hr/payroll/add_bonus")
+    public String addBonusDeduction(
+            @org.springframework.web.bind.annotation.RequestParam Long userId,
+            @org.springframework.web.bind.annotation.RequestParam String type,
+            @org.springframework.web.bind.annotation.RequestParam String category,
+            @org.springframework.web.bind.annotation.RequestParam Double amount,
+            @org.springframework.web.bind.annotation.RequestParam String impact,
+            @org.springframework.web.bind.annotation.RequestParam String effectiveMonth,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) String description) {
+        
+        com.example.admindashboard.model.User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            com.example.admindashboard.model.BonusDeduction bd = new com.example.admindashboard.model.BonusDeduction();
+            bd.setUser(user);
+            bd.setType(type);
+            bd.setCategory(category);
+            bd.setAmount(amount);
+            bd.setImpact(impact);
+            bd.setEffectiveMonth(effectiveMonth);
+            bd.setDescription(description != null ? description : "");
+            bd.setStatus("Approved");
+            bonusDeductionRepository.save(bd);
+        }
+        
+        return "redirect:/senior_hr/payroll";
+    }
+
     // --- MY SPACE ROUTE (HR Employee) ---
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_hr/employee")
