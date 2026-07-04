@@ -8,9 +8,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #2563eb;
+            --primary: #002D72;
             --primary-light: #eff6ff;
-            --sidebar-width: 220px;
+            --sidebar-width: 250px;
             --header-height: 70px;
         }
 
@@ -333,12 +333,12 @@
             </div>
         </div>
         <div class="nav-links">
-            <a href="/senior_hr/employee" class="nav-link-item"><i class="fas fa-users" style="color: #60a5fa;"></i> Employee</a>
-            <a href="/senior_hr/lms" class="nav-link-item"><i class="fas fa-graduation-cap" style="color: #4ade80;"></i> LMS</a>
-            <a href="/senior_hr/payroll" class="nav-link-item active"><i class="fas fa-money-check-alt"></i> Payroll</a>
-            <a href="/senior_hr/attendance" class="nav-link-item"><i class="fas fa-clock" style="color: #fca5a5;"></i> Attendance</a>
-            <a href="/senior_hr/performance" class="nav-link-item"><i class="fas fa-chart-line" style="color: #38bdf8;"></i> Performance</a>
-            <a href="#" class="nav-link-item" onclick="alert('Recruitment Module Under Development')"><i class="fas fa-user-plus" style="color: #818cf8;"></i> Recruitment</a>
+            <a href="/senior_hr/employee" class="nav-link-item"><i class="fas fa-users"></i> Employee</a>
+            <a href="/senior_hr/lms" class="nav-link-item"><i class="fas fa-graduation-cap"></i> LMS</a>
+            <a href="/senior_hr/payroll" class="nav-link-item active"><i class="fas fa-money-bill-wave"></i> Payroll</a>
+            <a href="/senior_hr/attendance" class="nav-link-item"><i class="fas fa-clock"></i> Attendance</a>
+            <a href="/senior_hr/performance" class="nav-link-item"><i class="fas fa-chart-line"></i> Performance</a>
+            <a href="#" class="nav-link-item" onclick="alert('Recruitment Module Under Development')"><i class="fas fa-user-plus"></i> Recruitment</a>
         </div>
     </div>
 
@@ -520,33 +520,48 @@
                     
                     <!-- Search & Select -->
                     <div class="d-flex align-items-end gap-4 mb-4">
-                        <div style="position: relative;">
+                        <div>
                             <label class="fw-bold mb-2" style="font-size: 0.9rem; color: #1e293b;">Search & Select Employee <span class="text-danger">*</span></label>
-                            <i class="fas fa-search search-icon"></i>
-                            <input type="text" class="search-input" placeholder="Amit Sharma">
+                            <div style="position: relative;">
+                                <i class="fas fa-search search-icon" style="z-index: 10; top: 50%; transform: translateY(-50%);"></i>
+                                <select class="form-select search-input" id="employeeSelect" onchange="handleEmployeeSelect(this)" style="padding-left: 2.5rem; background-color: #f8fafc; border: 1px solid #e2e8f0; width: 350px;">
+                                <option value="" disabled selected>Search by name or emp ID...</option>
+                                <option th:each="u : ${allUsers}" 
+                                        th:value="${u.id}" 
+                                        th:text="${u.fullName + ' (EMP' + u.id + ')'}"
+                                        th:data-name="${u.fullName}"
+                                        th:data-empid="${'EMP' + u.id}"
+                                        th:data-dept="${u.employeeProfile != null ? u.employeeProfile.businessUnit : (u.departmentId != null ? 'Dept ' + u.departmentId : 'N/A')}"
+                                        th:data-doj="${u.employeeProfile != null and u.employeeProfile.joiningDate != null ? u.employeeProfile.joiningDate : 'N/A'}"
+                                        th:data-type="${u.employeeProfile != null ? 'Full-Time' : 'N/A'}"
+                                        th:data-loc="${u.employeeProfile != null and u.employeeProfile.workLocation != null ? u.employeeProfile.workLocation : 'N/A'}"
+                                        th:data-desig="${u.employeeProfile != null and u.employeeProfile.designation != null ? u.employeeProfile.designation : 'N/A'}">
+                                </option>
+                            </select>
+                            </div>
                         </div>
                         
                         <!-- Employee Info Card -->
-                        <div class="d-flex align-items-center gap-4 ms-2">
+                        <div id="employee-info-card" class="d-none align-items-center gap-4 ms-2">
                             <div class="d-flex align-items-center gap-2">
-                                <img src="/images/avatar-1.jpg" alt="A" class="avatar-small mb-0" onerror="this.src='https://ui-avatars.com/api/?name=Amit+Sharma&amp;background=random'">
+                                <img id="emp-info-img" src="/images/avatar-1.jpg" alt="A" class="avatar-small mb-0" onerror="this.src='https://ui-avatars.com/api/?name=User&amp;background=random'">
                                 <div class="lh-1">
-                                    <div class="fw-bold" style="font-size: 0.95rem;">Amit Sharma</div>
-                                    <div class="text-muted" style="font-size: 0.75rem; margin-top: 4px;">EMP114 • Software Engineer</div>
+                                    <div id="emp-info-name" class="fw-bold" style="font-size: 0.95rem;">--</div>
+                                    <div id="emp-info-title" class="text-muted" style="font-size: 0.75rem; margin-top: 4px;">-- • --</div>
                                 </div>
                             </div>
                             
                             <div class="lh-1">
                                 <div class="text-muted" style="font-size: 0.75rem; margin-bottom: 4px;">Date of Joining</div>
-                                <div class="fw-bold" style="font-size: 0.85rem;">15 Jan 2026</div>
+                                <div id="emp-info-doj" class="fw-bold" style="font-size: 0.85rem;">--</div>
                             </div>
                             <div class="lh-1">
                                 <div class="text-muted" style="font-size: 0.75rem; margin-bottom: 4px;">Employment Type</div>
-                                <div class="fw-bold" style="font-size: 0.85rem;">Full-time</div>
+                                <div id="emp-info-type" class="fw-bold" style="font-size: 0.85rem;">--</div>
                             </div>
                             <div class="lh-1">
                                 <div class="text-muted" style="font-size: 0.75rem; margin-bottom: 4px;">Current CTC</div>
-                                <div class="fw-bold" style="font-size: 0.85rem;">6,00,000</div>
+                                <div class="fw-bold" style="font-size: 0.85rem;">--</div>
                             </div>
                             <div class="lh-1">
                                 <div class="text-muted" style="font-size: 0.75rem; margin-bottom: 4px;">Pay Frequency</div>
@@ -642,37 +657,37 @@
                     
                     <div class="d-flex gap-5 mb-5 align-items-center">
                         <div class="d-flex align-items-center gap-3">
-                            <img src="/images/avatar-1.jpg" alt="A" style="width: 50px; height: 50px; border-radius: 50%;" onerror="this.src='https://ui-avatars.com/api/?name=Amit+Sharma&amp;background=random'">
+                            <img id="newStructEmpAvatar" src="/images/avatar-1.jpg" alt="Avatar" style="width: 50px; height: 50px; border-radius: 50%;" onerror="this.src='https://ui-avatars.com/api/?name=User&amp;background=random'">
                             <div class="lh-1">
-                                <div class="fw-bold" style="font-size: 1.1rem; margin-bottom: 8px;">Amit Sharma</div>
-                                <div class="text-muted" style="font-size: 0.8rem;"><span class="me-3">Employee ID <strong>EMP114</strong></span> Department <strong>Engineering</strong></div>
+                                <div id="newStructEmpName" class="fw-bold" style="font-size: 1.1rem; margin-bottom: 8px;">Select Employee</div>
+                                <div class="text-muted" style="font-size: 0.8rem;"><span class="me-3">Employee ID <strong id="newStructEmpId">--</strong></span> Department <strong id="newStructEmpDept">--</strong></div>
                             </div>
                         </div>
                         
                         <div class="d-flex flex-wrap gap-4">
                             <div>
                                 <label class="form-label text-muted" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Date of Joining</label>
-                                <select class="form-select form-select-sm" style="width: 150px;"><option>20/05/2026</option></select>
+                                <div id="newStructEmpDoj" class="fw-bold" style="font-size: 0.9rem;">--</div>
                             </div>
                             <div>
                                 <label class="form-label text-muted" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Employment Type</label>
-                                <select class="form-select form-select-sm" style="width: 150px;"><option>Full-Time</option></select>
+                                <div id="newStructEmpType" class="fw-bold" style="font-size: 0.9rem;">--</div>
                             </div>
                             <div>
                                 <label class="form-label text-muted" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Location</label>
-                                <select class="form-select form-select-sm" style="width: 150px;"><option>Raipur, India</option></select>
+                                <div id="newStructEmpLoc" class="fw-bold" style="font-size: 0.9rem;">--</div>
                             </div>
                             <div>
                                 <label class="form-label text-muted" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Designation</label>
-                                <select class="form-select form-select-sm" style="width: 150px;"><option>SR. Developer</option></select>
+                                <div id="newStructEmpDesig" class="fw-bold" style="font-size: 0.9rem;">--</div>
                             </div>
                             <div>
                                 <label class="form-label text-muted" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Pay Frequency <span class="text-danger">*</span></label>
-                                <select class="form-select form-select-sm" style="width: 150px;"><option>Monthly</option></select>
+                                <select class="form-select form-select-sm" style="width: 120px;"><option>Monthly</option><option>Weekly</option></select>
                             </div>
                             <div>
                                 <label class="form-label text-muted" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Currency</label>
-                                <select class="form-select form-select-sm" style="width: 150px;"><option>INR</option></select>
+                                <select class="form-select form-select-sm" style="width: 100px;"><option>INR</option><option>USD</option></select>
                             </div>
                         </div>
                     </div>
@@ -796,7 +811,7 @@
                                 <tr th:each="slip : ${payslips}">
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img src="/images/avatar-1.jpg" alt="A" class="avatar-small mb-0" th:onerror="|this.src='https://ui-avatars.com/api/?name=${slip.user != null ? slip.user.fullName : 'A'}&amp;background=random'|">
+                                            <img src="/images/avatar-1.jpg" alt="A" class="avatar-small mb-0" th:data-name="${slip.user != null ? slip.user.fullName : 'A'}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent(this.getAttribute('data-name')) + '&amp;background=random';">
                                             <div class="lh-1">
                                                 <div class="fw-bold" style="font-size: 0.9rem;" th:text="${slip.user != null ? slip.user.fullName : 'Employee Name'}">Neha Sharma</div>
                                                 <div class="text-muted" style="font-size: 0.7rem; margin-top: 2px;" th:text="'EMP' + ${slip.user != null ? slip.user.id : '114'}">EMP114</div>
@@ -1250,6 +1265,40 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        function handleEmployeeSelect(selectElement) {
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            if (!selectedOption.value) return;
+
+            const name = selectedOption.getAttribute('data-name');
+            const empid = selectedOption.getAttribute('data-empid');
+            const dept = selectedOption.getAttribute('data-dept');
+            const doj = selectedOption.getAttribute('data-doj');
+            const type = selectedOption.getAttribute('data-type');
+            const loc = selectedOption.getAttribute('data-loc');
+            const desig = selectedOption.getAttribute('data-desig');
+
+            // Populate Employee Info Card (if it was hidden)
+            const infoCard = document.getElementById('employee-info-card');
+            if(infoCard) {
+                infoCard.classList.remove('d-none');
+                infoCard.classList.add('d-flex');
+                document.getElementById('emp-info-name').innerText = name || '--';
+                document.getElementById('emp-info-title').innerText = empid + ' • ' + (desig || 'Employee');
+                document.getElementById('emp-info-doj').innerText = doj || '--';
+                document.getElementById('emp-info-type').innerText = type || '--';
+                document.getElementById('emp-info-img').src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=random';
+            }
+
+            // Populate Create New Structure Form
+            document.getElementById('newStructEmpName').innerText = name || '--';
+            document.getElementById('newStructEmpId').innerText = empid || '--';
+            document.getElementById('newStructEmpDept').innerText = dept || '--';
+            document.getElementById('newStructEmpDoj').innerText = doj || '--';
+            document.getElementById('newStructEmpType').innerText = type || '--';
+            document.getElementById('newStructEmpLoc').innerText = loc || '--';
+            document.getElementById('newStructEmpDesig').innerText = desig || '--';
+            document.getElementById('newStructEmpAvatar').src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=random';
+        }
         function showCreateStructure() {
             document.getElementById('main-structure-view').style.display = 'none';
             document.getElementById('create-structure-view').style.display = 'block';

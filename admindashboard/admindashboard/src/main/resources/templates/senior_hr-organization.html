@@ -710,7 +710,7 @@
                                 <td class="fw-bold text-dark"><i class="fas fa-building text-muted me-2"></i> <span th:text="${dept.departmentName}">Top Management</span></td>
                                 <td>
                                     <div class="d-flex align-items-center" th:if="${dept.departmentHead != null}">
-                                        <img src="/images/avatar-1.jpg" alt="A" class="avatar-small mb-0" th:onerror="'this.src=\'https://ui-avatars.com/api/?name=' + ${dept.departmentHead.fullName} + '&background=random\''">
+                                        <img src="/images/avatar-1.jpg" alt="A" class="avatar-small mb-0" th:data-name="${dept.departmentHead.fullName}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent(this.getAttribute('data-name')) + '&amp;background=random';">
                                         <div class="lh-1">
                                             <div class="fw-bold" style="font-size: 0.85rem;" th:text="${dept.departmentHead.fullName}">Amit Sharma</div>
                                             <div class="text-muted" style="font-size: 0.7rem;" th:text="${dept.departmentHead.designation != null ? dept.departmentHead.designation : 'CEO'}">CEO</div>
