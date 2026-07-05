@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteCircle | HR Admin - Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #002D72;
+            --sidebar-width: 220px;
+            --header-height: 70px;
+        }
+        body {
+            background-color: #f8fafc;
+            overflow-x: hidden;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* --- SIDEBAR --- */
+        .myspace-sidebar {
+            width: var(--sidebar-width);
+            position: fixed; left: 0; top: 0; bottom: 0;
+            background: white; border-right: 1px solid #e0e0e0;
+            display: flex; flex-direction: column; z-index: 1051;
+        }
+        .myspace-sidebar .brand-area {
+            padding: 15px; border-bottom: 1px solid #e0e0e0;
+            display: flex; align-items: center; gap: 10px; height: var(--header-height);
+        }
+        .myspace-sidebar .brand-area img { width: 40px; height: 40px; border-radius: 4px; }
+        .myspace-sidebar .brand-area .brand-text { font-size: 0.9rem; font-weight: 700; color: #1e293b; line-height: 1.2; }
+        .myspace-sidebar .brand-area .brand-sub { font-size: 0.75rem; color: #64748b; font-weight: 400; }
+        
+        .myspace-sidebar .nav-links { padding: 15px 0; flex: 1; }
+        .myspace-sidebar .nav-link-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 20px; color: #475569; text-decoration: none;
+            font-size: 0.9rem; font-weight: 600;
+            border-left: 3px solid transparent;
+        }
+        .myspace-sidebar .nav-link-item:hover { background: #f1f5f9; color: var(--primary); }
+        .myspace-sidebar .nav-link-item.active { background: var(--primary); color: white; border-left-color: var(--primary); }
+        .myspace-sidebar .nav-link-item i { width: 20px; text-align: center; font-size: 1rem; }
+
+        /* --- GLOBAL NAVBAR --- */
+        .top-navbar {
+            position: fixed; top: 0; left: var(--sidebar-width); right: 0;
+            height: var(--header-height); background: #ffffff;
+            border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; padding: 0 30px; z-index: 1050;
+        }
+        .nav-brand { display: flex; align-items: center; gap: 15px; }
+
+        /* --- MAIN CONTENT AREA --- */
+        .myspace-main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 20px 30px;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* --- NAV TABS --- */
+        .custom-tabs { border-bottom: 1px solid #e2e8f0; margin-bottom: 25px; }
+        .custom-tabs .nav-link {
+            color: #1e293b; font-weight: 600; padding: 12px 25px;
+            border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; background: transparent;
+        }
+        .custom-tabs .nav-link:hover { color: var(--primary); }
+        .custom-tabs .nav-link.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        /* --- CHART CONTAINERS --- */
+        .chart-card {
+            background: white; border-radius: 8px; padding: 20px; height: 350px;
+            position: relative; margin-bottom: 30px;
+        }
+        .chart-card h5 { color: #1e3a8a; font-weight: 700; margin-bottom: 20px; }
+        
+        .chart-controls { position: absolute; right: 20px; top: 20px; }
+
+        /* --- TABLES --- */
+        .card-custom { background: white; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; }
+        .card-header-custom {
+            background: white; padding: 15px 20px; border-bottom: 1px solid #cbd5e1;
+            font-weight: 700; color: #1e3a8a; font-size: 1.1rem;
+        }
+        .table-custom { margin-bottom: 0; }
+        .table-custom thead th {
+            background: #f8fafc; color: #1e293b; font-weight: 700; font-size: 0.85rem;
+            padding: 12px 20px; border-bottom: 1px solid #cbd5e1; border-top: 1px solid #cbd5e1;
+        }
+        .table-custom tbody td {
+            padding: 15px 20px; vertical-align: middle; color: #475569; font-size: 0.85rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .btn-action { background: none; border: none; color: #1e3a8a; cursor: pointer; padding: 0 5px; font-size: 1rem; }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="myspace-sidebar shadow-sm">
+        <div class="brand-area">
+            <img src="/images/wcg-logo.jpg" alt="Logo">
+            <div>
+                <div class="brand-text">WhiteCircle</div>
+                <div class="brand-sub">HR Admin</div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a href="/senior_hr/employee" class="nav-link-item"><i class="fas fa-users"></i> Employee</a>
+            <a href="/senior_hr/lms" class="nav-link-item"><i class="fas fa-graduation-cap"></i> LMS</a>
+            <a href="/senior_hr/payroll" class="nav-link-item"><i class="fas fa-money-check-alt"></i> Payroll</a>
+            <a href="/senior_hr/attendance" class="nav-link-item"><i class="fas fa-clock"></i> Attendance</a>
+            <a href="/senior_hr/performance" class="nav-link-item"><i class="fas fa-chart-line"></i> Performance</a>
+            <a href="/senior_hr/recruitment" class="nav-link-item"><i class="fas fa-user-plus"></i> Recruitment</a>
+            <a href="/senior_hr/organization" class="nav-link-item"><i class="fas fa-sitemap text-muted"></i> Organization Structure</a>
+            <a href="/senior_hr/reports" class="nav-link-item active"><i class="fas fa-file-alt"></i> Reports</a>
+        </div>
+    </div>
+
+    <!-- GLOBAL NAVBAR -->
+    <nav class="top-navbar">
+        <div class="nav-brand">
+            <div class="d-flex flex-column lh-1">
+                <span style="color: #1e3a8a; font-weight: 700; font-size: 1.2rem;">WhiteCircle Group - Shahdol</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: #1e293b; margin-top: 4px;">Reports</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="myspace-main">
+
+        <!-- TABS -->
+        <ul class="nav custom-tabs" id="reportTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="employee-tab" data-bs-toggle="tab" data-bs-target="#employee-pane" type="button" role="tab" onclick="loadEmployeeData()">Employee Report</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="leave-tab" data-bs-toggle="tab" data-bs-target="#leave-pane" type="button" role="tab" onclick="loadLeaveData()">Leave Report</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="payroll-tab" data-bs-toggle="tab" data-bs-target="#payroll-pane" type="button" role="tab" onclick="loadPayrollData()">Payroll Report</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="reportTabsContent">
+            
+            <!-- EMPLOYEE REPORT PANE -->
+            <div class="tab-pane fade show active" id="employee-pane" role="tabpanel" tabindex="0">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="chart-card">
+                            <h5>Employee Trend</h5>
+                            <div class="chart-controls">
+                                <select class="form-select form-select-sm" style="width: 100px; color:#475569;"><option>Monthly</option></select>
+                            </div>
+                            <canvas id="empTrendChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="chart-card">
+                            <h5>Department Wise Headcount</h5>
+                            <div style="height: 250px; display: flex; justify-content: center; align-items: center; position:relative;">
+                                <canvas id="empDistChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-custom">
+                    <div class="card-header-custom">Employee Summary Report</div>
+                    <table class="table table-custom table-hover" id="empTable">
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Total Employee</th>
+                                <th>Male</th>
+                                <th>Female</th>
+                                <th>New hire</th>
+                                <th>Exits</th>
+                                <th>Avg. Tenure</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- LEAVE REPORT PANE -->
+            <div class="tab-pane fade" id="leave-pane" role="tabpanel" tabindex="0">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="chart-card">
+                            <h5>Leave Trend</h5>
+                            <div class="chart-controls">
+                                <select class="form-select form-select-sm" style="width: 100px; color:#475569;"><option>Monthly</option></select>
+                            </div>
+                            <canvas id="leaveTrendChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="chart-card">
+                            <h5>Leave Type Distribution (Days)</h5>
+                            <div style="height: 250px; display: flex; justify-content: center; align-items: center; position:relative;">
+                                <canvas id="leaveDistChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-custom">
+                    <div class="card-header-custom">Leave Summary Report</div>
+                    <table class="table table-custom table-hover" id="leaveTable">
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Total Request</th>
+                                <th>Approved</th>
+                                <th>Pending</th>
+                                <th>Rejected</th>
+                                <th>Leave Days Taken</th>
+                                <th>Avg. Leave Days</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PAYROLL REPORT PANE -->
+            <div class="tab-pane fade" id="payroll-pane" role="tabpanel" tabindex="0">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="chart-card">
+                            <h5>Payroll Trend (Net Payroll)</h5>
+                            <div class="chart-controls">
+                                <select class="form-select form-select-sm" style="width: 100px; color:#475569;"><option>Monthly</option></select>
+                            </div>
+                            <canvas id="payrollTrendChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="chart-card">
+                            <h5>Payroll Components (FY)</h5>
+                            <div style="height: 250px; display: flex; justify-content: center; align-items: center; position:relative;">
+                                <canvas id="payrollDistChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-custom">
+                    <div class="card-header-custom">Payroll Summary Report</div>
+                    <table class="table table-custom table-hover" id="payrollTable">
+                        <thead>
+                            <tr>
+                                <th>Payroll Run ID</th>
+                                <th>Payroll month</th>
+                                <th>Pay Date</th>
+                                <th>Employees</th>
+                                <th>Gross Payroll</th>
+                                <th>Deductions</th>
+                                <th>Net Payroll</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Chart Instances to allow destroying before re-render
+        let charts = {};
+
+        const palette = ['#3b82f6', '#10b981', '#f59e0b', '#f43f5e', '#a855f7', '#64748b'];
+
+        document.addEventListener("DOMContentLoaded", function() {
+            loadEmployeeData(); // Load first tab by default
+        });
+
+        async function loadEmployeeData() {
+            try {
+                const res = await fetch('/senior_hr/api/reports/employee');
+                const data = await res.json();
+                
+                renderLineChart('empTrendChart', data.trendLabels, [
+                    { label: 'Total Employees', data: data.totalEmployeesTrend, borderColor: '#3b82f6', backgroundColor: '#3b82f6' },
+                    { label: 'New Hires', data: data.newHiresTrend, borderColor: '#10b981', backgroundColor: '#10b981' },
+                    { label: 'Exits', data: data.exitsTrend, borderColor: '#a855f7', backgroundColor: '#a855f7' }
+                ]);
+                
+                renderDoughnutChart('empDistChart', data.distributionLabels, data.distributionData, data.totalEmployeesTrend[data.totalEmployeesTrend.length-1]);
+                
+                const tbody = document.querySelector('#empTable tbody');
+                tbody.innerHTML = data.tableData.map(row => `
+                    <tr>
+                        <td>${row.department}</td>
+                        <td>${row.totalEmployee}</td>
+                        <td>${row.male}</td>
+                        <td>${row.female}</td>
+                        <td>${row.newHire}</td>
+                        <td>${row.exits}</td>
+                        <td>${row.avgTenure}</td>
+                        <td>
+                            <button class="btn-action"><i class="fas fa-pen"></i></button>
+                            <button class="btn-action"><i class="fas fa-ellipsis-h"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch(e) { console.error('Failed to load employee data', e); }
+        }
+
+        async function loadLeaveData() {
+            try {
+                const res = await fetch('/senior_hr/api/reports/leave');
+                const data = await res.json();
+                
+                renderLineChart('leaveTrendChart', data.trendLabels, [
+                    { label: 'Total Requests', data: data.totalRequestsTrend, borderColor: '#3b82f6', backgroundColor: '#3b82f6' },
+                    { label: 'Approved', data: data.approvedTrend, borderColor: '#10b981', backgroundColor: '#10b981' },
+                    { label: 'Pending', data: data.pendingTrend, borderColor: '#f59e0b', backgroundColor: '#f59e0b' },
+                    { label: 'Rejected', data: data.rejectedTrend, borderColor: '#f43f5e', backgroundColor: '#f43f5e' }
+                ]);
+                
+                let totalDays = data.distributionData.reduce((a,b)=>a+b, 0);
+                renderDoughnutChart('leaveDistChart', data.distributionLabels, data.distributionData, totalDays + '\\nTotal Days');
+                
+                const tbody = document.querySelector('#leaveTable tbody');
+                tbody.innerHTML = data.tableData.map(row => `
+                    <tr>
+                        <td>${row.department}</td>
+                        <td>${row.totalRequest}</td>
+                        <td>${row.approved}</td>
+                        <td>${row.pending}</td>
+                        <td>${row.rejected}</td>
+                        <td>${row.leaveDaysTaken}</td>
+                        <td>${row.avgLeaveDays}</td>
+                        <td>
+                            <button class="btn-action"><i class="fas fa-pen"></i></button>
+                            <button class="btn-action"><i class="fas fa-ellipsis-h"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch(e) { console.error('Failed to load leave data', e); }
+        }
+
+        async function loadPayrollData() {
+            try {
+                const res = await fetch('/senior_hr/api/reports/payroll');
+                const data = await res.json();
+                
+                renderLineChart('payrollTrendChart', data.trendLabels, [
+                    { label: 'Net Payroll', data: data.netPayrollTrend, borderColor: '#3b82f6', backgroundColor: '#3b82f6' }
+                ], true); // true for currency formatting
+                
+                let totalGross = data.distributionData.reduce((a,b)=>a+b, 0);
+                renderDoughnutChart('payrollDistChart', data.distributionLabels, data.distributionData, '₹' + totalGross.toLocaleString('en-IN') + '\\nTotal Gross');
+                
+                const tbody = document.querySelector('#payrollTable tbody');
+                tbody.innerHTML = data.tableData.map(row => `
+                    <tr>
+                        <td>${row.payrollRunId}</td>
+                        <td>${row.payrollMonth}</td>
+                        <td>${row.payDate}</td>
+                        <td>${row.employees}</td>
+                        <td>${row.grossPayroll.toLocaleString('en-IN')}</td>
+                        <td>${row.deductions.toLocaleString('en-IN')}</td>
+                        <td>${row.netPayroll.toLocaleString('en-IN')}</td>
+                        <td>
+                            <button class="btn-action"><i class="fas fa-pen"></i></button>
+                            <button class="btn-action"><i class="fas fa-ellipsis-h"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch(e) { console.error('Failed to load payroll data', e); }
+        }
+
+        function renderLineChart(canvasId, labels, datasets, isCurrency = false) {
+            if(charts[canvasId]) charts[canvasId].destroy();
+            
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            const config = {
+                type: 'line',
+                data: { labels: labels, datasets: datasets.map(ds => ({
+                    ...ds,
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointBackgroundColor: ds.backgroundColor,
+                    tension: 0.3,
+                    fill: false
+                }))},
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8, font: {size: 11} } }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9', drawBorder: false },
+                            ticks: { 
+                                font: {size: 10, color:'#94a3b8'},
+                                callback: function(value) {
+                                    if(isCurrency) {
+                                        if(value >= 100000) return '₹ ' + (value/100000) + 'L';
+                                        return '₹ ' + value;
+                                    }
+                                    return value;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { font: {size: 10, color:'#94a3b8'} }
+                        }
+                    }
+                }
+            };
+            charts[canvasId] = new Chart(ctx, config);
+        }
+
+        function renderDoughnutChart(canvasId, labels, data, centerText) {
+            if(charts[canvasId]) charts[canvasId].destroy();
+            
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            const total = data.reduce((a,b)=>a+b, 0);
+            
+            // Register a custom plugin to draw text in the center
+            const centerTextPlugin = {
+                id: 'centerText',
+                beforeDraw: function(chart) {
+                    if (chart.config.type !== 'doughnut') return;
+                    let width = chart.chartArea.width,
+                        height = chart.chartArea.height,
+                        ctx = chart.ctx;
+
+                    ctx.restore();
+                    let fontSize = (height / 160).toFixed(2);
+                    ctx.font = "bold " + fontSize + "em sans-serif";
+                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = "#1e293b";
+
+                    let textLines = centerText.toString().split('\\n');
+                    let lineSpacing = 20;
+
+                    let startY = Math.round((height - (textLines.length - 1) * lineSpacing) / 2) + chart.chartArea.top;
+
+                    textLines.forEach((line, i) => {
+                        let textX = Math.round((width - ctx.measureText(line).width) / 2) + chart.chartArea.left;
+                        let textY = startY + (i * lineSpacing);
+                        
+                        if(i > 0) {
+                            ctx.font = (fontSize * 0.5) + "em sans-serif";
+                            ctx.fillStyle = "#64748b";
+                        }
+                        
+                        ctx.fillText(line, textX, textY);
+                    });
+                    ctx.save();
+                }
+            };
+
+            const config = {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: palette.slice(0, data.length),
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 8,
+                                font: { size: 12, color: '#334155' },
+                                padding: 20,
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    if (data.labels.length && data.datasets.length) {
+                                        return data.labels.map(function(label, i) {
+                                            const meta = chart.getDatasetMeta(0);
+                                            const ds = data.datasets[0];
+                                            const value = ds.data[i];
+                                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                            return {
+                                                text: label + '        ' + percentage + '%',
+                                                fillStyle: ds.backgroundColor[i],
+                                                hidden: isNaN(ds.data[i]) || meta.data[i].hidden,
+                                                index: i
+                                            };
+                                        });
+                                    }
+                                    return [];
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ': ' + context.raw;
+                                }
+                            }
+                        }
+                    }
+                },
+                plugins: [centerTextPlugin]
+            };
+            charts[canvasId] = new Chart(ctx, config);
+        }
+    </script>
+</body>
+</html>

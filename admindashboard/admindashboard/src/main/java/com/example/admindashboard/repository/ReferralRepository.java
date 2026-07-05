@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface ReferralRepository extends JpaRepository<Referral, Long> {
     List<Referral> findByReferredByIdOrderByIdDesc(Long userId);
+    List<Referral> findByJobPostingId(Long jobPostingId);
 }

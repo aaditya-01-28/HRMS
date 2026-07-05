@@ -7,10 +7,14 @@ import java.nio.file.StandardCopyOption;
 
 import com.example.admindashboard.model.Meeting;
 import com.example.admindashboard.model.ResignationRequest;
+import com.example.admindashboard.model.JobPosting;
+import com.example.admindashboard.model.Referral;
 import com.example.admindashboard.repository.MeetingRepository;
 import com.example.admindashboard.repository.ResignationRequestRepository;
 import com.example.admindashboard.repository.ServiceRequestRepository;
 import com.example.admindashboard.repository.UserRepository;
+import com.example.admindashboard.repository.JobPostingRepository;
+import com.example.admindashboard.repository.ReferralRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -24,7 +28,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.example.admindashboard.model.User;
-
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.http.ResponseEntity;
+import java.util.Map;
 @Controller
 public class SeniorDashboardController {
 
@@ -87,6 +95,12 @@ public class SeniorDashboardController {
 
     @Autowired
     private com.example.admindashboard.repository.AppraisalCycleRepository appraisalCycleRepository;
+
+    @Autowired
+    private JobPostingRepository jobPostingRepository;
+
+    @Autowired
+    private ReferralRepository referralRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -1567,9 +1581,321 @@ public class SeniorDashboardController {
         return "redirect:/senior_hr/attendance?tab=override";
     }
 
+    // --- RECRUITMENT ROUTE ---
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @GetMapping("/senior_hr/recruitment")
+    public String showSeniorHrRecruitment(Model model, Principal principal) {
+        // Seed job postings if empty
+        if (jobPostingRepository.count() == 0) {
+            JobPosting j1 = new JobPosting();
+            j1.setJobId("J-101");
+            j1.setTitle("Sr. Frontend Dev.");
+            j1.setDepartment("Development Team");
+            j1.setLocation("Shahdol, India");
+            j1.setJobType("Full-time");
+            j1.setExperienceRequired("0-2 Years");
+            j1.setNoOfOpenings(2);
+            j1.setDescription("We are looking for a skilled Frontend Developer...");
+            j1.setJobResponsibility("Add key responsibilities");
+            j1.setEligibilityCriteria("Any UG/PG Graduate");
+            j1.setPrimarySkills("React, Angular, Vue.js");
+            j1.setPostingDate(java.time.LocalDate.now().minusDays(10));
+            j1.setActive(true);
+            jobPostingRepository.save(j1);
+
+            JobPosting j2 = new JobPosting();
+            j2.setJobId("J-102");
+            j2.setTitle("Backend Dev.");
+            j2.setDepartment("Development Team");
+            j2.setLocation("Raipur, India");
+            j2.setJobType("Full-time");
+            j2.setExperienceRequired("2-4 Years");
+            j2.setNoOfOpenings(1);
+            j2.setDescription("Backend Dev opening description...");
+            j2.setJobResponsibility("Backend Responsibilities");
+            j2.setEligibilityCriteria("Any UG/PG Graduate");
+            j2.setPrimarySkills("Java, Python");
+            j2.setPostingDate(java.time.LocalDate.now().minusDays(15));
+            j2.setActive(false); // Closed
+            jobPostingRepository.save(j2);
+
+            JobPosting j3 = new JobPosting();
+            j3.setJobId("J-103");
+            j3.setTitle("UI Designer");
+            j3.setDepartment("Design Team");
+            j3.setLocation("Raipur, India");
+            j3.setJobType("Intern");
+            j3.setExperienceRequired("0-1 Years");
+            j3.setNoOfOpenings(1);
+            j3.setDescription("Intern UI Designer...");
+            j3.setJobResponsibility("Mockups, UX flows");
+            j3.setEligibilityCriteria("Any Graduate");
+            j3.setPrimarySkills("Figma, Adobe XD");
+            j3.setPostingDate(java.time.LocalDate.now().minusDays(20));
+            j3.setActive(false); // Closed
+            jobPostingRepository.save(j3);
+        }
+
+        // Seed candidates if empty
+        if (referralRepository.count() == 0) {
+            JobPosting j1 = jobPostingRepository.findByIsActiveTrue().stream().findFirst().orElse(null);
+            com.example.admindashboard.model.User nehaUser = userRepository.findAll().stream().filter(u -> u.getFullName() != null && u.getFullName().contains("Neha")).findFirst().orElse(null);
+
+            if (j1 != null) {
+                Referral r1 = new Referral();
+                r1.setFirstName("Neha");
+                r1.setLastName("Sharma");
+                r1.setEmail("neha.sharma@gmail.com");
+                r1.setCountryCode("+91");
+                r1.setMobileNumber("9874561230");
+                r1.setRelationship("Friend");
+                r1.setResumeFilename("neha_resume.pdf");
+                r1.setJobPosting(j1);
+                r1.setReferredBy(nehaUser);
+                r1.setReferralDate(java.time.LocalDateTime.now().minusDays(2));
+                r1.setStatus("INTERVIEWING");
+                r1.setExperienceYears("2 Years");
+                r1.setCurrentCompany("Tech Solutions");
+                r1.setCurrentRole("Frontend Developer");
+                r1.setNextStep("HR Interview 25 June, 2026");
+                r1.setHometown("Bangalore, India");
+                r1.setStage("Screening");
+                referralRepository.save(r1);
+
+                Referral r2 = new Referral();
+                r2.setFirstName("Amit");
+                r2.setLastName("Sharma");
+                r2.setEmail("amit.sharma401@gmail.com");
+                r2.setCountryCode("+91");
+                r2.setMobileNumber("9874561231");
+                r2.setRelationship("Friend");
+                r2.setResumeFilename("amit_resume.pdf");
+                r2.setJobPosting(j1);
+                r2.setReferredBy(nehaUser);
+                r2.setReferralDate(java.time.LocalDateTime.now().minusDays(2));
+                r2.setStatus("SUBMITTED");
+                r2.setExperienceYears("2 Years");
+                r2.setCurrentCompany("TechHolder");
+                r2.setCurrentRole("Frontend Engineer");
+                r2.setNextStep("HR Interview 25 June, 2026");
+                r2.setHometown("Bangalore, India");
+                r2.setStage("Screening");
+                referralRepository.save(r2);
+
+                Referral r3 = new Referral();
+                r3.setFirstName("Pihu");
+                r3.setLastName("Sharma");
+                r3.setEmail("pihu.sharma@gmail.com");
+                r3.setCountryCode("+91");
+                r3.setMobileNumber("9874561232");
+                r3.setRelationship("Cousin");
+                r3.setResumeFilename("pihu_resume.pdf");
+                r3.setJobPosting(j1);
+                r3.setReferredBy(nehaUser);
+                r3.setReferralDate(java.time.LocalDateTime.now().minusDays(2));
+                r3.setStatus("SUBMITTED");
+                r3.setExperienceYears("2 Years");
+                r3.setCurrentCompany("Code Vita");
+                r3.setCurrentRole("Frontend Developer");
+                r3.setNextStep("HR Interview 25 June, 2026");
+                r3.setHometown("Bangalore, India");
+                r3.setStage("Screening");
+                referralRepository.save(r3);
+
+                Referral r4 = new Referral();
+                r4.setFirstName("Sneha");
+                r4.setLastName("Patel");
+                r4.setEmail("sneha@gmail.com");
+                r4.setCountryCode("+91");
+                r4.setMobileNumber("9874561233");
+                r4.setRelationship("Cousin");
+                r4.setResumeFilename("sneha_resume.pdf");
+                r4.setJobPosting(j1);
+                r4.setReferredBy(nehaUser);
+                r4.setReferralDate(java.time.LocalDateTime.now().minusDays(5));
+                r4.setStatus("IN_REVIEW");
+                r4.setExperienceYears("1.5 Years");
+                r4.setCurrentCompany("XYZ Technoworks");
+                r4.setCurrentRole("Jr. Developer");
+                r4.setNextStep("HR Interview 25 June, 2026");
+                r4.setHometown("Bangalore, India");
+                r4.setStage("Tech Interview");
+                referralRepository.save(r4);
+
+                Referral r5 = new Referral();
+                r5.setFirstName("Piyush");
+                r5.setLastName("Patel");
+                r5.setEmail("piyush@gmail.com");
+                r5.setCountryCode("+91");
+                r5.setMobileNumber("9874561234");
+                r5.setRelationship("Cousin");
+                r5.setResumeFilename("piyush_resume.pdf");
+                r5.setJobPosting(j1);
+                r5.setReferredBy(nehaUser);
+                r5.setReferralDate(java.time.LocalDateTime.now().minusDays(5));
+                r5.setStatus("IN_REVIEW");
+                r5.setExperienceYears("1.5 Years");
+                r5.setCurrentCompany("XYZ Technoworks");
+                r5.setCurrentRole("Jr. Developer");
+                r5.setNextStep("HR Interview 25 June, 2026");
+                r5.setHometown("Bangalore, India");
+                r5.setStage("HR Interview");
+                referralRepository.save(r5);
+            }
+        }
+
+        List<JobPosting> jobs = jobPostingRepository.findAll();
+        List<Referral> candidates = referralRepository.findAll();
+
+        model.addAttribute("jobs", jobs);
+        model.addAttribute("candidates", candidates);
+        model.addAttribute("allUsers", userRepository.findAll());
+
+        // Count stats
+        long totalOpenings = jobs.size();
+        long openVacancy = jobs.stream().filter(JobPosting::isActive).count();
+        long closedOpenings = jobs.stream().filter(j -> !j.isActive()).count();
+        long draftOpenings = 3; // matching default in mock
+
+        model.addAttribute("totalOpenings", totalOpenings);
+        model.addAttribute("openVacancy", openVacancy);
+        model.addAttribute("closedOpenings", closedOpenings);
+        model.addAttribute("draftOpenings", draftOpenings);
+
+        return "senior_hr-recruitment";
+    }
+
+    @PostMapping("/senior_hr/recruitment/create-job")
+    public String createJobOpening(
+            @RequestParam("jobTitle") String jobTitle,
+            @RequestParam("department") String department,
+            @RequestParam("location") String location,
+            @RequestParam("jobType") String jobType,
+            @RequestParam("jobId") String jobId,
+            @RequestParam("experienceRequired") String experienceRequired,
+            @RequestParam("noOfOpenings") Integer noOfOpenings,
+            @RequestParam("description") String description,
+            @RequestParam("jobResponsibility") String jobResponsibility,
+            @RequestParam("qualifications") String qualifications,
+            @RequestParam("preferredSkills") String preferredSkills,
+            @RequestParam("noticePeriod") String noticePeriod,
+            @RequestParam("ctcRange") String ctcRange,
+            @RequestParam("applicationDeadline") String applicationDeadline,
+            @RequestParam("startTime") String startTime,
+            @RequestParam("endTime") String endTime) {
+
+        JobPosting job = new JobPosting();
+        job.setTitle(jobTitle);
+        job.setDepartment(department);
+        job.setLocation(location);
+        job.setJobType(jobType);
+        job.setJobId(jobId);
+        job.setExperienceRequired(experienceRequired);
+        job.setNoOfOpenings(noOfOpenings);
+        job.setDescription(description);
+        job.setJobResponsibility(jobResponsibility);
+        job.setEligibilityCriteria(qualifications);
+        job.setPrimarySkills(preferredSkills);
+        job.setNoticePeriod(noticePeriod);
+        job.setCtcRange(ctcRange);
+        if (applicationDeadline != null && !applicationDeadline.isEmpty()) {
+            job.setApplicationDeadline(java.time.LocalDate.parse(applicationDeadline));
+        }
+        job.setStartTime(startTime);
+        job.setEndTime(endTime);
+        job.setPostingDate(java.time.LocalDate.now());
+        job.setActive(true);
+
+        jobPostingRepository.save(job);
+
+        return "redirect:/senior_hr/recruitment?tab=openings";
+    }
+
+    @PostMapping("/senior_hr/recruitment/candidate/update-stage")
+    public String updateCandidateStage(
+            @RequestParam("candidateId") Long candidateId,
+            @RequestParam("stage") String stage) {
+
+        Referral ref = referralRepository.findById(candidateId).orElse(null);
+        if (ref != null) {
+            ref.setStage(stage);
+            // Sync status badge options: Screening -> SUBMITTED/IN_REVIEW, Tech/HR -> INTERVIEWING, Offer -> HIRED
+            if ("Screening".equals(stage)) {
+                ref.setStatus("IN_REVIEW");
+            } else if ("Tech Interview".equals(stage) || "HR Interview".equals(stage)) {
+                ref.setStatus("INTERVIEWING");
+            } else if ("Offer".equals(stage)) {
+                ref.setStatus("HIRED");
+            }
+            referralRepository.save(ref);
+        }
+        return "redirect:/senior_hr/recruitment?tab=candidates";
+    }
+
+    @PostMapping("/senior_hr/recruitment/candidate/reject")
+    public String rejectCandidate(@RequestParam("candidateId") Long candidateId) {
+        Referral ref = referralRepository.findById(candidateId).orElse(null);
+        if (ref != null) {
+            ref.setStatus("REJECTED");
+            referralRepository.save(ref);
+        }
+        return "redirect:/senior_hr/recruitment?tab=candidates";
+    }
+
+    @PostMapping("/senior_hr/recruitment/job/close")
+    public String closeJobOpening(@RequestParam("jobId") Long jobId) {
+        JobPosting job = jobPostingRepository.findById(jobId).orElse(null);
+        if (job != null) {
+            job.setActive(false);
+            jobPostingRepository.save(job);
+        }
+        return "redirect:/senior_hr/recruitment?tab=openings";
+    }
+
     // --- WORKFLOW ROUTES HANDLED BY DASHBOARD CONTROLLER ---
     private void loadDashboardData(Model model) {
         model.addAttribute("showMySpace", true);
     }
     
+    @GetMapping("/senior_hr/api/referrals/{id}")
+    @ResponseBody
+    public ResponseEntity<?> getReferral(@PathVariable Long id) {
+        Referral ref = referralRepository.findById(id).orElse(null);
+        if (ref == null) {
+            return ResponseEntity.notFound().build();
+        }
+        // Map to a clean DTO to avoid JSON recursion and Lazy proxy errors
+        Map<String, Object> data = new java.util.HashMap<>();
+        data.put("id", ref.getId());
+        data.put("firstName", ref.getFirstName());
+        data.put("lastName", ref.getLastName());
+        data.put("email", ref.getEmail());
+        data.put("status", ref.getStatus());
+        data.put("relationship", ref.getRelationship());
+        
+        if (ref.getJobPosting() != null) {
+            data.put("jobPosting", Map.of("title", ref.getJobPosting().getTitle()));
+        } else {
+            data.put("jobPosting", null);
+        }
+        
+        if (ref.getReferredBy() != null) {
+            data.put("referredBy", Map.of("fullName", ref.getReferredBy().getFullName()));
+        } else {
+            data.put("referredBy", null);
+        }
+        
+        return ResponseEntity.ok(data);
+    }
+
+    @DeleteMapping("/senior_hr/api/referrals/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteReferral(@PathVariable Long id) {
+        Referral ref = referralRepository.findById(id).orElse(null);
+        if (ref == null) {
+            return ResponseEntity.notFound().build();
+        }
+        referralRepository.delete(ref);
+        return ResponseEntity.ok(Map.of("success", true));
+    }
 }

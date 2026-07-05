@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteCircle | HR Admin - Recruitment</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #002D72;
+            --primary-light: #1e3a8a;
+            --sidebar-width: 220px;
+            --header-height: 70px;
+            --border-color: #e2e8f0;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        /* --- SIDEBAR --- */
+        .myspace-sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1051;
+            transition: transform 0.3s ease;
+        }
+        body.sidebar-toggled .myspace-sidebar { transform: translateX(-100%); }
+
+        .myspace-sidebar .brand-area {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: var(--header-height);
+        }
+        .myspace-sidebar .brand-area img {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+        }
+        .myspace-sidebar .brand-area .brand-text {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+        .myspace-sidebar .brand-area .brand-sub {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .myspace-sidebar .nav-links {
+            padding: 15px 0;
+            flex: 1;
+        }
+        .myspace-sidebar .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .myspace-sidebar .nav-link-item:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+        .myspace-sidebar .nav-link-item.active {
+            background: var(--primary);
+            color: white;
+            border-left-color: var(--primary-light);
+        }
+        .myspace-sidebar .nav-link-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        /* --- GLOBAL NAVBAR --- */
+        .top-navbar {
+            position: fixed; top: 0; left: var(--sidebar-width); right: 0;
+            height: var(--header-height);
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px;
+            z-index: 1050;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            transition: left 0.3s ease;
+        }
+        body.sidebar-toggled .top-navbar { left: 0; }
+        
+        .nav-brand {
+            display: flex; align-items: center; gap: 15px;
+            font-size: 1.4rem; font-weight: 800; color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        .myspace-main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 30px;
+            min-height: calc(100vh - var(--header-height));
+            transition: margin-left 0.3s ease;
+            background-color: #ffffff;
+        }
+        body.sidebar-toggled .myspace-main { margin-left: 0; }
+
+        .nav-tabs-custom {
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+        .nav-tabs-custom .nav-link {
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 0.5rem 1rem 0.75rem 1rem;
+            margin-right: 1rem;
+            font-size: 0.95rem;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .nav-tabs-custom .nav-link:hover {
+            color: var(--primary);
+        }
+        .nav-tabs-custom .nav-link.active {
+            color: var(--primary);
+            background-color: transparent;
+            border-bottom-color: var(--primary);
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        /* Kanban Styles */
+        .kanban-col {
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            min-height: 400px;
+        }
+        .kanban-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .kanban-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kanban-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        }
+
+        /* Slide Drawer / Detail Pane */
+        .detail-pane {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: white;
+            padding: 25px;
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+        }
+
+        /* Table Styles */
+        .table-custom {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .table-custom thead th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .table-custom tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            font-size: 0.85rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .table-custom tbody tr {
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+        .table-custom tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .avatar-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="myspace-sidebar shadow-sm">
+        <div class="brand-area">
+            <img src="/images/wcg-logo.jpg" alt="Logo">
+            <div>
+                <div class="brand-text">WhiteCircle</div>
+                <div class="brand-sub">HR Admin</div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a href="/senior_hr/employee" class="nav-link-item"><i class="fas fa-users"></i> Employee</a>
+            <a href="/senior_hr/lms" class="nav-link-item"><i class="fas fa-graduation-cap"></i> LMS</a>
+            <a href="/senior_hr/payroll" class="nav-link-item"><i class="fas fa-money-check-alt"></i> Payroll</a>
+            <a href="/senior_hr/attendance" class="nav-link-item"><i class="fas fa-clock"></i> Attendance</a>
+            <a href="/senior_hr/performance" class="nav-link-item"><i class="fas fa-chart-line"></i> Performance</a>
+            <a href="/senior_hr/recruitment" class="nav-link-item active"><i class="fas fa-user-plus"></i> Recruitment</a>
+            <a href="/senior_hr/organization" class="nav-link-item"><i class="fas fa-sitemap text-muted"></i> Organization Structure</a>
+            <a href="/senior_hr/reports" class="nav-link-item"><i class="fas fa-file-alt text-muted"></i> Reports</a>
+        </div>
+    </div>
+
+    <!-- GLOBAL NAVBAR -->
+    <nav class="top-navbar">
+        <div class="nav-brand">
+            <button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
+            <div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
+                <span style="color: #002D72; font-weight: 700; font-size: 1.3rem;">WhiteCircle Group - Shahdol</span>
+                <span id="nav-subtitle" style="font-size: 0.85rem; font-weight: 500; color: #333; margin-top: 2px;">Recruitment</span>
+            </div>
+        </div>
+        <div class="nav-actions d-flex align-items-center gap-3">
+            <a href="/senior_hr/dashboard" id="backBtn" class="btn btn-light text-dark fw-bold" style="border-radius: 6px; padding: 8px 20px; text-decoration: none;">
+                <i class="fas fa-arrow-left me-2"></i> Back
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="myspace-main">
+        
+        <!-- Tab Content & Forms Wrapper -->
+        <div id="recruitment-tabs-container">
+            <!-- Tabs -->
+            <ul class="nav nav-tabs nav-tabs-custom" id="recruitmentTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="openings-tab" data-bs-toggle="tab" data-bs-target="#openings-pane" type="button" role="tab">Job Openings</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="candidates-tab" data-bs-toggle="tab" data-bs-target="#candidates-pane" type="button" role="tab">Candidates</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="referrals-tab" data-bs-toggle="tab" data-bs-target="#referrals-pane" type="button" role="tab">Referrals</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="recruitmentTabsContent">
+                
+                <!-- JOB OPENINGS TAB -->
+                <div class="tab-pane fade show active" id="openings-pane" role="tabpanel">
+                    
+                    <!-- Stats Grid -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon bg-primary-subtle text-primary"><i class="fas fa-briefcase"></i></div>
+                                <div>
+                                    <div class="text-muted small fw-bold">Total Openings</div>
+                                    <div class="fs-4 fw-bold" th:text="${totalOpenings}">7</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon bg-success-subtle text-success"><i class="fas fa-user-check"></i></div>
+                                <div>
+                                    <div class="text-muted small fw-bold">Open Vacancy</div>
+                                    <div class="fs-4 fw-bold" th:text="${openVacancy}">2</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon bg-danger-subtle text-danger"><i class="fas fa-folder-closed"></i></div>
+                                <div>
+                                    <div class="text-muted small fw-bold">Closed</div>
+                                    <div class="fs-4 fw-bold" th:text="${closedOpenings}">4</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon bg-warning-subtle text-warning"><i class="fas fa-file-edit"></i></div>
+                                <div>
+                                    <div class="text-muted small fw-bold">Draft</div>
+                                    <div class="fs-4 fw-bold" th:text="${draftOpenings}">3</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filters and Search -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+                        <div class="d-flex align-items-center gap-2 flex-grow-1" style="max-width: 600px;">
+                            <div class="input-group input-group-sm" style="max-width: 250px;">
+                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                <input type="text" id="jobSearchInput" class="form-control border-start-0" placeholder="Search by job title, ID..." onkeyup="filterJobs()">
+                            </div>
+                            <select id="jobDeptFilter" class="form-select form-select-sm" style="width: 140px;" onchange="filterJobs()">
+                                <option value="All Departments">All Departments</option>
+                                <option value="Development Team">Development Team</option>
+                                <option value="Design Team">Design Team</option>
+                                <option value="Product Management">Product Management</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Human Resources">Human Resources</option>
+                            </select>
+                            <select id="jobTypeFilter" class="form-select form-select-sm" style="width: 120px;" onchange="filterJobs()">
+                                <option value="All Job Types">All Job Types</option>
+                                <option value="Full-time">Full-time</option>
+                                <option value="Intern">Intern</option>
+                                <option value="Contract">Contract</option>
+                                <option value="Part-time">Part-time</option>
+                            </select>
+                            <select id="jobStatusFilter" class="form-select form-select-sm" style="width: 100px;" onchange="filterJobs()">
+                                <option value="All Status">All Status</option>
+                                <option value="Open">Open</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary btn-sm px-3 fw-bold" style="background-color: #002D72;" onclick="toggleCreateJobView()">
+                                <i class="fas fa-plus"></i> Create Job Opening
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Job Openings Table and Sliding Pane -->
+                    <div class="row g-4">
+                        <div class="col-md-8" id="job-table-col">
+                            <div class="table-responsive border rounded">
+                                <table class="table table-custom mb-0" id="jobsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Job Title</th>
+                                            <th>Department</th>
+                                            <th>Location</th>
+                                            <th>Job Type</th>
+                                            <th>Job ID</th>
+                                            <th>Applicants</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="job : ${jobs}" th:data-id="${job.id}" th:data-jobid="${job.jobId}" th:data-title="${job.title}" th:data-dept="${job.department}" th:data-loc="${job.location}" th:data-type="${job.jobType}" th:data-exp="${job.experienceRequired}" th:data-active="${job.active}" th:data-posted="${job.postingDate}" onclick="selectJobRow(this)">
+                                            <td>
+                                                <div class="fw-bold text-dark" th:text="${job.title}">Sr. Frontend Dev.</div>
+                                            </td>
+                                            <td th:text="${job.department}">Development Team</td>
+                                            <td th:text="${job.location}">Shahdol, India</td>
+                                            <td th:text="${job.jobType}">Full-time</td>
+                                            <td th:text="${job.jobId}" class="text-muted">J-101</td>
+                                            <td>
+                                                <span class="fw-bold text-primary" th:text="${candidates.?[jobPosting != null && jobPosting.id == __${job.id}__].size()}">30</span>
+                                            </td>
+                                            <td>
+                                                <span th:class="${job.active ? 'badge bg-success-subtle text-success fw-bold' : 'badge bg-danger-subtle text-danger fw-bold'}" th:text="${job.active ? 'Open' : 'Closed'}">Open</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
+                                                <button class="btn btn-sm btn-link text-danger p-0"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Right Detail Side Panel -->
+                        <div class="col-md-4 d-none" id="job-detail-col">
+                            <div class="detail-pane shadow-sm">
+                                <div class="d-flex justify-content-between align-items-start mb-4">
+                                    <div>
+                                        <h4 class="fw-bold mb-1" id="drawerJobTitle">Sr. Frontend Dev.</h4>
+                                        <span class="text-muted" id="drawerJobId">Job ID: J-101</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-success-subtle text-success fw-bold px-2 py-1" id="drawerJobStatus">Open</span>
+                                        <button class="btn btn-sm btn-link text-muted p-0" onclick="closeJobDrawer()"><i class="fas fa-times fs-5"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="d-flex mb-3"><span class="fw-bold text-muted" style="width: 120px;"><i class="fas fa-building me-2"></i>Department:</span> <span id="drawerDept" class="fw-bold text-dark">Development</span></div>
+                                    <div class="d-flex mb-3"><span class="fw-bold text-muted" style="width: 120px;"><i class="fas fa-map-marker-alt me-2"></i>Location:</span> <span id="drawerLoc" class="fw-bold text-dark">Raipur, India</span></div>
+                                    <div class="d-flex mb-3"><span class="fw-bold text-muted" style="width: 120px;"><i class="fas fa-clock me-2"></i>Job Type:</span> <span id="drawerType" class="fw-bold text-dark">Full-time</span></div>
+                                    <div class="d-flex mb-3"><span class="fw-bold text-muted" style="width: 120px;"><i class="fas fa-graduation-cap me-2"></i>Experience:</span> <span id="drawerExp" class="fw-bold text-dark">0-2 Years</span></div>
+                                    <div class="d-flex mb-3"><span class="fw-bold text-muted" style="width: 120px;"><i class="fas fa-users me-2"></i>Applicants:</span> <span id="drawerApps" class="fw-bold text-primary fs-6">45</span></div>
+                                    <div class="d-flex mb-3"><span class="fw-bold text-muted" style="width: 120px;"><i class="fas fa-calendar-alt me-2"></i>Posted On:</span> <span id="drawerPosted" class="fw-bold text-dark">20th June, 2026</span></div>
+                                </div>
+
+                                <hr>
+                                <div class="d-flex gap-2">
+                                    <form id="closeJobForm" method="post" action="/senior_hr/recruitment/job/close" class="flex-grow-1">
+                                        <input type="hidden" name="jobId" id="drawerJobIdVal">
+                                        <button type="submit" class="btn btn-outline-danger w-100 fw-bold btn-sm py-2">Close Opening</button>
+                                    </form>
+                                    <button class="btn btn-primary w-100 fw-bold btn-sm py-2" style="background-color: #002D72;" onclick="alert('Editing capability under development')">Edit Job</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CANDIDATES TAB -->
+                <div class="tab-pane fade" id="candidates-pane" role="tabpanel">
+                    
+                    <!-- Candidate Header Filters -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Select Job Title</label>
+                            <select id="candidateJobSelect" class="form-select form-select-sm" onchange="onCandidateJobChanged()">
+                                <option th:each="job : ${jobs}" th:value="${job.id}" th:text="${job.title}" th:data-dept="${job.department}" th:data-loc="${job.location}" th:data-type="${job.jobType}">Senior Frontend Developer</option>
+                            </select>
+                        </div>
+                        <div class="col-md-9 d-flex align-items-end justify-content-start gap-4 pb-1">
+                            <div class="d-flex align-items-center gap-1"><i class="fas fa-building text-muted small me-1"></i><span class="small text-muted fw-bold">Department:</span> <span id="candHeaderDept" class="small fw-bold">Development</span></div>
+                            <div class="d-flex align-items-center gap-1"><i class="fas fa-map-marker-alt text-muted small me-1"></i><span class="small text-muted fw-bold">Location:</span> <span id="candHeaderLoc" class="small fw-bold">Raipur, India</span></div>
+                            <div class="d-flex align-items-center gap-1"><i class="fas fa-clock text-muted small me-1"></i><span class="small text-muted fw-bold">Job Type:</span> <span id="candHeaderType" class="small fw-bold">Full-time</span></div>
+                            <div class="d-flex align-items-center gap-1"><i class="fas fa-users text-muted small me-1"></i><span class="small text-muted fw-bold">Applicants:</span> <span id="candHeaderApps" class="small fw-bold text-primary">30</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Search & Stage Filters -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+                        <div class="d-flex align-items-center gap-2 flex-grow-1" style="max-width: 600px;">
+                            <div class="input-group input-group-sm" style="max-width: 250px;">
+                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                <input type="text" id="candidateSearchInput" class="form-control border-start-0" placeholder="Search candidates by name..." onkeyup="filterCandidates()">
+                            </div>
+                            <select id="candidateStageFilter" class="form-select form-select-sm" style="width: 140px;" onchange="filterCandidates()">
+                                <option value="All Stages">All Stages</option>
+                                <option value="Screening">Screening</option>
+                                <option value="Tech Interview">Tech Interview</option>
+                                <option value="HR Interview">HR Interview</option>
+                                <option value="Offer">Offer</option>
+                            </select>
+                            <select id="candidateExpFilter" class="form-select form-select-sm" style="width: 140px;" onchange="filterCandidates()">
+                                <option value="All experience">All experience</option>
+                                <option value="0-2 Years">0-2 Years</option>
+                                <option value="2-4 Years">2-4 Years</option>
+                                <option value="4+ Years">4+ Years</option>
+                            </select>
+                            <button class="btn btn-outline-secondary btn-sm px-3 fw-bold"><i class="fas fa-filter"></i> More Filters</button>
+                        </div>
+                    </div>
+
+                    <!-- Kanban Board -->
+                    <div class="row g-3 mb-5" id="kanban-row">
+                        <!-- Screening Col -->
+                        <div class="col-md-3">
+                            <div class="kanban-col">
+                                <div class="kanban-header">
+                                    <span class="fw-bold text-dark"><i class="fas fa-circle text-primary me-2"></i>1. Screening</span>
+                                    <span class="badge bg-primary-subtle text-primary" id="count-Screening">0</span>
+                                </div>
+                                <div class="kanban-cards-area" id="area-Screening">
+                                    <!-- Cards dynamically injected -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Tech Interview Col -->
+                        <div class="col-md-3">
+                            <div class="kanban-col">
+                                <div class="kanban-header">
+                                    <span class="fw-bold text-dark"><i class="fas fa-circle text-warning me-2"></i>2. Tech Interview</span>
+                                    <span class="badge bg-warning-subtle text-warning" id="count-Tech">0</span>
+                                </div>
+                                <div class="kanban-cards-area" id="area-Tech">
+                                    <!-- Cards dynamically injected -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- HR Interview Col -->
+                        <div class="col-md-3">
+                            <div class="kanban-col">
+                                <div class="kanban-header">
+                                    <span class="fw-bold text-dark"><i class="fas fa-circle text-info me-2"></i>3. HR Interview</span>
+                                    <span class="badge bg-info-subtle text-info" id="count-HR">0</span>
+                                </div>
+                                <div class="kanban-cards-area" id="area-HR">
+                                    <!-- Cards dynamically injected -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Offer Col -->
+                        <div class="col-md-3">
+                            <div class="kanban-col">
+                                <div class="kanban-header">
+                                    <span class="fw-bold text-dark"><i class="fas fa-circle text-success me-2"></i>4. Offer</span>
+                                    <span class="badge bg-success-subtle text-success" id="count-Offer">0</span>
+                                </div>
+                                <div class="kanban-cards-area" id="area-Offer">
+                                    <!-- Cards dynamically injected -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Applicants List Table & Side Drawer -->
+                    <h5 class="fw-bold text-dark mb-3" id="applicants-list-header">All Applicants (0)</h5>
+                    <div class="row g-4">
+                        <div class="col-md-8" id="candidate-table-col">
+                            <div class="table-responsive border rounded">
+                                <table class="table table-custom mb-0" id="candidatesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Candidates</th>
+                                            <th>Experience</th>
+                                            <th>Current Company</th>
+                                            <th>Stage</th>
+                                            <th>Applied On</th>
+                                            <th>Next Step</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Injected via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Candidate Detail Drawer -->
+                        <div class="col-md-4 d-none" id="candidate-detail-col">
+                            <div class="detail-pane shadow-sm">
+                                <div class="d-flex justify-content-between align-items-start mb-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar-circle fs-5" style="width: 48px; height: 48px; background-color: #002D72; color: white;" id="drawerCandInitial">A</div>
+                                        <div>
+                                            <h4 class="fw-bold mb-0" id="drawerCandName">Amit Sharma</h4>
+                                            <span class="text-muted small" id="drawerCandRole">Applicant</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-primary-subtle text-primary fw-bold" id="drawerCandStage">Screening</span>
+                                        <button class="btn btn-sm btn-link text-muted p-0" onclick="closeCandidateDrawer()"><i class="fas fa-times fs-5"></i></button>
+                                    </div>
+                                </div>
+
+                                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Contact Information</h6>
+                                <div class="mb-4">
+                                    <div class="d-flex mb-2 small"><span class="text-muted" style="width: 100px;"><i class="fas fa-envelope me-2"></i>Email:</span> <span id="drawerCandEmail" class="fw-bold text-dark">amit@gmail.com</span></div>
+                                    <div class="d-flex mb-2 small"><span class="text-muted" style="width: 100px;"><i class="fas fa-phone me-2"></i>Mobile:</span> <span id="drawerCandPhone" class="fw-bold text-dark">+91 9874561231</span></div>
+                                    <div class="d-flex mb-2 small"><span class="text-muted" style="width: 100px;"><i class="fab fa-linkedin me-2"></i>LinkedIn:</span> <a href="#" class="fw-bold text-primary text-decoration-none">linkedin.com/in/candidate</a></div>
+                                </div>
+
+                                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Other Details</h6>
+                                <div class="mb-4">
+                                    <div class="d-flex mb-2 small"><span class="text-muted" style="width: 120px;">Hometown:</span> <span id="drawerCandHometown" class="fw-bold text-dark">Bangalore, India</span></div>
+                                    <div class="d-flex mb-2 small"><span class="text-muted" style="width: 120px;">Applied On:</span> <span id="drawerCandApplied" class="fw-bold text-dark">20 June, 2026</span></div>
+                                    <div class="d-flex mb-2 small"><span class="text-muted" style="width: 120px;">Current Company:</span> <span id="drawerCandCompany" class="fw-bold text-dark">TechHolder</span></div>
+                                    <div class="d-flex mb-2 small"><span class="text-muted" style="width: 120px;">Current Role:</span> <span id="drawerCandCurrentRole" class="fw-bold text-dark">Frontend Engineer</span></div>
+                                    <div class="d-flex mb-2 small"><span class="text-muted" style="width: 120px;">Experience:</span> <span id="drawerCandExp" class="fw-bold text-dark">1.5 Years</span></div>
+                                </div>
+
+                                <hr>
+                                <div class="d-flex gap-2">
+                                    <form id="rejectCandForm" method="post" action="/senior_hr/recruitment/candidate/reject" class="flex-grow-1">
+                                        <input type="hidden" name="candidateId" id="rejectCandIdVal">
+                                        <button type="submit" class="btn btn-outline-danger w-100 fw-bold btn-sm py-2">Rejected</button>
+                                    </form>
+                                    <form id="advanceCandForm" method="post" action="/senior_hr/recruitment/candidate/update-stage" class="flex-grow-1">
+                                        <input type="hidden" name="candidateId" id="advanceCandIdVal">
+                                        <input type="hidden" name="stage" id="advanceCandStageVal">
+                                        <button type="submit" class="btn btn-primary w-100 fw-bold btn-sm py-2" style="background-color: #002D72; border-color: #002D72;" id="advanceStageBtn">Assign Round 2</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REFERRALS TAB -->
+                <div class="tab-pane fade" id="referrals-pane" role="tabpanel">
+                    <!-- Referral Filters -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Search</label>
+                            <input type="text" id="refSearchInput" class="form-control form-control-sm" placeholder="Search by name..." onkeyup="filterReferrals()">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Date range</label>
+                            <select id="refDateFilter" class="form-select form-select-sm" onchange="filterReferrals()">
+                                <option value="All">All time</option>
+                                <option value="May">01 May - 31 May 2026</option>
+                                <option value="June">01 June - 30 June 2026</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Roles</label>
+                            <select id="refRoleFilter" class="form-select form-select-sm" onchange="filterReferrals()">
+                                <option value="All roles">All roles</option>
+                                <option value="Sr. Frontend Dev.">Sr. Frontend Dev.</option>
+                                <option value="Backend Dev.">Backend Dev.</option>
+                                <option value="UI Designer">UI Designer</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Status</label>
+                            <select id="refStatusFilter" class="form-select form-select-sm" onchange="filterReferrals()">
+                                <option value="All status">All status</option>
+                                <option value="SUBMITTED">Submitted</option>
+                                <option value="IN_REVIEW">In Review</option>
+                                <option value="INTERVIEWING">Interviewing</option>
+                                <option value="HIRED">Hired</option>
+                                <option value="REJECTED">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Referrals Table -->
+                    <div class="table-responsive border rounded">
+                        <table class="table table-custom mb-0" id="referralsTable">
+                            <thead>
+                                <tr>
+                                    <th>Referred To</th>
+                                    <th>Referred By</th>
+                                    <th>Role</th>
+                                    <th>Date</th>
+                                    <th>Relation</th>
+                                    <th>Resume</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="cand : ${candidates}" th:if="${cand.referredBy != null}" th:data-name="${cand.firstName + ' ' + cand.lastName}" th:data-role="${cand.jobPosting.title}" th:data-status="${cand.status}" th:data-date="${cand.referralDate}">
+                                    <td>
+                                        <div class="fw-bold text-dark" th:text="${cand.firstName + ' ' + cand.lastName}">Sneha Patel</div>
+                                        <div class="text-muted small" th:text="${cand.email}">sneha@gmail.com</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-dark" th:text="${cand.referredBy.fullName}">Neha Sharma</div>
+                                        <div class="text-muted small">EMP114</div>
+                                    </td>
+                                    <td th:text="${cand.jobPosting.title}">Jr. Developer</td>
+                                    <td th:text="${#temporals.format(cand.referralDate, 'dd MMM, yyyy')}">15 May, 2026</td>
+                                    <td th:text="${cand.relationship}">Cousin</td>
+                                    <td>
+                                        <a href="#" class="text-decoration-none"><i class="far fa-file-pdf text-danger me-1"></i> <span th:text="${cand.resumeFilename}">sneha_resume.pdf</span></a>
+                                    </td>
+                                    <td>
+                                        <span th:class="${cand.status == 'HIRED' ? 'text-success fw-bold' : (cand.status == 'REJECTED' ? 'text-danger fw-bold' : 'text-primary fw-bold')}" th:text="${cand.status}">In Process</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-link text-primary p-0 me-2" th:onclick="'previewReferral(' + ${cand.id} + ')'" title="Preview"><i class="fas fa-eye"></i></button>
+                                        <div class="dropdown d-inline-block">
+                                            <button class="btn btn-sm btn-link text-dark p-0" data-bs-toggle="dropdown" title="Options"><i class="fas fa-ellipsis-h"></i></button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                <li>
+                                                    <button class="dropdown-item text-danger fw-bold" th:onclick="'deleteReferral(' + ${cand.id} + ')'">
+                                                        <i class="fas fa-trash-alt me-2"></i> Delete Referral
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- CREATE JOB OPENING FORM VIEW (hidden by default) -->
+        <div id="create-job-view" class="d-none">
+            <form th:action="@{/senior_hr/recruitment/create-job}" method="post">
+                <div class="d-flex align-items-center border-bottom pb-3 mb-4">
+                    <h5 class="fw-bold text-primary mb-0">Basic Detail</h5>
+                </div>
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Job Title <span class="text-danger">*</span></label>
+                        <input type="text" name="jobTitle" class="form-control" placeholder="Sr. Frontend Developer" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Department <span class="text-danger">*</span></label>
+                        <select name="department" class="form-select" required>
+                            <option value="Development Team">Development Team</option>
+                            <option value="Design Team">Design Team</option>
+                            <option value="Product Management">Product Management</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Human Resources">Human Resources</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Location <span class="text-danger">*</span></label>
+                        <input type="text" name="location" class="form-control" placeholder="Shahdol" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold d-block" style="font-size: 0.85rem;">Job Type <span class="text-danger">*</span></label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="jobType" id="typeFull" value="Full-time" checked>
+                        <label class="form-check-label" for="typeFull">Full-time</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="jobType" id="typeIntern" value="Intern">
+                        <label class="form-check-label" for="typeIntern">Intern</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="jobType" id="typeContract" value="Contract">
+                        <label class="form-check-label" for="typeContract">Contract</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="jobType" id="typePart" value="Part-time">
+                        <label class="form-check-label" for="typePart">Part-time</label>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Job ID <span class="text-danger">*</span></label>
+                        <input type="text" name="jobId" class="form-control" placeholder="JD-144" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Experience Required <span class="text-danger">*</span></label>
+                        <input type="text" name="experienceRequired" class="form-control" placeholder="0-2 Years" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">No. of Openings <span class="text-danger">*</span></label>
+                        <input type="number" name="noOfOpenings" class="form-control" placeholder="2" required>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center border-bottom pb-3 mb-4 mt-5">
+                    <h5 class="fw-bold text-primary mb-0">Job Summary</h5>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Job Description <span class="text-danger">*</span></label>
+                        <textarea name="description" class="form-control" rows="4" placeholder="We are looking for a skilled Developer." required></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Job Responsibility <span class="text-danger">*</span></label>
+                        <textarea name="jobResponsibility" class="form-control" rows="4" placeholder="Add key responsibilities" required></textarea>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Qualifications <span class="text-danger">*</span></label>
+                        <input type="text" name="qualifications" class="form-control" placeholder="Any UG/PG Graduate" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Preferred Skills <span class="text-danger">*</span></label>
+                        <input type="text" name="preferredSkills" class="form-control" placeholder="React, Angular, Vue.js" required>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center border-bottom pb-3 mb-4 mt-5">
+                    <h5 class="fw-bold text-primary mb-0">Job Settings</h5>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Notice Period <span class="text-danger">*</span></label>
+                        <input type="text" name="noticePeriod" class="form-control" placeholder="30 days" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">CTC Range <span class="text-danger">*</span></label>
+                        <input type="text" name="ctcRange" class="form-control" placeholder="6-8 LPA" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Application Deadline <span class="text-danger">*</span></label>
+<input type="date" name="applicationDeadline" id="appDeadlineInput" class="form-control" required>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const deadlineInput = document.getElementById('appDeadlineInput');
+        if(deadlineInput) {
+            deadlineInput.min = new Date().toISOString().split('T')[0];
+        }
+    });
+</script>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Start Time <span class="text-danger">*</span></label>
+                        <input type="time" name="startTime" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" style="font-size: 0.85rem;">End Time <span class="text-danger">*</span></label>
+                        <input type="time" name="endTime" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 mt-5">
+                    <button type="button" class="btn btn-outline-secondary px-5 py-2 fw-bold text-dark" onclick="toggleCreateJobView()">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-5 py-2 fw-bold" style="background-color: #002D72; border-color: #002D72;">Save & Next</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const candidatesData = /*[[${candidates}]]*/ [];
+        const jobsData = /*[[${jobs}]]*/ [];
+        /*]]>*/
+
+        function toggleCreateJobView() {
+            const tabsEl = document.getElementById('recruitment-tabs-container');
+            const formEl = document.getElementById('create-job-view');
+            const subTitleEl = document.getElementById('nav-subtitle');
+            const backBtn = document.getElementById('backBtn');
+
+            if (formEl.classList.contains('d-none')) {
+                tabsEl.classList.add('d-none');
+                formEl.classList.remove('d-none');
+                subTitleEl.textContent = 'Create Job Opening';
+                backBtn.setAttribute('data-orig-href', backBtn.getAttribute('href'));
+                backBtn.removeAttribute('href');
+                backBtn.setAttribute('onclick', 'toggleCreateJobView()');
+            } else {
+                formEl.classList.add('d-none');
+                tabsEl.classList.remove('d-none');
+                subTitleEl.textContent = 'Recruitment';
+                const origHref = backBtn.getAttribute('data-orig-href') || '/senior_hr/dashboard';
+                backBtn.setAttribute('href', origHref);
+                backBtn.removeAttribute('onclick');
+            }
+        }
+
+        // --- JOB OPENINGS SIDE DRAWER ---
+        function selectJobRow(row) {
+            // Remove active classes
+            document.querySelectorAll('#jobsTable tbody tr').forEach(r => r.classList.remove('table-active'));
+            row.classList.add('table-active');
+
+            const id = row.getAttribute('data-id');
+            const jobId = row.getAttribute('data-jobid');
+            const title = row.getAttribute('data-title');
+            const dept = row.getAttribute('data-dept');
+            const loc = row.getAttribute('data-loc');
+            const type = row.getAttribute('data-type');
+            const exp = row.getAttribute('data-exp');
+            const active = row.getAttribute('data-active') === 'true';
+            const posted = row.getAttribute('data-posted');
+
+            document.getElementById('drawerJobTitle').textContent = title;
+            document.getElementById('drawerJobId').textContent = 'Job ID: ' + jobId;
+            document.getElementById('drawerDept').textContent = dept;
+            document.getElementById('drawerLoc').textContent = loc;
+            document.getElementById('drawerType').textContent = type;
+            document.getElementById('drawerExp').textContent = exp;
+            document.getElementById('drawerPosted').textContent = posted;
+            
+            const count = candidatesData.filter(c => c.jobPosting && String(c.jobPosting.id) === String(id)).length;
+            document.getElementById('drawerApps').textContent = count;
+
+            const statusBadge = document.getElementById('drawerJobStatus');
+            statusBadge.textContent = active ? 'Open' : 'Closed';
+            statusBadge.className = active ? 'badge bg-success-subtle text-success fw-bold px-2 py-1' : 'badge bg-danger-subtle text-danger fw-bold px-2 py-1';
+
+            document.getElementById('drawerJobIdVal').value = id;
+
+            // Show drawer
+            document.getElementById('job-table-col').className = 'col-md-8';
+            document.getElementById('job-detail-col').classList.remove('d-none');
+        }
+
+        function closeJobDrawer() {
+            document.getElementById('job-detail-col').classList.add('d-none');
+            document.getElementById('job-table-col').className = 'col-md-12';
+            document.querySelectorAll('#jobsTable tbody tr').forEach(r => r.classList.remove('table-active'));
+        }
+
+        function filterJobs() {
+            const query = document.getElementById('jobSearchInput').value.toLowerCase();
+            const dept = document.getElementById('jobDeptFilter').value;
+            const type = document.getElementById('jobTypeFilter').value;
+            const status = document.getElementById('jobStatusFilter').value;
+
+            const rows = document.querySelectorAll('#jobsTable tbody tr');
+            rows.forEach(row => {
+                const title = row.getAttribute('data-title').toLowerCase();
+                const jobId = row.getAttribute('data-jobid').toLowerCase();
+                const rDept = row.getAttribute('data-dept');
+                const rType = row.getAttribute('data-type');
+                const rActive = row.getAttribute('data-active') === 'true';
+
+                const matchesQuery = !query || title.includes(query) || jobId.includes(query);
+                const matchesDept = dept === 'All Departments' || rDept === dept;
+                const matchesType = type === 'All Job Types' || rType === type;
+                
+                let matchesStatus = true;
+                if (status === 'Open') matchesStatus = rActive;
+                else if (status === 'Closed') matchesStatus = !rActive;
+
+                if (matchesQuery && matchesDept && matchesType && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // --- CANDIDATES LOGIC ---
+        function onCandidateJobChanged() {
+            const jobSelect = document.getElementById('candidateJobSelect');
+            const selectedOpt = jobSelect.options[jobSelect.selectedIndex];
+            
+            const dept = selectedOpt.getAttribute('data-dept') || '';
+            const loc = selectedOpt.getAttribute('data-loc') || '';
+            const type = selectedOpt.getAttribute('data-type') || '';
+            const jobId = jobSelect.value;
+
+            document.getElementById('candHeaderDept').textContent = dept;
+            document.getElementById('candHeaderLoc').textContent = loc;
+            document.getElementById('candHeaderType').textContent = type;
+
+            const filteredCandidates = candidatesData.filter(c => c.jobPosting && String(c.jobPosting.id) === String(jobId));
+            document.getElementById('candHeaderApps').textContent = filteredCandidates.length;
+
+            renderKanbanAndTable(filteredCandidates);
+        }
+
+        function renderKanbanAndTable(candList) {
+            // Clear kanban columns
+            const stages = ["Screening", "Tech Interview", "HR Interview", "Offer"];
+            stages.forEach(st => {
+                document.getElementById('area-' + getStageKey(st)).innerHTML = '';
+                document.getElementById('count-' + getStageKey(st)).textContent = '0';
+            });
+
+            // Populate Kanban and Table
+            const tbody = document.querySelector('#candidatesTable tbody');
+            tbody.innerHTML = '';
+
+            let visibleCount = 0;
+            const query = document.getElementById('candidateSearchInput').value.toLowerCase();
+            const stageFilter = document.getElementById('candidateStageFilter').value;
+            const expFilter = document.getElementById('candidateExpFilter').value;
+
+            candList.forEach(c => {
+                const name = (c.firstName + ' ' + c.lastName).toLowerCase();
+                const matchesQuery = !query || name.includes(query);
+                const matchesStage = stageFilter === 'All Stages' || c.stage === stageFilter;
+                
+                let matchesExp = true;
+                if (expFilter !== 'All experience') {
+                    matchesExp = c.experienceYears === expFilter;
+                }
+
+                if (!matchesQuery || !matchesStage || !matchesExp) return;
+
+                visibleCount++;
+
+                // Append card to Kanban column
+                const colArea = document.getElementById('area-' + getStageKey(c.stage));
+                if (colArea) {
+                    const card = document.createElement('div');
+                    card.className = 'kanban-card';
+                    card.setAttribute('onclick', `selectCandidate(${c.id})`);
+                    card.innerHTML = `
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="avatar-circle">${c.firstName[0]}${c.lastName[0]}</div>
+                            <div>
+                                <div class="fw-bold small text-dark">${c.firstName} ${c.lastName}</div>
+                                <div class="text-muted" style="font-size:0.7rem;">Applied ${c.experienceYears} ago</div>
+                            </div>
+                        </div>
+                        <div class="text-muted small">${c.currentCompany || 'Freelancer'}</div>
+                    `;
+                    colArea.appendChild(card);
+                    
+                    const countBadge = document.getElementById('count-' + getStageKey(c.stage));
+                    countBadge.textContent = parseInt(countBadge.textContent) + 1;
+                }
+
+                // Append row to Table
+                const tr = document.createElement('tr');
+                tr.setAttribute('onclick', `selectCandidate(${c.id})`);
+                tr.innerHTML = `
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="avatar-circle">${c.firstName[0]}${c.lastName[0]}</div>
+                            <div>
+                                <div class="fw-bold text-dark">${c.firstName} ${c.lastName}</div>
+                                <div class="text-muted small">${c.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${c.experienceYears || '-'}</td>
+                    <td>${c.currentCompany || '-'}</td>
+                    <td><span class="badge bg-primary-subtle text-primary fw-bold">${c.stage}</span></td>
+                    <td>20 June, 2026</td>
+                    <td>${c.nextStep || 'HR Interview'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
+                        <button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('applicants-list-header').textContent = `All Applicants (${visibleCount})`;
+        }
+
+        function getStageKey(stage) {
+            if (stage.includes("Screen")) return "Screening";
+            if (stage.includes("Tech")) return "Tech";
+            if (stage.includes("HR")) return "HR";
+            if (stage.includes("Offer")) return "Offer";
+            return "Screening";
+        }
+
+        function selectCandidate(id) {
+            const c = candidatesData.find(cand => String(cand.id) === String(id));
+            if (!c) return;
+
+            document.getElementById('drawerCandInitial').textContent = c.firstName[0] + c.lastName[0];
+            document.getElementById('drawerCandName').textContent = c.firstName + ' ' + c.lastName;
+            document.getElementById('drawerCandStage').textContent = c.stage;
+            document.getElementById('drawerCandEmail').textContent = c.email;
+            document.getElementById('drawerCandPhone').textContent = c.countryCode + ' ' + c.mobileNumber;
+            document.getElementById('drawerCandHometown').textContent = c.hometown || 'Bangalore, India';
+            document.getElementById('drawerCandCompany').textContent = c.currentCompany || 'Tech Solutions';
+            document.getElementById('drawerCandCurrentRole').textContent = c.currentRole || 'Frontend Developer';
+            document.getElementById('drawerCandExp').textContent = c.experienceYears || '2 Years';
+
+            // Configure advance stage button
+            const nextStageVal = getNextStage(c.stage);
+            document.getElementById('advanceCandIdVal').value = c.id;
+            document.getElementById('advanceCandStageVal').value = nextStageVal;
+            
+            const advBtn = document.getElementById('advanceStageBtn');
+            if (nextStageVal) {
+                advBtn.textContent = 'Move to ' + nextStageVal;
+                advBtn.parentElement.style.display = '';
+            } else {
+                advBtn.parentElement.style.display = 'none'; // reached offer stage
+            }
+
+            document.getElementById('rejectCandIdVal').value = c.id;
+
+            // Show drawer
+            document.getElementById('candidate-table-col').className = 'col-md-8';
+            document.getElementById('candidate-detail-col').classList.remove('d-none');
+        }
+
+        function getNextStage(current) {
+            if ("Screening" === current) return "Tech Interview";
+            if ("Tech Interview" === current) return "HR Interview";
+            if ("HR Interview" === current) return "Offer";
+            return null;
+        }
+
+        function closeCandidateDrawer() {
+            document.getElementById('candidate-detail-col').classList.add('d-none');
+            document.getElementById('candidate-table-col').className = 'col-md-12';
+        }
+
+        function filterCandidates() {
+            onCandidateJobChanged();
+        }
+
+        // --- REFERRALS FILTERING ---
+        function filterReferrals() {
+            const query = document.getElementById('refSearchInput').value.toLowerCase();
+            const date = document.getElementById('refDateFilter').value;
+            const role = document.getElementById('refRoleFilter').value;
+            const status = document.getElementById('refStatusFilter').value;
+
+            const rows = document.querySelectorAll('#referralsTable tbody tr');
+            rows.forEach(row => {
+                const name = row.getAttribute('data-name').toLowerCase();
+                const rRole = row.getAttribute('data-role');
+                const rStatus = row.getAttribute('data-status');
+
+                const matchesQuery = !query || name.includes(query);
+                const matchesRole = role === 'All roles' || rRole === role;
+                const matchesStatus = status === 'All status' || rStatus === status;
+
+                if (matchesQuery && matchesRole && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // --- PAGE INITIALIZATION ---
+        document.addEventListener("DOMContentLoaded", function() {
+            // Activate tab from URL query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab');
+            if (tab) {
+                const tabButton = document.getElementById(tab + '-tab');
+                if (tabButton) {
+                    const tabObj = new bootstrap.Tab(tabButton);
+                    tabObj.show();
+                }
+            }
+
+            // Initialize Candidate dropdown change
+            onCandidateJobChanged();
+        });
+    </script>
+
+    <!-- Referral Preview Modal -->
+    <div class="modal fade" id="referralPreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light border-bottom-0">
+                    <h5 class="modal-title fw-bold text-primary"><i class="fas fa-user-circle me-2"></i>Referral Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-semibold text-uppercase mb-1">Candidate Name</label>
+                            <div class="fw-bold text-dark fs-6" id="previewCandName"></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-semibold text-uppercase mb-1">Email</label>
+                            <div class="fw-bold text-dark fs-6 text-break" id="previewCandEmail"></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-semibold text-uppercase mb-1">Applied Role</label>
+                            <div class="fw-bold text-dark fs-6" id="previewCandRole"></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-semibold text-uppercase mb-1">Status</label>
+                            <div><span class="badge bg-primary px-3 py-2 rounded-pill" id="previewCandStatus"></span></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-semibold text-uppercase mb-1">Referred By</label>
+                            <div class="fw-bold text-dark fs-6" id="previewReferredBy"></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-semibold text-uppercase mb-1">Relation</label>
+                            <div class="fw-bold text-dark fs-6" id="previewRelation"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 bg-light">
+                    <button type="button" class="btn btn-secondary px-4 fw-bold" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function previewReferral(id) {
+            fetch(`/senior_hr/api/referrals/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('previewCandName').innerText = (data.firstName || '') + ' ' + (data.lastName || '');
+                    document.getElementById('previewCandEmail').innerText = data.email || '-';
+                    document.getElementById('previewCandRole').innerText = data.jobPosting ? data.jobPosting.title : '-';
+                    
+                    const statusBadge = document.getElementById('previewCandStatus');
+                    statusBadge.innerText = data.status || '-';
+                    if(data.status === 'HIRED') {
+                        statusBadge.className = 'badge bg-success px-3 py-2 rounded-pill';
+                    } else if (data.status === 'REJECTED') {
+                        statusBadge.className = 'badge bg-danger px-3 py-2 rounded-pill';
+                    } else {
+                        statusBadge.className = 'badge bg-primary px-3 py-2 rounded-pill';
+                    }
+                    
+                    document.getElementById('previewReferredBy').innerText = data.referredBy ? data.referredBy.fullName : '-';
+                    document.getElementById('previewRelation').innerText = data.relationship || '-';
+                    
+                    new bootstrap.Modal(document.getElementById('referralPreviewModal')).show();
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Error loading referral details.");
+                });
+        }
+
+        function deleteReferral(id) {
+            if(confirm("Are you sure you want to delete this referral? This action cannot be undone.")) {
+                fetch(`/senior_hr/api/referrals/${id}`, { method: 'DELETE' })
+                    .then(res => {
+                        if(res.ok) {
+                            window.location.reload();
+                        } else {
+                            alert("Failed to delete referral.");
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Error deleting referral.");
+                    });
+            }
+        }
+    </script>
+</body>
+</html>

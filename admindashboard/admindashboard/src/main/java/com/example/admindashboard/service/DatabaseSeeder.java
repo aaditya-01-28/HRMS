@@ -69,6 +69,28 @@ public class DatabaseSeeder implements CommandLineRunner {
             System.out.println("⚡ Legacy role column is already patched or removed.");
         }
 
+        try {
+            System.out.println("🛠️ Adding missing recruitment columns to database...");
+            jdbcTemplate.execute("ALTER TABLE referrals ADD COLUMN IF NOT EXISTS candidate_current_role VARCHAR(255)");
+            jdbcTemplate.execute("ALTER TABLE referrals ADD COLUMN IF NOT EXISTS current_company VARCHAR(255)");
+            jdbcTemplate.execute("ALTER TABLE referrals ADD COLUMN IF NOT EXISTS experience_years VARCHAR(255)");
+            jdbcTemplate.execute("ALTER TABLE referrals ADD COLUMN IF NOT EXISTS next_step VARCHAR(255)");
+            jdbcTemplate.execute("ALTER TABLE referrals ADD COLUMN IF NOT EXISTS hometown VARCHAR(255)");
+            jdbcTemplate.execute("ALTER TABLE referrals ADD COLUMN IF NOT EXISTS stage VARCHAR(255)");
+
+            jdbcTemplate.execute("ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS job_type VARCHAR(255)");
+            jdbcTemplate.execute("ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS no_of_openings INTEGER");
+            jdbcTemplate.execute("ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS job_responsibility TEXT");
+            jdbcTemplate.execute("ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS notice_period VARCHAR(255)");
+            jdbcTemplate.execute("ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS ctc_range VARCHAR(255)");
+            jdbcTemplate.execute("ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS application_deadline DATE");
+            jdbcTemplate.execute("ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS start_time VARCHAR(255)");
+            jdbcTemplate.execute("ALTER TABLE job_postings ADD COLUMN IF NOT EXISTS end_time VARCHAR(255)");
+            System.out.println("✅ Recruitment columns successfully created.");
+        } catch (Exception e) {
+            System.out.println("⚡ Error adding recruitment columns: " + e.getMessage());
+        }
+
         // 0. ENSURE ROLES EXIST FIRST
         Role adminRole = getOrCreateRole("ADMIN");
         Role employeeRole = getOrCreateRole("EMPLOYEE");

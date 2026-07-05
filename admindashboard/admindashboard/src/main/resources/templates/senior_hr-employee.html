@@ -248,7 +248,9 @@
 <a class="nav-link-item" href="/senior_hr/payroll"><i class="fas fa-money-check-alt"></i> Payroll</a>
 <a class="nav-link-item" href="/senior_hr/attendance"><i class="fas fa-clock"></i> Attendance</a>
 <a class="nav-link-item" href="/senior_hr/performance"><i class="fas fa-chart-line"></i> Performance</a>
-<a class="nav-link-item" href="#" onclick="alert('Recruitment Module Under Development')"><i class="fas fa-user-plus"></i> Recruitment</a>
+<a class="nav-link-item" href="/senior_hr/recruitment"><i class="fas fa-user-plus"></i> Recruitment</a>
+<a class="nav-link-item" href="/senior_hr/organization"><i class="fas fa-sitemap text-muted"></i> Organization Structure</a>
+<a class="nav-link-item" href="/senior_hr/reports"><i class="fas fa-file-alt text-muted"></i> Reports</a>
 </div>
 </div>
 <!-- GLOBAL NAVBAR -->
@@ -661,7 +663,15 @@
 </div>
 <div class="col-md-3">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">DOB <span class="text-danger">*</span></label>
-<input class="form-control" name="dob" type="date"/>
+<input class="form-control" name="dob" id="dobInput" type="date"/>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dobInput = document.getElementById('dobInput');
+        if(dobInput) {
+            dobInput.max = new Date().toISOString().split('T')[0];
+        }
+    });
+</script>
 </div>
 <div class="col-md-3">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Gender <span class="text-danger">*</span></label>
@@ -1756,6 +1766,26 @@
                 }
                 pInput.value = p;
             });
+        }
+
+        // Restrict probation dates to not be before the joining date
+        const joinDateInput = document.getElementById('joinDate');
+        const probCompletionInput = document.getElementById('probationCompletionDate');
+        const confirmDateInput = document.querySelector('input[name="dateOfConfirmation"]');
+        const reviewDateInput = document.querySelector('input[name="probationReviewDate"]');
+        
+        function updateMinDates() {
+            if(joinDateInput && joinDateInput.value) {
+                if(probCompletionInput) probCompletionInput.min = joinDateInput.value;
+                if(confirmDateInput) confirmDateInput.min = joinDateInput.value;
+                if(reviewDateInput) reviewDateInput.min = joinDateInput.value;
+            }
+        }
+
+        if(joinDateInput) {
+            joinDateInput.addEventListener('change', updateMinDates);
+            // Run once on load to set initial mins if joinDate is already filled
+            updateMinDates();
         }
     });
 

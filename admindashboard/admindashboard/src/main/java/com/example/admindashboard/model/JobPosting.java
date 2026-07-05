@@ -35,6 +35,19 @@ public class JobPosting {
     private LocalDate postingDate;
     private boolean isActive = true;
 
+    // Added fields for complete recruitment form details
+    private String jobType;
+    private Integer noOfOpenings;
+    
+    @Column(columnDefinition = "TEXT")
+    private String jobResponsibility;
+    
+    private String noticePeriod;
+    private String ctcRange;
+    private LocalDate applicationDeadline;
+    private String startTime;
+    private String endTime;
+
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -62,4 +75,21 @@ public class JobPosting {
     public void setPostingDate(LocalDate postingDate) { this.postingDate = postingDate; }
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
+
+    public String getJobType() { return jobType; }
+    public void setJobType(String jobType) { this.jobType = jobType; }
+    public Integer getNoOfOpenings() { return noOfOpenings; }
+    public void setNoOfOpenings(Integer noOfOpenings) { this.noOfOpenings = noOfOpenings; }
+    public String getJobResponsibility() { return jobResponsibility; }
+    public void setJobResponsibility(String jobResponsibility) { this.jobResponsibility = jobResponsibility; }
+    public String getNoticePeriod() { return noticePeriod; }
+    public void setNoticePeriod(String noticePeriod) { this.noticePeriod = noticePeriod; }
+    public String getCtcRange() { return ctcRange; }
+    public void setCtcRange(String ctcRange) { this.ctcRange = ctcRange; }
+    public LocalDate getApplicationDeadline() { return applicationDeadline; }
+    public void setApplicationDeadline(LocalDate applicationDeadline) { this.applicationDeadline = applicationDeadline; }
+    public String getStartTime() { return startTime; }
+    public void setStartTime(String startTime) { this.startTime = startTime; }
+    public String getEndTime() { return endTime; }
+    public void setEndTime(String endTime) { this.endTime = endTime; }
 }
