@@ -6,10 +6,10 @@
     <title>WhiteCircle | HR Admin - Policy & Compliance</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-light: #eff6ff;
+            --primary: #002D72;
             --sidebar-width: 220px;
             --header-height: 70px;
         }
@@ -21,95 +21,82 @@
             font-family: Arial, sans-serif;
         }
 
-        /* --- SIDEBAR --- */
+        /* Dashboard Header */
+        .dashboard-header {
+            height: var(--header-height);
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: var(--sidebar-width);
+            z-index: 1000;
+        }
+
+        /* Sidebar */
         .myspace-sidebar {
             width: var(--sidebar-width);
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
             background: white;
-            border-right: 1px solid #e0e0e0;
-            display: flex;
-            flex-direction: column;
-            z-index: 1051;
-            transition: transform 0.3s ease;
+            border-right: 1px solid #e2e8f0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 1010;
         }
-        body.sidebar-toggled .myspace-sidebar { transform: translateX(-100%); }
-
-        .myspace-sidebar .brand-area {
-            padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
+        .sidebar-brand {
+            height: var(--header-height);
             display: flex;
             align-items: center;
-            gap: 10px;
-            height: var(--header-height);
+            padding: 0 24px;
+            border-bottom: 1px solid #e2e8f0;
         }
-        .myspace-sidebar .brand-area img {
-            width: 40px;
-            height: 40px;
+        .sidebar-brand img {
+            width: 32px;
+            height: 32px;
             border-radius: 4px;
         }
-        .myspace-sidebar .brand-area .brand-text {
-            font-size: 0.9rem;
+        .brand-text {
+            margin-left: 12px;
+        }
+        .brand-text .company-name {
             font-weight: 700;
-            color: #1e293b;
-            line-height: 1.2;
+            color: #0f172a;
+            font-size: 16px;
         }
-        .myspace-sidebar .brand-area .brand-sub {
-            font-size: 0.75rem;
+        .brand-text .portal-name {
+            font-size: 12px;
             color: #64748b;
-            font-weight: 400;
         }
-
-        .myspace-sidebar .nav-links {
-            padding: 15px 0;
-            flex: 1;
+        .nav-menu {
+            padding: 16px 0;
         }
-        .myspace-sidebar .nav-link-item {
+        .nav-link-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
+            padding: 12px 24px;
             color: #475569;
             text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 600;
             transition: all 0.2s;
             border-left: 3px solid transparent;
         }
-        .myspace-sidebar .nav-link-item:hover {
+        .nav-link-item:hover {
             background: #f1f5f9;
             color: var(--primary);
         }
-        .myspace-sidebar .nav-link-item.active {
+        .nav-link-item.active {
             background: var(--primary);
             color: white;
             border-left-color: var(--primary);
         }
-        .myspace-sidebar .nav-link-item i {
+        .nav-link-item i {
             width: 20px;
-            text-align: center;
-            font-size: 1rem;
-        }
-
-        /* --- GLOBAL NAVBAR --- */
-        .top-navbar {
-            position: fixed; top: 0; left: var(--sidebar-width); right: 0;
-            height: var(--header-height);
-            background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 30px;
-            z-index: 1050;
-            transition: left 0.3s ease;
-        }
-        body.sidebar-toggled .top-navbar { left: 0; }
-        
-        .nav-brand {
-            display: flex; align-items: center; gap: 15px;
-            font-size: 1.4rem; font-weight: 800; color: #1e293b;
-            letter-spacing: -0.5px;
+            margin-right: 12px;
+            font-size: 18px;
         }
 
         /* --- MAIN CONTENT AREA --- */
@@ -118,9 +105,7 @@
             margin-top: var(--header-height);
             padding: 20px 30px;
             min-height: calc(100vh - var(--header-height));
-            transition: margin-left 0.3s ease;
         }
-        body.sidebar-toggled .myspace-main { margin-left: 0; }
 
         /* --- NAV TABS --- */
         .custom-tabs {
@@ -308,42 +293,55 @@
 <body>
 
     <!-- SIDEBAR -->
-    <div class="myspace-sidebar shadow-sm">
-        <div class="brand-area">
-            <img src="/images/wcg-logo.jpg" alt="Logo">
-            <div>
-                <div class="brand-text">WhiteCircle</div>
-                <div class="brand-sub">HR Admin</div>
+    <div class="myspace-sidebar">
+        <div class="sidebar-brand">
+            <img src="/images/whitecircle_logo.png" alt="WhiteCircle" onerror="this.src='https://ui-avatars.com/api/?name=W+C&background=0f172a&color=fff'">
+            <div class="brand-text">
+                <div class="company-name">WhiteCircle</div>
+                <div class="portal-name">HR Admin</div>
             </div>
         </div>
-        <div class="nav-links">
-            <a href="/senior_hr/dashboard" class="nav-link-item"><i class="fas fa-th-large text-muted"></i> Dashboard</a>
-            <a href="/senior_hr/employee" class="nav-link-item"><i class="fas fa-users text-muted"></i> Employee</a>
-            <a href="/senior_hr/lms" class="nav-link-item"><i class="fas fa-graduation-cap text-muted"></i> LMS</a>
-            <a href="/senior_hr/payroll" class="nav-link-item"><i class="fas fa-money-check-alt text-muted"></i> Payroll</a>
-            <a href="/senior_hr/attendance" class="nav-link-item"><i class="fas fa-clock text-muted"></i> Attendance</a>
-            <a href="/senior_hr/performance" class="nav-link-item"><i class="fas fa-chart-line text-muted"></i> Performance</a>
-            <a href="#" class="nav-link-item"><i class="fas fa-user-plus text-muted"></i> Recruitment</a>
-            <a href="#" class="nav-link-item"><i class="fas fa-file-alt text-muted"></i> Reports</a>
-            <a href="/senior_hr/roles" class="nav-link-item"><i class="fas fa-shield-alt text-muted"></i> Role & Permission</a>
-            <a href="/senior_hr/policies" class="nav-link-item active"><i class="fas fa-file-contract"></i> Policy & Compliance</a>
-            <a href="/senior_hr/organization" class="nav-link-item"><i class="fas fa-sitemap text-muted"></i> Organization Structure</a>
+        <div class="nav-menu">
+            <a href="/senior_hr/employee" class="nav-link-item">
+                <i class="fa-solid fa-users"></i> Employee
+            </a>
+            <a href="/senior_hr/lms" class="nav-link-item">
+                <i class="fa-solid fa-graduation-cap"></i> LMS
+            </a>
+            <a href="/senior_hr/payroll" class="nav-link-item">
+                <i class="fa-solid fa-money-check-dollar"></i> Payroll
+            </a>
+            <a href="/senior_hr/attendance" class="nav-link-item">
+                <i class="fa-solid fa-clock"></i> Attendance
+            </a>
+            <a href="/senior_hr/performance" class="nav-link-item">
+                <i class="fa-solid fa-chart-line"></i> Performance
+            </a>
+            <a href="/senior_hr/recruitment" class="nav-link-item">
+                <i class="fa-solid fa-user-plus"></i> Recruitment
+            </a>
+            <a href="/senior_hr/organization" class="nav-link-item">
+                <i class="fa-solid fa-sitemap"></i> Organization Structure
+            </a>
             <a href="/senior_hr/roles" class="nav-link-item">
                 <i class="fa-solid fa-user-shield"></i> Role &amp; Permission
             </a>
-            <a href="/senior_hr/reports" class="nav-link-item"><i class="fas fa-file-alt text-muted"></i> Reports</a>
+            <a href="/senior_hr/policies" class="nav-link-item active">
+                <i class="fa-solid fa-file-contract"></i> Policy &amp; Compliance
+            </a>
+            <a href="/senior_hr/reports" class="nav-link-item">
+                <i class="fa-solid fa-file-invoice"></i> Reports
+            </a>
         </div>
     </div>
 
-    <!-- GLOBAL NAVBAR -->
-    <nav class="top-navbar">
-        <div class="nav-brand">
-            <div class="d-flex flex-column lh-1">
-                <span style="color: #1e3a8a; font-weight: 700; font-size: 1.2rem;">WhiteCircle Group - Shahdol</span>
-                <span style="font-size: 0.85rem; font-weight: 500; color: #64748b; margin-top: 4px;">HR MANAGEMENT SYSTEM</span>
-            </div>
+    <!-- HEADER -->
+    <div class="dashboard-header">
+        <h5 class="m-0 fw-bold" style="color: #0f172a;">Policy &amp; Compliance</h5>
+        <div class="d-flex align-items-center">
+            <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
         </div>
-    </nav>
+    </div>
 
     <!-- MAIN CONTENT -->
     <div class="myspace-main">
@@ -646,9 +644,10 @@
                         </div>
                     </div>
                     <div class="col-md-3 p-4">
-                        <div class="fw-bold mb-4" style="color: #1e3a8a; font-size: 1.1rem;">Compliance Status Overview</div>
-                        <div class="chart-container" style="background: conic-gradient(#16a34a 0% 62.5%, #ea580c 62.5% 87.5%, #ef4444 87.5% 100%); border-radius: 50%;">
-                            <div class="donut-hole">
+                        <div class="fw-bold mb-4" style="color: #002D72; font-size: 1.1rem;">Compliance Status Overview</div>
+                        <div class="chart-container" style="position: relative; width: 180px; height: 180px; margin: 0 auto;">
+                            <canvas id="complianceDonutChart"></canvas>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
                                 <div class="fw-bold" style="font-size: 1.5rem;" th:text="${totalCompliances}">8</div>
                                 <div class="text-muted" style="font-size: 0.7rem;">Total</div>
                             </div>
@@ -840,7 +839,13 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const compliantCount = /*[[${compliantCount}]]*/ 5;
+        const dueSoonCount = /*[[${dueSoonCount}]]*/ 2;
+        const overdueCount = /*[[${overdueCount}]]*/ 1;
+        /*]]>*/
+
         function showCreatePolicy() {
             document.getElementById('page-header').style.display = 'none';
             document.getElementById('policyTabsContent').style.display = 'none';
@@ -851,6 +856,127 @@
             document.getElementById('page-header').style.display = 'block';
             document.getElementById('policyTabsContent').style.display = 'block';
             document.getElementById('create-policy-view').style.display = 'none';
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Initialize Compliance Donut Chart
+            const ctx = document.getElementById('complianceDonutChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Compliant', 'Due Soon', 'Overdue'],
+                        datasets: [{
+                            data: [compliantCount, dueSoonCount, overdueCount],
+                            backgroundColor: ['#16a34a', '#ea580c', '#ef4444'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        cutout: '75%'
+                    }
+                });
+            }
+
+            // 2. Client-side search and category filtering for Policies table
+            const searchInput = document.querySelector('.search-input');
+            const categorySelect = document.querySelector('.card-header-custom select');
+            const tableRows = document.querySelectorAll('.table-custom tbody tr');
+
+            function filterPolicies() {
+                const query = searchInput.value.toLowerCase().trim();
+                const category = categorySelect.value;
+
+                tableRows.forEach(row => {
+                    const title = row.querySelector('td:first-child').innerText.toLowerCase();
+                    const cat = row.querySelector('td:nth-child(2)').innerText;
+                    
+                    const matchQuery = title.includes(query);
+                    const matchCategory = (category === 'All Categories' || cat === category);
+
+                    if (matchQuery && matchCategory) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+
+            if (searchInput) searchInput.addEventListener('input', filterPolicies);
+            if (categorySelect) categorySelect.addEventListener('change', filterPolicies);
+
+            // Populate category select options dynamically from existing categories
+            if (categorySelect) {
+                const categories = new Set();
+                tableRows.forEach(row => {
+                    const cat = row.querySelector('td:nth-child(2)').innerText;
+                    if (cat) categories.add(cat);
+                });
+                categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat;
+                    opt.innerText = cat;
+                    categorySelect.appendChild(opt);
+                });
+            }
+        });
+
+        // 3. Form Submission
+        async function savePolicy() {
+            const title = document.querySelector('#create-policy-view input[placeholder*="title"]').value;
+            const category = document.querySelector('#create-policy-view select').value;
+            const code = document.querySelector('#create-policy-view input[placeholder*="code"]').value;
+            const effectiveFrom = document.querySelector('#create-policy-view input[type="date"]:first-of-type').value;
+            const reviewDate = document.querySelector('#create-policy-view input[type="date"]:last-of-type').value;
+            const desc = document.querySelector('#create-policy-view textarea').value;
+            const appliesToVal = document.querySelector('input[name="appliesTo"]:checked').nextElementSibling.innerText;
+            const priority = document.querySelector('#create-policy-view select:last-of-type').value;
+            const status = document.querySelector('.toggle-switch input').checked ? 'Active' : 'Draft';
+
+            if (!title || !code || !effectiveFrom || !reviewDate || !desc) {
+                alert('Please fill out all required fields.');
+                return;
+            }
+
+            const payload = {
+                policyTitle: title,
+                policyCategory: category,
+                policyCode: code,
+                effectiveFrom: effectiveFrom,
+                reviewDate: reviewDate,
+                shortDescription: desc,
+                appliesTo: appliesToVal,
+                priority: priority,
+                status: status
+            };
+
+            try {
+                const response = await fetch('/senior_hr/api/policies', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('Policy saved successfully!');
+                    window.location.reload();
+                } else {
+                    alert('Failed to save policy: ' + result.message);
+                }
+            } catch (err) {
+                alert('Error saving policy');
+            }
+        }
+
+        // Attach event handler to Save Policy button
+        const saveButton = document.querySelector('#create-policy-view button.btn-primary');
+        if (saveButton) {
+            saveButton.addEventListener('click', savePolicy);
         }
     </script>
 </body>

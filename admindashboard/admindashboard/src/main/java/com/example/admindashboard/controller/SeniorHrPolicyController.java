@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -153,5 +156,40 @@ public class SeniorHrPolicyController {
         a2.setAuditDate(LocalDate.of(2026, 7, 10));
         a2.setStatus("Upcoming");
         auditRepository.save(a2);
+    }
+
+    @PostMapping("/senior_hr/api/policies")
+    @ResponseBody
+    public java.util.Map<String, Object> createPolicyRest(@RequestBody java.util.Map<String, Object> payload) {
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        try {
+            CompanyPolicy policy = new CompanyPolicy();
+            policy.setPolicyTitle((String) payload.get("policyTitle"));
+            policy.setPolicyCategory((String) payload.get("policyCategory"));
+            policy.setPolicyCode((String) payload.get("policyCode"));
+            
+            String effFromStr = (String) payload.get("effectiveFrom");
+            if (effFromStr != null && !effFromStr.isEmpty()) {
+                policy.setEffectiveFrom(LocalDate.parse(effFromStr));
+            }
+            
+            String revDateStr = (String) payload.get("reviewDate");
+            if (revDateStr != null && !revDateStr.isEmpty()) {
+                policy.setReviewDate(LocalDate.parse(revDateStr));
+            }
+            
+            policy.setShortDescription((String) payload.get("shortDescription"));
+            policy.setAppliesTo((String) payload.get("appliesTo"));
+            policy.setPriority((String) payload.get("priority"));
+            policy.setStatus((String) payload.get("status"));
+            policy.setLastUpdated(LocalDateTime.now());
+
+            policyRepository.save(policy);
+            response.put("success", true);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+        }
+        return response;
     }
 }
