@@ -58,6 +58,35 @@ public class User {
     @JsonIgnore
     private ThanksWallet thanksWallet;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonIgnore
+    private java.util.List<EmployeeRoleAssignment> roleAssignments = new java.util.ArrayList<>();
+
+    // Helper method to get all aggregated permissions for this user (Option A)
+    @Transient
+    public java.util.Set<Permission> getAggregatedPermissions() {
+        java.util.Set<Permission> allPerms = new java.util.HashSet<>();
+        // Add primary role permissions
+        if (this.role != null && this.role.getPermissions() != null) {
+            allPerms.addAll(this.role.getPermissions());
+        }
+        // Add all active assignment permissions
+        if (this.roleAssignments != null) {
+            for (EmployeeRoleAssignment assignment : this.roleAssignments) {
+                if ("Active".equalsIgnoreCase(assignment.getStatus()) && 
+                    (assignment.getEffectiveFrom() == null || !java.time.LocalDate.now().isBefore(assignment.getEffectiveFrom()))) {
+                    if (assignment.getRole() != null && assignment.getRole().getPermissions() != null) {
+                        allPerms.addAll(assignment.getRole().getPermissions());
+                    }
+                }
+            }
+        }
+        return allPerms;
+    }
+
+    public java.util.List<EmployeeRoleAssignment> getRoleAssignments() { return roleAssignments; }
+    public void setRoleAssignments(java.util.List<EmployeeRoleAssignment> roleAssignments) { this.roleAssignments = roleAssignments; }
+
     public ThanksWallet getThanksWallet() { return thanksWallet; }
     public void setThanksWallet(ThanksWallet thanksWallet) { this.thanksWallet = thanksWallet; }
 

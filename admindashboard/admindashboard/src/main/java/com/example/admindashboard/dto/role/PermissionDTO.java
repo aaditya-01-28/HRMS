@@ -1,42 +1,28 @@
-package com.example.admindashboard.model;
+package com.example.admindashboard.dto.role;
 
-import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-@Entity
-@Table(name = "permissions")
-public class Permission {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class PermissionDTO {
     private Long id;
-
-    @Column(nullable = false, unique = true)
     private String permissionName;
-
     private String module;
-
     private String accessLevel;
 
-    @ManyToMany(mappedBy = "permissions")
-    @JsonIgnore
-    private Set<Role> roles = new HashSet<>();
+    // Constructors
+    public PermissionDTO() {}
+
+    public PermissionDTO(Long id, String permissionName, String module, String accessLevel) {
+        this.id = id;
+        this.permissionName = permissionName;
+        this.module = module;
+        this.accessLevel = accessLevel;
+    }
 
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
     public String getPermissionName() { return permissionName; }
     public void setPermissionName(String permissionName) { this.permissionName = permissionName; }
-
-    public Set<Role> getRoles() { return roles; }
-    public void setRoles(Set<Role> roles) { this.roles = roles; }
-
     public String getModule() { return module; }
     public void setModule(String module) { this.module = module; }
-
     public String getAccessLevel() { return accessLevel; }
     public void setAccessLevel(String accessLevel) { this.accessLevel = accessLevel; }
 }

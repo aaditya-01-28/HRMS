@@ -35,9 +35,10 @@ public class CustomUserDetailsService implements UserDetailsService {
             String cleanRole = user.getRole().getRoleName().replace("ROLE_", "").toUpperCase().trim();
             authorities.add(new SimpleGrantedAuthority("ROLE_" + cleanRole));
 
-            // 2. Add all granular permissions attached to this Role
-            if (user.getRole().getPermissions() != null) {
-                for (Permission permission : user.getRole().getPermissions()) {
+            // 2. Add all granular permissions from the primary role and all active assignments
+            java.util.Set<Permission> aggregatedPerms = user.getAggregatedPermissions();
+            if (aggregatedPerms != null) {
+                for (Permission permission : aggregatedPerms) {
                     authorities.add(new SimpleGrantedAuthority(permission.getPermissionName()));
                 }
             }

@@ -1,72 +1,42 @@
-package com.example.admindashboard.model;
+package com.example.admindashboard.dto.role;
 
-import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.List;
 
-@Entity
-@Table(name = "roles")
-public class Role {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class RoleDTO {
     private Long id;
-
-    @Column(nullable = false, unique = true)
     private String roleName;
-
-    @Column(unique = true)
     private String roleCode;
-
     private String description;
-
     private String category;
-
-    private String roleType = "System Role";
-
-    private String status = "Active";
-
-    private java.time.LocalDate createdOn = java.time.LocalDate.now();
-
+    private String roleType;
+    private String status;
+    private int usersCount;
+    private LocalDate createdOn;
     private String createdBy;
-
-    // This creates the role_permissions joining table!
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "role_permissions",
-            joinColumns = @JoinColumn(name = "role_id"),
-            inverseJoinColumns = @JoinColumn(name = "permission_id")
-    )
-    private Set<Permission> permissions = new HashSet<>();
+    private List<PermissionDTO> permissions;
 
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
     public String getRoleName() { return roleName; }
     public void setRoleName(String roleName) { this.roleName = roleName; }
-
-    public Set<Permission> getPermissions() { return permissions; }
-    public void setPermissions(Set<Permission> permissions) { this.permissions = permissions; }
-
     public String getRoleCode() { return roleCode; }
     public void setRoleCode(String roleCode) { this.roleCode = roleCode; }
-
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
-
     public String getRoleType() { return roleType; }
     public void setRoleType(String roleType) { this.roleType = roleType; }
-
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
-
-    public java.time.LocalDate getCreatedOn() { return createdOn; }
-    public void setCreatedOn(java.time.LocalDate createdOn) { this.createdOn = createdOn; }
-
+    public int getUsersCount() { return usersCount; }
+    public void setUsersCount(int usersCount) { this.usersCount = usersCount; }
+    public LocalDate getCreatedOn() { return createdOn; }
+    public void setCreatedOn(LocalDate createdOn) { this.createdOn = createdOn; }
     public String getCreatedBy() { return createdBy; }
     public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
+    public List<PermissionDTO> getPermissions() { return permissions; }
+    public void setPermissions(List<PermissionDTO> permissions) { this.permissions = permissions; }
 }

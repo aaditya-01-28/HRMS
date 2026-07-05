@@ -1405,7 +1405,7 @@ public class DashboardController {
 
             boolean isRoleUser =
                     currentUser.getRole() != null &&
-                    currentUser.getRole().getPermissions().stream()
+                    currentUser.getAggregatedPermissions().stream()
                             .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()));
 
             if (isRoleUser) {
@@ -1659,7 +1659,7 @@ public class DashboardController {
     	    String backUrl = "/ticket-dashboard?dept=" + dept;
 
     	    if (currentUser.getRole() != null &&
-    	        currentUser.getRole().getPermissions().stream()
+    	        currentUser.getAggregatedPermissions().stream()
     	            .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()))) {
 
     	        backUrl = "/role-ticket-dashboard?dept=" + dept;
@@ -1671,7 +1671,7 @@ public class DashboardController {
 
     	    boolean isRoleUser =
     	            currentUser.getRole() != null &&
-    	            currentUser.getRole().getPermissions().stream()
+    	            currentUser.getAggregatedPermissions().stream()
     	                    .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()));
 
     	    model.addAttribute("isRoleUser", isRoleUser);
@@ -1742,7 +1742,7 @@ public class DashboardController {
     	    String backUrl = "/ticket-dashboard?dept=" + dept;
 
     	    if (currentUser.getRole() != null &&
-    	        currentUser.getRole().getPermissions().stream()
+    	        currentUser.getAggregatedPermissions().stream()
     	            .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()))) {
 
     	        backUrl = "/role-ticket-dashboard?dept=" + dept;
@@ -1754,7 +1754,7 @@ public class DashboardController {
 
     	    boolean isRoleUser =
     	            currentUser.getRole() != null &&
-    	            currentUser.getRole().getPermissions().stream()
+    	            currentUser.getAggregatedPermissions().stream()
     	                    .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()));
 
     	    model.addAttribute("isRoleUser", isRoleUser);
@@ -1822,7 +1822,7 @@ public class DashboardController {
     	    String backUrl = "/ticket-dashboard?dept=" + dept;
 
     	    if (currentUser.getRole() != null &&
-    	        currentUser.getRole().getPermissions().stream()
+    	        currentUser.getAggregatedPermissions().stream()
     	            .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()))) {
 
     	        backUrl = "/role-ticket-dashboard?dept=" + dept;
@@ -1834,7 +1834,7 @@ public class DashboardController {
 
     	    boolean isRoleUser =
     	            currentUser.getRole() != null &&
-    	            currentUser.getRole().getPermissions().stream()
+    	            currentUser.getAggregatedPermissions().stream()
     	                    .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()));
 
     	    model.addAttribute("isRoleUser", isRoleUser);
@@ -1904,7 +1904,7 @@ public class DashboardController {
     	    String backUrl = "/ticket-dashboard?dept=" + dept;
 
     	    if (currentUser.getRole() != null &&
-    	        currentUser.getRole().getPermissions().stream()
+    	        currentUser.getAggregatedPermissions().stream()
     	            .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()))) {
 
     	        backUrl = "/role-ticket-dashboard?dept=" + dept;
@@ -1916,7 +1916,7 @@ public class DashboardController {
 
     	    boolean isRoleUser =
     	            currentUser.getRole() != null &&
-    	            currentUser.getRole().getPermissions().stream()
+    	            currentUser.getAggregatedPermissions().stream()
     	                    .anyMatch(p -> "admin_dashboard_view".equals(p.getPermissionName()));
 
     	    model.addAttribute("isRoleUser", isRoleUser);
