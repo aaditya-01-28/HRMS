@@ -18,21 +18,14 @@
             margin: 0;
             font-family: Arial, sans-serif;
         }
-        /* Dashboard Header */
-        .dashboard-header {
-            height: var(--header-height);
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            position: fixed;
-            top: 0;
-            right: 0;
-            left: var(--sidebar-width);
-            z-index: 1000;
+        /* --- GLOBAL NAVBAR --- */
+        .top-navbar {
+            position: fixed; top: 0; left: var(--sidebar-width); right: 0;
+            height: var(--header-height); background: #ffffff;
+            border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; padding: 0 30px; z-index: 1050;
         }
+        .nav-brand { display: flex; align-items: center; gap: 15px; }
+
         /* Sidebar */
         .myspace-sidebar {
             width: var(--sidebar-width);
@@ -95,11 +88,12 @@
             font-size: 18px;
         }
         
-        /* Main Content */
+        /* --- MAIN CONTENT AREA --- */
         .main-content {
             margin-left: var(--sidebar-width);
             margin-top: var(--header-height);
-            padding: 24px;
+            padding: 20px 30px;
+            min-height: calc(100vh - var(--header-height));
         }
         
         /* Tabs */
@@ -285,13 +279,15 @@
         </div>
     </div>
 
-    <!-- HEADER -->
-    <div class="dashboard-header">
-        <h5 class="m-0 fw-bold" style="color: #0f172a;">Role & Permission Management</h5>
-        <div class="d-flex align-items-center">
-            <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
+    <!-- GLOBAL NAVBAR -->
+    <nav class="top-navbar">
+        <div class="nav-brand">
+            <div class="d-flex flex-column lh-1">
+                <span style="color: #1e3a8a; font-weight: 700; font-size: 1.2rem;">WhiteCircle Group - Shahdol</span>
+                <span style="font-size: 0.85rem; font-weight: 500; color: #64748b; margin-top: 4px;">Role &amp; Permission</span>
+            </div>
         </div>
-    </div>
+    </nav>
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
