@@ -7,1557 +7,687 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dark-mode.css">
 
     <style>
         :root {
-            --bs-primary: #1e3a8a; /* Navy Blue */
-            --bs-purple: #7c3aed;  /* Timesheet Purple */
-            --bs-orange: #d97706;  /* Attendance Orange */
+            --bs-primary: #1e3a8a;
+            --bs-purple: #7c3aed;
+            --bs-orange: #d97706;
             --bg-color: #f1f5f9;
-			font-family:Arial,sans-serif;
+            font-family: Arial, sans-serif;
         }
 
-		body{
-		    background:#f8f8f8;
-		    font-family:Arial,sans-serif;
-		    font-size:14px;
-		}
-		
-		body,
-		button,
-		input,
-		select,
-		textarea,
-		a,
-		span,
-		p,
-		td,
-		th,
-		label{
-		    font-family:Arial,sans-serif;
-		    font-size:14px;
-		}
-
-		h1,
-		h2,
-		h3,
-		.page-title,
-		.approval-title span{
-		    font-family:Arial,sans-serif;
-		    font-size:20px;
-		    font-weight:700;
-		}
-
-		.approval-header{
-		    background:#d9dce2;
-		    height:62px;
-		    display:flex;
-		    justify-content:space-between;
-		    align-items:center;
-		    padding:0 24px;
-		    border-bottom:2px solid #c8d3e8;
-		}
-
-		.approval-title{
-		    display:flex;
-		    align-items:center;
-		    gap:12px;
-		}
-
-		.approval-title img{
-		    width:28px;
-		}
-
-		.approval-title span{
-			font-size:20px;
-			font-weight:700;
-		    color:#082b7a;
-		}
-
-		.home-btn{
-		    background:#2f66e0;
-		    color:white;
-		    border:none;
-		    border-radius:6px;
-		    padding:12px 32px;
-		    font-weight:600;
-		}
-
-		.page-content{
-		    padding:28px 26px 10px 26px;
-		}
-
-		.page-content h2{
-		    font-size:42px;
-		    font-weight:700;
-		    color:#111827;
-		}
-
-		.page-content p{
-		    font-size:18px;
-		    color:#7c7c7c;
-		}
-
-		.status-tabs{
-		    display:flex;
-		    gap:200px;
-		    margin-left:115px;
-		    margin-top:25px;
-		    margin-bottom:40px;
-			
-		}
-
-		.status-pill{
-		    border:none;
-		    border-radius:20px;
-		    padding:10px 34px;
-			font-size:14px;
-		    font-weight:600;
-		    cursor:pointer;
-		    transition:all 0.25s ease;
-		}
-
-		.pending{
-		    background:#f6e5b8;
-		    color:#d89b00;
-		}
-
-		.approved{
-		    background:#bdf0c8;
-		    color:#14a44d;
-		}
-
-		.reject{
-		    background:#f4c7c7;
-		    color:#ef4444;
-		}
-		
-		.pending.active{
-		    border:1px solid #2f2f2f;
-		    box-shadow:0 2px 6px rgba(0,0,0,0.15);
-		}
-
-		.approved.active{
-			border:1px solid #2f2f2f;
-		    box-shadow:0 2px 6px rgba(0,0,0,0.15);
-		}
-
-		.reject.active{
-			border:1px solid #2f2f2f;
-		    box-shadow:0 2px 6px rgba(0,0,0,0.15);
-		}
-
-		.approval-table {
-			width: 100%;
-			border-collapse: separate;
-			border-spacing: 0;
-			background: #ffffff;
-			margin-top: 20px;
-			border: 1px solid #e2e8f0;
-			border-radius: 8px;
-			overflow: hidden;
-			box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.025);
-		}
-
-		.approval-table th {
-			background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-			color: #1e3a8a;
-			padding: 14px 16px;
-			font-size: 0.9rem;
-			font-weight: 700;
-			text-align: left;
-			border-bottom: 1px solid #cbd5e1;
-		}
-
-		.approval-table td {
-			padding: 14px 16px;
-			font-size: 0.88rem;
-			color: #334155;
-			border-bottom: 1px solid #f1f5f9;
-			vertical-align: middle;
-		}
-
-		.approval-table tbody tr {
-			transition: background-color 0.2s ease;
-		}
-
-		.approval-table tbody tr:hover {
-			background-color: #f8fafc;
-		}
-
-		.approval-table tbody tr:last-child td {
-			border-bottom: none;
-		}
-
-		.view-btn {
-			background: #1e3a8a;
-			color: #fff;
-			border: none;
-			padding: 8px 18px;
-			border-radius: 6px;
-			cursor: pointer;
-			font-weight: 600;
-			font-size: 0.82rem;
-			transition: all 0.2s ease;
-			box-shadow: 0 2px 4px rgba(30,58,138,0.15);
-		}
-
-		.view-btn:hover {
-			background: #172554;
-			box-shadow: 0 4px 6px rgba(30,58,138,0.25);
-		}
-		.request-icon img {
-		    width: 42px;
-		    height: 42px;
-		}
-
-		.request-title {
-		    font-size: 18px;
-		    font-weight: 700;
-		    color: #082b7a;
-		}
-		#pending-section {
-		    width: 100%;
-		    margin-top: 40px;
-		    padding-left: 60px;
-		}
-
-		.request-date {
-		    font-size: 16px;
-		    color: #8c88d8;
-		    margin-top: 6px;
-		}
-
-		
-
-		.req-icon{
-		    width:42px;
-		    height:42px;
-		}
-
-		.request-content h4{
-		    margin:0;
-		    color:#0a2e7d;
-		    font-weight:700;
-		}
-
-		.submitted{
-		    margin-top:6px;
-		    margin-bottom:6px;
-		    color:#8b84d7;
-		    font-size:14px;
-		}
-		
-		.request-content{
-		    margin-top:-2px;
-		}
-		
-		.request-content a{
-		    text-decoration:none;
-		    color:#1e3a8a;
-		    font-weight:600;
-		    font-size:14px;
-		}
-		
-		.details-section.show{
-		    display:block;
-		}
-
-		.details-grid{
-		    display:grid;
-		    grid-template-columns:repeat(3,auto);
-		    gap:18px 45px;
-		    margin-top:10px;
-		}
-
-		.detail-item{
-		    display:flex;
-		    flex-direction:column;
-		}
-
-		.detail-label{
-		    color:#707070;
-		    font-size:13px;
-		    font-weight:500;
-		    margin-bottom:2px;
-		}
-
-		.detail-label i{
-		    margin-right:6px;
-		}
-
-		.detail-value{
-		    color:#111827;
-		    font-size:14px;
-		    font-weight:600;
-		    line-height:1.3;
-		}
-		
-		.rejection-notes{
-		    margin-top:16px;
-		    padding-top:12px;
-		    border-top:1px solid #e5e7eb;
-		}
-
-		.rejection-title{
-		    color:#ef4444;
-		    font-size:14px;
-		    font-weight:700;
-		    margin-bottom:6px;
-		}
-
-		.rejection-message{
-		    color:#111827;
-		    font-size:14px;
-		    font-weight:600;
-		    line-height:1.5;
-		    margin-top:4px;
-		}
-
-		.text-primary{
-		    color:#1e3a8a;
-		}
-
-		.text-success{
-		    color:#16a34a;
-		}
-
-		.text-danger{
-		    color:#dc2626;
-		}
-
-		.details-section.show {
-		    display: block;
-		}
-
-		.detail-row {
-		    display: flex;
-		    align-items: center;
-		    gap: 10px;
-		    margin-bottom: 12px;
-		}
-
-		.detail-label {
-		    color: #6b7280;
-		    font-size: 14px;
-		    font-weight: 600;
-		    min-width: 250px;
-		}
-
-		.shift-badge {
-		    background: #1d4ed8;
-		    color: white;
-		    padding: 3px 10px;
-		    border-radius: 20px;
-		    font-size: 11px;
-		    font-weight: 600;
-		}
-		
-		#pending-section,
-		#approved-section,
-		#denied-section{
-		    width:100%;
-		    margin-top:40px;
-		    padding-left:90px;
-		    padding-right:90px;
-		    box-sizing:border-box;
-		}
-		.timesheet-grid{
-		    display:grid;
-		    grid-template-columns:repeat(3,auto);
-		    gap:18px 30px;
-		    margin-top:10px;
-		}
-
-		.employee-notes{
-		    margin-top:18px;
-		}
-		
-		.filter-wrapper{
-		    position:relative;
-		    display:inline-block;
-		}
-
-		.filter-icon-btn{
-		    border:none;
-		    background:none;
-		    cursor:pointer;
-		    font-size:24px;
-		}
-
-		.filter-dropdown{
-		    position:absolute;
-		    top:40px;
-		    right:0;
-		    width:220px;
-		    background:#fff;
-		    border-radius:12px;
-		    box-shadow:0 8px 24px rgba(0,0,0,.15);
-		    display:none;
-		    z-index:999;
-		    padding:10px 0;
-		}
-
-		.filter-dropdown.show{
-		    display:block;
-		}
-
-		.filter-option{
-		    padding:12px 20px;
-		    cursor:pointer;
-		    font-size:14px;
-		    font-weight:500;
-		}
-
-		.filter-option:hover{
-		    background:#f5f7fb;
-		}
-
-		.filter-option.active{
-		    background:#eef4ff;
-		    color:#1d4ed8;
-		    font-weight:600;
-		}
-		/* =========================
-		   MOBILE RESPONSIVE
-		   ========================= */
-
-		@media (max-width: 768px) {
-
-		    .approval-header{
-		        padding:12px 15px;
-		        height:auto;
-		        flex-wrap:wrap;
-		        gap:10px;
-		    }
-
-		    .approval-title span{
-		        font-size:18px;
-		    }
-
-		    .home-btn{
-		        padding:8px 18px;
-		        font-size:13px;
-		    }
-
-		    .page-content{
-		        padding:20px 15px;
-		    }
-
-		    .page-content h2{
-		        font-size:20px !important;
-		    }
-
-		    .page-content p{
-		        font-size:14px !important;
-		    }
-
-		    /* Filter */
-		    .filter-wrapper{
-		        margin-top:10px;
-		    }
-
-		    .filter-dropdown{
-		        width:200px;
-		        right:0;
-		    }
-
-		    /* Status Tabs */
-		    .status-tabs{
-		        gap:12px;
-		        margin:20px 15px;
-		        justify-content:center;
-		        flex-wrap:wrap;
-		    }
-
-		    .status-pill{
-		        padding:8px 20px;
-		        font-size:14px;
-		    }
-
-		    /* Sections */
-		    #pending-section,
-		    #approved-section,
-		    #denied-section{
-		        padding-left:15px;
-		        padding-right:15px;
-		        margin-top:20px;
-		    }
-
-		    /* Request Card */
-		    .request-item{
-		        gap:12px;
-		        margin-bottom:25px;
-		    }
-
-		    .request-icon img{
-		        width:34px;
-		        height:34px;
-		    }
-
-		    .request-title{
-		        font-size:17px;
-		    }
-
-		    .request-date{
-		        font-size:14px;
-		    }
-
-		    .view-details{
-		        font-size:13px;
-		    }
-
-		    /* Details Grid */
-		    .details-grid{
-		        grid-template-columns:1fr;
-		        gap:14px;
-		    }
-
-		    .detail-label{
-		        font-size:13px;
-		    }
-
-		    .detail-value{
-		        font-size:13px;
-		    }
-
-		    /* Timesheet rows */
-		    .detail-row{
-		        flex-direction:column;
-		        align-items:flex-start;
-		        gap:4px;
-		    }
-
-		    .shift-badge{
-		        margin-top:5px;
-		    }
-
-		    .rejection-title{
-		        font-size:13px;
-		    }
-
-		    .rejection-message{
-		        font-size:13px;
-		    }
-		}
-
-
-		/* =========================
-		   EXTRA SMALL DEVICES
-		   ========================= */
-
-		@media (max-width: 480px){
-
-		    .approval-title span{
-		        font-size:16px;
-		    }
-
-		    .home-btn{
-		        width:100%;
-		    }
-
-		    .status-tabs{
-		        flex-direction:column;
-		        align-items:center;
-		    }
-
-		    .status-pill{
-		        width:180px;
-		    }
-
-		    .request-title{
-		        font-size:15px;
-		    }
-
-		    .request-date{
-		        font-size:13px;
-		    }
-
-		    .filter-dropdown{
-		        width:180px;
-		    }
-		}
-
-    </style>
-    <link href="/css/style.css" rel="stylesheet">
-
-    <style>
-        @media (max-width: 991px) {
-
-            /* 1. COMPACT GLOBAL LAYOUT */
-            html, body {
-                padding-top: 0 !important;
-                margin-top: 0 !important;
-                padding-left: 0 !important;
-                padding-right: 0 !important;
-                overflow-x: hidden !important;
-                width: 100% !important;
-            }
-            body { padding-top: 80px !important; }
-
-            /* 2. SHRINK THE TOP NAV BAR */
-
-
-            .top-header > .d-flex { min-width: 0 !important; width: auto !important; justify-content: flex-start !important; }
-            .top-header i.fa-check-double { font-size: 1.6rem !important; }
-            .top-header > .d-flex > div { padding-left: 8px !important; margin-left: 8px !important; }
-            .top-header span { font-size: 1.1rem !important; line-height: 1 !important; }
-            .top-header small { font-size: 0.85rem !important; }
-
-
-
-            /* 3. MAIN CONTAINER & FILTER AREA */
-            .main-container { padding: 0 15px !important; margin-bottom: 20px !important; }
-
-            .d-flex.justify-content-between.align-items-center.mb-4 { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; margin-bottom: 15px !important; }
-            .d-flex.justify-content-between.align-items-center.mb-4 > div:first-child h4 { font-size: 1.15rem !important; }
-            .d-flex.justify-content-between.align-items-center.mb-4 > div:first-child p { font-size: 0.8rem !important; }
-
-            .filter-dropdown, .filter-dropdown .dropdown-toggle { width: 100% !important; }
-            .filter-dropdown .dropdown-toggle { justify-content: space-between !important; padding: 10px 15px !important; }
-            .filter-dropdown .dropdown-menu { width: 100% !important; }
-
-            /* 4. HORIZONTAL SCROLLING FOR TABS */
-            .nav-pills {
-                display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important;
-                padding: 6px !important; width: 100% !important; margin-bottom: 15px !important;
-                -webkit-overflow-scrolling: touch; scrollbar-width: none;
-            }
-            .nav-pills::-webkit-scrollbar { display: none; }
-            .nav-pills .nav-item { flex: 0 0 auto !important; }
-            .nav-pills .nav-link { white-space: nowrap !important; padding: 8px 12px !important; font-size: 0.8rem !important; }
-
-            /* 5. COMPACT APPROVAL CARDS */
-            .approval-card { padding: 12px 10px 12px 15px !important; gap: 10px !important; margin-bottom: 12px !important; }
-            .icon-box { width: 35px !important; height: 35px !important; font-size: 1rem !important; }
-
-            .header-row { flex-wrap: wrap !important; gap: 6px !important; }
-            .req-title { font-size: 0.85rem !important; margin-bottom: 2px !important; }
-            .req-meta { font-size: 0.65rem !important; }
-            .status-badge { padding: 4px 8px !important; font-size: 0.6rem !important; }
-            .toggle-details-btn { font-size: 0.75rem !important; margin-top: 4px !important; }
-
-            .expanded-content { margin-top: 8px !important; padding-top: 8px !important; }
-            .req-desc { font-size: 0.8rem !important; margin-bottom: 8px !important; }
-
-            /* 6. DETAILS GRID */
-            .details-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; padding: 8px 10px !important; }
-            .detail-label { font-size: 0.6rem !important; }
-            .detail-value { font-size: 0.7rem !important; }
-
-            .rejection-box { padding: 10px !important; margin-top: 8px !important; }
-            .rejection-box p { font-size: 0.75rem !important; }
+        body {
+            background: #f8f8f8;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            margin: 0;
+            padding: 0;
         }
-		
-    </style>
 
-    <link href="/css/dark-mode.css" rel="stylesheet">
-    <script src="/js/theme-engine.js"></script>
+        body, button, input, select, textarea, a, span, p, td, th, label {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        .top-header {
+            background: #d9dce2;
+            height: 62px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 2px solid #c8d3e8;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .approval-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .approval-title i {
+            font-size: 24px;
+            color: #082b7a;
+        }
+
+        .approval-title span {
+            font-size: 20px;
+            font-weight: 700;
+            color: #082b7a;
+        }
+
+        .home-btn {
+            background: #2f66e0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 24px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .home-btn:hover {
+            color: white;
+            background: #1e3a8a;
+        }
+
+        .custom-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 0;
+            padding: 0 10px;
+            background: transparent;
+        }
+        .custom-tab {
+            padding: 12px 22px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+        }
+        .custom-tab:hover {
+            color: #1e3a8a;
+            background: #f1f5f9;
+        }
+        .custom-tab.active {
+            color: #1e3a8a;
+            border-bottom: 3px solid #1e3a8a;
+            background: #f1f5f9;
+        }
+
+        .filter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background-color: white;
+            color: #334155;
+            font-size: 14px;
+            min-width: 150px;
+            outline: none;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            width: 250px;
+            font-size: 14px;
+        }
+
+        .approval-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .approval-table th {
+            background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #1e3a8a;
+            padding: 14px 16px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-align: left;
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        .approval-table td {
+            padding: 14px 16px;
+            font-size: 0.88rem;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .view-btn {
+            background: #1e3a8a;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.82rem;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn:hover {
+            background: #172554;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .custom-tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            .search-input {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
 
-	<header class="top-header">
-	    <div class="page-title d-flex align-items-center">
-	        <i class="fas fa-clipboard-check text-dark" style="font-size: 2.5rem;"></i>
-	        <span class="fw-bold text-dark" style="border-left: 2px solid #cbd5e1; padding-left: 17px; margin-left: 15px; font-size: 1.5rem; letter-spacing: 0.5px;">
-	            My Approvals
-	        </span>
-	    </div>
-	    <a href="/default-redirect" class="btn-back-home">
-	        <i class="fas fa-arrow-left me-2"></i> Back to My Home
-	    </a>
-	</header>
-	<div class="page-content" style="margin-top: 140px;">
-
-	    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-
-	        <div>
-
-	            <h2 style="
-	                font-size:20px;
-	                font-weight:700;
-	                color:#111827;
-	                margin-bottom:10px;">
-	                Request Status Center
-	            </h2>
-
-	            <p style="
-	                color:#7b7b7b;
-	                font-size:14px;
-	                line-height:1.5;
-	                margin:0;">
-	                Track your leaves, timesheets and
-	                attendance status.
-	            </p>
-
-	        </div>
-
-			<div class="filter-wrapper">
-
-			    <button id="filterBtn" class="filter-icon-btn">
-			        <i class="fas fa-filter"></i>
-			    </button>
-
-			    <div id="filterDropdown" class="filter-dropdown">
-
-			        <div class="filter-option active"
-			             onclick="filterRequests('all')">
-
-			            <i class="fas fa-list"></i> All Requests
-			           
-			        </div>
-
-			        <div class="filter-option"
-			             onclick="setFilter(this,'leave')">
-			            <i class="fas fa-plane"></i> Leave Requests
-			           
-			        </div>
-
-			        <div class="filter-option"
-			             onclick="filterRequests('timesheet')">
-			            <i class="fas fa-file-alt"></i> Timesheets
-			            
-			        </div>
-
-			        <div class="filter-option"
-			             onclick="filterRequests('attendance')">
-			            <i class="fas fa-calendar-check"></i> Attendance
-			        </div>
-
-			    </div>
-
-			</div>
-
-	    </div>
-
-	</div>
-	<div class="status-tabs">
-
-		<button id="pendingTab"
-		        class="status-pill pending active">
-		    Pending
-		</button>
-
-		<button id="approvedTab"
-		        class="status-pill approved">
-		    Approved
-		</button>
-
-		<button id="deniedTab"
-		        class="status-pill reject">
-		    Rejected
-		</button>
-
-	</div>
-	
-	<div id="pending-section">
-
-	<div class="table-responsive">
-		<table class="table table-hover align-middle mb-0 approval-table">
-			<thead>
-				<tr style="background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);">
-					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Type</th>
-					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Date Range</th>
-					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Mode</th>
-					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Reason</th>
-					<th class="text-primary fw-bold py-3 text-end" style="border-bottom: 2px solid #cbd5e1; padding-right: 1.5rem;">View Details</th>
-				</tr>
-			</thead>
-
-	    <tbody>
-
-	        <!-- LEAVE -->
-			<tr th:each="leave : ${pendingLeaves}"
-			    class="leave-request">
-	            <td th:text="${leave.leaveType}"></td>
-
-	            <td>
-	                <span th:text="${leave.fromDate}"></span>
-	                -
-	                <span th:text="${leave.toDate}"></span>
-	            </td>
-
-	            <td th:text="${leave.leaveMode}"></td>
-
-	            <td th:text="${leave.reason}"></td>
-
-				<td class="text-end" style="padding-right: 1.5rem;">
-					<button class="view-btn"
-					        onclick="showDetails(this)">
-					    View
-					</button>
-
-					<div class="hidden-details"
-					     style="display:none;">
-
-					    <h6>Leave Details</h6>
-
-					    <table class="table table-bordered">
-
-					        <tr>
-					            <th>Leave Type</th>
-					            <td th:text="${leave.leaveType}"></td>
-					        </tr>
-
-					        <tr>
-					            <th>Date Range</th>
-					            <td>
-					                <span th:text="${leave.fromDate}"></span>
-					                -
-					                <span th:text="${leave.toDate}"></span>
-					            </td>
-					        </tr>
-
-					        <tr>
-					            <th>Leave Mode</th>
-					            <td th:text="${leave.leaveMode}"></td>
-					        </tr>
-
-					        <tr>
-					            <th>Reason</th>
-					            <td th:text="${leave.reason}"></td>
-					        </tr>
-
-					    </table>
-
-					</div>
-
-				   
-				</td>
-	        </tr>
-
-	        <!-- TIMESHEET -->
-			<tr th:each="timesheet : ${pendingTimesheets}" class="timesheet-request">
-			    <td>Timesheet</td>
-
-			    <td th:text="${timesheet.weekStartDate}"></td>
-
-			    <td>Regular Shift</td>
-
-			    <td th:text="${timesheet.overallComments}"></td>
-
-			    <td class="text-end" style="padding-right: 1.5rem;">
-			        <button class="view-btn"
-			                onclick="showDetails(this)">
-			            View
-			        </button>
-
-			        <div class="hidden-details" style="display:none;">
-
-			            <h6>Timesheet Details</h6>
-
-			            <table class="table table-bordered">
-
-			                <tr>
-			                    <th>Week Starting</th>
-			                    <td th:text="${timesheet.weekStartDate}"></td>
-			                </tr>
-
-			                <tr>
-			                    <th>Total Hours</th>
-			                    <td th:text="${timesheet.totalWeekHours + ' hrs'}"></td>
-			                </tr>
-
-			                <tr>
-			                    <th>Employee Notes</th>
-			                    <td th:text="${timesheet.overallComments}"></td>
-			                </tr>
-
-			            </table>
-
-			        </div>
-
-			    </td>
-			</tr>
-
-	        <!-- ATTENDANCE -->
-			<tr th:each="attendance : ${pendingAttendances}" class="attendance-request">
-			    <td>Attendance</td>
-
-			    <td>
-			        <span th:text="${attendance.weekStartDate}"></span>
-			        -
-			        <span th:text="${attendance.weekEndDate}"></span>
-			    </td>
-
-			    <td>Regularization</td>
-
-			    <td th:text="${attendance.reason}"></td>
-
-			    <td class="text-end" style="padding-right: 1.5rem;">
-			        <button class="view-btn"
-			                onclick="showDetails(this)">
-			            View
-			        </button>
-
-			        <div class="hidden-details" style="display:none;">
-
-			            <h6>Attendance Details</h6>
-
-			            <table class="table table-bordered">
-
-			                <tr>
-			                    <th>Week Duration</th>
-			                    <td>
-			                        <span th:text="${attendance.weekStartDate}"></span>
-			                        -
-			                        <span th:text="${attendance.weekEndDate}"></span>
-			                    </td>
-			                </tr>
-
-			                <tr>
-			                    <th>Submitted On</th>
-			                    <td th:text="${attendance.submittedOn}"></td>
-			                </tr>
-
-			                <tr>
-			                    <th>Total Hours</th>
-			                    <td th:text="${attendance.totalHours}"></td>
-			                </tr>
-
-			                <tr>
-			                    <th>Days Present</th>
-			                    <td th:text="${attendance.presentDays}"></td>
-			                </tr>
-
-			                <tr>
-			                    <th>Days Absent</th>
-			                    <td th:text="${attendance.absentDays}"></td>
-			                </tr>
-
-			                <tr>
-			                    <th>Reason</th>
-			                    <td th:text="${attendance.reason}"></td>
-			                </tr>
-
-			            </table>
-
-			        </div>
-
-			    </td>
-			</tr>
-
-	    </tbody>
-
-	</table>
-	</div>
-
-	</div>
-	
-	
-	<div id="approved-section" style="display:none;">
-
-	<div class="table-responsive">
-		<table class="table table-hover align-middle mb-0 approval-table">
-			<thead>
-				<tr style="background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);">
-					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Type</th>
-					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Date Range</th>
-					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Mode</th>
-					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Reason</th>
-					<th class="text-primary fw-bold py-3 text-end" style="border-bottom: 2px solid #cbd5e1; padding-right: 1.5rem;">View Details</th>
-				</tr>
-			</thead>
-
-		    <tbody>
-
-		        <!-- APPROVED LEAVES -->
-		        <tr th:each="leave : ${approvedLeaves}" class="leave-request">
-		            <td th:text="${leave.leaveType}"></td>
-
-		            <td>
-		                <span th:text="${leave.fromDate}"></span>
-		                -
-		                <span th:text="${leave.toDate}"></span>
-		            </td>
-
-		            <td th:text="${leave.leaveMode}"></td>
-
-		            <td th:text="${leave.reason}"></td>
-
-		            <td class="text-end" style="padding-right: 1.5rem;">
-		                <button class="view-btn"
-		                        onclick="showDetails(this)">
-		                    View
-		                </button>
-
-		                <div class="hidden-details" style="display:none;">
-
-		                    <h6>Approved Leave Details</h6>
-
-		                    <table class="table table-bordered">
-
-		                        <tr>
-		                            <th>Leave Type</th>
-		                            <td th:text="${leave.leaveType}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Date Range</th>
-		                            <td>
-		                                <span th:text="${leave.fromDate}"></span>
-		                                -
-		                                <span th:text="${leave.toDate}"></span>
-		                            </td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Leave Mode</th>
-		                            <td th:text="${leave.leaveMode}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Reason</th>
-		                            <td th:text="${leave.reason}"></td>
-		                        </tr>
-
-		                    </table>
-
-		                </div>
-
-		            </td>
-		        </tr>
-
-		        <!-- APPROVED TIMESHEETS -->
-		        <tr th:each="timesheet : ${approvedTimesheets}" class="timesheet-request">
-		            <td>Timesheet</td>
-
-		            <td th:text="${timesheet.weekStartDate}"></td>
-
-		            <td>Regular Shift</td>
-
-		            <td th:text="${timesheet.overallComments}"></td>
-
-		            <td class="text-end" style="padding-right: 1.5rem;">
-
-		                <button class="view-btn"
-		                        onclick="showDetails(this)">
-		                    View
-		                </button>
-
-		                <div class="hidden-details" style="display:none;">
-
-		                    <h6>Approved Timesheet Details</h6>
-
-		                    <table class="table table-bordered">
-
-		                        <tr>
-		                            <th>Week Starting</th>
-		                            <td th:text="${timesheet.weekStartDate}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Total Hours</th>
-		                            <td th:text="${timesheet.totalWeekHours + ' hrs'}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Employee Notes</th>
-		                            <td th:text="${timesheet.overallComments}"></td>
-		                        </tr>
-
-		                    </table>
-
-		                </div>
-
-		            </td>
-		        </tr>
-
-		        <!-- APPROVED ATTENDANCE -->
-				<tr th:each="attendance : ${approvedAttendances}"
-				    class="attendance-request">
-		            <td>Attendance</td>
-
-		            <td>
-		                <span th:text="${attendance.weekStartDate}"></span>
-		                -
-		                <span th:text="${attendance.weekEndDate}"></span>
-		            </td>
-
-		            <td>Regularization</td>
-
-		            <td th:text="${attendance.reason}"></td>
-
-		            <td class="text-end" style="padding-right: 1.5rem;">
-
-		                <button class="view-btn"
-		                        onclick="showDetails(this)">
-		                    View
-		                </button>
-
-		                <div class="hidden-details" style="display:none;">
-
-		                    <h6>Approved Attendance Details</h6>
-
-		                    <table class="table table-bordered">
-
-		                        <tr>
-		                            <th>Week Duration</th>
-		                            <td>
-		                                <span th:text="${attendance.weekStartDate}"></span>
-		                                -
-		                                <span th:text="${attendance.weekEndDate}"></span>
-		                            </td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Submitted On</th>
-		                            <td th:text="${attendance.submittedOn}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Total Hours</th>
-		                            <td th:text="${attendance.totalHours}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Days Present</th>
-		                            <td th:text="${attendance.presentDays}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Days Absent</th>
-		                            <td th:text="${attendance.absentDays}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Reason</th>
-		                            <td th:text="${attendance.reason}"></td>
-		                        </tr>
-
-		                    </table>
-
-		                </div>
-
-		            </td>
-		        </tr>
-
-		    </tbody>
-
-		</table>
-	</div>
-
-	</div>
-	
-
-	<div id="denied-section" style="display:none;">
-
-	<div class="table-responsive">
-		<table class="table table-hover align-middle mb-0 approval-table">
-			<thead>
-				<tr style="background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);">
-					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Type</th>
-					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Date Range</th>
-					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Mode</th>
-					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Reason</th>
-					<th class="text-primary fw-bold py-3 text-end" style="border-bottom: 2px solid #cbd5e1; padding-right: 1.5rem;">View Details</th>
-				</tr>
-			</thead>
-
-		    <tbody>
-
-		        <!-- REJECTED LEAVES -->
-		        <tr th:each="leave : ${deniedLeaves}" class="leave-request">
-		            <td th:text="${leave.leaveType}"></td>
-
-		            <td>
-		                <span th:text="${leave.fromDate}"></span>
-		                -
-		                <span th:text="${leave.toDate}"></span>
-		            </td>
-
-		            <td th:text="${leave.leaveMode}"></td>
-
-		            <td th:text="${leave.reason}"></td>
-
-		            <td class="text-end" style="padding-right: 1.5rem;">
-
-		                <button class="view-btn"
-		                        onclick="showDetails(this)">
-		                    View
-		                </button>
-
-		                <div class="hidden-details" style="display:none;">
-
-		                    <h6>Rejected Leave Details</h6>
-
-		                    <table class="table table-bordered">
-
-		                        <tr>
-		                            <th>Leave Type</th>
-		                            <td th:text="${leave.leaveType}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Date Range</th>
-		                            <td>
-		                                <span th:text="${leave.fromDate}"></span>
-		                                -
-		                                <span th:text="${leave.toDate}"></span>
-		                            </td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Leave Mode</th>
-		                            <td th:text="${leave.leaveMode}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Reason</th>
-		                            <td th:text="${leave.reason}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Manager Comments</th>
-		                            <td th:text="${leave.adminComments}"></td>
-		                        </tr>
-
-		                    </table>
-
-		                </div>
-
-		            </td>
-		        </tr>
-
-		        <!-- REJECTED TIMESHEETS -->
-		        <tr th:each="timesheet : ${deniedTimesheets}" class="timesheet-request">
-		            <td>Timesheet</td>
-
-		            <td th:text="${timesheet.weekStartDate}"></td>
-
-		            <td>Regular Shift</td>
-
-		            <td th:text="${timesheet.overallComments}"></td>
-
-		            <td class="text-end" style="padding-right: 1.5rem;">
-
-		                <button class="view-btn"
-		                        onclick="showDetails(this)">
-		                    View
-		                </button>
-
-		                <div class="hidden-details" style="display:none;">
-
-		                    <h6>Rejected Timesheet Details</h6>
-
-		                    <table class="table table-bordered">
-
-		                        <tr>
-		                            <th>Week Starting</th>
-		                            <td th:text="${timesheet.weekStartDate}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Total Hours</th>
-		                            <td th:text="${timesheet.totalWeekHours + ' hrs'}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Employee Notes</th>
-		                            <td th:text="${timesheet.overallComments}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Manager Comments</th>
-		                            <td th:text="${timesheet.managerComment}"></td>
-		                        </tr>
-
-		                    </table>
-
-		                </div>
-
-		            </td>
-		        </tr>
-
-		        <!-- REJECTED ATTENDANCE -->
-				<tr th:each="attendance : ${deniedAttendances}"
-				    class="attendance-request">
-		            <td>Attendance</td>
-
-		            <td>
-		                <span th:text="${attendance.weekStartDate}"></span>
-		                -
-		                <span th:text="${attendance.weekEndDate}"></span>
-		            </td>
-
-		            <td>Regularization</td>
-
-		            <td th:text="${attendance.reason}"></td>
-
-		            <td class="text-end" style="padding-right: 1.5rem;">
-
-		                <button class="view-btn"
-		                        onclick="showDetails(this)">
-		                    View
-		                </button>
-
-		                <div class="hidden-details" style="display:none;">
-
-		                    <h6>Rejected Attendance Details</h6>
-
-		                    <table class="table table-bordered">
-
-		                        <tr>
-		                            <th>Week Duration</th>
-		                            <td>
-		                                <span th:text="${attendance.weekStartDate}"></span>
-		                                -
-		                                <span th:text="${attendance.weekEndDate}"></span>
-		                            </td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Submitted On</th>
-		                            <td th:text="${attendance.submittedOn}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Total Hours</th>
-		                            <td th:text="${attendance.totalHours}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Days Present</th>
-		                            <td th:text="${attendance.presentDays}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Days Absent</th>
-		                            <td th:text="${attendance.absentDays}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Reason</th>
-		                            <td th:text="${attendance.reason}"></td>
-		                        </tr>
-
-		                        <tr>
-		                            <th>Manager Comments</th>
-		                            <td th:text="${attendance.reason}"></td>
-		                        </tr>
-
-		                    </table>
-
-		                </div>
-
-		            </td>
-		        </tr>
-
-		    </tbody>
-
-		</table>
-	</div>
-
-	</div>
-	<div class="modal fade"
-	     id="detailsModal"
-	     tabindex="-1">
-
-	    <div class="modal-dialog modal-lg">
-
-	        <div class="modal-content">
-
-	            <div class="modal-header">
-
-	                <h5 class="modal-title">
-	                    Request Details
-	                </h5>
-
-	                <button type="button"
-	                        class="btn-close"
-	                        data-bs-dismiss="modal">
-	                </button>
-
-	            </div>
-
-	            <div class="modal-body"
-	                 id="modalContent">
-	            </div>
-
-	        </div>
-
-	    </div>
-
-	</div>
-	
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    function applyFilter(event, filterValue, filterText, clickedElement) {
-        event.preventDefault(); // Stop the page from jumping when clicking links
-
-        // 1. Update the button text to show what is selected
-        document.getElementById('currentFilterText').innerText = filterText;
-
-        // 2. Move the blue "active" highlight to the newly clicked item
-        document.querySelectorAll('.filter-dropdown .dropdown-item').forEach(el => el.classList.remove('active'));
-        clickedElement.classList.add('active');
-
-        // 3. Filter the cards
-        const cards = document.querySelectorAll('.approval-card');
-        cards.forEach(card => {
-            const isLeave = card.querySelector('.ribbon-leave') !== null;
-            const isTimesheet = card.querySelector('.ribbon-timesheet') !== null;
-            const isAttendance = card.querySelector('.ribbon-attendance') !== null;
-
-            let showCard = false;
-            if (filterValue === 'all') showCard = true;
-            else if (filterValue === 'leave' && isLeave) showCard = true;
-            else if (filterValue === 'timesheet' && isTimesheet) showCard = true;
-            else if (filterValue === 'attendance' && isAttendance) showCard = true;
-
-            // Apply visibility with a quick fade-in effect
-            if (showCard) {
-                card.style.display = 'flex';
-                card.style.opacity = '0';
-                setTimeout(() => card.style.opacity = '1', 10); // Trigger transition
-            } else {
-                card.style.display = 'none';
-                card.style.opacity = '0';
-            }
-        });
-    }
-	
-	document.querySelectorAll('.status-pill').forEach(button => {
-
-	    button.addEventListener('click', function () {
-
-	        document
-	            .querySelectorAll('.status-pill')
-	            .forEach(btn => btn.classList.remove('active'));
-
-	        this.classList.add('active');
-
-	    });
-
-	});
-	
-	function toggleDetails(element) {
-
-	    const currentDetails = element.nextElementSibling;
-
-	    document.querySelectorAll('.details-section').forEach(section => {
-
-	        if(section !== currentDetails){
-	            section.classList.remove('show');
-	        }
-	    });
-
-	    document.querySelectorAll('.view-details').forEach(link => {
-
-	        if(link !== element){
-	            link.innerHTML = "View Details ▼";
-	        }
-	    });
-
-	    currentDetails.classList.toggle('show');
-
-	    if(currentDetails.classList.contains('show')){
-	        element.innerHTML = "Hide Details ▲";
-	    }else{
-	        element.innerHTML = "View Details ▼";
-	    }
-	}
-	document.getElementById("pendingTab").onclick = function () {
-
-	    document.getElementById("pending-section").style.display = "block";
-	    document.getElementById("approved-section").style.display = "none";
-	    document.getElementById("denied-section").style.display = "none";
-	};
-
-	document.getElementById("approvedTab").onclick = function () {
-
-	    document.getElementById("pending-section").style.display = "none";
-	    document.getElementById("approved-section").style.display = "block";
-	    document.getElementById("denied-section").style.display = "none";
-	};
-
-	document.getElementById("deniedTab").onclick = function () {
-
-	    document.getElementById("pending-section").style.display = "none";
-	    document.getElementById("approved-section").style.display = "none";
-	    document.getElementById("denied-section").style.display = "block";
-	};
-	
-	const filterBtn =
-	    document.getElementById('filterBtn');
-
-	const filterDropdown =
-	    document.getElementById('filterDropdown');
-
-	filterBtn.addEventListener('click', () => {
-	    filterDropdown.classList.toggle('show');
-	});
-
-	document.addEventListener('click', function(e){
-
-	    if(!e.target.closest('.filter-wrapper')){
-	        filterDropdown.classList.remove('show');
-	    }
-
-	});
-
-	function filterRequests(type) {
-
-	    let activeSection;
-
-	    if (document.getElementById("pending-section").style.display !== "none") {
-	        activeSection = document.getElementById("pending-section");
-	    } else if (document.getElementById("approved-section").style.display !== "none") {
-	        activeSection = document.getElementById("approved-section");
-	    } else {
-	        activeSection = document.getElementById("denied-section");
-	    }
-
-	    const rows = activeSection.querySelectorAll("tbody tr");
-
-	    rows.forEach(row => {
-
-	        row.style.display = "";
-
-	        if(type !== "all" &&
-	           !row.classList.contains(type + "-request")) {
-
-	            row.style.display = "none";
-	        }
-	    });
-
-	    document
-	        .querySelectorAll(".filter-option")
-	        .forEach(opt => opt.classList.remove("active"));
-
-	    filterDropdown.classList.remove("show");
-	}
-	function showDetails(button){
-
-	    const detailsDiv =
-	        button.nextElementSibling;
-
-	    if(!detailsDiv) return;
-
-	    document.getElementById("modalContent").innerHTML =
-	        detailsDiv.innerHTML;
-
-	    const modal =
-	        new bootstrap.Modal(
-	            document.getElementById("detailsModal")
-	        );
-
-	    modal.show();
-	}
-	function setFilter(element,type){
-
-	    document
-	        .querySelectorAll(".filter-option")
-	        .forEach(opt => opt.classList.remove("active"));
-
-	    element.classList.add("active");
-
-	    filterRequests(type);
-	}
-	
-</script>
-
+    <div class="top-header">
+        <div class="approval-title">
+            <i class="fas fa-clipboard-list"></i>
+            <span>My Approvals</span>
+        </div>
+        <a th:href="${backLink != null ? backLink : '/employee/dashboard'}" class="home-btn">Back to My Home</a>
+    </div>
+
+    <div class="page-content" style="margin-top: 80px; padding: 20px 26px;">
+        <div class="custom-tabs">
+            <div class="custom-tab active" id="tab-leave" onclick="switchTab('leave')">
+                <i class="far fa-user"></i> Leave Requests
+            </div>
+            <div class="custom-tab" id="tab-timesheet" onclick="switchTab('timesheet')">
+                <i class="far fa-clock"></i> Timesheets
+            </div>
+            <div class="custom-tab" id="tab-attendance" onclick="switchTab('attendance')">
+                <i class="fas fa-calendar-check"></i> Attendance
+            </div>
+        </div>
+
+        <!-- LEAVE VIEW -->
+        <div id="view-leave" style="display: block;">
+            <div class="filter-row">
+                <div class="d-flex gap-2">
+                    <select class="filter-select" id="leaveTypeFilter" onchange="filterLeaveTable()">
+                        <option value="All">All Types</option>
+                        <option value="Sick">Sick</option>
+                        <option value="Casual">Casual</option>
+                        <option value="Earned">Earned</option>
+                    </select>
+                    <select class="filter-select" id="leaveStatusFilter" onchange="filterLeaveTable()">
+                        <option value="All">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+                <input type="text" class="search-input" id="leaveSearch" placeholder="Search by name or reason..." onkeyup="searchTable('leaveSearch', 'leaveTable')">
+            </div>
+
+            <div class="table-responsive">
+                <table class="approval-table" id="leaveTable">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Leave Type</th>
+                            <th>Duration</th>
+                            <th>Dates</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- PENDING -->
+                        <tr th:each="req : ${pendingLeaves}" data-status="pending" th:data-type="${req.leaveType}">
+                            <td>
+                                <div class="fw-bold" th:text="${req.user != null ? req.user.fullName : 'Employee'}">Name</div>
+                            </td>
+                            <td>
+                                <span th:if="${req.leaveType == 'Sick'}" class="text-danger"><i class="fas fa-plus-square me-1"></i> Sick</span>
+                                <span th:if="${req.leaveType == 'Casual'}" class="text-primary"><i class="fas fa-umbrella-beach me-1"></i> Casual</span>
+                                <span th:if="${req.leaveType == 'Earned'}" class="text-success"><i class="fas fa-star me-1"></i> Earned</span>
+                            </td>
+                            <td>
+                                <div th:if="${req.leaveMode == 'Full Day'}" th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(req.fromDate, req.toDate) + 1} + ' Days'"></div>
+                                <div th:if="${req.leaveMode == 'Half Day'}">0.5 Days</div>
+                                <div th:if="${req.leaveMode == 'Short Leave'}">Short Leave</div>
+                            </td>
+                            <td>
+                                <div th:text="${#temporals.format(req.fromDate, 'MMM dd, yyyy')} + ' - ' + ${#temporals.format(req.toDate, 'MMM dd, yyyy')}"></div>
+                            </td>
+                            <td th:text="${req.reason}"></td>
+                            <td><span class="badge rounded-pill" style="background: #fef3c7; color: #d97706; border: 1px solid #fcd34d;">Pending</span></td>
+                            <td>
+                                <button class="view-btn" onclick="showDetails(this)">View</button>
+                                <div style="display: none;">
+                                    <table class="table table-bordered">
+                                        <tr><th>Employee Name</th><td th:text="${req.user != null ? req.user.fullName : ''}"></td></tr>
+                                        <tr><th>Leave Type</th><td th:text="${req.leaveType}"></td></tr>
+                                        <tr><th>From Date</th><td th:text="${req.fromDate}"></td></tr>
+                                        <tr><th>To Date</th><td th:text="${req.toDate}"></td></tr>
+                                        <tr><th>Leave Mode</th><td th:text="${req.leaveMode}"></td></tr>
+                                        <tr><th>Reason</th><td th:text="${req.reason}"></td></tr>
+                                        <tr><th>Status</th><td>Pending</td></tr>
+                                        <tr><th>Admin Comments</th><td th:text="${req.adminComments}"></td></tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- APPROVED -->
+                        <tr th:each="req : ${approvedLeaves}" data-status="approved" th:data-type="${req.leaveType}">
+                            <td><div class="fw-bold" th:text="${req.user != null ? req.user.fullName : 'Employee'}">Name</div></td>
+                            <td>
+                                <span th:if="${req.leaveType == 'Sick'}" class="text-danger"><i class="fas fa-plus-square me-1"></i> Sick</span>
+                                <span th:if="${req.leaveType == 'Casual'}" class="text-primary"><i class="fas fa-umbrella-beach me-1"></i> Casual</span>
+                                <span th:if="${req.leaveType == 'Earned'}" class="text-success"><i class="fas fa-star me-1"></i> Earned</span>
+                            </td>
+                            <td>
+                                <div th:if="${req.leaveMode == 'Full Day'}" th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(req.fromDate, req.toDate) + 1} + ' Days'"></div>
+                                <div th:if="${req.leaveMode == 'Half Day'}">0.5 Days</div>
+                                <div th:if="${req.leaveMode == 'Short Leave'}">Short Leave</div>
+                            </td>
+                            <td><div th:text="${#temporals.format(req.fromDate, 'MMM dd, yyyy')} + ' - ' + ${#temporals.format(req.toDate, 'MMM dd, yyyy')}"></div></td>
+                            <td th:text="${req.reason}"></td>
+                            <td><span class="badge rounded-pill" style="background: #d1fae5; color: #059669; border: 1px solid #6ee7b7;">Approved</span></td>
+                            <td>
+                                <button class="view-btn" onclick="showDetails(this)">View</button>
+                                <div style="display: none;">
+                                    <table class="table table-bordered">
+                                        <tr><th>Employee Name</th><td th:text="${req.user != null ? req.user.fullName : ''}"></td></tr>
+                                        <tr><th>Leave Type</th><td th:text="${req.leaveType}"></td></tr>
+                                        <tr><th>From Date</th><td th:text="${req.fromDate}"></td></tr>
+                                        <tr><th>To Date</th><td th:text="${req.toDate}"></td></tr>
+                                        <tr><th>Leave Mode</th><td th:text="${req.leaveMode}"></td></tr>
+                                        <tr><th>Reason</th><td th:text="${req.reason}"></td></tr>
+                                        <tr><th>Status</th><td>Approved</td></tr>
+                                        <tr><th>Admin Comments</th><td th:text="${req.adminComments}"></td></tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- DENIED -->
+                        <tr th:each="req : ${deniedLeaves}" data-status="rejected" th:data-type="${req.leaveType}">
+                            <td><div class="fw-bold" th:text="${req.user != null ? req.user.fullName : 'Employee'}">Name</div></td>
+                            <td>
+                                <span th:if="${req.leaveType == 'Sick'}" class="text-danger"><i class="fas fa-plus-square me-1"></i> Sick</span>
+                                <span th:if="${req.leaveType == 'Casual'}" class="text-primary"><i class="fas fa-umbrella-beach me-1"></i> Casual</span>
+                                <span th:if="${req.leaveType == 'Earned'}" class="text-success"><i class="fas fa-star me-1"></i> Earned</span>
+                            </td>
+                            <td>
+                                <div th:if="${req.leaveMode == 'Full Day'}" th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(req.fromDate, req.toDate) + 1} + ' Days'"></div>
+                                <div th:if="${req.leaveMode == 'Half Day'}">0.5 Days</div>
+                                <div th:if="${req.leaveMode == 'Short Leave'}">Short Leave</div>
+                            </td>
+                            <td><div th:text="${#temporals.format(req.fromDate, 'MMM dd, yyyy')} + ' - ' + ${#temporals.format(req.toDate, 'MMM dd, yyyy')}"></div></td>
+                            <td th:text="${req.reason}"></td>
+                            <td><span class="badge rounded-pill" style="background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5;">Rejected</span></td>
+                            <td>
+                                <button class="view-btn" onclick="showDetails(this)">View</button>
+                                <div style="display: none;">
+                                    <table class="table table-bordered">
+                                        <tr><th>Employee Name</th><td th:text="${req.user != null ? req.user.fullName : ''}"></td></tr>
+                                        <tr><th>Leave Type</th><td th:text="${req.leaveType}"></td></tr>
+                                        <tr><th>From Date</th><td th:text="${req.fromDate}"></td></tr>
+                                        <tr><th>To Date</th><td th:text="${req.toDate}"></td></tr>
+                                        <tr><th>Leave Mode</th><td th:text="${req.leaveMode}"></td></tr>
+                                        <tr><th>Reason</th><td th:text="${req.reason}"></td></tr>
+                                        <tr><th>Status</th><td>Rejected</td></tr>
+                                        <tr><th>Admin Comments</th><td th:text="${req.adminComments}"></td></tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="leaveEmpty" class="empty-state" style="display: none;">
+                    <i class="fas fa-folder-open fa-3x mb-3"></i>
+                    <h5>No data found</h5>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIMESHEET VIEW -->
+        <div id="view-timesheet" style="display: none;">
+            <div class="filter-row">
+                <div class="d-flex gap-2">
+                    <select class="filter-select" id="timesheetStatusFilter" onchange="filterTimesheetTable()">
+                        <option value="All">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+                <input type="text" class="search-input" id="timesheetSearch" placeholder="Search..." onkeyup="searchTable('timesheetSearch', 'timesheetTable')">
+            </div>
+
+            <div class="table-responsive">
+                <table class="approval-table" id="timesheetTable">
+                    <thead>
+                        <tr>
+                            <th>Week Start</th>
+                            <th>Total Hours</th>
+                            <th>Comments</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- PENDING -->
+                        <tr th:each="ts : ${pendingTimesheets}" data-status="pending">
+                            <td th:text="${ts.weekStartDate}"></td>
+                            <td th:text="${ts.totalWeekHours}"></td>
+                            <td th:text="${ts.overallComments}"></td>
+                            <td><span class="badge rounded-pill" style="background: #fef3c7; color: #d97706; border: 1px solid #fcd34d;">Pending</span></td>
+                            <td>
+                                <button class="view-btn" onclick="showDetails(this)">View</button>
+                                <div style="display: none;">
+                                    <table class="table table-bordered">
+                                        <tr><th>Week Start Date</th><td th:text="${ts.weekStartDate}"></td></tr>
+                                        <tr><th>Total Hours</th><td th:text="${ts.totalWeekHours}"></td></tr>
+                                        <tr><th>Comments</th><td th:text="${ts.overallComments}"></td></tr>
+                                        <tr><th>Manager Comments</th><td th:text="${ts.managerComment}"></td></tr>
+                                        <tr><th>Status</th><td>Pending</td></tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- APPROVED -->
+                        <tr th:each="ts : ${approvedTimesheets}" data-status="approved">
+                            <td th:text="${ts.weekStartDate}"></td>
+                            <td th:text="${ts.totalWeekHours}"></td>
+                            <td th:text="${ts.overallComments}"></td>
+                            <td><span class="badge rounded-pill" style="background: #d1fae5; color: #059669; border: 1px solid #6ee7b7;">Approved</span></td>
+                            <td>
+                                <button class="view-btn" onclick="showDetails(this)">View</button>
+                                <div style="display: none;">
+                                    <table class="table table-bordered">
+                                        <tr><th>Week Start Date</th><td th:text="${ts.weekStartDate}"></td></tr>
+                                        <tr><th>Total Hours</th><td th:text="${ts.totalWeekHours}"></td></tr>
+                                        <tr><th>Comments</th><td th:text="${ts.overallComments}"></td></tr>
+                                        <tr><th>Manager Comments</th><td th:text="${ts.managerComment}"></td></tr>
+                                        <tr><th>Status</th><td>Approved</td></tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- DENIED -->
+                        <tr th:each="ts : ${deniedTimesheets}" data-status="rejected">
+                            <td th:text="${ts.weekStartDate}"></td>
+                            <td th:text="${ts.totalWeekHours}"></td>
+                            <td th:text="${ts.overallComments}"></td>
+                            <td><span class="badge rounded-pill" style="background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5;">Rejected</span></td>
+                            <td>
+                                <button class="view-btn" onclick="showDetails(this)">View</button>
+                                <div style="display: none;">
+                                    <table class="table table-bordered">
+                                        <tr><th>Week Start Date</th><td th:text="${ts.weekStartDate}"></td></tr>
+                                        <tr><th>Total Hours</th><td th:text="${ts.totalWeekHours}"></td></tr>
+                                        <tr><th>Comments</th><td th:text="${ts.overallComments}"></td></tr>
+                                        <tr><th>Manager Comments</th><td th:text="${ts.managerComment}"></td></tr>
+                                        <tr><th>Status</th><td>Rejected</td></tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="timesheetEmpty" class="empty-state" style="display: none;">
+                    <i class="fas fa-folder-open fa-3x mb-3"></i>
+                    <h5>No data found</h5>
+                </div>
+            </div>
+        </div>
+
+        <!-- ATTENDANCE VIEW -->
+        <div id="view-attendance" style="display: none;">
+            <div class="filter-row">
+                <div class="d-flex gap-2">
+                    <select class="filter-select" id="attendanceStatusFilter" onchange="filterAttendanceTable()">
+                        <option value="All">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+                <input type="text" class="search-input" id="attendanceSearch" placeholder="Search..." onkeyup="searchTable('attendanceSearch', 'attendanceTable')">
+            </div>
+
+            <div class="table-responsive">
+                <table class="approval-table" id="attendanceTable">
+                    <thead>
+                        <tr>
+                            <th>Week Duration</th>
+                            <th>Submitted On</th>
+                            <th>Total Hours</th>
+                            <th>Present / Absent</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- PENDING -->
+                        <tr th:each="att : ${pendingAttendances}" data-status="pending">
+                            <td><div th:text="${att.weekStartDate} + ' - ' + ${att.weekEndDate}"></div></td>
+                            <td th:text="${#temporals.format(att.submittedOn, 'MMM dd, yyyy')}"></td>
+                            <td th:text="${att.totalHours}"></td>
+                            <td><span class="text-success fw-bold" th:text="${att.presentDays}"></span> / <span class="text-danger fw-bold" th:text="${att.absentDays}"></span></td>
+                            <td th:text="${att.reason}"></td>
+                            <td><span class="badge rounded-pill" style="background: #fef3c7; color: #d97706; border: 1px solid #fcd34d;">Pending</span></td>
+                            <td>
+                                <button class="view-btn" onclick="showDetails(this)">View</button>
+                                <div style="display: none;">
+                                    <table class="table table-bordered">
+                                        <tr><th>Week Start Date</th><td th:text="${att.weekStartDate}"></td></tr>
+                                        <tr><th>Week End Date</th><td th:text="${att.weekEndDate}"></td></tr>
+                                        <tr><th>Submitted On</th><td th:text="${#temporals.format(att.submittedOn, 'MMM dd, yyyy HH:mm')}"></td></tr>
+                                        <tr><th>Total Hours</th><td th:text="${att.totalHours}"></td></tr>
+                                        <tr><th>Present Days</th><td th:text="${att.presentDays}"></td></tr>
+                                        <tr><th>Absent Days</th><td th:text="${att.absentDays}"></td></tr>
+                                        <tr><th>Reason</th><td th:text="${att.reason}"></td></tr>
+                                        <tr><th>Status</th><td>Pending</td></tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- APPROVED -->
+                        <tr th:each="att : ${approvedAttendances}" data-status="approved">
+                            <td><div th:text="${att.weekStartDate} + ' - ' + ${att.weekEndDate}"></div></td>
+                            <td th:text="${#temporals.format(att.submittedOn, 'MMM dd, yyyy')}"></td>
+                            <td th:text="${att.totalHours}"></td>
+                            <td><span class="text-success fw-bold" th:text="${att.presentDays}"></span> / <span class="text-danger fw-bold" th:text="${att.absentDays}"></span></td>
+                            <td th:text="${att.reason}"></td>
+                            <td><span class="badge rounded-pill" style="background: #d1fae5; color: #059669; border: 1px solid #6ee7b7;">Approved</span></td>
+                            <td>
+                                <button class="view-btn" onclick="showDetails(this)">View</button>
+                                <div style="display: none;">
+                                    <table class="table table-bordered">
+                                        <tr><th>Week Start Date</th><td th:text="${att.weekStartDate}"></td></tr>
+                                        <tr><th>Week End Date</th><td th:text="${att.weekEndDate}"></td></tr>
+                                        <tr><th>Submitted On</th><td th:text="${#temporals.format(att.submittedOn, 'MMM dd, yyyy HH:mm')}"></td></tr>
+                                        <tr><th>Total Hours</th><td th:text="${att.totalHours}"></td></tr>
+                                        <tr><th>Present Days</th><td th:text="${att.presentDays}"></td></tr>
+                                        <tr><th>Absent Days</th><td th:text="${att.absentDays}"></td></tr>
+                                        <tr><th>Reason</th><td th:text="${att.reason}"></td></tr>
+                                        <tr><th>Status</th><td>Approved</td></tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- DENIED -->
+                        <tr th:each="att : ${deniedAttendances}" data-status="rejected">
+                            <td><div th:text="${att.weekStartDate} + ' - ' + ${att.weekEndDate}"></div></td>
+                            <td th:text="${#temporals.format(att.submittedOn, 'MMM dd, yyyy')}"></td>
+                            <td th:text="${att.totalHours}"></td>
+                            <td><span class="text-success fw-bold" th:text="${att.presentDays}"></span> / <span class="text-danger fw-bold" th:text="${att.absentDays}"></span></td>
+                            <td th:text="${att.reason}"></td>
+                            <td><span class="badge rounded-pill" style="background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5;">Rejected</span></td>
+                            <td>
+                                <button class="view-btn" onclick="showDetails(this)">View</button>
+                                <div style="display: none;">
+                                    <table class="table table-bordered">
+                                        <tr><th>Week Start Date</th><td th:text="${att.weekStartDate}"></td></tr>
+                                        <tr><th>Week End Date</th><td th:text="${att.weekEndDate}"></td></tr>
+                                        <tr><th>Submitted On</th><td th:text="${#temporals.format(att.submittedOn, 'MMM dd, yyyy HH:mm')}"></td></tr>
+                                        <tr><th>Total Hours</th><td th:text="${att.totalHours}"></td></tr>
+                                        <tr><th>Present Days</th><td th:text="${att.presentDays}"></td></tr>
+                                        <tr><th>Absent Days</th><td th:text="${att.absentDays}"></td></tr>
+                                        <tr><th>Reason</th><td th:text="${att.reason}"></td></tr>
+                                        <tr><th>Status</th><td>Rejected</td></tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="attendanceEmpty" class="empty-state" style="display: none;">
+                    <i class="fas fa-folder-open fa-3x mb-3"></i>
+                    <h5>No data found</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="detailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Request Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalContent">
+                    <!-- Dynamic Content -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/theme-engine.js"></script>
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.custom-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            ['leave', 'timesheet', 'attendance'].forEach(id => {
+                document.getElementById('view-' + id).style.display = 'none';
+            });
+            document.getElementById('view-' + tabId).style.display = 'block';
+        }
+
+        function filterLeaveTable() {
+            const typeFilter = document.getElementById('leaveTypeFilter').value.toLowerCase();
+            const statusFilter = document.getElementById('leaveStatusFilter').value.toLowerCase();
+            const searchVal = document.getElementById('leaveSearch').value.toLowerCase();
+            
+            let visibleCount = 0;
+            document.querySelectorAll('#leaveTable tbody tr').forEach(row => {
+                const type = row.getAttribute('data-type').toLowerCase();
+                const status = row.getAttribute('data-status');
+                const text = row.innerText.toLowerCase();
+                
+                const typeMatch = (typeFilter === 'all' || type === typeFilter);
+                const statusMatch = (statusFilter === 'all' || status === statusFilter);
+                const searchMatch = text.includes(searchVal);
+                
+                if (typeMatch && statusMatch && searchMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('leaveTable').style.display = visibleCount > 0 ? '' : 'none';
+            document.getElementById('leaveEmpty').style.display = visibleCount > 0 ? 'none' : 'block';
+        }
+
+        function filterTimesheetTable() {
+            const statusFilter = document.getElementById('timesheetStatusFilter').value.toLowerCase();
+            const searchVal = document.getElementById('timesheetSearch').value.toLowerCase();
+            
+            let visibleCount = 0;
+            document.querySelectorAll('#timesheetTable tbody tr').forEach(row => {
+                const status = row.getAttribute('data-status');
+                const text = row.innerText.toLowerCase();
+                
+                const statusMatch = (statusFilter === 'all' || status === statusFilter);
+                const searchMatch = text.includes(searchVal);
+                
+                if (statusMatch && searchMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('timesheetTable').style.display = visibleCount > 0 ? '' : 'none';
+            document.getElementById('timesheetEmpty').style.display = visibleCount > 0 ? 'none' : 'block';
+        }
+
+        function filterAttendanceTable() {
+            const statusFilter = document.getElementById('attendanceStatusFilter').value.toLowerCase();
+            const searchVal = document.getElementById('attendanceSearch').value.toLowerCase();
+            
+            let visibleCount = 0;
+            document.querySelectorAll('#attendanceTable tbody tr').forEach(row => {
+                const status = row.getAttribute('data-status');
+                const text = row.innerText.toLowerCase();
+                
+                const statusMatch = (statusFilter === 'all' || status === statusFilter);
+                const searchMatch = text.includes(searchVal);
+                
+                if (statusMatch && searchMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('attendanceTable').style.display = visibleCount > 0 ? '' : 'none';
+            document.getElementById('attendanceEmpty').style.display = visibleCount > 0 ? 'none' : 'block';
+        }
+
+        function searchTable(inputId, tableId) {
+            if (tableId === 'leaveTable') filterLeaveTable();
+            if (tableId === 'timesheetTable') filterTimesheetTable();
+            if (tableId === 'attendanceTable') filterAttendanceTable();
+        }
+
+        function showDetails(button) {
+            const detailsDiv = button.nextElementSibling;
+            if (!detailsDiv) return;
+            document.getElementById("modalContent").innerHTML = detailsDiv.innerHTML;
+            new bootstrap.Modal(document.getElementById("detailsModal")).show();
+        }
+    </script>
 </body>
 </html>

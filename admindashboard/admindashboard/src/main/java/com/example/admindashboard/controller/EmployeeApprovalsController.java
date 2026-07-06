@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class EmployeeApprovalsController {
     // SECURITY AUDIT PASSED: This is a self-service endpoint.
     // Data is inherently isolated to the authenticated Principal. No @PreAuthorize required.
     @GetMapping("/my-approvals")
-    public String viewMyApprovals(Principal principal, Model model) {
+        public String viewMyApprovals(Principal principal, HttpServletRequest request, Model model) {
 
         // 1. Get current employee securely from the session token
         String username = principal.getName();
@@ -55,6 +56,9 @@ public class EmployeeApprovalsController {
         // Calculate Total
         int totalPending = pendingLeaves.size() + pendingAttendances.size() + pendingTimesheets.size();
         model.addAttribute("totalPending", totalPending);
+
+        String referer = request.getHeader("referer");
+        model.addAttribute("backLink", referer != null && !referer.isBlank() ? referer : "/employee/dashboard");
 
         // 3. FETCH APPROVED REQUESTS (Strictly bound to currentUser)
         List<LeaveRequest> approvedLeaves = leaveRepo.findByUserAndStatusIgnoreCaseOrderByIdDesc(currentUser, "Approved");

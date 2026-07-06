@@ -932,7 +932,7 @@
                             </a>
                         </div>
 						<div class="col-md-6" th:if="${showMySpace}">
-						    <a href="/space/login" class="app-btn">
+                            <a th:href="${mySpaceLoginUrl != null ? mySpaceLoginUrl : '/space/login'}" class="app-btn" target="_blank" rel="noopener noreferrer">
 						        <i class="fas fa-layer-group text-primary me-2 fs-5"></i>
 						        <span class="app-text">My Space</span>
 						    </a>

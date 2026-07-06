@@ -211,6 +211,7 @@ public class SeniorDashboardController {
     public String showSeniorManagerDashboard(Model model, Principal principal, HttpServletRequest request) {
     	loadDashboardData(model);
         model.addAttribute("isSeniorManager", true);
+        model.addAttribute("mySpaceLoginUrl", "/senior_manager/myspace/login");
         model.addAttribute("workflowUrl", "/senior_manager/workflow");
     	return "employee-dashboard";
     }

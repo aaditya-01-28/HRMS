@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>WhiteCircle | Senior Manager - My Space</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #002D72;
+            --sidebar-width: 205px;
+            --header-height: 70px;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            background: #f3f4f6;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .myspace-sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: #f8fafc;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 1051;
+            transition: transform .3s ease;
+        }
+
+        body.sidebar-toggled .myspace-sidebar { transform: translateX(-100%); }
+
+        .brand-area {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: var(--header-height);
+        }
+
+        .brand-area img {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .brand-title { font-size: .92rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+        .brand-sub { font-size: .78rem; color: var(--muted); }
+
+        .nav-links { padding: 10px 0; flex: 1; }
+
+        .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 12px;
+            color: #475569;
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 600;
+            border-left: 3px solid transparent;
+            transition: all .2s;
+        }
+
+        .nav-link-item:hover { background: #eef2ff; color: var(--primary); }
+        .nav-link-item.active { background: #e2e8f0; color: var(--primary); border-left-color: var(--primary-light); }
+
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--header-height);
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1050;
+            transition: left .3s ease;
+        }
+
+        body.sidebar-toggled .top-navbar { left: 0; }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+        }
+
+        .myspace-main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 14px 18px;
+            min-height: calc(100vh - var(--header-height));
+            transition: margin-left .3s ease;
+        }
+
+        body.sidebar-toggled .myspace-main { margin-left: 0; }
+
+        .tabs-strip {
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .tab-link {
+            text-decoration: none;
+            color: #1f2937;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 3px solid transparent;
+            font-size: 1.02rem;
+        }
+
+        .tab-link.active { color: #2563eb; border-color: #2563eb; }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(170px, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 10px;
+            min-height: 60px;
+        }
+
+        .stat-card .icon { font-size: 1.3rem; }
+        .stat-card .label { font-size: .8rem; color: #475569; line-height: 1.2; }
+        .stat-card .value { font-size: 2rem; line-height: 1; font-weight: 700; margin-top: 2px; }
+
+        .panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .filters-row {
+            display: grid;
+            grid-template-columns: 1.5fr repeat(4, minmax(120px, 1fr));
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .filters-row input,
+        .filters-row select {
+            height: 36px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 0 10px;
+            width: 100%;
+            font-size: .9rem;
+            background: #fff;
+        }
+
+        .table th, .table td { font-size: .9rem; vertical-align: middle; }
+
+        .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 8px;
+            border: 1px solid #dbeafe;
+        }
+
+        .org-level {
+            color: #2563eb;
+            font-weight: 700;
+            min-width: 72px;
+            font-size: .9rem;
+        }
+
+        .org-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin: 12px 0;
+        }
+
+        .org-cards {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .org-card {
+            width: 140px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            font-size: .72rem;
+            background: #fff;
+        }
+
+        .org-card img {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 4px;
+        }
+
+        .pending-wrap {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .donut {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(#2563eb 0 25%, #8b5cf6 25% 45%, #06b6d4 45% 63%, #f59e0b 63% 80%, #ec4899 80% 100%);
+            margin: 6px auto;
+            position: relative;
+        }
+
+        .donut::after {
+            content: "";
+            position: absolute;
+            inset: 24px;
+            background: #fff;
+            border-radius: 50%;
+        }
+
+        .donut-text {
+            position: relative;
+            margin-top: -96px;
+            text-align: center;
+            font-weight: 700;
+            z-index: 2;
+        }
+
+        .legend-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-approved { color: #16a34a; }
+        .status-pending { color: #ea580c; }
+        .status-review { color: #2563eb; }
+        .status-declined { color: #dc2626; }
+
+        @media (max-width: 1200px) {
+            .stats-row { grid-template-columns: repeat(2, minmax(170px, 1fr)); }
+            .filters-row { grid-template-columns: 1fr 1fr; }
+            .pending-wrap { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .myspace-sidebar { transform: translateX(-100%); }
+            body.sidebar-toggled .myspace-sidebar { transform: translateX(0); }
+            .top-navbar { left: 0; padding: 0 10px; }
+            .myspace-main { margin-left: 0; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="myspace-sidebar shadow-sm">
+    <div class="brand-area">
+        <img src="/images/wcg-logo.jpg" alt="Logo"/>
+        <div>
+            <div class="brand-title">WhiteCircle</div>
+            <div class="brand-sub">Manager Admin</div>
+        </div>
+    </div>
+    <div class="nav-links">
+        <a href="/senior_manager/myspace?tab=directory" class="nav-link-item active"><i class="fa-solid fa-users"></i> Team & Employee</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-calendar-days"></i> Leave & Attendance</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-briefcase"></i> Project & Work</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Performance</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-user-plus"></i> Recruitment</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-wallet"></i> Financial & Expense</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-file-lines"></i> Reports</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-comments"></i> Communication</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-sitemap"></i> Org. Hierarchy</a>
+    </div>
+</div>
+
+<nav class="top-navbar">
+    <div class="nav-brand">
+        <button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
+        <div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
+            <span style="color:#002D72; font-weight:700; font-size:2.1rem;">WhiteCircle Group - Shahdol</span>
+            <span style="font-size:.85rem; font-weight:500; color:#333; margin-top:2px;">Team & Employee Management</span>
+        </div>
+    </div>
+    <div>
+        <a class="btn btn-light text-dark fw-bold" href="/senior_manager/dashboard" style="border-radius:6px; padding:8px 14px; text-decoration:none;">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</nav>
+
+<div class="myspace-main">
+    <div class="tabs-strip">
+        <a th:classappend="${activeTab == 'directory'} ? ' active' : ''" class="tab-link" href="/senior_manager/myspace?tab=directory">Employee Directory</a>
+        <a th:classappend="${activeTab == 'hierarchy'} ? ' active' : ''" class="tab-link" href="/senior_manager/myspace?tab=hierarchy">Team Hierarchy</a>
+        <a th:classappend="${activeTab == 'pending'} ? ' active' : ''" class="tab-link" href="/senior_manager/myspace?tab=pending">Pending Actions</a>
+        <a th:classappend="${activeTab == 'recommendations'} ? ' active' : ''" class="tab-link" href="/senior_manager/myspace?tab=recommendations">Recommendations</a>
+    </div>
+
+    <div th:if="${activeTab == 'directory'}">
+        <div class="stats-row">
+            <div class="stat-card"><i class="fa-solid fa-users icon text-primary"></i><div><div class="label">Total Team Members</div><div class="value" th:text="${totalTeamMembers}">0</div></div></div>
+            <div class="stat-card"><i class="fa-regular fa-circle-check icon text-success"></i><div><div class="label">Active Employees</div><div class="value" th:text="${activeEmployees}">0</div></div></div>
+            <div class="stat-card"><i class="fa-regular fa-clock icon text-warning"></i><div><div class="label">On Leave Today</div><div class="value" th:text="${onLeaveToday}">0</div></div></div>
+            <div class="stat-card"><i class="fa-regular fa-circle-xmark icon text-danger"></i><div><div class="label">Employee Exited</div><div class="value" th:text="${exitedEmployees}">0</div></div></div>
+        </div>
+
+        <div class="panel">
+            <div class="filters-row">
+                <input id="directorySearch" type="text" placeholder="Search by name, role or department"/>
+                <select id="directoryDepartment">
+                    <option value="">All Departments</option>
+                    <option th:each="d : ${departmentOptions}" th:value="${d}" th:text="${d}"></option>
+                </select>
+                <select id="directoryEmploymentType">
+                    <option value="">All Employment Type</option>
+                    <option th:each="t : ${employmentTypeOptions}" th:value="${t}" th:text="${t}"></option>
+                </select>
+                <select id="directoryStatus">
+                    <option value="">All Status</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="ON NOTICE">On Notice</option>
+                    <option value="EXITED">Exited</option>
+                    <option value="INACTIVE">Inactive</option>
+                </select>
+                <input id="directoryDate" type="date"/>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="directoryTable">
+                    <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Job Title</th>
+                        <th>Department</th>
+                        <th>Reporting To</th>
+                        <th>Employment Type</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(teamMembers)}">
+                        <td colspan="7" class="text-center text-muted">No team members found for this manager.</td>
+                    </tr>
+                    <tr th:each="m : ${teamMembers}"
+                        th:attr="
+                            data-name=${m.fullName},
+                            data-role=${m.designation != null && !m.designation.isBlank() ? m.designation : (m.employeeProfile != null ? m.employeeProfile.designation : '')},
+                            data-department=${m.employeeProfile != null ? m.employeeProfile.department : 'Unknown'},
+                            data-reporting=${m.employeeProfile != null && m.employeeProfile.reportingManager != null ? m.employeeProfile.reportingManager : (m.manager != null ? m.manager.fullName : '-')},
+                            data-employment=${m.employeeProfile != null && m.employeeProfile.employmentType != null && !m.employeeProfile.employmentType.isBlank() ? m.employeeProfile.employmentType : (m.role != null ? m.role.roleName : 'Full-time')},
+                            data-status=${m.status},
+                            data-joined=${m.employeeProfile != null && m.employeeProfile.joiningDate != null ? #temporals.format(m.employeeProfile.joiningDate, 'yyyy-MM-dd') : ''}">
+                        <td>
+                            <img class="avatar" th:src="${m.profileImage != null && !m.profileImage.isBlank() ? m.profileImage : '/images/male-avatar.png'}" alt="avatar"/>
+                            <span th:text="${m.fullName}">Employee Name</span>
+                        </td>
+                        <td th:text="${m.designation != null && !m.designation.isBlank() ? m.designation : (m.employeeProfile != null ? m.employeeProfile.designation : '-')}">-</td>
+                        <td th:text="${m.employeeProfile != null ? m.employeeProfile.department : 'Unknown'}">Unknown</td>
+                        <td th:text="${m.employeeProfile != null && m.employeeProfile.reportingManager != null ? m.employeeProfile.reportingManager : (m.manager != null ? m.manager.fullName : '-')}">-</td>
+                        <td class="text-success" th:text="${m.employeeProfile != null && m.employeeProfile.employmentType != null && !m.employeeProfile.employmentType.isBlank() ? m.employeeProfile.employmentType : (m.role != null ? m.role.roleName : 'Full-time')}">Full-time</td>
+                        <td th:classappend="${m.status == 'ACTIVE'} ? ' status-approved' : (${m.status == 'EXITED' || m.status == 'INACTIVE'} ? ' status-declined' : ' status-pending')" th:text="${m.status}">ACTIVE</td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-light border" type="button" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis"></i></button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <button class="dropdown-item js-view-member" type="button"
+                                                th:attr="
+                                                    data-name=${m.fullName},
+                                                    data-code=${m.username},
+                                                    data-role=${m.designation != null && !m.designation.isBlank() ? m.designation : (m.employeeProfile != null ? m.employeeProfile.designation : '-')},
+                                                    data-department=${m.employeeProfile != null ? m.employeeProfile.department : 'Unknown'},
+                                                    data-status=${m.status},
+                                                    data-email=${m.email},
+                                                    data-reporting=${m.employeeProfile != null && m.employeeProfile.reportingManager != null ? m.employeeProfile.reportingManager : (m.manager != null ? m.manager.fullName : '-')},
+                                                    data-employment=${m.employeeProfile != null && m.employeeProfile.employmentType != null && !m.employeeProfile.employmentType.isBlank() ? m.employeeProfile.employmentType : (m.role != null ? m.role.roleName : 'Full-time')}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#teamMemberModal">
+                                            <i class="fa-solid fa-eye me-2"></i>View details
+                                        </button>
+                                    </li>
+                                    <li><a class="dropdown-item" href="/senior_manager/workflow"><i class="fa-solid fa-list-check me-2"></i>Open workflow</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-between mt-3">
+                <small id="directoryCount" class="text-muted">Showing 0 entries</small>
+                <small class="text-muted">Use filters above to narrow results</small>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${activeTab == 'hierarchy'}">
+        <div class="stats-row">
+            <div class="stat-card"><i class="fa-solid fa-users icon text-primary"></i><div><div class="label">Total Team Members</div><div class="value" th:text="${totalTeamMembers}">0</div></div></div>
+            <div class="stat-card"><i class="fa-regular fa-circle-check icon text-success"></i><div><div class="label">Levels in hierarchy</div><div class="value">4</div></div></div>
+            <div class="stat-card"><i class="fa-regular fa-clock icon text-warning"></i><div><div class="label">Departments</div><div class="value" th:text="${#lists.size(departmentOptions)}">0</div></div></div>
+            <div class="stat-card"><i class="fa-regular fa-circle-xmark icon text-danger"></i><div><div class="label">Span of control</div><div class="value" th:text="${#lists.size(hierarchyLevel2)}">0</div></div></div>
+        </div>
+
+        <div class="panel">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="mb-0">Team Hierarchy</h6>
+                <div class="d-flex gap-2">
+                    <input id="hierarchySearch" type="text" class="form-control form-control-sm" placeholder="Search" style="width:140px;"/>
+                    <select id="hierarchyLevel" class="form-select form-select-sm" style="width:130px;">
+                        <option value="all">View options</option>
+                        <option value="level2">Level 2</option>
+                        <option value="level3">Level 3</option>
+                        <option value="level4">Level 4</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="org-row hierarchy-group" data-level="level1">
+                <div class="org-level">Level 1</div>
+                <div class="org-cards">
+                    <div class="org-card hierarchy-card" th:attr="data-name=${managerUser != null ? managerUser.fullName : ''}">
+                        <img src="/images/male-avatar.png" alt="avatar"/>
+                        <div><strong th:text="${managerUser != null ? managerUser.fullName : 'Manager'}">Manager</strong></div>
+                        <div>Senior Manager</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="org-row hierarchy-group" data-level="level2">
+                <div class="org-level">Level 2</div>
+                <div class="org-cards">
+                    <div class="org-card hierarchy-card" th:each="u : ${hierarchyLevel2}" th:attr="data-name=${u.fullName}">
+                        <img src="/images/male-avatar.png" alt="avatar"/>
+                        <div><strong th:text="${u.fullName}">Name</strong></div>
+                        <div th:text="${u.designation != null && !u.designation.isBlank() ? u.designation : '-'}">Role</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="org-row hierarchy-group" data-level="level3">
+                <div class="org-level">Level 3</div>
+                <div class="org-cards">
+                    <div class="org-card hierarchy-card" th:each="u : ${hierarchyLevel3}" th:attr="data-name=${u.fullName}">
+                        <img src="/images/male-avatar.png" alt="avatar"/>
+                        <div><strong th:text="${u.fullName}">Name</strong></div>
+                        <div th:text="${u.designation != null && !u.designation.isBlank() ? u.designation : '-'}">Role</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="org-row hierarchy-group" data-level="level4">
+                <div class="org-level">Level 4</div>
+                <div class="org-cards">
+                    <div class="org-card hierarchy-card" th:each="u : ${hierarchyLevel4}" th:attr="data-name=${u.fullName}">
+                        <img src="/images/male-avatar.png" alt="avatar"/>
+                        <div><strong th:text="${u.fullName}">Name</strong></div>
+                        <div th:text="${u.designation != null && !u.designation.isBlank() ? u.designation : '-'}">Role</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${activeTab == 'pending'}">
+        <div class="stats-row">
+            <div class="stat-card"><i class="fa-solid fa-users icon text-primary"></i><div><div class="label">Total Pending</div><div class="value" th:text="${pendingTotal}">0</div></div></div>
+            <div class="stat-card"><i class="fa-regular fa-circle-check icon text-success"></i><div><div class="label">Needs your approval</div><div class="value" th:text="${pendingNeedsApproval}">0</div></div></div>
+            <div class="stat-card"><i class="fa-regular fa-clock icon text-warning"></i><div><div class="label">Needs your review</div><div class="value" th:text="${pendingNeedsReview}">0</div></div></div>
+            <div class="stat-card"><i class="fa-regular fa-circle-xmark icon text-danger"></i><div><div class="label">Information only</div><div class="value" th:text="${pendingInfoOnly}">0</div></div></div>
+        </div>
+
+        <div class="panel">
+            <h6 class="mb-2">Pending Summary</h6>
+            <div class="pending-wrap">
+                <div>
+                    <div class="donut"></div>
+                    <div class="donut-text"><span th:text="${pendingTotal}">0</span><br/><small class="text-muted">Total Pending</small></div>
+                </div>
+                <div>
+                    <p th:each="entry, i : ${pendingSummaryByType}">
+                        <span class="legend-dot" th:style="'background:' + (${i.index} % 6 == 0 ? '#2563eb' : (${i.index} % 6 == 1 ? '#8b5cf6' : (${i.index} % 6 == 2 ? '#06b6d4' : (${i.index} % 6 == 3 ? '#f59e0b' : (${i.index} % 6 == 4 ? '#ec4899' : '#94a3b8')))))"></span>
+                        <span th:text="${entry.key}">Type</span>
+                        <span class="text-muted" th:text="${entry.value}"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="filters-row" style="grid-template-columns: 1.8fr 1fr 1fr 1fr;">
+                <input id="pendingSearch" type="text" placeholder="Search by employee name, action or ID"/>
+                <select id="pendingActionType">
+                    <option value="">Action Type</option>
+                    <option>Leave</option>
+                    <option>Timesheet</option>
+                    <option>Service Request</option>
+                    <option>Resignation</option>
+                </select>
+                <select id="pendingRequestGroup">
+                    <option value="">Request</option>
+                    <option>Needs approval</option>
+                    <option>Needs review</option>
+                    <option>Information only</option>
+                </select>
+                <select id="pendingPriority">
+                    <option value="">Priority</option>
+                    <option>High</option>
+                    <option>Medium</option>
+                    <option>Low</option>
+                </select>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="pendingTable">
+                    <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Action details</th>
+                        <th>Action type</th>
+                        <th>Requested by</th>
+                        <th>Request date</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(pendingActions)}">
+                        <td colspan="8" class="text-center text-muted">No pending actions available.</td>
+                    </tr>
+                    <tr th:each="item : ${pendingActions}"
+                        th:attr="
+                            data-name=${item['employeeName']},
+                            data-code=${item['employeeCode']},
+                            data-details=${item['actionDetails']},
+                            data-type=${item['actionType']},
+                            data-request=${item['requestGroup']},
+                            data-priority=${item['priority']},
+                            data-status=${item['status']}">
+                        <td><span th:text="${item['employeeName']}">Employee</span></td>
+                        <td th:text="${item['actionDetails']}">Details</td>
+                        <td th:text="${item['actionType']}">Type</td>
+                        <td th:text="${item['requestedBy']}">By</td>
+                        <td th:text="${item['requestDate']}">Date</td>
+                        <td th:text="${item['priority']}">Medium</td>
+                        <td th:classappend="${item['status'] == 'Approved'} ? ' status-approved' : (${item['status'] == 'Approval pending'} ? ' status-pending' : (${item['status'] == 'Review pending'} ? ' status-review' : ''))" th:text="${item['status']}">Status</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-secondary" th:href="${item['actionUrl']}" th:text="${item['actionLabel']}">Review</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-between mt-3">
+                <small id="pendingCount" class="text-muted">Showing 0 entries</small>
+                <small class="text-muted">Filtered from real manager queue</small>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${activeTab == 'recommendations'}">
+        <div class="stats-row">
+            <div class="stat-card"><i class="fa-solid fa-users icon text-primary"></i><div><div class="label">Total Recommendations</div><div class="value" th:text="${recommendationsTotal}">0</div></div></div>
+            <div class="stat-card"><i class="fa-regular fa-circle-check icon text-success"></i><div><div class="label">Approved</div><div class="value" th:text="${approvedRecommendations}">0</div></div></div>
+            <div class="stat-card"><i class="fa-regular fa-clock icon text-warning"></i><div><div class="label">Pending</div><div class="value" th:text="${pendingRecommendations}">0</div></div></div>
+            <div class="stat-card"><i class="fa-regular fa-circle-xmark icon text-danger"></i><div><div class="label">Declined</div><div class="value" th:text="${declinedRecommendations}">0</div></div></div>
+        </div>
+
+        <div class="panel">
+            <div class="filters-row">
+                <input id="recommendationSearch" type="text" placeholder="Search by name, role or department"/>
+                <select id="recommendationDepartment">
+                    <option value="">All Departments</option>
+                    <option th:each="d : ${departmentOptions}" th:value="${d}" th:text="${d}"></option>
+                </select>
+                <select id="recommendationEmploymentType">
+                    <option value="">All Employment Type</option>
+                    <option th:each="t : ${employmentTypeOptions}" th:value="${t}" th:text="${t}"></option>
+                </select>
+                <select id="recommendationStatus">
+                    <option value="">All Status</option>
+                    <option>Approved</option>
+                    <option>Pending</option>
+                    <option>Declined</option>
+                </select>
+                <input id="recommendationDate" type="date"/>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="recommendationTable">
+                    <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Current role</th>
+                        <th>Recommendation type</th>
+                        <th>Recommended for</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(recommendations)}">
+                        <td colspan="7" class="text-center text-muted">No recommendation records available yet.</td>
+                    </tr>
+                    <tr th:each="r : ${recommendations}"
+                        th:attr="
+                            data-name=${r['employeeName']},
+                            data-role=${r['currentRole']},
+                            data-type=${r['recommendationType']},
+                            data-department=${r['department']},
+                            data-employment=${r['employmentType']},
+                            data-status=${r['statusGroup']},
+                            data-date=${r['rawDate'] != null ? #temporals.format(r['rawDate'], 'yyyy-MM-dd') : ''}">
+                        <td><span th:text="${r['employeeName']}">Employee</span></td>
+                        <td th:text="${r['currentRole']}">Role</td>
+                        <td th:text="${r['recommendationType']}">Type</td>
+                        <td th:text="${r['recommendedFor']}">Recommended</td>
+                        <td th:text="${r['date']}">Date</td>
+                        <td th:classappend="${r['statusGroup'] == 'Approved'} ? ' status-approved' : (${r['statusGroup'] == 'Pending'} ? ' status-pending' : ' status-declined')" th:text="${r['statusGroup']}">Pending</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-secondary" th:href="${r['actionUrl']}">View</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-between mt-3">
+                <small id="recommendationCount" class="text-muted">Showing 0 entries</small>
+                <small class="text-muted">Results are pulled from completed team workflows</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="teamMemberModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Team Member Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2">
+                    <div class="col-5 text-muted">Name</div><div class="col-7 fw-semibold" id="memberName">-</div>
+                    <div class="col-5 text-muted">Employee ID</div><div class="col-7" id="memberCode">-</div>
+                    <div class="col-5 text-muted">Role</div><div class="col-7" id="memberRole">-</div>
+                    <div class="col-5 text-muted">Department</div><div class="col-7" id="memberDepartment">-</div>
+                    <div class="col-5 text-muted">Reporting To</div><div class="col-7" id="memberReporting">-</div>
+                    <div class="col-5 text-muted">Employment Type</div><div class="col-7" id="memberEmployment">-</div>
+                    <div class="col-5 text-muted">Status</div><div class="col-7" id="memberStatus">-</div>
+                    <div class="col-5 text-muted">Email</div><div class="col-7" id="memberEmail">-</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="/senior_manager/workflow" class="btn btn-primary">Open Workflow</a>
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function textContains(source, query) {
+        return (source || '').toLowerCase().includes((query || '').toLowerCase());
+    }
+
+    function applyDirectoryFilters() {
+        const search = document.getElementById('directorySearch');
+        const department = document.getElementById('directoryDepartment');
+        const employment = document.getElementById('directoryEmploymentType');
+        const status = document.getElementById('directoryStatus');
+        const date = document.getElementById('directoryDate');
+        const table = document.getElementById('directoryTable');
+        if (!table) return;
+
+        let visible = 0;
+        table.querySelectorAll('tbody tr').forEach(row => {
+            if (row.querySelector('td[colspan]')) return;
+            const matchSearch = textContains(row.dataset.name + ' ' + row.dataset.role + ' ' + row.dataset.department, search.value);
+            const matchDept = !department.value || row.dataset.department === department.value;
+            const matchEmployment = !employment.value || row.dataset.employment === employment.value;
+            const matchStatus = !status.value || (row.dataset.status || '').toUpperCase() === status.value.toUpperCase();
+            const matchDate = !date.value || row.dataset.joined === date.value;
+            const show = matchSearch && matchDept && matchEmployment && matchStatus && matchDate;
+            row.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        const count = document.getElementById('directoryCount');
+        if (count) count.textContent = `Showing ${visible} entries`;
+    }
+
+    function applyPendingFilters() {
+        const search = document.getElementById('pendingSearch');
+        const type = document.getElementById('pendingActionType');
+        const request = document.getElementById('pendingRequestGroup');
+        const priority = document.getElementById('pendingPriority');
+        const table = document.getElementById('pendingTable');
+        if (!table) return;
+
+        let visible = 0;
+        table.querySelectorAll('tbody tr').forEach(row => {
+            if (row.querySelector('td[colspan]')) return;
+            const haystack = `${row.dataset.name} ${row.dataset.code} ${row.dataset.details}`;
+            const matchSearch = textContains(haystack, search.value);
+            const matchType = !type.value || row.dataset.type === type.value;
+            const matchRequest = !request.value || row.dataset.request === request.value;
+            const matchPriority = !priority.value || row.dataset.priority === priority.value;
+            const show = matchSearch && matchType && matchRequest && matchPriority;
+            row.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        const count = document.getElementById('pendingCount');
+        if (count) count.textContent = `Showing ${visible} entries`;
+    }
+
+    function applyRecommendationFilters() {
+        const search = document.getElementById('recommendationSearch');
+        const department = document.getElementById('recommendationDepartment');
+        const employment = document.getElementById('recommendationEmploymentType');
+        const status = document.getElementById('recommendationStatus');
+        const date = document.getElementById('recommendationDate');
+        const table = document.getElementById('recommendationTable');
+        if (!table) return;
+
+        let visible = 0;
+        table.querySelectorAll('tbody tr').forEach(row => {
+            if (row.querySelector('td[colspan]')) return;
+            const haystack = `${row.dataset.name} ${row.dataset.role} ${row.dataset.department}`;
+            const matchSearch = textContains(haystack, search.value);
+            const matchDept = !department.value || row.dataset.department === department.value;
+            const matchEmployment = !employment.value || row.dataset.employment === employment.value;
+            const matchStatus = !status.value || row.dataset.status === status.value;
+            const matchDate = !date.value || row.dataset.date === date.value;
+            const show = matchSearch && matchDept && matchEmployment && matchStatus && matchDate;
+            row.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        const count = document.getElementById('recommendationCount');
+        if (count) count.textContent = `Showing ${visible} entries`;
+    }
+
+    function bindFilters() {
+        const bindings = [
+            ['directorySearch', 'input', applyDirectoryFilters],
+            ['directoryDepartment', 'change', applyDirectoryFilters],
+            ['directoryEmploymentType', 'change', applyDirectoryFilters],
+            ['directoryStatus', 'change', applyDirectoryFilters],
+            ['directoryDate', 'change', applyDirectoryFilters],
+            ['pendingSearch', 'input', applyPendingFilters],
+            ['pendingActionType', 'change', applyPendingFilters],
+            ['pendingRequestGroup', 'change', applyPendingFilters],
+            ['pendingPriority', 'change', applyPendingFilters],
+            ['recommendationSearch', 'input', applyRecommendationFilters],
+            ['recommendationDepartment', 'change', applyRecommendationFilters],
+            ['recommendationEmploymentType', 'change', applyRecommendationFilters],
+            ['recommendationStatus', 'change', applyRecommendationFilters],
+            ['recommendationDate', 'change', applyRecommendationFilters]
+        ];
+
+        bindings.forEach(([id, evt, fn]) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener(evt, fn);
+        });
+    }
+
+    function bindHierarchyControls() {
+        const search = document.getElementById('hierarchySearch');
+        const level = document.getElementById('hierarchyLevel');
+        const groups = document.querySelectorAll('.hierarchy-group');
+        const cards = document.querySelectorAll('.hierarchy-card');
+
+        function apply() {
+            const searchValue = (search ? search.value : '').toLowerCase();
+            const selectedLevel = level ? level.value : 'all';
+
+            cards.forEach(card => {
+                const matchesSearch = (card.dataset.name || '').toLowerCase().includes(searchValue);
+                card.style.display = matchesSearch ? '' : 'none';
+            });
+
+            groups.forEach(group => {
+                const levelMatch = selectedLevel === 'all' || group.dataset.level === selectedLevel || group.dataset.level === 'level1';
+                const hasVisibleCard = Array.from(group.querySelectorAll('.hierarchy-card')).some(c => c.style.display !== 'none');
+                group.style.display = (levelMatch && hasVisibleCard) ? '' : 'none';
+            });
+        }
+
+        if (search) search.addEventListener('input', apply);
+        if (level) level.addEventListener('change', apply);
+        apply();
+    }
+
+    function bindMemberModal() {
+        document.querySelectorAll('.js-view-member').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('memberName').textContent = btn.dataset.name || '-';
+                document.getElementById('memberCode').textContent = btn.dataset.code || '-';
+                document.getElementById('memberRole').textContent = btn.dataset.role || '-';
+                document.getElementById('memberDepartment').textContent = btn.dataset.department || '-';
+                document.getElementById('memberReporting').textContent = btn.dataset.reporting || '-';
+                document.getElementById('memberEmployment').textContent = btn.dataset.employment || '-';
+                document.getElementById('memberStatus').textContent = btn.dataset.status || '-';
+                document.getElementById('memberEmail').textContent = btn.dataset.email || '-';
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        bindFilters();
+        bindHierarchyControls();
+        bindMemberModal();
+        applyDirectoryFilters();
+        applyPendingFilters();
+        applyRecommendationFilters();
+    });
+</script>
+</body>
+</html>

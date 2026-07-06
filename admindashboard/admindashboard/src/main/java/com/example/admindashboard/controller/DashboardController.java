@@ -589,8 +589,10 @@ public class DashboardController {
             // For HR managers, resignation approvals are routed to them after reporting manager
             if (request.getRequestURI().contains("senior_hr")) {
                 pendingResignations = resignationRequestRepository.findByStatus("PENDING_HR");
+                model.addAttribute("isSeniorHr", true);
             } else {
                 pendingResignations = resignationRequestRepository.findByStatus("PENDING_MANAGER");
+                model.addAttribute("isSeniorHr", false);
             }
             model.addAttribute("pendingResignations", pendingResignations);
 
@@ -627,6 +629,12 @@ public class DashboardController {
 
             return "rewards-workflow";
         }
+        
+        java.util.List<ResignationRequest> allManagerResignations = resignationRequestRepository.findByStatus("PENDING_MANAGER");
+        model.addAttribute("pendingResignations", allManagerResignations);
+        java.util.List<Referral> allReferrals = referralRepository.findAll();
+        model.addAttribute("pendingReferrals", allReferrals);
+        
         return "manager-workflow";
     }
 
@@ -673,7 +681,7 @@ public class DashboardController {
         return "employee-dashboard";
     }
 
-    @PostMapping({"/HR/resignation/{id}/approve", "/senior_hr/resignation/{id}/approve"})
+    @PostMapping({"/HR/resignation/{id}/approve", "/senior_hr/resignation/{id}/approve", "/manager/resignation/{id}/approve"})
     public String approveResignationL2(@PathVariable("id") Long id, @RequestParam("noticePeriodDays") Integer noticePeriodDays, jakarta.servlet.http.HttpServletRequest request, Principal principal) {
         if (principal != null) {
             User l2Hr = userRepository.findByUsername(principal.getName()).orElse(null);
@@ -689,10 +697,10 @@ public class DashboardController {
                 userRepository.save(employee);
             }
         }
-        return "redirect:" + (request.getRequestURI().contains("senior_hr") ? "/senior_hr/workflow?tab=resignation" : "/HR/workflow?tab=resignation");
+        return "redirect:" + (request.getRequestURI().contains("senior_hr") ? "/senior_hr/workflow?tab=resignation" : (request.getRequestURI().contains("manager") ? "/manager/workflow?tab=resignation" : "/HR/workflow?tab=resignation"));
     }
 
-    @PostMapping({"/HR/resignation/{id}/reject", "/senior_hr/resignation/{id}/reject"})
+    @PostMapping({"/HR/resignation/{id}/reject", "/senior_hr/resignation/{id}/reject", "/manager/resignation/{id}/reject"})
     public String rejectResignationL2(@PathVariable("id") Long id, jakarta.servlet.http.HttpServletRequest request, Principal principal) {
         if (principal != null) {
             User l2Hr = userRepository.findByUsername(principal.getName()).orElse(null);
@@ -703,27 +711,27 @@ public class DashboardController {
                 resignationRequestRepository.save(req);
             }
         }
-        return "redirect:" + (request.getRequestURI().contains("senior_hr") ? "/senior_hr/workflow?tab=resignation" : "/HR/workflow?tab=resignation");
+        return "redirect:" + (request.getRequestURI().contains("senior_hr") ? "/senior_hr/workflow?tab=resignation" : (request.getRequestURI().contains("manager") ? "/manager/workflow?tab=resignation" : "/HR/workflow?tab=resignation"));
     }
 
-    @PostMapping({"/HR/referral/{id}/approve", "/senior_hr/referral/{id}/approve"})
+    @PostMapping({"/HR/referral/{id}/approve", "/senior_hr/referral/{id}/approve", "/manager/referral/{id}/approve"})
     public String approveReferral(@PathVariable("id") Long id, jakarta.servlet.http.HttpServletRequest request) {
         Referral ref = referralRepository.findById(id).orElse(null);
         if (ref != null) {
             ref.setStatus("IN_REVIEW");
             referralRepository.save(ref);
         }
-        return "redirect:" + (request.getRequestURI().contains("senior_hr") ? "/senior_hr/workflow?tab=referral" : "/HR/workflow?tab=referral");
+        return "redirect:" + (request.getRequestURI().contains("senior_hr") ? "/senior_hr/workflow?tab=referral" : (request.getRequestURI().contains("manager") ? "/manager/workflow?tab=referral" : "/HR/workflow?tab=referral"));
     }
 
-    @PostMapping({"/HR/referral/{id}/reject", "/senior_hr/referral/{id}/reject"})
+    @PostMapping({"/HR/referral/{id}/reject", "/senior_hr/referral/{id}/reject", "/manager/referral/{id}/reject"})
     public String rejectReferral(@PathVariable("id") Long id, jakarta.servlet.http.HttpServletRequest request) {
         Referral ref = referralRepository.findById(id).orElse(null);
         if (ref != null) {
             ref.setStatus("REJECTED");
             referralRepository.save(ref);
         }
-        return "redirect:" + (request.getRequestURI().contains("senior_hr") ? "/senior_hr/workflow?tab=referral" : "/HR/workflow?tab=referral");
+        return "redirect:" + (request.getRequestURI().contains("senior_hr") ? "/senior_hr/workflow?tab=referral" : (request.getRequestURI().contains("manager") ? "/manager/workflow?tab=referral" : "/HR/workflow?tab=referral"));
     }
 
     @GetMapping("/employee/resignation")

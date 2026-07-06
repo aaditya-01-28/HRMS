@@ -1422,34 +1422,9 @@
                                 <td class="text-muted" th:text="${req.requestDate}">Date</td>
                                 <td class="text-end" style="padding-right: 1.5rem;">
                                     <button class="btn btn-sm btn-success px-3 py-1.5 fw-semibold me-2" style="border-radius: 6px;" data-bs-toggle="modal" th:data-bs-target="'#approveResignationModal' + ${req.id}">Approve</button>
-                                    <form th:action="@{(${#request.requestURI.contains('senior_hr')} ? '/senior_hr/resignation/' : '/HR/resignation/') + ${req.id} + '/reject'}" method="post" style="display:inline;">
+                                    <form th:action="${isSeniorHr ? '/senior_hr/resignation/' + req.id + '/reject' : '/HR/resignation/' + req.id + '/reject'}" method="post" style="display:inline;">
                                         <button type="submit" class="btn btn-sm btn-danger px-3 py-1.5 fw-semibold" style="border-radius: 6px;">Reject</button>
                                     </form>
-                                    
-                                    <!-- Approve Modal -->
-                                    <div class="modal fade text-start" th:id="'approveResignationModal' + ${req.id}" tabindex="-1" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <form th:action="@{(${#request.requestURI.contains('senior_hr')} ? '/senior_hr/resignation/' : '/HR/resignation/') + ${req.id} + '/approve'}" method="post">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title fw-bold">Approve Resignation</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <p>Assign notice period for <strong th:text="${req.employee != null ? req.employee.fullName : 'Employee'}"></strong>.</p>
-                                                        <div class="mb-3">
-                                                            <label class="form-label fw-bold">Notice Period (Days)</label>
-                                                            <input type="number" class="form-control" name="noticePeriodDays" value="30" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="submit" class="btn btn-success">Approve</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </td>
                             </tr>
                             <tr th:if="${pendingResignations == null or pendingResignations.empty}">
@@ -1457,6 +1432,32 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                <!-- Approve Modals outside the table to prevent backdrop overlay issue -->
+                <div th:each="req : ${pendingResignations}">
+                    <div class="modal fade text-start" th:id="'approveResignationModal' + ${req.id}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form th:action="${isSeniorHr ? '/senior_hr/resignation/' + req.id + '/approve' : '/HR/resignation/' + req.id + '/approve'}" method="post">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title fw-bold">Approve Resignation</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Assign notice period for <strong th:text="${req.employee != null ? req.employee.fullName : 'Employee'}"></strong>.</p>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Notice Period (Days)</label>
+                                            <input type="number" class="form-control" name="noticePeriodDays" value="30" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-success">Approve</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1504,10 +1505,10 @@
                                 </td>
                                 <td class="text-end" style="padding-right: 1.5rem;">
                                     <div th:if="${ref.status == 'SUBMITTED'}">
-                                        <form th:action="@{(${#request.requestURI.contains('senior_hr')} ? '/senior_hr/referral/' : '/HR/referral/') + ${ref.id} + '/approve'}" method="post" style="display:inline;">
+                                        <form th:action="${isSeniorHr ? '/senior_hr/referral/' + ref.id + '/approve' : '/HR/referral/' + ref.id + '/approve'}" method="post" style="display:inline;">
                                             <button type="submit" class="btn btn-sm btn-success px-3 py-1.5 fw-semibold me-2" style="border-radius: 6px;">Approve</button>
                                         </form>
-                                        <form th:action="@{(${#request.requestURI.contains('senior_hr')} ? '/senior_hr/referral/' : '/HR/referral/') + ${ref.id} + '/reject'}" method="post" style="display:inline;">
+                                        <form th:action="${isSeniorHr ? '/senior_hr/referral/' + ref.id + '/reject' : '/HR/referral/' + ref.id + '/reject'}" method="post" style="display:inline;">
                                             <button type="submit" class="btn btn-sm btn-danger px-3 py-1.5 fw-semibold" style="border-radius: 6px;">Reject</button>
                                         </form>
                                     </div>
