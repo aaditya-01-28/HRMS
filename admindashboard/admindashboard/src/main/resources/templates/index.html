@@ -134,19 +134,19 @@
             <form action="/perform_login" method="post">
                 <input type="hidden" name="portalType" value="employee">
                 
-                <div class="mb-4">
+                <div class="mb-5">
                     <label class="form-label fw-bold text-dark fs-6">User ID</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white border-dark border-end-0"><i class="fas fa-user text-muted"></i></span>
-                        <input type="text" name="username" class="form-control border-dark border-start-0 fw-semibold" style="padding-left: 24px !important;" placeholder="e.g. EMP114 or EMP002" required>
+                        <input type="text" name="username" class="form-control border-dark border-start-0 ps-2 fw-semibold" placeholder="e.g. EMP114 or EMP002" required>
                     </div>
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-5">
                     <label class="form-label fw-bold text-dark fs-6">Password</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white border-dark border-end-0"><i class="fas fa-lock text-muted"></i></span>
-                        <input type="password" name="password" id="employeePassword" class="form-control border-dark border-start-0 border-end-0 fw-semibold" style="padding-left: 24px !important;" placeholder="••••••••••" required>
+                        <input type="password" name="password" id="employeePassword" class="form-control border-dark border-start-0 border-end-0 ps-2 fw-semibold" placeholder="••••••••••" required>
                         <button class="btn border-dark border-start-0 bg-white text-muted btn-toggle-password" type="button" onclick="togglePassword('employeePassword', 'eyeIconEmp')">
                             <i class="fas fa-eye-slash" id="eyeIconEmp"></i>
                         </button>
