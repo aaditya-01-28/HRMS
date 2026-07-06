@@ -1196,8 +1196,17 @@ public class SeniorDashboardController {
         java.util.List<java.util.Map<String, Object>> list = new java.util.ArrayList<>();
         for (com.example.admindashboard.model.AppraisalCycle c : cycles) {
             java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", c.getId());
             map.put("name", c.getCycleName());
             map.put("type", c.getCycleType());
+            map.put("code", c.getCycleCode());
+            map.put("durationType", c.getDurationType());
+            map.put("startDate", c.getStartDate());
+            map.put("endDate", c.getEndDate());
+            map.put("frequency", c.getFrequency());
+            map.put("timeZone", c.getTimeZone());
+            map.put("owner", c.getCycleOwner());
+            map.put("description", c.getDescription());
             
             // Format start/end date for duration display
             String duration = "-";
@@ -1224,6 +1233,7 @@ public class SeniorDashboardController {
 
     @PostMapping("/senior_hr/performance/create-cycle")
     public String createAppraisalCycle(
+            @RequestParam(value = "cycleId", required = false) Long cycleId,
             @RequestParam("cycleName") String cycleName,
             @RequestParam("cycleType") String cycleType,
             @RequestParam(value = "cycleCode", required = false) String cycleCode,
@@ -1235,7 +1245,15 @@ public class SeniorDashboardController {
             @RequestParam("cycleOwner") String cycleOwner,
             @RequestParam("description") String description) {
 
-        com.example.admindashboard.model.AppraisalCycle cycle = new com.example.admindashboard.model.AppraisalCycle();
+        com.example.admindashboard.model.AppraisalCycle cycle;
+        if (cycleId != null) {
+            cycle = appraisalCycleRepository.findById(cycleId).orElse(new com.example.admindashboard.model.AppraisalCycle());
+        } else {
+            cycle = new com.example.admindashboard.model.AppraisalCycle();
+            cycle.setProgress(0); // starts at 0%
+            cycle.setStatus("Active");
+            cycle.setEmpCount(112); // match default count
+        }
         cycle.setCycleName(cycleName);
         cycle.setCycleType(cycleType);
         cycle.setCycleCode(cycleCode);
@@ -1246,12 +1264,15 @@ public class SeniorDashboardController {
         cycle.setTimeZone(timeZone);
         cycle.setCycleOwner(cycleOwner);
         cycle.setDescription(description);
-        cycle.setProgress(0); // starts at 0%
-        cycle.setStatus("Active");
-        cycle.setEmpCount(112); // match default count
 
         appraisalCycleRepository.save(cycle);
 
+        return "redirect:/senior_hr/performance?tab=cycles";
+    }
+
+    @GetMapping("/senior_hr/performance/delete-cycle/{id}")
+    public String deleteAppraisalCycle(@PathVariable("id") Long id) {
+        appraisalCycleRepository.deleteById(id);
         return "redirect:/senior_hr/performance?tab=cycles";
     }
 

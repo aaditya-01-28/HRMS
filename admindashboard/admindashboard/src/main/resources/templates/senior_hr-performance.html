@@ -210,6 +210,7 @@
         .table-custom tbody tr:last-child td {
             border-bottom: none;
         }
+        .no-caret::after { display: none !important; }
     </style>
 </head>
 <body>
@@ -400,7 +401,7 @@
                     <!-- Appraisal Cycles Table -->
                     <div class="d-flex justify-content-end mb-3 gap-3">
                         <button class="btn btn-outline-secondary btn-sm px-3 fw-bold"><i class="fas fa-filter"></i> More Filters</button>
-                        <button class="btn btn-primary btn-sm px-3 fw-bold" onclick="toggleCreateCycleView()"><i class="fas fa-plus"></i> Create Appraisal Cycle</button>
+                        <button class="btn btn-primary btn-sm px-3 fw-bold" onclick="showCreateCycleView()"><i class="fas fa-plus"></i> Create Appraisal Cycle</button>
                     </div>
                     
                     <div class="table-responsive border rounded">
@@ -434,8 +435,34 @@
                                         <span th:class="${app.status == 'Active' ? 'text-success fw-bold' : 'text-success fw-bold'}" th:text="${app.status}">Status</span>
                                     </td>
                                     <td>
-                                        <button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
-                                        <button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
+                                        <button class="btn btn-sm btn-link text-dark p-0 me-2" 
+                                                th:onclick="'editAppraisalCycle(' + 
+                                                ${app.id} + ', ' + 
+                                                '\'' + ${app.name} + '\', ' + 
+                                                '\'' + ${app.type} + '\', ' + 
+                                                '\'' + ${app.code} + '\', ' + 
+                                                '\'' + ${app.durationType} + '\', ' + 
+                                                '\'' + ${app.startDate} + '\', ' + 
+                                                '\'' + ${app.endDate} + '\', ' + 
+                                                '\'' + ${app.frequency} + '\', ' + 
+                                                '\'' + ${app.timeZone} + '\', ' + 
+                                                '\'' + ${app.owner} + '\', ' + 
+                                                '\'' + ${app.description} + '\'' + 
+                                                ')'">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                        <div class="dropdown d-inline">
+                                            <button class="btn btn-sm btn-link text-dark p-0 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li>
+                                                    <button class="dropdown-item text-danger" type="button" th:onclick="'confirmDeleteCycle(' + ${app.id} + ')'">
+                                                        <i class="fas fa-trash me-2"></i>Delete
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -463,6 +490,7 @@
         <!-- CREATE APPRAISAL CYCLE VIEW (hidden by default) -->
         <div id="create-cycle-view" class="d-none">
             <form th:action="@{/senior_hr/performance/create-cycle}" method="post">
+                <input type="hidden" name="cycleId" id="cycleId">
                 <div class="d-flex align-items-center border-bottom pb-3 mb-4">
                     <div>
                         <h5 class="fw-bold text-primary mb-1">Appraisal Form</h5>
@@ -563,7 +591,7 @@
             if (formEl.classList.contains('d-none')) {
                 overviewEl.classList.add('d-none');
                 formEl.classList.remove('d-none');
-                subTitleEl.innerHTML = 'Performance <i class="fas fa-chevron-right" style="font-size:0.8rem; margin:0 5px;"></i> Create Appraisal Cycle <i class="fas fa-chevron-right" style="font-size:0.8rem; margin:0 5px;"></i> Overview';
+                subTitleEl.innerHTML = 'Performance <i class="fas fa-chevron-right" style="font-size:0.8rem; margin:0 5px;"></i> Create/Edit Appraisal Cycle <i class="fas fa-chevron-right" style="font-size:0.8rem; margin:0 5px;"></i> Overview';
                 backBtn.setAttribute('data-orig-href', backBtn.getAttribute('href'));
                 backBtn.removeAttribute('href');
                 backBtn.setAttribute('onclick', 'toggleCreateCycleView()');
@@ -574,6 +602,54 @@
                 const origHref = backBtn.getAttribute('data-orig-href') || '/senior_hr/dashboard';
                 backBtn.setAttribute('href', origHref);
                 backBtn.removeAttribute('onclick');
+            }
+        }
+
+        function showCreateCycleView() {
+            document.getElementById('cycleId').value = '';
+            document.querySelector('#create-cycle-view input[name="cycleName"]').value = '';
+            document.querySelector('#create-cycle-view select[name="cycleType"]').value = 'Annual';
+            document.querySelector('#create-cycle-view input[name="cycleCode"]').value = '';
+            document.querySelector('#create-cycle-view select[name="durationType"]').value = 'Custom';
+            document.querySelector('#create-cycle-view input[name="startDate"]').value = '';
+            document.querySelector('#create-cycle-view input[name="endDate"]').value = '';
+            document.querySelector('#create-cycle-view select[name="frequency"]').value = 'Annual';
+            document.querySelector('#create-cycle-view select[name="timeZone"]').value = '(GMT +5:30) Kolkata';
+            document.querySelector('#create-cycle-view select[name="cycleOwner"]').value = 'Neha Sharma';
+            document.querySelector('#create-cycle-view textarea[name="description"]').value = '';
+
+            const formTitle = document.querySelector('#create-cycle-view h5.fw-bold');
+            if (formTitle) {
+                formTitle.textContent = 'Appraisal Form';
+            }
+
+            toggleCreateCycleView();
+        }
+
+        function editAppraisalCycle(id, name, type, code, durationType, startDate, endDate, frequency, timeZone, owner, description) {
+            document.getElementById('cycleId').value = id;
+            document.querySelector('#create-cycle-view input[name="cycleName"]').value = name || '';
+            document.querySelector('#create-cycle-view select[name="cycleType"]').value = type || 'Annual';
+            document.querySelector('#create-cycle-view input[name="cycleCode"]').value = code || '';
+            document.querySelector('#create-cycle-view select[name="durationType"]').value = durationType || 'Custom';
+            document.querySelector('#create-cycle-view input[name="startDate"]').value = startDate || '';
+            document.querySelector('#create-cycle-view input[name="endDate"]').value = endDate || '';
+            document.querySelector('#create-cycle-view select[name="frequency"]').value = frequency || 'Annual';
+            document.querySelector('#create-cycle-view select[name="timeZone"]').value = timeZone || '(GMT +5:30) Kolkata';
+            document.querySelector('#create-cycle-view select[name="cycleOwner"]').value = owner || 'Neha Sharma';
+            document.querySelector('#create-cycle-view textarea[name="description"]').value = description || '';
+
+            const formTitle = document.querySelector('#create-cycle-view h5.fw-bold');
+            if (formTitle) {
+                formTitle.textContent = 'Edit Appraisal Cycle';
+            }
+
+            toggleCreateCycleView();
+        }
+
+        function confirmDeleteCycle(id) {
+            if (confirm("Are you sure you want to delete this appraisal cycle? This action cannot be undone.")) {
+                window.location.href = "/senior_hr/performance/delete-cycle/" + id;
             }
         }
 
