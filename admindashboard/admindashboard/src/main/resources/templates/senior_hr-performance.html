@@ -435,20 +435,18 @@
                                         <span th:class="${app.status == 'Active' ? 'text-success fw-bold' : 'text-success fw-bold'}" th:text="${app.status}">Status</span>
                                     </td>
                                     <td>
-                                        <button class="btn btn-sm btn-link text-dark p-0 me-2" 
-                                                th:onclick="'editAppraisalCycle(' + 
-                                                ${app.id} + ', ' + 
-                                                '\'' + ${app.name} + '\', ' + 
-                                                '\'' + ${app.type} + '\', ' + 
-                                                '\'' + ${app.code} + '\', ' + 
-                                                '\'' + ${app.durationType} + '\', ' + 
-                                                '\'' + ${app.startDate} + '\', ' + 
-                                                '\'' + ${app.endDate} + '\', ' + 
-                                                '\'' + ${app.frequency} + '\', ' + 
-                                                '\'' + ${app.timeZone} + '\', ' + 
-                                                '\'' + ${app.owner} + '\', ' + 
-                                                '\'' + ${app.description} + '\'' + 
-                                                ')'">
+                                        <button class="btn btn-sm btn-link text-dark edit-cycle-btn p-0 me-2" 
+                                                th:data-id="${app.id}"
+                                                th:data-name="${app.name}"
+                                                th:data-type="${app.type}"
+                                                th:data-code="${app.code}"
+                                                th:data-duration-type="${app.durationType}"
+                                                th:data-start-date="${app.startDate}"
+                                                th:data-end-date="${app.endDate}"
+                                                th:data-frequency="${app.frequency}"
+                                                th:data-time-zone="${app.timeZone}"
+                                                th:data-owner="${app.owner}"
+                                                th:data-description="${app.description}">
                                             <i class="fas fa-pen"></i>
                                         </button>
                                         <div class="dropdown d-inline">
@@ -457,7 +455,7 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end">
                                                 <li>
-                                                    <button class="dropdown-item text-danger" type="button" th:onclick="'confirmDeleteCycle(' + ${app.id} + ')'">
+                                                    <button class="dropdown-item text-danger delete-cycle-btn" type="button" th:data-id="${app.id}">
                                                         <i class="fas fa-trash me-2"></i>Delete
                                                     </button>
                                                 </li>
@@ -655,6 +653,32 @@
 
         // Charts
         document.addEventListener("DOMContentLoaded", function() {
+            // Bind edit cycle buttons
+            document.querySelectorAll('.edit-cycle-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const name = this.getAttribute('data-name');
+                    const type = this.getAttribute('data-type');
+                    const code = this.getAttribute('data-code');
+                    const durationType = this.getAttribute('data-duration-type');
+                    const startDate = this.getAttribute('data-start-date');
+                    const endDate = this.getAttribute('data-end-date');
+                    const frequency = this.getAttribute('data-frequency');
+                    const timeZone = this.getAttribute('data-time-zone');
+                    const owner = this.getAttribute('data-owner');
+                    const description = this.getAttribute('data-description');
+                    editAppraisalCycle(id, name, type, code, durationType, startDate, endDate, frequency, timeZone, owner, description);
+                });
+            });
+
+            // Bind delete cycle buttons
+            document.querySelectorAll('.delete-cycle-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    confirmDeleteCycle(id);
+                });
+            });
+
             // Activate tab from URL query parameter
             const urlParams = new URLSearchParams(window.location.search);
             const tab = urlParams.get('tab');
