@@ -1436,7 +1436,7 @@
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <p>Assign notice period for <strong th:text="${req.employee.fullName}"></strong>.</p>
+                                                        <p>Assign notice period for <strong th:text="${req.employee != null ? req.employee.fullName : 'Employee'}"></strong>.</p>
                                                         <div class="mb-3">
                                                             <label class="form-label fw-bold">Notice Period (Days)</label>
                                                             <input type="number" class="form-control" name="noticePeriodDays" value="30" required>
