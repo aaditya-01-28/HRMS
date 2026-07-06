@@ -345,6 +345,7 @@
             <i class="fas fa-ticket-alt"></i> Tickets
         </a>
     </div>
+</div> <!-- Close it-sidebar -->
 
 <!-- GLOBAL NAVBAR -->
 <nav class="top-navbar">
@@ -1408,10 +1409,12 @@
                             <tr th:each="req : ${pendingResignations}">
                                 <td class="py-3">
                                     <div class="d-flex align-items-center">
-                                        <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-2" style="width:36px; height:36px; font-size: 14px;" th:data-name="${req.employee.fullName}" th:text="${#strings.substring(req.employee.fullName, 0, 1)}"></div>
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-2" style="width:36px; height:36px; font-size: 14px;" 
+                                             th:data-name="${req.employee != null ? req.employee.fullName : 'Employee'}" 
+                                             th:text="${req.employee != null && !#strings.isEmpty(req.employee.fullName) ? #strings.substring(req.employee.fullName, 0, 1) : 'E'}"></div>
                                         <div>
-                                            <div class="fw-bold text-dark" th:text="${req.employee.fullName}">Name</div>
-                                            <div class="text-muted small" th:text="${req.employee.employeeProfile?.designation}">Designation</div>
+                                            <div class="fw-bold text-dark" th:text="${req.employee != null ? req.employee.fullName : 'Name'}">Name</div>
+                                            <div class="text-muted small" th:text="${req.employee != null && req.employee.employeeProfile != null ? req.employee.employeeProfile.designation : 'Designation'}">Designation</div>
                                         </div>
                                     </div>
                                 </td>
@@ -1482,9 +1485,11 @@
                             <tr th:each="ref : ${pendingReferrals}">
                                 <td class="py-3">
                                     <div class="d-flex align-items-center">
-                                        <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-2" style="width:36px; height:36px; font-size: 14px;" th:data-name="${ref.firstName + ' ' + ref.lastName}" th:text="${#strings.substring(ref.firstName, 0, 1)}">C</div>
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center border fw-bold text-primary bg-primary bg-opacity-10 me-2" style="width:36px; height:36px; font-size: 14px;" 
+                                             th:data-name="${ref.firstName != null ? ref.firstName + ' ' + (ref.lastName != null ? ref.lastName : '') : 'Candidate'}" 
+                                             th:text="${ref.firstName != null && !#strings.isEmpty(ref.firstName) ? #strings.substring(ref.firstName, 0, 1) : 'C'}">C</div>
                                         <div>
-                                            <div class="fw-bold text-dark" th:text="${ref.firstName + ' ' + ref.lastName}">Candidate Name</div>
+                                            <div class="fw-bold text-dark" th:text="${ref.firstName != null ? ref.firstName + ' ' + (ref.lastName != null ? ref.lastName : '') : 'Candidate Name'}">Candidate Name</div>
                                             <div class="text-muted small" th:text="${ref.email}">Email</div>
                                         </div>
                                     </div>

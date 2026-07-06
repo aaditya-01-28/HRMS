@@ -753,17 +753,17 @@
 	
 	<div id="pending-section">
 
-	<table class="approval-table">
-
-	    <thead>
-	        <tr>
-	            <th>Type</th>
-	            <th>Date Range</th>
-	            <th>Mode</th>
-	            <th>Reason</th>
-	            <th>View Details</th>
-	        </tr>
-	    </thead>
+	<div class="table-responsive">
+		<table class="table table-hover align-middle mb-0 approval-table">
+			<thead>
+				<tr style="background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);">
+					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Type</th>
+					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Date Range</th>
+					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Mode</th>
+					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Reason</th>
+					<th class="text-primary fw-bold py-3 text-end" style="border-bottom: 2px solid #cbd5e1; padding-right: 1.5rem;">View Details</th>
+				</tr>
+			</thead>
 
 	    <tbody>
 
@@ -782,7 +782,7 @@
 
 	            <td th:text="${leave.reason}"></td>
 
-				<td>
+				<td class="text-end" style="padding-right: 1.5rem;">
 					<button class="view-btn"
 					        onclick="showDetails(this)">
 					    View
@@ -837,7 +837,7 @@
 
 			    <td th:text="${timesheet.overallComments}"></td>
 
-			    <td>
+			    <td class="text-end" style="padding-right: 1.5rem;">
 			        <button class="view-btn"
 			                onclick="showDetails(this)">
 			            View
@@ -885,7 +885,7 @@
 
 			    <td th:text="${attendance.reason}"></td>
 
-			    <td>
+			    <td class="text-end" style="padding-right: 1.5rem;">
 			        <button class="view-btn"
 			                onclick="showDetails(this)">
 			            View
@@ -941,24 +941,24 @@
 	    </tbody>
 
 	</table>
+	</div>
 
 	</div>
 	
 	
 	<div id="approved-section" style="display:none;">
 
-	    <!-- APPROVED LEAVES -->
-		<table class="approval-table">
-
-		    <thead>
-		        <tr>
-		            <th>Type</th>
-		            <th>Date Range</th>
-		            <th>Mode</th>
-		            <th>Reason</th>
-		            <th>View Details</th>
-		        </tr>
-		    </thead>
+	<div class="table-responsive">
+		<table class="table table-hover align-middle mb-0 approval-table">
+			<thead>
+				<tr style="background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);">
+					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Type</th>
+					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Date Range</th>
+					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Mode</th>
+					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Reason</th>
+					<th class="text-primary fw-bold py-3 text-end" style="border-bottom: 2px solid #cbd5e1; padding-right: 1.5rem;">View Details</th>
+				</tr>
+			</thead>
 
 		    <tbody>
 
@@ -976,7 +976,7 @@
 
 		            <td th:text="${leave.reason}"></td>
 
-		            <td>
+		            <td class="text-end" style="padding-right: 1.5rem;">
 		                <button class="view-btn"
 		                        onclick="showDetails(this)">
 		                    View
@@ -1029,7 +1029,7 @@
 
 		            <td th:text="${timesheet.overallComments}"></td>
 
-		            <td>
+		            <td class="text-end" style="padding-right: 1.5rem;">
 
 		                <button class="view-btn"
 		                        onclick="showDetails(this)">
@@ -1079,7 +1079,7 @@
 
 		            <td th:text="${attendance.reason}"></td>
 
-		            <td>
+		            <td class="text-end" style="padding-right: 1.5rem;">
 
 		                <button class="view-btn"
 		                        onclick="showDetails(this)">
@@ -1136,24 +1136,24 @@
 		    </tbody>
 
 		</table>
+	</div>
 
 	</div>
 	
 
 	<div id="denied-section" style="display:none;">
 
-	    <!-- REJECTED LEAVES -->
-		<table class="approval-table">
-
-		    <thead>
-		        <tr>
-		            <th>Type</th>
-		            <th>Date Range</th>
-		            <th>Mode</th>
-		            <th>Reason</th>
-		            <th>View Details</th>
-		        </tr>
-		    </thead>
+	<div class="table-responsive">
+		<table class="table table-hover align-middle mb-0 approval-table">
+			<thead>
+				<tr style="background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);">
+					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Type</th>
+					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Date Range</th>
+					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Mode</th>
+					<th class="text-primary fw-bold py-3" style="border-bottom: 2px solid #cbd5e1;">Reason</th>
+					<th class="text-primary fw-bold py-3 text-end" style="border-bottom: 2px solid #cbd5e1; padding-right: 1.5rem;">View Details</th>
+				</tr>
+			</thead>
 
 		    <tbody>
 
@@ -1171,7 +1171,7 @@
 
 		            <td th:text="${leave.reason}"></td>
 
-		            <td>
+		            <td class="text-end" style="padding-right: 1.5rem;">
 
 		                <button class="view-btn"
 		                        onclick="showDetails(this)">
@@ -1230,7 +1230,7 @@
 
 		            <td th:text="${timesheet.overallComments}"></td>
 
-		            <td>
+		            <td class="text-end" style="padding-right: 1.5rem;">
 
 		                <button class="view-btn"
 		                        onclick="showDetails(this)">
@@ -1285,7 +1285,7 @@
 
 		            <td th:text="${attendance.reason}"></td>
 
-		            <td>
+		            <td class="text-end" style="padding-right: 1.5rem;">
 
 		                <button class="view-btn"
 		                        onclick="showDetails(this)">
@@ -1347,6 +1347,7 @@
 		    </tbody>
 
 		</table>
+	</div>
 
 	</div>
 	<div class="modal fade"
