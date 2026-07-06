@@ -1120,7 +1120,7 @@ public class SeniorDashboardController {
                 // Update ResignationRequest if exists
                 java.util.List<ResignationRequest> reqs = resignationRequestRepository.findByEmployee_Username(exitingUser.getUsername());
                 for (ResignationRequest req : reqs) {
-                    if ("PENDING_L3".equals(req.getStatus()) || "PENDING_L2".equals(req.getStatus())) {
+                    if ("PENDING_L3".equals(req.getStatus()) || "PENDING_L2".equals(req.getStatus()) || "PENDING_HR".equals(req.getStatus())) {
                         req.setStatus("OFFBOARDED");
                         req.setL3ApprovedBy(l3Hr);
                         resignationRequestRepository.save(req);
