@@ -611,12 +611,13 @@ public class DatabaseSeeder implements CommandLineRunner {
             userRepository.save(user);
         }
 
-        // Test Account 1: HR Admin
-        if (userRepository.findByUsername("EMP201").isEmpty()) {
+        // Test Account 1: Senior HR (L3)
+        Optional<User> emp201Opt = userRepository.findByUsername("EMP201");
+        if (emp201Opt.isEmpty()) {
             User hrUser = new User();
             hrUser.setUsername("EMP201");
             hrUser.setPassword("{noop}welcome123");
-            hrUser.setRole(hrAdminRole);
+            hrUser.setRole(seniorHrRole);
             hrUser.setFullName("Priya Sharma");
             hrUser.setEmail("priya.hr@whitecirclegroup.com");
 
@@ -629,7 +630,14 @@ public class DatabaseSeeder implements CommandLineRunner {
             hrProfile.setUser(hrUser);
             hrUser.setEmployeeProfile(hrProfile);
             userRepository.save(hrUser);
-            System.out.println("✅ Created HR Admin -> ID: EMP201");
+            System.out.println("✅ Created Senior HR -> ID: EMP201");
+        } else {
+            User hrUser = emp201Opt.get();
+            if (hrUser.getRole() == null || !"SENIOR_HR".equals(hrUser.getRole().getRoleName())) {
+                hrUser.setRole(seniorHrRole);
+                userRepository.save(hrUser);
+                System.out.println("✅ Upgraded EMP201 to Senior HR (L3)");
+            }
         }
 
         // Test Account 2: Finance / Payroll

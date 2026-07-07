@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>WhiteCircle | Project & Work</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #002D72;
+            --sidebar-width: 205px;
+            --header-height: 70px;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            background: #f8fafc;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .myspace-sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: #f8fafc;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 1051;
+            transition: transform .3s ease;
+        }
+
+        body.sidebar-toggled .myspace-sidebar { transform: translateX(-100%); }
+
+        .brand-area {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: var(--header-height);
+        }
+
+        .brand-area img {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .brand-title { font-size: .92rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+        .brand-sub { font-size: .78rem; color: var(--muted); }
+
+        .nav-links { padding: 10px 0; flex: 1; }
+
+        .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 12px;
+            color: #475569;
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 600;
+            border-left: 3px solid transparent;
+            transition: all .2s;
+        }
+
+        .nav-link-item:hover { background: #eef2ff; color: var(--primary); }
+        .nav-link-item.active { background: #e2e8f0; color: var(--primary); border-left-color: var(--primary-light); }
+
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--header-height);
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1050;
+            transition: left .3s ease;
+        }
+
+        body.sidebar-toggled .top-navbar { left: 0; }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+        }
+
+        .myspace-main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 14px 18px;
+            min-height: calc(100vh - var(--header-height));
+            transition: margin-left .3s ease;
+        }
+
+        body.sidebar-toggled .myspace-main { margin-left: 0; }
+
+        .tabs-strip {
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: flex-start;
+            gap: 40px;
+        }
+
+        .tab-link {
+            text-decoration: none;
+            color: #1f2937;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 3px solid transparent;
+            font-size: 1.1rem;
+        }
+
+        .tab-link.active { color: #2563eb; border-color: #2563eb; }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-height: 80px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .stat-card .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-card .label { font-size: .88rem; color: #64748b; font-weight: 600; }
+        .stat-card .value { font-size: 2.1rem; line-height: 1; font-weight: 700; margin-top: 4px; }
+
+        .panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        /* Filter Controls */
+        .filters-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.2fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .filters-row input, .filters-row select {
+            height: 40px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 0 14px;
+            font-size: .92rem;
+            background: #fff;
+            width: 100%;
+        }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            overflow: hidden;
+            width: 80px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background-color: #10b981;
+        }
+
+        .status-badge {
+            font-size: 0.78rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-active { background-color: #dcfce7; color: #15803d; }
+        .status-completed { background-color: #e0f2fe; color: #0369a1; }
+        .status-ontrack { background-color: #dcfce7; color: #15803d; }
+        .status-risk { background-color: #fee2e2; color: #b91c1c; }
+
+        .avatar-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar-group .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            margin-left: -8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.7rem;
+            color: #fff;
+        }
+
+        .avatar-group .avatar:first-child {
+            margin-left: 0;
+        }
+
+        .avatar-1 { background-color: #3b82f6; }
+        .avatar-2 { background-color: #10b981; }
+        .avatar-3 { background-color: #f59e0b; }
+        .avatar-more { background-color: #6b7280; }
+
+        @media (max-width: 1200px) {
+            .stats-row { grid-template-columns: 1fr 1fr; }
+            .filters-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .myspace-sidebar { transform: translateX(-100%); }
+            body.sidebar-toggled .myspace-sidebar { transform: translateX(0); }
+            .top-navbar { left: 0; padding: 0 10px; }
+            .myspace-main { margin-left: 0; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="myspace-sidebar shadow-sm">
+    <div class="brand-area">
+        <img src="/images/wcg-logo.jpg" alt="Logo"/>
+        <div>
+            <div class="brand-title">WhiteCircle</div>
+            <div class="brand-sub">Manager Admin</div>
+        </div>
+    </div>
+    <div class="nav-links">
+        <a href="/senior_manager/myspace?tab=directory" class="nav-link-item"><i class="fa-solid fa-users"></i> Team & Employee</a>
+        <a href="/senior_manager/leave_attendance" class="nav-link-item"><i class="fa-solid fa-calendar-days"></i> Leave & Attendance</a>
+        <a href="/senior_manager/project_work" class="nav-link-item active"><i class="fa-solid fa-briefcase"></i> Project & Work</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Performance</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-user-plus"></i> Recruitment</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-wallet"></i> Financial & Expense</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-file-lines"></i> Reports</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-comments"></i> Communication</a>
+        <a href="/senior_manager/myspace?tab=hierarchy" class="nav-link-item"><i class="fa-solid fa-sitemap"></i> Org. Hierarchy</a>
+    </div>
+</div>
+
+<nav class="top-navbar">
+    <div class="nav-brand">
+        <button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
+        <div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
+            <span style="color:#002D72; font-weight:700; font-size:2.1rem;">WhiteCircle Group - Shahdol</span>
+            <span style="font-size:.85rem; font-weight:500; color:#333; margin-top:2px;">Project & Work</span>
+        </div>
+    </div>
+    <div>
+        <a class="btn btn-light text-dark fw-bold" href="/senior_manager/dashboard" style="border-radius:6px; padding:8px 14px; text-decoration:none;">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</nav>
+
+<div class="myspace-main">
+    <div class="tabs-strip">
+        <a th:classappend="${activeTab == 'project'} ? ' active' : ''" class="tab-link" href="/senior_manager/project_work?tab=project">Project</a>
+        <a th:classappend="${activeTab == 'teamwork'} ? ' active' : ''" class="tab-link" href="/senior_manager/project_work?tab=teamwork">My TeamWork</a>
+        <a th:classappend="${activeTab == 'timesheets'} ? ' active' : ''" class="tab-link" href="/senior_manager/project_work?tab=timesheets">Timesheets</a>
+    </div>
+
+    <!-- ==================== VIEW 1: PROJECT ==================== -->
+    <div th:if="${activeTab == 'project'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-users"></i></div>
+                <div><div class="label">Total Team Members</div><div class="value" th:text="${totalMembers}">24</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-user-check"></i></div>
+                <div><div class="label">Active Employees</div><div class="value" th:text="${activeCount}">14</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-couch"></i></div>
+                <div><div class="label">Bench</div><div class="value" th:text="${benchCount}">6</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-user-slash"></i></div>
+                <div><div class="label">Employee Exited</div><div class="value" th:text="${exitedCount}">4</div></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="filters-row">
+                <input type="text" placeholder="Search by Project Name" id="projectSearchInput"/>
+                <select id="projectDeptSelect">
+                    <option value="">All Departments</option>
+                    <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+                </select>
+                <select id="projectStatusSelect">
+                    <option value="">All status</option>
+                    <option value="Active">Active</option>
+                    <option value="Development">Development</option>
+                    <option value="Planning">Planning</option>
+                    <option value="Completed">Completed</option>
+                </select>
+                <input type="text" placeholder="DD-MM-YYYY" style="background:#fff;"/>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle" id="projectTable">
+                    <thead>
+                        <tr class="text-muted fw-bold" style="font-size:0.85rem;">
+                            <th>Project Name</th>
+                            <th>Start date</th>
+                            <th>End Date</th>
+                            <th>Progress</th>
+                            <th></th>
+                            <th>Teams</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${projectsList}"
+                            th:attr="data-name=${row['projectName']}, data-department=${row['department']}, data-status=${row['status']}">
+                            <td class="fw-bold text-dark" th:text="${row['projectName']}">CRM Develop.</td>
+                            <td th:text="${row['startDate']}">01 Apr 2026</td>
+                            <td th:text="${row['endDate']}">01 Aug 2026</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-bar-fill" th:style="'width: ' + ${row['progress']} + '%'"></div>
+                                    </div>
+                                    <span style="font-size:0.75rem;" th:text="${#numbers.formatDecimal(row['progress'], 1, 0) + '%'}">85%</span>
+                                </div>
+                            </td>
+                            <td class="fw-bold" th:text="${row['budget']}">RS. 4.5 L/6.0 L</td>
+                            <td>
+                                <div class="avatar-group">
+                                    <div class="avatar avatar-1">AS</div>
+                                    <div class="avatar avatar-2">NN</div>
+                                    <div class="avatar avatar-3">VD</div>
+                                    <div class="avatar avatar-more">+2</div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge" th:classappend="${#strings.toUpperCase(row['status']) == 'COMPLETED'} ? ' status-completed' : ' status-active'" th:text="${row['status']}">Active</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-link text-dark"><i class="fa-solid fa-pencil"></i></button>
+                                <button class="btn btn-sm btn-link text-dark"><i class="fa-solid fa-ellipsis"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 2: MY TEAMWORK ==================== -->
+    <div th:if="${activeTab == 'teamwork'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-users"></i></div>
+                <div><div class="label">Total Team Members</div><div class="value" th:text="${teamworkTotalMembers}">7</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-list-check"></i></div>
+                <div><div class="label">Task Assigned</div><div class="value" th:text="${teamworkTasksAssigned}">14</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div><div class="label">Pending</div><div class="value" th:text="${teamworkPending}">6</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div><div class="label">Risk</div><div class="value" th:text="${teamworkRisk}">4</div></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="filters-row">
+                <input type="text" placeholder="Search by Employee Name" id="teamworkSearchInput"/>
+                <select id="teamworkDeptSelect">
+                    <option value="">All Departments</option>
+                    <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+                </select>
+                <select id="teamworkStatusSelect">
+                    <option value="">All status</option>
+                    <option value="On Track">On Track</option>
+                    <option value="Active">Active</option>
+                    <option value="At Risk">At Risk</option>
+                </select>
+                <input type="text" placeholder="DD-MM-YYYY" style="background:#fff;"/>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle" id="teamworkTable">
+                    <thead>
+                        <tr class="text-muted fw-bold" style="font-size:0.85rem;">
+                            <th>Employee Name</th>
+                            <th>Task Assigned</th>
+                            <th>In Progress</th>
+                            <th>Completed</th>
+                            <th class="text-danger">Overdue</th>
+                            <th>Completion %</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${teamworkRecords}"
+                            th:attr="data-name=${row['employeeName']}, data-department=${row['department']}, data-status=${row['status']}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(row['employeeName'], 0, 1)}">A</div>
+                                    <div>
+                                        <div class="fw-bold text-dark" th:text="${row['employeeName']}">Amit Sharma</div>
+                                        <small class="text-muted" th:text="${row['employeeCode']}">EMP114</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:text="${row['taskAssigned']}">6</td>
+                            <td th:text="${row['inProgress']}">2</td>
+                            <td th:text="${row['completed']}">3</td>
+                            <td class="text-danger fw-bold" th:text="${row['overdue']}">1</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-bar-fill" th:style="'width: ' + ${row['percent']} + '%'"></div>
+                                    </div>
+                                    <span style="font-size:0.75rem;" th:text="${#numbers.formatDecimal(row['percent'], 1, 0) + '%'}">85%</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge" th:classappend="${row['status'] == 'On Track' || row['status'] == 'Active'} ? ' status-ontrack' : ' status-risk'" th:text="${row['status']}">On Track</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-link text-dark"><i class="fa-solid fa-pencil"></i></button>
+                                <button class="btn btn-sm btn-link text-dark"><i class="fa-solid fa-ellipsis"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 3: TIMESHEETS ==================== -->
+    <div th:if="${activeTab == 'timesheets'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-clock"></i></div>
+                <div><div class="label">Total Hours Logged</div><div class="value" th:text="${#numbers.formatDecimal(tsTotalHours, 1, 0) + ' H'}">120 H</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-wallet"></i></div>
+                <div><div class="label">Billable Hours</div><div class="value" th:text="${#numbers.formatDecimal(tsBillableHours, 1, 0) + ' H'}">100 H</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div><div class="label">Pending</div><div class="value" th:text="${tsPending}">8</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
+                <div><div class="label">Rejected</div><div class="value" th:text="${tsRejected}">1</div></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="filters-row">
+                <input type="text" placeholder="Search by Employee Name" id="timesheetSearchInput"/>
+                <select id="timesheetDeptSelect">
+                    <option value="">All Departments</option>
+                    <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+                </select>
+                <select id="timesheetStatusSelect">
+                    <option value="">All status</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Draft">Draft</option>
+                </select>
+                <input type="text" placeholder="DD-MM-YYYY" style="background:#fff;"/>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle" id="timesheetTable">
+                    <thead>
+                        <tr class="text-muted fw-bold" style="font-size:0.85rem;">
+                            <th>Employee Name</th>
+                            <th>Week</th>
+                            <th>Total Hours</th>
+                            <th>Billable</th>
+                            <th>Projects</th>
+                            <th>Submitted On</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${timesheetRecords}"
+                            th:attr="data-name=${row['employeeName']}, data-department=${row['department']}, data-status=${row['status']}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(row['employeeName'], 0, 1)}">A</div>
+                                    <div>
+                                        <div class="fw-bold text-dark" th:text="${row['employeeName']}">Amit Sharma</div>
+                                        <small class="text-muted" th:text="${row['employeeCode']}">EMP114</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:text="${row['week']}">9 Jun - 15 Jun 2026</td>
+                            <td th:text="${row['totalHours']}">38 h 30 m</td>
+                            <td th:text="${row['billable']}">50 h 30 m</td>
+                            <td th:text="${row['projects']}">1</td>
+                            <td th:text="${row['submittedOn']}">01 Apr 2026</td>
+                            <td>
+                                <span class="status-badge" th:classappend="${row['status'] == 'Approved' || row['status'] == 'On Track'} ? ' status-ontrack' : ' status-active'" th:text="${row['status']}">On Track</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-link text-dark"><i class="fa-solid fa-pencil"></i></button>
+                                <button class="btn btn-sm btn-link text-dark"><i class="fa-solid fa-ellipsis"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Implement Project client-side filters
+        const projectSearch = document.getElementById('projectSearchInput');
+        const projectDept = document.getElementById('projectDeptSelect');
+        const projectStatus = document.getElementById('projectStatusSelect');
+
+        function filterProjects() {
+            const query = (projectSearch?.value || '').toLowerCase();
+            const dept = projectDept?.value || '';
+            const status = (projectStatus?.value || '').toLowerCase();
+
+            document.querySelectorAll('#projectTable tbody tr').forEach(row => {
+                const nameMatch = !query || (row.dataset.name || '').toLowerCase().includes(query);
+                const deptMatch = !dept || (row.dataset.department || '') === dept;
+                const statusMatch = !status || (row.dataset.status || '').toLowerCase() === status;
+                
+                row.style.display = (nameMatch && deptMatch && statusMatch) ? '' : 'none';
+            });
+        }
+
+        if (projectSearch) projectSearch.addEventListener('input', filterProjects);
+        if (projectDept) projectDept.addEventListener('change', filterProjects);
+        if (projectStatus) projectStatus.addEventListener('change', filterProjects);
+
+        // Implement Teamwork client-side filters
+        const teamworkSearch = document.getElementById('teamworkSearchInput');
+        const teamworkDept = document.getElementById('teamworkDeptSelect');
+        const teamworkStatus = document.getElementById('teamworkStatusSelect');
+
+        function filterTeamwork() {
+            const query = (teamworkSearch?.value || '').toLowerCase();
+            const dept = teamworkDept?.value || '';
+            const status = (teamworkStatus?.value || '').toLowerCase();
+
+            document.querySelectorAll('#teamworkTable tbody tr').forEach(row => {
+                const nameMatch = !query || (row.dataset.name || '').toLowerCase().includes(query);
+                const deptMatch = !dept || (row.dataset.department || '') === dept;
+                const statusMatch = !status || (row.dataset.status || '').toLowerCase() === status;
+                
+                row.style.display = (nameMatch && deptMatch && statusMatch) ? '' : 'none';
+            });
+        }
+
+        if (teamworkSearch) teamworkSearch.addEventListener('input', filterTeamwork);
+        if (teamworkDept) teamworkDept.addEventListener('change', filterTeamwork);
+        if (teamworkStatus) teamworkStatus.addEventListener('change', filterTeamwork);
+
+        // Implement Timesheets client-side filters
+        const timesheetSearch = document.getElementById('timesheetSearchInput');
+        const timesheetDept = document.getElementById('timesheetDeptSelect');
+        const timesheetStatus = document.getElementById('timesheetStatusSelect');
+
+        function filterTimesheets() {
+            const query = (timesheetSearch?.value || '').toLowerCase();
+            const dept = timesheetDept?.value || '';
+            const status = (timesheetStatus?.value || '').toLowerCase();
+
+            document.querySelectorAll('#timesheetTable tbody tr').forEach(row => {
+                const nameMatch = !query || (row.dataset.name || '').toLowerCase().includes(query);
+                const deptMatch = !dept || (row.dataset.department || '') === dept;
+                const statusMatch = !status || (row.dataset.status || '').toLowerCase() === status;
+                
+                row.style.display = (nameMatch && deptMatch && statusMatch) ? '' : 'none';
+            });
+        }
+
+        if (timesheetSearch) timesheetSearch.addEventListener('input', filterTimesheets);
+        if (timesheetDept) timesheetDept.addEventListener('change', filterTimesheets);
+        if (timesheetStatus) timesheetStatus.addEventListener('change', filterTimesheets);
+    });
+</script>
+</body>
+</html>

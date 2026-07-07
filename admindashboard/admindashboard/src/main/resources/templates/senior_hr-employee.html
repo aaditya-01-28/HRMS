@@ -292,6 +292,14 @@
 </nav>
 <!-- MAIN CONTENT -->
 <div class="myspace-main">
+<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show m-3 shadow-sm border-0" role="alert" style="background-color: #ecfdf5; border-left: 5px solid #10b981 !important;">
+    <i class="fas fa-check-circle me-2 text-success"></i> <span class="text-success-emphasis fw-bold" th:text="${successMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show m-3 shadow-sm border-0" role="alert" style="background-color: #fef2f2; border-left: 5px solid #ef4444 !important;">
+    <i class="fas fa-exclamation-circle me-2 text-danger"></i> <span class="text-danger-emphasis fw-bold" th:text="${errorMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
 <!-- TABS -->
 <ul class="nav custom-tabs" id="employeeTabs" role="tablist">
 <li class="nav-item" role="presentation">
@@ -359,14 +367,14 @@
 </div>
 <div class="ms-4">
 <ul class="list-unstyled mb-0" style="font-size: 0.75rem; font-weight: 600;">
-<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #002D72;"></span>Engineering <span class="float-end ms-4" th:text="${engPct} + '%'">36%</span></li>
-<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #10b981;"></span>Product <span class="float-end ms-4" th:text="${prodPct} + '%'">16%</span></li>
-<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #f59e0b;"></span>Design <span class="float-end ms-4" th:text="${desPct} + '%'">8%</span></li>
-<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #06b6d4;"></span>Marketing <span class="float-end ms-4" th:text="${mktPct} + '%'">5%</span></li>
-<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #8b5cf6;"></span>Sales <span class="float-end ms-4" th:text="${salesPct} + '%'">8%</span></li>
-<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #ec4899;"></span>HR <span class="float-end ms-4" th:text="${hrPct} + '%'">5%</span></li>
-<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #f43f5e;"></span>Finance <span class="float-end ms-4" th:text="${finPct} + '%'">5%</span></li>
-<li class="mb-0"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #94a3b8;"></span>Others <span class="float-end ms-4" th:text="${othersPct} + '%'">18%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #002D72;"></span>Engineering <span id="chartEngPct" class="float-end ms-4" th:text="${engPct} + '%'">36%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #10b981;"></span>Product <span id="chartProdPct" class="float-end ms-4" th:text="${prodPct} + '%'">16%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #f59e0b;"></span>Design <span id="chartDesPct" class="float-end ms-4" th:text="${desPct} + '%'">8%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #06b6d4;"></span>Marketing <span id="chartMktPct" class="float-end ms-4" th:text="${mktPct} + '%'">5%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #8b5cf6;"></span>Sales <span id="chartSalesPct" class="float-end ms-4" th:text="${salesPct} + '%'">8%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #ec4899;"></span>HR <span id="chartHrPct" class="float-end ms-4" th:text="${hrPct} + '%'">5%</span></li>
+<li class="mb-2"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #f43f5e;"></span>Finance <span id="chartFinPct" class="float-end ms-4" th:text="${finPct} + '%'">5%</span></li>
+<li class="mb-0"><span class="d-inline-block rounded-circle me-2" style="width: 8px; height: 8px; background: #94a3b8;"></span>Others <span id="chartOthersPct" class="float-end ms-4" th:text="${othersPct} + '%'">18%</span></li>
 </ul>
 </div>
 </div>
@@ -378,58 +386,58 @@
 <div class="d-flex align-items-center mb-3">
 <div style="width: 100px; font-size: 0.8rem;">Engineering</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" th:style="'width: ' + ${engPct} + '%;'"></div>
+<div id="barEngWidth" class="progress-bar bg-success" th:style="'width: ' + ${engPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${engPct} + '%'">45%</div>
+<div id="barEngText" class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${engPct} + '%'">45%</div>
 </div>
 <div class="d-flex align-items-center mb-3">
 <div style="width: 100px; font-size: 0.8rem;">Design</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" th:style="'width: ' + ${desPct} + '%;'"></div>
+<div id="barDesWidth" class="progress-bar bg-success" th:style="'width: ' + ${desPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${desPct} + '%'">27%</div>
+<div id="barDesText" class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${desPct} + '%'">27%</div>
 </div>
 <div class="d-flex align-items-center mb-3">
 <div style="width: 100px; font-size: 0.8rem;">Product</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" th:style="'width: ' + ${prodPct} + '%;'"></div>
+<div id="barProdWidth" class="progress-bar bg-success" th:style="'width: ' + ${prodPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${prodPct} + '%'">35%</div>
+<div id="barProdText" class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${prodPct} + '%'">35%</div>
 </div>
 <div class="d-flex align-items-center mb-3">
 <div style="width: 100px; font-size: 0.8rem;">HR</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" th:style="'width: ' + ${hrPct} + '%;'"></div>
+<div id="barHrWidth" class="progress-bar bg-success" th:style="'width: ' + ${hrPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${hrPct} + '%'">20%</div>
+<div id="barHrText" class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${hrPct} + '%'">20%</div>
 </div>
 <div class="d-flex align-items-center mb-3">
 <div style="width: 100px; font-size: 0.8rem;">Finance</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" th:style="'width: ' + ${finPct} + '%;'"></div>
+<div id="barFinWidth" class="progress-bar bg-success" th:style="'width: ' + ${finPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${finPct} + '%'">29%</div>
+<div id="barFinText" class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${finPct} + '%'">29%</div>
 </div>
 <div class="d-flex align-items-center mb-3">
 <div style="width: 100px; font-size: 0.8rem;">Sales</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" th:style="'width: ' + ${salesPct} + '%;'"></div>
+<div id="barSalesWidth" class="progress-bar bg-success" th:style="'width: ' + ${salesPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${salesPct} + '%'">36%</div>
+<div id="barSalesText" class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${salesPct} + '%'">36%</div>
 </div>
 <div class="d-flex align-items-center mb-3">
 <div style="width: 100px; font-size: 0.8rem;">Marketing</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" th:style="'width: ' + ${mktPct} + '%;'"></div>
+<div id="barMktWidth" class="progress-bar bg-success" th:style="'width: ' + ${mktPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${mktPct} + '%'">40%</div>
+<div id="barMktText" class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${mktPct} + '%'">40%</div>
 </div>
 <div class="d-flex align-items-center mb-0">
 <div style="width: 100px; font-size: 0.8rem;">Others</div>
 <div class="progress flex-grow-1" style="height: 6px;">
-<div class="progress-bar bg-success" th:style="'width: ' + ${othersPct} + '%;'"></div>
+<div id="barOthersWidth" class="progress-bar bg-success" th:style="'width: ' + ${othersPct} + '%;'"></div>
 </div>
-<div class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${othersPct} + '%'">33%</div>
+<div id="barOthersText" class="ms-3" style="font-size: 0.8rem; width: 30px;" th:text="${othersPct} + '%'">33%</div>
 </div>
 </div>
 </div>
@@ -467,7 +475,7 @@
 <option value="ON NOTICE">On Notice</option>
 <option value="EXITED">Exited</option>
 </select>
-<button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> More Filters</button>
+<button id="allEmpFilterBtn" class="btn btn-outline-secondary"><i class="fas fa-filter"></i> Apply Filter</button>
 </div>
 <div class="table-responsive border rounded">
 <table class="table table-custom mb-0">
@@ -532,9 +540,12 @@
 <!-- LIST VIEW -->
 <div class="card-custom border-0 shadow-none p-0" id="onboarding-list-view">
 <div class="d-flex gap-3 mb-4 mt-3">
-<div class="position-relative flex-grow-1" style="max-width: 300px;">
+<div class="d-flex gap-2 position-relative flex-grow-1" style="max-width: 380px;">
+<div class="position-relative flex-grow-1">
 <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 12px;"></i>
 <input class="form-control" id="onboardSearch" placeholder="Search by employee name" style="padding-left: 40px;" type="text"/>
+</div>
+<button id="onboardSearchBtn" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
 </div>
 <select class="form-select w-auto" id="onboardDept">
     <option disabled="" selected="" value="">Select...</option>
@@ -563,7 +574,7 @@
     <option value="UI/UX Designer">UI/UX Designer</option>
     <option value="Software Engineer">Software Engineer</option>
 </select>
-<button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> More Filters</button>
+<button id="onboardFilterBtn" class="btn btn-outline-secondary"><i class="fas fa-filter"></i> Apply Filter</button>
 <button class="btn btn-primary fw-bold ms-auto" onclick="toggleOnboardingForm(true)">
 <i class="fas fa-plus me-1"></i> Add Candidate
                         </button>
@@ -582,7 +593,7 @@
 <th>Action</th>
 </tr>
 </thead>
-<tbody>
+<tbody id="onboard-tbody">
 <tr th:each="cand, iterStat : ${candidates}">
 <td>
 <div class="d-flex align-items-center">
@@ -988,7 +999,7 @@
 <option value="Software Engineer">Software Engineer</option>
 <option value="Junior developer">Junior developer</option>
 </select>
-<button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> More Filters</button>
+<button id="offboardFilterBtn" class="btn btn-outline-secondary"><i class="fas fa-filter"></i> Apply Filter</button>
 <button class="btn btn-primary fw-bold ms-auto" onclick="openExitModal()">
 <i class="fas fa-plus me-1"></i> Exit Candidate
                         </button>
@@ -1086,7 +1097,7 @@
 <option value="Product Manager">Product Manager</option>
 <option value="Project Manager">Project Manager</option>
 </select>
-<button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> More Filters</button>
+<button id="pastEmpFilterBtn" class="btn btn-outline-secondary"><i class="fas fa-filter"></i> Apply Filter</button>
 </div>
 <div class="table-responsive border rounded">
 <table class="table table-custom mb-0">
@@ -1214,6 +1225,126 @@
               const step = document.getElementById(stepId);
               if(!step) return true;
               
+              if (stepId === 'step1-form') {
+                  const pEmailInput = document.querySelector('[name="personalEmail"]');
+                  const oEmailInput = document.querySelector('[name="officialEmail"]');
+                  const mobileInput = document.querySelector('[name="mobileNumber"]');
+                  const emergInput = document.querySelector('[name="emergencyPhone"]');
+                  const dobInput = document.getElementById('dobInput');
+                  const joinInput = document.getElementById('joinDate');
+
+                  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                  const phoneRegex = /^[0-9]{10}$/;
+
+                  if (pEmailInput && pEmailInput.value.trim() !== '' && !emailRegex.test(pEmailInput.value.trim())) {
+                      alert("Please enter a valid Personal Email address.");
+                      pEmailInput.style.border = '1px solid red';
+                      return false;
+                  } else if (pEmailInput) {
+                      pEmailInput.style.border = '';
+                  }
+
+                  if (oEmailInput && oEmailInput.value.trim() !== '' && !emailRegex.test(oEmailInput.value.trim())) {
+                      alert("Please enter a valid Official Email address.");
+                      oEmailInput.style.border = '1px solid red';
+                      return false;
+                  } else if (oEmailInput) {
+                      oEmailInput.style.border = '';
+                  }
+
+                  if (mobileInput && mobileInput.value.trim() !== '' && !phoneRegex.test(mobileInput.value.trim())) {
+                      alert("Mobile number must be exactly 10 digits.");
+                      mobileInput.style.border = '1px solid red';
+                      return false;
+                  } else if (mobileInput) {
+                      mobileInput.style.border = '';
+                  }
+
+                  if (emergInput && emergInput.value.trim() !== '' && !phoneRegex.test(emergInput.value.trim())) {
+                      alert("Emergency phone number must be exactly 10 digits.");
+                      emergInput.style.border = '1px solid red';
+                      return false;
+                  } else if (emergInput) {
+                      emergInput.style.border = '';
+                  }
+
+                  if (dobInput && dobInput.value) {
+                      const dobDate = new Date(dobInput.value);
+                      const today = new Date();
+                      let age = today.getFullYear() - dobDate.getFullYear();
+                      const m = today.getMonth() - dobDate.getMonth();
+                      if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+                          age--;
+                      }
+                      if (age < 18 || age > 100 || isNaN(dobDate.getTime())) {
+                          alert("Please enter a valid Date of Birth (Age must be between 18 and 100).");
+                          dobInput.style.border = '1px solid red';
+                          return false;
+                      } else {
+                          dobInput.style.border = '';
+                      }
+                  }
+
+                  if (joinInput && joinInput.value) {
+                      const joinDate = new Date(joinInput.value);
+                      const joinYear = joinDate.getFullYear();
+                      if (joinYear < 1980 || joinYear > 2050 || isNaN(joinDate.getTime())) {
+                          alert("Please enter a valid Joining Date year (between 1980 and 2050).");
+                          joinInput.style.border = '1px solid red';
+                          return false;
+                      } else {
+                          joinInput.style.border = '';
+                      }
+                  }
+              }
+
+              if (stepId === 'step4-form') {
+                  const panInput = document.querySelector('[name="panNo"]');
+                  const aadharInput = document.querySelector('[name="aadharNo"]');
+
+                  const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
+                  const aadharRegex = /^[0-9]{12}$/;
+
+                  if (panInput && panInput.value.trim() !== '' && !panRegex.test(panInput.value.trim())) {
+                      alert("Please enter a valid PAN card number (e.g. ABCDE1234F).");
+                      panInput.style.border = '1px solid red';
+                      return false;
+                  } else if (panInput) {
+                      panInput.style.border = '';
+                  }
+
+                  if (aadharInput && aadharInput.value.trim() !== '' && !aadharRegex.test(aadharInput.value.trim())) {
+                      alert("Aadhaar card number must be exactly 12 digits.");
+                      aadharInput.style.border = '1px solid red';
+                      return false;
+                  } else if (aadharInput) {
+                      aadharInput.style.border = '';
+                  }
+              }
+
+              if (stepId === 'step5-form') {
+                  const mandatoryDocs = [
+                      { inputId: 'photoDocInput', labelId: 'photoDocLabel', name: 'Passport Size Photo' },
+                      { inputId: 'resumeDocInput', labelId: 'resumeDocLabel', name: 'Resume/CV' },
+                      { inputId: 'aadhaarDocInput', labelId: 'aadhaarDocLabel', name: 'Aadhaar Card' },
+                      { inputId: 'panDocInput', labelId: 'panDocLabel', name: 'PAN Card' },
+                      { inputId: 'educationalDocInput', labelId: 'educationalDocLabel', name: 'Educational Certificate' }
+                  ];
+                  for (let doc of mandatoryDocs) {
+                      const input = document.getElementById(doc.inputId);
+                      const label = document.getElementById(doc.labelId);
+                      const hasFile = input && input.files && input.files.length > 0;
+                      const hasExisting = label && label.innerHTML.trim() !== '';
+                      if (!hasFile && !hasExisting) {
+                          alert(`Please upload the mandatory document: ${doc.name}`);
+                          if (input) input.style.border = '1px solid red';
+                          return false;
+                      } else {
+                          if (input) input.style.border = '';
+                      }
+                  }
+              }
+              
               const inputs = step.querySelectorAll('input, select, textarea');
               let isValid = true;
               for(let i = 0; i < inputs.length; i++) {
@@ -1331,9 +1462,10 @@
         });
 
         // Chart.js Setup for Donut Chart
+        let deptChartInstance = null;
         document.addEventListener("DOMContentLoaded", function() {
             const ctx = document.getElementById('deptDonutChart').getContext('2d');
-            new Chart(ctx, {
+            deptChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Engineering', 'Product', 'Design', 'Marketing', 'Sales', 'HR', 'Finance', 'Others'],
@@ -1365,27 +1497,32 @@
             const statusSelect = document.getElementById("offboardingStatus");
             const roleSelect = document.getElementById("offboardingRole");
             const tbody = document.getElementById("offboarding-tbody");
+            const offboardFilterBtn = document.getElementById("offboardFilterBtn");
 
             if(searchInput && tbody) {
                 const trs = tbody.getElementsByTagName("tr");
                 
                 function filterTable() {
-                    const searchVal = searchInput.value.toLowerCase();
-                    const deptVal = deptSelect.value.toLowerCase();
-                    const statusVal = statusSelect.value.toLowerCase();
-                    const roleVal = roleSelect.value.toLowerCase();
+                    const searchVal = (searchInput.value || "").toLowerCase().trim();
+                    const deptVal = (deptSelect.value || "").toLowerCase().trim();
+                    const statusVal = (statusSelect.value || "").toLowerCase().trim();
+                    const roleVal = (roleSelect.value || "").toLowerCase().trim();
+
+                    const isDeptEmpty = deptVal === "" || deptVal.includes("select");
+                    const isStatusEmpty = statusVal === "" || statusVal.includes("select");
+                    const isRoleEmpty = roleVal === "" || roleVal.includes("select");
 
                     for (let i = 0; i < trs.length; i++) {
                         const tr = trs[i];
-                        const nameText = tr.cells[0].innerText.toLowerCase();
-                        const deptText = tr.cells[1].innerText.toLowerCase();
-                        const roleText = tr.cells[2].innerText.toLowerCase();
-                        const statusText = tr.cells[6].innerText.toLowerCase();
+                        const nameText = tr.cells[1].innerText.toLowerCase();
+                        const deptText = tr.cells[2].innerText.toLowerCase();
+                        const roleText = tr.cells[3].innerText.toLowerCase();
+                        const statusText = tr.cells[7].innerText.toLowerCase();
 
                         const matchSearch = searchVal === "" || nameText.includes(searchVal);
-                        const matchDept = deptVal === "" || deptText.includes(deptVal);
-                        const matchStatus = statusVal === "" || statusText.includes(statusVal);
-                        const matchRole = roleVal === "" || roleText.includes(roleVal);
+                        const matchDept = isDeptEmpty || deptText.includes(deptVal);
+                        const matchStatus = isStatusEmpty || statusText.includes(statusVal);
+                        const matchRole = isRoleEmpty || roleText.includes(roleVal);
 
                         if (matchSearch && matchDept && matchStatus && matchRole) {
                             tr.style.display = "";
@@ -1399,24 +1536,33 @@
                 deptSelect.addEventListener("change", filterTable);
                 statusSelect.addEventListener("change", filterTable);
                 roleSelect.addEventListener("change", filterTable);
+                if (offboardFilterBtn) {
+                    offboardFilterBtn.addEventListener("click", filterTable);
+                }
             }
 
             
             // Filter functionality for Onboarding Table
             const onboardSearch = document.getElementById("onboardSearch");
+            const onboardSearchBtn = document.getElementById("onboardSearchBtn");
             const onboardDept = document.getElementById("onboardDept");
             const onboardLoc = document.getElementById("onboardLoc");
             const onboardRole = document.getElementById("onboardRole");
             const onboardTbody = document.getElementById("onboard-tbody");
+            const onboardFilterBtn = document.getElementById("onboardFilterBtn");
 
             if (onboardSearch && onboardTbody) {
                 const trs = onboardTbody.getElementsByTagName("tr");
                 
                 function filterOnboardTable() {
-                    const searchVal = onboardSearch.value.toLowerCase();
-                    const deptVal = onboardDept.value.toLowerCase();
-                    const locVal = onboardLoc.value.toLowerCase();
-                    const roleVal = onboardRole.value.toLowerCase();
+                    const searchVal = (onboardSearch.value || "").toLowerCase().trim();
+                    const deptVal = (onboardDept.value || "").toLowerCase().trim();
+                    const locVal = (onboardLoc.value || "").toLowerCase().trim();
+                    const roleVal = (onboardRole.value || "").toLowerCase().trim();
+
+                    const isDeptEmpty = deptVal === "" || deptVal.includes("select");
+                    const isLocEmpty = locVal === "" || locVal.includes("select");
+                    const isRoleEmpty = roleVal === "" || roleVal.includes("select");
 
                     for (let i = 0; i < trs.length; i++) {
                         const tr = trs[i];
@@ -1426,9 +1572,9 @@
                         const locText = tr.cells[3].innerText.toLowerCase();
 
                         const matchSearch = searchVal === "" || nameText.includes(searchVal);
-                        const matchDept = deptVal === "" || deptText.includes(deptVal);
-                        const matchLoc = locVal === "" || locText.includes(locVal);
-                        const matchRole = roleVal === "" || roleText.includes(roleVal);
+                        const matchDept = isDeptEmpty || deptText.includes(deptVal);
+                        const matchLoc = isLocEmpty || locText.includes(locVal);
+                        const matchRole = isRoleEmpty || roleText.includes(roleVal);
 
                         if (matchSearch && matchDept && matchLoc && matchRole) {
                             tr.style.display = "";
@@ -1442,24 +1588,110 @@
                 onboardDept.addEventListener("change", filterOnboardTable);
                 onboardLoc.addEventListener("change", filterOnboardTable);
                 onboardRole.addEventListener("change", filterOnboardTable);
+                if (onboardFilterBtn) {
+                    onboardFilterBtn.addEventListener("click", filterOnboardTable);
+                }
+                if (onboardSearchBtn) {
+                    onboardSearchBtn.addEventListener("click", filterOnboardTable);
+                }
             }
-// Filter functionality for All Employees Table
+            // Filter functionality for All Employees Table
             const allEmpSearch = document.getElementById("allEmpSearch");
             const allEmpDept = document.getElementById("allEmpDept");
             const allEmpLoc = document.getElementById("allEmpLoc");
             const allEmpRole = document.getElementById("allEmpRole");
             const allEmpStatus = document.getElementById("allEmpStatus");
             const allEmpTbody = document.getElementById("all-emp-tbody");
+            const allEmpFilterBtn = document.getElementById("allEmpFilterBtn");
 
             if (allEmpSearch && allEmpTbody) {
                 const allEmpTrs = allEmpTbody.getElementsByTagName("tr");
                 
+                function updateChartAndHeadcount() {
+                    let counts = {
+                        'Engineering': 0,
+                        'Product': 0,
+                        'Design': 0,
+                        'Marketing': 0,
+                        'Sales': 0,
+                        'HR': 0,
+                        'Finance': 0,
+                        'Others': 0
+                    };
+                    let totalVisible = 0;
+                    for (let i = 0; i < allEmpTrs.length; i++) {
+                        const tr = allEmpTrs[i];
+                        if (tr.style.display !== "none") {
+                            const dept = tr.cells[2].innerText.trim();
+                            if (counts.hasOwnProperty(dept)) {
+                                counts[dept]++;
+                            } else {
+                                counts['Others']++;
+                            }
+                            totalVisible++;
+                        }
+                    }
+
+                    // Calculate percentages
+                    const denom = totalVisible > 0 ? totalVisible : 1;
+                    const engPct = Math.round((counts['Engineering'] / denom) * 100);
+                    const prodPct = Math.round((counts['Product'] / denom) * 100);
+                    const desPct = Math.round((counts['Design'] / denom) * 100);
+                    const mktPct = Math.round((counts['Marketing'] / denom) * 100);
+                    const salesPct = Math.round((counts['Sales'] / denom) * 100);
+                    const hrPct = Math.round((counts['HR'] / denom) * 100);
+                    const finPct = Math.round((counts['Finance'] / denom) * 100);
+                    const othersPct = 100 - (engPct + prodPct + desPct + mktPct + salesPct + hrPct + finPct);
+                    const actualOthersPct = othersPct < 0 ? 0 : othersPct;
+
+                    // Update chart
+                    if (deptChartInstance) {
+                        deptChartInstance.data.datasets[0].data = [
+                            engPct, prodPct, desPct, mktPct, salesPct, hrPct, finPct, actualOthersPct
+                        ];
+                        deptChartInstance.update();
+                    }
+
+                    // Update percentages list next to the chart
+                    if (document.getElementById('chartEngPct')) document.getElementById('chartEngPct').innerText = engPct + '%';
+                    if (document.getElementById('chartProdPct')) document.getElementById('chartProdPct').innerText = prodPct + '%';
+                    if (document.getElementById('chartDesPct')) document.getElementById('chartDesPct').innerText = desPct + '%';
+                    if (document.getElementById('chartMktPct')) document.getElementById('chartMktPct').innerText = mktPct + '%';
+                    if (document.getElementById('chartSalesPct')) document.getElementById('chartSalesPct').innerText = salesPct + '%';
+                    if (document.getElementById('chartHrPct')) document.getElementById('chartHrPct').innerText = hrPct + '%';
+                    if (document.getElementById('chartFinPct')) document.getElementById('chartFinPct').innerText = finPct + '%';
+                    if (document.getElementById('chartOthersPct')) document.getElementById('chartOthersPct').innerText = actualOthersPct + '%';
+
+                    // Update headcount progress bars
+                    if (document.getElementById('barEngWidth')) document.getElementById('barEngWidth').style.width = engPct + '%';
+                    if (document.getElementById('barEngText')) document.getElementById('barEngText').innerText = engPct + '%';
+                    if (document.getElementById('barProdWidth')) document.getElementById('barProdWidth').style.width = prodPct + '%';
+                    if (document.getElementById('barProdText')) document.getElementById('barProdText').innerText = prodPct + '%';
+                    if (document.getElementById('barDesWidth')) document.getElementById('barDesWidth').style.width = desPct + '%';
+                    if (document.getElementById('barDesText')) document.getElementById('barDesText').innerText = desPct + '%';
+                    if (document.getElementById('barMktWidth')) document.getElementById('barMktWidth').style.width = mktPct + '%';
+                    if (document.getElementById('barMktText')) document.getElementById('barMktText').innerText = mktPct + '%';
+                    if (document.getElementById('barSalesWidth')) document.getElementById('barSalesWidth').style.width = salesPct + '%';
+                    if (document.getElementById('barSalesText')) document.getElementById('barSalesText').innerText = salesPct + '%';
+                    if (document.getElementById('barHrWidth')) document.getElementById('barHrWidth').style.width = hrPct + '%';
+                    if (document.getElementById('barHrText')) document.getElementById('barHrText').innerText = hrPct + '%';
+                    if (document.getElementById('barFinWidth')) document.getElementById('barFinWidth').style.width = finPct + '%';
+                    if (document.getElementById('barFinText')) document.getElementById('barFinText').innerText = finPct + '%';
+                    if (document.getElementById('barOthersWidth')) document.getElementById('barOthersWidth').style.width = actualOthersPct + '%';
+                    if (document.getElementById('barOthersText')) document.getElementById('barOthersText').innerText = actualOthersPct + '%';
+                }
+
                 function filterAllEmpTable() {
-                    const searchVal = allEmpSearch.value.toLowerCase();
-                    const deptVal = allEmpDept.value.toLowerCase();
-                    const locVal = allEmpLoc.value.toLowerCase();
-                    const roleVal = allEmpRole.value.toLowerCase();
-                    const statusVal = allEmpStatus.value.toLowerCase();
+                    const searchVal = (allEmpSearch.value || "").toLowerCase().trim();
+                    const deptVal = (allEmpDept.value || "").toLowerCase().trim();
+                    const locVal = (allEmpLoc.value || "").toLowerCase().trim();
+                    const roleVal = (allEmpRole.value || "").toLowerCase().trim();
+                    const statusVal = (allEmpStatus.value || "").toLowerCase().trim();
+
+                    const isDeptEmpty = deptVal === "" || deptVal.includes("select");
+                    const isLocEmpty = locVal === "" || locVal.includes("select");
+                    const isRoleEmpty = roleVal === "" || roleVal.includes("select");
+                    const isStatusEmpty = statusVal === "" || statusVal.includes("select");
 
                     for (let i = 0; i < allEmpTrs.length; i++) {
                         const tr = allEmpTrs[i];
@@ -1470,10 +1702,10 @@
                         const statusText = tr.cells[7].innerText.toLowerCase();
 
                         const matchSearch = searchVal === "" || nameText.includes(searchVal);
-                        const matchDept = deptVal === "" || deptText.includes(deptVal);
-                        const matchLoc = locVal === "" || locText.includes(locVal);
-                        const matchRole = roleVal === "" || roleText.includes(roleVal);
-                        const matchStatus = statusVal === "" || statusText.includes(statusVal);
+                        const matchDept = isDeptEmpty || deptText.includes(deptVal);
+                        const matchLoc = isLocEmpty || locText.includes(locVal);
+                        const matchRole = isRoleEmpty || roleText.includes(roleVal);
+                        const matchStatus = isStatusEmpty || statusText.includes(statusVal);
 
                         if (matchSearch && matchDept && matchLoc && matchRole && matchStatus) {
                             tr.style.display = "";
@@ -1481,6 +1713,7 @@
                             tr.style.display = "none";
                         }
                     }
+                    updateChartAndHeadcount();
                 }
 
                 allEmpSearch.addEventListener("keyup", filterAllEmpTable);
@@ -1488,7 +1721,70 @@
                 allEmpLoc.addEventListener("change", filterAllEmpTable);
                 allEmpRole.addEventListener("change", filterAllEmpTable);
                 allEmpStatus.addEventListener("change", filterAllEmpTable);
+                if (allEmpFilterBtn) {
+                    allEmpFilterBtn.addEventListener("click", filterAllEmpTable);
+                }
             }
+
+            // Filter functionality for Past Employee / Alumni Table
+            const pastEmpSearch = document.getElementById("pastEmpSearch");
+            const pastEmpDept = document.getElementById("pastEmpDept");
+            const pastEmpRole = document.getElementById("pastEmpRole");
+            const pastEmpTbody = document.getElementById("past-emp-tbody");
+            const pastEmpFilterBtn = document.getElementById("pastEmpFilterBtn");
+
+            if (pastEmpSearch && pastEmpTbody) {
+                const pastEmpTrs = pastEmpTbody.getElementsByTagName("tr");
+                
+                function filterPastEmpTable() {
+                    const searchVal = (pastEmpSearch.value || "").toLowerCase().trim();
+                    const deptVal = pastEmpDept ? (pastEmpDept.value || "").toLowerCase().trim() : "";
+                    const roleVal = pastEmpRole ? (pastEmpRole.value || "").toLowerCase().trim() : "";
+
+                    const isDeptEmpty = deptVal === "" || deptVal.includes("select");
+                    const isRoleEmpty = roleVal === "" || roleVal.includes("select");
+
+                    for (let i = 0; i < pastEmpTrs.length; i++) {
+                        const tr = pastEmpTrs[i];
+                        const nameText = tr.cells[0].innerText.toLowerCase();
+                        const deptText = tr.cells[1].innerText.toLowerCase();
+                        const roleText = tr.cells[2].innerText.toLowerCase();
+
+                        const matchSearch = searchVal === "" || nameText.includes(searchVal);
+                        const matchDept = isDeptEmpty || deptText.includes(deptVal);
+                        const matchRole = isRoleEmpty || roleText.includes(roleVal);
+
+                        if (matchSearch && matchDept && matchRole) {
+                            tr.style.display = "";
+                        } else {
+                            tr.style.display = "none";
+                        }
+                    }
+                }
+
+                pastEmpSearch.addEventListener("keyup", filterPastEmpTable);
+                if (pastEmpDept) pastEmpDept.addEventListener("change", filterPastEmpTable);
+                if (pastEmpRole) pastEmpRole.addEventListener("change", filterPastEmpTable);
+                if (pastEmpFilterBtn) {
+                    pastEmpFilterBtn.addEventListener("click", filterPastEmpTable);
+                }
+            }
+
+            // Tab switching prevention during active processes (BUG-015)
+            const tabButtons = document.querySelectorAll('#employeeTabs button[data-bs-toggle="tab"]');
+            tabButtons.forEach(btn => {
+                btn.addEventListener('show.bs.tab', function(event) {
+                    const onboardingFormView = document.getElementById('onboarding-form-view');
+                    const isOnboardingFormOpen = onboardingFormView && !onboardingFormView.classList.contains('d-none');
+                    const exitEmployeeModal = document.getElementById('exitEmployeeModal');
+                    const isExitModalOpen = exitEmployeeModal && exitEmployeeModal.classList.contains('show');
+
+                    if (isOnboardingFormOpen || isExitModalOpen) {
+                        event.preventDefault();
+                        alert("Please complete or cancel the current process before switching tabs.");
+                    }
+                });
+            });
         });
 
         function openExitModal() {
@@ -1513,6 +1809,44 @@
             
             const modal = new bootstrap.Modal(document.getElementById('exitEmployeeModal'));
             modal.show();
+        }
+
+        function validateAndSubmitExitForm() {
+            const lwd = document.getElementById("exitLastWorkingDate");
+            const type = document.getElementById("exitType");
+            const reason = document.getElementById("exitReason");
+            const notice = document.getElementById("exitNoticePeriod");
+            const proof = document.getElementById("exitResignationProof");
+
+            let isValid = true;
+            const fields = [lwd, type, reason, notice, proof];
+
+            fields.forEach(field => {
+                if (!field) return;
+                
+                let isFieldEmpty = false;
+                if (field.tagName === "SELECT") {
+                    isFieldEmpty = field.value === "" || field.value.toLowerCase().includes("select");
+                } else if (field.type === "file") {
+                    isFieldEmpty = !field.files || field.files.length === 0;
+                } else {
+                    isFieldEmpty = field.value.trim() === "";
+                }
+
+                if (isFieldEmpty) {
+                    field.style.border = "1px solid red";
+                    isValid = false;
+                } else {
+                    field.style.border = "";
+                }
+            });
+
+            if (!isValid) {
+                alert("Please fill all mandatory fields marked with * and upload the Resignation Proof.");
+                return;
+            }
+
+            document.getElementById("exitEmployeeForm").submit();
         }
     </script>
 <!-- EXIT EMPLOYEE MODAL -->
@@ -1541,35 +1875,35 @@
 <div class="row g-3 mb-3">
 <div class="col-md-6">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Last Working Date <span class="text-danger">*</span></label>
-<input class="form-control" type="date" value="2026-05-30"/>
+<input class="form-control" id="exitLastWorkingDate" name="lastWorkingDate" type="date"/>
 </div>
 <div class="col-md-6">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Exit Type <span class="text-danger">*</span></label>
-<select class="form-select"><option disabled="" selected="" value="">Select...</option><option>Resignation</option></select>
+<select class="form-select" id="exitType" name="exitType"><option disabled="" selected="" value="">Select...</option><option>Resignation</option></select>
 </div>
 <div class="col-12">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Reason for Exit <span class="text-danger">*</span></label>
-<select class="form-select"><option disabled="" selected="" value="">Select...</option><option>Career Growth</option></select>
+<select class="form-select" id="exitReason" name="exitReason"><option disabled="" selected="" value="">Select...</option><option>Career Growth</option></select>
 </div>
 <div class="col-12">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Exit Note (Optional)</label>
-<textarea class="form-control" placeholder="Add Comments" rows="2"></textarea>
+<textarea class="form-control" name="exitNote" placeholder="Add Comments" rows="2"></textarea>
 </div>
 <div class="col-md-6">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Handover To</label>
-<select class="form-select"><option disabled="" selected="" value="">Select...</option><option>Amit Kumar</option></select>
+<select class="form-select" id="exitHandoverTo" name="handoverTo"><option disabled="" selected="" value="">Select...</option><option>Amit Kumar</option></select>
 </div>
 <div class="col-md-6">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Handover Due Date</label>
-<input class="form-control" type="date" value="2026-11-25"/>
+<input class="form-control" id="exitHandoverDueDate" name="handoverDueDate" type="date"/>
 </div>
 <div class="col-md-6">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Notice Period (Days) <span class="text-danger">*</span></label>
-<input class="form-control" type="number" value="30"/>
+<input class="form-control" id="exitNoticePeriod" name="noticePeriod" type="number" value="30"/>
 </div>
 <div class="col-md-6">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Resignation Proof <span class="text-danger">*</span></label>
-<input class="form-control" style="font-size: 0.85rem;" type="file"/>
+<input class="form-control" id="exitResignationProof" name="resignationProof" style="font-size: 0.85rem;" type="file"/>
 </div>
 <div class="col-12">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Assets &amp; Accessories</label>
@@ -1618,7 +1952,7 @@
 </div>
 <div class="d-flex justify-content-center gap-3 mt-4">
 <button class="btn btn-outline-secondary px-5 py-2 fw-bold" onclick="goToStep4()" type="button">Back</button>
-<button class="btn btn-danger px-5 py-2 fw-bold" onclick="document.getElementById('exitEmployeeForm').submit();" type="button">Complete Offboarding</button>
+<button class="btn btn-danger px-5 py-2 fw-bold" onclick="validateAndSubmitExitForm()" type="button">Complete Offboarding</button>
 </div>
 </form>
 </div>

@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>WhiteCircle | Leave & Attendance</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #002D72;
+            --sidebar-width: 205px;
+            --header-height: 70px;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            background: #f8fafc;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .myspace-sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: #f8fafc;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 1051;
+            transition: transform .3s ease;
+        }
+
+        body.sidebar-toggled .myspace-sidebar { transform: translateX(-100%); }
+
+        .brand-area {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: var(--header-height);
+        }
+
+        .brand-area img {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .brand-title { font-size: .92rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+        .brand-sub { font-size: .78rem; color: var(--muted); }
+
+        .nav-links { padding: 10px 0; flex: 1; }
+
+        .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 12px;
+            color: #475569;
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 600;
+            border-left: 3px solid transparent;
+            transition: all .2s;
+        }
+
+        .nav-link-item:hover { background: #eef2ff; color: var(--primary); }
+        .nav-link-item.active { background: #e2e8f0; color: var(--primary); border-left-color: var(--primary-light); }
+
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--header-height);
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1050;
+            transition: left .3s ease;
+        }
+
+        body.sidebar-toggled .top-navbar { left: 0; }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+        }
+
+        .myspace-main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 14px 18px;
+            min-height: calc(100vh - var(--header-height));
+            transition: margin-left .3s ease;
+        }
+
+        body.sidebar-toggled .myspace-main { margin-left: 0; }
+
+        .tabs-strip {
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .tab-link {
+            text-decoration: none;
+            color: #1f2937;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 3px solid transparent;
+            font-size: 1.02rem;
+        }
+
+        .tab-link.active { color: #2563eb; border-color: #2563eb; }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            min-height: 60px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .stat-card .icon-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .stat-card .label { font-size: .75rem; color: #64748b; line-height: 1.2; font-weight: 600; text-transform: uppercase; }
+        .stat-card .value { font-size: 1.7rem; line-height: 1; font-weight: 700; margin-top: 2px; }
+
+        .panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 14px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-top: 10px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.72rem;
+            color: #64748b;
+            text-transform: uppercase;
+            padding: 6px 0;
+        }
+
+        .calendar-day {
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 6px;
+            min-height: 70px;
+            padding: 4px;
+            font-size: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .calendar-day.today {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .calendar-day .day-num {
+            font-weight: 700;
+            color: #475569;
+        }
+
+        .calendar-day .day-events {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-top: 4px;
+        }
+
+        .event-badge {
+            font-size: 0.65rem;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #fff;
+        }
+
+        .event-leave { background-color: #10b981; }
+        .event-partial { background-color: #f59e0b; }
+        .event-weekly-off { background-color: #8b5cf6; }
+        .event-holiday { background-color: #ef4444; }
+
+        .legend-row {
+            display: flex;
+            gap: 12px;
+            font-size: 0.75rem;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        /* Attendance Reports Layout */
+        .filters-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr) auto;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .filters-row select, .filters-row input {
+            height: 38px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 0 12px;
+            font-size: .88rem;
+            background: #fff;
+        }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .status-badge {
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-overdue { background-color: #fee2e2; color: #dc2626; }
+        .status-pending { background-color: #ffedd5; color: #ea580c; }
+        .status-approved { background-color: #dcfce7; color: #15803d; }
+        .status-rejected { background-color: #fee2e2; color: #b91c1c; }
+
+        @media (max-width: 1200px) {
+            .grid-2col { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
+            .filters-row { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .myspace-sidebar { transform: translateX(-100%); }
+            body.sidebar-toggled .myspace-sidebar { transform: translateX(0); }
+            .top-navbar { left: 0; padding: 0 10px; }
+            .myspace-main { margin-left: 0; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="myspace-sidebar shadow-sm">
+    <div class="brand-area">
+        <img src="/images/wcg-logo.jpg" alt="Logo"/>
+        <div>
+            <div class="brand-title">WhiteCircle</div>
+            <div class="brand-sub">Manager Admin</div>
+        </div>
+    </div>
+    <div class="nav-links">
+        <a href="/senior_manager/myspace?tab=directory" class="nav-link-item"><i class="fa-solid fa-users"></i> Team & Employee</a>
+        <a href="/senior_manager/leave_attendance" class="nav-link-item active"><i class="fa-solid fa-calendar-days"></i> Leave & Attendance</a>
+        <a href="/senior_manager/project_work" class="nav-link-item"><i class="fa-solid fa-briefcase"></i> Project & Work</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Performance</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-user-plus"></i> Recruitment</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-wallet"></i> Financial & Expense</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-file-lines"></i> Reports</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-comments"></i> Communication</a>
+        <a href="/senior_manager/myspace?tab=hierarchy" class="nav-link-item"><i class="fa-solid fa-sitemap"></i> Org. Hierarchy</a>
+    </div>
+</div>
+
+<nav class="top-navbar">
+    <div class="nav-brand">
+        <button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
+        <div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
+            <span style="color:#002D72; font-weight:700; font-size:2.1rem;">WhiteCircle Group - Shahdol</span>
+            <span style="font-size:.85rem; font-weight:500; color:#333; margin-top:2px;">LMS</span>
+        </div>
+    </div>
+    <div>
+        <a class="btn btn-light text-dark fw-bold" href="/senior_manager/dashboard" style="border-radius:6px; padding:8px 14px; text-decoration:none;">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</nav>
+
+<div class="myspace-main">
+    <div class="tabs-strip">
+        <a th:classappend="${activeTab == 'leave_calendar'} ? ' active' : ''" class="tab-link" href="/senior_manager/leave_attendance?tab=leave_calendar">View Team Leave Calendar</a>
+        <a th:classappend="${activeTab == 'escalate_override'} ? ' active' : ''" class="tab-link" href="/senior_manager/leave_attendance?tab=escalate_override">Escalate / Override Approvals</a>
+        <a th:classappend="${activeTab == 'attendance_reports'} ? ' active' : ''" class="tab-link" href="/senior_manager/leave_attendance?tab=attendance_reports">View Attendance Reports</a>
+    </div>
+
+    <!-- Alert Message Banner -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fa-solid fa-circle-check me-2"></i><span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- ==================== VIEW 1: TEAM LEAVE CALENDAR ==================== -->
+    <div th:if="${activeTab == 'leave_calendar'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-users"></i></div>
+                <div><div class="label">Total Members</div><div class="value" th:text="${totalMembers}">28</div><div style="font-size:0.7rem; color:#94a3b8;">Across departments</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-plane-departure"></i></div>
+                <div><div class="label">On Leave Today</div><div class="value" th:text="${onLeaveToday}">3</div><div style="font-size:0.7rem; color:#94a3b8;">Team members</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-user-check"></i></div>
+                <div><div class="label">Avg Attendance</div><div class="value" th:text="${#numbers.formatDecimal(avgAttendance, 1, 2) + '%'}">92.45%</div><div style="font-size:0.7rem; color:#94a3b8;">For this period</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-chart-pie"></i></div>
+                <div><div class="label">Leave Util.</div><div class="value" th:text="${#numbers.formatDecimal(leaveUtil, 1, 2) + '%'}">36.25%</div><div style="font-size:0.7rem; color:#94a3b8;">Of entitled leaves</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-calendar-check"></i></div>
+                <div><div class="label">Leaves Taken</div><div class="value" th:text="${leavesTaken}">45</div><div style="font-size:0.7rem; color:#94a3b8;">This period</div></div>
+            </div>
+        </div>
+
+        <div class="grid-2col">
+            <div>
+                <!-- Team Leave Summary Table -->
+                <div class="panel">
+                    <h6 class="fw-bold mb-3"><i class="fa-solid fa-list-check text-primary me-2"></i>Team Leave Summary</h6>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr class="text-muted" style="font-size:0.8rem;">
+                                    <th>Department</th>
+                                    <th>Members</th>
+                                    <th>On Leave</th>
+                                    <th>Leave Util. %</th>
+                                    <th>Attendance %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="row : ${teamLeaveSummary}">
+                                    <td class="fw-bold text-dark" th:text="${row['name']}">IT Department</td>
+                                    <td th:text="${row['members']}">8</td>
+                                    <td th:text="${row['onLeave']}">1</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span style="font-size:0.8rem; min-width:40px;" th:text="${#numbers.formatDecimal(row['util'], 1, 2) + '%'}">32.10%</span>
+                                            <div class="progress-bar-custom flex-grow-1">
+                                                <div class="progress-bar-fill bg-primary" th:style="'width:' + ${row['util']} + '%'"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span style="font-size:0.8rem; min-width:40px;" th:text="${#numbers.formatDecimal(row['attendance'], 1, 2) + '%'}">93.20%</span>
+                                            <div class="progress-bar-custom flex-grow-1">
+                                                <div class="progress-bar-fill bg-success" th:style="'width:' + ${row['attendance']} + '%'"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="table-light fw-bold">
+                                    <td>Total / Average</td>
+                                    <td th:text="${totalMembers}">28</td>
+                                    <td th:text="${onLeaveToday}">3</td>
+                                    <td th:text="${#numbers.formatDecimal(leaveUtil, 1, 2) + '%'}">36.25%</td>
+                                    <td th:text="${#numbers.formatDecimal(avgAttendance, 1, 2) + '%'}">92.45%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+                    <!-- Leave Type Summary (Pie Chart) -->
+                    <div class="panel">
+                        <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-pie text-primary me-2"></i>Leave Type Summary</h6>
+                        <div style="max-height: 180px; display:flex; align-items:center; justify-content:center;">
+                            <canvas id="leaveTypeChart" style="max-width:180px; max-height:180px;"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Balance Overview -->
+                    <div class="panel">
+                        <h6 class="fw-bold mb-3"><i class="fa-solid fa-wallet text-primary me-2"></i>Balance Overview</h6>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                            <div class="p-3 border rounded text-center bg-light">
+                                <div style="font-size:0.7rem; color:#64748b; font-weight:700;">ENTITLED</div>
+                                <div class="fs-4 fw-bold text-primary" th:text="${entitledLeaves}">124</div>
+                            </div>
+                            <div class="p-3 border rounded text-center bg-light">
+                                <div style="font-size:0.7rem; color:#64748b; font-weight:700;">USED</div>
+                                <div class="fs-4 fw-bold text-success" th:text="${usedLeaves}">45</div>
+                            </div>
+                            <div class="p-3 border rounded text-center bg-light">
+                                <div style="font-size:0.7rem; color:#64748b; font-weight:700;">PENDING</div>
+                                <div class="fs-4 fw-bold text-warning" th:text="${pendingLeaves}">5</div>
+                            </div>
+                            <div class="p-3 border rounded text-center bg-light">
+                                <div style="font-size:0.7rem; color:#64748b; font-weight:700;">BALANCE</div>
+                                <div class="fs-4 fw-bold text-info" th:text="${remainingLeaves}">79</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Leave Calendar -->
+            <div class="panel">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="fw-bold mb-0"><i class="fa-solid fa-calendar-days text-primary me-2"></i>Team Leave Calendar</h6>
+                    <div class="d-flex align-items-center gap-2">
+                        <button class="btn btn-sm btn-light border"><i class="fa-solid fa-chevron-left"></i></button>
+                        <span class="fw-bold text-dark" style="font-size:0.9rem;">July 2026</span>
+                        <button class="btn btn-sm btn-light border"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="legend-row">
+                    <div class="legend-item"><span class="legend-color event-leave"></span>On Leave</div>
+                    <div class="legend-item"><span class="legend-color event-partial"></span>Partial Day</div>
+                    <div class="legend-item"><span class="legend-color event-weekly-off"></span>Weekly Off</div>
+                    <div class="legend-item"><span class="legend-color event-holiday"></span>Holiday</div>
+                </div>
+
+                <div class="calendar-grid">
+                    <!-- Calendar headers -->
+                    <div class="calendar-day-header">Sun</div>
+                    <div class="calendar-day-header">Mon</div>
+                    <div class="calendar-day-header">Tue</div>
+                    <div class="calendar-day-header">Wed</div>
+                    <div class="calendar-day-header">Thu</div>
+                    <div class="calendar-day-header">Fri</div>
+                    <div class="calendar-day-header">Sat</div>
+
+                    <!-- Days -->
+                    <div class="calendar-day text-muted"><span class="day-num">28</span></div>
+                    <div class="calendar-day text-muted"><span class="day-num">29</span></div>
+                    <div class="calendar-day text-muted"><span class="day-num">30</span></div>
+                    <div class="calendar-day text-muted"><span class="day-num">31</span></div>
+                    
+                    <div class="calendar-day"><span class="day-num">1</span>
+                        <div class="day-events"><span class="event-badge event-holiday">Labours Day</span></div>
+                    </div>
+                    <div class="calendar-day"><span class="day-num">2</span>
+                        <div class="day-events"><span class="event-badge event-weekly-off">Weekly Off</span></div>
+                    </div>
+                    <div class="calendar-day"><span class="day-num">3</span>
+                        <div class="day-events"><span class="event-badge event-leave">Vikram M</span></div>
+                    </div>
+                    
+                    <div class="calendar-day"><span class="day-num">4</span></div>
+                    <div class="calendar-day"><span class="day-num">5</span></div>
+                    <div class="calendar-day"><span class="day-num">6</span></div>
+                    <div class="calendar-day"><span class="day-num">7</span>
+                        <div class="day-events"><span class="event-badge event-partial">Pooja Des</span></div>
+                    </div>
+                    <div class="calendar-day"><span class="day-num">8</span></div>
+                    <div class="calendar-day"><span class="day-num">9</span></div>
+                    <div class="calendar-day"><span class="day-num">10</span></div>
+
+                    <div class="calendar-day"><span class="day-num">11</span></div>
+                    <div class="calendar-day"><span class="day-num">12</span>
+                        <div class="day-events"><span class="event-badge event-leave">Neha Ver</span></div>
+                    </div>
+                    <div class="calendar-day"><span class="day-num">13</span></div>
+                    <div class="calendar-day"><span class="day-num">14</span></div>
+                    <div class="calendar-day"><span class="day-num">15</span>
+                        <div class="day-events"><span class="event-badge event-leave">Rahul Kur</span></div>
+                    </div>
+                    <div class="calendar-day"><span class="day-num">16</span></div>
+                    <div class="calendar-day"><span class="day-num">17</span></div>
+
+                    <div class="calendar-day"><span class="day-num">18</span></div>
+                    <div class="calendar-day"><span class="day-num">19</span>
+                        <div class="day-events"><span class="event-badge event-partial">Ankit Pab</span></div>
+                    </div>
+                    <div class="calendar-day"><span class="day-num">20</span></div>
+                    <div class="calendar-day today"><span class="day-num">21 (Today)</span></div>
+                    <div class="calendar-day"><span class="day-num">22</span></div>
+                    <div class="calendar-day"><span class="day-num">23</span></div>
+                    <div class="calendar-day"><span class="day-num">24</span></div>
+
+                    <div class="calendar-day"><span class="day-num">25</span></div>
+                    <div class="calendar-day"><span class="day-num">26</span>
+                        <div class="day-events"><span class="event-badge event-leave">Megha Jo</span></div>
+                    </div>
+                    <div class="calendar-day"><span class="day-num">27</span></div>
+                    <div class="calendar-day"><span class="day-num">28</span></div>
+                    <div class="calendar-day"><span class="day-num">29</span></div>
+                    <div class="calendar-day"><span class="day-num">30</span></div>
+                    <div class="calendar-day text-muted"><span class="day-num">1</span></div>
+                </div>
+                <button class="btn btn-outline-primary btn-sm w-100 mt-3 fw-bold">View Full Calendar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 2: ESCALATE / OVERRIDE APPROVALS ==================== -->
+    <div th:if="${activeTab == 'escalate_override'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div><div class="label">Pending Escalations</div><div class="value">5</div><div style="font-size:0.7rem; color:#94a3b8;">Action required</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+                <div><div class="label">Escalated To You</div><div class="value">3</div><div style="font-size:0.7rem; color:#94a3b8;">Team members</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div><div class="label">Overdue Escalations</div><div class="value">2</div><div style="font-size:0.7rem; color:#94a3b8;">Past deadline</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
+                <div><div class="label">Resolved</div><div class="value">12</div><div style="font-size:0.7rem; color:#94a3b8;">This month</div></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="fw-bold mb-0">Escalated Leave Requests (5)</h6>
+                <div class="d-flex gap-2">
+                    <select class="form-select form-select-sm" id="escalatedDeptSelect" style="width:150px;">
+                        <option value="">All Departments</option>
+                        <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+                    </select>
+                    <select class="form-select form-select-sm" id="escalatedLeaveTypeSelect" style="width:150px;">
+                        <option value="">All Leave Types</option>
+                        <option value="Casual Leave">Casual Leave</option>
+                        <option value="Sick Leave">Sick Leave</option>
+                        <option value="Earned Leave">Earned Leave</option>
+                        <option value="Comp Off">Comp Off</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover" id="escalatedTable">
+                    <thead>
+                        <tr class="text-muted" style="font-size:0.8rem; text-transform:uppercase;">
+                            <th>Employee</th>
+                            <th>Leave Type</th>
+                            <th>Period</th>
+                            <th>Days</th>
+                            <th>Escalated By</th>
+                            <th>Escalated On</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="req : ${escalatedRequests}"
+                            th:attr="data-department=${req['department']}, data-type=${req['type']}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(req['employee'], 0, 1)}">P</div>
+                                    <div>
+                                        <div class="fw-bold" th:text="${req['employee']}">Pooja Desai</div>
+                                        <small class="text-muted" th:text="${req['designation']}">Finance Director</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:text="${req['type']}">Earned Leave</td>
+                            <td th:text="${req['period']}">25 May - 28 May</td>
+                            <td class="fw-bold" th:text="${req['days']}">4</td>
+                            <td th:text="${req['escalatedBy']}">Admin Manager</td>
+                                    <td th:text="${req['escalatedOn']}">26 May 2026 10:30 AM</td>
+                            <td th:text="${req['reason']}">High workload in team</td>
+                            <td>
+                                <span class="status-badge" th:classappend="${req['status'] == 'OVERDUE'} ? ' status-overdue' : ' status-pending'" th:text="${req['status']}">OVERDUE</span>
+                            </td>
+                            <td class="text-end">
+                                <form th:action="@{/senior_manager/leave_attendance/action}" method="post" class="d-inline">
+                                    <input type="hidden" name="id" th:value="${req['id']}"/>
+                                    <button type="submit" name="action" value="Approve" class="btn btn-sm btn-outline-success me-1"><i class="fa-solid fa-check"></i></button>
+                                    <button type="submit" name="action" value="Reject" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-xmark"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="grid-2col">
+            <!-- Escalation Summary (Donut Chart) -->
+            <div class="panel">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-pie text-primary me-2"></i>Escalation Summary</h6>
+                <div style="max-height: 200px; display:flex; align-items:center; justify-content:center;">
+                    <canvas id="escalationChart" style="max-width:200px; max-height:200px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Override History -->
+            <div class="panel">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Override History (Recent)</h6>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr class="text-muted" style="font-size:0.75rem; text-transform:uppercase;">
+                                <th>Employee</th>
+                                <th>Leave Type</th>
+                                <th>Action Taken</th>
+                                <th>Action By</th>
+                                <th>Date & Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="history : ${overrideHistory}">
+                                <td class="fw-bold" th:text="${history['employee']}">Rahul Kumar</td>
+                                <td th:text="${history['type']}">Sick Leave</td>
+                                <td>
+                                    <span class="status-badge" th:classappend="${history['action'] == 'APPROVED'} ? ' status-approved' : ' status-rejected'" th:text="${history['action']}">APPROVED</span>
+                                </td>
+                                <td th:text="${history['actionBy']}">You</td>
+                                <td th:text="${history['dateTime']}">31 May 2026, 09:30 AM</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 3: ATTENDANCE REPORTS ==================== -->
+    <div th:if="${activeTab == 'attendance_reports'}">
+        <div class="filters-row">
+            <select id="attendanceDeptSelect" class="form-select form-select-sm" style="width:150px;">
+                <option value="">All Departments</option>
+                <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+            </select>
+            <select id="attendanceLocSelect" class="form-select form-select-sm" style="width:150px;">
+                <option value="">All Locations</option>
+                <option value="Shahdol">Shahdol</option>
+                <option value="Bangalore">Bangalore</option>
+                <option value="Noida">Noida</option>
+            </select>
+            <select class="form-select form-select-sm" style="width:180px;">
+                <option>May 2026 - 31 May 2026</option>
+            </select>
+            <button class="btn btn-outline-secondary btn-sm border fw-bold"><i class="fa-solid fa-sliders me-2"></i>Filters</button>
+            <button class="btn btn-outline-secondary btn-sm border fw-bold"><i class="fa-solid fa-download me-2"></i>Export</button>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-users"></i></div>
+                <div><div class="label">Total Team Members</div><div class="value" th:text="${totalMembers}">28</div><div style="font-size:0.7rem; color:#94a3b8;">Across all departments</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-percent"></i></div>
+                <div><div class="label">Average Attendance</div><div class="value" th:text="${#numbers.formatDecimal(avgAttendance, 1, 2) + '%'}">92.45%</div><div style="font-size:0.7rem; color:#94a3b8;">For this period</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-user-check"></i></div>
+                <div><div class="label">Present Today</div><div class="value" th:text="${presentToday}">23</div><div style="font-size:0.7rem; color:#94a3b8;">82.14% of team</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-user-xmark"></i></div>
+                <div><div class="label">Absent Today</div><div class="value" th:text="${absentToday}">3</div><div style="font-size:0.7rem; color:#94a3b8;">10.71% of team</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-clock"></i></div>
+                <div><div class="label">Avg Working Hours</div><div class="value" th:text="${avgWorkingHours}">8h 32m</div><div style="font-size:0.7rem; color:#94a3b8;">Per day</div></div>
+            </div>
+        </div>
+
+        <div class="grid-2col">
+            <!-- Attendance Overview (Line Chart) -->
+            <div class="panel">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-line text-primary me-2"></i>Attendance Overview</h6>
+                <div style="max-height: 250px; position: relative;">
+                    <canvas id="attendanceOverviewChart" style="max-height: 250px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Attendance by Department (Donut Chart) -->
+            <div class="panel">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-pie text-primary me-2"></i>Attendance by Department</h6>
+                <div style="max-height: 250px; display:flex; align-items:center; justify-content:center;">
+                    <canvas id="deptAttendanceChart" style="max-width:200px; max-height:200px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Attendance Summary Table -->
+        <div class="panel">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="fw-bold mb-0">Team Attendance Summary</h6>
+                <input type="text" class="form-control form-control-sm" id="attendanceSearchInput" placeholder="Search employee..." style="width:220px;"/>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle table-hover" id="attendanceTable">
+                    <thead>
+                        <tr class="text-muted" style="font-size:0.8rem; text-transform:uppercase;">
+                            <th>Employee</th>
+                            <th>Department</th>
+                            <th>Days</th>
+                            <th class="text-success">Present</th>
+                            <th class="text-danger">Absent</th>
+                            <th class="text-warning">Leave</th>
+                            <th>Half</th>
+                            <th>Avg. Att %</th>
+                            <th>Avg. Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="record : ${attendanceRecords}"
+                            th:attr="data-name=${record['employee']}, data-department=${record['department']}, data-location=${record['location']}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(record['employee'], 0, 1)}">V</div>
+                                    <div>
+                                        <div class="fw-bold" th:text="${record['employee']}">Vikram Mehta</div>
+                                        <small class="text-muted" th:text="${record['designation']}">CTO</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:text="${record['department']}">Information Technology</td>
+                            <td th:text="${record['days']}">22</td>
+                            <td class="text-success fw-bold" th:text="${record['present']}">20</td>
+                            <td class="text-danger fw-bold" th:text="${record['absent']}">1</td>
+                            <td class="text-warning fw-bold" th:text="${record['leave']}">1</td>
+                            <td th:text="${record['half']}">0</td>
+                            <td class="fw-bold text-primary" th:text="${#numbers.formatDecimal(record['percent'], 1, 2) + '%'}">95.45%</td>
+                            <td th:text="${record['hours']}">8h 45m</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener("DOMContentLoaded", function() {
+        const activeTab = /*[[${activeTab}]]*/ 'leave_calendar';
+
+        if (activeTab === 'leave_calendar') {
+            // Leave Type Summary Chart
+            const leaveCtx = document.getElementById('leaveTypeChart').getContext('2d');
+            new Chart(leaveCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Casual Leave', 'Sick Leave', 'Earned Leave', 'Comp Off'],
+                    datasets: [{
+                        data: [18, 12, 10, 5],
+                        backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 10,
+                                font: { size: 9 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        if (activeTab === 'escalate_override') {
+            // Escalation Summary Donut Chart
+            const escalationCtx = document.getElementById('escalationChart').getContext('2d');
+            new Chart(escalationCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Overdue', 'Pending', 'Approved'],
+                    datasets: [{
+                        data: [2, 3, 12],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 10,
+                                font: { size: 9 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        if (activeTab === 'attendance_reports') {
+            // Attendance Overview Line Chart
+            const attendanceCtx = document.getElementById('attendanceOverviewChart').getContext('2d');
+            new Chart(attendanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1 May', '5 May', '10 May', '15 May', '20 May', '25 May', '30 May'],
+                    datasets: [
+                        {
+                            label: 'Present %',
+                            data: [91.20, 93.45, 92.80, 94.10, 91.50, 93.60, 92.45],
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.05)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 80,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) { return value + "%" }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Department Attendance Donut Chart
+            const deptCtx = document.getElementById('deptAttendanceChart').getContext('2d');
+            new Chart(deptCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['IT', 'Finance', 'HR', 'Operations'],
+                    datasets: [{
+                        data: [94.60, 93.20, 91.10, 89.30],
+                        backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 10,
+                                font: { size: 9 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Escalated Leave Request filters (Escalate / Override Approvals Tab)
+        const escalatedDept = document.getElementById('escalatedDeptSelect');
+        const escalatedLeaveType = document.getElementById('escalatedLeaveTypeSelect');
+
+        function filterEscalated() {
+            const dept = escalatedDept?.value || '';
+            const type = (escalatedLeaveType?.value || '').toLowerCase();
+
+            document.querySelectorAll('#escalatedTable tbody tr').forEach(row => {
+                const rowDept = row.dataset.department || '';
+                const rowType = (row.dataset.type || '').toLowerCase();
+
+                const deptMatch = !dept || rowDept === dept;
+                const typeMatch = !type || rowType.includes(type);
+
+                row.style.display = (deptMatch && typeMatch) ? '' : 'none';
+            });
+        }
+
+        if (escalatedDept) escalatedDept.addEventListener('change', filterEscalated);
+        if (escalatedLeaveType) escalatedLeaveType.addEventListener('change', filterEscalated);
+
+        // Attendance summary table filters (View Attendance Reports Tab)
+        const attendanceDept = document.getElementById('attendanceDeptSelect');
+        const attendanceLoc = document.getElementById('attendanceLocSelect');
+        const attendanceSearch = document.getElementById('attendanceSearchInput');
+
+        function filterAttendance() {
+            const query = (attendanceSearch?.value || '').toLowerCase();
+            const dept = attendanceDept?.value || '';
+            const loc = attendanceLoc?.value || '';
+
+            document.querySelectorAll('#attendanceTable tbody tr').forEach(row => {
+                const name = (row.dataset.name || '').toLowerCase();
+                const rowDept = row.dataset.department || '';
+                const rowLoc = row.dataset.location || '';
+
+                const searchMatch = !query || name.includes(query);
+                const deptMatch = !dept || rowDept === dept;
+                const locMatch = !loc || rowLoc === loc;
+
+                row.style.display = (searchMatch && deptMatch && locMatch) ? '' : 'none';
+            });
+        }
+
+        if (attendanceSearch) attendanceSearch.addEventListener('input', filterAttendance);
+        if (attendanceDept) attendanceDept.addEventListener('change', filterAttendance);
+        if (attendanceLoc) attendanceLoc.addEventListener('change', filterAttendance);
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

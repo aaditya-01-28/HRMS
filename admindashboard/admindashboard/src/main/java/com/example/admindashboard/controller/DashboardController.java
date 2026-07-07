@@ -1228,16 +1228,12 @@ public class DashboardController {
 
             String dbPassword = currentUser.getPassword();
 
-            String cleanDbPassword =
-                    dbPassword != null
-                            ? dbPassword.replace("{noop}", "")
-                            : "";
-
             if (!typedUsername.equalsIgnoreCase(loginId)
-                    || !typedPassword.equals(cleanDbPassword)) {
+                    || dbPassword == null
+                    || !passwordEncoder.matches(typedPassword, dbPassword)) {
 
                 model.addAttribute("user", currentUser);
-                model.addAttribute("savedPassword", cleanDbPassword);
+                model.addAttribute("savedPassword", typedPassword);
                 model.addAttribute("authError", "Invalid credentials");
 
                 return "my-whitecircle-login";
@@ -1426,14 +1422,12 @@ public class DashboardController {
             model.addAttribute("user", currentUser);
             String dbPassword = currentUser.getPassword();
 
-            String cleanDbPassword =
-                    dbPassword != null ? dbPassword.replace("{noop}", "") : "";
-
             if (!typedUsername.equalsIgnoreCase(loginId)
-                    || !typedPassword.equals(cleanDbPassword)) {
+                    || dbPassword == null
+                    || !passwordEncoder.matches(typedPassword, dbPassword)) {
 
                 model.addAttribute("user", currentUser);
-                model.addAttribute("savedPassword", cleanDbPassword);
+                model.addAttribute("savedPassword", typedPassword);
                 model.addAttribute("authError", "Invalid credentials");
 
                 return "ticket-login";

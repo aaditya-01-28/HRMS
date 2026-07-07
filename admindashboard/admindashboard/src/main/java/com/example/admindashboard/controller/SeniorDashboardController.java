@@ -833,30 +833,33 @@ public class SeniorDashboardController {
         return "redirect:/senior_hr/payroll";
     }
 
-    // --- MY SPACE ROUTE (HR Employee) ---
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_hr/employee")
     public String showSeniorHrEmployee(Model model, Principal principal) {
         List<com.example.admindashboard.model.User> allUsers = userRepository.findAll();
         
-        long totalEmp = allUsers.size();
-        long activeEmp = allUsers.stream().filter(u -> "ACTIVE".equalsIgnoreCase(u.getStatus())).count();
-        long noticeEmp = allUsers.stream().filter(u -> "ON NOTICE".equalsIgnoreCase(u.getStatus())).count();
-        long offboardedEmp = allUsers.stream().filter(u -> "EXITED".equalsIgnoreCase(u.getStatus())).count();
-        // Since candidates are hardcoded in the frontend or managed separately, we'll keep onboarding to a dummy count for now, or you can calculate it based on a candidate table if it exists.
+        List<com.example.admindashboard.model.User> employeesOnly = allUsers.stream()
+            .filter(u -> !"ONBOARDING".equalsIgnoreCase(u.getStatus()) && !"admin".equalsIgnoreCase(u.getUsername()))
+            .collect(Collectors.toList());
+        
+        long totalEmp = employeesOnly.size();
+        long activeEmp = employeesOnly.stream().filter(u -> "ACTIVE".equalsIgnoreCase(u.getStatus())).count();
+        long noticeEmp = employeesOnly.stream().filter(u -> "ON NOTICE".equalsIgnoreCase(u.getStatus())).count();
+        long offboardedEmp = employeesOnly.stream().filter(u -> "EXITED".equalsIgnoreCase(u.getStatus())).count();
+        
         List<com.example.admindashboard.model.User> onboardingList = allUsers.stream()
             .filter(u -> "ONBOARDING".equalsIgnoreCase(u.getStatus()) || 
                          ("ACTIVE".equalsIgnoreCase(u.getStatus()) && u.getEmployeeProfile() != null && u.getEmployeeProfile().isOnboardingCompleted()))
             .collect(Collectors.toList());
-        long onboardingEmp = onboardingList.size();
+        long onboardingEmp = onboardingList.stream().filter(u -> "ONBOARDING".equalsIgnoreCase(u.getStatus())).count();
         model.addAttribute("candidates", onboardingList); 
         
-        java.util.Map<String, Long> deptCounts = allUsers.stream()
+        java.util.Map<String, Long> deptCounts = employeesOnly.stream()
             .filter(u -> u.getEmployeeProfile() != null && u.getEmployeeProfile().getDepartment() != null)
             .collect(Collectors.groupingBy(u -> u.getEmployeeProfile().getDepartment(), Collectors.counting()));
             
         // Calculate department stats
-        long totalWithDept = allUsers.stream()
+        long totalWithDept = employeesOnly.stream()
             .filter(u -> u.getEmployeeProfile() != null && u.getEmployeeProfile().getDepartment() != null)
             .count();
         double totalD = totalWithDept > 0 ? (double)totalWithDept : 1.0;
@@ -897,7 +900,7 @@ public class SeniorDashboardController {
         model.addAttribute("finPct", finPct);
         model.addAttribute("othersPct", othersPct);
         
-        model.addAttribute("allUsers", allUsers);
+        model.addAttribute("allUsers", employeesOnly);
         return "senior_hr-employee";
     }
     @PostMapping("/senior_hr/onboard")
@@ -918,8 +921,17 @@ public class SeniorDashboardController {
                                    @RequestParam(required=false) MultipartFile educationalDoc,
                                    @RequestParam(required=false) MultipartFile experienceDoc,
                                    @RequestParam(required=false) MultipartFile offerDoc,
-                                   org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttrs) {
+                                    org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttrs) {
         
+        String usernameToCheck = employeeCode != null && !employeeCode.isEmpty() ? employeeCode.toUpperCase() : null;
+        if (usernameToCheck != null) {
+            java.util.Optional<User> existingUser = userRepository.findByUsername(usernameToCheck);
+            if (existingUser.isPresent() && (id == null || !existingUser.get().getId().equals(id))) {
+                redirectAttrs.addFlashAttribute("errorMessage", "Employee Code/Username already exists!");
+                return "redirect:/senior_hr/employee?tab=onboarding";
+            }
+        }
+
         User user;
         boolean isNew = false;
         String randomPassword = null;

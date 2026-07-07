@@ -163,7 +163,7 @@
 
         .filters-row {
             display: grid;
-            grid-template-columns: 1.5fr repeat(4, minmax(120px, 1fr));
+            grid-template-columns: 1.5fr repeat(3, minmax(120px, 1fr));
             gap: 8px;
             margin-bottom: 10px;
         }
@@ -197,35 +197,166 @@
             font-size: .9rem;
         }
 
-        .org-row {
+        /* ===== ORG CHART TREE LAYOUT ===== */
+        .org-chart-container { padding: 0 0 24px 0; overflow-x: auto; }
+
+        .org-tier {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            margin: 12px 0;
+            gap: 0;
+            margin-bottom: 0;
+            position: relative;
         }
 
-        .org-cards {
+        .org-tier-label {
+            min-width: 80px;
+            padding: 12px 0 0 0;
+            color: #2563eb;
+            font-weight: 700;
+            font-size: .92rem;
+            flex-shrink: 0;
+        }
+
+        .org-tier-cards {
             display: flex;
-            gap: 10px;
             flex-wrap: wrap;
+            gap: 16px;
+            padding: 16px 0 24px 0;
+            position: relative;
+            justify-content: center;
+            flex: 1;
         }
 
-        .org-card {
-            width: 140px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            padding: 8px;
-            text-align: center;
-            font-size: .72rem;
+        /* Connecting vertical line from tier label */
+        .org-tier + .org-tier .org-tier-cards::before {
+            content: '';
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            width: 2px;
+            height: 24px;
+            background: #cbd5e1;
+        }
+
+        .org-tree-card {
+            width: 155px;
             background: #fff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 10px 12px;
+            text-align: center;
+            position: relative;
+            transition: all .25s ease;
+            cursor: default;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
 
-        .org-card img {
-            width: 26px;
-            height: 26px;
+        .org-tree-card:hover {
+            border-color: #93c5fd;
+            box-shadow: 0 4px 16px rgba(37,99,235,0.12);
+            transform: translateY(-3px);
+        }
+
+        .org-tree-card.is-you {
+            border-color: #2563eb;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        }
+
+        .org-tree-card .card-avatar {
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            color: #3b82f6;
+            font-size: 1.4rem;
+            overflow: hidden;
+        }
+
+        .org-tree-card .card-avatar img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .org-tree-card .card-name {
+            font-weight: 700;
+            font-size: .82rem;
+            color: #1e293b;
+            line-height: 1.2;
+            margin-bottom: 2px;
+        }
+
+        .org-tree-card .card-you-tag {
+            color: #2563eb;
+            font-size: .7rem;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .org-tree-card .card-designation {
+            font-size: .73rem;
+            color: #64748b;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+
+        .org-tree-card .card-reportees {
+            font-size: .76rem;
+            font-weight: 700;
+            color: #334155;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 6px;
+            margin-top: 4px;
+        }
+
+        .org-tree-card .card-reportees small {
+            display: block;
+            font-weight: 400;
+            color: #94a3b8;
+            font-size: .68rem;
+        }
+
+        /* Horizontal connector line between cards at same level */
+        .org-tier-cards::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #e2e8f0;
+        }
+
+        /* Vertical drop from horizontal line into each card */
+        .org-tree-card::before {
+            content: '';
+            position: absolute;
+            top: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 16px;
+            background: #cbd5e1;
+        }
+
+        /* First tier (L4) should not have connectors above */
+        .org-tier:first-child .org-tier-cards::after,
+        .org-tier:first-child .org-tree-card::before { display: none; }
+
+        .org-tree-card .card-role-badge {
+            display: inline-block;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: .65rem;
+            padding: 2px 8px;
+            border-radius: 10px;
             margin-bottom: 4px;
+            font-weight: 600;
         }
 
         .pending-wrap {
@@ -298,8 +429,8 @@
     </div>
     <div class="nav-links">
         <a href="/senior_manager/myspace?tab=directory" class="nav-link-item active"><i class="fa-solid fa-users"></i> Team & Employee</a>
-        <a href="#" class="nav-link-item"><i class="fa-solid fa-calendar-days"></i> Leave & Attendance</a>
-        <a href="#" class="nav-link-item"><i class="fa-solid fa-briefcase"></i> Project & Work</a>
+        <a href="/senior_manager/leave_attendance" class="nav-link-item"><i class="fa-solid fa-calendar-days"></i> Leave & Attendance</a>
+        <a href="/senior_manager/project_work" class="nav-link-item"><i class="fa-solid fa-briefcase"></i> Project & Work</a>
         <a href="#" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Performance</a>
         <a href="#" class="nav-link-item"><i class="fa-solid fa-user-plus"></i> Recruitment</a>
         <a href="#" class="nav-link-item"><i class="fa-solid fa-wallet"></i> Financial & Expense</a>
@@ -358,7 +489,6 @@
                     <option value="EXITED">Exited</option>
                     <option value="INACTIVE">Inactive</option>
                 </select>
-                <input id="directoryDate" type="date"/>
             </div>
 
             <div class="table-responsive">
@@ -433,10 +563,10 @@
 
     <div th:if="${activeTab == 'hierarchy'}">
         <div class="stats-row">
-            <div class="stat-card"><i class="fa-solid fa-users icon text-primary"></i><div><div class="label">Total Team Members</div><div class="value" th:text="${totalTeamMembers}">0</div></div></div>
+            <div class="stat-card"><i class="fa-solid fa-users icon text-primary"></i><div><div class="label">Total Team Members</div><div class="value" th:text="${totalHierarchyMembers}">0</div></div></div>
             <div class="stat-card"><i class="fa-regular fa-circle-check icon text-success"></i><div><div class="label">Levels in hierarchy</div><div class="value">4</div></div></div>
-            <div class="stat-card"><i class="fa-regular fa-clock icon text-warning"></i><div><div class="label">Departments</div><div class="value" th:text="${#lists.size(departmentOptions)}">0</div></div></div>
-            <div class="stat-card"><i class="fa-regular fa-circle-xmark icon text-danger"></i><div><div class="label">Span of control</div><div class="value" th:text="${#lists.size(hierarchyLevel2)}">0</div></div></div>
+            <div class="stat-card"><i class="fa-regular fa-clock icon text-warning"></i><div><div class="label">Departments</div><div class="value" th:text="${hierarchyDepartments}">0</div></div></div>
+            <div class="stat-card"><i class="fa-regular fa-circle-xmark icon text-danger"></i><div><div class="label">Span of control</div><div class="value" th:text="${hierarchySpanOfControl}">0</div></div></div>
         </div>
 
         <div class="panel">
@@ -446,55 +576,120 @@
                     <input id="hierarchySearch" type="text" class="form-control form-control-sm" placeholder="Search" style="width:140px;"/>
                     <select id="hierarchyLevel" class="form-select form-select-sm" style="width:130px;">
                         <option value="all">View options</option>
-                        <option value="level2">Level 2</option>
-                        <option value="level3">Level 3</option>
-                        <option value="level4">Level 4</option>
+                        <option value="level4">Level 4 (Admin)</option>
+                        <option value="level3">Level 3 (Senior)</option>
+                        <option value="level2">Level 2 (Manager)</option>
+                        <option value="level1">Level 1 (Employee)</option>
                     </select>
                 </div>
             </div>
 
-            <div class="org-row hierarchy-group" data-level="level1">
-                <div class="org-level">Level 1</div>
-                <div class="org-cards">
-                    <div class="org-card hierarchy-card" th:attr="data-name=${managerUser != null ? managerUser.fullName : ''}">
-                        <img src="/images/male-avatar.png" alt="avatar"/>
-                        <div><strong th:text="${managerUser != null ? managerUser.fullName : 'Manager'}">Manager</strong></div>
-                        <div>Senior Manager</div>
-                    </div>
-                </div>
-            </div>
+            <div class="org-chart-container">
 
-            <div class="org-row hierarchy-group" data-level="level2">
-                <div class="org-level">Level 2</div>
-                <div class="org-cards">
-                    <div class="org-card hierarchy-card" th:each="u : ${hierarchyLevel2}" th:attr="data-name=${u.fullName}">
-                        <img src="/images/male-avatar.png" alt="avatar"/>
-                        <div><strong th:text="${u.fullName}">Name</strong></div>
-                        <div th:text="${u.designation != null && !u.designation.isBlank() ? u.designation : '-'}">Role</div>
+                <!-- LEVEL 4 - Admin / System Ownership -->
+                <div class="org-tier hierarchy-group" data-level="level4" th:if="${!#lists.isEmpty(hierarchyLevel4)}">
+                    <div class="org-tier-label">Level 4</div>
+                    <div class="org-tier-cards">
+                        <div th:each="u : ${hierarchyLevel4}"
+                             class="org-tree-card hierarchy-card"
+                             th:classappend="${u['isCurrentUser']} ? ' is-you' : ''"
+                             th:attr="data-name=${u['fullName']}">
+                            <div class="card-avatar">
+                                <img th:if="${u['profileImage'] != null}" th:src="@{${u['profileImage']}}" alt=""/>
+                                <i th:if="${u['profileImage'] == null}" class="fa-solid fa-user-tie"></i>
+                            </div>
+                            <div class="card-name">
+                                <span th:text="${u['fullName']}">Name</span>
+                                <span class="card-you-tag" th:if="${u['isCurrentUser']}">You</span>
+                            </div>
+                            <div class="card-designation" th:text="${u['designation']}">Role</div>
+                            <div class="card-role-badge" th:text="${u['roleName']}">SUPER_ADMIN</div>
+                            <div class="card-reportees">
+                                <span th:text="${u['reportees']}">0</span>
+                                <small>Reportees</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="org-row hierarchy-group" data-level="level3">
-                <div class="org-level">Level 3</div>
-                <div class="org-cards">
-                    <div class="org-card hierarchy-card" th:each="u : ${hierarchyLevel3}" th:attr="data-name=${u.fullName}">
-                        <img src="/images/male-avatar.png" alt="avatar"/>
-                        <div><strong th:text="${u.fullName}">Name</strong></div>
-                        <div th:text="${u.designation != null && !u.designation.isBlank() ? u.designation : '-'}">Role</div>
+                <!-- LEVEL 3 - Senior Leadership -->
+                <div class="org-tier hierarchy-group" data-level="level3" th:if="${!#lists.isEmpty(hierarchyLevel3)}">
+                    <div class="org-tier-label">Level 3</div>
+                    <div class="org-tier-cards">
+                        <div th:each="u : ${hierarchyLevel3}"
+                             class="org-tree-card hierarchy-card"
+                             th:classappend="${u['isCurrentUser']} ? ' is-you' : ''"
+                             th:attr="data-name=${u['fullName']}">
+                            <div class="card-avatar">
+                                <img th:if="${u['profileImage'] != null}" th:src="@{${u['profileImage']}}" alt=""/>
+                                <i th:if="${u['profileImage'] == null}" class="fa-solid fa-user-shield"></i>
+                            </div>
+                            <div class="card-name">
+                                <span th:text="${u['fullName']}">Name</span>
+                                <span class="card-you-tag" th:if="${u['isCurrentUser']}">You</span>
+                            </div>
+                            <div class="card-designation" th:text="${u['designation']}">Role</div>
+                            <div class="card-role-badge" th:text="${u['roleName']}">SENIOR_HR</div>
+                            <div class="card-reportees">
+                                <span th:text="${u['reportees']}">0</span>
+                                <small>Reportees</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="org-row hierarchy-group" data-level="level4">
-                <div class="org-level">Level 4</div>
-                <div class="org-cards">
-                    <div class="org-card hierarchy-card" th:each="u : ${hierarchyLevel4}" th:attr="data-name=${u.fullName}">
-                        <img src="/images/male-avatar.png" alt="avatar"/>
-                        <div><strong th:text="${u.fullName}">Name</strong></div>
-                        <div th:text="${u.designation != null && !u.designation.isBlank() ? u.designation : '-'}">Role</div>
+                <!-- LEVEL 2 - Line Management & Functional Ops -->
+                <div class="org-tier hierarchy-group" data-level="level2" th:if="${!#lists.isEmpty(hierarchyLevel2)}">
+                    <div class="org-tier-label">Level 2</div>
+                    <div class="org-tier-cards">
+                        <div th:each="u : ${hierarchyLevel2}"
+                             class="org-tree-card hierarchy-card"
+                             th:classappend="${u['isCurrentUser']} ? ' is-you' : ''"
+                             th:attr="data-name=${u['fullName']}">
+                            <div class="card-avatar">
+                                <img th:if="${u['profileImage'] != null}" th:src="@{${u['profileImage']}}" alt=""/>
+                                <i th:if="${u['profileImage'] == null}" class="fa-solid fa-user-gear"></i>
+                            </div>
+                            <div class="card-name">
+                                <span th:text="${u['fullName']}">Name</span>
+                                <span class="card-you-tag" th:if="${u['isCurrentUser']}">You</span>
+                            </div>
+                            <div class="card-designation" th:text="${u['designation']}">Role</div>
+                            <div class="card-role-badge" th:text="${u['roleName']}">MANAGER</div>
+                            <div class="card-reportees">
+                                <span th:text="${u['reportees']}">0</span>
+                                <small>Reportees</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- LEVEL 1 - Standard Employees -->
+                <div class="org-tier hierarchy-group" data-level="level1" th:if="${!#lists.isEmpty(hierarchyLevel1)}">
+                    <div class="org-tier-label">Level 1</div>
+                    <div class="org-tier-cards">
+                        <div th:each="u : ${hierarchyLevel1}"
+                             class="org-tree-card hierarchy-card"
+                             th:classappend="${u['isCurrentUser']} ? ' is-you' : ''"
+                             th:attr="data-name=${u['fullName']}">
+                            <div class="card-avatar">
+                                <img th:if="${u['profileImage'] != null}" th:src="@{${u['profileImage']}}" alt=""/>
+                                <i th:if="${u['profileImage'] == null}" class="fa-solid fa-user"></i>
+                            </div>
+                            <div class="card-name">
+                                <span th:text="${u['fullName']}">Name</span>
+                                <span class="card-you-tag" th:if="${u['isCurrentUser']}">You</span>
+                            </div>
+                            <div class="card-designation" th:text="${u['designation']}">Role</div>
+                            <div class="card-role-badge" th:text="${u['roleName']}">EMPLOYEE</div>
+                            <div class="card-reportees">
+                                <span th:text="${u['reportees']}">0</span>
+                                <small>Reportees</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -620,7 +815,6 @@
                     <option>Pending</option>
                     <option>Declined</option>
                 </select>
-                <input id="recommendationDate" type="date"/>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0" id="recommendationTable">
@@ -707,19 +901,17 @@
         const department = document.getElementById('directoryDepartment');
         const employment = document.getElementById('directoryEmploymentType');
         const status = document.getElementById('directoryStatus');
-        const date = document.getElementById('directoryDate');
         const table = document.getElementById('directoryTable');
         if (!table) return;
 
         let visible = 0;
         table.querySelectorAll('tbody tr').forEach(row => {
             if (row.querySelector('td[colspan]')) return;
-            const matchSearch = textContains(row.dataset.name + ' ' + row.dataset.role + ' ' + row.dataset.department, search.value);
-            const matchDept = !department.value || row.dataset.department === department.value;
-            const matchEmployment = !employment.value || row.dataset.employment === employment.value;
-            const matchStatus = !status.value || (row.dataset.status || '').toUpperCase() === status.value.toUpperCase();
-            const matchDate = !date.value || row.dataset.joined === date.value;
-            const show = matchSearch && matchDept && matchEmployment && matchStatus && matchDate;
+            const matchSearch = !search || textContains(row.dataset.name + ' ' + row.dataset.role + ' ' + row.dataset.department, search.value);
+            const matchDept = !department || !department.value || row.dataset.department === department.value;
+            const matchEmployment = !employment || !employment.value || row.dataset.employment === employment.value;
+            const matchStatus = !status || !status.value || (row.dataset.status || '').toUpperCase() === status.value.toUpperCase();
+            const show = matchSearch && matchDept && matchEmployment && matchStatus;
             row.style.display = show ? '' : 'none';
             if (show) visible++;
         });
@@ -739,10 +931,10 @@
         table.querySelectorAll('tbody tr').forEach(row => {
             if (row.querySelector('td[colspan]')) return;
             const haystack = `${row.dataset.name} ${row.dataset.code} ${row.dataset.details}`;
-            const matchSearch = textContains(haystack, search.value);
-            const matchType = !type.value || row.dataset.type === type.value;
-            const matchRequest = !request.value || row.dataset.request === request.value;
-            const matchPriority = !priority.value || row.dataset.priority === priority.value;
+            const matchSearch = !search || textContains(haystack, search.value);
+            const matchType = !type || !type.value || row.dataset.type === type.value;
+            const matchRequest = !request || !request.value || row.dataset.request === request.value;
+            const matchPriority = !priority || !priority.value || row.dataset.priority === priority.value;
             const show = matchSearch && matchType && matchRequest && matchPriority;
             row.style.display = show ? '' : 'none';
             if (show) visible++;
@@ -756,7 +948,6 @@
         const department = document.getElementById('recommendationDepartment');
         const employment = document.getElementById('recommendationEmploymentType');
         const status = document.getElementById('recommendationStatus');
-        const date = document.getElementById('recommendationDate');
         const table = document.getElementById('recommendationTable');
         if (!table) return;
 
@@ -764,12 +955,11 @@
         table.querySelectorAll('tbody tr').forEach(row => {
             if (row.querySelector('td[colspan]')) return;
             const haystack = `${row.dataset.name} ${row.dataset.role} ${row.dataset.department}`;
-            const matchSearch = textContains(haystack, search.value);
-            const matchDept = !department.value || row.dataset.department === department.value;
-            const matchEmployment = !employment.value || row.dataset.employment === employment.value;
-            const matchStatus = !status.value || row.dataset.status === status.value;
-            const matchDate = !date.value || row.dataset.date === date.value;
-            const show = matchSearch && matchDept && matchEmployment && matchStatus && matchDate;
+            const matchSearch = !search || textContains(haystack, search.value);
+            const matchDept = !department || !department.value || row.dataset.department === department.value;
+            const matchEmployment = !employment || !employment.value || row.dataset.employment === employment.value;
+            const matchStatus = !status || !status.value || row.dataset.status === status.value;
+            const show = matchSearch && matchDept && matchEmployment && matchStatus;
             row.style.display = show ? '' : 'none';
             if (show) visible++;
         });
@@ -783,7 +973,6 @@
             ['directoryDepartment', 'change', applyDirectoryFilters],
             ['directoryEmploymentType', 'change', applyDirectoryFilters],
             ['directoryStatus', 'change', applyDirectoryFilters],
-            ['directoryDate', 'change', applyDirectoryFilters],
             ['pendingSearch', 'input', applyPendingFilters],
             ['pendingActionType', 'change', applyPendingFilters],
             ['pendingRequestGroup', 'change', applyPendingFilters],
@@ -791,8 +980,7 @@
             ['recommendationSearch', 'input', applyRecommendationFilters],
             ['recommendationDepartment', 'change', applyRecommendationFilters],
             ['recommendationEmploymentType', 'change', applyRecommendationFilters],
-            ['recommendationStatus', 'change', applyRecommendationFilters],
-            ['recommendationDate', 'change', applyRecommendationFilters]
+            ['recommendationStatus', 'change', applyRecommendationFilters]
         ];
 
         bindings.forEach(([id, evt, fn]) => {
