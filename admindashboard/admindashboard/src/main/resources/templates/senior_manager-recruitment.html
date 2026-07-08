@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>WhiteCircle | Recruitment Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #002D72;
+            --sidebar-width: 205px;
+            --header-height: 70px;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            background: #f8fafc;
+            margin: 0;
+            font-family: Inter, Arial, sans-serif;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .myspace-sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: #f8fafc;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 1051;
+            transition: transform .3s ease;
+        }
+
+        body.sidebar-toggled .myspace-sidebar { transform: translateX(-100%); }
+
+        .brand-area {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: var(--header-height);
+        }
+
+        .brand-area img {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .brand-title { font-size: .92rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+        .brand-sub { font-size: .78rem; color: var(--muted); }
+
+        .nav-links { padding: 10px 0; flex: 1; }
+
+        .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 12px;
+            color: #475569;
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 600;
+            border-left: 3px solid transparent;
+            transition: all .2s;
+        }
+
+        .nav-link-item:hover { background: #eef2ff; color: var(--primary); }
+        .nav-link-item.active { background: #e2e8f0; color: var(--primary); border-left-color: var(--primary-light); }
+
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--header-height);
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1050;
+            transition: left .3s ease;
+        }
+
+        body.sidebar-toggled .top-navbar { left: 0; }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+        }
+
+        .myspace-main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 14px 18px;
+            min-height: calc(100vh - var(--header-height));
+            transition: margin-left .3s ease;
+        }
+
+        body.sidebar-toggled .myspace-main { margin-left: 0; }
+
+        .tabs-strip {
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: flex-start;
+            gap: 40px;
+        }
+
+        .tab-link {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 3px solid transparent;
+            font-size: 1.1rem;
+        }
+
+        .tab-link.active { color: #002D72; border-color: #002D72; }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stats-row-5 {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(130px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-height: 90px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .stat-card .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-card .label { font-size: .84rem; color: #64748b; font-weight: 600; }
+        .stat-card .value { font-size: 1.8rem; line-height: 1; font-weight: 700; margin-top: 4px; }
+        .stat-card .subtext { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
+
+        .panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .filters-row {
+            display: grid;
+            grid-template-columns: 2.2fr 1fr 1fr 1.5fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .filters-row-5 {
+            display: grid;
+            grid-template-columns: 2.2fr 1fr 1fr 1fr 1.2fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .filters-row input, .filters-row select,
+        .filters-row-5 input, .filters-row-5 select {
+            height: 40px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 0 14px;
+            font-size: .92rem;
+            background: #fff;
+            width: 100%;
+        }
+
+        .status-badge {
+            font-size: 0.78rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-open { background-color: #dcfce7; color: #15803d; }
+        .badge-closed { background-color: #f1f5f9; color: #475569; }
+        .badge-offerextended { background-color: #e0f2fe; color: #0369a1; }
+        .badge-inprogress { background-color: #fef3c7; color: #b45309; }
+        .badge-pending { background-color: #fef3c7; color: #b45309; }
+        .badge-hold { background-color: #fee2e2; color: #b91c1c; }
+
+        .avatar-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar-group .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            margin-left: -8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.7rem;
+            color: #fff;
+        }
+
+        .avatar-group .avatar:first-child {
+            margin-left: 0;
+        }
+
+        .avatar-1 { background-color: #3b82f6; }
+        .avatar-2 { background-color: #10b981; }
+        .avatar-3 { background-color: #f59e0b; }
+        .avatar-more { background-color: #6b7280; }
+
+        .banner-info {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #1e3a8a;
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-interviewers-list {
+            max-height: 240px;
+            overflow-y: auto;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 16px;
+        }
+
+        .interviewer-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .interviewer-item:last-child {
+            border-bottom: none;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #eff6ff;
+            color: #1e40af;
+            font-size: 0.82rem;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .chip-close {
+            cursor: pointer;
+            color: #3b82f6;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-row, .stats-row-5 { grid-template-columns: 1fr 1fr; }
+            .filters-row, .filters-row-5 { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .myspace-sidebar { transform: translateX(-100%); }
+            body.sidebar-toggled .myspace-sidebar { transform: translateX(0); }
+            .top-navbar { left: 0; padding: 0 10px; }
+            .myspace-main { margin-left: 0; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="myspace-sidebar shadow-sm">
+    <div class="brand-area">
+        <img src="/images/wcg-logo.jpg" alt="Logo"/>
+        <div>
+            <div class="brand-title">WhiteCircle</div>
+            <div class="brand-sub">Manager Admin</div>
+        </div>
+    </div>
+    <div class="nav-links">
+        <a href="/senior_manager/myspace?tab=directory" class="nav-link-item"><i class="fa-solid fa-users"></i> Team & Employee</a>
+        <a href="/senior_manager/leave_attendance" class="nav-link-item"><i class="fa-solid fa-calendar-days"></i> Leave & Attendance</a>
+        <a href="/senior_manager/project_work" class="nav-link-item"><i class="fa-solid fa-briefcase"></i> Project & Work</a>
+        <a href="/senior_manager/performance" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Performance</a>
+        <a href="/senior_manager/recruitment" class="nav-link-item active"><i class="fa-solid fa-user-plus"></i> Recruitment</a>
+        <a href="/senior_manager/expenses" class="nav-link-item"><i class="fa-solid fa-wallet"></i> Financial & Expense</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-file-lines"></i> Reports</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-comments"></i> Communication</a>
+        <a href="/senior_manager/myspace?tab=hierarchy" class="nav-link-item"><i class="fa-solid fa-sitemap"></i> Org. Hierarchy</a>
+    </div>
+</div>
+
+<nav class="top-navbar">
+    <div class="nav-brand">
+        <button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
+        <div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
+            <span style="color:#002D72; font-weight:700; font-size:2.1rem;">WhiteCircle Group - Shahdol</span>
+            <span style="font-size:.85rem; font-weight:500; color:#333; margin-top:2px;">Recruitment Management</span>
+        </div>
+    </div>
+    <div>
+        <a class="btn btn-light text-dark fw-bold" href="/senior_manager/dashboard" style="border-radius:6px; padding:8px 14px; text-decoration:none;">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</nav>
+
+<div class="myspace-main">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.8rem;">Recruitment</h2>
+        </div>
+    </div>
+
+    <div class="tabs-strip">
+        <a th:classappend="${activeTab == 'requisitions'} ? ' active' : ''" class="tab-link" href="/senior_manager/recruitment?tab=requisitions">Requisitions</a>
+        <a th:classappend="${activeTab == 'my_interviews'} ? ' active' : ''" class="tab-link" href="/senior_manager/recruitment?tab=my_interviews">My Interviews</a>
+        <a th:classappend="${activeTab == 'feedback'} ? ' active' : ''" class="tab-link" href="/senior_manager/recruitment?tab=feedback">Feedback</a>
+        <a th:classappend="${activeTab == 'approvals'} ? ' active' : ''" class="tab-link" href="/senior_manager/recruitment?tab=approvals">Approvals</a>
+    </div>
+
+    <!-- ==================== VIEW 1: REQUISITIONS ==================== -->
+    <div th:if="${activeTab == 'requisitions'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-file-signature"></i></div>
+                <div>
+                    <div class="label">Total Requisitions</div>
+                    <div class="value" th:text="${totalReqs}">18</div>
+                    <div class="subtext">This Year</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
+                <div>
+                    <div class="label">Open Requisitions</div>
+                    <div class="value" th:text="${openReqs}">09</div>
+                    <div class="subtext">Active</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-users-viewfinder"></i></div>
+                <div>
+                    <div class="label">In Progress</div>
+                    <div class="value" th:text="${inProgressReqs}">06</div>
+                    <div class="subtext">With Interviews</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-paper-plane"></i></div>
+                <div>
+                    <div class="label">Offers Extended</div>
+                    <div class="value" th:text="${offersExtendedReqs}">02</div>
+                    <div class="subtext">This Year</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="filters-row flex-grow-1 me-3 mb-0">
+                    <input type="text" placeholder="Search by Job Title / Request ID" id="reqSearchInput"/>
+                    <select id="reqDeptSelect">
+                        <option value="">All Departments</option>
+                        <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+                    </select>
+                    <select id="reqStatusSelect">
+                        <option value="">All Status</option>
+                        <option value="Open">Open</option>
+                        <option value="Offer Extended">Offer Extended</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                    <input type="text" placeholder="DD-MM-YYYY - DD-MM-YYYY" style="background:#fff;"/>
+                </div>
+                <button class="btn btn-primary d-flex align-items-center gap-2" style="height:40px;" onclick="alert('Request New Hire triggered!')">
+                    <i class="fa-solid fa-plus"></i> Request New Hire
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover" id="requisitionsTable">
+                    <thead>
+                        <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                            <th>Request ID</th>
+                            <th>Job Title</th>
+                            <th>Department</th>
+                            <th>Requested On</th>
+                            <th>No. of Positions</th>
+                            <th>Current Stage</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${requisitionsList}"
+                            th:attr="data-name=${row['title']}, data-id=${row['jobId']}, data-department=${row['department']}, data-status=${row['status']}">
+                            <td class="fw-bold text-primary" th:text="${row['jobId']}">R-100</td>
+                            <td class="fw-bold text-dark" th:text="${row['title']}">Frontend Developer</td>
+                            <td th:text="${row['department']}">IT - Development</td>
+                            <td th:text="${row['requestedOn']}">28 May 2026</td>
+                            <td class="fw-bold text-center" th:text="${row['positions']}">2</td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1" th:text="${row['stage']}">Interview</span>
+                            </td>
+                            <td>
+                                <span class="status-badge" 
+                                      th:classappend="${row['status'] == 'Open' ? ' badge-open' : (row['status'] == 'Offer Extended' ? ' badge-offerextended' : ' badge-closed')}"
+                                      th:text="${row['status']}">Open</span>
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-link text-muted me-1" onclick="alert('Viewing requisition details...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
+                                <button class="btn btn-sm btn-link text-muted"><i class="fa-solid fa-ellipsis-vertical" style="font-size:1.1rem;"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- pagination -->
+            <div class="d-flex align-items-center justify-content-between mt-3" style="font-size:0.88rem;">
+                <div id="reqTableInfo">Showing 1 to 6 of 18 entries</div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0" id="reqPagination">
+                        <!-- generated by script -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 2: MY INTERVIEWS ==================== -->
+    <div th:if="${activeTab == 'my_interviews'}">
+        <div class="stats-row-5">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-id-card-clip"></i></div>
+                <div>
+                    <div class="label">Total Interviews</div>
+                    <div class="value">14</div>
+                    <div class="subtext">This Year</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-calendar-days"></i></div>
+                <div>
+                    <div class="label">Upcoming Interviews</div>
+                    <div class="value">05</div>
+                    <div class="subtext">Next 7 Days</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-circle-check"></i></div>
+                <div>
+                    <div class="label">Completed</div>
+                    <div class="value">06</div>
+                    <div class="subtext">This Year</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-comments"></i></div>
+                <div>
+                    <div class="label">Feedback Pending</div>
+                    <div class="value">03</div>
+                    <div class="subtext">Awaiting Feedback</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
+                <div>
+                    <div class="label">Cancelled/Resched.</div>
+                    <div class="value">02</div>
+                    <div class="subtext">This Year</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="filters-row flex-grow-1 me-3 mb-0">
+                    <input type="text" placeholder="Search Candidate" id="intSearchInput"/>
+                    <select id="intDeptSelect">
+                        <option value="">All Departments</option>
+                        <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+                    </select>
+                    <select id="intStageSelect">
+                        <option value="">All Stages</option>
+                        <option value="Technical Round">Technical Round</option>
+                        <option value="HR Round">HR Round</option>
+                        <option value="Design Round">Design Round</option>
+                    </select>
+                    <input type="text" placeholder="DD-MM-YYYY - DD-MM-YYYY" style="background:#fff;"/>
+                </div>
+                <button class="btn btn-outline-primary d-flex align-items-center gap-2" style="height:40px; border-color: #cbd5e1; color:#002D72; font-weight:600;" data-bs-toggle="modal" data-bs-target="#addInterviewersModal">
+                    Add Interview
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover" id="interviewsTable">
+                    <thead>
+                        <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                            <th>Candidate Name</th>
+                            <th>Job Title</th>
+                            <th>Department</th>
+                            <th>Interview Stage</th>
+                            <th>Interviewers</th>
+                            <th>Interview Date & Time</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${interviewsList}"
+                            th:attr="data-name=${row['candidate']}, data-department=${row['department']}, data-stage=${row['stage']}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px; font-size:0.85rem;" th:text="${#strings.substring(row['candidate'], 0, 1)}">A</div>
+                                    <div>
+                                        <div class="fw-bold text-dark" th:text="${row['candidate']}">Aman Singh</div>
+                                        <small class="text-muted" th:text="${row['candidateCode']}">CAN-2026-045</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="fw-bold text-dark" th:text="${row['title']}">Frontend Developer</td>
+                            <td th:text="${row['department']}">IT - Development</td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1" th:text="${row['stage']}">Technical Round</span>
+                            </td>
+                            <td>
+                                <div class="avatar-group">
+                                    <div th:each="init, i : ${row['interviewerInitials']}" 
+                                         class="avatar"
+                                         th:classappend="${i.index == 0 ? ' avatar-1' : (i.index == 1 ? ' avatar-2' : (i.index == 2 ? ' avatar-3' : ' avatar-more'))}"
+                                         th:text="${init}">AS</div>
+                                </div>
+                            </td>
+                            <td th:text="${row['dateTime']}">29 May 2026 10:00 AM - 11:00 AM</td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${row['status'] == 'Scheduled' ? ' badge-inprogress' : (row['status'] == 'Completed' ? ' badge-open' : ' badge-hold')}"
+                                      th:text="${row['status']}">Scheduled</span>
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-link text-muted me-1" onclick="alert('Viewing interview details...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
+                                <button class="btn btn-sm btn-link text-muted"><i class="fa-solid fa-ellipsis-vertical" style="font-size:1.1rem;"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- pagination -->
+            <div class="d-flex align-items-center justify-content-between mt-3" style="font-size:0.88rem;">
+                <div id="intTableInfo">Showing 1 to 5 of 14 entries</div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0" id="intPagination">
+                        <!-- generated by script -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 3: FEEDBACK ==================== -->
+    <div th:if="${activeTab == 'feedback'}">
+        <div class="stats-row-5">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-clipboard-question"></i></div>
+                <div>
+                    <div class="label">Feedback Requested</div>
+                    <div class="value">07</div>
+                    <div class="subtext">Pending</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-clipboard-check"></i></div>
+                <div>
+                    <div class="label">Feedback Submitted</div>
+                    <div class="value">15</div>
+                    <div class="subtext">This Year</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div>
+                    <div class="label">Pending Submission</div>
+                    <div class="value">04</div>
+                    <div class="subtext">Overdue</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-rotate-left"></i></div>
+                <div>
+                    <div class="label">Revised Feedback</div>
+                    <div class="value">03</div>
+                    <div class="subtext">This Year</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-user-slash"></i></div>
+                <div>
+                    <div class="label">Declined / Not Sel.</div>
+                    <div class="value">10</div>
+                    <div class="subtext">Based on Feedback</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="banner-info">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Provide honest and constructive feedback to help the recruitment team make better hiring decisions.</span>
+            </div>
+
+            <div class="filters-row-5 mb-4">
+                <input type="text" placeholder="Search by Candidate Name / Job Title" id="fbSearchInput"/>
+                <select id="fbDeptSelect">
+                    <option value="">All Departments</option>
+                    <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+                </select>
+                <select id="fbJobSelect">
+                    <option value="">All Job Titles</option>
+                    <option value="Frontend Developer">Frontend Developer</option>
+                    <option value="Backend Developer">Backend Developer</option>
+                    <option value="UI/UX Designer">UI/UX Designer</option>
+                    <option value="QA Engineer">QA Engineer</option>
+                </select>
+                <select id="fbStageSelect">
+                    <option value="">All Stages</option>
+                    <option value="Technical Round">Technical Round</option>
+                    <option value="HR Round">HR Round</option>
+                    <option value="Design Round">Design Round</option>
+                </select>
+                <input type="text" placeholder="DD-MM-YYYY" style="background:#fff;"/>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover" id="feedbackTable">
+                    <thead>
+                        <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                            <th>Candidate Name</th>
+                            <th>Job Title</th>
+                            <th>Department</th>
+                            <th>Interview Stage</th>
+                            <th>Interview Date</th>
+                            <th>Requested On</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${feedbackList}"
+                            th:attr="data-candidate=${row['candidate']}, data-title=${row['title']}, data-department=${row['department']}, data-stage=${row['stage']}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px; font-size:0.85rem;" th:text="${#strings.substring(row['candidate'], 0, 1)}">A</div>
+                                    <div>
+                                        <div class="fw-bold text-dark" th:text="${row['candidate']}">Aman Singh</div>
+                                        <small class="text-muted" th:text="${row['candidateCode']}">CAN-2026-045</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="fw-bold text-dark" th:text="${row['title']}">Frontend Developer</td>
+                            <td th:text="${row['department']}">IT - Development</td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1" th:text="${row['stage']}">Technical Round</span>
+                            </td>
+                            <td th:text="${row['interviewDate']}">29 May 2026 10:00 AM</td>
+                            <td th:text="${row['requestedOn']}">27 May 2026</td>
+                            <td class="text-danger fw-bold" th:text="${row['dueDate']}">30 May 2026 (Overdue)</td>
+                            <td>
+                                <span class="status-badge badge-inprogress" th:text="${row['status']}">PENDING</span>
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-primary fw-bold" style="border-radius:6px; color:#002D72; border-color:#002D72;" onclick="alert('Constructive Feedback Form submitted successfully!')">
+                                    Provide Feedback
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 4: APPROVALS ==================== -->
+    <div th:if="${activeTab == 'approvals'}">
+        <div class="stats-row-5">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-signature"></i></div>
+                <div>
+                    <div class="label">Pending Approvals</div>
+                    <div class="value">06</div>
+                    <div class="subtext">Requires Action</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
+                <div>
+                    <div class="label">Approved</div>
+                    <div class="value">18</div>
+                    <div class="subtext">This Year</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
+                <div>
+                    <div class="label">Rejected</div>
+                    <div class="value">04</div>
+                    <div class="subtext">This Year</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-circle-pause"></i></div>
+                <div>
+                    <div class="label">On Hold</div>
+                    <div class="value">02</div>
+                    <div class="subtext">This Year</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-chart-line"></i></div>
+                <div>
+                    <div class="label">Total Decisions</div>
+                    <div class="value">24</div>
+                    <div class="subtext">This Year</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="banner-info">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Review final stage candidates and take approval action. Your decision will move the candidate to the next step.</span>
+            </div>
+
+            <div class="filters-row-5 mb-4">
+                <input type="text" placeholder="Search by Candidate Name / Job Title" id="appSearchInput"/>
+                <select id="appDeptSelect">
+                    <option value="">All Departments</option>
+                    <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+                </select>
+                <select id="appJobSelect">
+                    <option value="">All Job Titles</option>
+                    <option value="Frontend Developer">Frontend Developer</option>
+                    <option value="Backend Developer">Backend Developer</option>
+                    <option value="UI/UX Designer">UI/UX Designer</option>
+                    <option value="QA Engineer">QA Engineer</option>
+                </select>
+                <input type="text" placeholder="DD-MM-YYYY" style="background:#fff;"/>
+                <select id="appStatusSelect">
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="On Hold">On Hold</option>
+                </select>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover" id="approvalsTable">
+                    <thead>
+                        <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                            <th>Candidate Name</th>
+                            <th>Job Title</th>
+                            <th>Department</th>
+                            <th>Final Interview Date</th>
+                            <th>Interviewers</th>
+                            <th>Overall Rating</th>
+                            <th>Recommendation</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${approvalsList}"
+                            th:attr="data-candidate=${row['candidate']}, data-title=${row['title']}, data-department=${row['department']}, data-status=${row['status']}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px; font-size:0.85rem;" th:text="${#strings.substring(row['candidate'], 0, 1)}">A</div>
+                                    <div>
+                                        <div class="fw-bold text-dark" th:text="${row['candidate']}">Aman Singh</div>
+                                        <small class="text-muted" th:text="${row['email']}">aman@gmail.com</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="fw-bold text-dark" th:text="${row['title']}">Frontend Developer</td>
+                            <td th:text="${row['department']}">IT - Development</td>
+                            <td th:text="${row['finalInterviewDate']}">29 May 2026 10:00 AM</td>
+                            <td>
+                                <div class="avatar-group">
+                                    <div class="avatar avatar-1">NV</div>
+                                    <div class="avatar avatar-2">RK</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-1">
+                                    <i class="fa-solid fa-star text-warning" style="font-size:0.8rem;"></i>
+                                    <i class="fa-solid fa-star text-warning" style="font-size:0.8rem;"></i>
+                                    <i class="fa-solid fa-star text-warning" style="font-size:0.8rem;"></i>
+                                    <i class="fa-solid fa-star text-warning" style="font-size:0.8rem;"></i>
+                                    <span class="fw-bold text-dark ms-1" th:text="${row['rating']}">4.2</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" th:text="${row['recommendation']}">Hire</span>
+                            </td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${row['status'] == 'Pending' ? ' badge-inprogress' : ' badge-hold'}"
+                                      th:text="${row['status']}">Pending</span>
+                            </td>
+                            <td class="text-end">
+                                <span th:if="${row['status'] == 'On Hold'}">
+                                    <button class="btn btn-sm btn-outline-primary fw-bold px-3 py-1" style="border-radius:6px; color:#002D72; border-color:#002D72;" onclick="alert('Hold successfully removed!')">Remove Hold</button>
+                                </span>
+                                <span th:if="${row['status'] != 'On Hold'}">
+                                    <button class="btn btn-sm btn-outline-success me-1 px-3 py-1" style="border-radius:6px;" onclick="alert('Candidate successfully Approved!')"><i class="fa-solid fa-check me-1"></i> Approve</button>
+                                    <button class="btn btn-sm btn-outline-danger px-3 py-1" style="border-radius:6px;" onclick="alert('Candidate successfully Rejected!')"><i class="fa-solid fa-xmark me-1"></i> Reject</button>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL: ADD INTERVIEWERS ==================== -->
+<div class="modal fade" id="addInterviewersModal" tabindex="-1" aria-labelledby="addInterviewersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:12px; padding:10px;">
+            <div class="modal-header border-0 pb-1">
+                <h5 class="modal-title fw-bold text-dark" id="addInterviewersModalLabel">Add Interviewers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3 position-relative">
+                    <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left:12px; top:50%; transform:translateY(-50%);"></i>
+                    <input type="text" class="form-control ps-5" placeholder="Search by name" id="modalSearchInput" style="height:40px; border-radius:8px;"/>
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-muted fw-bold mb-1" style="font-size:0.75rem; text-transform:uppercase;">Department</label>
+                    <select class="form-select" id="modalDeptSelect" style="height:40px; border-radius:8px;">
+                        <option value="">All Departments</option>
+                        <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+                    </select>
+                </div>
+
+                <div class="modal-interviewers-list" id="modalInterviewersContainer">
+                    <div class="interviewer-item" th:each="emp : ${activeEmployees}" 
+                         th:attr="data-name=${emp['name']}, data-dept=${emp['department']}">
+                        <div class="d-flex align-items-center gap-2">
+                            <input class="form-check-input me-2 interviewer-checkbox" type="checkbox" th:value="${emp['name']}"
+                                   th:checked="${emp['name'] == 'Neha Verma' || emp['name'] == 'Rahul Kapoor'}"/>
+                            <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.75rem;" th:text="${emp['initials']}">NV</div>
+                            <div>
+                                <div class="fw-bold text-dark" th:text="${emp['name']}">Neha Verma</div>
+                                <small class="text-muted" th:text="${emp['designation']}">HR Manager</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.8rem;" class="text-muted fw-bold mb-2">
+                    <span id="selectedCountSpan">2</span> Interviewers Selected
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mb-3" id="selectedChipsContainer">
+                    <span class="chip" id="chip-NehaVerma">Neha Verma <i class="fa-solid fa-xmark chip-close" onclick="removeChip('Neha Verma')"></i></span>
+                    <span class="chip" id="chip-RahulKapoor">Rahul Kapoor <i class="fa-solid fa-xmark chip-close" onclick="removeChip('Rahul Kapoor')"></i></span>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary fw-bold px-4" style="height:44px; border-radius:8px;" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary fw-bold px-4" style="height:44px; border-radius:8px; background-color:#002D72; border-color:#002D72;" data-bs-dismiss="modal" onclick="alert('Interviewers added successfully!')">Add Interviewers</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // --- 1. REQUISITIONS CLIENT FILTER & PAGINATION ---
+        const reqSearch = document.getElementById('reqSearchInput');
+        const reqDept = document.getElementById('reqDeptSelect');
+        const reqStatus = document.getElementById('reqStatusSelect');
+
+        let reqPage = 1;
+        let reqPageSize = 6;
+
+        function getFilteredReqs() {
+            const trs = Array.from(document.querySelectorAll('#requisitionsTable tbody tr'));
+            return trs.filter(row => {
+                const name = (row.dataset.name || '').toLowerCase();
+                const id = (row.dataset.id || '').toLowerCase();
+                const dept = row.dataset.department || '';
+                const status = row.dataset.status || '';
+
+                const q = (reqSearch?.value || '').toLowerCase();
+                const searchMatch = !q || name.includes(q) || id.includes(q);
+                const deptMatch = !reqDept?.value || dept === reqDept.value;
+                const statusMatch = !reqStatus?.value || status === reqStatus.value;
+
+                return searchMatch && deptMatch && statusMatch;
+            });
+        }
+
+        function paginateReqs() {
+            const all = Array.from(document.querySelectorAll('#requisitionsTable tbody tr'));
+            const filtered = getFilteredReqs();
+            all.forEach(r => r.style.display = 'none');
+
+            const total = filtered.length;
+            const start = (reqPage - 1) * reqPageSize;
+            const end = Math.min(start + reqPageSize, total);
+
+            filtered.slice(start, end).forEach(r => r.style.display = '');
+
+            const info = document.getElementById('reqTableInfo');
+            if (info) {
+                info.textContent = total > 0 ? `Showing ${start + 1} to ${end} of ${total} entries` : 'Showing 0 to 0 of 0 entries';
+            }
+
+            const pag = document.getElementById('reqPagination');
+            if (pag) {
+                pag.innerHTML = '';
+                const pages = Math.ceil(total / reqPageSize);
+
+                const prev = document.createElement('li');
+                prev.className = `page-item ${reqPage === 1 ? 'disabled' : ''}`;
+                prev.innerHTML = `<a class="page-link" href="#">&lt;</a>`;
+                prev.addEventListener('click', (e) => { e.preventDefault(); if (reqPage > 1) { reqPage--; paginateReqs(); } });
+                pag.appendChild(prev);
+
+                for (let i = 1; i <= pages; i++) {
+                    const li = document.createElement('li');
+                    li.className = `page-item ${reqPage === i ? 'active' : ''}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.addEventListener('click', (e) => { e.preventDefault(); reqPage = i; paginateReqs(); });
+                    pag.appendChild(li);
+                }
+
+                const next = document.createElement('li');
+                next.className = `page-item ${reqPage === pages || pages === 0 ? 'disabled' : ''}`;
+                next.innerHTML = `<a class="page-link" href="#">&gt;</a>`;
+                next.addEventListener('click', (e) => { e.preventDefault(); if (reqPage < pages) { reqPage++; paginateReqs(); } });
+                pag.appendChild(next);
+            }
+        }
+
+        if (reqSearch) reqSearch.addEventListener('input', () => { reqPage = 1; paginateReqs(); });
+        if (reqDept) reqDept.addEventListener('change', () => { reqPage = 1; paginateReqs(); });
+        if (reqStatus) reqStatus.addEventListener('change', () => { reqPage = 1; paginateReqs(); });
+        paginateReqs();
+
+        // --- 2. INTERVIEWS CLIENT FILTER & PAGINATION ---
+        const intSearch = document.getElementById('intSearchInput');
+        const intDept = document.getElementById('intDeptSelect');
+        const intStage = document.getElementById('intStageSelect');
+
+        let intPage = 1;
+        let intPageSize = 5;
+
+        function getFilteredInts() {
+            const trs = Array.from(document.querySelectorAll('#interviewsTable tbody tr'));
+            return trs.filter(row => {
+                const name = (row.dataset.name || '').toLowerCase();
+                const dept = row.dataset.department || '';
+                const stage = row.dataset.stage || '';
+
+                const q = (intSearch?.value || '').toLowerCase();
+                const searchMatch = !q || name.includes(q);
+                const deptMatch = !intDept?.value || dept === intDept.value;
+                const stageMatch = !intStage?.value || stage === intStage.value;
+
+                return searchMatch && deptMatch && stageMatch;
+            });
+        }
+
+        function paginateInts() {
+            const all = Array.from(document.querySelectorAll('#interviewsTable tbody tr'));
+            const filtered = getFilteredInts();
+            all.forEach(r => r.style.display = 'none');
+
+            const total = filtered.length;
+            const start = (intPage - 1) * intPageSize;
+            const end = Math.min(start + intPageSize, total);
+
+            filtered.slice(start, end).forEach(r => r.style.display = '');
+
+            const info = document.getElementById('intTableInfo');
+            if (info) {
+                info.textContent = total > 0 ? `Showing ${start + 1} to ${end} of ${total} entries` : 'Showing 0 to 0 of 0 entries';
+            }
+
+            const pag = document.getElementById('intPagination');
+            if (pag) {
+                pag.innerHTML = '';
+                const pages = Math.ceil(total / intPageSize);
+
+                const prev = document.createElement('li');
+                prev.className = `page-item ${intPage === 1 ? 'disabled' : ''}`;
+                prev.innerHTML = `<a class="page-link" href="#">&lt;</a>`;
+                prev.addEventListener('click', (e) => { e.preventDefault(); if (intPage > 1) { intPage--; paginateInts(); } });
+                pag.appendChild(prev);
+
+                for (let i = 1; i <= pages; i++) {
+                    const li = document.createElement('li');
+                    li.className = `page-item ${intPage === i ? 'active' : ''}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.addEventListener('click', (e) => { e.preventDefault(); intPage = i; paginateInts(); });
+                    pag.appendChild(li);
+                }
+
+                const next = document.createElement('li');
+                next.className = `page-item ${intPage === pages || pages === 0 ? 'disabled' : ''}`;
+                next.innerHTML = `<a class="page-link" href="#">&gt;</a>`;
+                next.addEventListener('click', (e) => { e.preventDefault(); if (intPage < pages) { intPage++; paginateInts(); } });
+                pag.appendChild(next);
+            }
+        }
+
+        if (intSearch) intSearch.addEventListener('input', () => { intPage = 1; paginateInts(); });
+        if (intDept) intDept.addEventListener('change', () => { intPage = 1; paginateInts(); });
+        if (intStage) intStage.addEventListener('change', () => { intPage = 1; paginateInts(); });
+        paginateInts();
+
+        // --- 3. FEEDBACK CLIENT FILTERS ---
+        const fbSearch = document.getElementById('fbSearchInput');
+        const fbDept = document.getElementById('fbDeptSelect');
+        const fbJob = document.getElementById('fbJobSelect');
+        const fbStage = document.getElementById('fbStageSelect');
+
+        function filterFeedback() {
+            const query = (fbSearch?.value || '').toLowerCase();
+            const dept = fbDept?.value || '';
+            const job = fbJob?.value || '';
+            const stage = fbStage?.value || '';
+
+            document.querySelectorAll('#feedbackTable tbody tr').forEach(row => {
+                const cname = (row.dataset.candidate || '').toLowerCase();
+                const jtitle = (row.dataset.title || '').toLowerCase();
+                const rdept = row.dataset.department || '';
+                const rstage = row.dataset.stage || '';
+
+                const searchMatch = !query || cname.includes(query) || jtitle.includes(query);
+                const deptMatch = !dept || rdept === dept;
+                const jobMatch = !job || jtitle.includes(job.toLowerCase());
+                const stageMatch = !stage || rstage === stage;
+
+                row.style.display = (searchMatch && deptMatch && jobMatch && stageMatch) ? '' : 'none';
+            });
+        }
+
+        if (fbSearch) fbSearch.addEventListener('input', filterFeedback);
+        if (fbDept) fbDept.addEventListener('change', filterFeedback);
+        if (fbJob) fbJob.addEventListener('change', filterFeedback);
+        if (fbStage) fbStage.addEventListener('change', filterFeedback);
+
+        // --- 4. APPROVALS CLIENT FILTERS ---
+        const appSearch = document.getElementById('appSearchInput');
+        const appDept = document.getElementById('appDeptSelect');
+        const appJob = document.getElementById('appJobSelect');
+        const appStatus = document.getElementById('appStatusSelect');
+
+        function filterApprovals() {
+            const query = (appSearch?.value || '').toLowerCase();
+            const dept = appDept?.value || '';
+            const job = appJob?.value || '';
+            const status = appStatus?.value || '';
+
+            document.querySelectorAll('#approvalsTable tbody tr').forEach(row => {
+                const cname = (row.dataset.candidate || '').toLowerCase();
+                const jtitle = (row.dataset.title || '').toLowerCase();
+                const rdept = row.dataset.department || '';
+                const rstatus = row.dataset.status || '';
+
+                const searchMatch = !query || cname.includes(query) || jtitle.includes(query);
+                const deptMatch = !dept || rdept === dept;
+                const jobMatch = !job || jtitle.includes(job.toLowerCase());
+                const statusMatch = !status || rstatus === status;
+
+                row.style.display = (searchMatch && deptMatch && jobMatch && statusMatch) ? '' : 'none';
+            });
+        }
+
+        if (appSearch) appSearch.addEventListener('input', filterApprovals);
+        if (appDept) appDept.addEventListener('change', filterApprovals);
+        if (appJob) appJob.addEventListener('change', filterApprovals);
+        if (appStatus) appStatus.addEventListener('change', filterApprovals);
+
+        // --- 5. MODAL INTERVIEWERS SEARCH & SELECTION ---
+        const modalSearch = document.getElementById('modalSearchInput');
+        const modalDept = document.getElementById('modalDeptSelect');
+        const container = document.getElementById('modalInterviewersContainer');
+
+        function filterModalEmployees() {
+            const query = (modalSearch?.value || '').toLowerCase();
+            const dept = modalDept?.value || '';
+
+            document.querySelectorAll('.interviewer-item').forEach(item => {
+                const name = (item.dataset.name || '').toLowerCase();
+                const rdept = item.dataset.dept || '';
+
+                const searchMatch = !query || name.includes(query);
+                const deptMatch = !dept || rdept === dept;
+
+                item.style.display = (searchMatch && deptMatch) ? '' : 'none';
+            });
+        }
+
+        if (modalSearch) modalSearch.addEventListener('input', filterModalEmployees);
+        if (modalDept) modalDept.addEventListener('change', filterModalEmployees);
+
+        // Sync checkbox changes to count and chips
+        if (container) {
+            container.addEventListener('change', function(e) {
+                if (e.target.classList.contains('interviewer-checkbox')) {
+                    syncChips();
+                }
+            });
+        }
+    });
+
+    function syncChips() {
+        const checkboxes = document.querySelectorAll('.interviewer-checkbox:checked');
+        const countSpan = document.getElementById('selectedCountSpan');
+        if (countSpan) countSpan.textContent = checkboxes.length;
+
+        const chipContainer = document.getElementById('selectedChipsContainer');
+        if (chipContainer) {
+            chipContainer.innerHTML = '';
+            checkboxes.forEach(chk => {
+                const name = chk.value;
+                const span = document.createElement('span');
+                span.className = 'chip';
+                span.id = `chip-${name.replace(/\s+/g, '')}`;
+                span.innerHTML = `${name} <i class="fa-solid fa-xmark chip-close" onclick="removeChip('${name}')"></i>`;
+                chipContainer.appendChild(span);
+            });
+        }
+    }
+
+    function removeChip(name) {
+        const checkboxes = document.querySelectorAll('.interviewer-checkbox');
+        checkboxes.forEach(chk => {
+            if (chk.value === name) {
+                chk.checked = false;
+            }
+        });
+        syncChips();
+    }
+</script>
+</body>
+</html>

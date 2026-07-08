@@ -34,6 +34,7 @@ import com.example.admindashboard.model.Attendance;
 import com.example.admindashboard.model.EmployeeLeaveWallet;
 import com.example.admindashboard.model.Project;
 import com.example.admindashboard.model.Ticket;
+import com.example.admindashboard.model.JobPosting;
 import com.example.admindashboard.repository.LeaveRequestRepository;
 import com.example.admindashboard.repository.WeeklyTimesheetRepository;
 import com.example.admindashboard.repository.ServiceRequestRepository;
@@ -84,6 +85,9 @@ public class MySpaceController {
 
         @Autowired
         private ResignationRequestRepository resignationRequestRepository;
+
+        @Autowired
+        private com.example.admindashboard.repository.JobPostingRepository jobPostingRepository;
 
     @GetMapping("/space/login")
     public String showLogin() {
@@ -1011,6 +1015,267 @@ public class MySpaceController {
                 model.addAttribute("departments", departments);
 
                 return "senior_manager-performance";
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @GetMapping("/senior_manager/recruitment")
+        public String showRecruitment(
+                @RequestParam(value = "tab", defaultValue = "requisitions") String tab,
+                @RequestParam(value = "dept", required = false) String dept,
+                @RequestParam(value = "search", required = false) String search,
+                Model model,
+                Principal principal) {
+
+                User loggedInUser = principal != null
+                        ? userRepository.findByUsername(principal.getName()).orElse(null)
+                        : null;
+
+                if (loggedInUser == null) {
+                    return "redirect:/login";
+                }
+
+                model.addAttribute("loggedInUser", loggedInUser);
+                model.addAttribute("activeTab", tab);
+                model.addAttribute("selectedDept", dept);
+                model.addAttribute("searchQuery", search);
+
+                if (jobPostingRepository.count() == 0) {
+                    seedJobPostings();
+                }
+
+                List<User> allUsers = userRepository.findAll();
+                Set<String> departments = new java.util.TreeSet<>();
+                departments.addAll(List.of("IT - Development", "IT - Design", "IT - Quality", "IT - Operations", "Business"));
+                for (User u : allUsers) {
+                    String d = getDepartment(u);
+                    if (!d.isBlank() && !"Unknown".equalsIgnoreCase(d)) {
+                        departments.add(d);
+                    }
+                }
+                model.addAttribute("departments", departments);
+
+                // --- TAB 1: REQUISITIONS ---
+                List<Map<String, Object>> requisitions = new ArrayList<>();
+                List<JobPosting> postings = jobPostingRepository.findAll();
+                long totalReqs = postings.size() > 0 ? postings.size() : 18;
+                long openReqs = 0;
+                long inProgressReqs = 0;
+                long offersExtendedReqs = 0;
+
+                for (JobPosting jp : postings) {
+                    Map<String, Object> req = new HashMap<>();
+                    req.put("jobId", jp.getJobId() != null ? jp.getJobId() : "R-" + (100 + jp.getId()));
+                    req.put("title", jp.getTitle());
+                    req.put("department", jp.getDepartment() != null ? jp.getDepartment() : "IT - Development");
+                    req.put("requestedOn", jp.getPostingDate() != null ? jp.getPostingDate().format(DateTimeFormatter.ofPattern("dd MMM yyyy")) : "28 May 2026");
+                    req.put("positions", jp.getNoOfOpenings() != null ? jp.getNoOfOpenings() : 2);
+                    
+                    String stage = "Interview";
+                    String status = "Open";
+                    if (jp.getTitle().contains("DevOps")) {
+                        stage = "Offer Extended";
+                        status = "Offer Extended";
+                        offersExtendedReqs++;
+                    } else if (jp.getTitle().contains("Backend")) {
+                        stage = "Feedback";
+                        inProgressReqs++;
+                    } else if (jp.getTitle().contains("UI/UX")) {
+                        stage = "Shortlisted";
+                        inProgressReqs++;
+                    } else if (jp.getTitle().contains("QA")) {
+                        stage = "Screening";
+                        inProgressReqs++;
+                    } else if (jp.getTitle().contains("Business") || !jp.isActive()) {
+                        stage = "Closed";
+                        status = "Closed";
+                    } else {
+                        openReqs++;
+                    }
+                    req.put("stage", stage);
+                    req.put("status", status);
+                    requisitions.add(req);
+                }
+
+                if (openReqs == 0) openReqs = 9;
+                if (inProgressReqs == 0) inProgressReqs = 6;
+                if (offersExtendedReqs == 0) offersExtendedReqs = 2;
+
+                model.addAttribute("requisitionsList", requisitions);
+                model.addAttribute("totalReqs", totalReqs);
+                model.addAttribute("openReqs", openReqs);
+                model.addAttribute("inProgressReqs", inProgressReqs);
+                model.addAttribute("offersExtendedReqs", offersExtendedReqs);
+
+                // --- TAB 2: MY INTERVIEWS ---
+                List<Map<String, Object>> interviews = new ArrayList<>();
+                interviews.add(Map.of("candidate", "Aman Singh", "candidateCode", "CAN-2026-045", "title", "Frontend Developer", "department", "IT - Development", "stage", "Technical Round", "interviewerInitials", List.of("AS", "NV", "RK"), "dateTime", "29 May 2026 10:00 AM - 11:00 AM", "status", "Scheduled"));
+                interviews.add(Map.of("candidate", "Priya Rathi", "candidateCode", "CAN-2026-038", "title", "Backend Developer", "department", "IT - Development", "stage", "HR Round", "interviewerInitials", List.of("PR", "NV"), "dateTime", "28 May 2026 02:00 PM - 03:00 PM", "status", "Scheduled"));
+                interviews.add(Map.of("candidate", "Rohit Kumar", "candidateCode", "CAN-2026-034", "title", "UI/UX Designer", "department", "IT - Design", "stage", "Design Round", "interviewerInitials", List.of("RK", "NV", "RK"), "dateTime", "27 May 2026 11:00 AM - 12:00 PM", "status", "Completed"));
+                interviews.add(Map.of("candidate", "Sneha Nair", "candidateCode", "CAN-2026-029", "title", "QA Engineer", "department", "IT - Quality", "stage", "Technical Round", "interviewerInitials", List.of("SN", "NV", "PO"), "dateTime", "26 May 2026 03:00 PM - 04:00 PM", "status", "Completed"));
+                interviews.add(Map.of("candidate", "Vikas Dubey", "candidateCode", "CAN-2026-022", "title", "DevOps Engineer", "department", "IT - Operations", "stage", "HR Round", "interviewerInitials", List.of("VD", "VI"), "dateTime", "25 May 2026 10:30 AM - 11:30 AM", "status", "Cancelled"));
+
+                model.addAttribute("interviewsList", interviews);
+
+                // --- TAB 3: FEEDBACK ---
+                List<Map<String, Object>> feedbackList = new ArrayList<>();
+                feedbackList.add(Map.of("id", 101L, "candidate", "Aman Singh", "candidateCode", "CAN-2026-045", "title", "Frontend Developer", "department", "IT - Development", "stage", "Technical Round", "interviewDate", "29 May 2026 10:00 AM", "requestedOn", "27 May 2026", "dueDate", "30 May 2026 (Overdue)", "status", "PENDING"));
+                feedbackList.add(Map.of("id", 102L, "candidate", "Priya Rathi", "candidateCode", "CAN-2026-038", "title", "Backend Developer", "department", "IT - Development", "stage", "HR Round", "interviewDate", "28 May 2026 02:00 PM", "requestedOn", "26 May 2026", "dueDate", "29 May 2026 (Overdue)", "status", "PENDING"));
+                feedbackList.add(Map.of("id", 103L, "candidate", "Rohit Kumar", "candidateCode", "CAN-2026-034", "title", "UI/UX Designer", "department", "IT - Design", "stage", "Design Round", "interviewDate", "27 May 2026 11:00 AM", "requestedOn", "25 May 2026", "dueDate", "28 May 2026 (Overdue)", "status", "PENDING"));
+
+                model.addAttribute("feedbackList", feedbackList);
+
+                // --- TAB 4: APPROVALS ---
+                List<Map<String, Object>> approvals = new ArrayList<>();
+                approvals.add(Map.of("id", 201L, "candidate", "Aman Singh", "email", "aman@gmail.com", "title", "Frontend Developer", "department", "IT - Development", "finalInterviewDate", "29 May 2026 10:00 AM", "rating", 4.2, "recommendation", "Hire", "status", "Pending"));
+                approvals.add(Map.of("id", 202L, "candidate", "Priya Rathi", "email", "priya@gmail.com", "title", "Backend Developer", "department", "IT - Development", "finalInterviewDate", "28 May 2026 02:00 PM", "rating", 4.0, "recommendation", "Hire", "status", "Pending"));
+                approvals.add(Map.of("id", 203L, "candidate", "Rohit Kumar", "email", "rohit@gmail.com", "title", "UI/UX Designer", "department", "IT - Design", "finalInterviewDate", "27 May 2026 11:00 AM", "rating", 3.2, "recommendation", "Consider", "status", "Pending"));
+                approvals.add(Map.of("id", 204L, "candidate", "Sneha Nair", "email", "sneha@gmail.com", "title", "QA Engineer", "department", "IT - Quality", "finalInterviewDate", "26 May 2026 03:00 PM", "rating", 3.5, "recommendation", "Hold", "status", "On Hold"));
+                approvals.add(Map.of("id", 205L, "candidate", "Vikas Dubey", "email", "vikas@gmail.com", "title", "DevOps Engineer", "department", "IT - Operations", "finalInterviewDate", "25 May 2026 10:30 AM", "rating", 2.8, "recommendation", "Not Suitable", "status", "Pending"));
+
+                model.addAttribute("approvalsList", approvals);
+
+                List<Map<String, Object>> activeEmployees = new ArrayList<>();
+                for (User u : allUsers) {
+                    if (u.getRole() == null || !"CLIENT".equalsIgnoreCase(u.getRole().getRoleName())) {
+                        Map<String, Object> emp = new HashMap<>();
+                        emp.put("name", u.getFullName());
+                        emp.put("designation", u.getDesignation() != null ? u.getDesignation() : "Employee");
+                        emp.put("email", u.getEmail());
+                        String initials = "AS";
+                        if (u.getFullName() != null && u.getFullName().trim().contains(" ")) {
+                            int spaceIdx = u.getFullName().trim().indexOf(" ");
+                            initials = u.getFullName().substring(0, 1) + u.getFullName().substring(spaceIdx + 1, spaceIdx + 2);
+                        } else if (u.getFullName() != null && u.getFullName().length() > 1) {
+                            initials = u.getFullName().substring(0, 2);
+                        }
+                        emp.put("initials", initials.toUpperCase());
+                        activeEmployees.add(emp);
+                    }
+                }
+                model.addAttribute("activeEmployees", activeEmployees);
+
+                return "senior_manager-recruitment";
+        }
+
+        private void seedJobPostings() {
+            try {
+                JobPosting jp1 = new JobPosting();
+                jp1.setJobId("R-100");
+                jp1.setTitle("Frontend Developer");
+                jp1.setDepartment("IT - Development");
+                jp1.setNoOfOpenings(2);
+                jp1.setPostingDate(LocalDate.of(2026, 5, 28));
+                jp1.setActive(true);
+                jobPostingRepository.save(jp1);
+
+                JobPosting jp2 = new JobPosting();
+                jp2.setJobId("R-101");
+                jp2.setTitle("Backend Developer");
+                jp2.setDepartment("IT - Development");
+                jp2.setNoOfOpenings(3);
+                jp2.setPostingDate(LocalDate.of(2026, 5, 26));
+                jp2.setActive(true);
+                jobPostingRepository.save(jp2);
+
+                JobPosting jp3 = new JobPosting();
+                jp3.setJobId("R-102");
+                jp3.setTitle("UI/UX Designer");
+                jp3.setDepartment("IT - Design");
+                jp3.setNoOfOpenings(1);
+                jp3.setPostingDate(LocalDate.of(2026, 5, 22));
+                jp3.setActive(true);
+                jobPostingRepository.save(jp3);
+
+                JobPosting jp4 = new JobPosting();
+                jp4.setJobId("R-103");
+                jp4.setTitle("QA Engineer");
+                jp4.setDepartment("IT - Quality");
+                jp4.setNoOfOpenings(2);
+                jp4.setPostingDate(LocalDate.of(2026, 5, 18));
+                jp4.setActive(true);
+                jobPostingRepository.save(jp4);
+
+                JobPosting jp5 = new JobPosting();
+                jp5.setJobId("R-104");
+                jp5.setTitle("DevOps Engineer");
+                jp5.setDepartment("IT - Operations");
+                jp5.setNoOfOpenings(1);
+                jp5.setPostingDate(LocalDate.of(2026, 5, 15));
+                jp5.setActive(true);
+                jobPostingRepository.save(jp5);
+
+                JobPosting jp6 = new JobPosting();
+                jp6.setJobId("R-105");
+                jp6.setTitle("Business Analyst");
+                jp6.setDepartment("Business");
+                jp6.setNoOfOpenings(2);
+                jp6.setPostingDate(LocalDate.of(2026, 5, 10));
+                jp6.setActive(false);
+                jobPostingRepository.save(jp6);
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @GetMapping("/senior_manager/expenses")
+        public String showExpenses(
+                @RequestParam(value = "tab", defaultValue = "approvals") String tab,
+                @RequestParam(value = "dept", required = false) String dept,
+                @RequestParam(value = "search", required = false) String search,
+                Model model,
+                Principal principal) {
+
+                User loggedInUser = principal != null
+                        ? userRepository.findByUsername(principal.getName()).orElse(null)
+                        : null;
+
+                if (loggedInUser == null) {
+                    return "redirect:/login";
+                }
+
+                model.addAttribute("loggedInUser", loggedInUser);
+                model.addAttribute("activeTab", tab);
+                model.addAttribute("selectedDept", dept);
+                model.addAttribute("searchQuery", search);
+
+                List<User> allUsers = userRepository.findAll();
+                Set<String> departments = new java.util.TreeSet<>();
+                departments.addAll(List.of("Information Technology", "Human Resources", "Finance Team", "Operations"));
+                for (User u : allUsers) {
+                    String d = getDepartment(u);
+                    if (!d.isBlank() && !"Unknown".equalsIgnoreCase(d)) {
+                        departments.add(d);
+                    }
+                }
+                model.addAttribute("departments", departments);
+
+                // --- TAB 1: EXPENSE APPROVALS ---
+                List<Map<String, Object>> approvals = new ArrayList<>();
+                approvals.add(Map.of("id", "R-100", "employee", "Vikram Mehta", "employeeCode", "EMP001", "department", "Information Technology", "type", "EXPENSE", "purpose", "Client meeting - Travel", "amount", 12450.0, "status", "Pending"));
+                approvals.add(Map.of("id", "R-101", "employee", "Neha Verma", "employeeCode", "EMP002", "department", "Human Resources", "type", "REIMBURSEMENT", "purpose", "Work from home setup", "amount", 8750.0, "status", "Approved"));
+                approvals.add(Map.of("id", "R-102", "employee", "Rahul Kumar", "employeeCode", "EMP003", "department", "Human Resources", "type", "BUDGET REQUEST", "purpose", "Team Building Activity", "amount", 50000.0, "status", "Pending"));
+                approvals.add(Map.of("id", "R-103", "employee", "Ankit Patel", "employeeCode", "EMP004", "department", "Information Technology", "type", "EXPENSE", "purpose", "Software Subscription", "amount", 15999.0, "status", "Approved"));
+                model.addAttribute("approvalsList", approvals);
+
+                // --- TAB 2: REIMBURSEMENTS ---
+                List<Map<String, Object>> reimbursements = new ArrayList<>();
+                reimbursements.add(Map.of("id", "R-100", "employee", "Neha Verma", "employeeCode", "EMP002", "department", "Human Resources", "purpose", "Travel - Client Meeting", "amount", 8750.0, "status", "Approved"));
+                reimbursements.add(Map.of("id", "R-101", "employee", "Rahul Kumar", "employeeCode", "EMP003", "department", "Human Resources", "purpose", "Work from home setup", "amount", 2350.0, "status", "Pending"));
+                reimbursements.add(Map.of("id", "R-102", "employee", "Ankit Patel", "employeeCode", "EMP004", "department", "Information Technology", "purpose", "Software Subscription", "amount", 15999.0, "status", "Approved"));
+                reimbursements.add(Map.of("id", "R-103", "employee", "Pooja Desai", "employeeCode", "EMP005", "department", "Finance Team", "purpose", "Internet & Mobile", "amount", 2150.0, "status", "Rejected"));
+                model.addAttribute("reimbursementsList", reimbursements);
+
+                // --- TAB 3: BUDGET REQUESTS ---
+                List<Map<String, Object>> budgetRequests = new ArrayList<>();
+                budgetRequests.add(Map.of("id", "BUD-2025-018", "requester", "Vikram Mehta", "employeeCode", "EMP001", "department", "Information Technology", "type", "PROJECT BUDGET", "purpose", "New CRM Software Implementation", "amount", 250000.0, "status", "Pending"));
+                budgetRequests.add(Map.of("id", "BUD-2025-017", "requester", "Neha Verma", "employeeCode", "EMP002", "department", "Human Resources", "type", "TEAM EVENT", "purpose", "Annual Team Offsite 2025", "amount", 120000.0, "status", "Approved"));
+                budgetRequests.add(Map.of("id", "BUD-2025-016", "requester", "Rahul Kumar", "employeeCode", "EMP003", "department", "Human Resources", "type", "HIRING", "purpose", "Q3 Recruitment Drive Costs", "amount", 300000.0, "status", "Pending"));
+                budgetRequests.add(Map.of("id", "BUD-2025-015", "requester", "Ankit Patel", "employeeCode", "EMP004", "department", "Information Technology", "type", "IT INFRA", "purpose", "Server Upgrade & Maintenance", "amount", 175000.0, "status", "Approved"));
+                budgetRequests.add(Map.of("id", "BUD-2025-014", "requester", "Pooja Desai", "employeeCode", "EMP005", "department", "Finance Team", "type", "OPERATIONAL", "purpose", "Finance Tools Annual Subscription", "amount", 85000.0, "status", "Rejected"));
+                model.addAttribute("budgetRequestsList", budgetRequests);
+
+                return "senior_manager-expenses";
         }
 
         private void seedProjectsAndTicketsAndTimesheets() {

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>WhiteCircle | Financial & Expense</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #002D72;
+            --sidebar-width: 205px;
+            --header-height: 70px;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            background: #f8fafc;
+            margin: 0;
+            font-family: Inter, Arial, sans-serif;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .myspace-sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: #f8fafc;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 1051;
+            transition: transform .3s ease;
+        }
+
+        body.sidebar-toggled .myspace-sidebar { transform: translateX(-100%); }
+
+        .brand-area {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: var(--header-height);
+        }
+
+        .brand-area img {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .brand-title { font-size: .92rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+        .brand-sub { font-size: .78rem; color: var(--muted); }
+
+        .nav-links { padding: 10px 0; flex: 1; }
+
+        .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 12px;
+            color: #475569;
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 600;
+            border-left: 3px solid transparent;
+            transition: all .2s;
+        }
+
+        .nav-link-item:hover { background: #eef2ff; color: var(--primary); }
+        .nav-link-item.active { background: #e2e8f0; color: var(--primary); border-left-color: var(--primary-light); }
+
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--header-height);
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1050;
+            transition: left .3s ease;
+        }
+
+        body.sidebar-toggled .top-navbar { left: 0; }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+        }
+
+        .myspace-main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 14px 18px;
+            min-height: calc(100vh - var(--header-height));
+            transition: margin-left .3s ease;
+        }
+
+        body.sidebar-toggled .myspace-main { margin-left: 0; }
+
+        .tabs-strip {
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: flex-start;
+            gap: 40px;
+        }
+
+        .tab-link {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 3px solid transparent;
+            font-size: 1.1rem;
+        }
+
+        .tab-link.active { color: #002D72; border-color: #002D72; }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-height: 90px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .stat-card .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .stat-card .label { font-size: .84rem; color: #64748b; font-weight: 600; }
+        .stat-card .value { font-size: 1.45rem; line-height: 1.2; font-weight: 700; margin-top: 4px; white-space: nowrap; }
+        .stat-card .subtext { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
+
+        .panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
+            gap: 20px;
+        }
+
+        .search-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .status-badge {
+            font-size: 0.78rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-approved { background-color: #dcfce7; color: #15803d; }
+        .status-pending { background-color: #fef3c7; color: #b45309; }
+        .status-rejected { background-color: #fee2e2; color: #b91c1c; }
+
+        .table th {
+            padding: 14px 16px !important;
+            vertical-align: middle;
+            font-weight: 700;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+        }
+
+        .table td {
+            padding: 16px 16px !important;
+            vertical-align: middle;
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+
+        .badge-type {
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .type-expense { background-color: #eff6ff; color: #1d4ed8; }
+        .type-reimbursement { background-color: #ecfdf5; color: #047857; }
+        .type-budget { background-color: #f3e8ff; color: #6b21a8; }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .progress-blue { background-color: #1d4ed8; }
+        .progress-green { background-color: #10b981; }
+        .progress-purple { background-color: #8b5cf6; }
+
+        .banner-info {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #1e3a8a;
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-row { grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); }
+            .layout-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .myspace-sidebar { transform: translateX(-100%); }
+            body.sidebar-toggled .myspace-sidebar { transform: translateX(0); }
+            .top-navbar { left: 0; padding: 0 10px; }
+            .myspace-main { margin-left: 0; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="myspace-sidebar shadow-sm">
+    <div class="brand-area">
+        <img src="/images/wcg-logo.jpg" alt="Logo"/>
+        <div>
+            <div class="brand-title">WhiteCircle</div>
+            <div class="brand-sub">Manager Admin</div>
+        </div>
+    </div>
+    <div class="nav-links">
+        <a href="/senior_manager/myspace?tab=directory" class="nav-link-item"><i class="fa-solid fa-users"></i> Team & Employee</a>
+        <a href="/senior_manager/leave_attendance" class="nav-link-item"><i class="fa-solid fa-calendar-days"></i> Leave & Attendance</a>
+        <a href="/senior_manager/project_work" class="nav-link-item"><i class="fa-solid fa-briefcase"></i> Project & Work</a>
+        <a href="/senior_manager/performance" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Performance</a>
+        <a href="/senior_manager/recruitment" class="nav-link-item"><i class="fa-solid fa-user-plus"></i> Recruitment</a>
+        <a href="/senior_manager/expenses" class="nav-link-item active"><i class="fa-solid fa-wallet"></i> Financial & Expense</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-file-lines"></i> Reports</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-comments"></i> Communication</a>
+        <a href="/senior_manager/myspace?tab=hierarchy" class="nav-link-item"><i class="fa-solid fa-sitemap"></i> Org. Hierarchy</a>
+    </div>
+</div>
+
+<nav class="top-navbar">
+    <div class="nav-brand">
+        <button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
+        <div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
+            <span style="color:#002D72; font-weight:700; font-size:2.1rem;">WhiteCircle Group - Shahdol</span>
+            <span style="font-size:.85rem; font-weight:500; color:#333; margin-top:2px;">Financial & Expense</span>
+        </div>
+    </div>
+    <div>
+        <a class="btn btn-light text-dark fw-bold" href="/senior_manager/dashboard" style="border-radius:6px; padding:8px 14px; text-decoration:none;">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</nav>
+
+<div class="myspace-main">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.8rem;" th:text="${activeTab == 'approvals' ? 'Expense Approvals' : (activeTab == 'reimbursements' ? 'Reimbursements' : 'Budget Requests')}">Expense Approvals</h2>
+            <p class="text-muted mb-0" style="font-size:0.88rem;" th:text="${activeTab == 'budget_request' ? 'Review and approve budget requests submitted by your team members.' : 'Review and approve expenses submitted by your team members.'}">Review and approve expenses submitted by your team members.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <select class="form-select form-select-sm" id="globalDeptSelect" style="width:160px; height:38px; background-color: #fff;">
+                <option value="">All Departments</option>
+                <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+            </select>
+            <select class="form-select form-select-sm" style="width:140px; height:38px; background-color: #fff;">
+                <option>FY 2025-26</option>
+                <option>FY 2024-25</option>
+            </select>
+            <button class="btn btn-outline-secondary btn-sm border fw-bold d-flex align-items-center gap-2" style="height:38px; background-color: #fff;"><i class="fa-solid fa-sliders"></i> Filters</button>
+            <button class="btn btn-outline-secondary btn-sm border fw-bold d-flex align-items-center gap-2" style="height:38px; background-color: #fff;" onclick="alert('Export completed successfully!')"><i class="fa-solid fa-download"></i> Export</button>
+        </div>
+    </div>
+
+    <div class="tabs-strip">
+        <a th:classappend="${activeTab == 'approvals'} ? ' active' : ''" class="tab-link" href="/senior_manager/expenses?tab=approvals">Expense Approvals</a>
+        <a th:classappend="${activeTab == 'reimbursements'} ? ' active' : ''" class="tab-link" href="/senior_manager/expenses?tab=reimbursements">Reimbursements</a>
+        <a th:classappend="${activeTab == 'budget_request'} ? ' active' : ''" class="tab-link" href="/senior_manager/expenses?tab=budget_request">Budget Request</a>
+    </div>
+
+    <!-- ==================== VIEW 1: EXPENSE APPROVALS ==================== -->
+    <div th:if="${activeTab == 'approvals'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                <div><div class="label">TOTAL REQUESTS</div><div class="value">28</div><div class="subtext">Across your team</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
+                <div><div class="label">APPROVED</div><div class="value">16</div><div class="subtext">57.14% of total</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div><div class="label">PENDING</div><div class="value">9</div><div class="subtext">32.14% of total</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
+                <div><div class="label">REJECTED</div><div class="value">3</div><div class="subtext">10.71% of total</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-wallet"></i></div>
+                <div><div class="label">TOTAL AMOUNT</div><div class="value">₹6,45,230</div><div class="subtext">Across all requests</div></div>
+            </div>
+        </div>
+
+        <div class="layout-grid">
+            <div class="panel">
+                <div class="search-row">
+                    <div class="position-relative">
+                        <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left:12px; top:50%; transform:translateY(-50%);"></i>
+                        <input type="text" class="form-control form-control-sm ps-5" placeholder="Search requests..." id="appSearchInput" style="width:260px; height:36px; border-radius:6px;"/>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted text-nowrap">Rows per page:</small>
+                        <select class="form-select form-select-sm" style="width:75px; height:36px;">
+                            <option>10</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover" id="approvalsTable">
+                        <thead>
+                            <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                                <th>Request ID</th>
+                                <th>Employee</th>
+                                <th>Department</th>
+                                <th>Type</th>
+                                <th>Purpose</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="row : ${approvalsList}" th:attr="data-name=${row['employee']}, data-department=${row['department']}">
+                                <td class="fw-bold text-primary text-nowrap" th:text="${row['id']}">R-100</td>
+                                <td class="text-nowrap">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(row['employee'], 0, 1)}">V</div>
+                                        <div>
+                                            <div class="fw-bold text-dark text-nowrap" th:text="${row['employee']}">Vikram Mehta</div>
+                                            <small class="text-muted" th:text="${row['employeeCode']}">EMP001</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><div style="min-width: 100px;" th:text="${row['department']}">Information Technology</div></td>
+                                <td class="text-nowrap">
+                                    <span class="badge-type" 
+                                          th:classappend="${row['type'] == 'EXPENSE' ? ' type-expense' : (row['type'] == 'REIMBURSEMENT' ? ' type-reimbursement' : ' type-budget')}"
+                                          th:text="${row['type']}">EXPENSE</span>
+                                </td>
+                                <td><div style="min-width: 140px;" th:text="${row['purpose']}">Client meeting - Travel</div></td>
+                                <td class="fw-bold text-dark text-nowrap" th:text="${'₹' + #numbers.formatDecimal(row['amount'], 1, 'COMMA', 0, 'POINT')}">₹12,450</td>
+                                <td class="text-nowrap">
+                                    <span class="status-badge" th:classappend="${row['status'] == 'Approved' ? ' status-approved' : ' status-pending'}" th:text="${row['status']}">Pending</span>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-link text-muted" onclick="alert('Viewing expense details...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- right sidebar overview -->
+            <div class="panel">
+                <h6 class="fw-bold mb-3">EXPENSE SUMMARY (THIS FY)</h6>
+                <div class="mb-4">
+                    <small class="text-muted">Total Amount</small>
+                    <h3 class="fw-bold text-primary mb-0">₹ 6,45,230</h3>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1" style="font-size:0.88rem;">
+                        <span><i class="fa-solid fa-circle text-primary me-1" style="font-size:0.6rem;"></i> Expenses</span>
+                        <span class="fw-bold">₹ 2,45,870 (38.09%)</span>
+                    </div>
+                    <div class="progress-bar-custom"><div class="progress-bar-fill progress-blue" style="width:38.09%"></div></div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1" style="font-size:0.88rem;">
+                        <span><i class="fa-solid fa-circle text-success me-1" style="font-size:0.6rem;"></i> Reimbursements</span>
+                        <span class="fw-bold">₹ 1,85,360 (28.74%)</span>
+                    </div>
+                    <div class="progress-bar-custom"><div class="progress-bar-fill progress-green" style="width:28.74%"></div></div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1" style="font-size:0.88rem;">
+                        <span><i class="fa-solid fa-circle text-warning me-1" style="font-size:0.6rem;"></i> Budget Requests</span>
+                        <span class="fw-bold">₹ 2,14,000 (33.17%)</span>
+                    </div>
+                    <div class="progress-bar-custom"><div class="progress-bar-fill progress-purple" style="width:33.17%"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 2: REIMBURSEMENTS ==================== -->
+    <div th:if="${activeTab == 'reimbursements'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-receipt"></i></div>
+                <div><div class="label">Total Requests</div><div class="value">24</div><div class="subtext">Across your team</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
+                <div><div class="label">Approved</div><div class="value">14</div><div class="subtext">58.33% of total</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div><div class="label">Pending</div><div class="value">7</div><div class="subtext">29.17% of total</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
+                <div><div class="label">Rejected</div><div class="value">3</div><div class="subtext">12.50% of total</div></div>
+            </div>
+            <div class="stat-card bg-primary text-white">
+                <div class="icon-circle bg-white bg-opacity-25 text-white"><i class="fa-solid fa-wallet"></i></div>
+                <div><div class="label text-white-50">Total Amount</div><div class="value">₹2,14,560</div><div class="subtext text-white-50">Across all requests</div></div>
+            </div>
+        </div>
+
+        <div class="layout-grid">
+            <div class="panel">
+                <div class="search-row">
+                    <div class="position-relative">
+                        <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left:12px; top:50%; transform:translateY(-50%);"></i>
+                        <input type="text" class="form-control form-control-sm ps-5" placeholder="Search reimbursements..." id="reimSearchInput" style="width:260px; height:36px; border-radius:6px;"/>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted text-nowrap">Rows per page:</small>
+                        <select class="form-select form-select-sm" style="width:75px; height:36px;">
+                            <option>10</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover" id="reimbursementsTable">
+                        <thead>
+                            <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                                <th>Request ID</th>
+                                <th>Employee</th>
+                                <th>Department</th>
+                                <th>Purpose</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="row : ${reimbursementsList}" th:attr="data-name=${row['employee']}, data-department=${row['department']}">
+                                <td class="fw-bold text-primary text-nowrap" th:text="${row['id']}">R-100</td>
+                                <td class="text-nowrap">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(row['employee'], 0, 1)}">N</div>
+                                        <div>
+                                            <div class="fw-bold text-dark text-nowrap" th:text="${row['employee']}">Neha Verma</div>
+                                            <small class="text-muted" th:text="${row['employeeCode']}">EMP002</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><div style="min-width: 100px;" th:text="${row['department']}">Human Resources</div></td>
+                                <td><div style="min-width: 140px;" th:text="${row['purpose']}">Travel - Client Meeting</div></td>
+                                <td class="fw-bold text-dark text-nowrap" th:text="${'₹' + #numbers.formatDecimal(row['amount'], 1, 'COMMA', 0, 'POINT')}">₹8,750</td>
+                                <td class="text-nowrap">
+                                    <span class="status-badge" 
+                                          th:classappend="${row['status'] == 'Approved' ? ' status-approved' : (row['status'] == 'Pending' ? ' status-pending' : ' status-rejected')}"
+                                          th:text="${row['status']}">Approved</span>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-link text-muted" onclick="alert('Viewing reimbursement details...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- right sidebar summaries -->
+            <div class="panel">
+                <h6 class="fw-bold mb-3">Reimbursement Summary (This FY)</h6>
+                <div class="mb-4">
+                    <small class="text-muted">Total Amount</small>
+                    <h3 class="fw-bold text-primary mb-0">₹ 2,14,560</h3>
+                </div>
+                <div style="height: 160px; position: relative;" class="mb-4">
+                    <canvas id="reimbursementDonutChart"></canvas>
+                    <div style="position: absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align: center;">
+                        <h5 class="fw-bold text-dark mb-0">100%</h5>
+                    </div>
+                </div>
+                <div style="font-size: 0.85rem; line-height: 1.8;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="fa-solid fa-circle text-success me-1" style="font-size:0.6rem;"></i> Approved</span>
+                        <span class="fw-bold">₹ 1,25,240</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="fa-solid fa-circle text-warning me-1" style="font-size:0.6rem;"></i> Pending</span>
+                        <span class="fw-bold">₹ 62,470</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="fa-solid fa-circle text-danger me-1" style="font-size:0.6rem;"></i> Rejected</span>
+                        <span class="fw-bold">₹ 26,850</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="banner-info mt-4">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>You can approve reimbursements within your approval limit of ₹ 5,000 per request. Requests exceeding this limit will be automatically routed to the Finance Director. Note: You cannot manage payroll or salary structures from this screen.</span>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 3: BUDGET REQUESTS ==================== -->
+    <div th:if="${activeTab == 'budget_request'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-wallet"></i></div>
+                <div><div class="label">TOTAL REQUESTS</div><div class="value">18</div><div class="subtext">Across your team</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
+                <div><div class="label">APPROVED</div><div class="value">7</div><div class="subtext">38.89% of total</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div><div class="label">PENDING</div><div class="value">8</div><div class="subtext">44.44% of total</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
+                <div><div class="label">REJECTED</div><div class="value">3</div><div class="subtext">16.67% of total</div></div>
+            </div>
+            <div class="stat-card bg-primary text-white">
+                <div class="icon-circle bg-white bg-opacity-25 text-white"><i class="fa-solid fa-wallet"></i></div>
+                <div><div class="label text-white-50">TOTAL AMOUNT REQUESTED</div><div class="value">₹12,45,800</div><div class="subtext text-white-50">Across all pending/approved requests</div></div>
+            </div>
+        </div>
+
+        <div class="layout-grid">
+            <div class="panel">
+                <div class="search-row">
+                    <div class="position-relative">
+                        <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left:12px; top:50%; transform:translateY(-50%);"></i>
+                        <input type="text" class="form-control form-control-sm ps-5" placeholder="Search budget requests..." id="budgetSearchInput" style="width:260px; height:36px; border-radius:6px;"/>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted text-nowrap">Rows per page:</small>
+                        <select class="form-select form-select-sm" style="width:75px; height:36px;">
+                            <option>10</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover" id="budgetTable">
+                        <thead>
+                            <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                                <th>Request ID</th>
+                                <th>Requester</th>
+                                <th>Department</th>
+                                <th>Budget Type</th>
+                                <th>Purpose</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="row : ${budgetRequestsList}" th:attr="data-name=${row['requester']}, data-department=${row['department']}">
+                                <td class="fw-bold text-primary text-nowrap" th:text="${row['id']}">BUD-2025-018</td>
+                                <td class="text-nowrap">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(row['requester'], 0, 1)}">V</div>
+                                        <div>
+                                            <div class="fw-bold text-dark text-nowrap" th:text="${row['requester']}">Vikram Mehta</div>
+                                            <small class="text-muted" th:text="${row['employeeCode']}">EMP001</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><div style="min-width: 100px;" th:text="${row['department']}">Information Technology</div></td>
+                                <td class="text-nowrap">
+                                    <span class="badge-type type-budget" th:text="${row['type']}">PROJECT BUDGET</span>
+                                </td>
+                                <td><div style="min-width: 140px;" th:text="${row['purpose']}">New CRM Software Implementation</div></td>
+                                <td class="fw-bold text-dark text-nowrap" th:text="${'₹' + #numbers.formatDecimal(row['amount'], 1, 'COMMA', 0, 'POINT')}">₹2,50,000</td>
+                                <td class="text-nowrap">
+                                    <span class="status-badge" 
+                                          th:classappend="${row['status'] == 'Approved' ? ' status-approved' : (row['status'] == 'Pending' ? ' status-pending' : ' status-rejected')}"
+                                          th:text="${row['status']}">Pending</span>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-link text-muted" onclick="alert('Viewing budget details...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- right sidebar details -->
+            <div class="panel">
+                <h6 class="fw-bold mb-3">Budget Summary (This FY)</h6>
+                <div class="mb-4">
+                    <small class="text-muted">Total Amount</small>
+                    <h3 class="fw-bold text-primary mb-0">₹ 12.4L</h3>
+                </div>
+                <div style="height: 160px; position: relative;" class="mb-4">
+                    <canvas id="budgetDonutChart"></canvas>
+                    <div style="position: absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align: center;">
+                        <h5 class="fw-bold text-dark mb-0">12.4L</h5>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold mb-3" style="font-size:0.85rem;">Budget by Department</h6>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1" style="font-size:0.8rem;">
+                        <span>Information Technology</span>
+                        <span class="fw-bold">41.4% (₹ 5,15,800)</span>
+                    </div>
+                    <div class="progress-bar-custom"><div class="progress-bar-fill progress-blue" style="width:41.4%"></div></div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1" style="font-size:0.8rem;">
+                        <span>Human Resources</span>
+                        <span class="fw-bold">25.7% (₹ 3,20,000)</span>
+                    </div>
+                    <div class="progress-bar-custom"><div class="progress-bar-fill progress-purple" style="width:25.7%"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="banner-info mt-4">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>Information: You can approve budget requests within your assigned approval limit. Requests exceeding 5,00,000 will require secondary approval from the Finance Director.</span>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener("DOMContentLoaded", function() {
+        const activeTab = /*[[${activeTab}]]*/ 'approvals';
+
+        // --- 1. REIMBURSEMENTS DONUT CHART ---
+        if (activeTab === 'reimbursements') {
+            const reimCtx = document.getElementById('reimbursementDonutChart').getContext('2d');
+            new Chart(reimCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Approved', 'Pending', 'Rejected'],
+                    datasets: [{
+                        data: [58.33, 29.17, 12.50],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '72%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // --- 2. BUDGET REQUESTS DONUT CHART ---
+        if (activeTab === 'budget_request') {
+            const budCtx = document.getElementById('budgetDonutChart').getContext('2d');
+            new Chart(budCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Approved', 'Pending', 'Rejected'],
+                    datasets: [{
+                        data: [38.89, 44.44, 16.67],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '72%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // --- 3. FILTER INTERACTION LOGIC ---
+        const globalDept = document.getElementById('globalDeptSelect');
+        const appSearch = document.getElementById('appSearchInput');
+        const reimSearch = document.getElementById('reimSearchInput');
+        const budgetSearch = document.getElementById('budgetSearchInput');
+
+        function filterTables() {
+            const dept = globalDept?.value || '';
+
+            // Filter approvals table
+            if (appSearch) {
+                const query = appSearch.value.toLowerCase();
+                document.querySelectorAll('#approvalsTable tbody tr').forEach(row => {
+                    const name = (row.dataset.name || '').toLowerCase();
+                    const rdept = row.dataset.department || '';
+
+                    const searchMatch = !query || name.includes(query);
+                    const deptMatch = !dept || rdept === dept;
+                    row.style.display = (searchMatch && deptMatch) ? '' : 'none';
+                });
+            }
+
+            // Filter reimbursements table
+            if (reimSearch) {
+                const query = reimSearch.value.toLowerCase();
+                document.querySelectorAll('#reimbursementsTable tbody tr').forEach(row => {
+                    const name = (row.dataset.name || '').toLowerCase();
+                    const rdept = row.dataset.department || '';
+
+                    const searchMatch = !query || name.includes(query);
+                    const deptMatch = !dept || rdept === dept;
+                    row.style.display = (searchMatch && deptMatch) ? '' : 'none';
+                });
+            }
+
+            // Filter budget table
+            if (budgetSearch) {
+                const query = budgetSearch.value.toLowerCase();
+                document.querySelectorAll('#budgetTable tbody tr').forEach(row => {
+                    const name = (row.dataset.name || '').toLowerCase();
+                    const rdept = row.dataset.department || '';
+
+                    const searchMatch = !query || name.includes(query);
+                    const deptMatch = !dept || rdept === dept;
+                    row.style.display = (searchMatch && deptMatch) ? '' : 'none';
+                });
+            }
+        }
+
+        if (globalDept) globalDept.addEventListener('change', filterTables);
+        if (appSearch) appSearch.addEventListener('input', filterTables);
+        if (reimSearch) reimSearch.addEventListener('input', filterTables);
+        if (budgetSearch) budgetSearch.addEventListener('input', filterTables);
+    });
+    /*]]>*/
+</script>
+</body>
+</html>
