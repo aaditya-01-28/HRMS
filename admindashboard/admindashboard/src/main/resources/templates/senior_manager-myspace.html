@@ -129,7 +129,7 @@
             font-size: 1.02rem;
         }
 
-        .tab-link.active { color: #2563eb; border-color: #2563eb; }
+        .tab-link.active { color: #002D72; border-color: #002D72; }
 
         .stats-row {
             display: grid;
@@ -191,7 +191,7 @@
         }
 
         .org-level {
-            color: #2563eb;
+            color: #002D72;
             font-weight: 700;
             min-width: 72px;
             font-size: .9rem;
@@ -211,7 +211,7 @@
         .org-tier-label {
             min-width: 80px;
             padding: 12px 0 0 0;
-            color: #2563eb;
+            color: #002D72;
             font-weight: 700;
             font-size: .92rem;
             flex-shrink: 0;
@@ -258,7 +258,7 @@
         }
 
         .org-tree-card.is-you {
-            border-color: #2563eb;
+            border-color: #002D72;
             background: linear-gradient(135deg, #eff6ff, #dbeafe);
         }
 
@@ -292,7 +292,7 @@
         }
 
         .org-tree-card .card-you-tag {
-            color: #2563eb;
+            color: #002D72;
             font-size: .7rem;
             font-weight: 600;
             margin-left: 4px;
@@ -370,7 +370,7 @@
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            background: conic-gradient(#2563eb 0 25%, #8b5cf6 25% 45%, #06b6d4 45% 63%, #f59e0b 63% 80%, #ec4899 80% 100%);
+            background: conic-gradient(#002D72 0 25%, #8b5cf6 25% 45%, #06b6d4 45% 63%, #f59e0b 63% 80%, #ec4899 80% 100%);
             margin: 6px auto;
             position: relative;
         }
@@ -401,7 +401,7 @@
 
         .status-approved { color: #16a34a; }
         .status-pending { color: #ea580c; }
-        .status-review { color: #2563eb; }
+        .status-review { color: #002D72; }
         .status-declined { color: #dc2626; }
 
         @media (max-width: 1200px) {
@@ -431,7 +431,7 @@
         <a href="/senior_manager/myspace?tab=directory" class="nav-link-item active"><i class="fa-solid fa-users"></i> Team & Employee</a>
         <a href="/senior_manager/leave_attendance" class="nav-link-item"><i class="fa-solid fa-calendar-days"></i> Leave & Attendance</a>
         <a href="/senior_manager/project_work" class="nav-link-item"><i class="fa-solid fa-briefcase"></i> Project & Work</a>
-        <a href="#" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Performance</a>
+        <a href="/senior_manager/performance" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Performance</a>
         <a href="#" class="nav-link-item"><i class="fa-solid fa-user-plus"></i> Recruitment</a>
         <a href="#" class="nav-link-item"><i class="fa-solid fa-wallet"></i> Financial & Expense</a>
         <a href="#" class="nav-link-item"><i class="fa-solid fa-file-lines"></i> Reports</a>
@@ -518,7 +518,7 @@
                             data-status=${m.status},
                             data-joined=${m.employeeProfile != null && m.employeeProfile.joiningDate != null ? #temporals.format(m.employeeProfile.joiningDate, 'yyyy-MM-dd') : ''}">
                         <td>
-                            <img class="avatar" th:src="${m.profileImage != null && !m.profileImage.isBlank() ? m.profileImage : '/images/male-avatar.png'}" alt="avatar"/>
+                            <img class="avatar" onerror="this.src='/images/user.png'" th:src="@{/images/user.png}" alt="avatar"/>
                             <span th:text="${m.fullName}">Employee Name</span>
                         </td>
                         <td th:text="${m.designation != null && !m.designation.isBlank() ? m.designation : (m.employeeProfile != null ? m.employeeProfile.designation : '-')}">-</td>
@@ -711,7 +711,7 @@
                 </div>
                 <div>
                     <p th:each="entry, i : ${pendingSummaryByType}">
-                        <span class="legend-dot" th:style="'background:' + (${i.index} % 6 == 0 ? '#2563eb' : (${i.index} % 6 == 1 ? '#8b5cf6' : (${i.index} % 6 == 2 ? '#06b6d4' : (${i.index} % 6 == 3 ? '#f59e0b' : (${i.index} % 6 == 4 ? '#ec4899' : '#94a3b8')))))"></span>
+                        <span class="legend-dot" th:style="'background:' + (${i.index} % 6 == 0 ? '#002D72' : (${i.index} % 6 == 1 ? '#8b5cf6' : (${i.index} % 6 == 2 ? '#06b6d4' : (${i.index} % 6 == 3 ? '#f59e0b' : (${i.index} % 6 == 4 ? '#ec4899' : '#94a3b8')))))"></span>
                         <span th:text="${entry.key}">Type</span>
                         <span class="text-muted" th:text="${entry.value}"></span>
                     </p>

@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>WhiteCircle | Performance Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #002D72;
+            --sidebar-width: 205px;
+            --header-height: 70px;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            background: #f8fafc;
+            margin: 0;
+            font-family: Inter, Arial, sans-serif;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .myspace-sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: #f8fafc;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 1051;
+            transition: transform .3s ease;
+        }
+
+        body.sidebar-toggled .myspace-sidebar { transform: translateX(-100%); }
+
+        .brand-area {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: var(--header-height);
+        }
+
+        .brand-area img {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .brand-title { font-size: .92rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+        .brand-sub { font-size: .78rem; color: var(--muted); }
+
+        .nav-links { padding: 10px 0; flex: 1; }
+
+        .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 12px;
+            color: #475569;
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 600;
+            border-left: 3px solid transparent;
+            transition: all .2s;
+        }
+
+        .nav-link-item:hover { background: #eef2ff; color: var(--primary); }
+        .nav-link-item.active { background: #e2e8f0; color: var(--primary); border-left-color: var(--primary-light); }
+
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--header-height);
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1050;
+            transition: left .3s ease;
+        }
+
+        body.sidebar-toggled .top-navbar { left: 0; }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+        }
+
+        .myspace-main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 14px 18px;
+            min-height: calc(100vh - var(--header-height));
+            transition: margin-left .3s ease;
+        }
+
+        body.sidebar-toggled .myspace-main { margin-left: 0; }
+
+        .tabs-strip {
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: flex-start;
+            gap: 40px;
+        }
+
+        .tab-link {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 3px solid transparent;
+            font-size: 1.1rem;
+        }
+
+        .tab-link.active { color: #2563eb; border-color: #2563eb; }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-height: 90px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .stat-card .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-card .label { font-size: .84rem; color: #64748b; font-weight: 600; }
+        .stat-card .value { font-size: 1.8rem; line-height: 1; font-weight: 700; margin-top: 4px; }
+        .stat-card .subtext { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr 0.9fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .panel-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #334155;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge {
+            font-size: 0.78rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-completed { background-color: #dcfce7; color: #15803d; }
+        .status-inprogress { background-color: #fef3c7; color: #b45309; }
+        .status-pending { background-color: #f1f5f9; color: #475569; }
+        .status-overdue { background-color: #fee2e2; color: #b91c1c; }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            overflow: hidden;
+            width: 80px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background-color: #10b981;
+        }
+
+        .progress-orange { background-color: #f59e0b; }
+        .progress-red { background-color: #ef4444; }
+
+        @media (max-width: 1200px) {
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
+            .charts-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .myspace-sidebar { transform: translateX(-100%); }
+            body.sidebar-toggled .myspace-sidebar { transform: translateX(0); }
+            .top-navbar { left: 0; padding: 0 10px; }
+            .myspace-main { margin-left: 0; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="myspace-sidebar shadow-sm">
+    <div class="brand-area">
+        <img src="/images/wcg-logo.jpg" alt="Logo"/>
+        <div>
+            <div class="brand-title">WhiteCircle</div>
+            <div class="brand-sub">Manager Admin</div>
+        </div>
+    </div>
+    <div class="nav-links">
+        <a href="/senior_manager/myspace?tab=directory" class="nav-link-item"><i class="fa-solid fa-users"></i> Team & Employee</a>
+        <a href="/senior_manager/leave_attendance" class="nav-link-item"><i class="fa-solid fa-calendar-days"></i> Leave & Attendance</a>
+        <a href="/senior_manager/project_work" class="nav-link-item"><i class="fa-solid fa-briefcase"></i> Project & Work</a>
+        <a href="/senior_manager/performance" class="nav-link-item active"><i class="fa-solid fa-chart-line"></i> Performance</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-user-plus"></i> Recruitment</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-wallet"></i> Financial & Expense</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-file-lines"></i> Reports</a>
+        <a href="#" class="nav-link-item"><i class="fa-solid fa-comments"></i> Communication</a>
+        <a href="/senior_manager/myspace?tab=hierarchy" class="nav-link-item"><i class="fa-solid fa-sitemap"></i> Org. Hierarchy</a>
+    </div>
+</div>
+
+<nav class="top-navbar">
+    <div class="nav-brand">
+        <button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
+        <div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
+            <span style="color:#002D72; font-weight:700; font-size:2.1rem;">WhiteCircle Group - Shahdol</span>
+            <span style="font-size:.85rem; font-weight:500; color:#333; margin-top:2px;">Performance Management</span>
+        </div>
+    </div>
+    <div>
+        <a class="btn btn-light text-dark fw-bold" href="/senior_manager/dashboard" style="border-radius:6px; padding:8px 14px; text-decoration:none;">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</nav>
+
+<div class="myspace-main">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.8rem;">Performance Management</h2>
+            <p class="text-muted mb-0" style="font-size: 0.88rem;">Manage performance reviews, goals, and feedback for your team.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <select class="form-select form-select-sm" id="globalDeptSelect" style="width:160px; height:38px; background-color: #fff;">
+                <option value="">All Departments</option>
+                <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+            </select>
+            <select class="form-select form-select-sm" id="globalCycleSelect" style="width:185px; height:38px; background-color: #fff;">
+                <option value="FY 2025-26">Review Cycle: FY 2025-26</option>
+                <option value="FY 2024-25">Review Cycle: FY 2024-25</option>
+            </select>
+            <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" style="height:38px; padding: 0 16px;" onclick="alert('Report exported successfully!')">
+                <i class="fa-solid fa-download"></i> Export Report
+            </button>
+        </div>
+    </div>
+
+    <div class="tabs-strip">
+        <a th:classappend="${activeTab == 'overview'} ? ' active' : ''" class="tab-link" href="/senior_manager/performance?tab=overview">Overview</a>
+        <a th:classappend="${activeTab == 'team_reviews'} ? ' active' : ''" class="tab-link" href="/senior_manager/performance?tab=team_reviews">Team Reviews</a>
+    </div>
+
+    <!-- ==================== VIEW 1: OVERVIEW ==================== -->
+    <div th:if="${activeTab == 'overview'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-users"></i></div>
+                <div>
+                    <div class="label">Team Members</div>
+                    <div class="value" th:text="${totalMembers}">28</div>
+                    <div class="subtext">Total active members</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
+                <div>
+                    <div class="label">Reviews Completed</div>
+                    <div class="value" th:text="${completedCount}">16</div>
+                    <div class="subtext" th:text="${#numbers.formatDecimal((completedCount * 100.0) / totalMembers, 1, 2) + '% of total team'}">57.14% of total team</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-clock"></i></div>
+                <div>
+                    <div class="label">Reviews In Progress</div>
+                    <div class="value" th:text="${inProgressCount}">8</div>
+                    <div class="subtext" th:text="${#numbers.formatDecimal((inProgressCount * 100.0) / totalMembers, 1, 2) + '% currently active'}">28.57% currently active</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-circle-pause"></i></div>
+                <div>
+                    <div class="label">Pending Reviews</div>
+                    <div class="value" th:text="${pendingCount}">4</div>
+                    <div class="subtext" th:text="${#numbers.formatDecimal((pendingCount * 100.0) / totalMembers, 1, 2) + '% awaiting initiation'}">14.29% awaiting initiation</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-star"></i></div>
+                <div>
+                    <div class="label">Average Rating</div>
+                    <div class="value" th:text="${#numbers.formatDecimal(avgRating, 1, 2) + ' / 5'}">3.72 / 5</div>
+                    <div class="subtext">Team average performance</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-row">
+            <!-- performance summary donut -->
+            <div class="panel">
+                <div class="panel-title d-flex justify-content-between align-items-center">
+                    <span>Performance Summary</span>
+                    <i class="fa-solid fa-circle-info text-muted cursor-pointer" title="Summary breakdown of employee performance reviews"></i>
+                </div>
+                <div class="row align-items-center">
+                    <div class="col-6 text-center" style="position:relative; height: 180px;">
+                        <canvas id="performanceSummaryChart"></canvas>
+                        <div style="position: absolute; top:50%; left:50%; transform:translate(-50%, -50%); line-height: 1;">
+                            <div class="fw-bold" style="font-size: 1.7rem; color: #1e293b;" th:text="${#numbers.formatDecimal(avgRating, 1, 2)}">3.72</div>
+                            <small class="text-muted fw-bold" style="font-size:0.65rem; text-transform:uppercase;">AVG RATING</small>
+                        </div>
+                    </div>
+                    <div class="col-6" style="font-size: 0.85rem; line-height: 1.6;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-circle text-success me-1" style="font-size:0.65rem;"></i> Outstanding</span>
+                            <span class="fw-bold" th:text="${outstanding + ' (' + #numbers.formatDecimal((outstanding*100.0)/totalMembers,1,1) + '%)'}">5 (17.8%)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-circle text-primary me-1" style="font-size:0.65rem;"></i> Exceeds</span>
+                            <span class="fw-bold" th:text="${exceeds + ' (' + #numbers.formatDecimal((exceeds*100.0)/totalMembers,1,1) + '%)'}">11 (39.3%)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-circle text-warning me-1" style="font-size:0.65rem;"></i> Meets</span>
+                            <span class="fw-bold" th:text="${meets + ' (' + #numbers.formatDecimal((meets*100.0)/totalMembers,1,1) + '%)'}">7 (25.0%)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-circle me-1" style="font-size:0.65rem; color:#8b5cf6;"></i> Below</span>
+                            <span class="fw-bold" th:text="${below + ' (' + #numbers.formatDecimal((below*100.0)/totalMembers,1,1) + '%)'}">3 (10.7%)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-circle text-danger me-1" style="font-size:0.65rem;"></i> Unsatisfactory</span>
+                            <span class="fw-bold" th:text="${unsatisfactory + ' (' + #numbers.formatDecimal((unsatisfactory*100.0)/totalMembers,1,1) + '%)'}">2 (7.1%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- rating distribution bar -->
+            <div class="panel">
+                <div class="panel-title">Rating Distribution</div>
+                <div style="height: 180px;">
+                    <canvas id="ratingDistributionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- review status pie -->
+            <div class="panel">
+                <div class="panel-title">Review Status</div>
+                <div class="row align-items-center">
+                    <div class="col-6" style="height: 180px;">
+                        <canvas id="reviewStatusChart"></canvas>
+                    </div>
+                    <div class="col-6" style="font-size: 0.85rem; line-height: 1.8;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-circle text-success me-1" style="font-size:0.65rem;"></i> Completed</span>
+                            <span class="fw-bold" th:text="${completedCount}">16</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-circle text-warning me-1" style="font-size:0.65rem;"></i> In Progress</span>
+                            <span class="fw-bold" th:text="${inProgressCount}">8</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fa-solid fa-circle text-danger me-1" style="font-size:0.65rem;"></i> Pending</span>
+                            <span class="fw-bold" th:text="${pendingCount}">4</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="fw-bold mb-0">Team Performance Overview</h6>
+                <div class="position-relative">
+                    <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left:12px; top:50%; transform:translateY(-50%);"></i>
+                    <input type="text" class="form-control form-control-sm ps-5" placeholder="Search employee..." id="overviewSearchInput" style="width:260px; height:36px; border-radius:6px;"/>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover" id="overviewPerformanceTable">
+                    <thead>
+                        <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                            <th>Employee</th>
+                            <th>Department</th>
+                            <th>Designation</th>
+                            <th>Review Status</th>
+                            <th>Self Rating</th>
+                            <th>Manager Rating</th>
+                            <th>Final Rating</th>
+                            <th>Review Date</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${reviewsList}"
+                            th:attr="data-name=${row['employeeName']}, data-department=${row['department']}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px; font-size:0.85rem;" th:text="${#strings.substring(row['employeeName'], 0, 1)}">V</div>
+                                    <div>
+                                        <div class="fw-bold text-dark" th:text="${row['employeeName']}">Vikram Mehta</div>
+                                        <small class="text-muted" th:text="${row['employeeCode']}">EMP001</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:text="${row['department']}">Information Technology</td>
+                            <td th:text="${row['designation']}">CTO</td>
+                            <td>
+                                <span class="status-badge" 
+                                      th:classappend="${row['status'] == 'Completed' ? ' status-completed' : (row['status'] == 'In Progress' ? ' status-inprogress' : (row['status'] == 'Overdue' ? ' status-overdue' : ' status-pending'))}"
+                                      th:text="${row['status']}">Completed</span>
+                            </td>
+                            <td>
+                                <span th:text="${row['selfRating'] != '-' ? row['selfRating'] : '-'}">4.2</span>
+                                <i class="fa-solid fa-star text-warning" th:if="${row['selfRating'] != '-'}"></i>
+                            </td>
+                            <td>
+                                <span th:text="${row['managerRating'] != '-' ? row['managerRating'] : '-'}">4.3</span>
+                                <i class="fa-solid fa-star text-warning" th:if="${row['managerRating'] != '-'}"></i>
+                            </td>
+                            <td>
+                                <span class="badge text-success bg-success-subtle px-2 py-1" style="font-size:0.85rem;" th:if="${row['finalRating'] != '-'}" th:text="${row['finalRating']}">4.3</span>
+                                <span th:if="${row['finalRating'] == '-'}">-</span>
+                            </td>
+                            <td th:text="${row['reviewDate']}">20 May 2026</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-link text-muted me-1" onclick="alert('Viewing feedback details...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
+                                <button class="btn btn-sm btn-link text-muted" onclick="alert('Downloading PDF report...')"><i class="fa-solid fa-download" style="font-size:1.1rem;"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- pagination -->
+            <div class="d-flex align-items-center justify-content-between mt-3" style="font-size:0.88rem;">
+                <div id="overviewTableInfo">Showing 1 to 5 of 28 entries</div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0" id="overviewPagination">
+                        <!-- generated by script -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 2: TEAM REVIEWS ==================== -->
+    <div th:if="${activeTab == 'team_reviews'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-file-invoice"></i></div>
+                <div>
+                    <div class="label">Total Reviews</div>
+                    <div class="value" th:text="${totalMembers}">28</div>
+                    <div class="subtext">Total reviews assigned</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
+                <div>
+                    <div class="label">Completed</div>
+                    <div class="value" th:text="${completedCount}">16</div>
+                    <div class="subtext" th:text="${#numbers.formatDecimal((completedCount*100.0)/totalMembers,1,2)+'% of total'}">57.14% of total</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div>
+                    <div class="label">In Progress</div>
+                    <div class="value" th:text="${inProgressCount}">8</div>
+                    <div class="subtext" th:text="${#numbers.formatDecimal((inProgressCount*100.0)/totalMembers,1,2)+'% of total'}">28.57% of total</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-secondary-subtle text-secondary"><i class="fa-solid fa-circle-minus"></i></div>
+                <div>
+                    <div class="label">Pending</div>
+                    <div class="value" th:text="${pendingCount}">4</div>
+                    <div class="subtext" th:text="${#numbers.formatDecimal((pendingCount*100.0)/totalMembers,1,2)+'% of total'}">14.29% of total</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div>
+                    <div class="label">Overdue</div>
+                    <div class="value" th:text="${overdueCount}">2</div>
+                    <div class="subtext text-danger font-semibold">Past due reviews</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="fw-bold" style="border-bottom: 2px solid #2563eb; padding-bottom: 4px; color:#2563eb;">All Reviews</span>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="position-relative">
+                        <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left:12px; top:50%; transform:translateY(-50%);"></i>
+                        <input type="text" class="form-control form-control-sm ps-5" placeholder="Search employee..." id="reviewsSearchInput" style="width:260px; height:36px; border-radius:6px;"/>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted text-nowrap">Rows per page:</small>
+                        <select class="form-select form-select-sm" id="rowsPerPageSelect" style="width:75px; height:36px;">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover" id="reviewsTable">
+                    <thead>
+                        <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                            <th>Employee</th>
+                            <th>Department</th>
+                            <th>Review Type</th>
+                            <th>Review Period</th>
+                            <th>Status</th>
+                            <th>Due Date</th>
+                            <th>Progress</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${reviewsList}"
+                            th:attr="data-name=${row['employeeName']}, data-department=${row['department']}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px; font-size:0.85rem;" th:text="${#strings.substring(row['employeeName'], 0, 1)}">V</div>
+                                    <div>
+                                        <div class="fw-bold text-dark" th:text="${row['employeeName']}">Vikram Mehta</div>
+                                        <small class="text-muted" th:text="${row['employeeCode']}">EMP001</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:text="${row['department']}">Information Technology</td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1" th:text="${row['reviewType']}">Annual Review</span>
+                            </td>
+                            <td th:text="${row['reviewPeriod']}">Apr 2024 - Mar 2025</td>
+                            <td>
+                                <span class="status-badge" 
+                                      th:classappend="${row['status'] == 'Completed' ? ' status-completed' : (row['status'] == 'In Progress' ? ' status-inprogress' : (row['status'] == 'Overdue' ? ' status-overdue' : ' status-pending'))}"
+                                      th:text="${row['status']}">Completed</span>
+                            </td>
+                            <td th:text="${row['dueDate']}" th:classappend="${row['status'] == 'Overdue'} ? ' text-danger fw-bold' : ''">15 May 2026</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-bar-fill" 
+                                             th:style="'width: ' + ${row['progress']} + '%'"
+                                             th:classappend="${row['progress'] <= 20 ? ' progress-red' : (row['progress'] <= 60 ? ' progress-orange' : '')}"></div>
+                                    </div>
+                                    <span style="font-size:0.75rem;" th:text="${row['progress'] + '%'}">100%</span>
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-link text-primary" onclick="alert('Viewing feedback reviews...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- pagination -->
+            <div class="d-flex align-items-center justify-content-between mt-3" style="font-size:0.88rem;">
+                <div id="reviewsTableInfo">Showing 1 to 10 of 28 entries</div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0" id="reviewsPagination">
+                        <!-- generated by script -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener("DOMContentLoaded", function() {
+        const activeTab = /*[[${activeTab}]]*/ 'overview';
+        const totalMembers = /*[[${totalMembers}]]*/ 28;
+
+        // Fetch dynamic chart numbers from controller model
+        const outstanding = /*[[${outstanding}]]*/ 5;
+        const exceeds = /*[[${exceeds}]]*/ 11;
+        const meets = /*[[${meets}]]*/ 7;
+        const below = /*[[${below}]]*/ 3;
+        const unsatisfactory = /*[[${unsatisfactory}]]*/ 2;
+
+        const bucket1 = /*[[${bucket1}]]*/ 2;
+        const bucket2 = /*[[${bucket2}]]*/ 3;
+        const bucket3 = /*[[${bucket3}]]*/ 7;
+        const bucket4 = /*[[${bucket4}]]*/ 11;
+        const bucket5 = /*[[${bucket5}]]*/ 5;
+
+        const completedCount = /*[[${completedCount}]]*/ 16;
+        const inProgressCount = /*[[${inProgressCount}]]*/ 8;
+        const pendingCount = /*[[${pendingCount}]]*/ 4;
+
+        if (activeTab === 'overview') {
+            // Performance Summary Donut Chart
+            const summaryCtx = document.getElementById('performanceSummaryChart').getContext('2d');
+            new Chart(summaryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Outstanding', 'Exceeds', 'Meets', 'Below', 'Unsatisfactory'],
+                    datasets: [{
+                        data: [outstanding, exceeds, meets, below, unsatisfactory],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '72%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Rating Distribution Bar Chart
+            const distCtx = document.getElementById('ratingDistributionChart').getContext('2d');
+            new Chart(distCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1 - 1.49', '1.5 - 2.49', '2.5 - 3.49', '3.5 - 4.49', '4.5 - 5'],
+                    datasets: [{
+                        data: [bucket1, bucket2, bucket3, bucket4, bucket5],
+                        backgroundColor: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 2 } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Review Status Pie Chart
+            const statusCtx = document.getElementById('reviewStatusChart').getContext('2d');
+            new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'In Progress', 'Pending'],
+                    datasets: [{
+                        data: [completedCount, inProgressCount, pendingCount],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Search and Department filtering logic
+        const globalDept = document.getElementById('globalDeptSelect');
+        const overviewSearch = document.getElementById('overviewSearchInput');
+        const reviewsSearch = document.getElementById('reviewsSearchInput');
+        const rowsPerPage = document.getElementById('rowsPerPageSelect');
+
+        let currentPageOverview = 1;
+        let rowsPerOverviewPage = 5;
+
+        let currentPageReviews = 1;
+        let rowsPerReviewsPage = 10;
+
+        function getFilteredRows(tableId, searchVal, deptVal) {
+            const trs = Array.from(document.querySelectorAll(`#${tableId} tbody tr`));
+            return trs.filter(row => {
+                const name = (row.dataset.name || '').toLowerCase();
+                const dept = row.dataset.department || '';
+
+                const searchMatch = !searchVal || name.includes(searchVal.toLowerCase());
+                const deptMatch = !deptVal || dept === deptVal;
+
+                return searchMatch && deptMatch;
+            });
+        }
+
+        function paginateTable(tableId, page, pageSize, searchVal, deptVal, infoId, paginationId) {
+            const allRows = Array.from(document.querySelectorAll(`#${tableId} tbody tr`));
+            const filteredRows = getFilteredRows(tableId, searchVal, deptVal);
+
+            // Hide all rows initially
+            allRows.forEach(r => r.style.display = 'none');
+
+            const total = filteredRows.length;
+            const start = (page - 1) * pageSize;
+            const end = Math.min(start + pageSize, total);
+
+            filteredRows.slice(start, end).forEach(r => r.style.display = '');
+
+            const infoText = total > 0 ? `Showing ${start + 1} to ${end} of ${total} entries` : 'Showing 0 to 0 of 0 entries';
+            const infoEl = document.getElementById(infoId);
+            if (infoEl) infoEl.textContent = infoText;
+
+            // Render pagination buttons
+            const pagEl = document.getElementById(paginationId);
+            if (pagEl) {
+                pagEl.innerHTML = '';
+                const pageCount = Math.ceil(total / pageSize);
+
+                // Prev button
+                const prevLi = document.createElement('li');
+                prevLi.className = `page-item ${page === 1 ? 'disabled' : ''}`;
+                prevLi.innerHTML = `<a class="page-link" href="#">&lt;</a>`;
+                prevLi.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (page > 1) {
+                        if (tableId === 'overviewPerformanceTable') {
+                            currentPageOverview--;
+                            updateOverviewTable();
+                        } else {
+                            currentPageReviews--;
+                            updateReviewsTable();
+                        }
+                    }
+                });
+                pagEl.appendChild(prevLi);
+
+                // Page numbers
+                for (let i = 1; i <= pageCount; i++) {
+                    const li = document.createElement('li');
+                    li.className = `page-item ${page === i ? 'active' : ''}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        if (tableId === 'overviewPerformanceTable') {
+                            currentPageOverview = i;
+                            updateOverviewTable();
+                        } else {
+                            currentPageReviews = i;
+                            updateReviewsTable();
+                        }
+                    });
+                    pagEl.appendChild(li);
+                }
+
+                // Next button
+                const nextLi = document.createElement('li');
+                nextLi.className = `page-item ${page === pageCount || pageCount === 0 ? 'disabled' : ''}`;
+                nextLi.innerHTML = `<a class="page-link" href="#">&gt;</a>`;
+                nextLi.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (page < pageCount) {
+                        if (tableId === 'overviewPerformanceTable') {
+                            currentPageOverview++;
+                            updateOverviewTable();
+                        } else {
+                            currentPageReviews++;
+                            updateReviewsTable();
+                        }
+                    }
+                });
+                pagEl.appendChild(nextLi);
+            }
+        }
+
+        function updateOverviewTable() {
+            if (activeTab !== 'overview') return;
+            paginateTable(
+                'overviewPerformanceTable',
+                currentPageOverview,
+                rowsPerOverviewPage,
+                overviewSearch?.value || '',
+                globalDept?.value || '',
+                'overviewTableInfo',
+                'overviewPagination'
+            );
+        }
+
+        function updateReviewsTable() {
+            if (activeTab !== 'team_reviews') return;
+            paginateTable(
+                'reviewsTable',
+                currentPageReviews,
+                rowsPerReviewsPage,
+                reviewsSearch?.value || '',
+                globalDept?.value || '',
+                'reviewsTableInfo',
+                'reviewsPagination'
+            );
+        }
+
+        // Event listeners
+        if (globalDept) {
+            globalDept.addEventListener('change', function() {
+                currentPageOverview = 1;
+                currentPageReviews = 1;
+                updateOverviewTable();
+                updateReviewsTable();
+            });
+        }
+
+        if (overviewSearch) {
+            overviewSearch.addEventListener('input', function() {
+                currentPageOverview = 1;
+                updateOverviewTable();
+            });
+        }
+
+        if (reviewsSearch) {
+            reviewsSearch.addEventListener('input', function() {
+                currentPageReviews = 1;
+                updateReviewsTable();
+            });
+        }
+
+        if (rowsPerPage) {
+            rowsPerPage.addEventListener('change', function() {
+                rowsPerReviewsPage = parseInt(rowsPerPage.value, 10);
+                currentPageReviews = 1;
+                updateReviewsTable();
+            });
+        }
+
+        // Initialize tables on load
+        updateOverviewTable();
+        updateReviewsTable();
+    });
+    /*]]>*/
+</script>
+</body>
+</html>
