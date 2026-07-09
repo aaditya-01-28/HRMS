@@ -1968,4 +1968,85 @@ public class SeniorDashboardController {
         referralRepository.delete(ref);
         return ResponseEntity.ok(Map.of("success", true));
     }
+
+    // --- LEAVE TYPE MANAGEMENT (BUG-021, BUG-022) ---
+    @PostMapping("/senior_hr/lms/leave-type/save")
+    public String saveLeaveType(@ModelAttribute com.example.admindashboard.model.LeaveTypeMaster leaveType,
+                                org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttrs) {
+        if (leaveType.getLeaveCode() != null) {
+            leaveType.setLeaveCode(leaveType.getLeaveCode().toUpperCase().trim());
+        }
+        
+        if (leaveType.getId() != null) {
+            java.util.Optional<com.example.admindashboard.model.LeaveTypeMaster> existingOpt = leaveTypeMasterRepository.findById(leaveType.getId());
+            if (existingOpt.isPresent()) {
+                com.example.admindashboard.model.LeaveTypeMaster existing = existingOpt.get();
+                existing.setLeaveName(leaveType.getLeaveName());
+                existing.setLeaveCode(leaveType.getLeaveCode());
+                existing.setMonthlyCredit(leaveType.getMonthlyCredit());
+                existing.setMaxBalance(leaveType.getMaxBalance());
+                existing.setCarryForward(leaveType.getCarryForward() != null ? leaveType.getCarryForward() : false);
+                existing.setIsPaid(leaveType.getIsPaid() != null ? leaveType.getIsPaid() : false);
+                existing.setRequiresApproval(leaveType.getRequiresApproval() != null ? leaveType.getRequiresApproval() : false);
+                existing.setActive(leaveType.getActive() != null ? leaveType.getActive() : false);
+                leaveTypeMasterRepository.save(existing);
+                redirectAttrs.addFlashAttribute("successMessage", "Leave Type updated successfully!");
+            } else {
+                redirectAttrs.addFlashAttribute("errorMessage", "Leave Type not found!");
+            }
+        } else {
+            if (leaveTypeMasterRepository.findByLeaveCode(leaveType.getLeaveCode()).isPresent()) {
+                redirectAttrs.addFlashAttribute("errorMessage", "Leave Code already exists!");
+            } else {
+                leaveTypeMasterRepository.save(leaveType);
+                redirectAttrs.addFlashAttribute("successMessage", "Leave Type added successfully!");
+            }
+        }
+        return "redirect:/senior_hr/lms";
+    }
+
+    @GetMapping("/senior_hr/api/leave-type/{id}")
+    @ResponseBody
+    public com.example.admindashboard.model.LeaveTypeMaster getLeaveTypeApi(@PathVariable Long id) {
+        return leaveTypeMasterRepository.findById(id).orElse(new com.example.admindashboard.model.LeaveTypeMaster());
+    }
+
+    // --- HOLIDAY MANAGEMENT (BUG-024, BUG-025) ---
+    @PostMapping("/senior_hr/lms/holiday/save")
+    public String saveHoliday(@ModelAttribute com.example.admindashboard.model.Holiday holiday,
+                              org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttrs) {
+        if (holiday.getHolidayDate() != null) {
+            java.time.DayOfWeek dow = holiday.getHolidayDate().getDayOfWeek();
+            String dayStr = dow.name().substring(0, 1) + dow.name().substring(1).toLowerCase();
+            holiday.setDayOfWeek(dayStr);
+            holiday.setYear(holiday.getHolidayDate().getYear());
+        }
+        
+        if (holiday.getId() != null) {
+            java.util.Optional<com.example.admindashboard.model.Holiday> existingOpt = holidayRepository.findById(holiday.getId());
+            if (existingOpt.isPresent()) {
+                com.example.admindashboard.model.Holiday existing = existingOpt.get();
+                existing.setHolidayName(holiday.getHolidayName());
+                existing.setHolidayDate(holiday.getHolidayDate());
+                existing.setDayOfWeek(holiday.getDayOfWeek());
+                existing.setHolidayType(holiday.getHolidayType());
+                existing.setYear(holiday.getYear());
+                existing.setActive(holiday.getActive() != null ? holiday.getActive() : false);
+                holidayRepository.save(existing);
+                redirectAttrs.addFlashAttribute("successMessage", "Holiday updated successfully!");
+            } else {
+                redirectAttrs.addFlashAttribute("errorMessage", "Holiday not found!");
+            }
+        } else {
+            holidayRepository.save(holiday);
+            redirectAttrs.addFlashAttribute("successMessage", "Holiday added successfully!");
+        }
+        return "redirect:/senior_hr/lms?tab=holiday";
+    }
+
+    @GetMapping("/senior_hr/api/holiday/{id}")
+    @ResponseBody
+    public com.example.admindashboard.model.Holiday getHolidayApi(@PathVariable Long id) {
+        return holidayRepository.findById(id).orElse(new com.example.admindashboard.model.Holiday());
+    }
 }

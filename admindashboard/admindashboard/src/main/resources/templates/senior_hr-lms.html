@@ -465,7 +465,7 @@
                     <div class="col-12">
                         <div class="d-flex justify-content-between align-items-center mb-3 px-1">
                             <h5 class="fw-bold mb-0" style="color: #1d4ed8;">Leave Balance Summary</h5>
-                            <button class="btn btn-primary fw-bold px-3"><i class="fas fa-plus me-1"></i> Add Leave Type</button>
+                            <button class="btn btn-primary fw-bold px-3" onclick="openAddLeaveTypeModal()" type="button"><i class="fas fa-plus me-1"></i> Add Leave Type</button>
                         </div>
                         
                         <div class="card-custom p-0 border" style="border-radius: 8px;">
@@ -476,85 +476,27 @@
                                             <th class="text-start ps-4" style="font-weight: 700; color: #1e293b;">Leave Type</th>
                                             <th style="font-weight: 700; color: #1e293b;">Annual Allocation</th>
                                             <th style="font-weight: 700; color: #1e293b;">Eligible Employee</th>
-                                            <th></th>
+                                            <th style="font-weight: 700; color: #1e293b;">Status</th>
                                             <th style="font-weight: 700; color: #1e293b;">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
+                                        <tr th:each="type : ${leaveTypes}">
                                             <td class="text-start ps-4">
                                                 <div class="d-flex align-items-center gap-2">
-                                                    <span class="leave-dot" style="background-color: #10b981;"></span>
-                                                    <span style="color: #475569;">Paid Leave</span>
+                                                    <span class="leave-dot" th:style="'background-color: ' + (${type.leaveCode == 'PL' or type.leaveCode == 'EL' ? '#10b981' : (type.leaveCode == 'CL' ? '#3b82f6' : (type.leaveCode == 'SL' ? '#ef4444' : '#a855f7'))})"></span>
+                                                    <span style="color: #475569;" th:text="${type.leaveName}">Paid Leave</span>
                                                 </div>
                                             </td>
-                                            <td style="color: #475569;">24 days</td>
+                                            <td style="color: #475569;" th:text="${type.maxBalance + ' days'}">24 days</td>
                                             <td style="color: #475569;">512</td>
-                                            <td style="color: #475569;">18</td>
+                                            <td style="color: #475569;" th:text="${type.active ? 'Active' : 'Inactive'}">Active</td>
                                             <td>
-                                                <i class="fas fa-pen text-muted mx-2" style="cursor: pointer;"></i>
-                                                <i class="fas fa-ellipsis-h text-muted mx-2" style="cursor: pointer;"></i>
+                                                <i class="fas fa-pen text-muted mx-2" style="cursor: pointer;" th:onclick="'editLeaveType(' + ${type.id} + ')'"></i>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td class="text-start ps-4">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <span class="leave-dot" style="background-color: #3b82f6;"></span>
-                                                    <span style="color: #475569;">Casual Leave</span>
-                                                </div>
-                                            </td>
-                                            <td style="color: #475569;">24 days</td>
-                                            <td style="color: #475569;">512</td>
-                                            <td style="color: #475569;">15</td>
-                                            <td>
-                                                <i class="fas fa-pen text-muted mx-2" style="cursor: pointer;"></i>
-                                                <i class="fas fa-ellipsis-h text-muted mx-2" style="cursor: pointer;"></i>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start ps-4">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <span class="leave-dot" style="background-color: #ef4444;"></span>
-                                                    <span style="color: #475569;">Sick Leave</span>
-                                                </div>
-                                            </td>
-                                            <td style="color: #475569;">24 days</td>
-                                            <td style="color: #475569;">512</td>
-                                            <td style="color: #475569;">12</td>
-                                            <td>
-                                                <i class="fas fa-pen text-muted mx-2" style="cursor: pointer;"></i>
-                                                <i class="fas fa-ellipsis-h text-muted mx-2" style="cursor: pointer;"></i>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start ps-4">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <span class="leave-dot" style="background-color: #a855f7;"></span>
-                                                    <span style="color: #475569;">Earned Leave</span>
-                                                </div>
-                                            </td>
-                                            <td style="color: #475569;">24 days</td>
-                                            <td style="color: #475569;">512</td>
-                                            <td style="color: #475569;">10</td>
-                                            <td>
-                                                <i class="fas fa-pen text-muted mx-2" style="cursor: pointer;"></i>
-                                                <i class="fas fa-ellipsis-h text-muted mx-2" style="cursor: pointer;"></i>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start ps-4">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <span class="leave-dot" style="background-color: #f59e0b;"></span>
-                                                    <span style="color: #475569;">Compensatory Off</span>
-                                                </div>
-                                            </td>
-                                            <td style="color: #475569;">24 days</td>
-                                            <td style="color: #475569;">512</td>
-                                            <td style="color: #475569;">18</td>
-                                            <td>
-                                                <i class="fas fa-pen text-muted mx-2" style="cursor: pointer;"></i>
-                                                <i class="fas fa-ellipsis-h text-muted mx-2" style="cursor: pointer;"></i>
-                                            </td>
+                                        <tr th:if="${#lists.isEmpty(leaveTypes)}">
+                                            <td colspan="5" class="text-center text-muted py-4">No leave types configured.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -621,9 +563,9 @@
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div class="input-group" style="width: 300px;">
                                 <span class="input-group-text bg-white text-muted border-end-0"><i class="fas fa-search"></i></span>
-                                <input type="text" class="form-control border-start-0" placeholder="Search Holidays">
+                                <input type="text" class="form-control border-start-0" id="searchHolidays" placeholder="Search Holidays">
                             </div>
-                            <button class="btn btn-primary-custom px-4 fw-bold"><i class="fas fa-plus me-1"></i> Add Holiday</button>
+                            <button class="btn btn-primary-custom px-4 fw-bold" onclick="openAddHolidayModal()" type="button"><i class="fas fa-plus me-1"></i> Add Holiday</button>
                         </div>
                         
                         <div class="card-custom">
@@ -639,7 +581,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:each="holiday : ${holidays}">
+                                        <tr th:each="holiday : ${holidays}" class="holiday-row">
                                             <td>
                                                 <div class="d-flex justify-content-center">
                                                     <div class="date-badge">
@@ -664,12 +606,12 @@
                                                     <img th:if="${holiday.holidayName != null and holiday.holidayName.contains('Christmas')}" src="/images/christmas.png" style="width: 24px;">
                                                     <img th:if="${holiday.holidayName != null and holiday.holidayName.contains('Raksha')}" src="/images/raksha.png" style="width: 24px;">
                                                     <img th:unless="${holiday.holidayName != null and (holiday.holidayName.contains('Republic') or holiday.holidayName.contains('Holi') or holiday.holidayName.contains('Good Friday') or holiday.holidayName.contains('Labour') or holiday.holidayName.contains('Independence') or holiday.holidayName.contains('Ganesh') or holiday.holidayName.contains('Gandhi') or holiday.holidayName.contains('Dussehra') or holiday.holidayName.contains('Diwali') or holiday.holidayName.contains('Christmas') or holiday.holidayName.contains('Raksha'))}" src="/images/republic.png" style="width: 24px;">
-                                                    <span th:text="${holiday.holidayName}">Independence Day</span>
+                                                    <span class="holiday-name-text" th:text="${holiday.holidayName}">Independence Day</span>
                                                 </div>
                                             </td>
                                             <td th:text="${holiday.holidayType}">Company Holiday</td>
                                             <td>
-                                                <i class="fas fa-pen text-muted me-3" style="cursor: pointer;"></i>
+                                                <i class="fas fa-pen text-muted me-3" style="cursor: pointer;" th:onclick="'editHoliday(' + ${holiday.id} + ')'"></i>
                                                 <i class="fas fa-ellipsis-h text-muted" style="cursor: pointer;"></i>
                                             </td>
                                         </tr>
@@ -1395,8 +1337,213 @@
             // Initial filter run
             filterLeaveRequests();
         });
-
     </script>
+
+<!-- LEAVE TYPE MODAL (BUG-021, BUG-022) -->
+<div class="modal fade" id="leaveTypeModal" tabindex="-1" aria-labelledby="leaveTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+            <div class="modal-header border-0 bg-light py-3 px-4">
+                <h5 class="modal-title fw-bold text-dark m-0" id="leaveTypeModalLabel">Add Leave Type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/senior_hr/lms/leave-type/save" method="post" id="leaveTypeForm">
+                <input type="hidden" name="id" id="leaveTypeId"/>
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Leave Name *</label>
+                            <input type="text" class="form-control" name="leaveName" id="leaveTypeName" required="required" placeholder="e.g. Sick Leave"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Leave Code *</label>
+                            <input type="text" class="form-control" name="leaveCode" id="leaveTypeCode" required="required" placeholder="e.g. SL"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Monthly Credit</label>
+                            <input type="number" step="0.1" class="form-control" name="monthlyCredit" id="leaveTypeMonthly" value="0.0"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Max Balance (Annual)</label>
+                            <input type="number" step="0.1" class="form-control" name="maxBalance" id="leaveTypeMax" value="0.0"/>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="carryForward" id="leaveTypeCarry" value="true"/>
+                                <label class="form-check-label fw-semibold text-dark" for="leaveTypeCarry">Carry Forward</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="isPaid" id="leaveTypePaid" value="true" checked="checked"/>
+                                <label class="form-check-label fw-semibold text-dark" for="leaveTypePaid">Is Paid Leave</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="requiresApproval" id="leaveTypeApproval" value="true" checked="checked"/>
+                                <label class="form-check-label fw-semibold text-dark" for="leaveTypeApproval">Requires Approval</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="active" id="leaveTypeActive" value="true" checked="checked"/>
+                                <label class="form-check-label fw-semibold text-dark" for="leaveTypeActive">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light p-3">
+                    <button type="button" class="btn btn-outline-secondary fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-semibold px-4">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- HOLIDAY MODAL (BUG-024, BUG-025) -->
+<div class="modal fade" id="holidayModal" tabindex="-1" aria-labelledby="holidayModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+            <div class="modal-header border-0 bg-light py-3 px-4">
+                <h5 class="modal-title fw-bold text-dark m-0" id="holidayModalLabel">Add Holiday</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/senior_hr/lms/holiday/save" method="post" id="holidayForm">
+                <input type="hidden" name="id" id="holidayId"/>
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-muted">Holiday Name *</label>
+                            <input type="text" class="form-control" name="holidayName" id="holidayNameInput" required="required" placeholder="e.g. Independence Day"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Holiday Date *</label>
+                            <input type="date" class="form-control" name="holidayDate" id="holidayDateInput" required="required"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Holiday Type *</label>
+                            <select class="form-select" name="holidayType" id="holidayTypeInput" required="required">
+                                <option value="FIXED">FIXED</option>
+                                <option value="FLOATER">FLOATER</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="active" id="holidayActiveInput" value="true" checked="checked"/>
+                                <label class="form-check-label fw-semibold text-dark" for="holidayActiveInput">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light p-3">
+                    <button type="button" class="btn btn-outline-secondary fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-semibold px-4">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+        // --- LEAVE TYPE POPUPS (BUG-021, BUG-022) ---
+        function openAddLeaveTypeModal() {
+            document.getElementById('leaveTypeId').value = '';
+            document.getElementById('leaveTypeForm').reset();
+            document.getElementById('leaveTypeModalLabel').innerText = 'Add Leave Type';
+            const modal = new bootstrap.Modal(document.getElementById('leaveTypeModal'));
+            modal.show();
+        }
+
+        function editLeaveType(id) {
+            fetch(`/senior_hr/api/leave-type/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if(!data.id) {
+                        alert("Failed to load leave type details.");
+                        return;
+                    }
+                    document.getElementById('leaveTypeId').value = data.id;
+                    document.getElementById('leaveTypeName').value = data.leaveName || '';
+                    document.getElementById('leaveTypeCode').value = data.leaveCode || '';
+                    document.getElementById('leaveTypeMonthly').value = data.monthlyCredit || 0;
+                    document.getElementById('leaveTypeMax').value = data.maxBalance || 0;
+                    document.getElementById('leaveTypeCarry').checked = data.carryForward === true;
+                    document.getElementById('leaveTypePaid').checked = data.isPaid === true;
+                    document.getElementById('leaveTypeApproval').checked = data.requiresApproval === true;
+                    document.getElementById('leaveTypeActive').checked = data.active === true;
+                    
+                    document.getElementById('leaveTypeModalLabel').innerText = 'Edit Leave Type';
+                    const modal = new bootstrap.Modal(document.getElementById('leaveTypeModal'));
+                    modal.show();
+                })
+                .catch(err => console.error("Error fetching leave type:", err));
+        }
+
+        // --- HOLIDAY POPUPS (BUG-024, BUG-025) ---
+        function openAddHolidayModal() {
+            document.getElementById('holidayId').value = '';
+            document.getElementById('holidayForm').reset();
+            document.getElementById('holidayModalLabel').innerText = 'Add Holiday';
+            const modal = new bootstrap.Modal(document.getElementById('holidayModal'));
+            modal.show();
+        }
+
+        function editHoliday(id) {
+            fetch(`/senior_hr/api/holiday/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if(!data.id) {
+                        alert("Failed to load holiday details.");
+                        return;
+                    }
+                    document.getElementById('holidayId').value = data.id;
+                    document.getElementById('holidayNameInput').value = data.holidayName || '';
+                    document.getElementById('holidayDateInput').value = data.holidayDate || '';
+                    document.getElementById('holidayTypeInput').value = data.holidayType || 'FIXED';
+                    document.getElementById('holidayActiveInput').checked = data.active === true;
+                    
+                    document.getElementById('holidayModalLabel').innerText = 'Edit Holiday';
+                    const modal = new bootstrap.Modal(document.getElementById('holidayModal'));
+                    modal.show();
+                })
+                .catch(err => console.error("Error fetching holiday:", err));
+        }
+
+        // --- HOLIDAY SEARCH FILTER (BUG-023) ---
+        function filterHolidays() {
+            const query = (document.getElementById('searchHolidays').value || '').toLowerCase().trim();
+            const rows = document.querySelectorAll('.holiday-row');
+            
+            rows.forEach(row => {
+                const nameText = (row.querySelector('.holiday-name-text').innerText || '').toLowerCase();
+                if (query === '' || nameText.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const hSearch = document.getElementById('searchHolidays');
+            if (hSearch) {
+                hSearch.addEventListener('input', filterHolidays);
+            }
+            
+            // Check for redirect tab parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+            if (tabParam === 'holiday') {
+                const tabEl = document.getElementById('holiday-tab');
+                if (tabEl) {
+                    const tab = bootstrap.Tab.getOrCreateInstance(tabEl);
+                    tab.show();
+                }
+            }
+        });
+</script>
 </body>
 </html>
 

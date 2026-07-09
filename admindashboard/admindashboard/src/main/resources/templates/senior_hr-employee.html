@@ -230,6 +230,30 @@
         .stepper-label { font-weight: 600; color: #64748b; font-size: 0.9rem; }
         .stepper-item.active .stepper-label { color: #1e293b; }
 
+        /* === MOBILE RESPONSIVE (BUG-020) === */
+        @media (max-width: 992px) {
+            .myspace-sidebar { transform: translateX(-100%); }
+            body.sidebar-toggled .myspace-sidebar { transform: translateX(0); }
+            .main-content { margin-left: 0 !important; width: 100% !important; }
+            .top-navbar { left: 0 !important; width: 100% !important; }
+        }
+        @media (max-width: 768px) {
+            .top-navbar { flex-direction: column; height: auto !important; padding: 10px !important; gap: 8px; }
+            .d-flex.flex-wrap.gap-2.gap-md-3 { flex-direction: column; }
+            .form-select.w-auto { width: 100% !important; }
+            .d-flex.justify-content-between.align-items-center.mt-3 { flex-direction: column; gap: 10px; }
+            .stat-item { min-width: 120px; }
+            .table-responsive { font-size: 0.8rem; }
+            .card-custom { padding: 12px !important; }
+        }
+        @media (max-width: 576px) {
+            .main-content { padding: 10px !important; margin-top: 60px !important; }
+            .stat-item { min-width: 100px; font-size: 0.75rem; }
+            .stat-item .value { font-size: 1.2rem !important; }
+            .table th, .table td { padding: 6px 4px !important; font-size: 0.75rem; }
+            .pagination { flex-wrap: wrap; }
+        }
+
     </style>
 </head>
 <body>
@@ -448,7 +472,7 @@
 </div>
 <!-- Table with Filters -->
 <div class="card-custom">
-<div class="d-flex gap-3 mb-4">
+<div class="d-flex flex-wrap gap-2 gap-md-3 mb-4">
 <div class="position-relative flex-grow-1" style="max-width: 300px;">
 <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 12px;"></i>
 <input class="form-control" id="allEmpSearch" placeholder="Search by employee name" style="padding-left: 40px;" type="text"/>
@@ -526,16 +550,8 @@
 </table>
 </div>
 <div class="d-flex justify-content-between align-items-center mt-3">
-<div class="text-muted" style="font-size: 0.85rem;">Showing 1 to 10 entries</div>
-<ul class="pagination pagination-sm mb-0">
-<li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
-<li class="page-item active"><a class="page-link" href="#">1</a></li>
-<li class="page-item"><a class="page-link" href="#">2</a></li>
-<li class="page-item"><a class="page-link" href="#">3</a></li>
-<li class="page-item"><a class="page-link" href="#">4</a></li>
-<li class="page-item"><a class="page-link" href="#">5</a></li>
-<li class="page-item"><a class="page-link" href="#">&gt;</a></li>
-</ul>
+<div class="text-muted" style="font-size: 0.85rem;" id="allEmpPagInfo">Showing 1 to 10 entries</div>
+<ul class="pagination pagination-sm mb-0" id="allEmpPagination"></ul>
 </div>
 </div>
 </div>
@@ -543,7 +559,7 @@
 <div class="tab-pane fade" id="onboarding-pane" role="tabpanel">
 <!-- LIST VIEW -->
 <div class="card-custom border-0 shadow-none p-0" id="onboarding-list-view">
-<div class="d-flex gap-3 mb-4 mt-3">
+<div class="d-flex flex-wrap gap-2 gap-md-3 mb-4 mt-3">
 <div class="d-flex gap-2 position-relative flex-grow-1" style="max-width: 380px;">
 <div class="position-relative flex-grow-1">
 <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 12px;"></i>
@@ -1065,16 +1081,8 @@
 </table>
 </div>
 <div class="d-flex justify-content-between align-items-center mt-3">
-<div class="text-muted" style="font-size: 0.85rem;">Showing 1 to 10 entries</div>
-<ul class="pagination pagination-sm mb-0">
-<li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
-<li class="page-item active"><a class="page-link" href="#">1</a></li>
-<li class="page-item"><a class="page-link" href="#">2</a></li>
-<li class="page-item"><a class="page-link" href="#">3</a></li>
-<li class="page-item"><a class="page-link" href="#">4</a></li>
-<li class="page-item"><a class="page-link" href="#">5</a></li>
-<li class="page-item"><a class="page-link" href="#">&gt;</a></li>
-</ul>
+<div class="text-muted" style="font-size: 0.85rem;" id="offboardPagInfo">Showing 1 to 10 entries</div>
+<ul class="pagination pagination-sm mb-0" id="offboardPagination"></ul>
 </div>
 </div>
 </div>
@@ -1138,7 +1146,7 @@
 <span class="text-danger fw-bold">EXITED</span>
 </td>
 <td>
-<button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-eye"></i></button>
+<button class="btn btn-sm btn-link text-dark p-0 me-2" th:onclick="'viewAlumniDetails(' + ${cand.id} + ')'" type="button"><i class="fas fa-eye"></i></button>
 <button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
 </td>
 </tr>
@@ -1146,12 +1154,8 @@
 </table>
 </div>
 <div class="d-flex justify-content-between align-items-center mt-3">
-<div class="text-muted" style="font-size: 0.85rem;">Showing 1 to 10 entries</div>
-<ul class="pagination pagination-sm mb-0">
-<li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
-<li class="page-item active"><a class="page-link" href="#">1</a></li>
-<li class="page-item"><a class="page-link" href="#">&gt;</a></li>
-</ul>
+<div class="text-muted" style="font-size: 0.85rem;" id="alumniPagInfo">Showing 1 to 10 entries</div>
+<ul class="pagination pagination-sm mb-0" id="alumniPagination"></ul>
 </div>
 </div>
 </div>
@@ -1560,6 +1564,59 @@
                     }
                 });
             }
+            // Dynamic filters builder (BUG-011, BUG-016)
+            function populateDynamicFilters(tbodyId, deptSelectId, locSelectId, roleSelectId, deptColIdx, roleColIdx, locColIdx) {
+                const tbody = document.getElementById(tbodyId);
+                if (!tbody) return;
+                const trs = tbody.getElementsByTagName("tr");
+                
+                const depts = new Set();
+                const locs = new Set();
+                const roles = new Set();
+                
+                for (let i = 0; i < trs.length; i++) {
+                    const tr = trs[i];
+                    if (tr.cells.length <= Math.max(deptColIdx, roleColIdx, (locColIdx || 0))) continue;
+                    
+                    const deptVal = tr.cells[deptColIdx].innerText.trim();
+                    const roleVal = tr.cells[roleColIdx].innerText.trim();
+                    const locVal = locColIdx !== null ? tr.cells[locColIdx].innerText.trim() : null;
+                    
+                    if (deptVal && deptVal !== 'N/A') depts.add(deptVal);
+                    if (roleVal && roleVal !== 'N/A') roles.add(roleVal);
+                    if (locVal && locVal !== 'N/A') locs.add(locVal);
+                }
+                
+                const populateSelect = (selectId, setValues) => {
+                    const select = document.getElementById(selectId);
+                    if (!select) return;
+                    const defaultOptions = [];
+                    if (select.options.length > 0) defaultOptions.push(select.options[0]);
+                    if (select.options.length > 1) defaultOptions.push(select.options[1]);
+                    select.innerHTML = '';
+                    defaultOptions.forEach(opt => select.appendChild(opt));
+                    
+                    Array.from(setValues).sort().forEach(val => {
+                        const opt = document.createElement('option');
+                        opt.value = val;
+                        opt.textContent = val;
+                        select.appendChild(opt);
+                    });
+                };
+                
+                if (deptSelectId) populateSelect(deptSelectId, depts);
+                if (locSelectId) populateSelect(locSelectId, locs);
+                if (roleSelectId) populateSelect(roleSelectId, roles);
+            }
+
+            // 1. All Employees
+            populateDynamicFilters('all-emp-tbody', 'allEmpDept', 'allEmpLoc', 'allEmpRole', 2, 3, 4);
+            // 2. Onboarding Candidates
+            populateDynamicFilters('onboard-tbody', 'onboardDept', 'onboardLoc', 'onboardRole', 1, 2, 3);
+            // 3. Offboarding Candidates
+            populateDynamicFilters('offboarding-tbody', 'offboardingDept', null, 'offboardingRole', 2, 3, 4);
+            // 4. Past Employees / Alumni
+            populateDynamicFilters('past-emp-tbody', 'pastEmpDept', null, 'pastEmpRole', 1, 2, 3);
         });
 
         // Chart.js Setup for Donut Chart
@@ -1604,6 +1661,11 @@
                 const trs = tbody.getElementsByTagName("tr");
                 
                 function filterTable() {
+                    // Unhide page-hidden rows before filtering
+                    document.querySelectorAll('#offboarding-tbody tr[data-page-hidden]').forEach(function(r) {
+                        r.style.display = '';
+                        r.removeAttribute('data-page-hidden');
+                    });
                     const searchVal = (searchInput.value || "").toLowerCase().trim();
                     const deptVal = (deptSelect.value || "").toLowerCase().trim();
                     const statusVal = (statusSelect.value || "").toLowerCase().trim();
@@ -1631,6 +1693,7 @@
                             tr.style.display = "none";
                         }
                     }
+                    if (window.resetPagination) resetPagination('offboarding-tbody');
                 }
 
                 searchInput.addEventListener("keyup", filterTable);
@@ -1787,6 +1850,11 @@
                 }
 
                 function filterAllEmpTable() {
+                    // Unhide page-hidden rows before filtering
+                    document.querySelectorAll('#all-emp-tbody tr[data-page-hidden]').forEach(function(r) {
+                        r.style.display = '';
+                        r.removeAttribute('data-page-hidden');
+                    });
                     const searchVal = (allEmpSearch.value || "").toLowerCase().trim();
                     const deptVal = (allEmpDept.value || "").toLowerCase().trim();
                     const locVal = (allEmpLoc.value || "").toLowerCase().trim();
@@ -1819,6 +1887,7 @@
                         }
                     }
                     updateChartAndHeadcount();
+                    if (window.resetPagination) resetPagination('all-emp-tbody');
                 }
 
                 allEmpSearch.addEventListener("keyup", filterAllEmpTable);
@@ -1842,6 +1911,11 @@
                 const pastEmpTrs = pastEmpTbody.getElementsByTagName("tr");
                 
                 function filterPastEmpTable() {
+                    // Unhide page-hidden rows before filtering
+                    document.querySelectorAll('#past-emp-tbody tr[data-page-hidden]').forEach(function(r) {
+                        r.style.display = '';
+                        r.removeAttribute('data-page-hidden');
+                    });
                     const searchVal = (pastEmpSearch.value || "").toLowerCase().trim();
                     const deptVal = pastEmpDept ? (pastEmpDept.value || "").toLowerCase().trim() : "";
                     const roleVal = pastEmpRole ? (pastEmpRole.value || "").toLowerCase().trim() : "";
@@ -1865,6 +1939,7 @@
                             tr.style.display = "none";
                         }
                     }
+                    if (window.resetPagination) resetPagination('past-emp-tbody');
                 }
 
                 pastEmpSearch.addEventListener("keyup", filterPastEmpTable);
@@ -1897,6 +1972,18 @@
             if (!selected) {
                 alert("Please select a candidate from the table first.");
                 return;
+            }
+            
+            const form = document.getElementById("exitEmployeeForm");
+            if (form) {
+                form.reset();
+                const noticeInput = document.getElementById("exitNoticePeriod");
+                if (noticeInput) noticeInput.value = "30";
+                
+                const inputs = form.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    input.style.border = '';
+                });
             }
             
             const userId = selected.value;
@@ -2064,7 +2151,77 @@
 </div>
 </div>
 </div>
+
+<!-- ALUMNI DETAILS MODAL -->
+<div class="modal fade" id="alumniDetailsModal" tabindex="-1" aria-labelledby="alumniDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+            <div class="modal-header border-0 bg-light py-3 px-4">
+                <h5 class="modal-title fw-bold text-dark m-0" id="alumniDetailsModalLabel">Alumni Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                    <img id="alumniAvatar" src="/images/user.png" class="rounded-circle border me-3" style="width: 55px; height: 55px; object-fit: cover;" onerror="this.src='/images/user.png';"/>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1" id="alumniName">Alumni Name</h5>
+                        <p class="text-muted mb-0" id="alumniEmail" style="font-size: 0.85rem;">Email</p>
+                    </div>
+                </div>
+                <div class="row g-4">
+                    <div class="col-6">
+                        <label class="text-muted small fw-bold uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Employee ID</label>
+                        <p class="fw-semibold text-dark mb-0" id="alumniEmpId">-</p>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small fw-bold uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Department</label>
+                        <p class="fw-semibold text-dark mb-0" id="alumniDept">-</p>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small fw-bold uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Designation</label>
+                        <p class="fw-semibold text-dark mb-0" id="alumniDesignation">-</p>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small fw-bold uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Location</label>
+                        <p class="fw-semibold text-dark mb-0" id="alumniLocation">-</p>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small fw-bold uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Exit Date</label>
+                        <p class="fw-semibold text-dark mb-0" id="alumniExitDate">-</p>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small fw-bold uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Status</label>
+                        <p class="mb-0"><span class="badge bg-danger px-3 py-2" style="font-size: 0.75rem; border-radius: 6px;">EXITED</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    function viewAlumniDetails(id) {
+        fetch(`/senior_hr/api/employee/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                if(!data.id) {
+                    alert("Failed to load alumni details.");
+                    return;
+                }
+                document.getElementById('alumniName').innerText = data.fullName || 'N/A';
+                document.getElementById('alumniEmail').innerText = data.email || 'N/A';
+                document.getElementById('alumniEmpId').innerText = data.employeeCode || 'N/A';
+                document.getElementById('alumniDept').innerText = data.department || 'N/A';
+                document.getElementById('alumniDesignation').innerText = data.designation || 'N/A';
+                document.getElementById('alumniLocation').innerText = data.city || 'N/A';
+                document.getElementById('alumniExitDate').innerText = data.joiningDate || 'N/A';
+                
+                const modal = new bootstrap.Modal(document.getElementById('alumniDetailsModal'));
+                modal.show();
+            })
+            .catch(err => console.error("Error fetching alumni details:", err));
+    }
+
     function editCandidate(id) {
         fetch(`/senior_hr/api/employee/${id}`)
             .then(res => res.json())
@@ -2255,6 +2412,146 @@
         }
     });
 
+</script>
+<script>
+// ========== REUSABLE PAGINATION ENGINE (BUG-019, BUG-026) ==========
+(function() {
+    const PAGE_SIZE = 10;
+    const paginators = {};
+
+    function setupPagination(tbodyId, paginationUlId, infoId) {
+        const state = { currentPage: 1 };
+        paginators[tbodyId] = state;
+
+        function getVisibleRows() {
+            const tbody = document.getElementById(tbodyId);
+            if (!tbody) return [];
+            return Array.from(tbody.querySelectorAll('tr')).filter(function(r) {
+                return r.style.display !== 'none' && !r.classList.contains('filtered-out');
+            });
+        }
+
+        function render() {
+            const rows = getVisibleRows();
+            const totalRows = rows.length;
+            const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
+            if (state.currentPage > totalPages) state.currentPage = totalPages;
+            const start = (state.currentPage - 1) * PAGE_SIZE;
+            const end = start + PAGE_SIZE;
+
+            // Hide ALL rows in tbody first, then show only current page rows
+            const tbody = document.getElementById(tbodyId);
+            if (!tbody) return;
+            const allRows = Array.from(tbody.querySelectorAll('tr'));
+            allRows.forEach(function(r) {
+                if (r.style.display === 'none' || r.classList.contains('filtered-out')) return; // skip already filtered
+                r.setAttribute('data-paginated', 'true');
+            });
+            // First mark all visible rows as hidden via pagination
+            rows.forEach(function(r, i) {
+                if (i >= start && i < end) {
+                    r.style.display = '';
+                    r.removeAttribute('data-page-hidden');
+                } else {
+                    r.style.display = 'none';
+                    r.setAttribute('data-page-hidden', 'true');
+                }
+            });
+
+            // Update info text
+            var info = document.getElementById(infoId);
+            if (info) {
+                if (totalRows === 0) {
+                    info.textContent = 'No entries found';
+                } else {
+                    info.textContent = 'Showing ' + (start + 1) + ' to ' + Math.min(end, totalRows) + ' of ' + totalRows + ' entries';
+                }
+            }
+
+            // Build pagination buttons
+            var ul = document.getElementById(paginationUlId);
+            if (!ul) return;
+            ul.innerHTML = '';
+
+            // Previous button
+            var prevLi = document.createElement('li');
+            prevLi.className = 'page-item' + (state.currentPage <= 1 ? ' disabled' : '');
+            var prevA = document.createElement('a');
+            prevA.className = 'page-link';
+            prevA.href = '#';
+            prevA.innerHTML = '&lt;';
+            prevA.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (state.currentPage > 1) { state.currentPage--; render(); }
+            });
+            prevLi.appendChild(prevA);
+            ul.appendChild(prevLi);
+
+            // Page numbers (show max 5 around current)
+            var startPage = Math.max(1, state.currentPage - 2);
+            var endPage = Math.min(totalPages, startPage + 4);
+            if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+            for (var p = startPage; p <= endPage; p++) {
+                (function(pageNum) {
+                    var li = document.createElement('li');
+                    li.className = 'page-item' + (pageNum === state.currentPage ? ' active' : '');
+                    var a = document.createElement('a');
+                    a.className = 'page-link';
+                    a.href = '#';
+                    a.textContent = pageNum;
+                    a.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        state.currentPage = pageNum;
+                        render();
+                    });
+                    li.appendChild(a);
+                    ul.appendChild(li);
+                })(p);
+            }
+
+            // Next button
+            var nextLi = document.createElement('li');
+            nextLi.className = 'page-item' + (state.currentPage >= totalPages ? ' disabled' : '');
+            var nextA = document.createElement('a');
+            nextA.className = 'page-link';
+            nextA.href = '#';
+            nextA.innerHTML = '&gt;';
+            nextA.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (state.currentPage < totalPages) { state.currentPage++; render(); }
+            });
+            nextLi.appendChild(nextA);
+            ul.appendChild(nextLi);
+        }
+
+        // Expose render for external calls (e.g., after filtering)
+        state.render = render;
+        return state;
+    }
+
+    // Reset pagination after any filter runs
+    window.resetPagination = function(tbodyId) {
+        // First, unhide any page-hidden rows so filters see all rows
+        var tbody = document.getElementById(tbodyId);
+        if (tbody) {
+            tbody.querySelectorAll('tr[data-page-hidden]').forEach(function(r) {
+                r.style.display = '';
+                r.removeAttribute('data-page-hidden');
+            });
+        }
+        if (paginators[tbodyId]) {
+            paginators[tbodyId].currentPage = 1;
+            paginators[tbodyId].render();
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        setupPagination('all-emp-tbody', 'allEmpPagination', 'allEmpPagInfo');
+        setupPagination('offboarding-tbody', 'offboardPagination', 'offboardPagInfo');
+        setupPagination('past-emp-tbody', 'alumniPagination', 'alumniPagInfo');
+    });
+})();
 </script>
 </body>
 </html>
