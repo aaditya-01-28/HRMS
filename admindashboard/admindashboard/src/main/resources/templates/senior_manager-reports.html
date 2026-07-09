@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>WhiteCircle | Reports Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #002D72;
+            --sidebar-width: 205px;
+            --header-height: 70px;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            background: #f8fafc;
+            margin: 0;
+            font-family: Inter, Arial, sans-serif;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .myspace-sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: #f8fafc;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 1051;
+            transition: transform .3s ease;
+        }
+
+        body.sidebar-toggled .myspace-sidebar { transform: translateX(-100%); }
+
+        .brand-area {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: var(--header-height);
+        }
+
+        .brand-area img {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .brand-title { font-size: .92rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+        .brand-sub { font-size: .78rem; color: var(--muted); }
+
+        .nav-links { padding: 10px 0; flex: 1; }
+
+        .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 12px;
+            color: #475569;
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 600;
+            border-left: 3px solid transparent;
+            transition: all .2s;
+        }
+
+        .nav-link-item:hover { background: #eef2ff; color: var(--primary); }
+        .nav-link-item.active { background: #e2e8f0; color: var(--primary); border-left-color: var(--primary-light); }
+
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--header-height);
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1050;
+            transition: left .3s ease;
+        }
+
+        body.sidebar-toggled .top-navbar { left: 0; }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+        }
+
+        .myspace-main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 14px 18px;
+            min-height: calc(100vh - var(--header-height));
+            transition: margin-left .3s ease;
+        }
+
+        body.sidebar-toggled .myspace-main { margin-left: 0; }
+
+        .tabs-strip {
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: flex-start;
+            gap: 40px;
+        }
+
+        .tab-link {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 3px solid transparent;
+            font-size: 1.1rem;
+        }
+
+        .tab-link.active { color: #002D72; border-color: #002D72; }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-height: 90px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .stat-card .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .stat-card .label { font-size: .84rem; color: #64748b; font-weight: 600; }
+        .stat-card .value { font-size: 1.45rem; line-height: 1.2; font-weight: 700; margin-top: 4px; white-space: nowrap; }
+        .stat-card .subtext { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
+
+        .panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .filters-row {
+            display: grid;
+            grid-template-columns: 2.2fr 1fr 1.5fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: end;
+        }
+
+        .filters-row input, .filters-row select {
+            height: 40px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 0 14px;
+            font-size: .92rem;
+            background: #fff;
+            width: 100%;
+        }
+
+        .banner-info {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #1e3a8a;
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            font-size: 0.78rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-excellent { background-color: #dcfce7; color: #15803d; }
+        .status-good { background-color: #e0f2fe; color: #0369a1; }
+        .status-average { background-color: #fef3c7; color: #b45309; }
+
+        .table th {
+            padding: 14px 16px !important;
+            vertical-align: middle;
+            font-weight: 700;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+        }
+
+        .table td {
+            padding: 16px 16px !important;
+            vertical-align: middle;
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+
+        .layout-grid-3 {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .layout-grid-2 {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-custom {
+            height: 6px;
+            border-radius: 3px;
+            background: #e2e8f0;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .progress-blue { background-color: #3b82f6; }
+        .progress-green { background-color: #10b981; }
+        .progress-orange { background-color: #f59e0b; }
+        .progress-red { background-color: #ef4444; }
+
+        @media (max-width: 1200px) {
+            .layout-grid-3, .layout-grid-2 { grid-template-columns: 1fr; }
+            .filters-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .myspace-sidebar { transform: translateX(-100%); }
+            body.sidebar-toggled .myspace-sidebar { transform: translateX(0); }
+            .top-navbar { left: 0; padding: 0 10px; }
+            .myspace-main { margin-left: 0; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="myspace-sidebar shadow-sm">
+    <div class="brand-area">
+        <img src="/images/wcg-logo.jpg" alt="Logo"/>
+        <div>
+            <div class="brand-title">WhiteCircle</div>
+            <div class="brand-sub">Manager Admin</div>
+        </div>
+    </div>
+    <div class="nav-links">
+        <a href="/senior_manager/myspace?tab=directory" class="nav-link-item"><i class="fa-solid fa-users"></i> Team & Employee</a>
+        <a href="/senior_manager/leave_attendance" class="nav-link-item"><i class="fa-solid fa-calendar-days"></i> Leave & Attendance</a>
+        <a href="/senior_manager/project_work" class="nav-link-item"><i class="fa-solid fa-briefcase"></i> Project & Work</a>
+        <a href="/senior_manager/performance" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Performance</a>
+        <a href="/senior_manager/recruitment" class="nav-link-item"><i class="fa-solid fa-user-plus"></i> Recruitment</a>
+        <a href="/senior_manager/expenses" class="nav-link-item"><i class="fa-solid fa-wallet"></i> Financial & Expense</a>
+        <a href="/senior_manager/reports" class="nav-link-item active"><i class="fa-solid fa-file-lines"></i> Reports</a>
+        <a href="/senior_manager/communication" class="nav-link-item"><i class="fa-solid fa-comments"></i> Communication</a>
+        <a href="/senior_manager/hierarchy" class="nav-link-item"><i class="fa-solid fa-sitemap"></i> Org. Hierarchy</a>
+    </div>
+</div>
+
+<nav class="top-navbar">
+    <div class="nav-brand">
+        <button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
+        <div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
+            <span style="color:#002D72; font-weight:700; font-size:2.1rem;">WhiteCircle Group - Shahdol</span>
+            <span style="font-size:.85rem; font-weight:500; color:#333; margin-top:2px;">Reports Management</span>
+        </div>
+    </div>
+    <div>
+        <a class="btn btn-light text-dark fw-bold" href="/senior_manager/dashboard" style="border-radius:6px; padding:8px 14px; text-decoration:none;">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</nav>
+
+<div class="myspace-main">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.8rem;">Reports</h2>
+        </div>
+    </div>
+
+    <div class="tabs-strip">
+        <a th:classappend="${activeTab == 'performance'} ? ' active' : ''" class="tab-link" href="/senior_manager/reports?tab=performance">Team Performance</a>
+        <a th:classappend="${activeTab == 'attendance'} ? ' active' : ''" class="tab-link" href="/senior_manager/reports?tab=attendance">Attendance</a>
+        <a th:classappend="${activeTab == 'leaves'} ? ' active' : ''" class="tab-link" href="/senior_manager/reports?tab=leaves">Leave Trends</a>
+        <a th:classappend="${activeTab == 'projects'} ? ' active' : ''" class="tab-link" href="/senior_manager/reports?tab=projects">Project Metrics</a>
+    </div>
+
+    <!-- ==================== VIEW 1: TEAM PERFORMANCE ==================== -->
+    <div th:if="${activeTab == 'performance'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-users"></i></div>
+                <div><div class="label">TOTAL TEAM MEMBERS</div><div class="value">24</div><div class="subtext">This Year</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-award"></i></div>
+                <div><div class="label">HIGH PERFORMERS</div><div class="value">06</div><div class="subtext">This Year</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-star-half-stroke"></i></div>
+                <div><div class="label">AVERAGE PERFORMANCE</div><div class="value">3.8 / 5</div><div class="subtext">This Year</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-bullseye"></i></div>
+                <div><div class="label">GOALS ACHIEVED</div><div class="value">78%</div><div class="subtext">This Year</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-secondary-subtle text-secondary"><i class="fa-solid fa-file-arrow-down"></i></div>
+                <div><div class="label">REPORTS EXPORTED</div><div class="value">12</div><div class="subtext">This Year</div></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="filters-row mb-4">
+                <div>
+                    <label class="text-muted fw-bold mb-1" style="font-size:0.75rem;">Search by Employee Name</label>
+                    <input type="text" placeholder="Search by Employee Name" id="perfSearchInput"/>
+                </div>
+                <div>
+                    <label class="text-muted fw-bold mb-1" style="font-size:0.75rem;">Team Lead</label>
+                    <select id="perfLeadSelect">
+                        <option value="">All Team Leads</option>
+                        <option value="Pawan Singh">Pawan Singh</option>
+                        <option value="Ankit Verma">Ankit Verma</option>
+                        <option value="Neeraj Tiwari">Neeraj Tiwari</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-muted fw-bold mb-1" style="font-size:0.75rem;">Date Range</label>
+                    <input type="text" placeholder="DD-MM-YYYY - DD-MM-YYYY"/>
+                </div>
+                <div>
+                    <label class="text-muted fw-bold mb-1" style="font-size:0.75rem;">Performance Rating</label>
+                    <select id="perfRatingSelect">
+                        <option value="">All Ratings</option>
+                        <option value="4">4+ Stars</option>
+                        <option value="3">3+ Stars</option>
+                        <option value="2">Under 3 Stars</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="banner-info">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>These reports are based on data you have access to. Company-wide confidential reports are not available.</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover" id="performanceTable">
+                    <thead>
+                        <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                            <th>Employee Name</th>
+                            <th>Team Lead</th>
+                            <th>Role</th>
+                            <th class="text-center">Goals Assigned</th>
+                            <th class="text-center">Goals Achieved</th>
+                            <th>Performance Rating</th>
+                            <th>Last Review Date</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${performanceList}"
+                            th:attr="data-name=${row['name']}, data-lead=${row['lead']}, data-rating=${row['rating']}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(row['name'], 0, 1)}">A</div>
+                                    <div class="fw-bold text-dark text-nowrap" th:text="${row['name']}">Aman Singh</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:24px; height:24px; font-size:0.7rem;" th:text="${#strings.substring(row['lead'], 0, 1)}">P</div>
+                                    <span class="text-nowrap" th:text="${row['lead']}">Pawan Singh</span>
+                                </div>
+                            </td>
+                            <td class="text-nowrap" th:text="${row['role']}">Frontend Developer</td>
+                            <td class="text-center fw-bold text-dark" th:text="${row['goalsAssigned']}">6</td>
+                            <td class="text-center fw-bold text-muted" th:text="${row['goalsAchieved']}">5 (83%)</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-1">
+                                    <i class="fa-solid fa-star text-warning" style="font-size:0.85rem;" th:each="star : ${#numbers.sequence(1, row['ratingInt'])}"></i>
+                                    <span class="fw-bold text-dark ms-1" th:text="${row['rating']}">4.2</span>
+                                </div>
+                            </td>
+                            <td class="text-nowrap" th:text="${row['reviewDate']}">20 May 2026</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-link text-muted me-1" onclick="alert('Viewing report details...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
+                                <button class="btn btn-sm btn-link text-muted" onclick="alert('Downloading team performance report PDF...')"><i class="fa-solid fa-download" style="font-size:1.1rem;"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 2: ATTENDANCE ==================== -->
+    <div th:if="${activeTab == 'attendance'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-calendar-check"></i></div>
+                <div><div class="label">AVERAGE ATTENDANCE</div><div class="value">92.6%</div><div class="subtext">This Month</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-user-check"></i></div>
+                <div><div class="label">PRESENT DAYS</div><div class="value">2,138</div><div class="subtext">This Month</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-user-xmark"></i></div>
+                <div><div class="label">ABSENT DAYS</div><div class="value">168</div><div class="subtext">This Month</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-clock"></i></div>
+                <div><div class="label">LATE DAYS</div><div class="value">142</div><div class="subtext">This Month</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-secondary-subtle text-secondary"><i class="fa-solid fa-file-arrow-down"></i></div>
+                <div><div class="label">REPORTS EXPORTED</div><div class="value">08</div><div class="subtext">This Year</div></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="filters-row mb-4">
+                <div>
+                    <label class="text-muted fw-bold mb-1" style="font-size:0.75rem;">Search by Employee Name</label>
+                    <input type="text" placeholder="Search by Employee Name" id="attSearchInput"/>
+                </div>
+                <div>
+                    <label class="text-muted fw-bold mb-1" style="font-size:0.75rem;">Department</label>
+                    <select id="attDeptSelect">
+                        <option value="">All Departments</option>
+                        <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-muted fw-bold mb-1" style="font-size:0.75rem;">Date Range</label>
+                    <input type="text" placeholder="01-May-2026 - 31-May-2026"/>
+                </div>
+                <div>
+                    <label class="text-muted fw-bold mb-1" style="font-size:0.75rem;">View</label>
+                    <select>
+                        <option>Daily View</option>
+                        <option>Weekly View</option>
+                        <option>Monthly Summary</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="banner-info">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Attendance data is available up to the current date. Company-wide confidential reports are not available.</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover" id="attendanceTable">
+                    <thead>
+                        <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                            <th>Employee Name</th>
+                            <th>Department</th>
+                            <th class="text-center">Total Working Days</th>
+                            <th class="text-center">Present (%)</th>
+                            <th class="text-center">Absent (%)</th>
+                            <th class="text-center">Late (%)</th>
+                            <th class="text-center">Half Days (%)</th>
+                            <th class="text-center">Leaves (%)</th>
+                            <th class="text-center">Attendance (%)</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${attendanceList}"
+                            th:attr="data-name=${row['name']}, data-department=${row['department']}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(row['name'], 0, 1)}">A</div>
+                                    <div>
+                                        <div class="fw-bold text-dark text-nowrap" th:text="${row['name']}">Aman Singh</div>
+                                        <small class="text-muted" th:text="${row['empCode']}">EMP-1001</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-nowrap" th:text="${row['department']}">IT - Development</td>
+                            <td class="text-center fw-bold text-dark" th:text="${row['workingDays']}">24</td>
+                            <td class="text-center fw-bold text-success text-nowrap" th:text="${row['presentPct']}">22 (91.7%)</td>
+                            <td class="text-center fw-bold text-danger text-nowrap" th:text="${row['absentPct']}">1 (4.2%)</td>
+                            <td class="text-center fw-bold text-warning text-nowrap" th:text="${row['latePct']}">1 (4.2%)</td>
+                            <td class="text-center text-muted" th:text="${row['halfPct']}">0 (0%)</td>
+                            <td class="text-center text-muted" th:text="${row['leavePct']}">0 (0%)</td>
+                            <td class="text-center fw-bold text-success" th:text="${row['totalPct']}">91.7%</td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${row['status'] == 'EXCELLENT' ? ' status-excellent' : (row['status'] == 'GOOD' ? ' status-good' : ' status-average')}"
+                                      th:text="${row['status']}">EXCELLENT</span>
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-link text-muted me-1" onclick="alert('Viewing attendance logs...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
+                                <button class="btn btn-sm btn-link text-muted"><i class="fa-solid fa-ellipsis-vertical" style="font-size:1.1rem;"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 3: LEAVE TRENDS ==================== -->
+    <div th:if="${activeTab == 'leaves'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-plane-departure"></i></div>
+                <div><div class="label">TOTAL LEAVES TAKEN</div><div class="value">186</div><div class="subtext">This Month</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
+                <div><div class="label">APPROVED LEAVES</div><div class="value">162</div><div class="subtext">This Month (87.1%)</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
+                <div><div class="label">REJECTED LEAVES</div><div class="value">12</div><div class="subtext">This Month (6.5%)</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-circle-pause"></i></div>
+                <div><div class="label">PENDING LEAVES</div><div class="value">12</div><div class="subtext">This Month (6.5%)</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-secondary-subtle text-secondary"><i class="fa-solid fa-file-arrow-down"></i></div>
+                <div><div class="label">REPORTS EXPORTED</div><div class="value">07</div><div class="subtext">This Month</div></div>
+            </div>
+        </div>
+
+        <div class="layout-grid-2">
+            <div class="panel d-flex flex-column align-items-center justify-content-center text-center">
+                <h6 class="fw-bold mb-4 w-100 text-start">Leave by Type</h6>
+                <div style="height: 180px; position: relative; width: 100%; max-width: 200px;" class="mb-4">
+                    <canvas id="leaveTypeChart"></canvas>
+                    <div style="position: absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align: center;">
+                        <h4 class="fw-bold text-dark mb-0">186</h4>
+                        <small class="text-muted">Total Leaves</small>
+                    </div>
+                </div>
+                <div class="row w-100 text-start" style="font-size:0.84rem; line-height: 2;">
+                    <div class="col-6">
+                        <div><i class="fa-solid fa-circle text-primary me-1" style="font-size:0.5rem;"></i> Casual Leave: 78 (41.9%)</div>
+                        <div><i class="fa-solid fa-circle text-warning me-1" style="font-size:0.5rem;"></i> Privilege Leave: 32 (17.2%)</div>
+                        <div><i class="fa-solid fa-circle text-info me-1" style="font-size:0.5rem;"></i> Other Leave: 12 (6.5%)</div>
+                    </div>
+                    <div class="col-6">
+                        <div><i class="fa-solid fa-circle text-success me-1" style="font-size:0.5rem;"></i> Sick Leave: 45 (24.2%)</div>
+                        <div><i class="fa-solid fa-circle text-purple me-1" style="font-size:0.5rem; color:#8b5cf6;"></i> Work From Home: 19 (10.2%)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="d-flex align-items-end justify-content-between mb-4">
+                    <div class="d-flex gap-3 flex-grow-1 me-3">
+                        <div class="flex-fill">
+                            <label class="text-muted fw-bold mb-1" style="font-size:0.75rem;">Search by Employee Name</label>
+                            <input type="text" placeholder="Search by Employee Name" id="leaveSearchInput" style="height:40px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 14px; width:100%;"/>
+                        </div>
+                        <div class="flex-fill">
+                            <label class="text-muted fw-bold mb-1" style="font-size:0.75rem;">Department</label>
+                            <select id="leaveDeptSelect" style="height:40px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 14px; width:100%;">
+                                <option value="">All Departments</option>
+                                <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-primary fw-bold d-flex align-items-center gap-2" style="height:40px; border-color:#002D72; color:#002D72;" onclick="alert('Leave Trend report exported successfully!')">
+                        <i class="fa-solid fa-download"></i> Export Report
+                    </button>
+                </div>
+
+                <div class="banner-info">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Leave trend data is available up to the current date. Company-wide confidential reports are not available.</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover" id="leavesTable">
+                        <thead>
+                            <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                                <th>Employee Name</th>
+                                <th>Department</th>
+                                <th>Leave Type</th>
+                                <th class="text-center">Leaves Taken</th>
+                                <th class="text-center">Approved</th>
+                                <th class="text-center">Pending</th>
+                                <th class="text-center">Rejected</th>
+                                <th>Approval Rate</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="row : ${leaveTrendsList}"
+                                th:attr="data-name=${row['name']}, data-department=${row['department']}">
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(row['name'], 0, 1)}">A</div>
+                                        <div>
+                                            <div class="fw-bold text-dark text-nowrap" th:text="${row['name']}">Aman Singh</div>
+                                            <small class="text-muted" th:text="${row['empCode']}">EMP-1001</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-nowrap" th:text="${row['department']}">IT - Development</td>
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1" th:text="${row['type']}">Casual Leave</span>
+                                </td>
+                                <td class="text-center fw-bold text-dark" th:text="${row['leavesTaken']}">12</td>
+                                <td class="text-center fw-bold text-success" th:text="${row['approved']}">11</td>
+                                <td class="text-center fw-bold text-warning" th:text="${row['pending']}">1</td>
+                                <td class="text-center fw-bold text-danger" th:text="${row['rejected']}">0</td>
+                                <td class="fw-bold text-success" th:text="${row['rate']}">91.7%</td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-link text-muted" onclick="alert('Viewing employee leave ledger...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW 4: PROJECT METRICS ==================== -->
+    <div th:if="${activeTab == 'projects'}">
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-briefcase"></i></div>
+                <div><div class="label">TOTAL PROJECTS</div><div class="value">12</div><div class="subtext">This Month</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
+                <div><div class="label">ON TRACK</div><div class="value">7</div><div class="subtext">58.3%</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div><div class="label">AT RISK</div><div class="value">3</div><div class="subtext">25.0%</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-circle-exmark"></i></div>
+                <div><div class="label">DELAYED</div><div class="value">2</div><div class="subtext">16.7%</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-circle-check"></i></div>
+                <div><div class="label">COMPLETED</div><div class="value">5</div><div class="subtext">This Month</div></div>
+            </div>
+        </div>
+
+        <div class="panel mb-4">
+            <div class="d-flex align-items-end justify-content-between">
+                <div class="d-flex gap-3 flex-grow-1 me-3">
+                    <div class="flex-fill">
+                        <label class="text-muted fw-bold mb-1" style="font-size:0.75rem;">Search</label>
+                        <input type="text" placeholder="Search Projects..." id="projSearchInput" style="height:40px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 14px; width:100%;"/>
+                    </div>
+                    <div class="flex-fill">
+                        <label class="text-muted fw-bold mb-1" style="font-size:0.75rem;">Department</label>
+                        <select id="projDeptSelect" style="height:40px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 14px; width:100%;">
+                            <option value="">All Departments</option>
+                            <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+                        </select>
+                    </div>
+                    <div class="flex-fill">
+                        <label class="text-muted fw-bold mb-1" style="font-size:0.75rem;">Project Status</label>
+                        <select id="projStatusSelect" style="height:40px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 14px; width:100%;">
+                            <option value="">All Status</option>
+                            <option value="On Track">On Track</option>
+                            <option value="At Risk">At Risk</option>
+                            <option value="Delayed">Delayed</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-outline-primary fw-bold d-flex align-items-center gap-2" style="height:40px; border-color:#002D72; color:#002D72;" onclick="alert('Project metrics report exported successfully!')">
+                    <i class="fa-solid fa-download"></i> Export Report
+                </button>
+            </div>
+        </div>
+
+        <div class="layout-grid-3">
+            <div class="panel d-flex flex-column align-items-center text-center justify-content-center">
+                <h6 class="fw-bold mb-3 w-100 text-start">Projects by Status</h6>
+                <div style="height: 140px; position: relative; width: 100%; max-width: 140px;" class="mb-3">
+                    <canvas id="projStatusChart"></canvas>
+                    <div style="position: absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align: center;">
+                        <h4 class="fw-bold text-dark mb-0">12</h4>
+                        <small class="text-muted" style="font-size:0.68rem;">Total Projects</small>
+                    </div>
+                </div>
+                <div style="font-size:0.8rem; line-height: 1.8;" class="w-100 text-start">
+                    <div class="d-flex justify-content-between"><span>On Track:</span><span class="fw-bold text-success">7 (58.3%)</span></div>
+                    <div class="d-flex justify-content-between"><span>At Risk:</span><span class="fw-bold text-warning">3 (25.0%)</span></div>
+                    <div class="d-flex justify-content-between"><span>Delayed:</span><span class="fw-bold text-danger">2 (16.7%)</span></div>
+                    <div class="d-flex justify-content-between"><span>Completed:</span><span class="fw-bold text-primary">5 (41.7%)</span></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h6 class="fw-bold mb-3">Projects by Progress</h6>
+                <div style="height: 220px; width: 100%;">
+                    <canvas id="projProgressChart"></canvas>
+                </div>
+            </div>
+
+            <div class="panel d-flex flex-column align-items-center justify-content-center text-center">
+                <h6 class="fw-bold mb-4 w-100 text-start">Average Progress</h6>
+                <div style="height: 140px; position: relative; width: 100%; max-width: 140px;" class="mb-4">
+                    <canvas id="avgProgressChart"></canvas>
+                    <div style="position: absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align: center;">
+                        <h3 class="fw-bold text-success mb-0">64%</h3>
+                        <small class="text-muted" style="font-size:0.68rem;">Overall Average</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="table-responsive">
+                <table class="table align-middle table-hover" id="projectsTable">
+                    <thead>
+                        <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                            <th>Project Name</th>
+                            <th>Department</th>
+                            <th>Project Manager</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Progress</th>
+                            <th>Status</th>
+                            <th class="text-center">Team Members</th>
+                            <th class="text-center">Tasks Completed</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${projectMetricsList}"
+                            th:attr="data-name=${row['name']}, data-department=${row['department']}, data-status=${row['status']}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${row['code']}">WD</div>
+                                    <div class="fw-bold text-dark text-nowrap" th:text="${row['name']}">Website Redesign</div>
+                                </div>
+                            </td>
+                            <td class="text-nowrap" th:text="${row['department']}">IT - Development</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:24px; height:24px; font-size:0.7rem;" th:text="${#strings.substring(row['manager'], 0, 1)}">A</div>
+                                    <span class="text-nowrap" th:text="${row['manager']}">Aman Singh</span>
+                                </div>
+                            </td>
+                            <td class="text-nowrap" th:text="${row['start']}">01 May 2026</td>
+                            <td class="text-nowrap" th:text="${row['end']}">30 Jun 2026</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2" style="min-width: 120px;">
+                                    <div class="progress-bar-custom flex-grow-1">
+                                        <div class="progress-bar-fill progress-blue" th:style="${'width: ' + row['progress'] + '%'}"></div>
+                                    </div>
+                                    <span class="fw-bold text-dark" th:text="${row['progress'] + '%'}">80%</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${row['status'] == 'On Track' ? ' status-excellent' : (row['status'] == 'At Risk' ? ' status-average' : ' status-rejected')}"
+                                      th:text="${row['status']}">On Track</span>
+                            </td>
+                            <td class="text-center fw-bold text-dark" th:text="${row['teamCount']}">6</td>
+                            <td class="text-center fw-bold text-muted text-nowrap" th:text="${row['tasks']}">24 / 30</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-link text-muted me-1" onclick="alert('Viewing project timeline metrics...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
+                                <button class="btn btn-sm btn-link text-muted"><i class="fa-solid fa-ellipsis-vertical" style="font-size:1.1rem;"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener("DOMContentLoaded", function() {
+        const activeTab = /*[[${activeTab}]]*/ 'performance';
+
+        // --- 1. LEAVE TRENDS DONUT CHART ---
+        if (activeTab === 'leaves') {
+            const leaveCtx = document.getElementById('leaveTypeChart').getContext('2d');
+            new Chart(leaveCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Casual Leave', 'Privilege Leave', 'Other Leave', 'Sick Leave', 'Work From Home'],
+                    datasets: [{
+                        data: [41.9, 17.2, 6.5, 24.2, 10.2],
+                        backgroundColor: ['#3b82f6', '#f59e0b', '#06b6d4', '#10b981', '#8b5cf6'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '72%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // --- 2. PROJECT STATUS CHART ---
+        if (activeTab === 'projects') {
+            const statusCtx = document.getElementById('projStatusChart').getContext('2d');
+            new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['On Track', 'At Risk', 'Delayed'],
+                    datasets: [{
+                        data: [7, 3, 2],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '72%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Projects by Progress Bar Chart
+            const progressCtx = document.getElementById('projProgressChart').getContext('2d');
+            new Chart(progressCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['0-25%', '26-50%', '51-75%', '76-100%'],
+                    datasets: [{
+                        label: 'No. of Projects',
+                        data: [1, 2, 5, 4],
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Average Progress Radial Chart
+            const avgCtx = document.getElementById('avgProgressChart').getContext('2d');
+            new Chart(avgCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Progress', 'Remaining'],
+                    datasets: [{
+                        data: [64, 36],
+                        backgroundColor: ['#10b981', '#e2e8f0'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '76%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // --- 3. FILTER LOGIC ---
+        const perfSearch = document.getElementById('perfSearchInput');
+        const perfLead = document.getElementById('perfLeadSelect');
+        const perfRating = document.getElementById('perfRatingSelect');
+
+        function filterPerformance() {
+            const query = (perfSearch?.value || '').toLowerCase();
+            const lead = perfLead?.value || '';
+            const rating = perfRating?.value || '';
+
+            document.querySelectorAll('#performanceTable tbody tr').forEach(row => {
+                const name = (row.dataset.name || '').toLowerCase();
+                const rlead = row.dataset.lead || '';
+                const rrating = parseFloat(row.dataset.rating || '0');
+
+                const searchMatch = !query || name.includes(query);
+                const leadMatch = !lead || rlead === lead;
+                let ratingMatch = true;
+                if (rating === '4') ratingMatch = rrating >= 4.0;
+                else if (rating === '3') ratingMatch = rrating >= 3.0;
+                else if (rating === '2') ratingMatch = rrating < 3.0;
+
+                row.style.display = (searchMatch && leadMatch && ratingMatch) ? '' : 'none';
+            });
+        }
+
+        if (perfSearch) perfSearch.addEventListener('input', filterPerformance);
+        if (perfLead) perfLead.addEventListener('change', filterPerformance);
+        if (perfRating) perfRating.addEventListener('change', filterPerformance);
+
+
+        const attSearch = document.getElementById('attSearchInput');
+        const attDept = document.getElementById('attDeptSelect');
+
+        function filterAttendance() {
+            const query = (attSearch?.value || '').toLowerCase();
+            const dept = attDept?.value || '';
+
+            document.querySelectorAll('#attendanceTable tbody tr').forEach(row => {
+                const name = (row.dataset.name || '').toLowerCase();
+                const rdept = row.dataset.department || '';
+
+                const searchMatch = !query || name.includes(query);
+                const deptMatch = !dept || rdept === dept;
+
+                row.style.display = (searchMatch && deptMatch) ? '' : 'none';
+            });
+        }
+
+        if (attSearch) attSearch.addEventListener('input', filterAttendance);
+        if (attDept) attDept.addEventListener('change', filterAttendance);
+
+
+        const leaveSearch = document.getElementById('leaveSearchInput');
+        const leaveDept = document.getElementById('leaveDeptSelect');
+
+        function filterLeaves() {
+            const query = (leaveSearch?.value || '').toLowerCase();
+            const dept = leaveDept?.value || '';
+
+            document.querySelectorAll('#leavesTable tbody tr').forEach(row => {
+                const name = (row.dataset.name || '').toLowerCase();
+                const rdept = row.dataset.department || '';
+
+                const searchMatch = !query || name.includes(query);
+                const deptMatch = !dept || rdept === dept;
+
+                row.style.display = (searchMatch && deptMatch) ? '' : 'none';
+            });
+        }
+
+        if (leaveSearch) leaveSearch.addEventListener('input', filterLeaves);
+        if (leaveDept) leaveDept.addEventListener('change', filterLeaves);
+
+
+        const projSearch = document.getElementById('projSearchInput');
+        const projDept = document.getElementById('projDeptSelect');
+        const projStatus = document.getElementById('projStatusSelect');
+
+        function filterProjects() {
+            const query = (projSearch?.value || '').toLowerCase();
+            const dept = projDept?.value || '';
+            const status = projStatus?.value || '';
+
+            document.querySelectorAll('#projectsTable tbody tr').forEach(row => {
+                const name = (row.dataset.name || '').toLowerCase();
+                const rdept = row.dataset.department || '';
+                const rstatus = row.dataset.status || '';
+
+                const searchMatch = !query || name.includes(query);
+                const deptMatch = !dept || rdept === dept;
+                const statusMatch = !status || rstatus === status;
+
+                row.style.display = (searchMatch && deptMatch && statusMatch) ? '' : 'none';
+            });
+        }
+
+        if (projSearch) projSearch.addEventListener('input', filterProjects);
+        if (projDept) projDept.addEventListener('change', filterProjects);
+        if (projStatus) projStatus.addEventListener('change', filterProjects);
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

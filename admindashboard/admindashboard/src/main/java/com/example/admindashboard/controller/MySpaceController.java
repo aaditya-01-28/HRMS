@@ -1278,6 +1278,280 @@ public class MySpaceController {
                 return "senior_manager-expenses";
         }
 
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @GetMapping("/senior_manager/reports")
+        public String showReports(
+                @RequestParam(value = "tab", defaultValue = "performance") String tab,
+                @RequestParam(value = "dept", required = false) String dept,
+                @RequestParam(value = "search", required = false) String search,
+                Model model,
+                Principal principal) {
+
+                User loggedInUser = principal != null
+                        ? userRepository.findByUsername(principal.getName()).orElse(null)
+                        : null;
+
+                if (loggedInUser == null) {
+                    return "redirect:/login";
+                }
+
+                model.addAttribute("loggedInUser", loggedInUser);
+                model.addAttribute("activeTab", tab);
+                model.addAttribute("selectedDept", dept);
+                model.addAttribute("searchQuery", search);
+
+                List<User> allUsers = userRepository.findAll();
+                Set<String> departments = new java.util.TreeSet<>();
+                departments.addAll(List.of("IT - Development", "IT - Design", "IT - Quality", "IT - Operations", "Business"));
+                for (User u : allUsers) {
+                    String d = getDepartment(u);
+                    if (!d.isBlank() && !"Unknown".equalsIgnoreCase(d)) {
+                        departments.add(d);
+                    }
+                }
+                model.addAttribute("departments", departments);
+
+                // --- TAB 1: TEAM PERFORMANCE ---
+                List<Map<String, Object>> performanceList = new ArrayList<>();
+                performanceList.add(Map.of("name", "Aman Singh", "lead", "Pawan Singh", "role", "Frontend Developer", "goalsAssigned", 6, "goalsAchieved", "5 (83%)", "rating", 4.2, "ratingInt", 4, "reviewDate", "20 May 2026"));
+                performanceList.add(Map.of("name", "Priya Rathi", "lead", "Pawan Singh", "role", "Backend Developer", "goalsAssigned", 5, "goalsAchieved", "4 (80%)", "rating", 4.0, "ratingInt", 4, "reviewDate", "18 May 2026"));
+                performanceList.add(Map.of("name", "Rohit Kumar", "lead", "Ankit Verma", "role", "UI/UX Designer", "goalsAssigned", 4, "goalsAchieved", "3 (75%)", "rating", 3.5, "ratingInt", 3, "reviewDate", "17 May 2026"));
+                performanceList.add(Map.of("name", "Sneha Nair", "lead", "Ankit Verma", "role", "QA Engineer", "goalsAssigned", 5, "goalsAchieved", "4 (80%)", "rating", 4.0, "ratingInt", 4, "reviewDate", "15 May 2026"));
+                performanceList.add(Map.of("name", "Vikas Dubey", "lead", "Neeraj Tiwari", "role", "DevOps Engineer", "goalsAssigned", 6, "goalsAchieved", "3 (50%)", "rating", 2.8, "ratingInt", 3, "reviewDate", "14 May 2026"));
+                performanceList.add(Map.of("name", "Neha Mehta", "lead", "Neeraj Tiwari", "role", "Business Analyst", "goalsAssigned", 5, "goalsAchieved", "4 (80%)", "rating", 4.1, "ratingInt", 4, "reviewDate", "12 May 2026"));
+                
+                model.addAttribute("performanceList", performanceList);
+
+                // --- TAB 2: ATTENDANCE ---
+                List<Map<String, Object>> attendanceList = new ArrayList<>();
+                
+                Map<String, Object> a1 = new HashMap<>();
+                a1.put("name", "Aman Singh"); a1.put("empCode", "EMP-1001"); a1.put("department", "IT - Development"); a1.put("workingDays", 24); a1.put("presentPct", "22 (91.7%)"); a1.put("absentPct", "1 (4.2%)"); a1.put("latePct", "1 (4.2%)"); a1.put("halfPct", "0 (0%)"); a1.put("leavePct", "0 (0%)"); a1.put("totalPct", "91.7%"); a1.put("status", "EXCELLENT");
+                attendanceList.add(a1);
+
+                Map<String, Object> a2 = new HashMap<>();
+                a2.put("name", "Priya Rathi"); a2.put("empCode", "EMP-1002"); a2.put("department", "IT - Development"); a2.put("workingDays", 24); a2.put("presentPct", "21 (87.5%)"); a2.put("absentPct", "2 (8.3%)"); a2.put("latePct", "1 (4.2%)"); a2.put("halfPct", "0 (0%)"); a2.put("leavePct", "0 (0%)"); a2.put("totalPct", "87.5%"); a2.put("status", "GOOD");
+                attendanceList.add(a2);
+
+                Map<String, Object> a3 = new HashMap<>();
+                a3.put("name", "Rohit Kumar"); a3.put("empCode", "EMP-1003"); a3.put("department", "IT - Design"); a3.put("workingDays", 24); a3.put("presentPct", "20 (83.3%)"); a3.put("absentPct", "2 (8.3%)"); a3.put("latePct", "2 (8.3%)"); a3.put("halfPct", "0 (0%)"); a3.put("leavePct", "0 (0%)"); a3.put("totalPct", "83.3%"); a3.put("status", "GOOD");
+                attendanceList.add(a3);
+
+                Map<String, Object> a4 = new HashMap<>();
+                a4.put("name", "Sneha Nair"); a4.put("empCode", "EMP-1004"); a4.put("department", "IT - Quality"); a4.put("workingDays", 24); a4.put("presentPct", "21 (87.5%)"); a4.put("absentPct", "1 (4.2%)"); a4.put("latePct", "2 (8.3%)"); a4.put("halfPct", "0 (0%)"); a4.put("leavePct", "0 (0%)"); a4.put("totalPct", "87.5%"); a4.put("status", "GOOD");
+                attendanceList.add(a4);
+
+                Map<String, Object> a5 = new HashMap<>();
+                a5.put("name", "Vikas Dubey"); a5.put("empCode", "EMP-1005"); a5.put("department", "IT - Operations"); a5.put("workingDays", 24); a5.put("presentPct", "19 (79.2%)"); a5.put("absentPct", "3 (12.5%)"); a5.put("latePct", "2 (8.3%)"); a5.put("halfPct", "0 (0%)"); a5.put("leavePct", "0 (0%)"); a5.put("totalPct", "79.2%"); a5.put("status", "AVERAGE");
+                attendanceList.add(a5);
+
+                Map<String, Object> a6 = new HashMap<>();
+                a6.put("name", "Neha Mehta"); a6.put("empCode", "EMP-1006"); a6.put("department", "Business"); a6.put("workingDays", 24); a6.put("presentPct", "22 (91.7%)"); a6.put("absentPct", "1 (4.2%)"); a6.put("latePct", "1 (4.2%)"); a6.put("halfPct", "0 (0%)"); a6.put("leavePct", "0 (0%)"); a6.put("totalPct", "91.7%"); a6.put("status", "EXCELLENT");
+                attendanceList.add(a6);
+
+                model.addAttribute("attendanceList", attendanceList);
+
+                // --- TAB 3: LEAVE TRENDS ---
+                List<Map<String, Object>> leaveTrendsList = new ArrayList<>();
+                leaveTrendsList.add(Map.of("name", "Aman Singh", "empCode", "EMP-1001", "department", "IT - Development", "type", "Casual Leave", "leavesTaken", 12, "approved", 11, "pending", 1, "rejected", 0, "rate", "91.7%"));
+                leaveTrendsList.add(Map.of("name", "Priya Rathi", "empCode", "EMP-1002", "department", "IT - Development", "type", "Sick Leave", "leavesTaken", 9, "approved", 8, "pending", 1, "rejected", 0, "rate", "88.9%"));
+                leaveTrendsList.add(Map.of("name", "Rohit Kumar", "empCode", "EMP-1003", "department", "IT - Design", "type", "Privilege Leave", "leavesTaken", 7, "approved", 6, "pending", 0, "rejected", 1, "rate", "85.7%"));
+                
+                model.addAttribute("leaveTrendsList", leaveTrendsList);
+
+                // --- TAB 4: PROJECT METRICS ---
+                List<Map<String, Object>> projectMetricsList = new ArrayList<>();
+                projectMetricsList.add(Map.of("name", "Website Redesign", "code", "WD", "department", "IT - Development", "manager", "Aman Singh", "start", "01 May 2026", "end", "30 Jun 2026", "progress", 80, "status", "On Track", "teamCount", 6, "tasks", "24 / 30"));
+                projectMetricsList.add(Map.of("name", "Mobile App Development", "code", "MAPP", "department", "IT - Development", "manager", "Priya Rathi", "start", "10 Apr 2026", "end", "30 Jul 2026", "progress", 45, "status", "At Risk", "teamCount", 5, "tasks", "18 / 40"));
+                projectMetricsList.add(Map.of("name", "CRM Integration", "code", "CRM", "department", "IT - Development", "manager", "Rohit Kumar", "start", "15 Mar 2026", "end", "15 Jun 2026", "progress", 25, "status", "Delayed", "teamCount", 4, "tasks", "10 / 40"));
+                
+                model.addAttribute("projectMetricsList", projectMetricsList);
+
+                return "senior_manager-reports";
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @GetMapping("/senior_manager/communication")
+        public String showCommunication(
+                @RequestParam(value = "tab", defaultValue = "send") String tab,
+                Model model,
+                Principal principal) {
+
+                User loggedInUser = principal != null
+                        ? userRepository.findByUsername(principal.getName()).orElse(null)
+                        : null;
+
+                if (loggedInUser == null) {
+                    return "redirect:/login";
+                }
+
+                model.addAttribute("loggedInUser", loggedInUser);
+                model.addAttribute("activeTab", tab);
+
+                List<Project> projects = projectRepository.findAll();
+                model.addAttribute("projectsList", projects);
+
+                // --- TAB 1: RECENT COMMUNICATIONS ---
+                List<Map<String, Object>> recentCommunications = new ArrayList<>();
+                recentCommunications.add(Map.of("subject", "Project Update - Website Redesign", "sentTo", "IT - Development Team", "type", "Project Update", "priority", "Normal", "sentOn", "28 May 2026, 10:30 AM", "recipients", 12, "openRate", 75, "status", "Sent"));
+                recentCommunications.add(Map.of("subject", "Deadline Reminder: Sprint 3", "sentTo", "Design Team", "type", "Deadline Reminder", "priority", "High", "sentOn", "27 May 2026, 04:15 PM", "recipients", 8, "openRate", 62, "status", "Sent"));
+                model.addAttribute("recentCommunications", recentCommunications);
+
+                // --- TAB 2: RECENT PROJECT UPDATES ---
+                List<Map<String, Object>> recentProjectUpdates = new ArrayList<>();
+                recentProjectUpdates.add(Map.of("subject", "Website Redesign - Progress Update", "project", "Website Redesign", "sharedWith", "IT - Development Team", "sharedOn", "28 May 2026, 10:30 AM", "recipients", 12, "views", 18, "acknowledged", "10 (83%)", "status", "COMPLETED"));
+                recentProjectUpdates.add(Map.of("subject", "API Integration - Issue Update", "project", "Mobile App Development", "sharedWith", "IT - Development Team", "sharedOn", "27 May 2026, 04:15 PM", "recipients", 10, "views", 14, "acknowledged", "6 (60%)", "status", "OPEN"));
+                recentProjectUpdates.add(Map.of("subject", "Sprint 3 - Task Update", "project", "CRM Integration", "sharedWith", "Design Team", "sharedOn", "26 May 2026, 11:05 AM", "recipients", 8, "views", 12, "acknowledged", "7 (88%)", "status", "COMPLETED"));
+                recentProjectUpdates.add(Map.of("subject", "Milestone 1 Completion", "project", "Analytics Dashboard", "sharedWith", "IT - Operations Team", "sharedOn", "25 May 2026, 03:20 PM", "recipients", 6, "views", 9, "acknowledged", "5 (83%)", "status", "COMPLETED"));
+                recentProjectUpdates.add(Map.of("subject", "General Update - Kickoff Notes", "project", "HRMS Enhancement", "sharedWith", "HR Department", "sharedOn", "24 May 2026, 09:00 AM", "recipients", 15, "views", 21, "acknowledged", "12 (80%)", "status", "COMPLETED"));
+                model.addAttribute("recentProjectUpdates", recentProjectUpdates);
+
+                // --- TAB 3: RECENT NOTIFICATIONS ---
+                List<Map<String, Object>> recentNotifications = new ArrayList<>();
+                recentNotifications.add(Map.of("subject", "Sprint 3 Deadline Reminder", "notifyTo", "IT - Development Team", "type", "Deadline Reminder", "priority", "High", "sentOn", "28 May 2026, 10:30 AM", "recipients", 12, "status", "Sent"));
+                recentNotifications.add(Map.of("subject", "Policy Update - Work From Home", "notifyTo", "All Employees", "type", "Policy Change", "priority", "Normal", "sentOn", "27 May 2026, 04:15 PM", "recipients", 156, "status", "Sent"));
+                recentNotifications.add(Map.of("subject", "Client Call Time Change", "notifyTo", "Design Team", "type", "Schedule Change", "priority", "Normal", "sentOn", "26 May 2026, 11:05 AM", "recipients", 8, "status", "Sent"));
+                recentNotifications.add(Map.of("subject", "Monthly Report Submission Deadline", "notifyTo", "Finance Team", "type", "Deadline Reminder", "priority", "High", "sentOn", "25 May 2026, 03:20 PM", "recipients", 6, "status", "Pending"));
+                recentNotifications.add(Map.of("subject", "System Maintenance - Saturday", "notifyTo", "All Employees", "type", "General Update", "priority", "Low", "sentOn", "24 May 2026, 09:00 AM", "recipients", 184, "status", "Scheduled"));
+                model.addAttribute("recentNotifications", recentNotifications);
+
+                return "senior_manager-communication";
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @GetMapping("/senior_manager/hierarchy")
+        public String showHierarchy(Model model, Principal principal) {
+                User loggedInUser = principal != null
+                        ? userRepository.findByUsername(principal.getName()).orElse(null)
+                        : null;
+
+                if (loggedInUser == null) {
+                    return "redirect:/login";
+                }
+
+                model.addAttribute("loggedInUser", loggedInUser);
+
+                List<User> allUsers = userRepository.findAll();
+                long empCount = allUsers.stream()
+                        .filter(u -> u.getRole() != null && !"CLIENT".equalsIgnoreCase(u.getRole().getRoleName()))
+                        .count();
+                if (empCount == 0) empCount = 245;
+
+                long mgrCount = allUsers.stream()
+                        .filter(u -> u.getManager() != null)
+                        .map(u -> u.getManager().getId())
+                        .distinct()
+                        .count();
+                if (mgrCount == 0) mgrCount = 28;
+
+                long deptCount = allUsers.stream()
+                        .filter(u -> u.getDepartmentId() != null)
+                        .map(User::getDepartmentId)
+                        .distinct()
+                        .count();
+                if (deptCount == 0) deptCount = 12;
+
+                long posCount = allUsers.stream()
+                        .filter(u -> u.getDesignation() != null && !u.getDesignation().isBlank())
+                        .map(User::getDesignation)
+                        .distinct()
+                        .count();
+                if (posCount == 0) posCount = 45;
+
+                // Statistical summaries
+                model.addAttribute("totalEmployees", empCount);
+                model.addAttribute("totalDepartments", deptCount);
+                model.addAttribute("totalManagers", mgrCount);
+                model.addAttribute("totalPositions", posCount);
+
+                // Organization Tree Counts
+                long topMgt = 0;
+                long hrDept = 0;
+                long hrMgr = 0;
+                long hrExec = 0;
+                long itDept = 0;
+                long finDept = 0;
+                long opsDept = 0;
+                long salesMkt = 0;
+
+                for (User u : allUsers) {
+                    String role = u.getRole() != null ? u.getRole().getRoleName() : "";
+                    if ("CLIENT".equalsIgnoreCase(role)) {
+                        continue;
+                    }
+                    String dept = getDepartment(u).trim().toLowerCase();
+                    String designation = u.getDesignation() != null ? u.getDesignation().trim().toLowerCase() : "";
+
+                    // Top Management
+                    if ("ceo".equals(designation) || "cto".equals(designation) || designation.contains("director") || "top management".equalsIgnoreCase(role)) {
+                        topMgt++;
+                    }
+
+                    // Human Resources
+                    if (dept.contains("human resources") || dept.equals("hr")) {
+                        hrDept++;
+                        if (designation.contains("manager")) {
+                            hrMgr++;
+                        } else {
+                            hrExec++;
+                        }
+                    }
+                    // Information Technology
+                    else if (dept.contains("information technology") || dept.startsWith("it")) {
+                        itDept++;
+                    }
+                    // Finance
+                    else if (dept.contains("finance") || dept.contains("accounts")) {
+                        finDept++;
+                    }
+                    // Operations
+                    else if (dept.contains("operations") || dept.contains("admin")) {
+                        opsDept++;
+                    }
+                    // Sales & Marketing
+                    else if (dept.contains("sales") || dept.contains("marketing")) {
+                        salesMkt++;
+                    }
+                }
+
+                // Fallbacks in case database is empty or sparse:
+                if (topMgt == 0) topMgt = 1;
+                if (hrDept == 0) { hrDept = 24; hrMgr = 6; hrExec = 18; }
+                if (itDept == 0) itDept = 68;
+                if (finDept == 0) finDept = 34;
+                if (opsDept == 0) opsDept = 56;
+                if (salesMkt == 0) salesMkt = 62;
+
+                long totalTreeCount = topMgt + hrDept + itDept + finDept + opsDept + salesMkt;
+                if (totalTreeCount < empCount) {
+                    totalTreeCount = empCount;
+                }
+
+                model.addAttribute("totalTreeCount", totalTreeCount);
+                model.addAttribute("topMgtCount", topMgt);
+                model.addAttribute("hrDeptCount", hrDept);
+                model.addAttribute("hrMgrCount", hrMgr);
+                model.addAttribute("hrExecCount", hrExec);
+                model.addAttribute("itDeptCount", itDept);
+                model.addAttribute("finDeptCount", finDept);
+                model.addAttribute("opsDeptCount", opsDept);
+                model.addAttribute("salesMktCount", salesMkt);
+
+                // Direct Reports list for Amit Sharma
+                List<Map<String, Object>> directReports = new ArrayList<>();
+                directReports.add(Map.of("name", "Neha Verma", "position", "HR Director", "department", "HR", "status", "Full-time"));
+                directReports.add(Map.of("name", "Vikram Mehta", "position", "CTO", "department", "IT", "status", "Full-time"));
+                model.addAttribute("directReports", directReports);
+
+                // Recent Changes list
+                List<Map<String, Object>> recentChanges = new ArrayList<>();
+                recentChanges.add(Map.of("change", "Dept Transfer", "employee", "Rahul Kumar", "changedBy", "HR Admin", "dateTime", "20 May 2026, 11:30 AM"));
+                recentChanges.add(Map.of("change", "Manager Assigned", "employee", "Deepak Yadav", "changedBy", "HR Admin", "dateTime", "19 May 2026, 04:15 PM"));
+                model.addAttribute("recentChanges", recentChanges);
+
+                return "senior_manager-hierarchy";
+        }
+
         private void seedProjectsAndTicketsAndTimesheets() {
             try {
                 List<User> activeUsers = userRepository.findAll().stream()
