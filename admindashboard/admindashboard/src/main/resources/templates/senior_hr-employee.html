@@ -247,7 +247,7 @@
                 <i class="fa-solid fa-users"></i> Employee
             </a>
             <a href="/senior_hr/lms" class="nav-link-item">
-                <i class="fa-solid fa-graduation-cap"></i> LMS
+                <i class="fa-solid fa-calendar-days"></i> Leave Management
             </a>
             <a href="/senior_hr/payroll" class="nav-link-item">
                 <i class="fa-solid fa-money-check-dollar"></i> Payroll
@@ -668,7 +668,7 @@
 </div>
 <div class="col-md-3">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Employee ID <span class="text-danger">*</span></label>
-<input class="form-control" name="employeeCode" type="text"/>
+<input class="form-control" id="onboardEmployeeCode" name="employeeCode" type="text"/>
 </div>
 <div class="col-md-3">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">First Name <span class="text-danger">*</span></label>
@@ -781,15 +781,18 @@
 </div>
 <div class="col-md-4">
 <label class="form-label fw-bold text-primary border-bottom border-primary" style="font-size: 0.85rem;">Grade/Level <span class="text-danger">*</span></label>
-<select class="form-select" name="gradeLevel"><option disabled="" selected="" value="">Select...</option><option value="L1">L1</option><option value="L2">L2</option><option value="L3">L3</option><option value="L4">L4</option><option value="L5">L5</option></select>
+<select class="form-select" name="gradeLevel"><option disabled="" selected="" value="">Select...</option><option value="L1">L1</option><option value="L2">L2</option><option value="L3">L3</option><option value="L4">L4</option></select>
 </div>
 <div class="col-md-4">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Role <span class="text-danger">*</span></label>
 <select class="form-select" name="roleName"><option disabled="" selected="" value="">Select...</option><option value="Employee">Employee</option><option value="Team Lead">Team Lead</option><option value="Manager">Manager</option><option value="HR Admin">HR Admin</option><option value="Super Admin">Super Admin</option></select>
 </div>
 <div class="col-md-4">
-<label class="form-label fw-bold" style="font-size: 0.85rem;">Reports To <span class="text-danger">*</span></label>
-<select class="form-select" name="reportsTo"><option disabled="" selected="" value="">Select...</option><option value="Amit Kumar">Amit Kumar</option><option value="Neha Sharma">Neha Sharma</option><option value="Vikram Mehta">Vikram Mehta</option><option value="Pooja Desai">Pooja Desai</option><option value="Sanjay Tiwari">Sanjay Tiwari</option></select>
+<label class="form-label fw-bold" style="font-size: 0.85rem;">Reporting Manager <span class="text-danger">*</span></label>
+<select class="form-select" name="reportsTo">
+    <option disabled="" selected="" value="">Select...</option>
+    <option th:each="mgr : ${l2Managers}" th:value="${mgr.fullName}" th:text="${mgr.fullName}">Manager Name</option>
+</select>
 </div>
 <div class="col-md-4">
 <label class="form-label fw-bold" style="font-size: 0.85rem;">Business Unit <span class="text-danger">*</span></label>
@@ -1237,6 +1240,13 @@
                   const dobInput = document.getElementById('dobInput');
                   const joinInput = document.getElementById('joinDate');
 
+                  const empCodeInput = document.getElementById('onboardEmployeeCode');
+                  if (empCodeInput && empCodeInput.dataset.duplicate === 'true') {
+                      alert(`Employee ID '${empCodeInput.value}' already exists! Please use a unique ID.`);
+                      empCodeInput.style.border = '1px solid red';
+                      return false;
+                  }
+
                   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                   const phoneRegex = /^[0-9]{10}$/;
 
@@ -1296,13 +1306,55 @@
                           alert("Please enter a valid Joining Date year (between 1980 and 2050).");
                           joinInput.style.border = '1px solid red';
                           return false;
+                      }
+
+                      // Check if joining date is within 1.5 years from today (before or after)
+                      const today = new Date();
+                      const minJoinDate = new Date();
+                      minJoinDate.setMonth(today.getMonth() - 18);
+                      const maxJoinDate = new Date();
+                      maxJoinDate.setMonth(today.getMonth() + 18);
+
+                      // Normalize hours to compare only date
+                      today.setHours(0,0,0,0);
+                      minJoinDate.setHours(0,0,0,0);
+                      maxJoinDate.setHours(0,0,0,0);
+                      joinDate.setHours(0,0,0,0);
+
+                      if (joinDate < minJoinDate || joinDate > maxJoinDate) {
+                          alert("Joining date cannot be more than 1.5 years from today (before or after).");
+                          joinInput.style.border = '1px solid red';
+                          return false;
                       } else {
                           joinInput.style.border = '';
                       }
                   }
+
+                  const probCompletionInput = document.getElementById('probationCompletionDate');
+                  if (joinInput && joinInput.value && probCompletionInput && probCompletionInput.value) {
+                      const joinDate = new Date(joinInput.value);
+                      const completionDate = new Date(probCompletionInput.value);
+                      joinDate.setHours(0,0,0,0);
+                      completionDate.setHours(0,0,0,0);
+
+                      const timeDiff = completionDate.getTime() - joinDate.getTime();
+                      if (timeDiff < 0) {
+                          alert("Probation completion date cannot be before the joining date.");
+                          probCompletionInput.style.border = '1px solid red';
+                          return false;
+                      }
+                      const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                      if (diffDays > 180) {
+                          alert("Probation period cannot be more than 180 days.");
+                          probCompletionInput.style.border = '1px solid red';
+                          return false;
+                      } else {
+                          probCompletionInput.style.border = '';
+                      }
+                  }
               }
 
-              if (stepId === 'step4-form') {
+              if (stepId === 'step3-form') {
                   const panInput = document.querySelector('[name="panNo"]');
                   const aadharInput = document.querySelector('[name="aadharNo"]');
 
@@ -1459,10 +1511,55 @@
             if (join) join.addEventListener('change', calculateProbation);
             if (completion) completion.addEventListener('change', calculateProbation);
             if (join) {
-                let today = new Date().toISOString().split('T')[0];
-                join.setAttribute('min', today);
+                let today = new Date();
+                let minDate = new Date();
+                minDate.setMonth(today.getMonth() - 18);
+                let maxDate = new Date();
+                maxDate.setMonth(today.getMonth() + 18);
+                
+                join.setAttribute('min', minDate.toISOString().split('T')[0]);
+                join.setAttribute('max', maxDate.toISOString().split('T')[0]);
             }
 
+            const empCodeInput = document.getElementById('onboardEmployeeCode');
+            if (empCodeInput) {
+                empCodeInput.addEventListener('change', function() {
+                    const val = empCodeInput.value.trim();
+                    if (val === '') return;
+                    
+                    fetch(`/senior_hr/api/employee/check-username?username=${encodeURIComponent(val)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.exists) {
+                                alert(`Employee ID '${val}' already exists! Please use a unique ID.`);
+                                empCodeInput.style.border = '1px solid red';
+                                empCodeInput.dataset.duplicate = 'true';
+                            } else {
+                                empCodeInput.style.border = '';
+                                delete empCodeInput.dataset.duplicate;
+                            }
+                        })
+                        .catch(err => console.error("Error checking username:", err));
+                });
+            }
+            const roleSelect = document.querySelector('#onboardingForm select[name="roleName"]');
+            const gradeSelect = document.querySelector('#onboardingForm select[name="gradeLevel"]');
+            if (roleSelect && gradeSelect) {
+                roleSelect.addEventListener('change', function() {
+                    const role = roleSelect.value;
+                    if (role === 'Employee') {
+                        gradeSelect.value = 'L1';
+                    } else if (role === 'Team Lead') {
+                        gradeSelect.value = 'L2';
+                    } else if (role === 'Manager') {
+                        gradeSelect.value = 'L2';
+                    } else if (role === 'HR Admin') {
+                        gradeSelect.value = 'L2';
+                    } else if (role === 'Super Admin') {
+                        gradeSelect.value = 'L4';
+                    }
+                });
+            }
         });
 
         // Chart.js Setup for Donut Chart
@@ -2140,7 +2237,12 @@
         
         function updateMinDates() {
             if(joinDateInput && joinDateInput.value) {
-                if(probCompletionInput) probCompletionInput.min = joinDateInput.value;
+                if(probCompletionInput) {
+                    probCompletionInput.min = joinDateInput.value;
+                    let join = new Date(joinDateInput.value);
+                    join.setDate(join.getDate() + 180);
+                    probCompletionInput.max = join.toISOString().split('T')[0];
+                }
                 if(confirmDateInput) confirmDateInput.min = joinDateInput.value;
                 if(reviewDateInput) reviewDateInput.min = joinDateInput.value;
             }

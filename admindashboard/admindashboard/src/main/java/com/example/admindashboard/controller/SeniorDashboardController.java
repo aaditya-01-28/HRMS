@@ -900,6 +900,13 @@ public class SeniorDashboardController {
         model.addAttribute("finPct", finPct);
         model.addAttribute("othersPct", othersPct);
         
+        java.util.Set<String> L2_ROLES = java.util.Set.of("HR_ADMIN", "HR_EXECUTIVE", "MANAGER", "HR_MANAGER", "PROJECT_MANAGER", "FINANCE", "RECRUITER", "IT_ADMIN", "IT_SUPPORT", "AUDITOR", "TRANSPORT", "LND", "REWARDS", "SENIOR_MANAGER");
+        List<com.example.admindashboard.model.User> l2Managers = allUsers.stream()
+            .filter(u -> u.getRole() != null && L2_ROLES.contains(u.getRole().getRoleName()) && "ACTIVE".equalsIgnoreCase(u.getStatus()))
+            .sorted(java.util.Comparator.comparing(com.example.admindashboard.model.User::getFullName))
+            .collect(Collectors.toList());
+        model.addAttribute("l2Managers", l2Managers);
+
         model.addAttribute("allUsers", employeesOnly);
         return "senior_hr-employee";
     }
@@ -923,6 +930,26 @@ public class SeniorDashboardController {
                                    @RequestParam(required=false) MultipartFile offerDoc,
                                     org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttrs) {
         
+        java.time.LocalDate joiningDate = employeeProfile != null ? employeeProfile.getJoiningDate() : null;
+        if (joiningDate != null) {
+            java.time.LocalDate todayDate = java.time.LocalDate.now();
+            if (joiningDate.isAfter(todayDate.plusMonths(18)) || joiningDate.isBefore(todayDate.minusMonths(18))) {
+                redirectAttrs.addFlashAttribute("errorMessage", "Joining date cannot be more than 1.5 years from today (before or after)!");
+                return "redirect:/senior_hr/employee?tab=onboarding";
+            }
+        }
+        if (joiningDate != null && probationCompletionDate != null) {
+            long days = java.time.temporal.ChronoUnit.DAYS.between(joiningDate, probationCompletionDate);
+            if (days < 0) {
+                redirectAttrs.addFlashAttribute("errorMessage", "Probation completion date cannot be before the joining date!");
+                return "redirect:/senior_hr/employee?tab=onboarding";
+            }
+            if (days > 180) {
+                redirectAttrs.addFlashAttribute("errorMessage", "Probation period cannot be more than 180 days!");
+                return "redirect:/senior_hr/employee?tab=onboarding";
+            }
+        }
+
         String usernameToCheck = employeeCode != null && !employeeCode.isEmpty() ? employeeCode.toUpperCase() : null;
         if (usernameToCheck != null) {
             java.util.Optional<User> existingUser = userRepository.findByUsername(usernameToCheck);
@@ -1032,6 +1059,15 @@ public class SeniorDashboardController {
         
         redirectAttrs.addFlashAttribute("successMessage", "Onboarding Completed Successfully! Login credentials sent via email.");
         return "redirect:/senior_hr/employee?tab=onboarding";
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/senior_hr/api/employee/check-username")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public java.util.Map<String, Boolean> checkUsername(@org.springframework.web.bind.annotation.RequestParam String username) {
+        boolean exists = userRepository.existsByUsername(username.toUpperCase().trim());
+        java.util.Map<String, Boolean> response = new java.util.HashMap<>();
+        response.put("exists", exists);
+        return response;
     }
 
     
