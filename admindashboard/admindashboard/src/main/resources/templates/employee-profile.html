@@ -224,6 +224,7 @@
 		}
 
 		#v-pills-edu,
+		#v-pills-jobdata,
 		#v-pills-work,
 		#v-pills-project,
 		#v-pills-reporting,
@@ -485,6 +486,11 @@
 		    </button>
 
 		    <button class="tab-btn"
+		            onclick="showProfileTab('v-pills-jobdata',this)">
+		        Job Data
+		    </button>
+
+		    <button class="tab-btn"
 		            onclick="showProfileTab('v-pills-work',this)">
 		        Statutory
 		    </button>
@@ -604,6 +610,39 @@
 										<option value="Widowed"
 										        th:selected="${employeeProfile.maritalStatus == 'Widowed'}">Widowed</option>
 						            </select>
+						        </div>
+
+						        <!-- Contact Information sub-section -->
+						        <div class="section-title mt-4" style="grid-column: span 2; font-weight: bold; font-size: 1.1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; color: #1e3a8a;">Contact Information</div>
+
+						        <div class="field-group">
+						            <label>Address Line 1</label>
+						            <input type="text" name="presentStreet" th:value="${employeeProfile.presentStreet}">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Address Line 2</label>
+						            <input type="text" name="presentArea" th:value="${employeeProfile.presentArea}">
+						        </div>
+
+						        <div class="field-group">
+						            <label>City</label>
+						            <input type="text" name="presentCity" th:value="${employeeProfile.presentCity}">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Pincode</label>
+						            <input type="text" name="presentPincode" th:value="${employeeProfile.presentPincode}">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Phone</label>
+						            <input type="text" name="mobileNumber" th:value="${employeeProfile.mobileNumber}">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Email</label>
+						            <input type="email" name="personalEmail" th:value="${employeeProfile.personalEmail}">
 						        </div>
 
 						    </div>
@@ -880,6 +919,70 @@
 										<option value="Probation" th:selected="${employeeProfile.category == 'Probation'}">Probation</option>
 
 									</select>
+						        </div>
+
+						    </div>
+
+						</div>
+						<!-- JOB DATA TAB -->
+						<div id="v-pills-jobdata" style="display:none;">
+
+						    <div class="general-grid">
+
+						        <!-- Position & Organization sub-section -->
+						        <div class="section-title" style="grid-column: span 2; font-weight: bold; font-size: 1.1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; color: #1e3a8a;">Position &amp; Organization</div>
+
+						        <div class="field-group">
+						            <label>Position / Designation</label>
+						            <input type="text" name="designation" th:value="${employeeProfile.designation}">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Company Name</label>
+						            <input type="text" name="companyName" th:value="${employeeProfile.companyName}">
+						        </div>
+
+						        <!-- Job Information sub-section -->
+						        <div class="section-title mt-4" style="grid-column: span 2; font-weight: bold; font-size: 1.1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; color: #1e3a8a;">Job Information</div>
+
+						        <div class="field-group">
+						            <label>Vertical Head</label>
+						            <input type="text" name="verticalHead" th:value="${employeeProfile.verticalHead}">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Seating Location / Seat Place</label>
+						            <input type="text" name="seatingLocation" th:value="${employeeProfile.seatingLocation}">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Assigned HR L2</label>
+						            <input type="text" name="assignedHrL2" th:value="${employeeProfile.assignedHrL2}">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Assigned HR L3</label>
+						            <input type="text" name="assignedHrL3" th:value="${employeeProfile.assignedHrL3}">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Date of Joining</label>
+						            <input type="date" id="jobJoiningDate" name="joiningDate" th:value="${user.employeeProfile?.joiningDate}" class="employee-readonly" readonly>
+						        </div>
+
+						        <div class="field-group">
+						            <label>Current Experience</label>
+						            <input type="text" id="currentExperience" class="employee-readonly" readonly>
+						        </div>
+
+						        <div class="field-group">
+						            <label>Previous Relevant Experience (Years)</label>
+						            <input type="number" step="0.1" id="previousExperience" name="previousExperience" th:value="${employeeProfile.previousExperience}" oninput="calculateExperiences()">
+						        </div>
+
+						        <div class="field-group">
+						            <label>Total Experience</label>
+						            <input type="text" id="totalExperience" class="employee-readonly" readonly>
 						        </div>
 
 						    </div>
@@ -1457,6 +1560,7 @@
 	    const tabs = [
 	        'v-pills-personal',
 	        'v-pills-edu',
+	        'v-pills-jobdata',
 	        'v-pills-work',
 	        'v-pills-project',
 	        'v-pills-reporting',
@@ -1610,8 +1714,64 @@
 	    window.location.reload();
 
 	});
-	
 
+	function calculateExperiences() {
+	    const joiningDateInput = document.getElementById('jobJoiningDate');
+	    const prevExpInput = document.getElementById('previousExperience');
+	    
+	    if (!joiningDateInput || !prevExpInput) return;
+	    
+	    const joiningDateVal = joiningDateInput.value;
+	    const prevExpVal = parseFloat(prevExpInput.value) || 0;
+	    
+	    if (!joiningDateVal) {
+	        document.getElementById('currentExperience').value = "0 Days";
+	        document.getElementById('totalExperience').value = prevExpVal + " Year" + (prevExpVal !== 1 ? "s" : "");
+	        return;
+	    }
+	    
+	    const joinDate = new Date(joiningDateVal);
+	    const today = new Date();
+	    
+	    let years = today.getFullYear() - joinDate.getFullYear();
+	    let months = today.getMonth() - joinDate.getMonth();
+	    let days = today.getDate() - joinDate.getDate();
+	    
+	    if (days < 0) {
+	        months--;
+	        const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+	        days += prevMonth.getDate();
+	    }
+	    
+	    if (months < 0) {
+	        years--;
+	        months += 12;
+	    }
+	    
+	    let currentExpStr = "";
+	    if (years > 0) currentExpStr += years + " Year" + (years > 1 ? "s" : "") + " ";
+	    if (months > 0) currentExpStr += months + " Month" + (months > 1 ? "s" : "") + " ";
+	    if (days > 0 || currentExpStr === "") currentExpStr += days + " Day" + (days > 1 ? "s" : "");
+	    currentExpStr = currentExpStr.trim();
+	    
+	    document.getElementById('currentExperience').value = currentExpStr;
+	    
+	    // Calculate Total Experience
+	    const currentYearsDecimal = years + (months / 12) + (days / 365);
+	    const totalYearsDecimal = currentYearsDecimal + prevExpVal;
+	    
+	    const totalYears = Math.floor(totalYearsDecimal);
+	    const totalMonths = Math.round((totalYearsDecimal - totalYears) * 12);
+	    
+	    let totalExpStr = "";
+	    if (totalYears > 0) totalExpStr += totalYears + " Year" + (totalYears > 1 ? "s" : "") + " ";
+	    if (totalMonths > 0) totalExpStr += totalMonths + " Month" + (totalMonths > 1 ? "s" : "");
+	    if (totalExpStr === "") totalExpStr = "0 Days";
+	    
+	    document.getElementById('totalExperience').value = totalExpStr.trim();
+	}
+
+	window.addEventListener('DOMContentLoaded', calculateExperiences);
 </script>
 </body>
 </html>

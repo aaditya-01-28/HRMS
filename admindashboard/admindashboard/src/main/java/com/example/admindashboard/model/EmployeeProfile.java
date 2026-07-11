@@ -181,6 +181,13 @@ public class EmployeeProfile {
     private String otEligible;
     private String probationPeriodStr;
 
+    private String companyName;
+    private String verticalHead;
+    private String seatingLocation;
+    private String assignedHrL2;
+    private String assignedHrL3;
+    private String previousExperience;
+
 
     
 
@@ -756,5 +763,21 @@ public class EmployeeProfile {
     public boolean isOnboardingCompleted() { return onboardingCompleted; }
     public void setOnboardingCompleted(boolean onboardingCompleted) { this.onboardingCompleted = onboardingCompleted; }
 
+    public String getCompanyName() { return companyName; }
+    public void setCompanyName(String companyName) { this.companyName = companyName; }
 
+    public String getVerticalHead() { return verticalHead; }
+    public void setVerticalHead(String verticalHead) { this.verticalHead = verticalHead; }
+
+    public String getSeatingLocation() { return seatingLocation; }
+    public void setSeatingLocation(String seatingLocation) { this.seatingLocation = seatingLocation; }
+
+    public String getAssignedHrL2() { return assignedHrL2; }
+    public void setAssignedHrL2(String assignedHrL2) { this.assignedHrL2 = assignedHrL2; }
+
+    public String getAssignedHrL3() { return assignedHrL3; }
+    public void setAssignedHrL3(String assignedHrL3) { this.assignedHrL3 = assignedHrL3; }
+
+    public String getPreviousExperience() { return previousExperience; }
+    public void setPreviousExperience(String previousExperience) { this.previousExperience = previousExperience; }
 }

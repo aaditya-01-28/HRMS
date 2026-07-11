@@ -1030,6 +1030,13 @@ public class DashboardController {
         existingProfile.setMaritalStatus(formProfile.getMaritalStatus());
         existingProfile.setNotes(formProfile.getNotes());
 
+        existingProfile.setCompanyName(formProfile.getCompanyName());
+        existingProfile.setVerticalHead(formProfile.getVerticalHead());
+        existingProfile.setSeatingLocation(formProfile.getSeatingLocation());
+        existingProfile.setAssignedHrL2(formProfile.getAssignedHrL2());
+        existingProfile.setAssignedHrL3(formProfile.getAssignedHrL3());
+        existingProfile.setPreviousExperience(formProfile.getPreviousExperience());
+
         existingProfile.setBranch(formProfile.getBranch());
         existingProfile.setDesignation(formProfile.getDesignation());
         existingProfile.setSalaryStructure(formProfile.getSalaryStructure());
