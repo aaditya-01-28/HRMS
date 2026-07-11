@@ -16,6 +16,14 @@ import com.example.admindashboard.repository.UserRepository;
 import com.example.admindashboard.repository.JobPostingRepository;
 import com.example.admindashboard.repository.ReferralRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.example.admindashboard.model.FacilityVendor;
+import com.example.admindashboard.model.FacilityDevice;
+import com.example.admindashboard.model.FacilityService;
+import com.example.admindashboard.model.FacilityContract;
+import com.example.admindashboard.repository.FacilityVendorRepository;
+import com.example.admindashboard.repository.FacilityDeviceRepository;
+import com.example.admindashboard.repository.FacilityServiceRepository;
+import com.example.admindashboard.repository.FacilityContractRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,10 +39,24 @@ import com.example.admindashboard.model.User;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.http.ResponseEntity;
 import java.util.Map;
+import java.time.LocalDate;
 @Controller
 public class SeniorDashboardController {
+
+    @Autowired
+    private FacilityVendorRepository facilityVendorRepository;
+
+    @Autowired
+    private FacilityDeviceRepository facilityDeviceRepository;
+
+    @Autowired
+    private FacilityServiceRepository facilityServiceRepository;
+
+    @Autowired
+    private FacilityContractRepository facilityContractRepository;
 
     @Autowired
     private ServiceRequestRepository serviceRequestRepository;
@@ -131,6 +153,36 @@ public class SeniorDashboardController {
 
         // Redirect to employee dashboard by default after login
         return "redirect:/senior_hr/employee?tab=onboarding";
+    }
+
+    // --- LOGIN ROUTE (Facilities L3 My Space) ---
+    @GetMapping("/senior_facility/login")
+    public String showSeniorFacilityLogin() {
+        return "senior_facility-login";
+    }
+
+    @PostMapping("/senior_facility/login")
+    public String processSeniorFacilityLogin(
+            @RequestParam String username,
+            @RequestParam String password,
+            Model model) {
+
+        User user = userRepository
+                .findByUsername(username.toUpperCase())
+                .orElse(null);
+
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+            model.addAttribute("authError", "Invalid username or password");
+            return "senior_facility-login";
+        }
+
+        String role = user.getRole() != null ? user.getRole().getRoleName() : "";
+        if (!"SENIOR_FACILITY_HEAD".equalsIgnoreCase(role)) {
+            model.addAttribute("authError", "Only Facilities Head credentials can access this My Space");
+            return "senior_facility-login";
+        }
+
+        return "redirect:/senior_facility/my_space";
     }
 
     // --- LMS ROUTE ---
@@ -263,6 +315,184 @@ public class SeniorDashboardController {
         model.addAttribute("isSeniorManager", true);
         model.addAttribute("workflowUrl", "/senior_rewards/workflow");
     	return "employee-dashboard";
+    }
+
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @GetMapping("/senior_facility/dashboard")
+    public String showSeniorFacilityDashboard(Model model, Principal principal, HttpServletRequest request) {
+        String currentUserId = principal.getName();
+        List<com.example.admindashboard.model.ServiceRequest> recentTickets =
+                serviceRequestRepository.findTop3ByEmployeeIdOrderByIdDesc(currentUserId);
+        model.addAttribute("recentTickets", recentTickets);
+        model.addAttribute("pendingMeetingInvites", getPendingMeetingInvites(currentUserId));
+        model.addAttribute("isSeniorManager", true);
+        model.addAttribute("workflowUrl", "/senior_facility/workflow");
+        return "senior_facility-dashboard";
+    }
+
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @GetMapping("/senior_facility/my_space")
+    public String showSeniorFacilityMySpace(Model model, Principal principal, @RequestParam(name="tab", defaultValue="dashboard") String tab) {
+        model.addAttribute("vendors", facilityVendorRepository.findAll());
+        model.addAttribute("devices", facilityDeviceRepository.findAll());
+        model.addAttribute("services", facilityServiceRepository.findAll());
+        model.addAttribute("contracts", facilityContractRepository.findAll());
+        model.addAttribute("activeTab", tab);
+        
+        // Stats for Service Management (expanded under housekeeping/pantry/maintenance/etc.)
+        List<FacilityService> activeServices = facilityServiceRepository.findAll().stream()
+                .filter(s -> "Active".equalsIgnoreCase(s.getStatus()))
+                .collect(Collectors.toList());
+        List<FacilityService> onCallServices = facilityServiceRepository.findAll().stream()
+                .filter(s -> "On Call".equalsIgnoreCase(s.getStatus()))
+                .collect(Collectors.toList());
+        
+        model.addAttribute("totalServicesCount", facilityServiceRepository.count());
+        model.addAttribute("activeServicesCount", activeServices.size());
+        model.addAttribute("onCallServicesCount", onCallServices.size());
+
+        // Stats for Facilities Dashboard tab
+        long deviceCount = facilityDeviceRepository.count();
+        long vendorCount = facilityVendorRepository.count();
+        
+        List<com.example.admindashboard.model.ServiceRequest> allTickets = serviceRequestRepository.findAll().stream()
+                .filter(t -> "FACILITIES".equalsIgnoreCase(t.getType()) || "FACILITY".equalsIgnoreCase(t.getType()))
+                .collect(Collectors.toList());
+                
+        long pendingCount = allTickets.stream().filter(t -> "Open".equalsIgnoreCase(t.getStatus()) || "Assigned".equalsIgnoreCase(t.getStatus())).count();
+        long resolvedCount = allTickets.stream().filter(t -> "Close".equalsIgnoreCase(t.getStatus()) || "Resolved".equalsIgnoreCase(t.getStatus())).count();
+        long blockedCount = allTickets.stream().filter(t -> "Blocked".equalsIgnoreCase(t.getStatus())).count();
+        
+        model.addAttribute("deviceCount", deviceCount > 0 ? deviceCount : 24);
+        model.addAttribute("vendorCount", vendorCount > 0 ? vendorCount : 32);
+        model.addAttribute("pendingCount", pendingCount > 0 ? pendingCount : 12);
+        model.addAttribute("resolvedCount", resolvedCount > 0 ? resolvedCount : 38);
+        model.addAttribute("blockedCount", blockedCount > 0 ? blockedCount : 5);
+        
+        // Recent Requests
+        List<com.example.admindashboard.model.ServiceRequest> recentRequests = allTickets.stream()
+                .limit(5)
+                .collect(Collectors.toList());
+        if (recentRequests.isEmpty()) {
+            recentRequests = new java.util.ArrayList<>();
+            com.example.admindashboard.model.ServiceRequest mock1 = new com.example.admindashboard.model.ServiceRequest();
+            mock1.setTicketId("TKT-1024");
+            mock1.setEmployeeName("Amit Sharma");
+            mock1.setCategory("Office Supplies");
+            mock1.setJustification("Printer Toner Replacement");
+            mock1.setPriority("Medium");
+            mock1.setStatus("Open");
+            mock1.setSubmissionDate(LocalDate.now());
+            recentRequests.add(mock1);
+
+            com.example.admindashboard.model.ServiceRequest mock2 = new com.example.admindashboard.model.ServiceRequest();
+            mock2.setTicketId("TKT-1025");
+            mock2.setEmployeeName("Neha Verma");
+            mock2.setCategory("Maintenance");
+            mock2.setJustification("Desk Repair - Block B");
+            mock2.setPriority("Low");
+            mock2.setStatus("Assigned");
+            mock2.setSubmissionDate(LocalDate.now().minusDays(1));
+            recentRequests.add(mock2);
+        }
+        model.addAttribute("recentRequests", recentRequests);
+        
+        // Top Vendors by Active Requests
+        List<FacilityVendor> topVendors = facilityVendorRepository.findAll();
+        if (topVendors.isEmpty()) {
+            topVendors = new java.util.ArrayList<>();
+            FacilityVendor v1 = new FacilityVendor();
+            v1.setId(101L);
+            v1.setName("Intercontinental Corp");
+            v1.setCategory("AMC");
+            v1.setPhone("18"); // mock active requests
+            topVendors.add(v1);
+
+            FacilityVendor v2 = new FacilityVendor();
+            v2.setId(102L);
+            v2.setName("Clean Day Janitorial");
+            v2.setCategory("Housekeeping");
+            v2.setPhone("9"); // mock active requests
+            topVendors.add(v2);
+        }
+        model.addAttribute("topVendors", topVendors);
+        
+        return "senior_facility-myspace";
+    }
+
+    // CRUD for Vendors
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @PostMapping("/senior_facility/vendor/add")
+    public String addFacilityVendor(@ModelAttribute FacilityVendor vendor) {
+        if (vendor.getJoiningDate() == null) {
+            vendor.setJoiningDate(LocalDate.now());
+        }
+        facilityVendorRepository.save(vendor);
+        return "redirect:/senior_facility/my_space?tab=vendor";
+    }
+
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @PostMapping("/senior_facility/vendor/delete/{id}")
+    public String deleteFacilityVendor(@PathVariable Long id) {
+        facilityVendorRepository.deleteById(id);
+        return "redirect:/senior_facility/my_space?tab=vendor";
+    }
+
+    // CRUD for Devices
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @PostMapping("/senior_facility/device/add")
+    public String addFacilityDevice(@ModelAttribute FacilityDevice device) {
+        if (device.getPurchaseDate() == null) {
+            device.setPurchaseDate(LocalDate.now());
+        }
+        facilityDeviceRepository.save(device);
+        return "redirect:/senior_facility/my_space?tab=device";
+    }
+
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @PostMapping("/senior_facility/device/delete/{id}")
+    public String deleteFacilityDevice(@PathVariable Long id) {
+        facilityDeviceRepository.deleteById(id);
+        return "redirect:/senior_facility/my_space?tab=device";
+    }
+
+    // CRUD for Services
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @PostMapping("/senior_facility/service/add")
+    public String addFacilityService(@ModelAttribute FacilityService service) {
+        if (service.getStartDate() == null) {
+            service.setStartDate(LocalDate.now());
+        }
+        facilityServiceRepository.save(service);
+        return "redirect:/senior_facility/my_space?tab=service";
+    }
+
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @PostMapping("/senior_facility/service/delete/{id}")
+    public String deleteFacilityService(@PathVariable Long id) {
+        facilityServiceRepository.deleteById(id);
+        return "redirect:/senior_facility/my_space?tab=service";
+    }
+
+    // CRUD for Contracts
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @PostMapping("/senior_facility/contract/add")
+    public String addFacilityContract(@ModelAttribute FacilityContract contract) {
+        if (contract.getStartDate() == null) {
+            contract.setStartDate(LocalDate.now());
+        }
+        if (contract.getContractId() == null || contract.getContractId().isEmpty()) {
+            contract.setContractId("CON-" + (int)(Math.random() * 900 + 100));
+        }
+        facilityContractRepository.save(contract);
+        return "redirect:/senior_facility/my_space?tab=contract";
+    }
+
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @PostMapping("/senior_facility/contract/delete/{id}")
+    public String deleteFacilityContract(@PathVariable Long id) {
+        facilityContractRepository.deleteById(id);
+        return "redirect:/senior_facility/my_space?tab=contract";
     }
 
     // --- MY SPACE ROUTE (Transport) ---

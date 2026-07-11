@@ -130,6 +130,10 @@ public class DashboardController {
             return "redirect:/senior_transport/dashboard";
         } else if (request.isUserInRole("SENIOR_REWARDS_HEAD")) {
             return "redirect:/senior_rewards/dashboard";
+        } else if (request.isUserInRole("SENIOR_FACILITY_HEAD")) {
+            return "redirect:/senior_facility/dashboard";
+        } else if (request.isUserInRole("FACILITY_L2")) {
+            return "redirect:/facility/dashboard";
         } else if (request.isUserInRole("SUPER_ADMIN") || request.isUserInRole("HR_ADMIN") ||
             request.isUserInRole("IT_ADMIN") || request.isUserInRole("HR_MANAGER") ||
             request.isUserInRole("PROJECT_MANAGER") || request.isUserInRole("FINANCE")) {
@@ -253,7 +257,7 @@ public class DashboardController {
         }).toList();
     }
 
-    @GetMapping({"/manager/dashboard", "/itsupport/dashboard", "/learninghead/dashboard", "/accounts/dashboard", "/transportation/dashboard", "/HR/dashboard", "/rewards-manager/dashboard"})
+    @GetMapping({"/manager/dashboard", "/itsupport/dashboard", "/learninghead/dashboard", "/accounts/dashboard", "/transportation/dashboard", "/HR/dashboard", "/rewards-manager/dashboard", "/facility/dashboard"})
     public String showManagerDashboard(org.springframework.ui.Model model, java.security.Principal principal, jakarta.servlet.http.HttpServletRequest request) {
         String currentUserId = principal.getName();
         User currentUser = userRepository.findByUsername(currentUserId).orElseThrow();
@@ -328,6 +332,8 @@ public class DashboardController {
             return "hr-dashboard";
         } else if (request.getRequestURI().contains("rewards-manager")) {
             return "rewards-dashboard";
+        } else if (request.getRequestURI().contains("facility")) {
+            return "facility-dashboard";
         }
         return "manager-dashboard";
     }
@@ -343,7 +349,9 @@ public class DashboardController {
         "/senior_lnd/workflow",
         "/senior_accounts/workflow",
         "/senior_transport/workflow",
-        "/senior_rewards/workflow"
+        "/senior_rewards/workflow",
+        "/facility/workflow",
+        "/senior_facility/workflow"
     })
     public String showManagerWorkflow(org.springframework.ui.Model model, java.security.Principal principal, jakarta.servlet.http.HttpServletRequest request) {
         String currentUserId = principal.getName();
@@ -601,6 +609,21 @@ public class DashboardController {
             model.addAttribute("pendingReferrals", referrals);
 
             return "hr-workflow";
+        } else if (uri.contains("facility")) {
+            java.util.List<ServiceRequest> facilityTickets = serviceRequestRepository.findAll().stream()
+                    .filter(t -> "FACILITIES".equalsIgnoreCase(t.getType()) || "FACILITY".equalsIgnoreCase(t.getType()))
+                    .collect(Collectors.toList());
+            
+            java.util.List<ServiceRequest> pendingFacilityTickets = facilityTickets.stream()
+                    .filter(t -> "Open".equalsIgnoreCase(t.getStatus()) || "Assigned".equalsIgnoreCase(t.getStatus()) || "Close".equalsIgnoreCase(t.getStatus()))
+                    .collect(Collectors.toList());
+
+            model.addAttribute("allItTickets", facilityTickets);
+            model.addAttribute("pendingTickets", pendingFacilityTickets);
+            model.addAttribute("otherTickets", new java.util.ArrayList<>());
+            model.addAttribute("isItSupport", true); // Trigger table view
+
+            return "facility-workflow";
         } else if (uri.contains("rewards")) {
             java.util.List<ServiceRequest> rewardsTickets = serviceRequestRepository.findAll().stream()
                     .filter(t -> "REWARDS".equalsIgnoreCase(t.getType()))
@@ -826,7 +849,7 @@ public class DashboardController {
         model.addAttribute("activeJobs", activeJobs);
         model.addAttribute("myReferrals", myReferrals);
         model.addAttribute("user", currentUser);
-        model.addAttribute("backUrl", "/employee/dashboard");
+        model.addAttribute("backUrl", "/default-redirect");
         return "employee-referral";
     }
 
@@ -1174,7 +1197,7 @@ public class DashboardController {
         if (referer != null && !referer.isEmpty()) {
             model.addAttribute("backUrl", referer);
         } else {
-            model.addAttribute("backUrl", "/employee/dashboard");
+            model.addAttribute("backUrl", "/default-redirect");
         }
         return "password-reset";
     }
@@ -1278,7 +1301,7 @@ public class DashboardController {
             Model model,
             Authentication authentication) {
 
-        String backUrl = "/employee/dashboard";
+        String backUrl = "/default-redirect";
 
         if (authentication != null &&
                 authentication.getAuthorities().stream()
@@ -1310,7 +1333,7 @@ public class DashboardController {
             return "redirect:/admin/dashboard";
         }
 
-        return "redirect:/employee/dashboard";
+        return "redirect:/default-redirect";
     }
     
     @PostMapping("/erp-timesheet")
@@ -1347,7 +1370,7 @@ public class DashboardController {
                 model.addAttribute("activeProjects", new ArrayList<>());
                 model.addAttribute("submittedTimesheets", new ArrayList<>());
                 
-                String backUrl = "/employee/dashboard";
+                String backUrl = "/default-redirect";
 
                 if (userDetails.getAuthorities().stream()
                         .anyMatch(a -> a.getAuthority().equals("admin_dashboard_view"))) {
@@ -1633,15 +1656,14 @@ public class DashboardController {
 
             tickets.addAll(
                     serviceRequestRepository
-                            .findByTypeOrderByIdDesc("FACILITIES")
-            );
-
-            tickets.addAll(
-                    serviceRequestRepository
                             .findByTypeOrderByIdDesc("ALUMNI")
             );
 
-        }else {
+        } else if ("FACILITY_L2".equalsIgnoreCase(roleName) || "SENIOR_FACILITY_HEAD".equalsIgnoreCase(roleName)) {
+            tickets = new ArrayList<>(
+                    serviceRequestRepository.findByTypeOrderByIdDesc("FACILITIES")
+            );
+        } else {
 
             tickets = new ArrayList<>();
         }

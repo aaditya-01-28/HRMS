@@ -288,7 +288,7 @@ public class AttendanceService {
             LocalDate monday) {
 
         List<AttendanceDayDTO> result = new ArrayList<>();
-        String weekStatus = "Draft";
+        String weekStatus = "Not Submitted";
 
         LocalDate mondayDate = monday;
 
@@ -305,7 +305,7 @@ public class AttendanceService {
 
         if (weeklyAttendance.isEmpty()) {
 
-            weekStatus = "Draft";
+            weekStatus = "Not Submitted";
 
         } else {
 
@@ -320,7 +320,7 @@ public class AttendanceService {
 
             }else {
 
-                weekStatus = "Draft";
+                weekStatus = "Not Submitted";
             }
         }
 

@@ -346,7 +346,32 @@
             .telemetry-metrics-readout-strip { flex-direction: column; gap: 15px; }
             .node-monthly-hours, .node-submitted-weeks, .node-drafts-pending { width: 100%; }
         }
+
+        @media (max-width: 768px) {
+            .erp-hero-banner {
+                height: auto !important;
+                padding: 20px 15px !important;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                position: relative;
+            }
+            .btn-floating-back-home {
+                position: static !important;
+                align-self: flex-start;
+                margin-top: 10px;
+                display: inline-flex;
+            }
+            .timesheet-matrix-table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
     </style>
+    <link href="/css/dark-mode.css" rel="stylesheet">
+    <script src="/js/theme-engine.js"></script>
 </head>
 <body>
 
@@ -356,7 +381,7 @@
         <h1 class="erp-banner-raw-title">Weekly Timesheet Inbox</h1>
         <p class="erp-banner-subtitle">View and manage your timesheet records</p>
     </div>
-	<a href="/erp-timesheet" class="btn-floating-back-home">
+	<a href="/default-redirect" class="btn-floating-back-home">
 	    <i class="fas fa-arrow-left"></i> Back to Home
 	</a>
 </div>

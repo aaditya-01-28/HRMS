@@ -5,6 +5,10 @@ import com.example.admindashboard.repository.ClientRepository;
 import com.example.admindashboard.repository.PermissionRepository;
 import com.example.admindashboard.repository.RoleRepository;
 import com.example.admindashboard.repository.UserRepository;
+import com.example.admindashboard.repository.FacilityVendorRepository;
+import com.example.admindashboard.repository.FacilityDeviceRepository;
+import com.example.admindashboard.repository.FacilityServiceRepository;
+import com.example.admindashboard.repository.FacilityContractRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -43,6 +47,18 @@ public class DatabaseSeeder implements CommandLineRunner {
     // NEW: Injecting JdbcTemplate to fix the database constraint
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private FacilityVendorRepository facilityVendorRepository;
+
+    @Autowired
+    private FacilityDeviceRepository facilityDeviceRepository;
+
+    @Autowired
+    private FacilityServiceRepository facilityServiceRepository;
+
+    @Autowired
+    private FacilityContractRepository facilityContractRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -115,6 +131,8 @@ public class DatabaseSeeder implements CommandLineRunner {
         Role seniorAccountsHeadRole = getOrCreateRole("SENIOR_ACCOUNTS_HEAD");
         Role seniorTransportHeadRole = getOrCreateRole("SENIOR_TRANSPORT_HEAD");
         Role seniorRewardsHeadRole = getOrCreateRole("SENIOR_REWARDS_HEAD");
+        Role facilityL2Role = getOrCreateRole("FACILITY_L2");
+        Role seniorFacilityHeadRole = getOrCreateRole("SENIOR_FACILITY_HEAD");
 
         // ==========================================
         // THE MATRIX MAPPING (Strict 1:1 with BRD)
@@ -390,6 +408,18 @@ public class DatabaseSeeder implements CommandLineRunner {
                 rewardProgramManage, rewardCatalogManage, pointsAllocate, pointsAdjust, rewardApprove, rewardReportView, campaignManage, notificationConfigure, platformConfigure
         )));
         roleRepository.save(seniorRewardsHeadRole);
+
+        // FACILITY L2
+        facilityL2Role.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView, empView
+        )));
+        roleRepository.save(facilityL2Role);
+
+        // SENIOR FACILITY HEAD
+        seniorFacilityHeadRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView, empView
+        )));
+        roleRepository.save(seniorFacilityHeadRole);
 
         // REWARDS
         rewardsRole.setPermissions(new HashSet<>(Arrays.asList(
@@ -1235,6 +1265,300 @@ public class DatabaseSeeder implements CommandLineRunner {
             seedLeaveRequest("EMP114", "Annual Leave", LocalDate.of(2026, 6, 25), LocalDate.of(2026, 6, 29), 5.0, "Vacation", "Pending");
             seedLeaveRequest("EMP187", "Casual Leave", LocalDate.of(2026, 6, 16), LocalDate.of(2026, 6, 16), 1.0, "Personal Work", "Rejected");
             System.out.println("✅ Seeded Leave Requests.");
+        }
+
+        // ==========================================
+        // SEED FACILITIES ACCOUNTS AND DATA
+        // ==========================================
+        Role facL2 = getOrCreateRole("FACILITY_L2");
+        Role facL3 = getOrCreateRole("SENIOR_FACILITY_HEAD");
+
+        // Clean up old facility_l2/facility_l3 users if present
+        userRepository.findByUsername("facility_l2").ifPresent(u -> userRepository.delete(u));
+        userRepository.findByUsername("facility_l3").ifPresent(u -> userRepository.delete(u));
+
+        if (userRepository.findByUsername("EMP203").isEmpty()) {
+            User user = new User();
+            user.setUsername("EMP203");
+            user.setPassword("{noop}Welcome@123");
+            user.setRole(facL2);
+            user.setFullName("Rajesh Kumar");
+            user.setEmail("facility.l2@wcg.com");
+            user.setDesignation("Facilities Admin");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("Facilities Admin");
+            profile.setDepartment("Facilities");
+            profile.setJoiningDate(LocalDate.now());
+            profile.setWorkLocation("Delhi");
+            profile.setEmployeeCode("EMP203");
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+            System.out.println("✅ Seeded user: EMP203");
+        }
+
+        if (userRepository.findByUsername("ADMIN105").isEmpty()) {
+            User user = new User();
+            user.setUsername("ADMIN105");
+            user.setPassword("{noop}Welcome@123");
+            user.setRole(facL3);
+            user.setFullName("Sanjay Singh");
+            user.setEmail("facility.l3@wcg.com");
+            user.setDesignation("Facility Head");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("Facility Head");
+            profile.setDepartment("Facilities");
+            profile.setJoiningDate(LocalDate.now());
+            profile.setWorkLocation("Delhi");
+            profile.setEmployeeCode("ADMIN105");
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+            System.out.println("✅ Seeded user: ADMIN105");
+        }
+
+        // Seed Facility Vendors
+        if (facilityVendorRepository.count() == 0) {
+            FacilityVendor v1 = new FacilityVendor();
+            v1.setName("CleanAir Solutions");
+            v1.setCategory("Maintenance");
+            v1.setContactPerson("Amit Patel");
+            v1.setPhone("+91-9876543210");
+            v1.setEmail("amit@coolair.com");
+            v1.setStatus("Active");
+            v1.setJoiningDate(LocalDate.of(2025, 5, 12));
+            facilityVendorRepository.save(v1);
+
+            FacilityVendor v2 = new FacilityVendor();
+            v2.setName("Sparkle Clean Services");
+            v2.setCategory("Housekeeping");
+            v2.setContactPerson("Priya Sharma");
+            v2.setPhone("+91-9876543211");
+            v2.setEmail("priya@sparkle.com");
+            v2.setStatus("Active");
+            v2.setJoiningDate(LocalDate.of(2025, 6, 1));
+            facilityVendorRepository.save(v2);
+
+            FacilityVendor v3 = new FacilityVendor();
+            v3.setName("PowerFix Engineers");
+            v3.setCategory("Maintenance");
+            v3.setContactPerson("Rajiv Mehta");
+            v3.setPhone("+91-9876543212");
+            v3.setEmail("rajiv@powerfix.com");
+            v3.setStatus("Active");
+            v3.setJoiningDate(LocalDate.of(2025, 7, 15));
+            facilityVendorRepository.save(v3);
+
+            FacilityVendor v4 = new FacilityVendor();
+            v4.setName("Aqua Care Services");
+            v4.setCategory("Maintenance");
+            v4.setContactPerson("Siddharth Jain");
+            v4.setPhone("+91-9876543213");
+            v4.setEmail("sid@aquacare.com");
+            v4.setStatus("Active");
+            v4.setJoiningDate(LocalDate.of(2025, 8, 10));
+            facilityVendorRepository.save(v4);
+
+            FacilityVendor v5 = new FacilityVendor();
+            v5.setName("Intercontinental Corp");
+            v5.setCategory("AMC");
+            v5.setContactPerson("David Miller");
+            v5.setPhone("+91-9876543214");
+            v5.setEmail("david@intercontinental.com");
+            v5.setStatus("Active");
+            v5.setJoiningDate(LocalDate.of(2025, 9, 20));
+            facilityVendorRepository.save(v5);
+
+            System.out.println("✅ Seeded Facility Vendors.");
+        }
+
+        // Seed Facility Devices
+        if (facilityDeviceRepository.count() == 0) {
+            FacilityDevice d1 = new FacilityDevice();
+            d1.setDeviceName("AC Preventive Maintenance");
+            d1.setDeviceModel("Split AC 2 Ton");
+            d1.setVendorName("CleanAir Solutions");
+            d1.setSerialNumber("AC-SPL-001");
+            d1.setCost(45000.0);
+            d1.setWarrantyExpiry(LocalDate.of(2028, 12, 31));
+            d1.setPurchaseDate(LocalDate.of(2025, 1, 10));
+            d1.setLocation("L3, Block A");
+            d1.setIpAddress("192.168.1.50");
+            d1.setMacAddress("00:1A:2B:3C:4D:5E");
+            d1.setStatus("Active");
+            facilityDeviceRepository.save(d1);
+
+            FacilityDevice d2 = new FacilityDevice();
+            d2.setDeviceName("Electrical Panel Check");
+            d2.setDeviceModel("Main Distribution Board");
+            d2.setVendorName("Sparkle Clean Services");
+            d2.setSerialNumber("EP-MDB-002");
+            d2.setCost(85000.0);
+            d2.setWarrantyExpiry(LocalDate.of(2030, 5, 20));
+            d2.setPurchaseDate(LocalDate.of(2025, 2, 15));
+            d2.setLocation("Basement, Block B");
+            d2.setIpAddress("");
+            d2.setMacAddress("");
+            d2.setStatus("Active");
+            facilityDeviceRepository.save(d2);
+
+            FacilityDevice d3 = new FacilityDevice();
+            d3.setDeviceName("Generator Servicing");
+            d3.setDeviceModel("250 kVA Genset");
+            d3.setVendorName("PowerFix Engineers");
+            d3.setSerialNumber("GEN-250-003");
+            d3.setCost(15000.0);
+            d3.setWarrantyExpiry(LocalDate.of(2027, 7, 15));
+            d3.setPurchaseDate(LocalDate.of(2025, 3, 20));
+            d3.setLocation("Power House, Yard");
+            d3.setIpAddress("");
+            d3.setMacAddress("");
+            d3.setStatus("Active");
+            facilityDeviceRepository.save(d3);
+
+            FacilityDevice d4 = new FacilityDevice();
+            d4.setDeviceName("Plumbing Inspection");
+            d4.setDeviceModel("Water Filtration System");
+            d4.setVendorName("Aqua Care Services");
+            d4.setSerialNumber("PL-WFS-004");
+            d4.setCost(35000.0);
+            d4.setWarrantyExpiry(LocalDate.of(2026, 8, 10));
+            d4.setPurchaseDate(LocalDate.of(2025, 4, 10));
+            d4.setLocation("Terrace, Block C");
+            d4.setIpAddress("");
+            d4.setMacAddress("");
+            d4.setStatus("Active");
+            facilityDeviceRepository.save(d4);
+
+            System.out.println("✅ Seeded Facility Devices.");
+        }
+
+        // Seed Facility Services
+        if (facilityServiceRepository.count() == 0) {
+            FacilityService s1 = new FacilityService();
+            s1.setServiceName("AC Preventive Maintenance");
+            s1.setCategory("Maintenance");
+            s1.setVendorName("CleanAir Solutions");
+            s1.setCost(12000.0);
+            s1.setDescription("All AC Units");
+            s1.setStartDate(LocalDate.of(2026, 5, 12));
+            s1.setEndDate(LocalDate.of(2027, 5, 12));
+            s1.setNextBillDate(LocalDate.of(2026, 6, 12));
+            s1.setStatus("Active");
+            s1.setFrequency("Monthly");
+            s1.setAssignedTo("Rajesh Kumar");
+            s1.setPriority("Medium");
+            facilityServiceRepository.save(s1);
+
+            FacilityService s2 = new FacilityService();
+            s2.setServiceName("Electrical Panel Check");
+            s2.setCategory("Maintenance");
+            s2.setVendorName("Sparkle Clean Services");
+            s2.setCost(45000.0);
+            s2.setDescription("Main Building");
+            s2.setStartDate(LocalDate.of(2026, 5, 20));
+            s2.setEndDate(LocalDate.of(2027, 5, 20));
+            s2.setNextBillDate(LocalDate.of(2026, 8, 20));
+            s2.setStatus("Active");
+            s2.setFrequency("Quarterly");
+            s2.setAssignedTo("Rajesh Kumar");
+            s2.setPriority("High");
+            facilityServiceRepository.save(s2);
+
+            FacilityService s3 = new FacilityService();
+            s3.setServiceName("Generator Servicing");
+            s3.setCategory("Maintenance");
+            s3.setVendorName("PowerFix Engineers");
+            s3.setCost(15000.0);
+            s3.setDescription("Backup Generator");
+            s3.setStartDate(LocalDate.of(2026, 5, 15));
+            s3.setEndDate(LocalDate.of(2027, 5, 15));
+            s3.setNextBillDate(LocalDate.of(2026, 6, 15));
+            s3.setStatus("Active");
+            s3.setFrequency("Monthly");
+            s3.setAssignedTo("Rajesh Kumar");
+            s3.setPriority("Medium");
+            facilityServiceRepository.save(s3);
+
+            FacilityService s4 = new FacilityService();
+            s4.setServiceName("Plumbing Inspection");
+            s4.setCategory("Maintenance");
+            s4.setVendorName("Aqua Care Services");
+            s4.setCost(5000.0);
+            s4.setDescription("All Washrooms");
+            s4.setStartDate(LocalDate.of(2026, 5, 8));
+            s4.setEndDate(LocalDate.of(2027, 5, 8));
+            s4.setNextBillDate(LocalDate.of(2026, 5, 15));
+            s4.setStatus("On Call");
+            s4.setFrequency("Weekly");
+            s4.setAssignedTo("Rajesh Kumar");
+            s4.setPriority("Medium");
+            facilityServiceRepository.save(s4);
+
+            System.out.println("✅ Seeded Facility Services.");
+        }
+
+        // Seed Facility Contracts
+        if (facilityContractRepository.count() == 0) {
+            FacilityContract c1 = new FacilityContract();
+            c1.setContractId("CON-101");
+            c1.setContractName("HVAC Maintenance AMC");
+            c1.setVendorName("CleanAir Solutions");
+            c1.setCategory("Maintenance");
+            c1.setStartDate(LocalDate.of(2026, 1, 1));
+            c1.setEndDate(LocalDate.of(2026, 12, 31));
+            c1.setNextBillDate(LocalDate.of(2026, 2, 1));
+            c1.setCost(120000.0);
+            c1.setStatus("Active");
+            c1.setDescription("Annual Maintenance Contract for all air conditioning units.");
+            facilityContractRepository.save(c1);
+
+            FacilityContract c2 = new FacilityContract();
+            c2.setContractId("CON-102");
+            c2.setContractName("Daily Office Cleaning");
+            c2.setVendorName("Sparkle Clean Services");
+            c2.setCategory("Housekeeping");
+            c2.setStartDate(LocalDate.of(2026, 2, 1));
+            c2.setEndDate(LocalDate.of(2027, 1, 31));
+            c2.setNextBillDate(LocalDate.of(2026, 3, 1));
+            c2.setCost(45000.0);
+            c2.setStatus("Active");
+            c2.setDescription("Daily cleaning services contract.");
+            facilityContractRepository.save(c2);
+
+            FacilityContract c3 = new FacilityContract();
+            c3.setContractId("CON-103");
+            c3.setContractName("Main Building Security");
+            c3.setVendorName("Intercontinental Corp");
+            c3.setCategory("Security");
+            c3.setStartDate(LocalDate.of(2026, 3, 1));
+            c3.setEndDate(LocalDate.of(2027, 2, 28));
+            c3.setNextBillDate(LocalDate.of(2026, 4, 1));
+            c3.setCost(95000.0);
+            c3.setStatus("Active");
+            c3.setDescription("Building security guards deployment contract.");
+            facilityContractRepository.save(c3);
+
+            FacilityContract c4 = new FacilityContract();
+            c4.setContractId("CON-104");
+            c4.setContractName("Fire Safety Systems AMC");
+            c4.setVendorName("PowerFix Engineers");
+            c4.setCategory("AMC");
+            c4.setStartDate(LocalDate.of(2025, 6, 1));
+            c4.setEndDate(LocalDate.of(2026, 5, 31));
+            c4.setNextBillDate(LocalDate.of(2026, 6, 1));
+            c4.setCost(25000.0);
+            c4.setStatus("Expired");
+            c4.setDescription("Annual maintenance for fire alarm and extinguisher systems.");
+            facilityContractRepository.save(c4);
+
+            System.out.println("✅ Seeded Facility Contracts.");
         }
     }
 

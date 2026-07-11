@@ -745,6 +745,12 @@
         }
 
         // --- TIME VALIDATION CHECK ---
+        const timeFormatRegex = /^\d{2}:\d{2}$/;
+        if (!timeFormatRegex.test(payload.startTime) || !timeFormatRegex.test(payload.endTime)) {
+            Swal.fire({ icon: 'error', title: 'Invalid Time Format', text: 'Please enter a valid Start and End Time (HH:MM).', confirmButtonColor: '#1e3a8a' });
+            return;
+        }
+
         const [startHours, startMins] = payload.startTime.split(':').map(Number);
         const [endHours, endMins] = payload.endTime.split(':').map(Number);
         const totalStart = (startHours * 60) + startMins;

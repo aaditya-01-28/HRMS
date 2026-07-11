@@ -186,7 +186,36 @@
             color: #64748b;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         @media (max-width: 768px) {
+            .approval-table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .top-header {
+                padding: 0 12px !important;
+                height: auto !important;
+                min-height: 62px;
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+            }
+            .approval-title span {
+                font-size: 16px !important;
+            }
+            .home-btn {
+                padding: 6px 12px !important;
+                font-size: 12px !important;
+            }
+            .page-content {
+                margin-top: 90px !important;
+                padding: 12px 10px !important;
+            }
             .custom-tabs {
                 overflow-x: auto;
                 white-space: nowrap;

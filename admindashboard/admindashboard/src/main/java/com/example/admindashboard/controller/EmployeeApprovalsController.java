@@ -58,7 +58,7 @@ public class EmployeeApprovalsController {
         model.addAttribute("totalPending", totalPending);
 
         String referer = request.getHeader("referer");
-        model.addAttribute("backLink", referer != null && !referer.isBlank() ? referer : "/employee/dashboard");
+        model.addAttribute("backLink", referer != null && !referer.isBlank() ? referer : "/default-redirect");
 
         // 3. FETCH APPROVED REQUESTS (Strictly bound to currentUser)
         List<LeaveRequest> approvedLeaves = leaveRepo.findByUserAndStatusIgnoreCaseOrderByIdDesc(currentUser, "Approved");

@@ -138,28 +138,27 @@
 		======================================== */
 
 		.tree{
-
 		    display:inline-block;
 		}
 
 		.tree ul{
-
-		    padding-top:30px;
-
-		    position:relative;
+			display: flex;
+			justify-content: center;
+			padding-top: 30px;
+			position: relative;
+			margin: 0;
+			padding-left: 0;
 		}
 
 		.tree li{
-
-		    float:left;
-
-		    text-align:center;
-
-		    list-style:none;
-
-		    position:relative;
-
-		    padding:30px 15px 0 15px;
+			text-align: center;
+			list-style: none;
+			position: relative;
+			padding: 30px 10px 0 10px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			flex-shrink: 0;
 		}
 
 		.tree::after{
@@ -355,20 +354,27 @@
 		@media(max-width:768px){
 
 		    .page-header{
-
-		        flex-direction:column;
-
-		        gap:20px;
-
-		        height:auto;
+                padding: 15px !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                gap: 12px !important;
+                height: auto !important;
 		    }
 
 		    .page-title{
-
-		        font-size:32px;
+                font-size: 24px !important;
+                margin-bottom: 5px !important;
+                text-align: center;
 		    }
+
+            .dashboard-btn {
+                padding: 8px 14px !important;
+                font-size: 12px !important;
+            }
 		}
 	</style>
+    <link href="/css/dark-mode.css" rel="stylesheet">
+    <script src="/js/theme-engine.js"></script>
 </head>
 
 <body>

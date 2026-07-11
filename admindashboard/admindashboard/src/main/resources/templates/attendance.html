@@ -1047,7 +1047,7 @@
 	                        class="btn attendance-submit-btn"
 	                        id="modalSubmitBtn">
 
-	                    Submit
+	                    Save/Set
 
 	                </button>
 
@@ -1390,6 +1390,16 @@
 
 	    try {
 
+			const todayStr = new Date().toISOString().split('T')[0];
+			if (selectedAttendanceDate < todayStr) {
+			    Swal.fire({
+			        icon: 'warning',
+			        title: 'Invalid Date',
+			        text: 'You cannot record attendance for past dates.'
+			    });
+			    return;
+			}
+
 			const hours =
 			    document.getElementById(
 			        'durationHours'
@@ -1399,6 +1409,17 @@
 			    document.getElementById(
 			        'durationMinutes'
 			    ).value || 0;
+
+			const hrsInt = parseInt(hours);
+			const minsInt = parseInt(minutes);
+			if (hrsInt > 24 || (hrsInt === 24 && minsInt > 0) || hrsInt < 0 || minsInt < 0 || minsInt >= 60) {
+			    Swal.fire({
+			        icon: 'warning',
+			        title: 'Invalid Duration',
+			        text: 'Attendance duration must be between 0 and 24 hours.'
+			    });
+			    return;
+			}
 				
 			const enteredMinutes =
 			    (parseInt(hours) * 60) +

@@ -37,7 +37,7 @@
             z-index: 1051;
             transition: transform 0.3s ease;
         }
-        body.sidebar-toggled .myspace-sidebar { transform: translateX(-100%); }
+        body.sidebar-open .myspace-sidebar { transform: translateX(0); }
 
         .myspace-sidebar .brand-area {
             padding: 15px;
@@ -107,7 +107,7 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             transition: left 0.3s ease;
         }
-        body.sidebar-toggled .top-navbar { left: 0; }
+
         
         .nav-brand {
             display: flex; align-items: center; gap: 15px;
@@ -123,7 +123,7 @@
             min-height: calc(100vh - var(--header-height));
             transition: margin-left 0.3s ease;
         }
-        body.sidebar-toggled .myspace-main { margin-left: 0; }
+
 
         /* --- NAV TABS --- */
         .custom-tabs {
@@ -230,28 +230,226 @@
         .stepper-label { font-weight: 600; color: #64748b; font-size: 0.9rem; }
         .stepper-item.active .stepper-label { color: #1e293b; }
 
-        /* === MOBILE RESPONSIVE (BUG-020) === */
-        @media (max-width: 992px) {
-            .myspace-sidebar { transform: translateX(-100%); }
-            body.sidebar-toggled .myspace-sidebar { transform: translateX(0); }
-            .main-content { margin-left: 0 !important; width: 100% !important; }
-            .top-navbar { left: 0 !important; width: 100% !important; }
+        /* === MOBILE RESPONSIVE === */
+
+        /* Sidebar overlay backdrop */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 1050;
+            backdrop-filter: blur(2px);
         }
+
+        /* ---- TABLET (≤992px) ---- */
+        @media (max-width: 992px) {
+            .myspace-sidebar {
+                transform: translateX(-100%);
+            }
+            body.sidebar-open .myspace-sidebar {
+                transform: translateX(0);
+            }
+            body.sidebar-open .sidebar-overlay {
+                display: block;
+            }
+            .myspace-main {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            .top-navbar {
+                left: 0 !important;
+                width: 100% !important;
+            }
+            /* Charts row: stack vertically */
+            .row.mb-5 > .col-md-5,
+            .row.mb-5 > .col-md-7 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+
+        /* ---- MOBILE (≤768px) ---- */
         @media (max-width: 768px) {
-            .top-navbar { flex-direction: column; height: auto !important; padding: 10px !important; gap: 8px; }
-            .d-flex.flex-wrap.gap-2.gap-md-3 { flex-direction: column; }
-            .form-select.w-auto { width: 100% !important; }
-            .d-flex.justify-content-between.align-items-center.mt-3 { flex-direction: column; gap: 10px; }
-            .stat-item { min-width: 120px; }
+            :root {
+                --header-height: auto;
+            }
+            .top-navbar {
+                flex-direction: row;
+                flex-wrap: wrap;
+                height: auto !important;
+                padding: 10px 15px !important;
+                gap: 8px;
+            }
+            .top-navbar .nav-brand {
+                font-size: 1rem;
+                gap: 8px;
+            }
+            .top-navbar .nav-brand .d-flex.flex-column span:first-child {
+                font-size: 1rem !important;
+            }
+            .top-navbar .nav-brand .d-flex.flex-column span:last-child {
+                font-size: 0.75rem !important;
+            }
+            .myspace-main {
+                padding: 15px !important;
+                margin-top: 60px !important;
+            }
+
+            /* Tabs: horizontal scroll */
+            .custom-tabs {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                white-space: nowrap;
+                padding-bottom: 2px;
+            }
+            .custom-tabs::-webkit-scrollbar { display: none; }
+            .custom-tabs .nav-item { flex-shrink: 0; }
+            .custom-tabs .nav-link {
+                padding: 10px 14px;
+                font-size: 0.82rem;
+                white-space: nowrap;
+            }
+
+            /* Stats row: wrap into grid */
+            .d-flex.justify-content-between.align-items-center.mb-5.mt-3.px-3 {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 12px !important;
+                justify-content: flex-start !important;
+            }
+            .stat-item {
+                min-width: calc(50% - 12px);
+                flex: 0 0 calc(50% - 12px);
+                gap: 10px !important;
+            }
+            .stat-item .icon { font-size: 1.5rem !important; }
+            .stat-item .label { font-size: 0.72rem; }
+            .stat-item .value { font-size: 1.2rem !important; }
+
+            /* Charts: stack and center */
+            .d-flex.align-items-center.justify-content-center {
+                flex-direction: column !important;
+                align-items: center !important;
+            }
+            .d-flex.align-items-center.justify-content-center .ms-4 {
+                margin-left: 0 !important;
+                margin-top: 15px;
+            }
+            .px-5 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+
+            /* Filters: wrap properly */
+            .d-flex.flex-wrap.gap-2.gap-md-3 {
+                flex-wrap: wrap !important;
+            }
+            .form-select.w-auto {
+                width: 100% !important;
+                min-width: unset !important;
+            }
+            .position-relative.flex-grow-1 {
+                max-width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            /* Table */
             .table-responsive { font-size: 0.8rem; }
             .card-custom { padding: 12px !important; }
+
+            /* Pagination row */
+            .d-flex.justify-content-between.align-items-center.mt-3 {
+                flex-direction: column !important;
+                gap: 10px;
+                text-align: center;
+            }
+
+            /* Stepper: horizontal scroll */
+            .stepper-wrapper {
+                overflow-x: auto;
+                flex-wrap: nowrap !important;
+                gap: 0;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            .stepper-wrapper::-webkit-scrollbar { display: none; }
+            .stepper-item {
+                flex-shrink: 0;
+                min-width: max-content;
+                padding: 0 6px;
+            }
+            .stepper-label { font-size: 0.75rem; }
+            .stepper-circle { width: 26px; height: 26px; font-size: 0.8rem; }
+
+            /* Form fields inside wizard */
+            .row.g-4 > [class*="col-md-3"],
+            .row.g-4 > [class*="col-md-4"],
+            .row.g-4 > [class*="col-md-6"] {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
         }
+
+        /* ---- SMALL MOBILE (≤576px) ---- */
         @media (max-width: 576px) {
-            .main-content { padding: 10px !important; margin-top: 60px !important; }
-            .stat-item { min-width: 100px; font-size: 0.75rem; }
-            .stat-item .value { font-size: 1.2rem !important; }
-            .table th, .table td { padding: 6px 4px !important; font-size: 0.75rem; }
-            .pagination { flex-wrap: wrap; }
+            .myspace-main {
+                padding: 10px !important;
+                margin-top: 56px !important;
+            }
+            .top-navbar {
+                padding: 8px 10px !important;
+            }
+            .top-navbar .nav-brand .d-flex.flex-column span:first-child {
+                font-size: 0.88rem !important;
+            }
+
+            /* Stats: single column */
+            .stat-item {
+                min-width: 100% !important;
+                flex: 0 0 100% !important;
+            }
+
+            /* Table cells */
+            .table-custom thead th {
+                padding: 8px 6px !important;
+                font-size: 0.73rem !important;
+            }
+            .table-custom tbody td {
+                padding: 10px 6px !important;
+                font-size: 0.73rem !important;
+            }
+            .emp-avatar {
+                width: 28px !important;
+                height: 28px !important;
+                margin-right: 6px !important;
+                font-size: 0.65rem !important;
+            }
+
+            /* Pagination */
+            .pagination { flex-wrap: wrap; justify-content: center; }
+            .pagination .page-link { font-size: 0.75rem; padding: 4px 8px; }
+
+            /* Modals */
+            .modal-dialog {
+                max-width: calc(100vw - 20px) !important;
+                margin: 10px !important;
+            }
+
+            /* Card custom */
+            .card-custom {
+                padding: 8px !important;
+                border-radius: 8px !important;
+            }
+
+            /* Back button in navbar */
+            .nav-actions .btn {
+                padding: 6px 12px !important;
+                font-size: 0.8rem !important;
+            }
         }
 
     </style>
@@ -299,10 +497,12 @@
             </a>
         </div>
 </div>
+<!-- SIDEBAR OVERLAY (mobile backdrop) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="document.body.classList.remove('sidebar-open')"></div>
 <!-- GLOBAL NAVBAR -->
 <nav class="top-navbar">
 <div class="nav-brand">
-<button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-toggled')"><i class="fas fa-bars"></i></button>
+<button class="btn btn-light" onclick="document.body.classList.toggle('sidebar-open')"><i class="fas fa-bars"></i></button>
 <div class="d-flex flex-column lh-1 ms-2" style="padding: 5px 10px;">
 <span style="color: #002D72; font-weight: 700; font-size: 1.3rem;">WhiteCircle Group - Shahdol</span>
 <span style="font-size: 0.85rem; font-weight: 500; color: #333; margin-top: 2px;">Employee Directory</span>

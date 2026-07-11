@@ -582,7 +582,7 @@
             if (window.recentLeavesData && window.recentLeavesData.length > 0) {
                 const isDuplicate = window.recentLeavesData.some(leave => {
                     // Ignore leaves that were previously rejected
-                    if (leave.status === 'REJECTED') return false;
+                    if (leave.status && leave.status.toUpperCase() === 'REJECTED') return false;
 
                     const existingStart = new Date(leave.fromDate);
                     const existingEnd = new Date(leave.toDate);

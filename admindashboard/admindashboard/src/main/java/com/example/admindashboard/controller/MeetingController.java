@@ -40,7 +40,11 @@ public class MeetingController {
             // 2. Attach the organizer to the meeting
             meeting.setOrganizer(organizer);
 
-            // 3. Validate Date (Max 1 Year in advance & Not in the past)
+            // 3. Validate Date & Time fields are not null
+            if (meeting.getMeetingDate() == null || meeting.getStartTime() == null || meeting.getEndTime() == null) {
+                return ResponseEntity.badRequest().body("Meeting Date, Start Time, and End Time are required.");
+            }
+
             java.time.LocalDate today = java.time.LocalDate.now();
             if (meeting.getMeetingDate().isBefore(today)) {
                 return ResponseEntity.badRequest().body("Cannot book meetings in the past.");

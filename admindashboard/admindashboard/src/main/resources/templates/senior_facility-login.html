@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Facility Head</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial,sans-serif;
+        }
+
+        body{
+            font-family:Arial,sans-serif;
+            font-size:14px;
+            background:#e5e7eb;
+            margin:0;
+            padding:0;
+            height:100vh;
+            overflow:hidden;
+        }
+
+        .split-screen-container{
+            display:flex;
+            width:100%;
+            height:100vh;
+        }
+
+        .left-banner-side{
+            flex:1;
+            background:
+                    linear-gradient(rgba(0,0,0,0.1),rgba(0,0,0,0.1)),
+                    url('/images/Reception.png');
+            background-size:cover;
+            background-position:center;
+            display:none;
+        }
+
+        @media(min-width:768px){
+            .left-banner-side{
+                display:block;
+            }
+        }
+
+        .right-login-side{
+            width:100%;
+            background:#dcdcdc;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            position:relative;
+            padding:40px;
+        }
+
+        @media(min-width:768px){
+            .right-login-side{
+                width:45%;
+                flex-shrink:0;
+            }
+        }
+
+        .btn-circular-back{
+            position:absolute;
+            top:30px;
+            left:30px;
+            width:46px;
+            height:46px;
+            background:#002D72;
+            color:#fff !important;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            text-decoration:none;
+            font-size:18px;
+            box-shadow:0 4px 10px rgba(0,102,255,.3);
+        }
+
+        .btn-circular-back:hover{
+            background:#001A4A;
+        }
+
+        .brand-logo-card{
+            width:85px;
+            height:85px;
+            background:transparent;
+            border-radius:12px;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            padding:0;
+            margin-bottom:35px;
+        }
+
+        .brand-logo-card img{
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            border-radius:12px;
+            display:block;
+        }
+
+        .custom-logo-vector{
+            width:40px;
+            height:40px;
+            border:2px solid #fff;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#fff;
+            font-weight:800;
+            font-size:20px;
+            position:relative;
+        }
+
+        .custom-logo-vector::after{
+            content:'↗';
+            position:absolute;
+            top:-2px;
+            right:4px;
+            font-size:12px;
+        }
+
+        .brand-logo-card span{
+            color:#fff;
+            font-size:9px;
+            font-weight:700;
+            margin-top:6px;
+            text-transform:uppercase;
+        }
+
+        .welcome-headline{
+            font-size:20px;
+            font-weight:700;
+            color:#000;
+            margin-bottom:35px;
+        }
+
+        .login-form-box{
+            width:100%;
+            max-width:360px;
+        }
+
+        .input-wrapper-group{
+            position:relative;
+            margin-bottom:20px;
+        }
+
+        .input-label-caption{
+            display:block;
+            font-size:14px;
+            font-weight:600;
+            color:#222;
+            margin-bottom:6px;
+        }
+
+        .input-icon-decor{
+            position:absolute;
+            left:14px;
+            top:41px;
+            color:#666;
+            font-size:14px;
+        }
+
+        .sso-input-field{
+            width:100%;
+            background:#bcbcbc;
+            border:1px solid #888;
+            border-radius:6px;
+            padding:10px 15px 10px 40px;
+            font-size:14px;
+            color:#000;
+            outline:none;
+        }
+
+        .sso-input-field:focus{
+            border-color:#002D72;
+        }
+
+        .link-forgot-password{
+            color:#ef4444;
+            font-size:14px;
+            font-weight:700;
+            text-decoration:none;
+            display:inline-block;
+            margin-bottom:25px;
+        }
+
+        .link-forgot-password:hover{
+            color:#dc2626;
+        }
+
+        .btn-continue-sso{
+            width:100%;
+            background:#1e3a8a;
+            color:#fff;
+            font-weight:600;
+            font-size:14px;
+            padding:12px;
+            border-radius:8px;
+            border:none;
+            cursor:pointer;
+            box-shadow:0 4px 12px rgba(37,99,235,.25);
+        }
+
+        .btn-continue-sso:hover{
+            background:#1d4ed8;
+        }
+
+        .social-footer-row{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            gap:32px;
+            margin-top:60px;
+        }
+
+        .social-icon-anchor{
+            color:#000;
+            font-size:24px;
+            text-decoration:none;
+        }
+
+        .social-icon-anchor:hover{
+            color:#1e3a8a;
+        }
+
+        .auth-error{
+            color:#dc2626;
+            font-size:14px;
+            font-weight:700;
+            margin-bottom:15px;
+        }
+
+        @media(max-width:768px){
+
+            .right-login-side{
+                width:100%;
+                padding:25px;
+            }
+
+            .welcome-headline{
+                font-size:20px;
+            }
+
+            .login-form-box{
+                max-width:100%;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="split-screen-container">
+
+    <div class="left-banner-side"></div>
+
+    <div class="right-login-side">
+
+        <a href="/senior_facility/dashboard" class="btn-circular-back">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+
+        <div class="brand-logo-card" style="background: none; box-shadow: none; border-radius: 0; width: auto; height: auto; padding: 0;">
+            <img src="/images/wcg-logo.jpg" alt="White Circle" style="height: 85px; border-radius: 12px; object-fit: contain;">
+        </div>
+
+        <h2 class="welcome-headline">
+            Welcome Back!
+        </h2>
+
+        <div class="login-form-box">
+
+            <form th:action="@{/senior_facility/login}" method="POST">
+
+                <div class="input-wrapper-group">
+
+                    <label class="input-label-caption">
+                        Username or Employee ID
+                    </label>
+
+                    <i class="fa-solid fa-user input-icon-decor"></i>
+
+                    <input type="text"
+                           class="sso-input-field"
+                           name="username"
+                           placeholder="Enter Employee ID"
+                           required>
+
+                </div>
+
+                <div class="input-wrapper-group">
+
+                    <label class="input-label-caption">
+                        Password
+                    </label>
+
+                    <i class="fa-solid fa-lock input-icon-decor"></i>
+
+                    <input type="password"
+                           class="sso-input-field"
+                           name="password"
+                           id="spacePassword"
+                           placeholder="*****"
+                           style="padding-right:40px;"
+                           required>
+
+                    <i class="fa-solid fa-eye"
+                       style="position:absolute;
+                              right:14px;
+                              top:41px;
+                              cursor:pointer;
+                              color:#666666;"
+                       onclick="togglePassword()">
+                    </i>
+
+                </div>
+
+                <div th:if="${authError}" class="auth-error">
+                    <span th:text="${authError}"></span>
+                </div>
+
+                <a href="/forgot-password"
+                   class="link-forgot-password">
+                    Forgot Password?
+                </a>
+
+                <button type="submit"
+                        class="btn-continue-sso">
+                    Continue to My Space
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="social-footer-row">
+
+            <a href="#" class="social-icon-anchor">
+                <i class="fa-brands fa-instagram"></i>
+            </a>
+
+            <a href="#" class="social-icon-anchor">
+                <i class="fa-brands fa-linkedin"></i>
+            </a>
+
+            <a href="#" class="social-icon-anchor">
+                <i class="fa-regular fa-envelope"></i>
+            </a>
+
+            <a href="#" class="social-icon-anchor">
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function togglePassword() {
+
+    const passwordField =
+        document.getElementById('spacePassword');
+
+    const eyeIcon =
+        document.querySelector('.fa-eye, .fa-eye-slash');
+
+    if(passwordField.type === 'password') {
+
+        passwordField.type = 'text';
+
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+
+    } else {
+
+        passwordField.type = 'password';
+
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+    }
+}
+
+</script>
+
+</body>
+</html>
