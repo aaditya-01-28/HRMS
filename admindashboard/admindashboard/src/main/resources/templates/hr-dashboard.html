@@ -800,7 +800,14 @@
 
         </div>
 
-        <div class="col-md-4 pe-4 text-end">
+        <div class="col-md-4 pe-4 text-end d-flex align-items-center justify-content-end gap-3">
+            <a href="/employee/notifications" class="btn btn-light border rounded-circle d-flex align-items-center justify-content-center position-relative" style="width: 40px; height: 40px; padding: 0; font-size: 1.1rem; color: #002D72;">
+                <i class="fa-solid fa-bell"></i>
+                <span th:if="${unreadNotificationCount != null && unreadNotificationCount > 0}" 
+                      th:text="${unreadNotificationCount}" 
+                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                      style="font-size: 0.75rem; transform: translate(-30%, -30%) !important;">3</span>
+            </a>
             <div class="d-inline-flex align-items-center bg-light rounded-pill px-3 py-1 border">
                 <div class="form-check form-switch d-flex align-items-center">
                     <i class="fas fa-sun text-warning me-2 small"></i>

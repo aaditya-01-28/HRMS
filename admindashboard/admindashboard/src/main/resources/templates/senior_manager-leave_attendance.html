@@ -481,9 +481,9 @@
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <h6 class="fw-bold mb-0"><i class="fa-solid fa-calendar-days text-primary me-2"></i>Team Leave Calendar</h6>
                     <div class="d-flex align-items-center gap-2">
-                        <button class="btn btn-sm btn-light border"><i class="fa-solid fa-chevron-left"></i></button>
-                        <span class="fw-bold text-dark" style="font-size:0.9rem;">July 2026</span>
-                        <button class="btn btn-sm btn-light border"><i class="fa-solid fa-chevron-right"></i></button>
+                        <button type="button" id="calendar-prev-btn" class="btn btn-sm btn-light border"><i class="fa-solid fa-chevron-left"></i></button>
+                        <span id="calendar-month-year-label" class="fw-bold text-dark" style="font-size:0.9rem;">July 2026</span>
+                        <button type="button" id="calendar-next-btn" class="btn btn-sm btn-light border"><i class="fa-solid fa-chevron-right"></i></button>
                     </div>
                 </div>
                 <div class="legend-row">
@@ -493,75 +493,10 @@
                     <div class="legend-item"><span class="legend-color event-holiday"></span>Holiday</div>
                 </div>
 
-                <div class="calendar-grid">
-                    <!-- Calendar headers -->
-                    <div class="calendar-day-header">Sun</div>
-                    <div class="calendar-day-header">Mon</div>
-                    <div class="calendar-day-header">Tue</div>
-                    <div class="calendar-day-header">Wed</div>
-                    <div class="calendar-day-header">Thu</div>
-                    <div class="calendar-day-header">Fri</div>
-                    <div class="calendar-day-header">Sat</div>
-
-                    <!-- Days -->
-                    <div class="calendar-day text-muted"><span class="day-num">28</span></div>
-                    <div class="calendar-day text-muted"><span class="day-num">29</span></div>
-                    <div class="calendar-day text-muted"><span class="day-num">30</span></div>
-                    <div class="calendar-day text-muted"><span class="day-num">31</span></div>
-                    
-                    <div class="calendar-day"><span class="day-num">1</span>
-                        <div class="day-events"><span class="event-badge event-holiday">Labours Day</span></div>
-                    </div>
-                    <div class="calendar-day"><span class="day-num">2</span>
-                        <div class="day-events"><span class="event-badge event-weekly-off">Weekly Off</span></div>
-                    </div>
-                    <div class="calendar-day"><span class="day-num">3</span>
-                        <div class="day-events"><span class="event-badge event-leave">Vikram M</span></div>
-                    </div>
-                    
-                    <div class="calendar-day"><span class="day-num">4</span></div>
-                    <div class="calendar-day"><span class="day-num">5</span></div>
-                    <div class="calendar-day"><span class="day-num">6</span></div>
-                    <div class="calendar-day"><span class="day-num">7</span>
-                        <div class="day-events"><span class="event-badge event-partial">Pooja Des</span></div>
-                    </div>
-                    <div class="calendar-day"><span class="day-num">8</span></div>
-                    <div class="calendar-day"><span class="day-num">9</span></div>
-                    <div class="calendar-day"><span class="day-num">10</span></div>
-
-                    <div class="calendar-day"><span class="day-num">11</span></div>
-                    <div class="calendar-day"><span class="day-num">12</span>
-                        <div class="day-events"><span class="event-badge event-leave">Neha Ver</span></div>
-                    </div>
-                    <div class="calendar-day"><span class="day-num">13</span></div>
-                    <div class="calendar-day"><span class="day-num">14</span></div>
-                    <div class="calendar-day"><span class="day-num">15</span>
-                        <div class="day-events"><span class="event-badge event-leave">Rahul Kur</span></div>
-                    </div>
-                    <div class="calendar-day"><span class="day-num">16</span></div>
-                    <div class="calendar-day"><span class="day-num">17</span></div>
-
-                    <div class="calendar-day"><span class="day-num">18</span></div>
-                    <div class="calendar-day"><span class="day-num">19</span>
-                        <div class="day-events"><span class="event-badge event-partial">Ankit Pab</span></div>
-                    </div>
-                    <div class="calendar-day"><span class="day-num">20</span></div>
-                    <div class="calendar-day today"><span class="day-num">21 (Today)</span></div>
-                    <div class="calendar-day"><span class="day-num">22</span></div>
-                    <div class="calendar-day"><span class="day-num">23</span></div>
-                    <div class="calendar-day"><span class="day-num">24</span></div>
-
-                    <div class="calendar-day"><span class="day-num">25</span></div>
-                    <div class="calendar-day"><span class="day-num">26</span>
-                        <div class="day-events"><span class="event-badge event-leave">Megha Jo</span></div>
-                    </div>
-                    <div class="calendar-day"><span class="day-num">27</span></div>
-                    <div class="calendar-day"><span class="day-num">28</span></div>
-                    <div class="calendar-day"><span class="day-num">29</span></div>
-                    <div class="calendar-day"><span class="day-num">30</span></div>
-                    <div class="calendar-day text-muted"><span class="day-num">1</span></div>
+                <div class="calendar-grid" id="calendar-grid-container">
+                    <!-- Dynamic Days will be rendered here -->
                 </div>
-                <button class="btn btn-outline-primary btn-sm w-100 mt-3 fw-bold">View Full Calendar</button>
+                <button type="button" class="btn btn-outline-primary btn-sm w-100 mt-3 fw-bold" onclick="showAllLeaveRequestsModal()">View All Leaves</button>
             </div>
         </div>
     </div>
@@ -835,6 +770,145 @@
                     }
                 }
             });
+
+            // --- Dynamic Calendar Render Logic ---
+            const calendarEvents = /*[[${calendarEvents}]]*/ [];
+            
+            // Common holidays to display in calendar
+            const nationalHolidays = [
+                { date: "01-26", label: "Republic Day" },
+                { date: "05-01", label: "Labours Day" },
+                { date: "08-15", label: "Independence Day" },
+                { date: "10-02", label: "Gandhi Jayanti" },
+                { date: "12-25", label: "Christmas Day" }
+            ];
+
+            let currentCalendarDate = new Date(); // Start with today's date
+            
+            const monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+
+            const gridContainer = document.getElementById("calendar-grid-container");
+            const monthYearLabel = document.getElementById("calendar-month-year-label");
+            const prevBtn = document.getElementById("calendar-prev-btn");
+            const nextBtn = document.getElementById("calendar-next-btn");
+
+            function renderCalendar(date) {
+                if (!gridContainer || !monthYearLabel) return;
+                
+                gridContainer.innerHTML = ""; // Clear grid
+                
+                const year = date.getFullYear();
+                const month = date.getMonth(); // 0-indexed
+                
+                monthYearLabel.innerText = monthNames[month] + " " + year;
+                
+                // Add header row
+                const headers = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+                headers.forEach(h => {
+                    const headerDiv = document.createElement("div");
+                    headerDiv.className = "calendar-day-header";
+                    headerDiv.innerText = h;
+                    gridContainer.appendChild(headerDiv);
+                });
+
+                // First day of current month
+                const firstDayIndex = new Date(year, month, 1).getDay();
+                
+                // Last day of current month
+                const lastDay = new Date(year, month + 1, 0).getDate();
+                
+                // Last day of previous month
+                const prevLastDay = new Date(year, month, 0).getDate();
+                
+                // Days to show from previous month
+                for (let i = firstDayIndex; i > 0; i--) {
+                    const dayDiv = document.createElement("div");
+                    dayDiv.className = "calendar-day text-muted";
+                    
+                    const dayNum = prevLastDay - i + 1;
+                    dayDiv.innerHTML = `<span class="day-num">${dayNum}</span>`;
+                    gridContainer.appendChild(dayDiv);
+                }
+                
+                // Days of current month
+                const today = new Date();
+                for (let day = 1; day <= lastDay; day++) {
+                    const dayDiv = document.createElement("div");
+                    dayDiv.className = "calendar-day";
+                    
+                    // Check if today
+                    if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
+                        dayDiv.classList.add("today");
+                        dayDiv.innerHTML = `<span class="day-num">${day} (Today)</span><div class="day-events"></div>`;
+                    } else {
+                        dayDiv.innerHTML = `<span class="day-num">${day}</span><div class="day-events"></div>`;
+                    }
+                    
+                    const eventsContainer = dayDiv.querySelector(".day-events");
+                    const currentDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    const currentDayOfWeek = new Date(year, month, day).getDay(); // 0 = Sunday, 6 = Saturday
+
+                    // 1. Check if Weekend (Weekly Off)
+                    if (currentDayOfWeek === 0 || currentDayOfWeek === 6) {
+                        const badge = document.createElement("span");
+                        badge.className = "event-badge event-weekly-off";
+                        badge.innerText = "Weekly Off";
+                        eventsContainer.appendChild(badge);
+                    }
+
+                    // 2. Check if Holiday
+                    const holidayMatch = nationalHolidays.find(h => h.date === `${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+                    if (holidayMatch) {
+                        const badge = document.createElement("span");
+                        badge.className = "event-badge event-holiday";
+                        badge.innerText = holidayMatch.label;
+                        eventsContainer.appendChild(badge);
+                    }
+
+                    // 3. Check for Approved Leaves
+                    calendarEvents.forEach(e => {
+                        if (currentDateStr >= e.fromDate && currentDateStr <= e.toDate) {
+                            const badge = document.createElement("span");
+                            badge.className = "event-badge event-leave";
+                            badge.innerText = e.name;
+                            badge.title = `${e.name} - ${e.type}`;
+                            eventsContainer.appendChild(badge);
+                        }
+                    });
+                    
+                    gridContainer.appendChild(dayDiv);
+                }
+                
+                // Days from next month to fill grid
+                const totalCells = gridContainer.children.length - 7;
+                const nextMonthCells = totalCells > 28 && totalCells <= 35 ? 35 - totalCells : 42 - totalCells;
+                for (let i = 1; i <= nextMonthCells; i++) {
+                    const dayDiv = document.createElement("div");
+                    dayDiv.className = "calendar-day text-muted";
+                    dayDiv.innerHTML = `<span class="day-num">${i}</span>`;
+                    gridContainer.appendChild(dayDiv);
+                }
+            }
+
+            // Bind buttons
+            if (prevBtn) {
+                prevBtn.onclick = function() {
+                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+                    renderCalendar(currentCalendarDate);
+                };
+            }
+            if (nextBtn) {
+                nextBtn.onclick = function() {
+                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+                    renderCalendar(currentCalendarDate);
+                };
+            }
+
+            // Initial render
+            renderCalendar(currentCalendarDate);
         }
 
         if (activeTab === 'escalate_override') {
@@ -979,7 +1053,60 @@
         if (attendanceDept) attendanceDept.addEventListener('change', filterAttendance);
         if (attendanceLoc) attendanceLoc.addEventListener('change', filterAttendance);
     });
+
+    function showAllLeaveRequestsModal() {
+        const el = document.getElementById('allLeavesModal');
+        if (el) {
+            const myModal = new bootstrap.Modal(el);
+            myModal.show();
+        }
+    }
     /*]]>*/
 </script>
+
+<!-- View All Leaves Modal -->
+<div class="modal fade" id="allLeavesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px;">
+            <div class="modal-header text-white" style="background: #002D72; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-calendar-days me-2"></i>Approved Leave Directory</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="allLeavesTable">
+                        <thead class="table-light text-secondary">
+                            <tr>
+                                <th class="fw-bold">Employee</th>
+                                <th class="fw-bold">Leave Type</th>
+                                <th class="fw-bold text-center">From Date</th>
+                                <th class="fw-bold text-center">To Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="e : ${calendarEvents}">
+                                <td>
+                                    <div class="fw-bold text-dark" th:text="${e.name}">Employee Name</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary" th:text="${e.type}">Leave Type</span>
+                                </td>
+                                <td class="text-center text-secondary" th:text="${e.fromDate}">From Date</td>
+                                <td class="text-center text-secondary" th:text="${e.toDate}">To Date</td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(calendarEvents)}">
+                                <td colspan="4" class="text-center text-muted py-4">No approved leave records found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

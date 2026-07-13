@@ -400,6 +400,10 @@
 </nav>
 
 <div class="myspace-main">
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show fw-bold shadow-sm mb-4" role="alert" style="max-width: 1250px; margin: 10px 0 20px 0;">
+        <i class="fas fa-check-circle me-2"></i> <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold text-dark mb-1" style="font-size: 1.8rem;" th:text="${activeTab == 'project' ? 'Share Project Updates' : (activeTab == 'notification' ? 'Notify Team About Deadlines or Changes' : 'Send Communication')}">Send Communication</h2>
@@ -439,11 +443,11 @@
 
         <div class="panel">
             <h6 class="fw-bold mb-3">Create New Communication</h6>
-            <form onsubmit="event.preventDefault(); showToast('Communication message sent successfully!')">
+            <form method="POST" action="/senior_manager/communication/send">
                 <div class="form-grid-4">
                     <div>
                         <label class="form-label-custom">Send To<span class="required-star">*</span></label>
-                        <select class="form-control-custom" required>
+                        <select name="recipientGroup" class="form-control-custom" required>
                             <option value="">Select Team or Department</option>
                             <option value="All">All Employees</option>
                             <option value="Dev">IT - Development</option>
@@ -457,11 +461,11 @@
                     </div>
                     <div>
                         <label class="form-label-custom">Subject<span class="required-star">*</span></label>
-                        <input type="text" class="form-control-custom" placeholder="Enter subject" required/>
+                        <input type="text" name="subject" class="form-control-custom" placeholder="Enter subject" required/>
                     </div>
                     <div>
                         <label class="form-label-custom">Priority</label>
-                        <select class="form-control-custom">
+                        <select name="priority" class="form-control-custom">
                             <option>Normal</option>
                             <option>High</option>
                             <option>Low</option>
@@ -469,7 +473,7 @@
                     </div>
                     <div>
                         <label class="form-label-custom">Message Type</label>
-                        <select class="form-control-custom">
+                        <select name="messageType" class="form-control-custom">
                             <option>General Communication</option>
                             <option>Project Update</option>
                             <option>Deadline Reminder</option>
@@ -495,7 +499,7 @@
                             <button type="button"><i class="fa-solid fa-image"></i></button>
                             <button type="button"><i class="fa-solid fa-face-smile"></i></button>
                         </div>
-                        <textarea class="editor-textarea" placeholder="Write your message here..." required></textarea>
+                        <textarea name="message" class="editor-textarea" placeholder="Write your message here..." required></textarea>
                     </div>
                 </div>
 
@@ -575,11 +579,11 @@
         <div class="layout-grid-share">
             <div class="panel">
                 <h6 class="fw-bold mb-3">Create New Project Update</h6>
-                <form onsubmit="event.preventDefault(); showToast('Project update shared successfully!')">
+                <form method="POST" action="/senior_manager/communication/project-update">
                     <div class="form-grid-3">
                         <div>
                             <label class="form-label-custom">Select Project<span class="required-star">*</span></label>
-                            <select class="form-control-custom" required>
+                            <select name="projectName" class="form-control-custom" required>
                                 <option value="">Select Project</option>
                                 <option th:each="p : ${projectsList}" th:value="${p.projectName}" th:text="${p.projectName}"></option>
                                 <option th:if="${#lists.isEmpty(projectsList)}" value="Website Redesign">Website Redesign</option>
@@ -589,7 +593,7 @@
                         </div>
                         <div>
                             <label class="form-label-custom">Share With<span class="required-star">*</span></label>
-                            <select class="form-control-custom" required>
+                            <select name="recipientGroup" class="form-control-custom" required>
                                 <option value="">Select Team or Department</option>
                                 <option value="All">All Employees</option>
                                 <option value="Dev">IT - Development Team</option>
@@ -603,7 +607,7 @@
                         </div>
                         <div>
                             <label class="form-label-custom">Subject<span class="required-star">*</span></label>
-                            <input type="text" class="form-control-custom" placeholder="Enter update subject" required/>
+                            <input type="text" name="subject" class="form-control-custom" placeholder="Enter update subject" required/>
                         </div>
                     </div>
 
@@ -622,7 +626,7 @@
                                 <button type="button"><i class="fa-solid fa-image"></i></button>
                                 <button type="button"><i class="fa-solid fa-face-smile"></i></button>
                             </div>
-                            <textarea class="editor-textarea" placeholder="Write your update details here..." required></textarea>
+                            <textarea name="message" class="editor-textarea" placeholder="Write your update details here..." required></textarea>
                         </div>
                     </div>
 
@@ -721,11 +725,11 @@
 
         <div class="panel">
             <h6 class="fw-bold mb-3">Create New Notification</h6>
-            <form onsubmit="event.preventDefault(); showToast('Notification published successfully!')">
+            <form method="POST" action="/senior_manager/communication/notification">
                 <div class="form-grid-4">
                     <div>
                         <label class="form-label-custom">Notify To<span class="required-star">*</span></label>
-                        <select class="form-control-custom" required>
+                        <select name="recipientGroup" class="form-control-custom" required>
                             <option value="">Select Team or Department</option>
                             <option value="All">All Employees</option>
                             <option value="Dev">IT - Development Team</option>
@@ -739,7 +743,7 @@
                     </div>
                     <div>
                         <label class="form-label-custom">Notification Type<span class="required-star">*</span></label>
-                        <select class="form-control-custom" required>
+                        <select name="messageType" class="form-control-custom" required>
                             <option value="">Select Type</option>
                             <option>Deadline Reminder</option>
                             <option>Policy Change</option>
@@ -749,7 +753,7 @@
                     </div>
                     <div>
                         <label class="form-label-custom">Priority</label>
-                        <select class="form-control-custom">
+                        <select name="priority" class="form-control-custom">
                             <option>Normal</option>
                             <option>High</option>
                             <option>Low</option>
@@ -757,7 +761,7 @@
                     </div>
                     <div>
                         <label class="form-label-custom">Subject<span class="required-star">*</span></label>
-                        <input type="text" class="form-control-custom" placeholder="Enter notification subject" required/>
+                        <input type="text" name="subject" class="form-control-custom" placeholder="Enter notification subject" required/>
                     </div>
                 </div>
 
@@ -776,7 +780,7 @@
                             <button type="button"><i class="fa-solid fa-image"></i></button>
                             <button type="button"><i class="fa-solid fa-face-smile"></i></button>
                         </div>
-                        <textarea class="editor-textarea" placeholder="Write your message here..." required></textarea>
+                        <textarea name="message" class="editor-textarea" placeholder="Write your message here..." required></textarea>
                     </div>
                 </div>
 

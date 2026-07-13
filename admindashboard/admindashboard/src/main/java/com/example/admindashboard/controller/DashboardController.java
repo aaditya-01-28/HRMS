@@ -66,6 +66,9 @@ public class DashboardController {
     private EmailService emailService;
 
     @Autowired
+    private HrmsNotificationRepository hrmsNotificationRepository;
+
+    @Autowired
     private RoleRepository roleRepository;
 
     @Autowired
@@ -2538,4 +2541,27 @@ public class DashboardController {
         return "redirect:/admin/profile";
     }
 
+    @GetMapping("/employee/notifications")
+    public String showNotifications(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        User user = userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        List<HrmsNotification> notifications = hrmsNotificationRepository.findByUserOrderByCreatedAtDesc(user);
+        
+        // Mark all as read
+        for (HrmsNotification n : notifications) {
+            if (!n.isRead()) {
+                n.setRead(true);
+                hrmsNotificationRepository.save(n);
+            }
+        }
+        
+        model.addAttribute("notifications", notifications);
+        model.addAttribute("user", user);
+        
+        return "employee-notifications";
+    }
 }

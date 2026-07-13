@@ -3,7 +3,11 @@ package com.example.admindashboard.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import com.example.admindashboard.model.User;
+import com.example.admindashboard.model.HrmsNotification;
+import com.example.admindashboard.model.EmployeeProfile;
 import com.example.admindashboard.repository.UserRepository;
+import com.example.admindashboard.repository.HrmsNotificationRepository;
+import com.example.admindashboard.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +43,26 @@ import com.example.admindashboard.repository.LeaveRequestRepository;
 import com.example.admindashboard.repository.WeeklyTimesheetRepository;
 import com.example.admindashboard.repository.ServiceRequestRepository;
 import com.example.admindashboard.repository.ResignationRequestRepository;
+import com.example.admindashboard.model.ExpenseClaim;
+import com.example.admindashboard.model.ReimbursementRequest;
+import com.example.admindashboard.model.BudgetRequest;
+import com.example.admindashboard.model.Candidate;
+import com.example.admindashboard.model.Interview;
+import com.example.admindashboard.model.InterviewFeedback;
+import com.example.admindashboard.model.RecruitmentApproval;
+import com.example.admindashboard.model.CommunicationBroadcast;
+import com.example.admindashboard.model.ProjectUpdateNotification;
+import com.example.admindashboard.model.RecentNotificationRecord;
+import com.example.admindashboard.repository.ExpenseClaimRepository;
+import com.example.admindashboard.repository.ReimbursementRequestRepository;
+import com.example.admindashboard.repository.BudgetRequestRepository;
+import com.example.admindashboard.repository.CandidateRepository;
+import com.example.admindashboard.repository.InterviewRepository;
+import com.example.admindashboard.repository.InterviewFeedbackRepository;
+import com.example.admindashboard.repository.RecruitmentApprovalRepository;
+import com.example.admindashboard.repository.CommunicationBroadcastRepository;
+import com.example.admindashboard.repository.ProjectUpdateNotificationRepository;
+import com.example.admindashboard.repository.RecentNotificationRecordRepository;
 
 
 @Controller
@@ -88,6 +112,42 @@ public class MySpaceController {
 
         @Autowired
         private com.example.admindashboard.repository.JobPostingRepository jobPostingRepository;
+
+        @Autowired
+        private ExpenseClaimRepository expenseClaimRepository;
+
+        @Autowired
+        private ReimbursementRequestRepository reimbursementRequestRepository;
+
+        @Autowired
+        private BudgetRequestRepository budgetRequestRepository;
+
+        @Autowired
+        private CandidateRepository candidateRepository;
+
+        @Autowired
+        private InterviewRepository interviewRepository;
+
+        @Autowired
+        private InterviewFeedbackRepository interviewFeedbackRepository;
+
+        @Autowired
+        private RecruitmentApprovalRepository recruitmentApprovalRepository;
+
+        @Autowired
+        private CommunicationBroadcastRepository communicationBroadcastRepository;
+
+        @Autowired
+        private ProjectUpdateNotificationRepository projectUpdateNotificationRepository;
+
+        @Autowired
+        private RecentNotificationRecordRepository recentNotificationRecordRepository;
+
+        @Autowired
+        private HrmsNotificationRepository hrmsNotificationRepository;
+
+        @Autowired
+        private EmailService emailService;
 
     @GetMapping("/space/login")
     public String showLogin() {
@@ -442,6 +502,21 @@ public class MySpaceController {
                 model.addAttribute("presentToday", presentToday);
                 model.addAttribute("absentToday", 3);
                 model.addAttribute("avgWorkingHours", "8h 32m");
+
+                List<Map<String, Object>> calendarEvents = new ArrayList<>();
+                List<LeaveRequest> approvedLeaves = leaveRequestRepository.findAll().stream()
+                        .filter(r -> "Approved".equalsIgnoreCase(r.getStatus()))
+                        .collect(java.util.stream.Collectors.toList());
+                for (LeaveRequest r : approvedLeaves) {
+                    if (r.getUser() == null || r.getFromDate() == null || r.getToDate() == null) continue;
+                    Map<String, Object> event = new HashMap<>();
+                    event.put("name", r.getUser().getFullName());
+                    event.put("fromDate", r.getFromDate().toString());
+                    event.put("toDate", r.getToDate().toString());
+                    event.put("type", r.getLeaveType());
+                    calendarEvents.add(event);
+                }
+                model.addAttribute("calendarEvents", calendarEvents);
 
                 // Balance cards
                 model.addAttribute("entitledLeaves", entitledLeaves);
@@ -1109,33 +1184,83 @@ public class MySpaceController {
                 model.addAttribute("inProgressReqs", inProgressReqs);
                 model.addAttribute("offersExtendedReqs", offersExtendedReqs);
 
+                seedRecruitmentData();
+
                 // --- TAB 2: MY INTERVIEWS ---
                 List<Map<String, Object>> interviews = new ArrayList<>();
-                interviews.add(Map.of("candidate", "Aman Singh", "candidateCode", "CAN-2026-045", "title", "Frontend Developer", "department", "IT - Development", "stage", "Technical Round", "interviewerInitials", List.of("AS", "NV", "RK"), "dateTime", "29 May 2026 10:00 AM - 11:00 AM", "status", "Scheduled"));
-                interviews.add(Map.of("candidate", "Priya Rathi", "candidateCode", "CAN-2026-038", "title", "Backend Developer", "department", "IT - Development", "stage", "HR Round", "interviewerInitials", List.of("PR", "NV"), "dateTime", "28 May 2026 02:00 PM - 03:00 PM", "status", "Scheduled"));
-                interviews.add(Map.of("candidate", "Rohit Kumar", "candidateCode", "CAN-2026-034", "title", "UI/UX Designer", "department", "IT - Design", "stage", "Design Round", "interviewerInitials", List.of("RK", "NV", "RK"), "dateTime", "27 May 2026 11:00 AM - 12:00 PM", "status", "Completed"));
-                interviews.add(Map.of("candidate", "Sneha Nair", "candidateCode", "CAN-2026-029", "title", "QA Engineer", "department", "IT - Quality", "stage", "Technical Round", "interviewerInitials", List.of("SN", "NV", "PO"), "dateTime", "26 May 2026 03:00 PM - 04:00 PM", "status", "Completed"));
-                interviews.add(Map.of("candidate", "Vikas Dubey", "candidateCode", "CAN-2026-022", "title", "DevOps Engineer", "department", "IT - Operations", "stage", "HR Round", "interviewerInitials", List.of("VD", "VI"), "dateTime", "25 May 2026 10:30 AM - 11:30 AM", "status", "Cancelled"));
-
+                for (Interview iv : interviewRepository.findAll()) {
+                    if (search != null && !search.isBlank() && !iv.getCandidate().getName().toLowerCase().contains(search.toLowerCase())) {
+                        continue;
+                    }
+                    if (dept != null && !dept.isBlank() && !iv.getDepartment().equalsIgnoreCase(dept)) {
+                        continue;
+                    }
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("candidate", iv.getCandidate().getName());
+                    map.put("candidateCode", iv.getCandidate().getCandidateCode());
+                    map.put("title", iv.getTitle());
+                    map.put("department", iv.getDepartment());
+                    map.put("stage", iv.getStage());
+                    map.put("dateTime", iv.getDateTime());
+                    map.put("status", iv.getStatus());
+                    
+                    List<String> initialsList = new ArrayList<>();
+                    if (iv.getInterviewerInitials() != null) {
+                        for (String s : iv.getInterviewerInitials().split(",")) {
+                            initialsList.add(s.trim());
+                        }
+                    }
+                    map.put("interviewerInitials", initialsList);
+                    interviews.add(map);
+                }
                 model.addAttribute("interviewsList", interviews);
 
                 // --- TAB 3: FEEDBACK ---
                 List<Map<String, Object>> feedbackList = new ArrayList<>();
-                feedbackList.add(Map.of("id", 101L, "candidate", "Aman Singh", "candidateCode", "CAN-2026-045", "title", "Frontend Developer", "department", "IT - Development", "stage", "Technical Round", "interviewDate", "29 May 2026 10:00 AM", "requestedOn", "27 May 2026", "dueDate", "30 May 2026 (Overdue)", "status", "PENDING"));
-                feedbackList.add(Map.of("id", 102L, "candidate", "Priya Rathi", "candidateCode", "CAN-2026-038", "title", "Backend Developer", "department", "IT - Development", "stage", "HR Round", "interviewDate", "28 May 2026 02:00 PM", "requestedOn", "26 May 2026", "dueDate", "29 May 2026 (Overdue)", "status", "PENDING"));
-                feedbackList.add(Map.of("id", 103L, "candidate", "Rohit Kumar", "candidateCode", "CAN-2026-034", "title", "UI/UX Designer", "department", "IT - Design", "stage", "Design Round", "interviewDate", "27 May 2026 11:00 AM", "requestedOn", "25 May 2026", "dueDate", "28 May 2026 (Overdue)", "status", "PENDING"));
-
+                for (InterviewFeedback fb : interviewFeedbackRepository.findAll()) {
+                    if (search != null && !search.isBlank() && !fb.getCandidate().getName().toLowerCase().contains(search.toLowerCase())) {
+                        continue;
+                    }
+                    if (dept != null && !dept.isBlank() && !fb.getDepartment().equalsIgnoreCase(dept)) {
+                        continue;
+                    }
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", fb.getId());
+                    map.put("candidate", fb.getCandidate().getName());
+                    map.put("candidateCode", fb.getCandidate().getCandidateCode());
+                    map.put("title", fb.getTitle());
+                    map.put("department", fb.getDepartment());
+                    map.put("stage", fb.getStage());
+                    map.put("interviewDate", fb.getInterviewDate());
+                    map.put("requestedOn", fb.getRequestedOn());
+                    map.put("dueDate", fb.getDueDate());
+                    map.put("status", fb.getStatus());
+                    feedbackList.add(map);
+                }
                 model.addAttribute("feedbackList", feedbackList);
 
                 // --- TAB 4: APPROVALS ---
-                List<Map<String, Object>> approvals = new ArrayList<>();
-                approvals.add(Map.of("id", 201L, "candidate", "Aman Singh", "email", "aman@gmail.com", "title", "Frontend Developer", "department", "IT - Development", "finalInterviewDate", "29 May 2026 10:00 AM", "rating", 4.2, "recommendation", "Hire", "status", "Pending"));
-                approvals.add(Map.of("id", 202L, "candidate", "Priya Rathi", "email", "priya@gmail.com", "title", "Backend Developer", "department", "IT - Development", "finalInterviewDate", "28 May 2026 02:00 PM", "rating", 4.0, "recommendation", "Hire", "status", "Pending"));
-                approvals.add(Map.of("id", 203L, "candidate", "Rohit Kumar", "email", "rohit@gmail.com", "title", "UI/UX Designer", "department", "IT - Design", "finalInterviewDate", "27 May 2026 11:00 AM", "rating", 3.2, "recommendation", "Consider", "status", "Pending"));
-                approvals.add(Map.of("id", 204L, "candidate", "Sneha Nair", "email", "sneha@gmail.com", "title", "QA Engineer", "department", "IT - Quality", "finalInterviewDate", "26 May 2026 03:00 PM", "rating", 3.5, "recommendation", "Hold", "status", "On Hold"));
-                approvals.add(Map.of("id", 205L, "candidate", "Vikas Dubey", "email", "vikas@gmail.com", "title", "DevOps Engineer", "department", "IT - Operations", "finalInterviewDate", "25 May 2026 10:30 AM", "rating", 2.8, "recommendation", "Not Suitable", "status", "Pending"));
-
-                model.addAttribute("approvalsList", approvals);
+                List<Map<String, Object>> approvalsList = new ArrayList<>();
+                for (RecruitmentApproval ap : recruitmentApprovalRepository.findAll()) {
+                    if (search != null && !search.isBlank() && !ap.getCandidate().getName().toLowerCase().contains(search.toLowerCase())) {
+                        continue;
+                    }
+                    if (dept != null && !dept.isBlank() && !ap.getDepartment().equalsIgnoreCase(dept)) {
+                        continue;
+                    }
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", ap.getId());
+                    map.put("candidate", ap.getCandidate().getName());
+                    map.put("email", ap.getEmail());
+                    map.put("title", ap.getTitle());
+                    map.put("department", ap.getDepartment());
+                    map.put("finalInterviewDate", ap.getFinalInterviewDate());
+                    map.put("rating", ap.getRating());
+                    map.put("recommendation", ap.getRecommendation());
+                    map.put("status", ap.getStatus());
+                    approvalsList.add(map);
+                }
+                model.addAttribute("approvalsList", approvalsList);
 
                 List<Map<String, Object>> activeEmployees = new ArrayList<>();
                 for (User u : allUsers) {
@@ -1220,6 +1345,285 @@ public class MySpaceController {
             }
         }
 
+        private void seedExpensesData() {
+            if (expenseClaimRepository.count() == 0) {
+                User vikram = userRepository.findByUsername("EMP001").orElse(null);
+                if (vikram == null) {
+                    vikram = userRepository.findAll().stream().filter(u -> !u.getUsername().equals("ADMIN")).findFirst().orElse(null);
+                }
+                User neha = userRepository.findByUsername("EMP002").orElse(null);
+                if (neha == null && vikram != null) neha = vikram;
+                User rahul = userRepository.findByUsername("EMP003").orElse(null);
+                if (rahul == null && vikram != null) rahul = vikram;
+                User ankit = userRepository.findByUsername("EMP004").orElse(null);
+                if (ankit == null && vikram != null) ankit = vikram;
+                User pooja = userRepository.findByUsername("EMP005").orElse(null);
+                if (pooja == null && vikram != null) pooja = vikram;
+
+                if (vikram != null) {
+                    ExpenseClaim c1 = new ExpenseClaim();
+                    c1.setUser(vikram); c1.setPurpose("Client meeting - Travel"); c1.setAmount(12450.0); c1.setStatus("Pending"); c1.setSubmissionDate(LocalDate.now());
+                    expenseClaimRepository.save(c1);
+                }
+                if (neha != null) {
+                    ExpenseClaim c2 = new ExpenseClaim();
+                    c2.setUser(neha); c2.setPurpose("Work from home setup"); c2.setAmount(8750.0); c2.setStatus("Approved"); c2.setSubmissionDate(LocalDate.now());
+                    expenseClaimRepository.save(c2);
+                }
+                if (rahul != null) {
+                    ExpenseClaim c3 = new ExpenseClaim();
+                    c3.setUser(rahul); c3.setPurpose("Team Building Activity"); c3.setAmount(50000.0); c3.setStatus("Pending"); c3.setSubmissionDate(LocalDate.now());
+                    expenseClaimRepository.save(c3);
+                }
+                if (ankit != null) {
+                    ExpenseClaim c4 = new ExpenseClaim();
+                    c4.setUser(ankit); c4.setPurpose("Software Subscription"); c4.setAmount(15999.0); c4.setStatus("Approved"); c4.setSubmissionDate(LocalDate.now());
+                    expenseClaimRepository.save(c4);
+                }
+            }
+
+            if (reimbursementRequestRepository.count() == 0) {
+                User neha = userRepository.findByUsername("EMP002").orElse(null);
+                if (neha == null) neha = userRepository.findAll().stream().filter(u -> !u.getUsername().equals("ADMIN")).findFirst().orElse(null);
+                User rahul = userRepository.findByUsername("EMP003").orElse(null);
+                if (rahul == null && neha != null) rahul = neha;
+                User ankit = userRepository.findByUsername("EMP004").orElse(null);
+                if (ankit == null && neha != null) ankit = neha;
+                User pooja = userRepository.findByUsername("EMP005").orElse(null);
+                if (pooja == null && neha != null) pooja = neha;
+
+                if (neha != null) {
+                    ReimbursementRequest r1 = new ReimbursementRequest();
+                    r1.setUser(neha); r1.setPurpose("Travel - Client Meeting"); r1.setAmount(8750.0); r1.setStatus("Approved"); r1.setSubmissionDate(LocalDate.now());
+                    reimbursementRequestRepository.save(r1);
+                }
+                if (rahul != null) {
+                    ReimbursementRequest r2 = new ReimbursementRequest();
+                    r2.setUser(rahul); r2.setPurpose("Work from home setup"); r2.setAmount(2350.0); r2.setStatus("Pending"); r2.setSubmissionDate(LocalDate.now());
+                    reimbursementRequestRepository.save(r2);
+                }
+                if (ankit != null) {
+                    ReimbursementRequest r3 = new ReimbursementRequest();
+                    r3.setUser(ankit); r3.setPurpose("Software Subscription"); r3.setAmount(15999.0); r3.setStatus("Approved"); r3.setSubmissionDate(LocalDate.now());
+                    reimbursementRequestRepository.save(r3);
+                }
+                if (pooja != null) {
+                    ReimbursementRequest r4 = new ReimbursementRequest();
+                    r4.setUser(pooja); r4.setPurpose("Internet & Mobile"); r4.setAmount(2150.0); r4.setStatus("Rejected"); r4.setSubmissionDate(LocalDate.now());
+                    reimbursementRequestRepository.save(r4);
+                }
+            }
+
+            if (budgetRequestRepository.count() == 0) {
+                User vikram = userRepository.findByUsername("EMP001").orElse(null);
+                if (vikram == null) vikram = userRepository.findAll().stream().filter(u -> !u.getUsername().equals("ADMIN")).findFirst().orElse(null);
+                User neha = userRepository.findByUsername("EMP002").orElse(null);
+                if (neha == null && vikram != null) neha = vikram;
+                User rahul = userRepository.findByUsername("EMP003").orElse(null);
+                if (rahul == null && vikram != null) rahul = vikram;
+                User ankit = userRepository.findByUsername("EMP004").orElse(null);
+                if (ankit == null && vikram != null) ankit = vikram;
+                User pooja = userRepository.findByUsername("EMP005").orElse(null);
+                if (pooja == null && vikram != null) pooja = vikram;
+
+                if (vikram != null) {
+                    BudgetRequest b1 = new BudgetRequest();
+                    b1.setRequester(vikram); b1.setDepartment("Information Technology"); b1.setType("PROJECT BUDGET"); b1.setPurpose("New CRM Software Implementation"); b1.setAmount(250000.0); b1.setStatus("Pending"); b1.setSubmissionDate(LocalDate.now());
+                    budgetRequestRepository.save(b1);
+                }
+                if (neha != null) {
+                    BudgetRequest b2 = new BudgetRequest();
+                    b2.setRequester(neha); b2.setDepartment("Human Resources"); b2.setType("TEAM EVENT"); b2.setPurpose("Annual Team Offsite 2025"); b2.setAmount(120000.0); b2.setStatus("Approved"); b2.setSubmissionDate(LocalDate.now());
+                    budgetRequestRepository.save(b2);
+                }
+                if (rahul != null) {
+                    BudgetRequest b3 = new BudgetRequest();
+                    b3.setRequester(rahul); b3.setDepartment("Human Resources"); b3.setType("HIRING"); b3.setPurpose("Q3 Recruitment Drive Costs"); b3.setAmount(300000.0); b3.setStatus("Pending"); b3.setSubmissionDate(LocalDate.now());
+                    budgetRequestRepository.save(b3);
+                }
+                if (ankit != null) {
+                    BudgetRequest b4 = new BudgetRequest();
+                    b4.setRequester(ankit); b4.setDepartment("Information Technology"); b4.setType("IT INFRA"); b4.setPurpose("Server Upgrade & Maintenance"); b4.setAmount(175000.0); b4.setStatus("Approved"); b4.setSubmissionDate(LocalDate.now());
+                    budgetRequestRepository.save(b4);
+                }
+                if (pooja != null) {
+                    BudgetRequest b5 = new BudgetRequest();
+                    b5.setRequester(pooja); b5.setDepartment("Finance Team"); b5.setType("OPERATIONAL"); b5.setPurpose("Finance Tools Annual Subscription"); b5.setAmount(85000.0); b5.setStatus("Rejected"); b5.setSubmissionDate(LocalDate.now());
+                    budgetRequestRepository.save(b5);
+                }
+            }
+        }
+
+        private void seedRecruitmentData() {
+            if (candidateRepository.count() == 0) {
+                Candidate c1 = new Candidate();
+                c1.setCandidateCode("CAN-2026-045"); c1.setName("Aman Singh"); c1.setEmail("aman@gmail.com"); c1.setJobTitle("Frontend Developer"); c1.setDepartment("IT - Development");
+                candidateRepository.save(c1);
+
+                Candidate c2 = new Candidate();
+                c2.setCandidateCode("CAN-2026-038"); c2.setName("Priya Rathi"); c2.setEmail("priya@gmail.com"); c2.setJobTitle("Backend Developer"); c2.setDepartment("IT - Development");
+                candidateRepository.save(c2);
+
+                Candidate c3 = new Candidate();
+                c3.setCandidateCode("CAN-2026-034"); c3.setName("Rohit Kumar"); c3.setEmail("rohit@gmail.com"); c3.setJobTitle("UI/UX Designer"); c3.setDepartment("IT - Design");
+                candidateRepository.save(c3);
+
+                Candidate c4 = new Candidate();
+                c4.setCandidateCode("CAN-2026-029"); c4.setName("Sneha Nair"); c4.setEmail("sneha@gmail.com"); c4.setJobTitle("QA Engineer"); c4.setDepartment("IT - Quality");
+                candidateRepository.save(c4);
+
+                Candidate c5 = new Candidate();
+                c5.setCandidateCode("CAN-2026-022"); c5.setName("Vikas Dubey"); c5.setEmail("vikas@gmail.com"); c5.setJobTitle("DevOps Engineer"); c5.setDepartment("IT - Operations");
+                candidateRepository.save(c5);
+            }
+
+            if (interviewRepository.count() == 0) {
+                Candidate aman = candidateRepository.findByName("Aman Singh").orElse(null);
+                Candidate priya = candidateRepository.findByName("Priya Rathi").orElse(null);
+                Candidate rohit = candidateRepository.findByName("Rohit Kumar").orElse(null);
+                Candidate sneha = candidateRepository.findByName("Sneha Nair").orElse(null);
+                Candidate vikas = candidateRepository.findByName("Vikas Dubey").orElse(null);
+
+                if (aman != null) {
+                    Interview i1 = new Interview();
+                    i1.setCandidate(aman); i1.setTitle("Frontend Developer"); i1.setDepartment("IT - Development"); i1.setStage("Technical Round"); i1.setInterviewerInitials("AS,NV,RK"); i1.setDateTime("29 May 2026 10:00 AM - 11:00 AM"); i1.setStatus("Scheduled");
+                    interviewRepository.save(i1);
+                }
+                if (priya != null) {
+                    Interview i2 = new Interview();
+                    i2.setCandidate(priya); i2.setTitle("Backend Developer"); i2.setDepartment("IT - Development"); i2.setStage("HR Round"); i2.setInterviewerInitials("PR,NV"); i2.setDateTime("28 May 2026 02:00 PM - 03:00 PM"); i2.setStatus("Scheduled");
+                    interviewRepository.save(i2);
+                }
+                if (rohit != null) {
+                    Interview i3 = new Interview();
+                    i3.setCandidate(rohit); i3.setTitle("UI/UX Designer"); i3.setDepartment("IT - Design"); i3.setStage("Design Round"); i3.setInterviewerInitials("RK,NV,RK"); i3.setDateTime("27 May 2026 11:00 AM - 12:00 PM"); i3.setStatus("Completed");
+                    interviewRepository.save(i3);
+                }
+                if (sneha != null) {
+                    Interview i4 = new Interview();
+                    i4.setCandidate(sneha); i4.setTitle("QA Engineer"); i4.setDepartment("IT - Quality"); i4.setStage("Technical Round"); i4.setInterviewerInitials("SN,NV,PO"); i4.setDateTime("26 May 2026 03:00 PM - 04:00 PM"); i4.setStatus("Completed");
+                    interviewRepository.save(i4);
+                }
+                if (vikas != null) {
+                    Interview i5 = new Interview();
+                    i5.setCandidate(vikas); i5.setTitle("DevOps Engineer"); i5.setDepartment("IT - Operations"); i5.setStage("HR Round"); i5.setInterviewerInitials("VD,VI"); i5.setDateTime("25 May 2026 10:30 AM - 11:30 AM"); i5.setStatus("Cancelled");
+                    interviewRepository.save(i5);
+                }
+            }
+
+            if (interviewFeedbackRepository.count() == 0) {
+                Candidate aman = candidateRepository.findByName("Aman Singh").orElse(null);
+                Candidate priya = candidateRepository.findByName("Priya Rathi").orElse(null);
+                Candidate rohit = candidateRepository.findByName("Rohit Kumar").orElse(null);
+
+                if (aman != null) {
+                    InterviewFeedback f1 = new InterviewFeedback();
+                    f1.setCandidate(aman); f1.setTitle("Frontend Developer"); f1.setDepartment("IT - Development"); f1.setStage("Technical Round"); f1.setInterviewDate("29 May 2026 10:00 AM"); f1.setRequestedOn("27 May 2026"); f1.setDueDate("30 May 2026 (Overdue)"); f1.setStatus("PENDING");
+                    interviewFeedbackRepository.save(f1);
+                }
+                if (priya != null) {
+                    InterviewFeedback f2 = new InterviewFeedback();
+                    f2.setCandidate(priya); f2.setTitle("Backend Developer"); f2.setDepartment("IT - Development"); f2.setStage("HR Round"); f2.setInterviewDate("28 May 2026 02:00 PM"); f2.setRequestedOn("26 May 2026"); f2.setDueDate("29 May 2026 (Overdue)"); f2.setStatus("PENDING");
+                    interviewFeedbackRepository.save(f2);
+                }
+                if (rohit != null) {
+                    InterviewFeedback f3 = new InterviewFeedback();
+                    f3.setCandidate(rohit); f3.setTitle("UI/UX Designer"); f3.setDepartment("IT - Design"); f3.setStage("Design Round"); f3.setInterviewDate("27 May 2026 11:00 AM"); f3.setRequestedOn("25 May 2026"); f3.setDueDate("28 May 2026 (Overdue)"); f3.setStatus("PENDING");
+                    interviewFeedbackRepository.save(f3);
+                }
+            }
+
+            if (recruitmentApprovalRepository.count() == 0) {
+                Candidate aman = candidateRepository.findByName("Aman Singh").orElse(null);
+                Candidate priya = candidateRepository.findByName("Priya Rathi").orElse(null);
+                Candidate rohit = candidateRepository.findByName("Rohit Kumar").orElse(null);
+                Candidate sneha = candidateRepository.findByName("Sneha Nair").orElse(null);
+                Candidate vikas = candidateRepository.findByName("Vikas Dubey").orElse(null);
+
+                if (aman != null) {
+                    RecruitmentApproval a1 = new RecruitmentApproval();
+                    a1.setCandidate(aman); a1.setEmail("aman@gmail.com"); a1.setTitle("Frontend Developer"); a1.setDepartment("IT - Development"); a1.setFinalInterviewDate("29 May 2026 10:00 AM"); a1.setRating(4.2); a1.setRecommendation("Hire"); a1.setStatus("Pending");
+                    recruitmentApprovalRepository.save(a1);
+                }
+                if (priya != null) {
+                    RecruitmentApproval a2 = new RecruitmentApproval();
+                    a2.setCandidate(priya); a2.setEmail("priya@gmail.com"); a2.setTitle("Backend Developer"); a2.setDepartment("IT - Development"); a2.setFinalInterviewDate("28 May 2026 02:00 PM"); a2.setRating(4.0); a2.setRecommendation("Hire"); a2.setStatus("Pending");
+                    recruitmentApprovalRepository.save(a2);
+                }
+                if (rohit != null) {
+                    RecruitmentApproval a3 = new RecruitmentApproval();
+                    a3.setCandidate(rohit); a3.setEmail("rohit@gmail.com"); a3.setTitle("UI/UX Designer"); a3.setDepartment("IT - Design"); a3.setFinalInterviewDate("27 May 2026 11:00 AM"); a3.setRating(3.2); a3.setRecommendation("Consider"); a3.setStatus("Pending");
+                    recruitmentApprovalRepository.save(a3);
+                }
+                if (sneha != null) {
+                    RecruitmentApproval a4 = new RecruitmentApproval();
+                    a4.setCandidate(sneha); a4.setEmail("sneha@gmail.com"); a4.setTitle("QA Engineer"); a4.setDepartment("IT - Quality"); a4.setFinalInterviewDate("26 May 2026 03:00 PM"); a4.setRating(3.5); a4.setRecommendation("Hold"); a4.setStatus("On Hold");
+                    recruitmentApprovalRepository.save(a4);
+                }
+                if (vikas != null) {
+                    RecruitmentApproval a5 = new RecruitmentApproval();
+                    a5.setCandidate(vikas); a5.setEmail("vikas@gmail.com"); a5.setTitle("DevOps Engineer"); a5.setDepartment("IT - Operations"); a5.setFinalInterviewDate("25 May 2026 10:30 AM"); a5.setRating(2.8); a5.setRecommendation("Not Suitable"); a5.setStatus("Pending");
+                    recruitmentApprovalRepository.save(a5);
+                }
+            }
+        }
+
+        private void seedCommunicationData() {
+            if (communicationBroadcastRepository.count() == 0) {
+                CommunicationBroadcast b1 = new CommunicationBroadcast();
+                b1.setSubject("Project Update - Website Redesign"); b1.setSentTo("IT - Development Team"); b1.setType("Project Update"); b1.setPriority("Normal"); b1.setSentOn("28 May 2026, 10:30 AM"); b1.setRecipients(12); b1.setOpenRate(75); b1.setStatus("Sent");
+                communicationBroadcastRepository.save(b1);
+
+                CommunicationBroadcast b2 = new CommunicationBroadcast();
+                b2.setSubject("Deadline Reminder: Sprint 3"); b2.setSentTo("Design Team"); b2.setType("Deadline Reminder"); b2.setPriority("High"); b2.setSentOn("27 May 2026, 04:15 PM"); b2.setRecipients(8); b2.setOpenRate(62); b2.setStatus("Sent");
+                communicationBroadcastRepository.save(b2);
+            }
+
+            if (projectUpdateNotificationRepository.count() == 0) {
+                ProjectUpdateNotification p1 = new ProjectUpdateNotification();
+                p1.setSubject("Website Redesign - Progress Update"); p1.setProject("Website Redesign"); p1.setSharedWith("IT - Development Team"); p1.setSharedOn("28 May 2026, 10:30 AM"); p1.setRecipients(12); p1.setViews(18); p1.setAcknowledged("10 (83%)"); p1.setStatus("COMPLETED");
+                projectUpdateNotificationRepository.save(p1);
+
+                ProjectUpdateNotification p2 = new ProjectUpdateNotification();
+                p2.setSubject("API Integration - Issue Update"); p2.setProject("Mobile App Development"); p2.setSharedWith("IT - Development Team"); p2.setSharedOn("27 May 2026, 04:15 PM"); p2.setRecipients(10); p2.setViews(14); p2.setAcknowledged("6 (60%)"); p2.setStatus("OPEN");
+                projectUpdateNotificationRepository.save(p2);
+
+                ProjectUpdateNotification p3 = new ProjectUpdateNotification();
+                p3.setSubject("Sprint 3 - Task Update"); p3.setProject("CRM Integration"); p3.setSharedWith("Design Team"); p3.setSharedOn("26 May 2026, 11:05 AM"); p3.setRecipients(8); p3.setViews(12); p3.setAcknowledged("7 (88%)"); p3.setStatus("COMPLETED");
+                projectUpdateNotificationRepository.save(p3);
+
+                ProjectUpdateNotification p4 = new ProjectUpdateNotification();
+                p4.setSubject("Milestone 1 Completion"); p4.setProject("Analytics Dashboard"); p4.setSharedWith("IT - Operations Team"); p4.setSharedOn("25 May 2026, 03:20 PM"); p4.setRecipients(6); p4.setViews(9); p4.setAcknowledged("5 (83%)"); p4.setStatus("COMPLETED");
+                projectUpdateNotificationRepository.save(p4);
+
+                ProjectUpdateNotification p5 = new ProjectUpdateNotification();
+                p5.setSubject("General Update - Kickoff Notes"); p5.setProject("HRMS Enhancement"); p5.setSharedWith("HR Department"); p5.setSharedOn("24 May 2026, 09:00 AM"); p5.setRecipients(15); p5.setViews(21); p5.setAcknowledged("12 (80%)"); p5.setStatus("COMPLETED");
+                projectUpdateNotificationRepository.save(p5);
+            }
+
+            if (recentNotificationRecordRepository.count() == 0) {
+                RecentNotificationRecord n1 = new RecentNotificationRecord();
+                n1.setSubject("Sprint 3 Deadline Reminder"); n1.setNotifyTo("IT - Development Team"); n1.setType("Deadline Reminder"); n1.setPriority("High"); n1.setSentOn("28 May 2026, 10:30 AM"); n1.setRecipients(12); n1.setStatus("Sent");
+                recentNotificationRecordRepository.save(n1);
+
+                RecentNotificationRecord n2 = new RecentNotificationRecord();
+                n2.setSubject("Policy Update - Work From Home"); n2.setNotifyTo("All Employees"); n2.setType("Policy Change"); n2.setPriority("Normal"); n2.setSentOn("27 May 2026, 04:15 PM"); n2.setRecipients(156); n2.setStatus("Sent");
+                recentNotificationRecordRepository.save(n2);
+
+                RecentNotificationRecord n3 = new RecentNotificationRecord();
+                n3.setSubject("Client Call Time Change"); n3.setNotifyTo("Design Team"); n3.setType("Schedule Change"); n3.setPriority("Normal"); n3.setSentOn("26 May 2026, 11:05 AM"); n3.setRecipients(8); n3.setStatus("Sent");
+                recentNotificationRecordRepository.save(n3);
+
+                RecentNotificationRecord n4 = new RecentNotificationRecord();
+                n4.setSubject("Monthly Report Submission Deadline"); n4.setNotifyTo("Finance Team"); n4.setType("Deadline Reminder"); n4.setPriority("High"); n4.setSentOn("25 May 2026, 03:20 PM"); n4.setRecipients(6); n4.setStatus("Pending");
+                recentNotificationRecordRepository.save(n4);
+
+                RecentNotificationRecord n5 = new RecentNotificationRecord();
+                n5.setSubject("System Maintenance - Saturday"); n5.setNotifyTo("All Employees"); n5.setType("General Update"); n5.setPriority("Low"); n5.setSentOn("24 May 2026, 09:00 AM"); n5.setRecipients(184); n5.setStatus("Scheduled");
+                recentNotificationRecordRepository.save(n5);
+            }
+        }
+
         @PreAuthorize("hasRole('SENIOR_MANAGER')")
         @GetMapping("/senior_manager/expenses")
         public String showExpenses(
@@ -1253,29 +1657,74 @@ public class MySpaceController {
                 }
                 model.addAttribute("departments", departments);
 
+                seedExpensesData();
+
                 // --- TAB 1: EXPENSE APPROVALS ---
                 List<Map<String, Object>> approvals = new ArrayList<>();
-                approvals.add(Map.of("id", "R-100", "employee", "Vikram Mehta", "employeeCode", "EMP001", "department", "Information Technology", "type", "EXPENSE", "purpose", "Client meeting - Travel", "amount", 12450.0, "status", "Pending"));
-                approvals.add(Map.of("id", "R-101", "employee", "Neha Verma", "employeeCode", "EMP002", "department", "Human Resources", "type", "REIMBURSEMENT", "purpose", "Work from home setup", "amount", 8750.0, "status", "Approved"));
-                approvals.add(Map.of("id", "R-102", "employee", "Rahul Kumar", "employeeCode", "EMP003", "department", "Human Resources", "type", "BUDGET REQUEST", "purpose", "Team Building Activity", "amount", 50000.0, "status", "Pending"));
-                approvals.add(Map.of("id", "R-103", "employee", "Ankit Patel", "employeeCode", "EMP004", "department", "Information Technology", "type", "EXPENSE", "purpose", "Software Subscription", "amount", 15999.0, "status", "Approved"));
+                for (ExpenseClaim claim : expenseClaimRepository.findAll()) {
+                    User u = claim.getUser();
+                    if (search != null && !search.isBlank() && !u.getFullName().toLowerCase().contains(search.toLowerCase())) {
+                        continue;
+                    }
+                    if (dept != null && !dept.isBlank() && !getDepartment(u).equalsIgnoreCase(dept)) {
+                        continue;
+                    }
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", "R-" + claim.getId());
+                    map.put("employee", u.getFullName());
+                    map.put("employeeCode", u.getUsername());
+                    map.put("department", getDepartment(u));
+                    map.put("type", "EXPENSE");
+                    map.put("purpose", claim.getPurpose());
+                    map.put("amount", claim.getAmount());
+                    map.put("status", claim.getStatus());
+                    approvals.add(map);
+                }
                 model.addAttribute("approvalsList", approvals);
 
                 // --- TAB 2: REIMBURSEMENTS ---
                 List<Map<String, Object>> reimbursements = new ArrayList<>();
-                reimbursements.add(Map.of("id", "R-100", "employee", "Neha Verma", "employeeCode", "EMP002", "department", "Human Resources", "purpose", "Travel - Client Meeting", "amount", 8750.0, "status", "Approved"));
-                reimbursements.add(Map.of("id", "R-101", "employee", "Rahul Kumar", "employeeCode", "EMP003", "department", "Human Resources", "purpose", "Work from home setup", "amount", 2350.0, "status", "Pending"));
-                reimbursements.add(Map.of("id", "R-102", "employee", "Ankit Patel", "employeeCode", "EMP004", "department", "Information Technology", "purpose", "Software Subscription", "amount", 15999.0, "status", "Approved"));
-                reimbursements.add(Map.of("id", "R-103", "employee", "Pooja Desai", "employeeCode", "EMP005", "department", "Finance Team", "purpose", "Internet & Mobile", "amount", 2150.0, "status", "Rejected"));
+                for (ReimbursementRequest req : reimbursementRequestRepository.findAll()) {
+                    User u = req.getUser();
+                    if (search != null && !search.isBlank() && !u.getFullName().toLowerCase().contains(search.toLowerCase())) {
+                        continue;
+                    }
+                    if (dept != null && !dept.isBlank() && !getDepartment(u).equalsIgnoreCase(dept)) {
+                        continue;
+                    }
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", "R-" + req.getId());
+                    map.put("employee", u.getFullName());
+                    map.put("employeeCode", u.getUsername());
+                    map.put("department", getDepartment(u));
+                    map.put("purpose", req.getPurpose());
+                    map.put("amount", req.getAmount());
+                    map.put("status", req.getStatus());
+                    reimbursements.add(map);
+                }
                 model.addAttribute("reimbursementsList", reimbursements);
 
                 // --- TAB 3: BUDGET REQUESTS ---
                 List<Map<String, Object>> budgetRequests = new ArrayList<>();
-                budgetRequests.add(Map.of("id", "BUD-2025-018", "requester", "Vikram Mehta", "employeeCode", "EMP001", "department", "Information Technology", "type", "PROJECT BUDGET", "purpose", "New CRM Software Implementation", "amount", 250000.0, "status", "Pending"));
-                budgetRequests.add(Map.of("id", "BUD-2025-017", "requester", "Neha Verma", "employeeCode", "EMP002", "department", "Human Resources", "type", "TEAM EVENT", "purpose", "Annual Team Offsite 2025", "amount", 120000.0, "status", "Approved"));
-                budgetRequests.add(Map.of("id", "BUD-2025-016", "requester", "Rahul Kumar", "employeeCode", "EMP003", "department", "Human Resources", "type", "HIRING", "purpose", "Q3 Recruitment Drive Costs", "amount", 300000.0, "status", "Pending"));
-                budgetRequests.add(Map.of("id", "BUD-2025-015", "requester", "Ankit Patel", "employeeCode", "EMP004", "department", "Information Technology", "type", "IT INFRA", "purpose", "Server Upgrade & Maintenance", "amount", 175000.0, "status", "Approved"));
-                budgetRequests.add(Map.of("id", "BUD-2025-014", "requester", "Pooja Desai", "employeeCode", "EMP005", "department", "Finance Team", "type", "OPERATIONAL", "purpose", "Finance Tools Annual Subscription", "amount", 85000.0, "status", "Rejected"));
+                for (BudgetRequest budget : budgetRequestRepository.findAll()) {
+                    User u = budget.getRequester();
+                    if (search != null && !search.isBlank() && !u.getFullName().toLowerCase().contains(search.toLowerCase())) {
+                        continue;
+                    }
+                    if (dept != null && !dept.isBlank() && !budget.getDepartment().equalsIgnoreCase(dept)) {
+                        continue;
+                    }
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", "BUD-2025-0" + budget.getId());
+                    map.put("requester", u.getFullName());
+                    map.put("employeeCode", u.getUsername());
+                    map.put("department", budget.getDepartment());
+                    map.put("type", budget.getType());
+                    map.put("purpose", budget.getPurpose());
+                    map.put("amount", budget.getAmount());
+                    map.put("status", budget.getStatus());
+                    budgetRequests.add(map);
+                }
                 model.addAttribute("budgetRequestsList", budgetRequests);
 
                 return "senior_manager-expenses";
@@ -1394,31 +1843,246 @@ public class MySpaceController {
                 List<Project> projects = projectRepository.findAll();
                 model.addAttribute("projectsList", projects);
 
+                seedCommunicationData();
+
                 // --- TAB 1: RECENT COMMUNICATIONS ---
                 List<Map<String, Object>> recentCommunications = new ArrayList<>();
-                recentCommunications.add(Map.of("subject", "Project Update - Website Redesign", "sentTo", "IT - Development Team", "type", "Project Update", "priority", "Normal", "sentOn", "28 May 2026, 10:30 AM", "recipients", 12, "openRate", 75, "status", "Sent"));
-                recentCommunications.add(Map.of("subject", "Deadline Reminder: Sprint 3", "sentTo", "Design Team", "type", "Deadline Reminder", "priority", "High", "sentOn", "27 May 2026, 04:15 PM", "recipients", 8, "openRate", 62, "status", "Sent"));
+                for (CommunicationBroadcast cb : communicationBroadcastRepository.findAll()) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("subject", cb.getSubject());
+                    map.put("sentTo", cb.getSentTo());
+                    map.put("type", cb.getType());
+                    map.put("priority", cb.getPriority());
+                    map.put("sentOn", cb.getSentOn());
+                    map.put("recipients", cb.getRecipients());
+                    map.put("openRate", cb.getOpenRate());
+                    map.put("status", cb.getStatus());
+                    recentCommunications.add(map);
+                }
                 model.addAttribute("recentCommunications", recentCommunications);
 
                 // --- TAB 2: RECENT PROJECT UPDATES ---
                 List<Map<String, Object>> recentProjectUpdates = new ArrayList<>();
-                recentProjectUpdates.add(Map.of("subject", "Website Redesign - Progress Update", "project", "Website Redesign", "sharedWith", "IT - Development Team", "sharedOn", "28 May 2026, 10:30 AM", "recipients", 12, "views", 18, "acknowledged", "10 (83%)", "status", "COMPLETED"));
-                recentProjectUpdates.add(Map.of("subject", "API Integration - Issue Update", "project", "Mobile App Development", "sharedWith", "IT - Development Team", "sharedOn", "27 May 2026, 04:15 PM", "recipients", 10, "views", 14, "acknowledged", "6 (60%)", "status", "OPEN"));
-                recentProjectUpdates.add(Map.of("subject", "Sprint 3 - Task Update", "project", "CRM Integration", "sharedWith", "Design Team", "sharedOn", "26 May 2026, 11:05 AM", "recipients", 8, "views", 12, "acknowledged", "7 (88%)", "status", "COMPLETED"));
-                recentProjectUpdates.add(Map.of("subject", "Milestone 1 Completion", "project", "Analytics Dashboard", "sharedWith", "IT - Operations Team", "sharedOn", "25 May 2026, 03:20 PM", "recipients", 6, "views", 9, "acknowledged", "5 (83%)", "status", "COMPLETED"));
-                recentProjectUpdates.add(Map.of("subject", "General Update - Kickoff Notes", "project", "HRMS Enhancement", "sharedWith", "HR Department", "sharedOn", "24 May 2026, 09:00 AM", "recipients", 15, "views", 21, "acknowledged", "12 (80%)", "status", "COMPLETED"));
+                for (ProjectUpdateNotification pun : projectUpdateNotificationRepository.findAll()) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("subject", pun.getSubject());
+                    map.put("project", pun.getProject());
+                    map.put("sharedWith", pun.getSharedWith());
+                    map.put("sharedOn", pun.getSharedOn());
+                    map.put("recipients", pun.getRecipients());
+                    map.put("views", pun.getViews());
+                    map.put("acknowledged", pun.getAcknowledged());
+                    map.put("status", pun.getStatus());
+                    recentProjectUpdates.add(map);
+                }
                 model.addAttribute("recentProjectUpdates", recentProjectUpdates);
 
                 // --- TAB 3: RECENT NOTIFICATIONS ---
                 List<Map<String, Object>> recentNotifications = new ArrayList<>();
-                recentNotifications.add(Map.of("subject", "Sprint 3 Deadline Reminder", "notifyTo", "IT - Development Team", "type", "Deadline Reminder", "priority", "High", "sentOn", "28 May 2026, 10:30 AM", "recipients", 12, "status", "Sent"));
-                recentNotifications.add(Map.of("subject", "Policy Update - Work From Home", "notifyTo", "All Employees", "type", "Policy Change", "priority", "Normal", "sentOn", "27 May 2026, 04:15 PM", "recipients", 156, "status", "Sent"));
-                recentNotifications.add(Map.of("subject", "Client Call Time Change", "notifyTo", "Design Team", "type", "Schedule Change", "priority", "Normal", "sentOn", "26 May 2026, 11:05 AM", "recipients", 8, "status", "Sent"));
-                recentNotifications.add(Map.of("subject", "Monthly Report Submission Deadline", "notifyTo", "Finance Team", "type", "Deadline Reminder", "priority", "High", "sentOn", "25 May 2026, 03:20 PM", "recipients", 6, "status", "Pending"));
-                recentNotifications.add(Map.of("subject", "System Maintenance - Saturday", "notifyTo", "All Employees", "type", "General Update", "priority", "Low", "sentOn", "24 May 2026, 09:00 AM", "recipients", 184, "status", "Scheduled"));
+                for (RecentNotificationRecord rnr : recentNotificationRecordRepository.findAll()) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("subject", rnr.getSubject());
+                    map.put("notifyTo", rnr.getNotifyTo());
+                    map.put("type", rnr.getType());
+                    map.put("priority", rnr.getPriority());
+                    map.put("sentOn", rnr.getSentOn());
+                    map.put("recipients", rnr.getRecipients());
+                    map.put("status", rnr.getStatus());
+                    recentNotifications.add(map);
+                }
                 model.addAttribute("recentNotifications", recentNotifications);
 
                 return "senior_manager-communication";
+        }
+
+        private List<User> findUsersInGroup(String group) {
+            List<User> allUsers = userRepository.findAll();
+            if (group == null || group.equalsIgnoreCase("All")) {
+                return allUsers;
+            }
+            
+            List<User> filtered = new ArrayList<>();
+            for (User u : allUsers) {
+                EmployeeProfile ep = u.getEmployeeProfile();
+                if (ep != null && ep.getDepartment() != null) {
+                    String dept = ep.getDepartment().toLowerCase();
+                    String target = group.toLowerCase();
+                    if (dept.contains(target) || target.contains(dept)) {
+                        filtered.add(u);
+                    } else if (target.equals("dev") && (dept.contains("dev") || dept.contains("software") || dept.contains("program"))) {
+                        filtered.add(u);
+                    } else if (target.equals("qa") && (dept.contains("qa") || dept.contains("quality") || dept.contains("test"))) {
+                        filtered.add(u);
+                    } else if (target.equals("ops") && (dept.contains("ops") || dept.contains("operations") || dept.contains("support"))) {
+                        filtered.add(u);
+                    }
+                }
+            }
+            return filtered;
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @PostMapping("/senior_manager/communication/send")
+        public String sendCommunication(
+                @RequestParam("recipientGroup") String recipientGroup,
+                @RequestParam("subject") String subject,
+                @RequestParam("priority") String priority,
+                @RequestParam("messageType") String messageType,
+                @RequestParam("message") String message,
+                Principal principal,
+                org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+            
+            User sender = principal != null ? userRepository.findByUsername(principal.getName()).orElse(null) : null;
+            String senderName = sender != null ? sender.getFullName() : "Senior Manager";
+            String senderDesignation = (sender != null && sender.getEmployeeProfile() != null && sender.getEmployeeProfile().getDesignation() != null)
+                ? sender.getEmployeeProfile().getDesignation() : "Senior Manager";
+            
+            List<User> recipients = findUsersInGroup(recipientGroup);
+            for (User recipient : recipients) {
+                HrmsNotification notif = new HrmsNotification(
+                    recipient,
+                    subject,
+                    message,
+                    messageType,
+                    priority,
+                    senderName,
+                    senderDesignation
+                );
+                hrmsNotificationRepository.save(notif);
+                
+                if (recipient.getEmail() != null && !recipient.getEmail().isEmpty()) {
+                    emailService.sendGenericEmail(recipient.getEmail(), subject, message);
+                }
+            }
+            
+            try {
+                CommunicationBroadcast cb = new CommunicationBroadcast();
+                cb.setSubject(subject);
+                cb.setSentTo(recipientGroup);
+                cb.setType(messageType);
+                cb.setPriority(priority);
+                cb.setSentOn(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a")));
+                cb.setRecipients(recipients.size());
+                cb.setOpenRate(0);
+                cb.setStatus("Sent");
+                communicationBroadcastRepository.save(cb);
+
+                RecentNotificationRecord rn = new RecentNotificationRecord();
+                rn.setSubject(subject);
+                rn.setNotifyTo(recipientGroup);
+                rn.setType(messageType);
+                rn.setPriority(priority);
+                rn.setSentOn(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a")));
+                rn.setRecipients(recipients.size());
+                rn.setStatus("Sent");
+                recentNotificationRecordRepository.save(rn);
+            } catch (Exception e) {
+                // ignore
+            }
+
+            redirectAttributes.addFlashAttribute("successMessage", "Communication message sent via email and dashboard notifications successfully!");
+            return "redirect:/senior_manager/communication?tab=send";
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @PostMapping("/senior_manager/communication/project-update")
+        public String sendProjectUpdate(
+                @RequestParam("projectName") String projectName,
+                @RequestParam("recipientGroup") String recipientGroup,
+                @RequestParam("subject") String subject,
+                @RequestParam("message") String message,
+                Principal principal,
+                org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+            
+            User sender = principal != null ? userRepository.findByUsername(principal.getName()).orElse(null) : null;
+            String senderName = sender != null ? sender.getFullName() : "Senior Manager";
+            String senderDesignation = (sender != null && sender.getEmployeeProfile() != null && sender.getEmployeeProfile().getDesignation() != null)
+                ? sender.getEmployeeProfile().getDesignation() : "Senior Manager";
+            
+            String title = "[" + projectName + "] " + subject;
+            List<User> recipients = findUsersInGroup(recipientGroup);
+            for (User recipient : recipients) {
+                HrmsNotification notif = new HrmsNotification(
+                    recipient,
+                    title,
+                    message,
+                    "Project Update",
+                    "Normal",
+                    senderName,
+                    senderDesignation
+                );
+                hrmsNotificationRepository.save(notif);
+                
+                if (recipient.getEmail() != null && !recipient.getEmail().isEmpty()) {
+                    emailService.sendGenericEmail(recipient.getEmail(), title, message);
+                }
+            }
+            
+            try {
+                ProjectUpdateNotification pu = new ProjectUpdateNotification();
+                pu.setSubject(subject);
+                pu.setProject(projectName);
+                pu.setSharedWith(recipientGroup);
+                pu.setSharedOn(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a")));
+                pu.setRecipients(recipients.size());
+                pu.setViews(0);
+                pu.setAcknowledged("0 (0%)");
+                pu.setStatus("OPEN");
+                projectUpdateNotificationRepository.save(pu);
+            } catch (Exception e) {
+                // ignore
+            }
+
+            redirectAttributes.addFlashAttribute("successMessage", "Project update shared via email and dashboard notifications successfully!");
+            return "redirect:/senior_manager/communication?tab=project";
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @PostMapping("/senior_manager/communication/notification")
+        public String publishNotification(
+                @RequestParam("recipientGroup") String recipientGroup,
+                @RequestParam("messageType") String messageType,
+                @RequestParam("priority") String priority,
+                @RequestParam("subject") String subject,
+                @RequestParam("message") String message,
+                Principal principal,
+                org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+            
+            User sender = principal != null ? userRepository.findByUsername(principal.getName()).orElse(null) : null;
+            String senderName = sender != null ? sender.getFullName() : "Senior Manager";
+            String senderDesignation = (sender != null && sender.getEmployeeProfile() != null && sender.getEmployeeProfile().getDesignation() != null)
+                ? sender.getEmployeeProfile().getDesignation() : "Senior Manager";
+            
+            List<User> recipients = findUsersInGroup(recipientGroup);
+            for (User recipient : recipients) {
+                HrmsNotification notif = new HrmsNotification(
+                    recipient,
+                    subject,
+                    message,
+                    messageType,
+                    priority,
+                    senderName,
+                    senderDesignation
+                );
+                hrmsNotificationRepository.save(notif);
+            }
+            
+            try {
+                RecentNotificationRecord rn = new RecentNotificationRecord();
+                rn.setSubject(subject);
+                rn.setNotifyTo(recipientGroup);
+                rn.setType(messageType);
+                rn.setPriority(priority);
+                rn.setSentOn(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a")));
+                rn.setRecipients(recipients.size());
+                rn.setStatus("Sent");
+                recentNotificationRecordRepository.save(rn);
+            } catch (Exception e) {
+                // ignore
+            }
+
+            redirectAttributes.addFlashAttribute("successMessage", "Notification published to employee dashboards successfully!");
+            return "redirect:/senior_manager/communication?tab=notification";
         }
 
         @PreAuthorize("hasRole('SENIOR_MANAGER')")
@@ -1695,6 +2359,77 @@ public class MySpaceController {
                             }
                             attendanceRepository.save(att);
                         }
+                    }
+                }
+
+                if (leaveRequestRepository.count() == 0) {
+                    List<User> employeesList = activeUsers.stream()
+                            .filter(u -> u.getRole() == null || !"CLIENT".equalsIgnoreCase(u.getRole().getRoleName()))
+                            .collect(java.util.stream.Collectors.toList());
+                    if (employeesList.size() >= 5) {
+                        LocalDate today = LocalDate.now();
+                        int year = today.getYear();
+                        int month = today.getMonthValue();
+
+                        // Leave 1: Vikram M
+                        LeaveRequest lr1 = new LeaveRequest();
+                        lr1.setUser(employeesList.get(0));
+                        lr1.setLeaveType("Casual Leave");
+                        lr1.setFromDate(LocalDate.of(year, month, 3));
+                        lr1.setToDate(LocalDate.of(year, month, 5));
+                        lr1.setTotalDays(3.0);
+                        lr1.setStatus("Approved");
+                        lr1.setReason("Personal work");
+                        lr1.setCreatedAt(today.minusDays(10));
+                        leaveRequestRepository.save(lr1);
+
+                        // Leave 2: Pooja Desai
+                        LeaveRequest lr2 = new LeaveRequest();
+                        lr2.setUser(employeesList.get(1));
+                        lr2.setLeaveType("Earned Leave");
+                        lr2.setFromDate(LocalDate.of(year, month, 7));
+                        lr2.setToDate(LocalDate.of(year, month, 8));
+                        lr2.setTotalDays(2.0);
+                        lr2.setStatus("Approved");
+                        lr2.setReason("Family function");
+                        lr2.setCreatedAt(today.minusDays(10));
+                        leaveRequestRepository.save(lr2);
+
+                        // Leave 3: Neha Iyer
+                        LeaveRequest lr3 = new LeaveRequest();
+                        lr3.setUser(employeesList.get(2));
+                        lr3.setLeaveType("Sick Leave");
+                        lr3.setFromDate(LocalDate.of(year, month, 12));
+                        lr3.setToDate(LocalDate.of(year, month, 14));
+                        lr3.setTotalDays(3.0);
+                        lr3.setStatus("Approved");
+                        lr3.setReason("Medical checkup");
+                        lr3.setCreatedAt(today.minusDays(10));
+                        leaveRequestRepository.save(lr3);
+
+                        // Leave 4: Rahul Kumar
+                        LeaveRequest lr4 = new LeaveRequest();
+                        lr4.setUser(employeesList.get(3));
+                        lr4.setLeaveType("Casual Leave");
+                        lr4.setFromDate(LocalDate.of(year, month, 15));
+                        lr4.setToDate(LocalDate.of(year, month, 16));
+                        lr4.setTotalDays(2.0);
+                        lr4.setStatus("Approved");
+                        lr4.setReason("Out of station");
+                        lr4.setCreatedAt(today.minusDays(10));
+                        leaveRequestRepository.save(lr4);
+
+                        // Leave 5: Megha Joshi
+                        LeaveRequest lr5 = new LeaveRequest();
+                        lr5.setUser(employeesList.get(4));
+                        lr5.setLeaveType("Casual Leave");
+                        lr5.setFromDate(LocalDate.of(year, month, 26));
+                        lr5.setToDate(LocalDate.of(year, month, 27));
+                        lr5.setTotalDays(2.0);
+                        lr5.setStatus("Approved");
+                        lr5.setReason("Rest");
+                        lr5.setCreatedAt(today.minusDays(10));
+                        leaveRequestRepository.save(lr5);
                     }
                 }
             } catch (Exception e) {

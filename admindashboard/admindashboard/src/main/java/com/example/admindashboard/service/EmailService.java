@@ -440,4 +440,22 @@ public class EmailService {
             System.err.println("❌ Onboarding Email Delivery Error: " + e.getMessage());
         }
     }
+
+    @Async
+    public void sendGenericEmail(String toEmail, String subject, String htmlContent) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(toEmail);
+            helper.setFrom(systemEmail != null ? systemEmail : "no-reply@whitecircle.com", "WhiteCircle HRMS");
+            helper.setSubject(subject);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            System.out.println("✅ Generic Email Sent Successfully to: " + toEmail);
+        } catch (Exception e) {
+            System.err.println("❌ Generic Email Delivery Error: " + e.getMessage());
+        }
+    }
 }
