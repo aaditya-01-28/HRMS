@@ -294,7 +294,7 @@
                     </div>
                     <div class="text-muted small">Total Devices</div>
                     <div class="fs-3 fw-bold my-1" th:text="${deviceCount}">24</div>
-                    <div class="text-success small fw-semibold">Active: 15 | Maint: 9</div>
+                    <div class="text-success small fw-semibold" th:text="${'Active: ' + activeDevicesCount + ' | Maint: ' + maintDevicesCount}">Active: 15 | Maint: 9</div>
                 </div>
             </div>
             <div class="col-md-2.4 col-sm-6 col-xs-12" style="width: 20%">
@@ -304,7 +304,7 @@
                     </div>
                     <div class="text-muted small">Total Vendors</div>
                     <div class="fs-3 fw-bold my-1" th:text="${vendorCount}">32</div>
-                    <div class="text-success small fw-semibold">Active: 28</div>
+                    <div class="text-success small fw-semibold" th:text="${'Active: ' + activeVendorsCount}">Active: 28</div>
                 </div>
             </div>
             <div class="col-md-2.4 col-sm-6 col-xs-12" style="width: 20%">
@@ -314,7 +314,7 @@
                     </div>
                     <div class="text-muted small">Pending Requests</div>
                     <div class="fs-3 fw-bold my-1" th:text="${pendingCount}">12</div>
-                    <div class="text-warning small fw-semibold">Assigned: 8</div>
+                    <div class="text-warning small fw-semibold" th:text="${'Assigned: ' + assignedCount}">Assigned: 8</div>
                 </div>
             </div>
             <div class="col-md-2.4 col-sm-6 col-xs-12" style="width: 20%">
@@ -324,7 +324,7 @@
                     </div>
                     <div class="text-muted small">Resolved Requests</div>
                     <div class="fs-3 fw-bold my-1" th:text="${resolvedCount}">38</div>
-                    <div class="text-success small fw-semibold">Completed: 100%</div>
+                    <div class="text-success small fw-semibold" th:text="${'Completed: ' + completionPercentage + '%'}">Completed: 100%</div>
                 </div>
             </div>
             <div class="col-md-2.4 col-sm-6 col-xs-12" style="width: 20%">
@@ -334,7 +334,7 @@
                     </div>
                     <div class="text-muted small">Blocked Requests</div>
                     <div class="fs-3 fw-bold my-1" th:text="${blockedCount}">5</div>
-                    <div class="text-danger small fw-semibold">Requires Review</div>
+                    <div class="text-danger small fw-semibold" th:text="${'Requires Review: ' + blockedCount}">Requires Review</div>
                 </div>
             </div>
         </div>
@@ -412,7 +412,7 @@
                                 <tr th:each="vendor : ${topVendors}">
                                     <td class="fw-semibold" th:text="${vendor.name}">Intercontinental Corp</td>
                                     <td th:text="${vendor.category}">AMC</td>
-                                    <td class="text-end fw-bold text-primary" th:text="${vendor.phone}">18</td>
+                                    <td class="text-end fw-bold text-primary" th:text="${vendor.activeRequests}">18</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1054,16 +1054,16 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script th:if="${activeTab == 'dashboard'}">
+<script th:inline="javascript" th:if="${activeTab == 'dashboard'}">
     // Monthly Requests Chart
     const monthlyCtx = document.getElementById('monthlyRequestsChart').getContext('2d');
     new Chart(monthlyCtx, {
         type: 'bar',
         data: {
-            labels: ['12 May', '20 May', '28 May', '03 Jun', '12 Jun', '20 Jun', '28 Jun'],
+            labels: /*[[${dateLabels}]]*/ ['12 May', '20 May', '28 May', '03 Jun', '12 Jun', '20 Jun', '28 Jun'],
             datasets: [{
                 label: 'Service Requests',
-                data: [15, 20, 24, 21, 23, 14, 12],
+                data: /*[[${dateData}]]*/ [15, 20, 24, 21, 23, 14, 12],
                 backgroundColor: '#3b82f6',
                 borderRadius: 6
             }]
@@ -1086,9 +1086,9 @@
     new Chart(categoryCtx, {
         type: 'doughnut',
         data: {
-            labels: ['IT Equipment', 'Office Supplies', 'Access Control', 'Maintenance', 'Cleaning'],
+            labels: /*[[${categoryLabels}]]*/ ['IT Equipment', 'Office Supplies', 'Access Control', 'Maintenance', 'Cleaning'],
             datasets: [{
-                data: [35, 20, 15, 20, 10],
+                data: /*[[${categoryData}]]*/ [35, 20, 15, 20, 10],
                 backgroundColor: ['#2563eb', '#3b82f6', '#f59e0b', '#ef4444', '#10b981'],
                 borderWidth: 0
             }]

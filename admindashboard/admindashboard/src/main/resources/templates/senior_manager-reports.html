@@ -334,23 +334,23 @@
         <div class="stats-row">
             <div class="stat-card">
                 <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-users"></i></div>
-                <div><div class="label">TOTAL TEAM MEMBERS</div><div class="value">24</div><div class="subtext">This Year</div></div>
+                <div><div class="label">TOTAL TEAM MEMBERS</div><div class="value" th:text="${repTotalTeamMembers}">24</div><div class="subtext">This Year</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-award"></i></div>
-                <div><div class="label">HIGH PERFORMERS</div><div class="value">06</div><div class="subtext">This Year</div></div>
+                <div><div class="label">HIGH PERFORMERS</div><div class="value" th:text="${repHighPerformers}">06</div><div class="subtext">This Year</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-star-half-stroke"></i></div>
-                <div><div class="label">AVERAGE PERFORMANCE</div><div class="value">3.8 / 5</div><div class="subtext">This Year</div></div>
+                <div><div class="label">AVERAGE PERFORMANCE</div><div class="value" th:text="${repAvgPerformance}">3.8 / 5</div><div class="subtext">This Year</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-bullseye"></i></div>
-                <div><div class="label">GOALS ACHIEVED</div><div class="value">78%</div><div class="subtext">This Year</div></div>
+                <div><div class="label">GOALS ACHIEVED</div><div class="value" th:text="${repGoalsAchieved}">78%</div><div class="subtext">This Year</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-secondary-subtle text-secondary"><i class="fa-solid fa-file-arrow-down"></i></div>
-                <div><div class="label">REPORTS EXPORTED</div><div class="value">12</div><div class="subtext">This Year</div></div>
+                <div><div class="label">REPORTS EXPORTED</div><div class="value" th:text="${repExported1}">12</div><div class="subtext">This Year</div></div>
             </div>
         </div>
 
@@ -447,23 +447,23 @@
         <div class="stats-row">
             <div class="stat-card">
                 <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-calendar-check"></i></div>
-                <div><div class="label">AVERAGE ATTENDANCE</div><div class="value">92.6%</div><div class="subtext">This Month</div></div>
+                <div><div class="label">AVERAGE ATTENDANCE</div><div class="value" th:text="${repAvgAttendance}">92.6%</div><div class="subtext">This Month</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-user-check"></i></div>
-                <div><div class="label">PRESENT DAYS</div><div class="value">2,138</div><div class="subtext">This Month</div></div>
+                <div><div class="label">PRESENT DAYS</div><div class="value" th:text="${repPresentDays}">2,138</div><div class="subtext">This Month</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-user-xmark"></i></div>
-                <div><div class="label">ABSENT DAYS</div><div class="value">168</div><div class="subtext">This Month</div></div>
+                <div><div class="label">ABSENT DAYS</div><div class="value" th:text="${repAbsentDays}">168</div><div class="subtext">This Month</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-clock"></i></div>
-                <div><div class="label">LATE DAYS</div><div class="value">142</div><div class="subtext">This Month</div></div>
+                <div><div class="label">LATE DAYS</div><div class="value" th:text="${repLateDays}">142</div><div class="subtext">This Month</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-secondary-subtle text-secondary"><i class="fa-solid fa-file-arrow-down"></i></div>
-                <div><div class="label">REPORTS EXPORTED</div><div class="value">08</div><div class="subtext">This Year</div></div>
+                <div><div class="label">REPORTS EXPORTED</div><div class="value" th:text="${repExported2}">08</div><div class="subtext">This Year</div></div>
             </div>
         </div>
 
@@ -560,23 +560,23 @@
         <div class="stats-row">
             <div class="stat-card">
                 <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-plane-departure"></i></div>
-                <div><div class="label">TOTAL LEAVES TAKEN</div><div class="value">186</div><div class="subtext">This Month</div></div>
+                <div><div class="label">TOTAL LEAVES TAKEN</div><div class="value" th:text="${repTotalLeavesTaken}">186</div><div class="subtext">This Month</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
-                <div><div class="label">APPROVED LEAVES</div><div class="value">162</div><div class="subtext">This Month (87.1%)</div></div>
+                <div><div class="label">APPROVED LEAVES</div><div class="value" th:text="${repLeaveApproved}">162</div><div class="subtext" th:text="'This Month (' + (${repTotalLeavesTaken} > 0 ? ${repLeaveApproved} * 100 / ${repTotalLeavesTaken} : 0) + '%)'">This Month (87.1%)</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
-                <div><div class="label">REJECTED LEAVES</div><div class="value">12</div><div class="subtext">This Month (6.5%)</div></div>
+                <div><div class="label">REJECTED LEAVES</div><div class="value" th:text="${repLeaveRejected}">12</div><div class="subtext" th:text="'This Month (' + (${repTotalLeavesTaken} > 0 ? ${repLeaveRejected} * 100 / ${repTotalLeavesTaken} : 0) + '%)'">This Month (6.5%)</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-circle-pause"></i></div>
-                <div><div class="label">PENDING LEAVES</div><div class="value">12</div><div class="subtext">This Month (6.5%)</div></div>
+                <div><div class="label">PENDING LEAVES</div><div class="value" th:text="${repLeavePending}">12</div><div class="subtext" th:text="'This Month (' + (${repTotalLeavesTaken} > 0 ? ${repLeavePending} * 100 / ${repTotalLeavesTaken} : 0) + '%)'">This Month (6.5%)</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-secondary-subtle text-secondary"><i class="fa-solid fa-file-arrow-down"></i></div>
-                <div><div class="label">REPORTS EXPORTED</div><div class="value">07</div><div class="subtext">This Month</div></div>
+                <div><div class="label">REPORTS EXPORTED</div><div class="value" th:text="${repExported3}">07</div><div class="subtext">This Month</div></div>
             </div>
         </div>
 
@@ -683,23 +683,23 @@
         <div class="stats-row">
             <div class="stat-card">
                 <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-briefcase"></i></div>
-                <div><div class="label">TOTAL PROJECTS</div><div class="value">12</div><div class="subtext">This Month</div></div>
+                <div><div class="label">TOTAL PROJECTS</div><div class="value" th:text="${repTotalProjects}">12</div><div class="subtext">This Month</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
-                <div><div class="label">ON TRACK</div><div class="value">7</div><div class="subtext">58.3%</div></div>
+                <div><div class="label">ON TRACK</div><div class="value" th:text="${reportOnTrackCount}">7</div><div class="subtext" th:text="${repTotalProjects} > 0 ? (${reportOnTrackCount} * 100 / ${repTotalProjects}) + '%' : '0%'">58.3%</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                <div><div class="label">AT RISK</div><div class="value">3</div><div class="subtext">25.0%</div></div>
+                <div><div class="label">AT RISK</div><div class="value" th:text="${reportAtRiskCount}">3</div><div class="subtext" th:text="${repTotalProjects} > 0 ? (${reportAtRiskCount} * 100 / ${repTotalProjects}) + '%' : '0%'">25.0%</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-circle-exmark"></i></div>
-                <div><div class="label">DELAYED</div><div class="value">2</div><div class="subtext">16.7%</div></div>
+                <div><div class="label">DELAYED</div><div class="value" th:text="${reportDelayedCount}">2</div><div class="subtext" th:text="${repTotalProjects} > 0 ? (${reportDelayedCount} * 100 / ${repTotalProjects}) + '%' : '0%'">16.7%</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-circle-check"></i></div>
-                <div><div class="label">COMPLETED</div><div class="value">5</div><div class="subtext">This Month</div></div>
+                <div><div class="label">COMPLETED</div><div class="value" th:text="${repProjCompleted}">5</div><div class="subtext">This Month</div></div>
             </div>
         </div>
 
@@ -835,10 +835,36 @@
     </div>
 </div>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
+<!-- Hidden inputs for Thymeleaf parameters -->
+<input type="hidden" id="activeTabInput" th:value="${activeTab}" />
+<input type="hidden" id="reportCasualCount" th:value="${reportCasualCount}" />
+<input type="hidden" id="reportPrivilegeCount" th:value="${reportPrivilegeCount}" />
+<input type="hidden" id="reportOtherCount" th:value="${reportOtherCount}" />
+<input type="hidden" id="reportSickCount" th:value="${reportSickCount}" />
+<input type="hidden" id="reportWfhCount" th:value="${reportWfhCount}" />
+<input type="hidden" id="reportOnTrackCount" th:value="${reportOnTrackCount}" />
+<input type="hidden" id="reportAtRiskCount" th:value="${reportAtRiskCount}" />
+<input type="hidden" id="reportDelayedCount" th:value="${reportDelayedCount}" />
+<input type="hidden" id="progressBucket1" th:value="${progressBucket1}" />
+<input type="hidden" id="progressBucket2" th:value="${progressBucket2}" />
+<input type="hidden" id="progressBucket3" th:value="${progressBucket3}" />
+<input type="hidden" id="progressBucket4" th:value="${progressBucket4}" />
+
+<script>
     document.addEventListener("DOMContentLoaded", function() {
-        const activeTab = /*[[${activeTab}]]*/ 'performance';
+        const activeTab = document.getElementById('activeTabInput')?.value || 'performance';
+        const reportCasual = parseFloat(document.getElementById('reportCasualCount')?.value || '0');
+        const reportPrivilege = parseFloat(document.getElementById('reportPrivilegeCount')?.value || '0');
+        const reportOther = parseFloat(document.getElementById('reportOtherCount')?.value || '0');
+        const reportSick = parseFloat(document.getElementById('reportSickCount')?.value || '0');
+        const reportWfh = parseFloat(document.getElementById('reportWfhCount')?.value || '0');
+        const reportOnTrack = parseFloat(document.getElementById('reportOnTrackCount')?.value || '0');
+        const reportAtRisk = parseFloat(document.getElementById('reportAtRiskCount')?.value || '0');
+        const reportDelayed = parseFloat(document.getElementById('reportDelayedCount')?.value || '0');
+        const progressBucket1 = parseFloat(document.getElementById('progressBucket1')?.value || '0');
+        const progressBucket2 = parseFloat(document.getElementById('progressBucket2')?.value || '0');
+        const progressBucket3 = parseFloat(document.getElementById('progressBucket3')?.value || '0');
+        const progressBucket4 = parseFloat(document.getElementById('progressBucket4')?.value || '0');
 
         // --- 1. LEAVE TRENDS DONUT CHART ---
         if (activeTab === 'leaves') {
@@ -848,7 +874,7 @@
                 data: {
                     labels: ['Casual Leave', 'Privilege Leave', 'Other Leave', 'Sick Leave', 'Work From Home'],
                     datasets: [{
-                        data: [/*[[${reportCasualCount}]]*/ 41.9, /*[[${reportPrivilegeCount}]]*/ 17.2, /*[[${reportOtherCount}]]*/ 6.5, /*[[${reportSickCount}]]*/ 24.2, /*[[${reportWfhCount}]]*/ 10.2],
+                        data: [reportCasual, reportPrivilege, reportOther, reportSick, reportWfh],
                         backgroundColor: ['#3b82f6', '#f59e0b', '#06b6d4', '#10b981', '#8b5cf6'],
                         borderWidth: 2
                     }]
@@ -872,7 +898,7 @@
                 data: {
                     labels: ['On Track', 'At Risk', 'Delayed'],
                     datasets: [{
-                        data: [/*[[${reportOnTrackCount}]]*/ 7, /*[[${reportAtRiskCount}]]*/ 3, /*[[${reportDelayedCount}]]*/ 2],
+                        data: [reportOnTrack, reportAtRisk, reportDelayed],
                         backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
                         borderWidth: 2
                     }]
@@ -895,7 +921,7 @@
                     labels: ['0-25%', '26-50%', '51-75%', '76-100%'],
                     datasets: [{
                         label: 'No. of Projects',
-                        data: [/*[[${progressBucket1}]]*/ 1, /*[[${progressBucket2}]]*/ 2, /*[[${progressBucket3}]]*/ 5, /*[[${progressBucket4}]]*/ 4],
+                        data: [progressBucket1, progressBucket2, progressBucket3, progressBucket4],
                         backgroundColor: '#3b82f6',
                         borderRadius: 4
                     }]

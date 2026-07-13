@@ -501,19 +501,19 @@
         <div class="stats-row">
             <div class="stat-card">
                 <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                <div><div class="label">Pending Escalations</div><div class="value">5</div><div style="font-size:0.7rem; color:#94a3b8;">Action required</div></div>
+                <div><div class="label">Pending Escalations</div><div class="value" th:text="${pendingEscalations}">5</div><div style="font-size:0.7rem; color:#94a3b8;">Action required</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
-                <div><div class="label">Escalated To You</div><div class="value">3</div><div style="font-size:0.7rem; color:#94a3b8;">Team members</div></div>
+                <div><div class="label">Escalated To You</div><div class="value" th:text="${escalatedToYou}">3</div><div style="font-size:0.7rem; color:#94a3b8;">Team members</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                <div><div class="label">Overdue Escalations</div><div class="value">2</div><div style="font-size:0.7rem; color:#94a3b8;">Past deadline</div></div>
+                <div><div class="label">Overdue Escalations</div><div class="value" th:text="${overdueEscalations}">2</div><div style="font-size:0.7rem; color:#94a3b8;">Past deadline</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
-                <div><div class="label">Resolved</div><div class="value">12</div><div style="font-size:0.7rem; color:#94a3b8;">This month</div></div>
+                <div><div class="label">Resolved</div><div class="value" th:text="${resolvedEscalations}">12</div><div style="font-size:0.7rem; color:#94a3b8;">This month</div></div>
             </div>
         </div>
 

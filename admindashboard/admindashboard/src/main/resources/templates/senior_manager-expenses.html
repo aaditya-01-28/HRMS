@@ -338,23 +338,23 @@
         <div class="stats-row">
             <div class="stat-card">
                 <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-                <div><div class="label">TOTAL REQUESTS</div><div class="value">28</div><div class="subtext">Across your team</div></div>
+                <div><div class="label">TOTAL REQUESTS</div><div class="value" th:text="${expTotalRequests}">28</div><div class="subtext">Across your team</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
-                <div><div class="label">APPROVED</div><div class="value">16</div><div class="subtext">57.14% of total</div></div>
+                <div><div class="label">APPROVED</div><div class="value" th:text="${expApproved}">16</div><div class="subtext">57.14% of total</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-hourglass-half"></i></div>
-                <div><div class="label">PENDING</div><div class="value">9</div><div class="subtext">32.14% of total</div></div>
+                <div><div class="label">PENDING</div><div class="value" th:text="${expPending}">9</div><div class="subtext">32.14% of total</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
-                <div><div class="label">REJECTED</div><div class="value">3</div><div class="subtext">10.71% of total</div></div>
+                <div><div class="label">REJECTED</div><div class="value" th:text="${expRejected}">3</div><div class="subtext">10.71% of total</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-wallet"></i></div>
-                <div><div class="label">TOTAL AMOUNT</div><div class="value">₹6,45,230</div><div class="subtext">Across all requests</div></div>
+                <div><div class="label">TOTAL AMOUNT</div><div class="value" th:text="${'₹' + expTotalAmount}">₹6,45,230</div><div class="subtext">Across all requests</div></div>
             </div>
         </div>
 
@@ -413,8 +413,8 @@
                                     <span class="status-badge" th:classappend="${row['status'] == 'Approved' ? ' status-approved' : (row['status'] == 'Rejected' ? ' status-rejected' : (row['status'].contains('Forward') ? ' status-completed' : ' status-pending'))}" th:text="${row['status']}">Pending</span>
                                 </td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-link text-primary me-1" th:onclick="'openEditModal(\'' + ${row['id']} + '\', \'' + ${row['purpose']} + '\', ' + ${row['amount']} + ')'" title="Edit/Review"><i class="fa-regular fa-pen-to-square" style="font-size:1.1rem;"></i></button>
-                                    <button class="btn btn-sm btn-link text-warning me-1" th:onclick="'openAssignModal(\'' + ${row['id']} + '\')'" title="Assign"><i class="fa-solid fa-user-plus" style="font-size:1.1rem;"></i></button>
+                                    <button class="btn btn-sm btn-link text-primary me-1 btn-edit-expense" th:data-id="${row['id']}" th:data-purpose="${row['purpose']}" th:data-amount="${row['amount']}" title="Edit/Review"><i class="fa-regular fa-pen-to-square" style="font-size:1.1rem;"></i></button>
+                                    <button class="btn btn-sm btn-link text-warning me-1 btn-assign-expense" th:data-id="${row['id']}" title="Assign"><i class="fa-solid fa-user-plus" style="font-size:1.1rem;"></i></button>
                                     <form th:action="@{/senior_manager/expenses/action}" method="POST" style="display:inline;" onsubmit="return confirm('Forward this request to accounts department?')">
                                         <input type="hidden" name="requestId" th:value="${row['id']}"/>
                                         <input type="hidden" name="action" value="Forward"/>
@@ -477,23 +477,23 @@
         <div class="stats-row">
             <div class="stat-card">
                 <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-receipt"></i></div>
-                <div><div class="label">Total Requests</div><div class="value">24</div><div class="subtext">Across your team</div></div>
+                <div><div class="label">Total Requests</div><div class="value" th:text="${reimTotalRequests}">24</div><div class="subtext">Across your team</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
-                <div><div class="label">Approved</div><div class="value">14</div><div class="subtext">58.33% of total</div></div>
+                <div><div class="label">Approved</div><div class="value" th:text="${reimApprovedCount}">14</div><div class="subtext">58.33% of total</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-hourglass-half"></i></div>
-                <div><div class="label">Pending</div><div class="value">7</div><div class="subtext">29.17% of total</div></div>
+                <div><div class="label">Pending</div><div class="value" th:text="${reimPendingCount}">7</div><div class="subtext">29.17% of total</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
-                <div><div class="label">Rejected</div><div class="value">3</div><div class="subtext">12.50% of total</div></div>
+                <div><div class="label">Rejected</div><div class="value" th:text="${reimRejectedCount}">3</div><div class="subtext">12.50% of total</div></div>
             </div>
             <div class="stat-card bg-primary text-white">
                 <div class="icon-circle bg-white bg-opacity-25 text-white"><i class="fa-solid fa-wallet"></i></div>
-                <div><div class="label text-white-50">Total Amount</div><div class="value">₹2,14,560</div><div class="subtext text-white-50">Across all requests</div></div>
+                <div><div class="label text-white-50">Total Amount</div><div class="value" th:text="${'₹' + reimTotalAmount}">₹2,14,560</div><div class="subtext text-white-50">Across all requests</div></div>
             </div>
         </div>
 
@@ -546,8 +546,8 @@
                                     <span class="status-badge" th:classappend="${row['status'] == 'Approved' ? ' status-approved' : (row['status'] == 'Rejected' ? ' status-rejected' : (row['status'].contains('Forward') ? ' status-completed' : ' status-pending'))}" th:text="${row['status']}">Approved</span>
                                 </td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-link text-primary me-1" th:onclick="'openEditModal(\'' + ${row['id']} + '\', \'' + ${row['purpose']} + '\', ' + ${row['amount']} + ')'" title="Edit/Review"><i class="fa-regular fa-pen-to-square" style="font-size:1.1rem;"></i></button>
-                                    <button class="btn btn-sm btn-link text-warning me-1" th:onclick="'openAssignModal(\'' + ${row['id']} + '\')'" title="Assign"><i class="fa-solid fa-user-plus" style="font-size:1.1rem;"></i></button>
+                                    <button class="btn btn-sm btn-link text-primary me-1 btn-edit-expense" th:data-id="${row['id']}" th:data-purpose="${row['purpose']}" th:data-amount="${row['amount']}" title="Edit/Review"><i class="fa-regular fa-pen-to-square" style="font-size:1.1rem;"></i></button>
+                                    <button class="btn btn-sm btn-link text-warning me-1 btn-assign-expense" th:data-id="${row['id']}" title="Assign"><i class="fa-solid fa-user-plus" style="font-size:1.1rem;"></i></button>
                                     <form th:action="@{/senior_manager/expenses/action}" method="POST" style="display:inline;" onsubmit="return confirm('Forward this request to accounts department?')">
                                         <input type="hidden" name="requestId" th:value="${row['id']}"/>
                                         <input type="hidden" name="action" value="Forward"/>
@@ -614,23 +614,23 @@
         <div class="stats-row">
             <div class="stat-card">
                 <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-wallet"></i></div>
-                <div><div class="label">TOTAL REQUESTS</div><div class="value">18</div><div class="subtext">Across your team</div></div>
+                <div><div class="label">TOTAL REQUESTS</div><div class="value" th:text="${budgetTotalRequests}">18</div><div class="subtext">Across your team</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-circle-check"></i></div>
-                <div><div class="label">APPROVED</div><div class="value">7</div><div class="subtext">38.89% of total</div></div>
+                <div><div class="label">APPROVED</div><div class="value" th:text="${budgetApprovedCount}">7</div><div class="subtext">38.89% of total</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-hourglass-half"></i></div>
-                <div><div class="label">PENDING</div><div class="value">8</div><div class="subtext">44.44% of total</div></div>
+                <div><div class="label">PENDING</div><div class="value" th:text="${budgetPendingCount}">8</div><div class="subtext">44.44% of total</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-danger-subtle text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
-                <div><div class="label">REJECTED</div><div class="value">3</div><div class="subtext">16.67% of total</div></div>
+                <div><div class="label">REJECTED</div><div class="value" th:text="${budgetRejectedCount}">3</div><div class="subtext">16.67% of total</div></div>
             </div>
             <div class="stat-card bg-primary text-white">
                 <div class="icon-circle bg-white bg-opacity-25 text-white"><i class="fa-solid fa-wallet"></i></div>
-                <div><div class="label text-white-50">TOTAL AMOUNT REQUESTED</div><div class="value">₹12,45,800</div><div class="subtext text-white-50">Across all pending/approved requests</div></div>
+                <div><div class="label text-white-50">TOTAL AMOUNT REQUESTED</div><div class="value" th:text="${'₹' + budgetTotalAmount}">₹12,45,800</div><div class="subtext text-white-50">Across all pending/approved requests</div></div>
             </div>
         </div>
 
@@ -687,8 +687,8 @@
                                     <span class="status-badge" th:classappend="${row['status'] == 'Approved' ? ' status-approved' : (row['status'] == 'Rejected' ? ' status-rejected' : (row['status'].contains('Forward') ? ' status-completed' : ' status-pending'))}" th:text="${row['status']}">Pending</span>
                                 </td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-link text-primary me-1" th:onclick="'openEditModal(\'' + ${row['id']} + '\', \'' + ${row['purpose']} + '\', ' + ${row['amount']} + ')'" title="Edit/Review"><i class="fa-regular fa-pen-to-square" style="font-size:1.1rem;"></i></button>
-                                    <button class="btn btn-sm btn-link text-warning me-1" th:onclick="'openAssignModal(\'' + ${row['id']} + '\')'" title="Assign"><i class="fa-solid fa-user-plus" style="font-size:1.1rem;"></i></button>
+                                    <button class="btn btn-sm btn-link text-primary me-1 btn-edit-expense" th:data-id="${row['id']}" th:data-purpose="${row['purpose']}" th:data-amount="${row['amount']}" title="Edit/Review"><i class="fa-regular fa-pen-to-square" style="font-size:1.1rem;"></i></button>
+                                    <button class="btn btn-sm btn-link text-warning me-1 btn-assign-expense" th:data-id="${row['id']}" title="Assign"><i class="fa-solid fa-user-plus" style="font-size:1.1rem;"></i></button>
                                     <form th:action="@{/senior_manager/expenses/action}" method="POST" style="display:inline;" onsubmit="return confirm('Forward this request to accounts department?')">
                                         <input type="hidden" name="requestId" th:value="${row['id']}"/>
                                         <input type="hidden" name="action" value="Forward"/>
@@ -806,8 +806,8 @@
                                 <span class="status-badge" th:classappend="${row['status'] == 'Approved' ? ' status-approved' : (row['status'] == 'Rejected' ? ' status-rejected' : (row['status'].contains('Forward') ? ' status-completed' : ' status-pending'))}" th:text="${row['status']}">Pending</span>
                             </td>
                             <td class="text-end">
-                                <button class="btn btn-sm btn-link text-primary me-1" th:onclick="'openEditModal(\'' + ${row['id']} + '\', \'' + ${row['purpose']} + '\', ' + ${row['amount']} + ')'" title="Edit/Review"><i class="fa-regular fa-pen-to-square" style="font-size:1.1rem;"></i></button>
-                                <button class="btn btn-sm btn-link text-warning me-1" th:onclick="'openAssignModal(\'' + ${row['id']} + '\')'" title="Assign"><i class="fa-solid fa-user-plus" style="font-size:1.1rem;"></i></button>
+                                <button class="btn btn-sm btn-link text-primary me-1 btn-edit-expense" th:data-id="${row['id']}" th:data-purpose="${row['purpose']}" th:data-amount="${row['amount']}" title="Edit/Review"><i class="fa-regular fa-pen-to-square" style="font-size:1.1rem;"></i></button>
+                                <button class="btn btn-sm btn-link text-warning me-1 btn-assign-expense" th:data-id="${row['id']}" title="Assign"><i class="fa-solid fa-user-plus" style="font-size:1.1rem;"></i></button>
                                 <form th:action="@{/senior_manager/expenses/action}" method="POST" style="display:inline;" onsubmit="return confirm('Forward this request to accounts department?')">
                                     <input type="hidden" name="requestId" th:value="${row['id']}"/>
                                     <input type="hidden" name="action" value="Forward"/>
@@ -885,11 +885,24 @@
         </div>
     </div>
 </div>
+<!-- Hidden inputs for Thymeleaf parameters -->
+<input type="hidden" id="activeTabInput" th:value="${activeTab}" />
+<input type="hidden" id="reimApprovedCount" th:value="${reimApprovedCount}" />
+<input type="hidden" id="reimPendingCount" th:value="${reimPendingCount}" />
+<input type="hidden" id="reimRejectedCount" th:value="${reimRejectedCount}" />
+<input type="hidden" id="budgetApprovedCount" th:value="${budgetApprovedCount}" />
+<input type="hidden" id="budgetPendingCount" th:value="${budgetPendingCount}" />
+<input type="hidden" id="budgetRejectedCount" th:value="${budgetRejectedCount}" />
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
+<script>
     document.addEventListener("DOMContentLoaded", function() {
-        const activeTab = /*[[${activeTab}]]*/ 'approvals';
+        const activeTab = document.getElementById('activeTabInput')?.value || 'approvals';
+        const reimApproved = parseFloat(document.getElementById('reimApprovedCount')?.value || '0');
+        const reimPending = parseFloat(document.getElementById('reimPendingCount')?.value || '0');
+        const reimRejected = parseFloat(document.getElementById('reimRejectedCount')?.value || '0');
+        const budgetApproved = parseFloat(document.getElementById('budgetApprovedCount')?.value || '0');
+        const budgetPending = parseFloat(document.getElementById('budgetPendingCount')?.value || '0');
+        const budgetRejected = parseFloat(document.getElementById('budgetRejectedCount')?.value || '0');
 
         // --- 1. REIMBURSEMENTS DONUT CHART ---
         if (activeTab === 'reimbursements') {
@@ -899,7 +912,7 @@
                 data: {
                     labels: ['Approved', 'Pending', 'Rejected'],
                     datasets: [{
-                        data: [/*[[${reimApprovedCount}]]*/ 58.33, /*[[${reimPendingCount}]]*/ 29.17, /*[[${reimRejectedCount}]]*/ 12.50],
+                        data: [reimApproved, reimPending, reimRejected],
                         backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
                         borderWidth: 2
                     }]
@@ -923,7 +936,7 @@
                 data: {
                     labels: ['Approved', 'Pending', 'Rejected'],
                     datasets: [{
-                        data: [/*[[${budgetApprovedCount}]]*/ 38.89, /*[[${budgetPendingCount}]]*/ 44.44, /*[[${budgetRejectedCount}]]*/ 16.67],
+                        data: [budgetApproved, budgetPending, budgetRejected],
                         backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
                         borderWidth: 2
                     }]
@@ -1029,7 +1042,21 @@
             }
         }
     }
-    /*]]>*/
+
+    // Wire up edit buttons (data-* attributes instead of th:onclick)
+    document.querySelectorAll('.btn-edit-expense').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            openEditModal(this.dataset.id, this.dataset.purpose, this.dataset.amount);
+        });
+    });
+
+    // Wire up assign buttons
+    document.querySelectorAll('.btn-assign-expense').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            openAssignModal(this.dataset.id);
+        });
+    });
+
 </script>
 </body>
 </html>

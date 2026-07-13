@@ -621,9 +621,19 @@ public class DashboardController {
                     .filter(t -> "Open".equalsIgnoreCase(t.getStatus()) || "Assigned".equalsIgnoreCase(t.getStatus()) || "Close".equalsIgnoreCase(t.getStatus()))
                     .collect(Collectors.toList());
 
+            java.util.List<ServiceRequest> otherTickets = serviceRequestRepository.findAll().stream()
+                    .filter(t -> !("FACILITIES".equalsIgnoreCase(t.getType()) || "FACILITY".equalsIgnoreCase(t.getType())))
+                    .collect(Collectors.toList());
+
+            String backUrl = "/facility/dashboard";
+            if (uri.contains("senior")) {
+                backUrl = "/senior_facility/my_space?tab=dashboard";
+            }
+            model.addAttribute("backUrl", backUrl);
+
             model.addAttribute("allItTickets", facilityTickets);
             model.addAttribute("pendingTickets", pendingFacilityTickets);
-            model.addAttribute("otherTickets", new java.util.ArrayList<>());
+            model.addAttribute("otherTickets", otherTickets);
             model.addAttribute("isItSupport", true); // Trigger table view
 
             return "facility-workflow";

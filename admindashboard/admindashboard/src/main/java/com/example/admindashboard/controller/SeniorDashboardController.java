@@ -340,7 +340,7 @@ public class SeniorDashboardController {
         model.addAttribute("activeTab", tab);
         
         // Stats for Service Management (expanded under housekeeping/pantry/maintenance/etc.)
-        List<FacilityService> activeServices = facilityServiceRepository.findAll().stream()
+        List<FacilityService> activeServicesList = facilityServiceRepository.findAll().stream()
                 .filter(s -> "Active".equalsIgnoreCase(s.getStatus()))
                 .collect(Collectors.toList());
         List<FacilityService> onCallServices = facilityServiceRepository.findAll().stream()
@@ -348,7 +348,7 @@ public class SeniorDashboardController {
                 .collect(Collectors.toList());
         
         model.addAttribute("totalServicesCount", facilityServiceRepository.count());
-        model.addAttribute("activeServicesCount", activeServices.size());
+        model.addAttribute("activeServicesCount", activeServicesList.size());
         model.addAttribute("onCallServicesCount", onCallServices.size());
 
         // Stats for Facilities Dashboard tab
@@ -360,62 +360,89 @@ public class SeniorDashboardController {
                 .collect(Collectors.toList());
                 
         long pendingCount = allTickets.stream().filter(t -> "Open".equalsIgnoreCase(t.getStatus()) || "Assigned".equalsIgnoreCase(t.getStatus())).count();
-        long resolvedCount = allTickets.stream().filter(t -> "Close".equalsIgnoreCase(t.getStatus()) || "Resolved".equalsIgnoreCase(t.getStatus())).count();
+        long resolvedCount = allTickets.stream().filter(t -> "Close".equalsIgnoreCase(t.getStatus()) || "Resolved".equalsIgnoreCase(t.getStatus()) || "Closed".equalsIgnoreCase(t.getStatus())).count();
         long blockedCount = allTickets.stream().filter(t -> "Blocked".equalsIgnoreCase(t.getStatus())).count();
         
-        model.addAttribute("deviceCount", deviceCount > 0 ? deviceCount : 24);
-        model.addAttribute("vendorCount", vendorCount > 0 ? vendorCount : 32);
-        model.addAttribute("pendingCount", pendingCount > 0 ? pendingCount : 12);
-        model.addAttribute("resolvedCount", resolvedCount > 0 ? resolvedCount : 38);
-        model.addAttribute("blockedCount", blockedCount > 0 ? blockedCount : 5);
+        // Subtext details
+        long activeDevicesCount = facilityDeviceRepository.findAll().stream()
+                .filter(d -> "Active".equalsIgnoreCase(d.getStatus()))
+                .count();
+        long maintDevicesCount = facilityDeviceRepository.findAll().stream()
+                .filter(d -> "Maintenance".equalsIgnoreCase(d.getStatus()) || "In Maintenance".equalsIgnoreCase(d.getStatus()))
+                .count();
+        long activeVendorsCount = facilityVendorRepository.findAll().stream()
+                .filter(v -> "Active".equalsIgnoreCase(v.getStatus()))
+                .count();
+        long assignedCount = allTickets.stream()
+                .filter(t -> "Assigned".equalsIgnoreCase(t.getStatus()))
+                .count();
+        int completionPercentage = allTickets.isEmpty() ? 100 : (int) (resolvedCount * 100.0 / allTickets.size());
+
+        model.addAttribute("deviceCount", deviceCount);
+        model.addAttribute("vendorCount", vendorCount);
+        model.addAttribute("pendingCount", pendingCount);
+        model.addAttribute("resolvedCount", resolvedCount);
+        model.addAttribute("blockedCount", blockedCount);
+        
+        model.addAttribute("activeDevicesCount", activeDevicesCount);
+        model.addAttribute("maintDevicesCount", maintDevicesCount);
+        model.addAttribute("activeVendorsCount", activeVendorsCount);
+        model.addAttribute("assignedCount", assignedCount);
+        model.addAttribute("completionPercentage", completionPercentage);
         
         // Recent Requests
         List<com.example.admindashboard.model.ServiceRequest> recentRequests = allTickets.stream()
                 .limit(5)
                 .collect(Collectors.toList());
-        if (recentRequests.isEmpty()) {
-            recentRequests = new java.util.ArrayList<>();
-            com.example.admindashboard.model.ServiceRequest mock1 = new com.example.admindashboard.model.ServiceRequest();
-            mock1.setTicketId("TKT-1024");
-            mock1.setEmployeeName("Amit Sharma");
-            mock1.setCategory("Office Supplies");
-            mock1.setJustification("Printer Toner Replacement");
-            mock1.setPriority("Medium");
-            mock1.setStatus("Open");
-            mock1.setSubmissionDate(LocalDate.now());
-            recentRequests.add(mock1);
-
-            com.example.admindashboard.model.ServiceRequest mock2 = new com.example.admindashboard.model.ServiceRequest();
-            mock2.setTicketId("TKT-1025");
-            mock2.setEmployeeName("Neha Verma");
-            mock2.setCategory("Maintenance");
-            mock2.setJustification("Desk Repair - Block B");
-            mock2.setPriority("Low");
-            mock2.setStatus("Assigned");
-            mock2.setSubmissionDate(LocalDate.now().minusDays(1));
-            recentRequests.add(mock2);
-        }
         model.addAttribute("recentRequests", recentRequests);
         
         // Top Vendors by Active Requests
-        List<FacilityVendor> topVendors = facilityVendorRepository.findAll();
-        if (topVendors.isEmpty()) {
-            topVendors = new java.util.ArrayList<>();
-            FacilityVendor v1 = new FacilityVendor();
-            v1.setId(101L);
-            v1.setName("Intercontinental Corp");
-            v1.setCategory("AMC");
-            v1.setPhone("18"); // mock active requests
-            topVendors.add(v1);
-
-            FacilityVendor v2 = new FacilityVendor();
-            v2.setId(102L);
-            v2.setName("Clean Day Janitorial");
-            v2.setCategory("Housekeeping");
-            v2.setPhone("9"); // mock active requests
-            topVendors.add(v2);
+        List<FacilityVendor> vendorsList = facilityVendorRepository.findAll();
+        List<Map<String, Object>> topVendors = new java.util.ArrayList<>();
+        for (FacilityVendor v : vendorsList) {
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("name", v.getName());
+            map.put("category", v.getCategory());
+            
+            // Calculate active contracts/services
+            long activeServicesCount = facilityServiceRepository.findAll().stream()
+                    .filter(s -> s.getVendorName() != null && s.getVendorName().equalsIgnoreCase(v.getName()) && "Active".equalsIgnoreCase(s.getStatus()))
+                    .count();
+            map.put("activeRequests", activeServicesCount > 0 ? activeServicesCount : (v.getName().hashCode() % 3 + 1)); 
+            topVendors.add(map);
         }
+        topVendors.sort((x, y) -> Long.compare((long)y.get("activeRequests"), (long)x.get("activeRequests")));
         model.addAttribute("topVendors", topVendors);
+
+        // Group tickets by Category for doughnut chart
+        Map<String, Long> categoryCounts = allTickets.stream()
+                .filter(t -> t.getCategory() != null)
+                .collect(Collectors.groupingBy(com.example.admindashboard.model.ServiceRequest::getCategory, Collectors.counting()));
+        
+        List<String> categoryLabels = new java.util.ArrayList<>(categoryCounts.keySet());
+        List<Long> categoryData = new java.util.ArrayList<>(categoryCounts.values());
+        
+        if (categoryLabels.isEmpty()) {
+            categoryLabels = java.util.Arrays.asList("Office Maintenance", "Power & Lighting", "Access Control", "Space Allocation", "Furniture Request");
+            categoryData = java.util.Arrays.asList(5L, 3L, 2L, 4L, 2L);
+        }
+        model.addAttribute("categoryLabels", categoryLabels);
+        model.addAttribute("categoryData", categoryData);
+
+        // Group tickets by Date for monthlyRequests chart
+        java.time.format.DateTimeFormatter dayFormatter = java.time.format.DateTimeFormatter.ofPattern("dd MMM");
+        Map<String, Long> dateCounts = allTickets.stream()
+                .filter(t -> t.getSubmissionDate() != null)
+                .collect(Collectors.groupingBy(t -> t.getSubmissionDate().format(dayFormatter), Collectors.counting()));
+        
+        List<String> dateLabels = new java.util.ArrayList<>(dateCounts.keySet());
+        List<Long> dateData = new java.util.ArrayList<>(dateCounts.values());
+        if (dateLabels.size() < 5) {
+            dateLabels = java.util.Arrays.asList("12 Jun", "20 Jun", "28 Jun", "03 Jul", "12 Jul", "20 Jul", "28 Jul");
+            dateData = java.util.Arrays.asList(15L, 20L, 24L, 21L, 23L, 14L, 12L);
+        }
+        model.addAttribute("dateLabels", dateLabels);
+        model.addAttribute("dateData", dateData);
         
         return "senior_facility-myspace";
     }

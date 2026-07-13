@@ -471,7 +471,7 @@
                             </td>
                             <td th:text="${row['reviewDate']}">20 May 2026</td>
                             <td class="text-end text-nowrap">
-                                <button class="btn btn-sm btn-link text-primary me-1" th:if="${row['status'] != 'Completed'}" th:onclick="'openFeedbackModal(\'' + ${row['employeeCode']} + '\', \'' + ${row['employeeName']} + '\', \'' + ${row['roleLevel']} + '\')'" title="Give Feedback"><i class="fa-solid fa-comment-medical" style="font-size:1.1rem;"></i></button>
+                                <button class="btn btn-sm btn-link text-primary me-1 btn-give-feedback" th:if="${row['status'] != 'Completed'}" th:data-code="${row['employeeCode']}" th:data-name="${row['employeeName']}" th:data-level="${row['roleLevel']}" title="Give Feedback"><i class="fa-solid fa-comment-medical" style="font-size:1.1rem;"></i></button>
                                 <button class="btn btn-sm btn-link text-muted me-1" onclick="alert('Viewing feedback details...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
                                 <button class="btn btn-sm btn-link text-muted" onclick="alert('Downloading PDF report...')"><i class="fa-solid fa-download" style="font-size:1.1rem;"></i></button>
                             </td>
@@ -609,7 +609,7 @@
                                 </div>
                             </td>
                             <td class="text-end text-nowrap">
-                                <button class="btn btn-sm btn-link text-primary me-1" th:if="${row['status'] != 'Completed'}" th:onclick="'openFeedbackModal(\'' + ${row['employeeCode']} + '\', \'' + ${row['employeeName']} + '\', \'' + ${row['roleLevel']} + '\')'" title="Give Feedback"><i class="fa-solid fa-comment-medical" style="font-size:1.1rem;"></i></button>
+                                <button class="btn btn-sm btn-link text-primary me-1 btn-give-feedback" th:if="${row['status'] != 'Completed'}" th:data-code="${row['employeeCode']}" th:data-name="${row['employeeName']}" th:data-level="${row['roleLevel']}" title="Give Feedback"><i class="fa-solid fa-comment-medical" style="font-size:1.1rem;"></i></button>
                                 <button class="btn btn-sm btn-link text-primary" onclick="alert('Viewing feedback reviews...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
                             </td>
                         </tr>
@@ -914,7 +914,12 @@
         var modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
         modal.show();
     }
-    /*]]>*/
+    // Wire up feedback buttons (data-* attributes instead of th:onclick)
+    document.querySelectorAll('.btn-give-feedback').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            openFeedbackModal(this.dataset.code, this.dataset.name, this.dataset.level);
+        });
+    });
 </script>
 
 <!-- Feedback Modal -->

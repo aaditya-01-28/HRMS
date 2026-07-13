@@ -421,23 +421,23 @@
         <div class="stats-row">
             <div class="stat-card">
                 <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-paper-plane"></i></div>
-                <div><div class="label">MESSAGES SENT</div><div class="value">28</div><div class="subtext">This Month</div></div>
+                <div><div class="label">MESSAGES SENT</div><div class="value" th:text="${messagesSent}">28</div><div class="subtext">This Month</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-users"></i></div>
-                <div><div class="label">TOTAL RECIPIENTS</div><div class="value">156</div><div class="subtext">This Month</div></div>
+                <div><div class="label">TOTAL RECIPIENTS</div><div class="value" th:text="${totalRecipients}">156</div><div class="subtext">This Month</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-envelope-open"></i></div>
-                <div><div class="label">OPEN RATE</div><div class="value">68%</div><div class="subtext">This Month</div></div>
+                <div><div class="label">OPEN RATE</div><div class="value" th:text="${openRate + '%'}">68%</div><div class="subtext">This Month</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-circle-check"></i></div>
-                <div><div class="label">ACKNOWLEDGED</div><div class="value">42</div><div class="subtext">This Month</div></div>
+                <div><div class="label">ACKNOWLEDGED</div><div class="value" th:text="${acknowledged}">42</div><div class="subtext">This Month</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-secondary-subtle text-secondary"><i class="fa-solid fa-clock"></i></div>
-                <div><div class="label">PENDING</div><div class="value">16</div><div class="subtext">This Month</div></div>
+                <div><div class="label">PENDING</div><div class="value" th:text="${pending}">16</div><div class="subtext">This Month</div></div>
             </div>
         </div>
 
@@ -727,23 +727,23 @@
         <div class="stats-row">
             <div class="stat-card">
                 <div class="icon-circle bg-primary-subtle text-primary"><i class="fa-solid fa-bell"></i></div>
-                <div><div class="label">NOTIFICATIONS SENT</div><div class="value">32</div><div class="subtext">This Month</div></div>
+                <div><div class="label">NOTIFICATIONS SENT</div><div class="value" th:text="${notificationsSent}">32</div><div class="subtext">This Month</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-success-subtle text-success"><i class="fa-solid fa-users"></i></div>
-                <div><div class="label">TOTAL RECIPIENTS</div><div class="value">184</div><div class="subtext">This Month</div></div>
+                <div><div class="label">TOTAL RECIPIENTS</div><div class="value" th:text="${notifTotalRecipients}">184</div><div class="subtext">This Month</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-warning-subtle text-warning"><i class="fa-solid fa-hourglass-half"></i></div>
-                <div><div class="label">UPCOMING DEADLINES</div><div class="value">12</div><div class="subtext">Next 7 Days</div></div>
+                <div><div class="label">UPCOMING DEADLINES</div><div class="value" th:text="${upcomingDeadlines}">12</div><div class="subtext">Next 7 Days</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-info-subtle text-info"><i class="fa-solid fa-bullhorn"></i></div>
-                <div><div class="label">CHANGES ANNOUNCED</div><div class="value">9</div><div class="subtext">This Month</div></div>
+                <div><div class="label">CHANGES ANNOUNCED</div><div class="value" th:text="${changesAnnounced}">9</div><div class="subtext">This Month</div></div>
             </div>
             <div class="stat-card">
                 <div class="icon-circle bg-secondary-subtle text-secondary"><i class="fa-solid fa-pause"></i></div>
-                <div><div class="label">PENDING NOTIFICATIONS</div><div class="value">6</div><div class="subtext">This Month</div></div>
+                <div><div class="label">PENDING NOTIFICATIONS</div><div class="value" th:text="${notifPending}">6</div><div class="subtext">This Month</div></div>
             </div>
         </div>
 

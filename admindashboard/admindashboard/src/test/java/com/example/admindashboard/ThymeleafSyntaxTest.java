@@ -163,4 +163,126 @@ public class ThymeleafSyntaxTest {
             org.junit.jupiter.api.Assertions.fail(e.getMessage());
         }
     }
+
+    @Test
+    public void testSeniorManagerPerformanceSyntax() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRequestURI("/senior_manager/performance");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockServletContext servletContext = new MockServletContext();
+
+        JakartaServletWebApplication application = JakartaServletWebApplication.buildApplication(servletContext);
+        IWebExchange exchange = application.buildExchange(request, response);
+
+        WebContext context = new WebContext(exchange);
+        
+        context.setVariable("activeTab", "overview");
+        context.setVariable("totalMembers", 10);
+        context.setVariable("completedCount", 5);
+        context.setVariable("inProgressCount", 3);
+        context.setVariable("pendingCount", 1);
+        context.setVariable("overdueCount", 1);
+        context.setVariable("avgRating", 4.2);
+        context.setVariable("outstanding", 2);
+        context.setVariable("exceeds", 3);
+        context.setVariable("meets", 3);
+        context.setVariable("below", 1);
+        context.setVariable("unsatisfactory", 1);
+        context.setVariable("bucket1", 1);
+        context.setVariable("bucket2", 1);
+        context.setVariable("bucket3", 3);
+        context.setVariable("bucket4", 3);
+        context.setVariable("bucket5", 2);
+        context.setVariable("reviewsList", Collections.emptyList());
+        context.setVariable("departments", Collections.emptySet());
+
+        System.out.println("TEST_START_RENDER_SM_PERFORMANCE");
+        try {
+            String result = templateEngine.process("senior_manager-performance", context);
+            System.out.println("TEST_SUCCESS: RENDERED SM PERFORMANCE OK");
+        } catch (Exception e) {
+            System.out.println("TEST_FAILURE SM PERFORMANCE: " + e.getMessage());
+            e.printStackTrace();
+            org.junit.jupiter.api.Assertions.fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSeniorManagerExpensesSyntax() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRequestURI("/senior_manager/expenses");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockServletContext servletContext = new MockServletContext();
+
+        JakartaServletWebApplication application = JakartaServletWebApplication.buildApplication(servletContext);
+        IWebExchange exchange = application.buildExchange(request, response);
+
+        WebContext context = new WebContext(exchange);
+        
+        context.setVariable("activeTab", "approvals");
+        context.setVariable("departments", Collections.emptySet());
+        context.setVariable("approvalsList", Collections.emptyList());
+        context.setVariable("reimbursementsList", Collections.emptyList());
+        context.setVariable("budgetRequestsList", Collections.emptyList());
+        context.setVariable("assignableRequestsList", Collections.emptyList());
+        context.setVariable("allUsersList", Collections.emptyList());
+        context.setVariable("reimApprovedCount", 0);
+        context.setVariable("reimPendingCount", 0);
+        context.setVariable("reimRejectedCount", 0);
+        context.setVariable("budgetApprovedCount", 0);
+        context.setVariable("budgetPendingCount", 0);
+        context.setVariable("budgetRejectedCount", 0);
+
+        System.out.println("TEST_START_RENDER_SM_EXPENSES");
+        try {
+            String result = templateEngine.process("senior_manager-expenses", context);
+            System.out.println("TEST_SUCCESS: RENDERED SM EXPENSES OK");
+        } catch (Exception e) {
+            System.out.println("TEST_FAILURE SM EXPENSES: " + e.getMessage());
+            e.printStackTrace();
+            org.junit.jupiter.api.Assertions.fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSeniorManagerReportsSyntax() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRequestURI("/senior_manager/reports");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockServletContext servletContext = new MockServletContext();
+
+        JakartaServletWebApplication application = JakartaServletWebApplication.buildApplication(servletContext);
+        IWebExchange exchange = application.buildExchange(request, response);
+
+        WebContext context = new WebContext(exchange);
+        
+        context.setVariable("activeTab", "performance");
+        context.setVariable("departments", Collections.emptySet());
+        context.setVariable("performanceList", Collections.emptyList());
+        context.setVariable("attendanceList", Collections.emptyList());
+        context.setVariable("leaveTrendsList", Collections.emptyList());
+        context.setVariable("projectMetricsList", Collections.emptyList());
+        context.setVariable("reportCasualCount", 0);
+        context.setVariable("reportSickCount", 0);
+        context.setVariable("reportPrivilegeCount", 0);
+        context.setVariable("reportWfhCount", 0);
+        context.setVariable("reportOtherCount", 0);
+        context.setVariable("reportOnTrackCount", 0);
+        context.setVariable("reportAtRiskCount", 0);
+        context.setVariable("reportDelayedCount", 0);
+        context.setVariable("progressBucket1", 0);
+        context.setVariable("progressBucket2", 0);
+        context.setVariable("progressBucket3", 0);
+        context.setVariable("progressBucket4", 0);
+
+        System.out.println("TEST_START_RENDER_SM_REPORTS");
+        try {
+            String result = templateEngine.process("senior_manager-reports", context);
+            System.out.println("TEST_SUCCESS: RENDERED SM RPORTS OK");
+        } catch (Exception e) {
+            System.out.println("TEST_FAILURE SM REPORTS: " + e.getMessage());
+            e.printStackTrace();
+            org.junit.jupiter.api.Assertions.fail(e.getMessage());
+        }
+    }
 }

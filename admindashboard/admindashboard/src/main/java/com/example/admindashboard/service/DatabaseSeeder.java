@@ -60,6 +60,9 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Autowired
     private FacilityContractRepository facilityContractRepository;
 
+    @Autowired
+    private com.example.admindashboard.repository.ServiceRequestRepository serviceRequestRepository;
+
     @Override
     public void run(String... args) throws Exception {
                 // Always update existing seeded users to ensure they have correct employeeCode and department
@@ -1560,6 +1563,85 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             System.out.println("✅ Seeded Facility Contracts.");
         }
+
+        // Clean up or update any legacy dummy tickets to use real employee records
+        java.util.List<ServiceRequest> legacyTickets = serviceRequestRepository.findAll();
+        for (ServiceRequest req : legacyTickets) {
+            if ("EMP101".equals(req.getEmployeeId())) {
+                req.setEmployeeId("EMP114");
+                req.setEmployeeName("Om Tripathi");
+                serviceRequestRepository.save(req);
+            } else if ("EMP102".equals(req.getEmployeeId())) {
+                req.setEmployeeId("EMP601");
+                req.setEmployeeName("Neha Verma");
+                serviceRequestRepository.save(req);
+            } else if ("EMP103".equals(req.getEmployeeId())) {
+                req.setEmployeeId("EMP129");
+                req.setEmployeeName("Saumya Katare");
+                serviceRequestRepository.save(req);
+            } else if ("EMP104".equals(req.getEmployeeId())) {
+                req.setEmployeeId("EMP187");
+                req.setEmployeeName("Om Singrore");
+                serviceRequestRepository.save(req);
+            } else if ("EMP105".equals(req.getEmployeeId())) {
+                req.setEmployeeId("EMP201");
+                req.setEmployeeName("Priya Sharma");
+                serviceRequestRepository.save(req);
+            } else if ("EMP106".equals(req.getEmployeeId())) {
+                req.setEmployeeId("EMP301");
+                req.setEmployeeName("Kavita Finance");
+                serviceRequestRepository.save(req);
+            } else if ("EMP107".equals(req.getEmployeeId())) {
+                req.setEmployeeId("EMP401");
+                req.setEmployeeName("Sneha Gupta");
+                serviceRequestRepository.save(req);
+            } else if ("EMP108".equals(req.getEmployeeId())) {
+                req.setEmployeeId("EMP501");
+                req.setEmployeeName("Ravi IT");
+                serviceRequestRepository.save(req);
+            } else if ("EMP109".equals(req.getEmployeeId())) {
+                req.setEmployeeId("EMP1101");
+                req.setEmployeeName("Pooja Singh");
+                serviceRequestRepository.save(req);
+            } else if ("EMP110".equals(req.getEmployeeId())) {
+                req.setEmployeeId("EMP701");
+                req.setEmployeeName("Amit Project");
+                serviceRequestRepository.save(req);
+            } else if ("EMP111".equals(req.getEmployeeId())) {
+                req.setEmployeeId("EMP114");
+                req.setEmployeeName("Om Tripathi");
+                serviceRequestRepository.save(req);
+            } else if ("EMP112".equals(req.getEmployeeId())) {
+                req.setEmployeeId("EMP601");
+                req.setEmployeeName("Neha Verma");
+                serviceRequestRepository.save(req);
+            } else if ("EMP113".equals(req.getEmployeeId())) {
+                req.setEmployeeId("EMP129");
+                req.setEmployeeName("Saumya Katare");
+                serviceRequestRepository.save(req);
+            }
+        }
+
+        // Seed Facility Tickets
+        long facTicketCount = serviceRequestRepository.findAll().stream()
+                .filter(t -> "FACILITIES".equalsIgnoreCase(t.getType()) || "FACILITY".equalsIgnoreCase(t.getType()))
+                .count();
+        if (facTicketCount == 0) {
+            seedFacilityTicket("TKT-1024", "EMP114", "Om Tripathi", "Office Maintenance", "Printer Toner Replacement", "Medium", "Open", LocalDate.now(), "The printer in Block A level 3 is out of black toner.");
+            seedFacilityTicket("TKT-1025", "EMP601", "Neha Verma", "Workstation Layout", "Desk Repair - Block B", "Low", "Assigned", LocalDate.now().minusDays(1), "Desk drawer lock is jammed.");
+            seedFacilityTicket("TKT-1026", "EMP129", "Saumya Katare", "Power & Lighting", "AC Adjustment in Conference Room", "High", "In Progress", LocalDate.now().minusDays(2), "AC remote not working, temperature locked at 16 degrees.");
+            seedFacilityTicket("TKT-1027", "EMP187", "Om Singrore", "Access Control", "Physical Key Request", "Medium", "Closed", LocalDate.now().minusDays(5), "Requesting drawer key for new locker.");
+            seedFacilityTicket("TKT-1028", "EMP201", "Priya Sharma", "Space Allocation", "Permanent Cabin Allocation", "High", "Open", LocalDate.now().minusDays(3), "Relocated to Delhi branch, need permanent desk assignment.");
+            seedFacilityTicket("TKT-1029", "EMP301", "Kavita Finance", "Passes & Access", "Vehicle Parking Sticker", "Low", "Closed", LocalDate.now().minusDays(10), "New car registration sticker.");
+            seedFacilityTicket("TKT-1030", "EMP401", "Sneha Gupta", "Furniture Request", "Ergonomic Standing Desk", "Medium", "Blocked", LocalDate.now().minusDays(4), "Medical recommendation for standing desk.");
+            seedFacilityTicket("TKT-1031", "EMP501", "Ravi IT", "Event Setup", "Conference Room AV Setup", "High", "Closed", LocalDate.now().minusDays(8), "Annual board meet AV requirements setup.");
+            seedFacilityTicket("TKT-1032", "EMP1101", "Pooja Singh", "Office Maintenance", "Leaking Tap in Cafeteria", "Medium", "Open", LocalDate.now().minusDays(1), "Water leakage near washbasin.");
+            seedFacilityTicket("TKT-1033", "EMP701", "Amit Project", "Power & Lighting", "Replacing fused tubelights", "Low", "Open", LocalDate.now(), "Two tube lights fused in cabin 4.");
+            seedFacilityTicket("TKT-1034", "EMP114", "Om Tripathi", "Space Allocation", "Extra seating for interns", "Medium", "Open", LocalDate.now().minusDays(2), "Need 3 temporary chairs in bays 12-14.");
+            seedFacilityTicket("TKT-1035", "EMP601", "Neha Verma", "Furniture Request", "Drawer repair", "Low", "Closed", LocalDate.now().minusDays(12), "Drawer handle broken.");
+            seedFacilityTicket("TKT-1036", "EMP129", "Saumya Katare", "Access Control", "Temporary visitor pass", "High", "Closed", LocalDate.now().minusDays(6), "Visitor pass for client delegation.");
+            System.out.println("✅ Seeded Facilities Service Requests.");
+        }
     }
 
 
@@ -1614,5 +1696,21 @@ public class DatabaseSeeder implements CommandLineRunner {
             userRepository.save(u);
             System.out.println("✏️ Updated existing user fields for " + username);
         }
+     }
+
+    private void seedFacilityTicket(String ticketId, String employeeId, String employeeName, String category, String detailItem, String priority, String status, LocalDate submissionDate, String justification) {
+        ServiceRequest req = new ServiceRequest();
+        req.setTicketId(ticketId);
+        req.setEmployeeId(employeeId);
+        req.setEmployeeName(employeeName);
+        req.setType("FACILITIES");
+        req.setCategory(category);
+        req.setDetailItem(detailItem);
+        req.setPriority(priority);
+        req.setStatus(status);
+        req.setSubmissionDate(submissionDate);
+        req.setJustification(justification);
+        req.setDepartment("Facilities");
+        serviceRequestRepository.save(req);
     }
 }
