@@ -470,10 +470,14 @@
                                 <span th:if="${row['finalRating'] == '-'}">-</span>
                             </td>
                             <td th:text="${row['reviewDate']}">20 May 2026</td>
-                            <td class="text-end">
+                            <td class="text-end text-nowrap">
+                                <button class="btn btn-sm btn-link text-primary me-1" th:if="${row['status'] != 'Completed'}" th:onclick="'openFeedbackModal(\'' + ${row['employeeCode']} + '\', \'' + ${row['employeeName']} + '\', \'' + ${row['roleLevel']} + '\')'" title="Give Feedback"><i class="fa-solid fa-comment-medical" style="font-size:1.1rem;"></i></button>
                                 <button class="btn btn-sm btn-link text-muted me-1" onclick="alert('Viewing feedback details...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
                                 <button class="btn btn-sm btn-link text-muted" onclick="alert('Downloading PDF report...')"><i class="fa-solid fa-download" style="font-size:1.1rem;"></i></button>
                             </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(reviewsList)}">
+                            <td colspan="9" class="text-center text-muted py-4">No performance review records found.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -604,9 +608,13 @@
                                     <span style="font-size:0.75rem;" th:text="${row['progress'] + '%'}">100%</span>
                                 </div>
                             </td>
-                            <td class="text-end">
+                            <td class="text-end text-nowrap">
+                                <button class="btn btn-sm btn-link text-primary me-1" th:if="${row['status'] != 'Completed'}" th:onclick="'openFeedbackModal(\'' + ${row['employeeCode']} + '\', \'' + ${row['employeeName']} + '\', \'' + ${row['roleLevel']} + '\')'" title="Give Feedback"><i class="fa-solid fa-comment-medical" style="font-size:1.1rem;"></i></button>
                                 <button class="btn btn-sm btn-link text-primary" onclick="alert('Viewing feedback reviews...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
                             </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(reviewsList)}">
+                            <td colspan="9" class="text-center text-muted py-4">No performance reviews found.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -883,7 +891,98 @@
         updateOverviewTable();
         updateReviewsTable();
     });
+
+    function openFeedbackModal(employeeCode, employeeName, roleLevel) {
+        document.getElementById('feedbackEmployeeCode').value = employeeCode;
+        document.getElementById('feedbackEmployeeName').value = employeeName;
+        document.getElementById('feedbackRoleLevel').value = roleLevel;
+
+        var r1Label = document.getElementById('rating1Label');
+        var r2Label = document.getElementById('rating2Label');
+        var r3Label = document.getElementById('rating3Label');
+
+        if (roleLevel === 'L2') {
+            r1Label.innerText = "Leadership & Team Management (1-5)";
+            r2Label.innerText = "Project Execution & Delivery (1-5)";
+            r3Label.innerText = "Strategic Thinking & Decision Making (1-5)";
+        } else {
+            r1Label.innerText = "Technical/Job Skills (1-5)";
+            r2Label.innerText = "Communication & Quality of Work (1-5)";
+            r3Label.innerText = "Teamwork & Collaboration (1-5)";
+        }
+
+        var modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+        modal.show();
+    }
     /*]]>*/
 </script>
+
+<!-- Feedback Modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:12px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold text-dark mb-0">Submit Performance Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/senior_manager/performance/feedback}" method="POST">
+                <div class="modal-body py-4">
+                    <input type="hidden" name="employeeCode" id="feedbackEmployeeCode"/>
+                    <input type="hidden" name="roleLevel" id="feedbackRoleLevel"/>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark">Employee Name</label>
+                        <input type="text" id="feedbackEmployeeName" class="form-control text-muted" readonly style="background-color:#f8fafc; font-weight:600;"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark" id="rating1Label">Rating 1</label>
+                        <select name="rating1" class="form-select" required>
+                            <option value="">Choose rating (1 to 5)...</option>
+                            <option value="5.0">5 - Outstanding</option>
+                            <option value="4.0">4 - Exceeds Expectations</option>
+                            <option value="3.0">3 - Meets Expectations</option>
+                            <option value="2.0">2 - Below Expectations</option>
+                            <option value="1.0">1 - Unsatisfactory</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark" id="rating2Label">Rating 2</label>
+                        <select name="rating2" class="form-select" required>
+                            <option value="">Choose rating (1 to 5)...</option>
+                            <option value="5.0">5 - Outstanding</option>
+                            <option value="4.0">4 - Exceeds Expectations</option>
+                            <option value="3.0">3 - Meets Expectations</option>
+                            <option value="2.0">2 - Below Expectations</option>
+                            <option value="1.0">1 - Unsatisfactory</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark" id="rating3Label">Rating 3</label>
+                        <select name="rating3" class="form-select" required>
+                            <option value="">Choose rating (1 to 5)...</option>
+                            <option value="5.0">5 - Outstanding</option>
+                            <option value="4.0">4 - Exceeds Expectations</option>
+                            <option value="3.0">3 - Meets Expectations</option>
+                            <option value="2.0">2 - Below Expectations</option>
+                            <option value="1.0">1 - Unsatisfactory</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark">Detailed Feedback & Comments</label>
+                        <textarea name="comments" class="form-control" rows="4" placeholder="Provide details on strengths, areas of improvement, and key outcomes..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
 </html>

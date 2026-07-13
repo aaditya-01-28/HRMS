@@ -330,6 +330,7 @@
         <a th:classappend="${activeTab == 'approvals'} ? ' active' : ''" class="tab-link" href="/senior_manager/expenses?tab=approvals">Expense Approvals</a>
         <a th:classappend="${activeTab == 'reimbursements'} ? ' active' : ''" class="tab-link" href="/senior_manager/expenses?tab=reimbursements">Reimbursements</a>
         <a th:classappend="${activeTab == 'budget_request'} ? ' active' : ''" class="tab-link" href="/senior_manager/expenses?tab=budget_request">Budget Request</a>
+        <a th:classappend="${activeTab == 'assign'} ? ' active' : ''" class="tab-link" href="/senior_manager/expenses?tab=assign">Assign Requests</a>
     </div>
 
     <!-- ==================== VIEW 1: EXPENSE APPROVALS ==================== -->
@@ -382,13 +383,14 @@
                                 <th>Type</th>
                                 <th>Purpose</th>
                                 <th>Amount</th>
+                                <th>Assigned To</th>
                                 <th>Status</th>
-                                <th class="text-end">Actions</th>
+                                <th class="text-end" style="min-width: 180px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr th:each="row : ${approvalsList}" th:attr="data-name=${row['employee']}, data-department=${row['department']}">
-                                <td class="fw-bold text-primary text-nowrap" th:text="${row['id']}">R-100</td>
+                                <td class="fw-bold text-primary text-nowrap" th:text="${row['id']}">EXP-100</td>
                                 <td class="text-nowrap">
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(row['employee'], 0, 1)}">V</div>
@@ -406,12 +408,32 @@
                                 </td>
                                 <td><div style="min-width: 140px;" th:text="${row['purpose']}">Client meeting - Travel</div></td>
                                 <td class="fw-bold text-dark text-nowrap" th:text="${'₹' + #numbers.formatDecimal(row['amount'], 1, 'COMMA', 0, 'POINT')}">₹12,450</td>
+                                <td class="text-muted text-nowrap" th:text="${row['assignedTo']}">-</td>
                                 <td class="text-nowrap">
-                                    <span class="status-badge" th:classappend="${row['status'] == 'Approved' ? ' status-approved' : ' status-pending'}" th:text="${row['status']}">Pending</span>
+                                    <span class="status-badge" th:classappend="${row['status'] == 'Approved' ? ' status-approved' : (row['status'] == 'Rejected' ? ' status-rejected' : (row['status'].contains('Forward') ? ' status-completed' : ' status-pending'))}" th:text="${row['status']}">Pending</span>
                                 </td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-link text-muted" onclick="alert('Viewing expense details...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
+                                    <button class="btn btn-sm btn-link text-primary me-1" th:onclick="'openEditModal(\'' + ${row['id']} + '\', \'' + ${row['purpose']} + '\', ' + ${row['amount']} + ')'" title="Edit/Review"><i class="fa-regular fa-pen-to-square" style="font-size:1.1rem;"></i></button>
+                                    <button class="btn btn-sm btn-link text-warning me-1" th:onclick="'openAssignModal(\'' + ${row['id']} + '\')'" title="Assign"><i class="fa-solid fa-user-plus" style="font-size:1.1rem;"></i></button>
+                                    <form th:action="@{/senior_manager/expenses/action}" method="POST" style="display:inline;" onsubmit="return confirm('Forward this request to accounts department?')">
+                                        <input type="hidden" name="requestId" th:value="${row['id']}"/>
+                                        <input type="hidden" name="action" value="Forward"/>
+                                        <button type="submit" class="btn btn-sm btn-link text-success me-1" title="Forward to Accounts"><i class="fa-solid fa-share-from-square" style="font-size:1.1rem;"></i></button>
+                                    </form>
+                                    <form th:action="@{/senior_manager/expenses/action}" method="POST" style="display:inline;" th:if="${row['status'] == 'Pending' || row['status'].contains('Forward')}">
+                                        <input type="hidden" name="requestId" th:value="${row['id']}"/>
+                                        <input type="hidden" name="action" value="Approve"/>
+                                        <button type="submit" class="btn btn-sm btn-link text-success me-1" title="Approve"><i class="fa-solid fa-check" style="font-size:1.1rem;"></i></button>
+                                    </form>
+                                    <form th:action="@{/senior_manager/expenses/action}" method="POST" style="display:inline;" th:if="${row['status'] == 'Pending' || row['status'].contains('Forward')}">
+                                        <input type="hidden" name="requestId" th:value="${row['id']}"/>
+                                        <input type="hidden" name="action" value="Reject"/>
+                                        <button type="submit" class="btn btn-sm btn-link text-danger" title="Reject"><i class="fa-solid fa-xmark" style="font-size:1.1rem;"></i></button>
+                                    </form>
                                 </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(approvalsList)}">
+                                <td colspan="9" class="text-center text-muted py-4">No expense approvals pending.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -499,13 +521,14 @@
                                 <th>Department</th>
                                 <th>Purpose</th>
                                 <th>Amount</th>
+                                <th>Assigned To</th>
                                 <th>Status</th>
-                                <th class="text-end">Actions</th>
+                                <th class="text-end" style="min-width: 180px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr th:each="row : ${reimbursementsList}" th:attr="data-name=${row['employee']}, data-department=${row['department']}">
-                                <td class="fw-bold text-primary text-nowrap" th:text="${row['id']}">R-100</td>
+                                <td class="fw-bold text-primary text-nowrap" th:text="${row['id']}">REIM-100</td>
                                 <td class="text-nowrap">
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(row['employee'], 0, 1)}">N</div>
@@ -518,14 +541,32 @@
                                 <td><div style="min-width: 100px;" th:text="${row['department']}">Human Resources</div></td>
                                 <td><div style="min-width: 140px;" th:text="${row['purpose']}">Travel - Client Meeting</div></td>
                                 <td class="fw-bold text-dark text-nowrap" th:text="${'₹' + #numbers.formatDecimal(row['amount'], 1, 'COMMA', 0, 'POINT')}">₹8,750</td>
+                                <td class="text-muted text-nowrap" th:text="${row['assignedTo']}">-</td>
                                 <td class="text-nowrap">
-                                    <span class="status-badge" 
-                                          th:classappend="${row['status'] == 'Approved' ? ' status-approved' : (row['status'] == 'Pending' ? ' status-pending' : ' status-rejected')}"
-                                          th:text="${row['status']}">Approved</span>
+                                    <span class="status-badge" th:classappend="${row['status'] == 'Approved' ? ' status-approved' : (row['status'] == 'Rejected' ? ' status-rejected' : (row['status'].contains('Forward') ? ' status-completed' : ' status-pending'))}" th:text="${row['status']}">Approved</span>
                                 </td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-link text-muted" onclick="alert('Viewing reimbursement details...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
+                                    <button class="btn btn-sm btn-link text-primary me-1" th:onclick="'openEditModal(\'' + ${row['id']} + '\', \'' + ${row['purpose']} + '\', ' + ${row['amount']} + ')'" title="Edit/Review"><i class="fa-regular fa-pen-to-square" style="font-size:1.1rem;"></i></button>
+                                    <button class="btn btn-sm btn-link text-warning me-1" th:onclick="'openAssignModal(\'' + ${row['id']} + '\')'" title="Assign"><i class="fa-solid fa-user-plus" style="font-size:1.1rem;"></i></button>
+                                    <form th:action="@{/senior_manager/expenses/action}" method="POST" style="display:inline;" onsubmit="return confirm('Forward this request to accounts department?')">
+                                        <input type="hidden" name="requestId" th:value="${row['id']}"/>
+                                        <input type="hidden" name="action" value="Forward"/>
+                                        <button type="submit" class="btn btn-sm btn-link text-success me-1" title="Forward to Accounts"><i class="fa-solid fa-share-from-square" style="font-size:1.1rem;"></i></button>
+                                    </form>
+                                    <form th:action="@{/senior_manager/expenses/action}" method="POST" style="display:inline;" th:if="${row['status'] == 'Pending' || row['status'].contains('Forward')}">
+                                        <input type="hidden" name="requestId" th:value="${row['id']}"/>
+                                        <input type="hidden" name="action" value="Approve"/>
+                                        <button type="submit" class="btn btn-sm btn-link text-success me-1" title="Approve"><i class="fa-solid fa-check" style="font-size:1.1rem;"></i></button>
+                                    </form>
+                                    <form th:action="@{/senior_manager/expenses/action}" method="POST" style="display:inline;" th:if="${row['status'] == 'Pending' || row['status'].contains('Forward')}">
+                                        <input type="hidden" name="requestId" th:value="${row['id']}"/>
+                                        <input type="hidden" name="action" value="Reject"/>
+                                        <button type="submit" class="btn btn-sm btn-link text-danger" title="Reject"><i class="fa-solid fa-xmark" style="font-size:1.1rem;"></i></button>
+                                    </form>
                                 </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(reimbursementsList)}">
+                                <td colspan="8" class="text-center text-muted py-4">No reimbursement requests found.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -618,18 +659,19 @@
                                 <th>Budget Type</th>
                                 <th>Purpose</th>
                                 <th>Amount</th>
+                                <th>Assigned To</th>
                                 <th>Status</th>
-                                <th class="text-end">Actions</th>
+                                <th class="text-end" style="min-width: 180px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="row : ${budgetRequestsList}" th:attr="data-name=${row['requester']}, data-department=${row['department']}">
-                                <td class="fw-bold text-primary text-nowrap" th:text="${row['id']}">BUD-2025-018</td>
+                            <tr th:each="row : ${budgetRequestsList}" th:attr="data-name=${row['employee']}, data-department=${row['department']}">
+                                <td class="fw-bold text-primary text-nowrap" th:text="${row['id']}">BUD-100</td>
                                 <td class="text-nowrap">
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(row['requester'], 0, 1)}">V</div>
+                                        <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(row['employee'], 0, 1)}">V</div>
                                         <div>
-                                            <div class="fw-bold text-dark text-nowrap" th:text="${row['requester']}">Vikram Mehta</div>
+                                            <div class="fw-bold text-dark text-nowrap" th:text="${row['employee']}">Vikram Mehta</div>
                                             <small class="text-muted" th:text="${row['employeeCode']}">EMP001</small>
                                         </div>
                                     </div>
@@ -640,14 +682,32 @@
                                 </td>
                                 <td><div style="min-width: 140px;" th:text="${row['purpose']}">New CRM Software Implementation</div></td>
                                 <td class="fw-bold text-dark text-nowrap" th:text="${'₹' + #numbers.formatDecimal(row['amount'], 1, 'COMMA', 0, 'POINT')}">₹2,50,000</td>
+                                <td class="text-muted text-nowrap" th:text="${row['assignedTo']}">-</td>
                                 <td class="text-nowrap">
-                                    <span class="status-badge" 
-                                          th:classappend="${row['status'] == 'Approved' ? ' status-approved' : (row['status'] == 'Pending' ? ' status-pending' : ' status-rejected')}"
-                                          th:text="${row['status']}">Pending</span>
+                                    <span class="status-badge" th:classappend="${row['status'] == 'Approved' ? ' status-approved' : (row['status'] == 'Rejected' ? ' status-rejected' : (row['status'].contains('Forward') ? ' status-completed' : ' status-pending'))}" th:text="${row['status']}">Pending</span>
                                 </td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-link text-muted" onclick="alert('Viewing budget details...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
+                                    <button class="btn btn-sm btn-link text-primary me-1" th:onclick="'openEditModal(\'' + ${row['id']} + '\', \'' + ${row['purpose']} + '\', ' + ${row['amount']} + ')'" title="Edit/Review"><i class="fa-regular fa-pen-to-square" style="font-size:1.1rem;"></i></button>
+                                    <button class="btn btn-sm btn-link text-warning me-1" th:onclick="'openAssignModal(\'' + ${row['id']} + '\')'" title="Assign"><i class="fa-solid fa-user-plus" style="font-size:1.1rem;"></i></button>
+                                    <form th:action="@{/senior_manager/expenses/action}" method="POST" style="display:inline;" onsubmit="return confirm('Forward this request to accounts department?')">
+                                        <input type="hidden" name="requestId" th:value="${row['id']}"/>
+                                        <input type="hidden" name="action" value="Forward"/>
+                                        <button type="submit" class="btn btn-sm btn-link text-success me-1" title="Forward to Accounts"><i class="fa-solid fa-share-from-square" style="font-size:1.1rem;"></i></button>
+                                    </form>
+                                    <form th:action="@{/senior_manager/expenses/action}" method="POST" style="display:inline;" th:if="${row['status'] == 'Pending' || row['status'].contains('Forward')}">
+                                        <input type="hidden" name="requestId" th:value="${row['id']}"/>
+                                        <input type="hidden" name="action" value="Approve"/>
+                                        <button type="submit" class="btn btn-sm btn-link text-success me-1" title="Approve"><i class="fa-solid fa-check" style="font-size:1.1rem;"></i></button>
+                                    </form>
+                                    <form th:action="@{/senior_manager/expenses/action}" method="POST" style="display:inline;" th:if="${row['status'] == 'Pending' || row['status'].contains('Forward')}">
+                                        <input type="hidden" name="requestId" th:value="${row['id']}"/>
+                                        <input type="hidden" name="action" value="Reject"/>
+                                        <button type="submit" class="btn btn-sm btn-link text-danger" title="Reject"><i class="fa-solid fa-xmark" style="font-size:1.1rem;"></i></button>
+                                    </form>
                                 </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(budgetRequestsList)}">
+                                <td colspan="9" class="text-center text-muted py-4">No budget requests found.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -691,6 +751,139 @@
             <span>Information: You can approve budget requests within your assigned approval limit. Requests exceeding 5,00,000 will require secondary approval from the Finance Director.</span>
         </div>
     </div>
+
+    <!-- ==================== VIEW 4: ASSIGN REQUESTS ==================== -->
+    <div th:if="${activeTab == 'assign'}">
+        <div class="panel">
+            <h6 class="fw-bold mb-3">Assign & Forward Requests</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="position-relative">
+                        <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left:12px; top:50%; transform:translateY(-50%);"></i>
+                        <input type="text" id="employeeSearchAssign" onkeyup="filterAssignTable()" class="form-control" placeholder="Search employee code or name..." style="padding-left:36px; height:42px; border-radius:8px;"/>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <span class="badge bg-secondary-subtle text-secondary border px-3 py-2" style="font-size:0.9rem;" th:text="${#lists.size(assignableRequestsList) + ' total pending/active requests'}">10 requests</span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover" id="assignRequestsTable">
+                    <thead>
+                        <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                            <th>Request ID</th>
+                            <th>Employee</th>
+                            <th>Type</th>
+                            <th>Purpose</th>
+                            <th>Amount</th>
+                            <th>Assigned To</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${assignableRequestsList}" th:attr="data-name=${row['employee']}, data-code=${row['employeeCode']}">
+                            <td class="fw-bold text-primary text-nowrap" th:text="${row['id']}">EXP-1</td>
+                            <td class="text-nowrap">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(row['employee'], 0, 1)}">V</div>
+                                    <div>
+                                        <div class="fw-bold text-dark text-nowrap" th:text="${row['employee']}">Vikram Mehta</div>
+                                        <small class="text-muted" th:text="${row['employeeCode']}">EMP001</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-nowrap">
+                                <span class="badge-type" 
+                                      th:classappend="${row['type'] == 'EXPENSE' ? ' type-expense' : (row['type'] == 'REIMBURSEMENT' ? ' type-reimbursement' : ' type-budget')}"
+                                      th:text="${row['type']}">EXPENSE</span>
+                            </td>
+                            <td><div style="min-width: 140px;" th:text="${row['purpose']}">Client meeting - Travel</div></td>
+                            <td class="fw-bold text-dark text-nowrap" th:text="${'₹' + #numbers.formatDecimal(row['amount'], 1, 'COMMA', 0, 'POINT')}">₹12,450</td>
+                            <td class="text-muted text-nowrap" th:text="${row['assignedTo']}">-</td>
+                            <td class="text-nowrap">
+                                <span class="status-badge" th:classappend="${row['status'] == 'Approved' ? ' status-approved' : (row['status'] == 'Rejected' ? ' status-rejected' : (row['status'].contains('Forward') ? ' status-completed' : ' status-pending'))}" th:text="${row['status']}">Pending</span>
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-link text-primary me-1" th:onclick="'openEditModal(\'' + ${row['id']} + '\', \'' + ${row['purpose']} + '\', ' + ${row['amount']} + ')'" title="Edit/Review"><i class="fa-regular fa-pen-to-square" style="font-size:1.1rem;"></i></button>
+                                <button class="btn btn-sm btn-link text-warning me-1" th:onclick="'openAssignModal(\'' + ${row['id']} + '\')'" title="Assign"><i class="fa-solid fa-user-plus" style="font-size:1.1rem;"></i></button>
+                                <form th:action="@{/senior_manager/expenses/action}" method="POST" style="display:inline;" onsubmit="return confirm('Forward this request to accounts department?')">
+                                    <input type="hidden" name="requestId" th:value="${row['id']}"/>
+                                    <input type="hidden" name="action" value="Forward"/>
+                                    <button type="submit" class="btn btn-sm btn-link text-success" title="Forward to Accounts"><i class="fa-solid fa-share-from-square" style="font-size:1.1rem;"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(assignableRequestsList)}">
+                            <td colspan="8" class="text-center text-muted py-4">No requests found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit/Review Modal -->
+<div class="modal fade" id="editRequestModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:12px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold text-dark mb-0">Review & Edit Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/senior_manager/expenses/edit}" method="POST">
+                <div class="modal-body py-4">
+                    <input type="hidden" name="requestId" id="editRequestId"/>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark">Request ID</label>
+                        <input type="text" id="editRequestIdLabel" class="form-control" readonly style="background-color:#f8fafc; font-weight:bold;"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark">Purpose / Description</label>
+                        <textarea name="purpose" id="editRequestPurpose" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark">Amount (₹)</label>
+                        <input type="number" step="0.01" name="amount" id="editRequestAmount" class="form-control" required/>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Modal -->
+<div class="modal fade" id="assignRequestModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:12px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold text-dark mb-0">Assign Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/senior_manager/expenses/assign}" method="POST">
+                <div class="modal-body py-4">
+                    <input type="hidden" name="requestId" id="assignRequestId"/>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark">Select Assignee</label>
+                        <select name="assignee" class="form-select" required>
+                            <option value="">Select Employee...</option>
+                            <option th:each="u : ${allUsersList}" th:value="${u.fullName}" th:text="${u.fullName + ' (' + u.username + ')'}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4">Assign Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <script th:inline="javascript">
@@ -706,7 +899,7 @@
                 data: {
                     labels: ['Approved', 'Pending', 'Rejected'],
                     datasets: [{
-                        data: [58.33, 29.17, 12.50],
+                        data: [/*[[${reimApprovedCount}]]*/ 58.33, /*[[${reimPendingCount}]]*/ 29.17, /*[[${reimRejectedCount}]]*/ 12.50],
                         backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
                         borderWidth: 2
                     }]
@@ -730,7 +923,7 @@
                 data: {
                     labels: ['Approved', 'Pending', 'Rejected'],
                     datasets: [{
-                        data: [38.89, 44.44, 16.67],
+                        data: [/*[[${budgetApprovedCount}]]*/ 38.89, /*[[${budgetPendingCount}]]*/ 44.44, /*[[${budgetRejectedCount}]]*/ 16.67],
                         backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
                         borderWidth: 2
                     }]
@@ -800,6 +993,42 @@
         if (reimSearch) reimSearch.addEventListener('input', filterTables);
         if (budgetSearch) budgetSearch.addEventListener('input', filterTables);
     });
+
+    function openEditModal(requestId, purpose, amount) {
+        document.getElementById('editRequestId').value = requestId;
+        document.getElementById('editRequestIdLabel').value = requestId;
+        document.getElementById('editRequestPurpose').value = purpose;
+        document.getElementById('editRequestAmount').value = amount;
+        
+        var modal = new bootstrap.Modal(document.getElementById('editRequestModal'));
+        modal.show();
+    }
+
+    function openAssignModal(requestId) {
+        document.getElementById('assignRequestId').value = requestId;
+        
+        var modal = new bootstrap.Modal(document.getElementById('assignRequestModal'));
+        modal.show();
+    }
+
+    function filterAssignTable() {
+        var input = document.getElementById('employeeSearchAssign').value.toLowerCase();
+        var table = document.getElementById('assignRequestsTable');
+        var trs = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        
+        for (var i = 0; i < trs.length; i++) {
+            var tr = trs[i];
+            if (tr.id === 'no-data-row') continue;
+            var name = tr.getAttribute('data-name') ? tr.getAttribute('data-name').toLowerCase() : '';
+            var code = tr.getAttribute('data-code') ? tr.getAttribute('data-code').toLowerCase() : '';
+            
+            if (name.includes(input) || code.includes(input)) {
+                tr.style.display = '';
+            } else {
+                tr.style.display = 'none';
+            }
+        }
+    }
     /*]]>*/
 </script>
 </body>

@@ -105,6 +105,18 @@ public class AdminLeaveController {
                 return ResponseEntity.badRequest()
                         .body("Leave already approved.");
             }
+
+            if (isManager) {
+                leave.setStatus("PENDING_HR");
+                leave.setAdminComments(note != null && !note.isBlank() ? note : "Approved by Manager " + currentUser.getFullName());
+                leave.setActionDate(LocalDateTime.now());
+                if (assignedTo != null && !assignedTo.isBlank()) {
+                    leave.setAssignedTo(assignedTo);
+                }
+                leaveRequestRepository.save(leave);
+                return ResponseEntity.ok("Leave request approved by Manager and forwarded to HR.");
+            }
+
             leave.setStatus("Approved");
             leave.setAdminComments(note);
             leave.setActionDate(LocalDateTime.now());
@@ -310,6 +322,33 @@ public class AdminLeaveController {
 
             return ResponseEntity.ok("Leave Rejected successfully");
 
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    // 4. HANDLE LEAVE EDIT (Called by HR)
+    @PreAuthorize("hasAuthority('leave_approve')")
+    @PostMapping("/api/admin/leave/edit/{id}")
+    @ResponseBody
+    public ResponseEntity<String> editLeave(
+            @PathVariable Long id,
+            @RequestParam String leaveType,
+            @RequestParam String fromDate,
+            @RequestParam String toDate,
+            @RequestParam Double totalDays,
+            Principal principal) {
+        try {
+            LeaveRequest leave = leaveRequestRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid leave Id:" + id));
+
+            leave.setLeaveType(leaveType);
+            leave.setFromDate(java.time.LocalDate.parse(fromDate));
+            leave.setToDate(java.time.LocalDate.parse(toDate));
+            leave.setTotalDays(totalDays);
+
+            leaveRequestRepository.save(leave);
+            return ResponseEntity.ok("Leave request edited successfully.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }

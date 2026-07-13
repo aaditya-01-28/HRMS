@@ -458,6 +458,9 @@
                                 <button class="btn btn-sm btn-link text-muted"><i class="fa-solid fa-ellipsis-vertical" style="font-size:1.1rem;"></i></button>
                             </td>
                         </tr>
+                        <tr th:if="${#lists.isEmpty(requisitionsList)}">
+                            <td colspan="8" class="text-center text-muted py-4">No requisitions found.</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -589,6 +592,9 @@
                                 <button class="btn btn-sm btn-link text-muted me-1" onclick="alert('Viewing interview details...')"><i class="fa-regular fa-eye" style="font-size:1.1rem;"></i></button>
                                 <button class="btn btn-sm btn-link text-muted"><i class="fa-solid fa-ellipsis-vertical" style="font-size:1.1rem;"></i></button>
                             </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(interviewsList)}">
+                            <td colspan="9" class="text-center text-muted py-4">No interviews found.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -722,6 +728,9 @@
                                     Provide Feedback
                                 </button>
                             </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(feedbackList)}">
+                            <td colspan="9" class="text-center text-muted py-4">No feedback requests found.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -863,6 +872,9 @@
                                     <button class="btn btn-sm btn-outline-danger px-3 py-1" style="border-radius:6px;" onclick="alert('Candidate successfully Rejected!')"><i class="fa-solid fa-xmark me-1"></i> Reject</button>
                                 </span>
                             </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(approvalsList)}">
+                            <td colspan="9" class="text-center text-muted py-4">No recruitment approvals pending.</td>
                         </tr>
                     </tbody>
                 </table>

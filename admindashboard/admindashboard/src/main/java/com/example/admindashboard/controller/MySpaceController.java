@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import com.example.admindashboard.service.LearningDashboardService;
 import java.security.Principal;
 import java.util.List;
@@ -37,6 +38,8 @@ import com.example.admindashboard.model.ResignationRequest;
 import com.example.admindashboard.model.Attendance;
 import com.example.admindashboard.model.EmployeeLeaveWallet;
 import com.example.admindashboard.model.Project;
+import com.example.admindashboard.model.ProjectMember;
+import com.example.admindashboard.repository.ProjectMemberRepository;
 import com.example.admindashboard.model.Ticket;
 import com.example.admindashboard.model.JobPosting;
 import com.example.admindashboard.repository.LeaveRequestRepository;
@@ -63,6 +66,12 @@ import com.example.admindashboard.repository.RecruitmentApprovalRepository;
 import com.example.admindashboard.repository.CommunicationBroadcastRepository;
 import com.example.admindashboard.repository.ProjectUpdateNotificationRepository;
 import com.example.admindashboard.repository.RecentNotificationRecordRepository;
+import com.example.admindashboard.model.PerformanceReview;
+import com.example.admindashboard.model.AuditLog;
+import com.example.admindashboard.model.Goal;
+import com.example.admindashboard.repository.GoalRepository;
+import com.example.admindashboard.model.EmployeeFeedback;
+import com.example.admindashboard.repository.EmployeeFeedbackRepository;
 
 
 @Controller
@@ -148,6 +157,21 @@ public class MySpaceController {
 
         @Autowired
         private EmailService emailService;
+
+        @Autowired
+        private com.example.admindashboard.repository.PerformanceReviewRepository performanceReviewRepository;
+
+        @Autowired
+        private com.example.admindashboard.repository.AuditLogRepository auditLogRepository;
+
+        @Autowired
+        private GoalRepository goalRepository;
+
+        @Autowired
+        private EmployeeFeedbackRepository employeeFeedbackRepository;
+
+        @Autowired
+        private ProjectMemberRepository projectMemberRepository;
 
     @GetMapping("/space/login")
     public String showLogin() {
@@ -446,23 +470,31 @@ public class MySpaceController {
                         .filter(u -> u.getId() != null && !u.getId().equals(loggedInUser.getId()))
                         .filter(u -> u.getRole() == null || !"CLIENT".equalsIgnoreCase(u.getRole().getRoleName()))
                         .collect(java.util.stream.Collectors.toList());
+                Set<Long> teamMemberIds = employees.stream().map(User::getId).collect(java.util.stream.Collectors.toSet());
 
-                long totalMembers = employees.size() > 0 ? employees.size() : 28;
+                long totalMembers = employees.size();
 
                 // Today's leaves
                 long onLeaveToday = leaveRequestRepository.findAll().stream()
                         .filter(r -> "Approved".equalsIgnoreCase(r.getStatus()))
+                        .filter(r -> r.getUser() != null && teamMemberIds.contains(r.getUser().getId()))
                         .filter(r -> isDateInLeaveRange(LocalDate.now(), r.getFromDate(), r.getToDate()))
                         .count();
-                if (onLeaveToday == 0) onLeaveToday = 3; // Fallback to match screenshot
 
                 // Attendance logic
-                long presentToday = attendanceRepository.countByDate(LocalDate.now());
-                if (presentToday == 0) presentToday = 23; // Fallback to match screenshot
+                long presentToday = attendanceRepository.findAll().stream()
+                        .filter(a -> LocalDate.now().equals(a.getDate()) && a.getUser() != null && teamMemberIds.contains(a.getUser().getId()))
+                        .filter(a -> "Present".equalsIgnoreCase(a.getStatus()))
+                        .count();
+
+                long absentToday = employees.size() - presentToday - onLeaveToday;
+                if (absentToday < 0) absentToday = 0;
 
                 // Calculate average attendance from real database records
-                List<Attendance> allAttendance = attendanceRepository.findAll();
-                double avgAttendance = 92.45;
+                List<Attendance> allAttendance = attendanceRepository.findAll().stream()
+                        .filter(a -> a.getUser() != null && teamMemberIds.contains(a.getUser().getId()))
+                        .collect(java.util.stream.Collectors.toList());
+                double avgAttendance = 0.0;
                 if (!allAttendance.isEmpty()) {
                     long totalAttendanceDays = allAttendance.stream()
                             .filter(a -> "Present".equalsIgnoreCase(a.getStatus()) || "Absent".equalsIgnoreCase(a.getStatus()))
@@ -476,12 +508,14 @@ public class MySpaceController {
                 }
 
                 // Calculate leave utilization
-                List<EmployeeLeaveWallet> wallets = employeeLeaveWalletRepository.findAll();
-                double leaveUtil = 36.25;
-                long entitledLeaves = 124;
-                long usedLeaves = 45;
-                long pendingLeaves = 5;
-                long remainingLeaves = 79;
+                List<EmployeeLeaveWallet> wallets = employeeLeaveWalletRepository.findAll().stream()
+                        .filter(w -> w.getUser() != null && teamMemberIds.contains(w.getUser().getId()))
+                        .collect(java.util.stream.Collectors.toList());
+                double leaveUtil = 0.0;
+                long entitledLeaves = 0;
+                long usedLeaves = 0;
+                long pendingLeaves = 0;
+                long remainingLeaves = 0;
 
                 if (!wallets.isEmpty()) {
                     entitledLeaves = Math.round(wallets.stream().mapToDouble(w -> w.getOpeningBalance() != null ? w.getOpeningBalance() : 0.0).sum());
@@ -498,14 +532,43 @@ public class MySpaceController {
                 model.addAttribute("onLeaveToday", onLeaveToday);
                 model.addAttribute("avgAttendance", avgAttendance);
                 model.addAttribute("leaveUtil", leaveUtil);
-                model.addAttribute("leavesTaken", usedLeaves > 0 ? usedLeaves : 45);
+                model.addAttribute("leavesTaken", usedLeaves);
                 model.addAttribute("presentToday", presentToday);
-                model.addAttribute("absentToday", 3);
-                model.addAttribute("avgWorkingHours", "8h 32m");
+                model.addAttribute("absentToday", absentToday);
+
+                String avgWorkingHours = "0h 0m";
+                if (!allAttendance.isEmpty()) {
+                    double totalHrsSum = 0.0;
+                    int counts = 0;
+                    for (Attendance a : allAttendance) {
+                        if (a.getTotalHours() != null && a.getTotalHours().toLowerCase().contains("h")) {
+                            try {
+                                String clean = a.getTotalHours().replace("h", "").replace("m", "").trim();
+                                String[] parts = clean.split(" ");
+                                double val = Double.parseDouble(parts[0]);
+                                if (parts.length > 1) {
+                                    val += Double.parseDouble(parts[1]) / 60.0;
+                                }
+                                totalHrsSum += val;
+                                counts++;
+                            } catch (Exception e) {}
+                        }
+                    }
+                    if (counts > 0) {
+                        double avg = totalHrsSum / counts;
+                        int h = (int) avg;
+                        int m = (int) ((avg - h) * 60);
+                        avgWorkingHours = h + "h " + m + "m";
+                    }
+                }
+                if ("0h 0m".equals(avgWorkingHours)) {
+                    avgWorkingHours = "8h 30m";
+                }
+                model.addAttribute("avgWorkingHours", avgWorkingHours);
 
                 List<Map<String, Object>> calendarEvents = new ArrayList<>();
                 List<LeaveRequest> approvedLeaves = leaveRequestRepository.findAll().stream()
-                        .filter(r -> "Approved".equalsIgnoreCase(r.getStatus()))
+                        .filter(r -> "Approved".equalsIgnoreCase(r.getStatus()) && r.getUser() != null && teamMemberIds.contains(r.getUser().getId()))
                         .collect(java.util.stream.Collectors.toList());
                 for (LeaveRequest r : approvedLeaves) {
                     if (r.getUser() == null || r.getFromDate() == null || r.getToDate() == null) continue;
@@ -526,7 +589,6 @@ public class MySpaceController {
 
                 // Department Options
                 Set<String> departments = new java.util.TreeSet<>();
-                departments.addAll(List.of("IT Department", "Human Resources", "Finance Team", "Operations"));
                 for (User u : allUsers) {
                     String d = getDepartment(u);
                     if (!d.isBlank() && !"Unknown".equalsIgnoreCase(d)) {
@@ -553,14 +615,14 @@ public class MySpaceController {
                             .filter(r -> isDateInLeaveRange(LocalDate.now(), r.getFromDate(), r.getToDate()))
                             .count();
                             
-                    double dUtil = 30.0;
+                    double dUtil = 0.0;
                     double dOpening = wallets.stream().filter(w -> w.getUser() != null && dUserIds.contains(w.getUser().getId())).mapToDouble(w -> w.getOpeningBalance() != null ? w.getOpeningBalance() : 0.0).sum();
                     double dUsed = wallets.stream().filter(w -> w.getUser() != null && dUserIds.contains(w.getUser().getId())).mapToDouble(w -> w.getUsedBalance() != null ? w.getUsedBalance() : 0.0).sum();
                     if (dOpening > 0) {
                         dUtil = (dUsed * 100.0) / dOpening;
                     }
                     
-                    double dAtt = 92.0;
+                    double dAtt = 0.0;
                     long dTotalDays = allAttendance.stream().filter(a -> a.getUser() != null && dUserIds.contains(a.getUser().getId()) && ("Present".equalsIgnoreCase(a.getStatus()) || "Absent".equalsIgnoreCase(a.getStatus()))).count();
                     long dPresentDays = allAttendance.stream().filter(a -> a.getUser() != null && dUserIds.contains(a.getUser().getId()) && "Present".equalsIgnoreCase(a.getStatus())).count();
                     if (dTotalDays > 0) {
@@ -576,22 +638,16 @@ public class MySpaceController {
                     ));
                 }
 
-                if (teamLeaveSummary.isEmpty()) {
-                    teamLeaveSummary.add(Map.of("name", "IT Department", "members", 8, "onLeave", 1, "util", 32.10, "attendance", 93.20));
-                    teamLeaveSummary.add(Map.of("name", "Human Resources", "members", 5, "onLeave", 0, "util", 28.00, "attendance", 95.60));
-                    teamLeaveSummary.add(Map.of("name", "Finance Team", "members", 6, "onLeave", 1, "util", 34.20, "attendance", 91.00));
-                } else {
-                    teamLeaveSummary.sort(Comparator.comparing(m -> String.valueOf(m.get("name")), String.CASE_INSENSITIVE_ORDER));
-                }
+                teamLeaveSummary.sort(Comparator.comparing(m -> String.valueOf(m.get("name")), String.CASE_INSENSITIVE_ORDER));
                 model.addAttribute("teamLeaveSummary", teamLeaveSummary);
 
                 // Escalated Leave Requests
                 List<Map<String, Object>> escalatedRequests = new ArrayList<>();
                 List<LeaveRequest> pendingRequests = leaveRequestRepository.findAll().stream()
-                        .filter(r -> "Pending".equalsIgnoreCase(r.getStatus()))
+                        .filter(r -> "Pending".equalsIgnoreCase(r.getStatus()) && r.getUser() != null && teamMemberIds.contains(r.getUser().getId()))
                         .collect(java.util.stream.Collectors.toList());
 
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("d MMM yyyy");
+                DateTimeFormatter dtfFormat = DateTimeFormatter.ofPattern("d MMM yyyy");
                 for (LeaveRequest r : pendingRequests) {
                     Map<String, Object> req = new HashMap<>();
                     req.put("id", r.getId());
@@ -601,42 +657,47 @@ public class MySpaceController {
                     
                     String period = "";
                     if (r.getFromDate() != null) {
-                        period = r.getFromDate().format(dtf);
+                        period = r.getFromDate().format(dtfFormat);
                         if (r.getToDate() != null && !r.getToDate().equals(r.getFromDate())) {
-                            period += " - " + r.getToDate().format(dtf);
+                            period += " - " + r.getToDate().format(dtfFormat);
                         }
                     }
                     req.put("period", period);
                     req.put("days", r.getTotalDays() != null ? r.getTotalDays() : 1.0);
                     req.put("escalatedBy", "Admin");
-                    req.put("escalatedOn", r.getCreatedAt() != null ? r.getCreatedAt().format(dtf) : LocalDate.now().format(dtf));
+                    req.put("escalatedOn", r.getCreatedAt() != null ? r.getCreatedAt().format(dtfFormat) : LocalDate.now().format(dtfFormat));
                     req.put("reason", r.getReason() != null ? r.getReason() : "General request");
                     req.put("status", "PENDING");
                     req.put("department", r.getUser() != null ? getDepartment(r.getUser()) : "Unknown");
                     escalatedRequests.add(req);
                 }
-
-                if (escalatedRequests.isEmpty()) {
-                    Map<String, Object> req1 = new HashMap<>();
-                    req1.put("id", 9991L); req1.put("employee", "Pooja Desai"); req1.put("designation", "Finance Director"); req1.put("type", "Earned Leave"); req1.put("period", "25 May - 28 May"); req1.put("days", 4.0); req1.put("escalatedBy", "Admin Manager"); req1.put("escalatedOn", "26 May 2026 10:30 AM"); req1.put("reason", "High workload in team"); req1.put("status", "OVERDUE"); req1.put("department", "Finance Team");
-                    escalatedRequests.add(req1);
-
-                    Map<String, Object> req2 = new HashMap<>();
-                    req2.put("id", 9992L); req2.put("employee", "Ankit Patel"); req2.put("designation", "IT Manager"); req2.put("type", "Casual Leave"); req2.put("period", "29 May 2026"); req2.put("days", 1.0); req2.put("escalatedBy", "Admin"); req2.put("escalatedOn", "29 May 2026 09:15 AM"); req2.put("reason", "Project deadline conflict"); req2.put("status", "PENDING"); req2.put("department", "IT Department");
-                    escalatedRequests.add(req2);
-
-                    Map<String, Object> req3 = new HashMap<>();
-                    req3.put("id", 9993L); req3.put("employee", "Neha Iyer"); req3.put("designation", "Senior Dev"); req3.put("type", "Sick Leave"); req3.put("period", "30 May - 31 May"); req3.put("days", 2.0); req3.put("escalatedBy", "Admin"); req3.put("escalatedOn", "30 May 2026 11:20 AM"); req3.put("reason", "Medical emergency"); req3.put("status", "PENDING"); req3.put("department", "IT Department");
-                    escalatedRequests.add(req3);
-                }
                 model.addAttribute("escalatedRequests", escalatedRequests);
 
-                // Override History
+                // Override History from DB completed leaves
                 List<Map<String, Object>> overrideHistory = new ArrayList<>();
-                overrideHistory.add(Map.of("employee", "Rahul Kumar", "type", "Sick Leave", "action", "APPROVED", "actionBy", "You", "dateTime", "31 May 2026, 09:30 AM"));
-                overrideHistory.add(Map.of("employee", "Priya Singh", "type", "Earned Leave", "action", "REJECTED", "actionBy", "You", "dateTime", "30 May 2026, 03:15 PM"));
-                overrideHistory.add(Map.of("employee", "Megha Joshi", "type", "Casual Leave", "action", "APPROVED", "actionBy", "You", "dateTime", "29 May 2026, 11:10 AM"));
-                overrideHistory.add(Map.of("employee", "Sanjay Tiwari", "type", "Comp Off", "action", "APPROVED", "actionBy", "You", "dateTime", "28 May 2026, 06:45 PM"));
+                List<LeaveRequest> completedLeaves = leaveRequestRepository.findAll().stream()
+                        .filter(r -> r.getUser() != null && teamMemberIds.contains(r.getUser().getId()))
+                        .filter(r -> "Approved".equalsIgnoreCase(r.getStatus()) || "Rejected".equalsIgnoreCase(r.getStatus()))
+                        .sorted((a, b) -> {
+                            LocalDate da = a.getCreatedAt() != null ? a.getCreatedAt() : a.getFromDate();
+                            LocalDate db = b.getCreatedAt() != null ? b.getCreatedAt() : b.getFromDate();
+                            if (da == null && db == null) return 0;
+                            if (da == null) return 1;
+                            if (db == null) return -1;
+                            return db.compareTo(da);
+                        })
+                        .limit(10)
+                        .collect(java.util.stream.Collectors.toList());
+
+                for (LeaveRequest r : completedLeaves) {
+                    overrideHistory.add(Map.of(
+                        "employee", r.getUser().getFullName(),
+                        "type", r.getLeaveType() != null ? r.getLeaveType() : "Casual Leave",
+                        "action", r.getStatus().toUpperCase(),
+                        "actionBy", "You",
+                        "dateTime", r.getCreatedAt() != null ? r.getCreatedAt().format(DateTimeFormatter.ofPattern("d MMM yyyy")) : "-"
+                    ));
+                }
                 model.addAttribute("overrideHistory", overrideHistory);
 
                 // Attendance Reports Table
@@ -673,14 +734,109 @@ public class MySpaceController {
                     attendanceRecords.add(record);
                 }
 
-                if (attendanceRecords.isEmpty()) {
-                    attendanceRecords.add(Map.of("employee", "Vikram Mehta", "designation", "CTO", "department", "Information Technology", "days", 22, "present", 20, "absent", 1, "leave", 1, "half", 0, "percent", 95.45, "hours", "8h 45m"));
-                    attendanceRecords.add(Map.of("employee", "Neha Verma", "designation", "HR DIRECTOR", "department", "Human Resources", "days", 22, "present", 19, "absent", 1, "leave", 2, "half", 0, "percent", 90.91, "hours", "8h 30m"));
-                    attendanceRecords.add(Map.of("employee", "Ankit Patel", "designation", "IT MANAGER", "department", "Information Technology", "days", 22, "present", 21, "absent", 0, "leave", 1, "half", 0, "percent", 95.45, "hours", "8h 50m"));
-                } else {
-                    attendanceRecords.sort(Comparator.comparing(m -> String.valueOf(m.get("employee")), String.CASE_INSENSITIVE_ORDER));
-                }
+                attendanceRecords.sort(Comparator.comparing(m -> String.valueOf(m.get("employee")), String.CASE_INSENSITIVE_ORDER));
                 model.addAttribute("attendanceRecords", attendanceRecords);
+
+                // Add chart metrics
+                long overdueLeaveCount = 0;
+                long pendingLeaveCount = 0;
+                long approvedLeaveCount = 0;
+                for (LeaveRequest r : leaveRequestRepository.findAll()) {
+                    if (r.getUser() == null || !teamMemberIds.contains(r.getUser().getId())) continue;
+                    if ("Approved".equalsIgnoreCase(r.getStatus())) {
+                        approvedLeaveCount++;
+                    } else if ("Pending".equalsIgnoreCase(r.getStatus())) {
+                        if (r.getCreatedAt() != null && r.getCreatedAt().isBefore(LocalDate.now().minusDays(3))) {
+                            overdueLeaveCount++;
+                        } else {
+                            pendingLeaveCount++;
+                        }
+                    }
+                }
+                model.addAttribute("overdueLeaveCount", overdueLeaveCount);
+                model.addAttribute("pendingLeaveCount", pendingLeaveCount);
+                model.addAttribute("approvedLeaveCount", approvedLeaveCount);
+
+                long casualLeaveCount = 0;
+                long sickLeaveCount = 0;
+                long earnedLeaveCount = 0;
+                long compOffCount = 0;
+                for (LeaveRequest r : leaveRequestRepository.findAll()) {
+                    if (r.getUser() == null || !teamMemberIds.contains(r.getUser().getId())) continue;
+                    if (!"Approved".equalsIgnoreCase(r.getStatus())) continue;
+                    String lt = r.getLeaveType() != null ? r.getLeaveType().toLowerCase() : "";
+                    if (lt.contains("casual")) casualLeaveCount++;
+                    else if (lt.contains("sick")) sickLeaveCount++;
+                    else if (lt.contains("earned")) earnedLeaveCount++;
+                    else if (lt.contains("comp")) compOffCount++;
+                }
+                model.addAttribute("casualLeaveCount", casualLeaveCount);
+                model.addAttribute("sickLeaveCount", sickLeaveCount);
+                model.addAttribute("earnedLeaveCount", earnedLeaveCount);
+                model.addAttribute("compOffCount", compOffCount);
+
+                // Last 7 days attendance trends
+                List<LocalDate> recentDates = attendanceRepository.findAll().stream()
+                        .map(Attendance::getDate)
+                        .filter(java.util.Objects::nonNull)
+                        .distinct()
+                        .sorted(Comparator.reverseOrder())
+                        .limit(7)
+                        .sorted()
+                        .collect(java.util.stream.Collectors.toList());
+
+                List<String> attendanceLabels = new ArrayList<>();
+                List<Double> presentTrend = new ArrayList<>();
+                List<Double> absentTrend = new ArrayList<>();
+
+                DateTimeFormatter labelFmt = DateTimeFormatter.ofPattern("d MMM");
+                for (LocalDate d : recentDates) {
+                    List<Attendance> dayAtt = attendanceRepository.findAll().stream()
+                            .filter(a -> d.equals(a.getDate()) && a.getUser() != null && teamMemberIds.contains(a.getUser().getId()))
+                            .collect(java.util.stream.Collectors.toList());
+                    long total = dayAtt.size();
+                    long present = dayAtt.stream().filter(a -> "Present".equalsIgnoreCase(a.getStatus())).count();
+                    long absent = dayAtt.stream().filter(a -> "Absent".equalsIgnoreCase(a.getStatus())).count();
+                    
+                    attendanceLabels.add(d.format(labelFmt));
+                    presentTrend.add(total > 0 ? (present * 100.0) / total : 0.0);
+                    absentTrend.add(total > 0 ? (absent * 100.0) / total : 0.0);
+                }
+
+                if (attendanceLabels.isEmpty()) {
+                    attendanceLabels = List.of("1 May", "5 May", "10 May", "15 May", "20 May", "25 May", "30 May");
+                    presentTrend = List.of(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                    absentTrend = List.of(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                }
+                
+                model.addAttribute("attendanceLabels", attendanceLabels);
+                model.addAttribute("presentTrend", presentTrend);
+                model.addAttribute("absentTrend", absentTrend);
+
+                // Department Attendance Donut Chart metrics from DB
+                List<String> deptAttendanceLabels = new ArrayList<>();
+                List<Double> deptAttendanceData = new ArrayList<>();
+                Map<String, List<Attendance>> deptAttendanceMap = allAttendance.stream()
+                        .collect(java.util.stream.Collectors.groupingBy(a -> getDepartment(a.getUser())));
+
+                for (Map.Entry<String, List<Attendance>> entry : deptAttendanceMap.entrySet()) {
+                    String dName = entry.getKey();
+                    if ("Unknown".equalsIgnoreCase(dName) || dName.isBlank()) continue;
+                    List<Attendance> list = entry.getValue();
+                    long total = list.stream().filter(a -> "Present".equalsIgnoreCase(a.getStatus()) || "Absent".equalsIgnoreCase(a.getStatus())).count();
+                    long present = list.stream().filter(a -> "Present".equalsIgnoreCase(a.getStatus())).count();
+                    if (total > 0) {
+                        double avg = (present * 100.0) / total;
+                        deptAttendanceLabels.add(dName);
+                        deptAttendanceData.add(Double.parseDouble(String.format(java.util.Locale.US, "%.2f", avg)));
+                    }
+                }
+                if (deptAttendanceLabels.isEmpty()) {
+                    deptAttendanceLabels = List.of("No Data");
+                    deptAttendanceData = List.of(0.0);
+                }
+                model.addAttribute("deptAttendanceLabels", deptAttendanceLabels);
+                model.addAttribute("deptAttendanceData", deptAttendanceData);
 
                 return "senior_manager-leave_attendance";
         }
@@ -697,7 +853,8 @@ public class MySpaceController {
                     LeaveRequest r = leaveRequestRepository.findById(id).orElse(null);
                     if (r != null) {
                         employeeName = r.getUser() != null ? r.getUser().getFullName() : "Employee";
-                        r.setStatus("Approve".equalsIgnoreCase(action) ? "Approved" : "Rejected");
+                        r.setStatus("Approve".equalsIgnoreCase(action) ? "PENDING_HR" : "Rejected");
+                        r.setAdminComments("Approve".equalsIgnoreCase(action) ? "Approved by Senior Manager" : "Rejected by Senior Manager");
                         r.setActionDate(java.time.LocalDateTime.now());
                         leaveRequestRepository.save(r);
                     }
@@ -750,18 +907,15 @@ public class MySpaceController {
                 List<WeeklyTimesheet> allTimesheets = weeklyTimesheetRepository.findAll();
 
                 // 1. Calculate active, bench, exited counts
-                long totalMembers = employees.size() > 0 ? employees.size() : 24;
+                long totalMembers = employees.size();
                 long activeCount = employees.stream().filter(u -> "ACTIVE".equalsIgnoreCase(u.getStatus())).count();
-                if (activeCount == 0) activeCount = 14;
 
                 long benchCount = employees.stream()
                         .filter(u -> "ACTIVE".equalsIgnoreCase(u.getStatus()))
                         .filter(u -> allTickets.stream().noneMatch(t -> t.getAssignedTo() != null && t.getAssignedTo().getId().equals(u.getId())))
                         .count();
-                if (benchCount == 0) benchCount = 6;
 
                 long exitedCount = employees.stream().filter(u -> "EXITED".equalsIgnoreCase(u.getStatus())).count();
-                if (exitedCount == 0) exitedCount = 4;
 
                 model.addAttribute("totalMembers", totalMembers);
                 model.addAttribute("activeCount", activeCount);
@@ -783,25 +937,45 @@ public class MySpaceController {
                     double avgProgress = 0.0;
                     if (!projTickets.isEmpty()) {
                         avgProgress = projTickets.stream().mapToDouble(t -> t.getProgressPercentage() != null ? t.getProgressPercentage() : 0.0).average().orElse(0.0);
-                    } else {
-                        avgProgress = 85.0; // Mock default progress
                     }
 
                     // Collect team members assigned to this project
-                    Set<User> teamUsers = projTickets.stream()
-                            .map(Ticket::getAssignedTo)
+                    List<ProjectMember> pMembers = projectMemberRepository.findByProjectId(p.getId());
+                    Set<User> teamUsers = pMembers.stream()
+                            .map(ProjectMember::getUser)
                             .filter(java.util.Objects::nonNull)
                             .collect(java.util.stream.Collectors.toSet());
 
                     Map<String, Object> rec = new HashMap<>();
+                    rec.put("projectId", p.getId());
                     rec.put("projectName", p.getProjectName());
-                    rec.put("startDate", p.getCreatedAt() != null ? p.getCreatedAt().format(dtf) : "01 Apr 2026");
-                    rec.put("endDate", p.getCreatedAt() != null ? p.getCreatedAt().plusMonths(4).format(dtf) : "01 Aug 2026");
+
+                    LocalDate sDate = p.getStartDate();
+                    LocalDate eDate = p.getEndDate();
+                    if (sDate == null) sDate = p.getCreatedAt() != null ? p.getCreatedAt().toLocalDate() : LocalDate.of(2026, 4, 1);
+                    if (eDate == null) eDate = sDate.plusMonths(4);
+
+                    rec.put("startDate", sDate.format(dtf));
+                    rec.put("endDate", eDate.format(dtf));
+                    rec.put("rawStartDate", sDate.toString());
+                    rec.put("rawEndDate", eDate.toString());
                     rec.put("progress", avgProgress);
                     rec.put("budget", "RS. 4.5 L/6.0 L");
                     rec.put("status", p.getStage() != null ? p.getStage() : "Active");
                     rec.put("teams", teamUsers);
-                    
+
+                    List<Map<String, Object>> membersDetail = new ArrayList<>();
+                    for (ProjectMember pm : pMembers) {
+                        if (pm.getUser() == null) continue;
+                        Map<String, Object> md = new HashMap<>();
+                        md.put("userId", pm.getUser().getId());
+                        md.put("name", pm.getUser().getFullName());
+                        md.put("role", pm.getRole() != null ? pm.getRole() : "Developer");
+                        md.put("billable", pm.getBillable() != null ? pm.getBillable() : true);
+                        membersDetail.add(md);
+                    }
+                    rec.put("membersDetail", membersDetail);
+
                     String pDept = "IT Department";
                     if (!teamUsers.isEmpty()) {
                         pDept = getDepartment(teamUsers.iterator().next());
@@ -809,12 +983,14 @@ public class MySpaceController {
                     rec.put("department", pDept);
                     projectRecords.add(rec);
                 }
-
-                if (projectRecords.isEmpty()) {
-                    projectRecords.add(Map.of("projectName", "CRM Develop.", "startDate", "01 Apr 2026", "endDate", "01 Aug 2026", "progress", 85.0, "budget", "RS. 4.5 L/6.0 L", "status", "Active", "teams", List.of()));
-                    projectRecords.add(Map.of("projectName", "Database Integration", "startDate", "01 May 2026", "endDate", "01 Jun 2026", "progress", 65.0, "budget", "RS. 4.5 L/6.0 L", "status", "Active", "teams", List.of()));
-                }
                 model.addAttribute("projectsList", projectRecords);
+
+                List<User> activeEmployees = userRepository.findAll().stream()
+                        .filter(u -> u.getStatus() != null && "ACTIVE".equalsIgnoreCase(u.getStatus()))
+                        .filter(u -> u.getRole() == null || !"CLIENT".equalsIgnoreCase(u.getRole().getRoleName()))
+                        .sorted(Comparator.comparing(User::getFullName, String.CASE_INSENSITIVE_ORDER))
+                        .collect(java.util.stream.Collectors.toList());
+                model.addAttribute("activeEmployees", activeEmployees);
 
                 // 3. Team Work Tab (View 2)
                 List<Map<String, Object>> teamworkRecords = new ArrayList<>();
@@ -865,15 +1041,6 @@ public class MySpaceController {
                     rec.put("department", getDepartment(u));
                     teamworkRecords.add(rec);
                 }
-
-                if (teamworkRecords.isEmpty()) {
-                    teamworkRecords.add(Map.of("employeeName", "Amit Sharma", "employeeCode", "EMP114", "taskAssigned", 6L, "inProgress", 2L, "completed", 3L, "overdue", 1L, "percent", 85.0, "status", "On Track"));
-                    teamworkRecords.add(Map.of("employeeName", "Neha Nair", "employeeCode", "EMP114", "taskAssigned", 6L, "inProgress", 2L, "completed", 3L, "overdue", 1L, "percent", 65.0, "status", "Active"));
-                    teamworkTotalMembers = 7;
-                    teamworkTasksAssigned = 14;
-                    teamworkPending = 6;
-                    teamworkRisk = 4;
-                }
                 model.addAttribute("teamworkRecords", teamworkRecords);
                 model.addAttribute("teamworkTotalMembers", teamworkTotalMembers);
                 model.addAttribute("teamworkTasksAssigned", teamworkTasksAssigned);
@@ -918,13 +1085,6 @@ public class MySpaceController {
                     timesheetRecords.add(rec);
                 }
 
-                if (timesheetRecords.isEmpty()) {
-                    timesheetRecords.add(Map.of("employeeName", "Amit Sharma", "employeeCode", "EMP114", "week", "9 Jun - 15 Jun 2026", "totalHours", "38 h 30 m", "billable", "50 h 30 m", "projects", 1, "submittedOn", "01 Apr 2026", "status", "On Track"));
-                    timesheetRecords.add(Map.of("employeeName", "Neha Nair", "employeeCode", "EMP114", "week", "9 Jun - 15 Jun 2026", "totalHours", "38 h 30 m", "billable", "50 h 30 m", "projects", 1, "submittedOn", "01 May 2026", "status", "Active"));
-                    tsTotalHours = 120;
-                    tsPending = 8;
-                    tsRejected = 1;
-                }
                 model.addAttribute("timesheetRecords", timesheetRecords);
                 model.addAttribute("tsTotalHours", tsTotalHours);
                 model.addAttribute("tsBillableHours", tsTotalHours * 0.8);
@@ -952,22 +1112,17 @@ public class MySpaceController {
                     return "redirect:/login";
                 }
 
+                seedPerformanceReviews();
+
                 model.addAttribute("loggedInUser", loggedInUser);
                 model.addAttribute("activeTab", tab);
                 model.addAttribute("selectedDept", dept);
                 model.addAttribute("selectedCycle", cycle);
                 model.addAttribute("searchQuery", search);
 
-                // Fetch real active users
-                List<User> allUsers = userRepository.findAll();
-                List<User> employees = allUsers.stream()
-                        .filter(u -> u.getId() != null && !u.getId().equals(loggedInUser.getId()))
-                        .filter(u -> u.getRole() == null || !"CLIENT".equalsIgnoreCase(u.getRole().getRoleName()))
-                        .filter(u -> "ACTIVE".equalsIgnoreCase(u.getStatus()))
-                        .collect(java.util.stream.Collectors.toList());
-
-                // Generate dynamic reviews based on employee list
+                List<PerformanceReview> allReviews = performanceReviewRepository.findAll();
                 List<Map<String, Object>> reviews = new ArrayList<>();
+
                 long completedCount = 0;
                 long inProgressCount = 0;
                 long pendingCount = 0;
@@ -975,25 +1130,30 @@ public class MySpaceController {
                 double ratingSum = 0.0;
                 long ratedEmployeesCount = 0;
 
-                // Summary distribution
                 long outstanding = 0;
                 long exceeds = 0;
                 long meets = 0;
                 long below = 0;
                 long unsatisfactory = 0;
 
-                // Rating distribution buckets
-                long bucket1 = 0; // 1 - 1.49
-                long bucket2 = 0; // 1.5 - 2.49
-                long bucket3 = 0; // 2.5 - 3.49
-                long bucket4 = 0; // 3.5 - 4.49
-                long bucket5 = 0; // 4.5 - 5
+                long bucket1 = 0;
+                long bucket2 = 0;
+                long bucket3 = 0;
+                long bucket4 = 0;
+                long bucket5 = 0;
 
-                java.util.Random rand = new java.util.Random();
-                
-                for (User u : employees) {
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd MMM yyyy");
+
+                for (PerformanceReview pr : allReviews) {
+                    User u = pr.getEmployee();
+                    if (u == null) continue;
+
                     // Filter search query if present
                     if (search != null && !search.isBlank() && !u.getFullName().toLowerCase().contains(search.toLowerCase())) {
+                        continue;
+                    }
+                    // Filter department if present
+                    if (dept != null && !dept.isBlank() && !getDepartment(u).equalsIgnoreCase(dept)) {
                         continue;
                     }
 
@@ -1001,55 +1161,38 @@ public class MySpaceController {
                     r.put("employeeName", u.getFullName());
                     r.put("employeeCode", u.getUsername());
                     r.put("department", getDepartment(u));
-                    r.put("designation", u.getDesignation() != null ? u.getDesignation() : "Employee");
-
-                    int seed = u.getFullName().hashCode();
-                    rand.setSeed(seed);
-
-                    String status;
-                    int roll = rand.nextInt(100);
-                    if (roll < 55) {
-                        status = "Completed";
+                    r.put("designation", pr.getDesignation());
+                    r.put("status", pr.getStatus());
+                    r.put("reviewType", pr.getReviewType());
+                    r.put("reviewPeriod", pr.getReviewPeriod());
+                    r.put("dueDate", pr.getDueDate() != null ? pr.getDueDate().format(dtf) : "-");
+                    r.put("selfRating", pr.getSelfRating() != null ? pr.getSelfRating() : "-");
+                    String userRole = (u.getRole() != null) ? u.getRole().getRoleName() : "EMPLOYEE";
+                    r.put("roleLevel", userRole.contains("MANAGER") ? "L2" : "L1");
+                    
+                    String status = pr.getStatus();
+                    if ("Completed".equalsIgnoreCase(status)) {
                         completedCount++;
-                    } else if (roll < 85) {
-                        status = "In Progress";
-                        inProgressCount++;
+                        double finalRating = pr.getFinalRating() != null ? pr.getFinalRating() : 0.0;
+                        r.put("managerRating", pr.getManagerRating() != null ? pr.getManagerRating() : "-");
+                        r.put("finalRating", finalRating > 0 ? finalRating : "-");
+                        r.put("reviewDate", pr.getReviewDate() != null ? pr.getReviewDate().format(dtf) : "-");
+
+                        if (finalRating > 0) {
+                            ratingSum += finalRating;
+                            ratedEmployeesCount++;
+
+                            if (finalRating >= 4.5) { outstanding++; bucket5++; }
+                            else if (finalRating >= 3.5) { exceeds++; bucket4++; }
+                            else if (finalRating >= 2.5) { meets++; bucket3++; }
+                            else if (finalRating >= 1.5) { below++; bucket2++; }
+                            else { unsatisfactory++; bucket1++; }
+                        }
                     } else {
-                        status = "Pending";
-                        pendingCount++;
-                    }
+                        if ("In Progress".equalsIgnoreCase(status)) inProgressCount++;
+                        else if ("Overdue".equalsIgnoreCase(status)) overdueCount++;
+                        else if ("Pending".equalsIgnoreCase(status)) pendingCount++;
 
-                    boolean isOverdue = false;
-                    if (("In Progress".equals(status) || "Pending".equals(status)) && rand.nextInt(100) < 30) {
-                        status = "Overdue";
-                        overdueCount++;
-                        isOverdue = true;
-                    }
-
-                    r.put("status", status);
-                    r.put("reviewType", rand.nextBoolean() ? "Annual Review" : "Probation Review");
-                    r.put("reviewPeriod", "Apr 2024 - Mar 2025");
-                    r.put("dueDate", LocalDate.now().plusDays(rand.nextInt(30) - 15).format(DateTimeFormatter.ofPattern("dd MMM yyyy")));
-                    r.put("progress", "Completed".equals(status) ? 100 : ("In Progress".equals(status) ? 60 : ("Overdue".equals(status) ? 20 : 0)));
-
-                    double selfRating = Math.round((3.0 + rand.nextDouble() * 2.0) * 10.0) / 10.0;
-                    r.put("selfRating", selfRating);
-
-                    if ("Completed".equals(status)) {
-                        double finalRating = Math.round((3.0 + rand.nextDouble() * 2.0) * 10.0) / 10.0;
-                        r.put("managerRating", finalRating);
-                        r.put("finalRating", finalRating);
-                        r.put("reviewDate", LocalDate.now().minusDays(rand.nextInt(30)).format(DateTimeFormatter.ofPattern("dd MMM yyyy")));
-
-                        ratingSum += finalRating;
-                        ratedEmployeesCount++;
-
-                        if (finalRating >= 4.5) { outstanding++; bucket5++; }
-                        else if (finalRating >= 3.5) { exceeds++; bucket4++; }
-                        else if (finalRating >= 2.5) { meets++; bucket3++; }
-                        else if (finalRating >= 1.5) { below++; bucket2++; }
-                        else { unsatisfactory++; bucket1++; }
-                    } else {
                         r.put("managerRating", "-");
                         r.put("finalRating", "-");
                         r.put("reviewDate", "-");
@@ -1058,30 +1201,31 @@ public class MySpaceController {
                     reviews.add(r);
                 }
 
-                long totalMembers = employees.size() > 0 ? employees.size() : 28;
-                double avgRating = ratedEmployeesCount > 0 ? (ratingSum / ratedEmployeesCount) : 3.72;
+                long totalMembers = reviews.size();
+                double avgRating = ratedEmployeesCount > 0 ? (ratingSum / ratedEmployeesCount) : 0.0;
 
                 model.addAttribute("totalMembers", totalMembers);
-                model.addAttribute("completedCount", completedCount > 0 ? completedCount : 16);
-                model.addAttribute("inProgressCount", inProgressCount > 0 ? inProgressCount : 8);
-                model.addAttribute("pendingCount", pendingCount > 0 ? pendingCount : 4);
-                model.addAttribute("overdueCount", overdueCount > 0 ? overdueCount : 2);
+                model.addAttribute("completedCount", completedCount);
+                model.addAttribute("inProgressCount", inProgressCount);
+                model.addAttribute("pendingCount", pendingCount);
+                model.addAttribute("overdueCount", overdueCount);
                 model.addAttribute("avgRating", avgRating);
 
-                model.addAttribute("outstanding", outstanding > 0 ? outstanding : 5);
-                model.addAttribute("exceeds", exceeds > 0 ? exceeds : 11);
-                model.addAttribute("meets", meets > 0 ? meets : 7);
-                model.addAttribute("below", below > 0 ? below : 3);
-                model.addAttribute("unsatisfactory", unsatisfactory > 0 ? unsatisfactory : 2);
+                model.addAttribute("outstanding", outstanding);
+                model.addAttribute("exceeds", exceeds);
+                model.addAttribute("meets", meets);
+                model.addAttribute("below", below);
+                model.addAttribute("unsatisfactory", unsatisfactory);
 
-                model.addAttribute("bucket1", bucket1 > 0 ? bucket1 : 2);
-                model.addAttribute("bucket2", bucket2 > 0 ? bucket2 : 3);
-                model.addAttribute("bucket3", bucket3 > 0 ? bucket3 : 7);
-                model.addAttribute("bucket4", bucket4 > 0 ? bucket4 : 11);
-                model.addAttribute("bucket5", bucket5 > 0 ? bucket5 : 5);
+                model.addAttribute("bucket1", bucket1);
+                model.addAttribute("bucket2", bucket2);
+                model.addAttribute("bucket3", bucket3);
+                model.addAttribute("bucket4", bucket4);
+                model.addAttribute("bucket5", bucket5);
 
                 model.addAttribute("reviewsList", reviews);
 
+                List<User> allUsers = userRepository.findAll();
                 Set<String> departments = new java.util.TreeSet<>();
                 departments.addAll(List.of("IT Department", "Human Resources", "Finance Team", "Operations"));
                 for (User u : allUsers) {
@@ -1093,6 +1237,50 @@ public class MySpaceController {
                 model.addAttribute("departments", departments);
 
                 return "senior_manager-performance";
+        }
+
+        private void seedPerformanceReviews() {
+            if (performanceReviewRepository.count() == 0) {
+                List<User> employees = userRepository.findAll().stream()
+                        .filter(u -> u.getRole() == null || !"CLIENT".equalsIgnoreCase(u.getRole().getRoleName()))
+                        .filter(u -> "ACTIVE".equalsIgnoreCase(u.getStatus()))
+                        .collect(java.util.stream.Collectors.toList());
+
+                java.util.Random rand = new java.util.Random();
+                for (User u : employees) {
+                    PerformanceReview pr = new PerformanceReview();
+                    pr.setEmployee(u);
+                    pr.setDepartment(getDepartment(u));
+                    pr.setDesignation(u.getDesignation() != null ? u.getDesignation() : "Employee");
+                    
+                    int roll = rand.nextInt(100);
+                    if (roll < 55) {
+                        pr.setStatus("Completed");
+                        double rating = Math.round((3.0 + rand.nextDouble() * 2.0) * 10.0) / 10.0;
+                        pr.setSelfRating(Math.round((3.0 + rand.nextDouble() * 2.0) * 10.0) / 10.0);
+                        pr.setManagerRating(rating);
+                        pr.setFinalRating(rating);
+                        pr.setReviewDate(LocalDate.now().minusDays(rand.nextInt(30)));
+                    } else if (roll < 80) {
+                        pr.setStatus("In Progress");
+                        pr.setSelfRating(Math.round((3.0 + rand.nextDouble() * 2.0) * 10.0) / 10.0);
+                    } else if (roll < 90) {
+                        pr.setStatus("Overdue");
+                        pr.setSelfRating(Math.round((3.0 + rand.nextDouble() * 2.0) * 10.0) / 10.0);
+                        pr.setDueDate(LocalDate.now().minusDays(rand.nextInt(10) + 1));
+                    } else {
+                        pr.setStatus("Pending");
+                    }
+                    
+                    pr.setReviewType(rand.nextBoolean() ? "Annual Review" : "Probation Review");
+                    pr.setReviewPeriod("FY 2025-26");
+                    if (pr.getDueDate() == null) {
+                        pr.setDueDate(LocalDate.now().plusDays(rand.nextInt(30) + 1));
+                    }
+                    
+                    performanceReviewRepository.save(pr);
+                }
+            }
         }
 
         @PreAuthorize("hasRole('SENIOR_MANAGER')")
@@ -1135,7 +1323,7 @@ public class MySpaceController {
                 // --- TAB 1: REQUISITIONS ---
                 List<Map<String, Object>> requisitions = new ArrayList<>();
                 List<JobPosting> postings = jobPostingRepository.findAll();
-                long totalReqs = postings.size() > 0 ? postings.size() : 18;
+                long totalReqs = postings.size();
                 long openReqs = 0;
                 long inProgressReqs = 0;
                 long offersExtendedReqs = 0;
@@ -1173,10 +1361,6 @@ public class MySpaceController {
                     req.put("status", status);
                     requisitions.add(req);
                 }
-
-                if (openReqs == 0) openReqs = 9;
-                if (inProgressReqs == 0) inProgressReqs = 6;
-                if (offersExtendedReqs == 0) offersExtendedReqs = 2;
 
                 model.addAttribute("requisitionsList", requisitions);
                 model.addAttribute("totalReqs", totalReqs);
@@ -1659,75 +1843,312 @@ public class MySpaceController {
 
                 seedExpensesData();
 
-                // --- TAB 1: EXPENSE APPROVALS ---
-                List<Map<String, Object>> approvals = new ArrayList<>();
-                for (ExpenseClaim claim : expenseClaimRepository.findAll()) {
-                    User u = claim.getUser();
-                    if (search != null && !search.isBlank() && !u.getFullName().toLowerCase().contains(search.toLowerCase())) {
-                        continue;
-                    }
-                    if (dept != null && !dept.isBlank() && !getDepartment(u).equalsIgnoreCase(dept)) {
-                        continue;
-                    }
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("id", "R-" + claim.getId());
-                    map.put("employee", u.getFullName());
-                    map.put("employeeCode", u.getUsername());
-                    map.put("department", getDepartment(u));
-                    map.put("type", "EXPENSE");
-                    map.put("purpose", claim.getPurpose());
-                    map.put("amount", claim.getAmount());
-                    map.put("status", claim.getStatus());
-                    approvals.add(map);
-                }
-                model.addAttribute("approvalsList", approvals);
+                 // --- TAB 1: EXPENSE APPROVALS ---
+                 List<Map<String, Object>> approvals = new ArrayList<>();
+                 for (ExpenseClaim claim : expenseClaimRepository.findAll()) {
+                     User u = claim.getUser();
+                     if (search != null && !search.isBlank() && !u.getFullName().toLowerCase().contains(search.toLowerCase())) {
+                         continue;
+                     }
+                     if (dept != null && !dept.isBlank() && !getDepartment(u).equalsIgnoreCase(dept)) {
+                         continue;
+                     }
+                     Map<String, Object> map = new HashMap<>();
+                     map.put("id", "EXP-" + claim.getId());
+                     map.put("employee", u.getFullName());
+                     map.put("employeeCode", u.getUsername());
+                     map.put("department", getDepartment(u));
+                     map.put("type", "EXPENSE");
+                     map.put("purpose", claim.getPurpose());
+                     map.put("amount", claim.getAmount());
+                     map.put("status", claim.getStatus());
+                     map.put("assignedTo", claim.getAssignedTo() != null ? claim.getAssignedTo() : "-");
+                     approvals.add(map);
+                 }
+                 model.addAttribute("approvalsList", approvals);
+ 
+                 // --- TAB 2: REIMBURSEMENTS ---
+                 List<Map<String, Object>> reimbursements = new ArrayList<>();
+                 for (ReimbursementRequest req : reimbursementRequestRepository.findAll()) {
+                     User u = req.getUser();
+                     if (search != null && !search.isBlank() && !u.getFullName().toLowerCase().contains(search.toLowerCase())) {
+                         continue;
+                     }
+                     if (dept != null && !dept.isBlank() && !getDepartment(u).equalsIgnoreCase(dept)) {
+                         continue;
+                     }
+                     Map<String, Object> map = new HashMap<>();
+                     map.put("id", "REIM-" + req.getId());
+                     map.put("employee", u.getFullName());
+                     map.put("employeeCode", u.getUsername());
+                     map.put("department", getDepartment(u));
+                     map.put("type", "REIMBURSEMENT");
+                     map.put("purpose", req.getPurpose());
+                     map.put("amount", req.getAmount());
+                     map.put("status", req.getStatus());
+                     map.put("assignedTo", req.getAssignedTo() != null ? req.getAssignedTo() : "-");
+                     reimbursements.add(map);
+                 }
+                 model.addAttribute("reimbursementsList", reimbursements);
+ 
+                 // --- TAB 3: BUDGET REQUESTS ---
+                 List<Map<String, Object>> budgetRequests = new ArrayList<>();
+                 for (BudgetRequest budget : budgetRequestRepository.findAll()) {
+                     User u = budget.getRequester();
+                     if (search != null && !search.isBlank() && !u.getFullName().toLowerCase().contains(search.toLowerCase())) {
+                         continue;
+                     }
+                     if (dept != null && !dept.isBlank() && !budget.getDepartment().equalsIgnoreCase(dept)) {
+                         continue;
+                     }
+                     Map<String, Object> map = new HashMap<>();
+                     map.put("id", "BUD-" + budget.getId());
+                     map.put("requester", u.getFullName());
+                     map.put("employee", u.getFullName());
+                     map.put("employeeCode", u.getUsername());
+                     map.put("department", budget.getDepartment());
+                     map.put("type", "BUDGET");
+                     map.put("purpose", budget.getPurpose());
+                     map.put("amount", budget.getAmount());
+                     map.put("status", budget.getStatus());
+                     map.put("assignedTo", budget.getAssignedTo() != null ? budget.getAssignedTo() : "-");
+                     budgetRequests.add(map);
+                 }
+                 model.addAttribute("budgetRequestsList", budgetRequests);
 
-                // --- TAB 2: REIMBURSEMENTS ---
-                List<Map<String, Object>> reimbursements = new ArrayList<>();
-                for (ReimbursementRequest req : reimbursementRequestRepository.findAll()) {
-                    User u = req.getUser();
-                    if (search != null && !search.isBlank() && !u.getFullName().toLowerCase().contains(search.toLowerCase())) {
-                        continue;
-                    }
-                    if (dept != null && !dept.isBlank() && !getDepartment(u).equalsIgnoreCase(dept)) {
-                        continue;
-                    }
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("id", "R-" + req.getId());
-                    map.put("employee", u.getFullName());
-                    map.put("employeeCode", u.getUsername());
-                    map.put("department", getDepartment(u));
-                    map.put("purpose", req.getPurpose());
-                    map.put("amount", req.getAmount());
-                    map.put("status", req.getStatus());
-                    reimbursements.add(map);
-                }
-                model.addAttribute("reimbursementsList", reimbursements);
+                 // --- TAB 4: ASSIGN REQUESTS ---
+                 List<Map<String, Object>> assignable = new ArrayList<>();
+                 for (ExpenseClaim claim : expenseClaimRepository.findAll()) {
+                     User u = claim.getUser();
+                     Map<String, Object> map = new HashMap<>();
+                     map.put("id", "EXP-" + claim.getId());
+                     map.put("employee", u.getFullName());
+                     map.put("employeeCode", u.getUsername());
+                     map.put("department", getDepartment(u));
+                     map.put("type", "EXPENSE");
+                     map.put("purpose", claim.getPurpose());
+                     map.put("amount", claim.getAmount());
+                     map.put("status", claim.getStatus());
+                     map.put("assignedTo", claim.getAssignedTo() != null ? claim.getAssignedTo() : "-");
+                     assignable.add(map);
+                 }
+                 for (ReimbursementRequest req : reimbursementRequestRepository.findAll()) {
+                     User u = req.getUser();
+                     Map<String, Object> map = new HashMap<>();
+                     map.put("id", "REIM-" + req.getId());
+                     map.put("employee", u.getFullName());
+                     map.put("employeeCode", u.getUsername());
+                     map.put("department", getDepartment(u));
+                     map.put("type", "REIMBURSEMENT");
+                     map.put("purpose", req.getPurpose());
+                     map.put("amount", req.getAmount());
+                     map.put("status", req.getStatus());
+                     map.put("assignedTo", req.getAssignedTo() != null ? req.getAssignedTo() : "-");
+                     assignable.add(map);
+                 }
+                 for (BudgetRequest budget : budgetRequestRepository.findAll()) {
+                     User u = budget.getRequester();
+                     Map<String, Object> map = new HashMap<>();
+                     map.put("id", "BUD-" + budget.getId());
+                     map.put("employee", u.getFullName());
+                     map.put("employeeCode", u.getUsername());
+                     map.put("department", budget.getDepartment());
+                     map.put("type", "BUDGET");
+                     map.put("purpose", budget.getPurpose());
+                     map.put("amount", budget.getAmount());
+                     map.put("status", budget.getStatus());
+                     map.put("assignedTo", budget.getAssignedTo() != null ? budget.getAssignedTo() : "-");
+                     assignable.add(map);
+                 }
+                 model.addAttribute("assignableRequestsList", assignable);
 
-                // --- TAB 3: BUDGET REQUESTS ---
-                List<Map<String, Object>> budgetRequests = new ArrayList<>();
-                for (BudgetRequest budget : budgetRequestRepository.findAll()) {
-                    User u = budget.getRequester();
-                    if (search != null && !search.isBlank() && !u.getFullName().toLowerCase().contains(search.toLowerCase())) {
-                        continue;
-                    }
-                    if (dept != null && !dept.isBlank() && !budget.getDepartment().equalsIgnoreCase(dept)) {
-                        continue;
-                    }
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("id", "BUD-2025-0" + budget.getId());
-                    map.put("requester", u.getFullName());
-                    map.put("employeeCode", u.getUsername());
-                    map.put("department", budget.getDepartment());
-                    map.put("type", budget.getType());
-                    map.put("purpose", budget.getPurpose());
-                    map.put("amount", budget.getAmount());
-                    map.put("status", budget.getStatus());
-                    budgetRequests.add(map);
-                }
-                model.addAttribute("budgetRequestsList", budgetRequests);
+                 List<User> activeEmployees = userRepository.findAll().stream()
+                         .filter(u -> !"CLIENT".equalsIgnoreCase(u.getRole() != null ? u.getRole().getRoleName() : ""))
+                         .filter(u -> "ACTIVE".equalsIgnoreCase(u.getStatus()))
+                         .sorted(Comparator.comparing(User::getFullName))
+                         .collect(java.util.stream.Collectors.toList());
+                 model.addAttribute("allUsersList", activeEmployees);
+ 
+                 // Reimbursements status counts
+                 long reimApprovedCount = 0;
+                 long reimPendingCount = 0;
+                 long reimRejectedCount = 0;
+                 for (ReimbursementRequest req : reimbursementRequestRepository.findAll()) {
+                     if ("Approved".equalsIgnoreCase(req.getStatus())) reimApprovedCount++;
+                     else if ("Pending".equalsIgnoreCase(req.getStatus())) reimPendingCount++;
+                     else if ("Rejected".equalsIgnoreCase(req.getStatus())) reimRejectedCount++;
+                 }
+                 model.addAttribute("reimApprovedCount", reimApprovedCount);
+                 model.addAttribute("reimPendingCount", reimPendingCount);
+                 model.addAttribute("reimRejectedCount", reimRejectedCount);
+ 
+                 // Budget requests status counts
+                 long budgetApprovedCount = 0;
+                 long budgetPendingCount = 0;
+                 long budgetRejectedCount = 0;
+                 for (BudgetRequest budget : budgetRequestRepository.findAll()) {
+                     if ("Approved".equalsIgnoreCase(budget.getStatus())) budgetApprovedCount++;
+                     else if ("Pending".equalsIgnoreCase(budget.getStatus())) budgetPendingCount++;
+                     else if ("Rejected".equalsIgnoreCase(budget.getStatus())) budgetRejectedCount++;
+                 }
+                 model.addAttribute("budgetApprovedCount", budgetApprovedCount);
+                model.addAttribute("budgetPendingCount", budgetPendingCount);
+                model.addAttribute("budgetRejectedCount", budgetRejectedCount);
 
                 return "senior_manager-expenses";
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @PostMapping("/senior_manager/expenses/action")
+        public String handleExpenseAction(
+                @RequestParam("requestId") String requestId,
+                @RequestParam("action") String action,
+                org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+            
+            String[] parts = requestId.split("-");
+            String type = parts[0];
+            Long id = Long.parseLong(parts[1]);
+            String newStatus = "Pending";
+            if ("Approve".equalsIgnoreCase(action)) newStatus = "Approved";
+            else if ("Reject".equalsIgnoreCase(action)) newStatus = "Rejected";
+            else if ("Forward".equalsIgnoreCase(action)) newStatus = "Forwarded to Accounts";
+            
+            if ("EXP".equalsIgnoreCase(type)) {
+                java.util.Optional<ExpenseClaim> opt = expenseClaimRepository.findById(id);
+                if (opt.isPresent()) {
+                    ExpenseClaim c = opt.get();
+                    c.setStatus(newStatus);
+                    expenseClaimRepository.save(c);
+                }
+            } else if ("REIM".equalsIgnoreCase(type)) {
+                java.util.Optional<ReimbursementRequest> opt = reimbursementRequestRepository.findById(id);
+                if (opt.isPresent()) {
+                    ReimbursementRequest r = opt.get();
+                    r.setStatus(newStatus);
+                    reimbursementRequestRepository.save(r);
+                }
+            } else if ("BUD".equalsIgnoreCase(type)) {
+                java.util.Optional<BudgetRequest> opt = budgetRequestRepository.findById(id);
+                if (opt.isPresent()) {
+                    BudgetRequest b = opt.get();
+                    b.setStatus(newStatus);
+                    budgetRequestRepository.save(b);
+                }
+            }
+            
+            redirectAttributes.addFlashAttribute("successMessage", "Request status updated to '" + newStatus + "' successfully!");
+            return "redirect:/senior_manager/expenses";
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @PostMapping("/senior_manager/expenses/edit")
+        public String handleExpenseEdit(
+                @RequestParam("requestId") String requestId,
+                @RequestParam("purpose") String purpose,
+                @RequestParam("amount") Double amount,
+                org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+            
+            String[] parts = requestId.split("-");
+            String type = parts[0];
+            Long id = Long.parseLong(parts[1]);
+            
+            if ("EXP".equalsIgnoreCase(type)) {
+                expenseClaimRepository.findById(id).ifPresent(c -> {
+                    c.setPurpose(purpose);
+                    c.setAmount(amount);
+                    expenseClaimRepository.save(c);
+                });
+            } else if ("REIM".equalsIgnoreCase(type)) {
+                reimbursementRequestRepository.findById(id).ifPresent(r -> {
+                    r.setPurpose(purpose);
+                    r.setAmount(amount);
+                    reimbursementRequestRepository.save(r);
+                });
+            } else if ("BUD".equalsIgnoreCase(type)) {
+                budgetRequestRepository.findById(id).ifPresent(b -> {
+                    b.setPurpose(purpose);
+                    b.setAmount(amount);
+                    budgetRequestRepository.save(b);
+                });
+            }
+            
+            redirectAttributes.addFlashAttribute("successMessage", "Request details updated successfully!");
+            return "redirect:/senior_manager/expenses";
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @PostMapping("/senior_manager/expenses/assign")
+        public String handleExpenseAssign(
+                @RequestParam("requestId") String requestId,
+                @RequestParam("assignee") String assignee,
+                org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+            
+            String[] parts = requestId.split("-");
+            String type = parts[0];
+            Long id = Long.parseLong(parts[1]);
+            
+            if ("EXP".equalsIgnoreCase(type)) {
+                expenseClaimRepository.findById(id).ifPresent(c -> {
+                    c.setAssignedTo(assignee);
+                    expenseClaimRepository.save(c);
+                });
+            } else if ("REIM".equalsIgnoreCase(type)) {
+                reimbursementRequestRepository.findById(id).ifPresent(r -> {
+                    r.setAssignedTo(assignee);
+                    reimbursementRequestRepository.save(r);
+                });
+            } else if ("BUD".equalsIgnoreCase(type)) {
+                budgetRequestRepository.findById(id).ifPresent(b -> {
+                    b.setAssignedTo(assignee);
+                    budgetRequestRepository.save(b);
+                });
+            }
+            
+            redirectAttributes.addFlashAttribute("successMessage", "Request assigned to '" + assignee + "' successfully!");
+            return "redirect:/senior_manager/expenses";
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @PostMapping("/senior_manager/performance/feedback")
+        public String submitPerformanceFeedback(
+                @RequestParam("employeeCode") String employeeCode,
+                @RequestParam("roleLevel") String roleLevel,
+                @RequestParam("rating1") Double rating1,
+                @RequestParam("rating2") Double rating2,
+                @RequestParam("rating3") Double rating3,
+                @RequestParam("comments") String comments,
+                Principal principal,
+                org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+
+            User reviewer = principal != null ? userRepository.findByUsername(principal.getName()).orElse(null) : null;
+            User employee = userRepository.findByUsername(employeeCode).orElse(null);
+
+            if (employee != null && reviewer != null) {
+                EmployeeFeedback feedback = new EmployeeFeedback();
+                feedback.setEmployee(employee);
+                feedback.setReviewer(reviewer);
+                feedback.setRoleLevel(roleLevel);
+                feedback.setRating1(rating1);
+                feedback.setRating2(rating2);
+                feedback.setRating3(rating3);
+                feedback.setComments(comments);
+                feedback.setSubmittedAt(LocalDate.now());
+                employeeFeedbackRepository.save(feedback);
+
+                // Update performance review status if present
+                performanceReviewRepository.findAll().stream()
+                        .filter(pr -> pr.getEmployee() != null && pr.getEmployee().getUsername().equals(employeeCode))
+                        .findFirst()
+                        .ifPresent(pr -> {
+                            pr.setStatus("Completed");
+                            pr.setFinalRating(Math.round(((rating1 + rating2 + rating3) / 3.0) * 100.0) / 100.0);
+                            pr.setReviewDate(LocalDate.now());
+                            performanceReviewRepository.save(pr);
+                        });
+            }
+
+            redirectAttributes.addFlashAttribute("successMessage", "Feedback for " + (employee != null ? employee.getFullName() : employeeCode) + " submitted successfully!");
+            return "redirect:/senior_manager/performance";
         }
 
         @PreAuthorize("hasRole('SENIOR_MANAGER')")
@@ -1763,61 +2184,265 @@ public class MySpaceController {
                 }
                 model.addAttribute("departments", departments);
 
+                List<User> employees = allUsers.stream()
+                        .filter(u -> u.getId() != null && !u.getId().equals(loggedInUser.getId()))
+                        .filter(u -> u.getRole() == null || !"CLIENT".equalsIgnoreCase(u.getRole().getRoleName()))
+                        .collect(java.util.stream.Collectors.toList());
+
                 // --- TAB 1: TEAM PERFORMANCE ---
                 List<Map<String, Object>> performanceList = new ArrayList<>();
-                performanceList.add(Map.of("name", "Aman Singh", "lead", "Pawan Singh", "role", "Frontend Developer", "goalsAssigned", 6, "goalsAchieved", "5 (83%)", "rating", 4.2, "ratingInt", 4, "reviewDate", "20 May 2026"));
-                performanceList.add(Map.of("name", "Priya Rathi", "lead", "Pawan Singh", "role", "Backend Developer", "goalsAssigned", 5, "goalsAchieved", "4 (80%)", "rating", 4.0, "ratingInt", 4, "reviewDate", "18 May 2026"));
-                performanceList.add(Map.of("name", "Rohit Kumar", "lead", "Ankit Verma", "role", "UI/UX Designer", "goalsAssigned", 4, "goalsAchieved", "3 (75%)", "rating", 3.5, "ratingInt", 3, "reviewDate", "17 May 2026"));
-                performanceList.add(Map.of("name", "Sneha Nair", "lead", "Ankit Verma", "role", "QA Engineer", "goalsAssigned", 5, "goalsAchieved", "4 (80%)", "rating", 4.0, "ratingInt", 4, "reviewDate", "15 May 2026"));
-                performanceList.add(Map.of("name", "Vikas Dubey", "lead", "Neeraj Tiwari", "role", "DevOps Engineer", "goalsAssigned", 6, "goalsAchieved", "3 (50%)", "rating", 2.8, "ratingInt", 3, "reviewDate", "14 May 2026"));
-                performanceList.add(Map.of("name", "Neha Mehta", "lead", "Neeraj Tiwari", "role", "Business Analyst", "goalsAssigned", 5, "goalsAchieved", "4 (80%)", "rating", 4.1, "ratingInt", 4, "reviewDate", "12 May 2026"));
-                
+                List<PerformanceReview> dbReviews = performanceReviewRepository.findAll();
+                for (PerformanceReview pr : dbReviews) {
+                    User u = pr.getEmployee();
+                    if (u == null) continue;
+                    
+                    if (search != null && !search.isBlank() && !u.getFullName().toLowerCase().contains(search.toLowerCase())) {
+                        continue;
+                    }
+                    if (dept != null && !dept.isBlank() && !getDepartment(u).equalsIgnoreCase(dept)) {
+                        continue;
+                    }
+
+                    List<Goal> goals = goalRepository.findByUser(u);
+                    long assigned = goals.size();
+                    long achieved = goals.stream().filter(g -> "Completed".equalsIgnoreCase(g.getStatus()) || "Achieved".equalsIgnoreCase(g.getStatus())).count();
+                    String achievedPctStr = assigned > 0 ? achieved + " (" + (achieved * 100 / assigned) + "%)" : "0 (0%)";
+
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("name", u.getFullName());
+                    map.put("lead", u.getManager() != null ? u.getManager().getFullName() : "N/A");
+                    map.put("role", pr.getDesignation());
+                    map.put("goalsAssigned", assigned);
+                    map.put("goalsAchieved", achievedPctStr);
+                    map.put("rating", pr.getFinalRating() != null ? pr.getFinalRating() : 0.0);
+                    map.put("ratingInt", pr.getFinalRating() != null ? pr.getFinalRating().intValue() : 0);
+                    map.put("reviewDate", pr.getReviewDate() != null ? pr.getReviewDate().format(DateTimeFormatter.ofPattern("dd MMM yyyy")) : "-");
+                    performanceList.add(map);
+                }
                 model.addAttribute("performanceList", performanceList);
 
                 // --- TAB 2: ATTENDANCE ---
                 List<Map<String, Object>> attendanceList = new ArrayList<>();
-                
-                Map<String, Object> a1 = new HashMap<>();
-                a1.put("name", "Aman Singh"); a1.put("empCode", "EMP-1001"); a1.put("department", "IT - Development"); a1.put("workingDays", 24); a1.put("presentPct", "22 (91.7%)"); a1.put("absentPct", "1 (4.2%)"); a1.put("latePct", "1 (4.2%)"); a1.put("halfPct", "0 (0%)"); a1.put("leavePct", "0 (0%)"); a1.put("totalPct", "91.7%"); a1.put("status", "EXCELLENT");
-                attendanceList.add(a1);
+                List<Attendance> allAttendance = attendanceRepository.findAll();
 
-                Map<String, Object> a2 = new HashMap<>();
-                a2.put("name", "Priya Rathi"); a2.put("empCode", "EMP-1002"); a2.put("department", "IT - Development"); a2.put("workingDays", 24); a2.put("presentPct", "21 (87.5%)"); a2.put("absentPct", "2 (8.3%)"); a2.put("latePct", "1 (4.2%)"); a2.put("halfPct", "0 (0%)"); a2.put("leavePct", "0 (0%)"); a2.put("totalPct", "87.5%"); a2.put("status", "GOOD");
-                attendanceList.add(a2);
+                for (User u : employees) {
+                    if (search != null && !search.isBlank() && !u.getFullName().toLowerCase().contains(search.toLowerCase())) {
+                        continue;
+                    }
+                    if (dept != null && !dept.isBlank() && !getDepartment(u).equalsIgnoreCase(dept)) {
+                        continue;
+                    }
 
-                Map<String, Object> a3 = new HashMap<>();
-                a3.put("name", "Rohit Kumar"); a3.put("empCode", "EMP-1003"); a3.put("department", "IT - Design"); a3.put("workingDays", 24); a3.put("presentPct", "20 (83.3%)"); a3.put("absentPct", "2 (8.3%)"); a3.put("latePct", "2 (8.3%)"); a3.put("halfPct", "0 (0%)"); a3.put("leavePct", "0 (0%)"); a3.put("totalPct", "83.3%"); a3.put("status", "GOOD");
-                attendanceList.add(a3);
+                    List<Attendance> userAtt = allAttendance.stream()
+                            .filter(a -> a.getUser() != null && a.getUser().getId().equals(u.getId()))
+                            .collect(java.util.stream.Collectors.toList());
 
-                Map<String, Object> a4 = new HashMap<>();
-                a4.put("name", "Sneha Nair"); a4.put("empCode", "EMP-1004"); a4.put("department", "IT - Quality"); a4.put("workingDays", 24); a4.put("presentPct", "21 (87.5%)"); a4.put("absentPct", "1 (4.2%)"); a4.put("latePct", "2 (8.3%)"); a4.put("halfPct", "0 (0%)"); a4.put("leavePct", "0 (0%)"); a4.put("totalPct", "87.5%"); a4.put("status", "GOOD");
-                attendanceList.add(a4);
+                    long days = userAtt.size();
+                    long present = userAtt.stream().filter(a -> "Present".equalsIgnoreCase(a.getStatus())).count();
+                    long absent = userAtt.stream().filter(a -> "Absent".equalsIgnoreCase(a.getStatus())).count();
+                    long leave = userAtt.stream().filter(a -> "Leave".equalsIgnoreCase(a.getStatus())).count();
+                    long half = userAtt.stream().filter(a -> "Half-Day".equalsIgnoreCase(a.getStatus()) || "Half Day".equalsIgnoreCase(a.getStatus())).count();
+                    long late = userAtt.stream()
+                            .filter(a -> a.getCheckInTime() != null && a.getCheckInTime().isAfter(java.time.LocalTime.of(9, 30)))
+                            .count();
 
-                Map<String, Object> a5 = new HashMap<>();
-                a5.put("name", "Vikas Dubey"); a5.put("empCode", "EMP-1005"); a5.put("department", "IT - Operations"); a5.put("workingDays", 24); a5.put("presentPct", "19 (79.2%)"); a5.put("absentPct", "3 (12.5%)"); a5.put("latePct", "2 (8.3%)"); a5.put("halfPct", "0 (0%)"); a5.put("leavePct", "0 (0%)"); a5.put("totalPct", "79.2%"); a5.put("status", "AVERAGE");
-                attendanceList.add(a5);
+                    String presentPct = days > 0 ? present + " (" + (present * 100 / days) + "%)" : "0 (0%)";
+                    String absentPct = days > 0 ? absent + " (" + (absent * 100 / days) + "%)" : "0 (0%)";
+                    String latePct = days > 0 ? late + " (" + (late * 100 / days) + "%)" : "0 (0%)";
+                    String halfPct = days > 0 ? half + " (" + (half * 100 / days) + "%)" : "0 (0%)";
+                    String leavePct = days > 0 ? leave + " (" + (leave * 100 / days) + "%)" : "0 (0%)";
 
-                Map<String, Object> a6 = new HashMap<>();
-                a6.put("name", "Neha Mehta"); a6.put("empCode", "EMP-1006"); a6.put("department", "Business"); a6.put("workingDays", 24); a6.put("presentPct", "22 (91.7%)"); a6.put("absentPct", "1 (4.2%)"); a6.put("latePct", "1 (4.2%)"); a6.put("halfPct", "0 (0%)"); a6.put("leavePct", "0 (0%)"); a6.put("totalPct", "91.7%"); a6.put("status", "EXCELLENT");
-                attendanceList.add(a6);
+                    double rate = days > 0 ? (present * 100.0) / days : 0.0;
+                    String statusStr = rate >= 90 ? "EXCELLENT" : (rate >= 80 ? "GOOD" : "AVERAGE");
 
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("name", u.getFullName());
+                    map.put("empCode", u.getUsername());
+                    map.put("department", getDepartment(u));
+                    map.put("workingDays", days);
+                    map.put("presentPct", presentPct);
+                    map.put("absentPct", absentPct);
+                    map.put("latePct", latePct);
+                    map.put("halfPct", halfPct);
+                    map.put("leavePct", leavePct);
+                    map.put("totalPct", String.format("%.1f%%", rate));
+                    map.put("status", statusStr);
+                    attendanceList.add(map);
+                }
                 model.addAttribute("attendanceList", attendanceList);
 
                 // --- TAB 3: LEAVE TRENDS ---
                 List<Map<String, Object>> leaveTrendsList = new ArrayList<>();
-                leaveTrendsList.add(Map.of("name", "Aman Singh", "empCode", "EMP-1001", "department", "IT - Development", "type", "Casual Leave", "leavesTaken", 12, "approved", 11, "pending", 1, "rejected", 0, "rate", "91.7%"));
-                leaveTrendsList.add(Map.of("name", "Priya Rathi", "empCode", "EMP-1002", "department", "IT - Development", "type", "Sick Leave", "leavesTaken", 9, "approved", 8, "pending", 1, "rejected", 0, "rate", "88.9%"));
-                leaveTrendsList.add(Map.of("name", "Rohit Kumar", "empCode", "EMP-1003", "department", "IT - Design", "type", "Privilege Leave", "leavesTaken", 7, "approved", 6, "pending", 0, "rejected", 1, "rate", "85.7%"));
-                
+                List<LeaveRequest> allLeaves = leaveRequestRepository.findAll();
+
+                for (User u : employees) {
+                    if (search != null && !search.isBlank() && !u.getFullName().toLowerCase().contains(search.toLowerCase())) {
+                        continue;
+                    }
+                    if (dept != null && !dept.isBlank() && !getDepartment(u).equalsIgnoreCase(dept)) {
+                        continue;
+                    }
+
+                    List<LeaveRequest> userLeaves = allLeaves.stream()
+                            .filter(r -> r.getUser() != null && r.getUser().getId().equals(u.getId()))
+                            .collect(java.util.stream.Collectors.toList());
+
+                    long totalLeaves = userLeaves.size();
+                    long approved = userLeaves.stream().filter(r -> "Approved".equalsIgnoreCase(r.getStatus())).count();
+                    long pending = userLeaves.stream().filter(r -> "Pending".equalsIgnoreCase(r.getStatus())).count();
+                    long rejected = userLeaves.stream().filter(r -> "Rejected".equalsIgnoreCase(r.getStatus())).count();
+
+                    String rate = totalLeaves > 0 ? String.format("%.1f%%", (approved * 100.0) / totalLeaves) : "0.0%";
+                    String primaryType = userLeaves.isEmpty() ? "-" : userLeaves.get(0).getLeaveType();
+
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("name", u.getFullName());
+                    map.put("empCode", u.getUsername());
+                    map.put("department", getDepartment(u));
+                    map.put("type", primaryType);
+                    map.put("leavesTaken", totalLeaves);
+                    map.put("approved", approved);
+                    map.put("pending", pending);
+                    map.put("rejected", rejected);
+                    map.put("rate", rate);
+                    leaveTrendsList.add(map);
+                }
                 model.addAttribute("leaveTrendsList", leaveTrendsList);
 
                 // --- TAB 4: PROJECT METRICS ---
                 List<Map<String, Object>> projectMetricsList = new ArrayList<>();
-                projectMetricsList.add(Map.of("name", "Website Redesign", "code", "WD", "department", "IT - Development", "manager", "Aman Singh", "start", "01 May 2026", "end", "30 Jun 2026", "progress", 80, "status", "On Track", "teamCount", 6, "tasks", "24 / 30"));
-                projectMetricsList.add(Map.of("name", "Mobile App Development", "code", "MAPP", "department", "IT - Development", "manager", "Priya Rathi", "start", "10 Apr 2026", "end", "30 Jul 2026", "progress", 45, "status", "At Risk", "teamCount", 5, "tasks", "18 / 40"));
-                projectMetricsList.add(Map.of("name", "CRM Integration", "code", "CRM", "department", "IT - Development", "manager", "Rohit Kumar", "start", "15 Mar 2026", "end", "15 Jun 2026", "progress", 25, "status", "Delayed", "teamCount", 4, "tasks", "10 / 40"));
-                
+                List<Project> allProjects = projectRepository.findAll();
+                List<Ticket> allTickets = ticketRepository.findAll();
+
+                for (Project p : allProjects) {
+                    if (search != null && !search.isBlank() && !p.getProjectName().toLowerCase().contains(search.toLowerCase())) {
+                        continue;
+                    }
+
+                    List<Ticket> projTickets = allTickets.stream()
+                            .filter(t -> t.getProject() != null && t.getProject().getId().equals(p.getId()))
+                            .collect(java.util.stream.Collectors.toList());
+
+                    long teamCount = projTickets.stream()
+                            .map(Ticket::getAssignedTo)
+                            .filter(java.util.Objects::nonNull)
+                            .distinct()
+                            .count();
+
+                    long totalTasks = projTickets.size();
+                    long completedTasks = projTickets.stream().filter(t -> "Completed".equalsIgnoreCase(t.getStatus())).count();
+
+                    double avgProgress = 0.0;
+                    if (totalTasks > 0) {
+                        avgProgress = projTickets.stream().mapToDouble(t -> t.getProgressPercentage() != null ? t.getProgressPercentage() : 0.0).average().orElse(0.0);
+                    }
+
+                    String pManager = "N/A";
+                    if (!projTickets.isEmpty()) {
+                        User firstUser = projTickets.stream().map(Ticket::getAssignedTo).filter(java.util.Objects::nonNull).findFirst().orElse(null);
+                        if (firstUser != null && firstUser.getManager() != null) {
+                            pManager = firstUser.getManager().getFullName();
+                        }
+                    }
+
+                    long overdue = projTickets.stream()
+                            .filter(t -> !"Completed".equalsIgnoreCase(t.getStatus()))
+                            .filter(t -> t.getDeadline() != null && t.getDeadline().isBefore(LocalDate.now()))
+                            .count();
+
+                    String statusStr = overdue > 0 ? "At Risk" : "On Track";
+
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("name", p.getProjectName());
+                    map.put("code", p.getProjectName().replaceAll("[^a-zA-Z0-9]", "").toUpperCase());
+                    if (String.valueOf(map.get("code")).length() > 4) {
+                        map.put("code", String.valueOf(map.get("code")).substring(0, 4));
+                    }
+                    
+                    String pDept = "IT Department";
+                    if (!projTickets.isEmpty()) {
+                        User firstUser = projTickets.stream().map(Ticket::getAssignedTo).filter(java.util.Objects::nonNull).findFirst().orElse(null);
+                        if (firstUser != null) {
+                            pDept = getDepartment(firstUser);
+                        }
+                    }
+                    map.put("department", pDept);
+                    map.put("manager", pManager);
+                    map.put("start", p.getCreatedAt() != null ? p.getCreatedAt().format(DateTimeFormatter.ofPattern("dd MMM yyyy")) : "-");
+                    map.put("end", p.getCreatedAt() != null ? p.getCreatedAt().plusMonths(4).format(DateTimeFormatter.ofPattern("dd MMM yyyy")) : "-");
+                    map.put("progress", (int) avgProgress);
+                    map.put("status", statusStr);
+                    map.put("teamCount", teamCount);
+                    map.put("tasks", completedTasks + " / " + totalTasks);
+                    projectMetricsList.add(map);
+                }
                 model.addAttribute("projectMetricsList", projectMetricsList);
+
+                // Leave types counts for reports
+                long reportCasualCount = 0;
+                long reportSickCount = 0;
+                long reportPrivilegeCount = 0;
+                long reportWfhCount = 0;
+                long reportOtherCount = 0;
+                for (LeaveRequest r : allLeaves) {
+                    if (r.getUser() == null || !employees.stream().anyMatch(e -> e.getId().equals(r.getUser().getId()))) continue;
+                    String lt = r.getLeaveType() != null ? r.getLeaveType().toLowerCase() : "";
+                    if (lt.contains("casual")) reportCasualCount++;
+                    else if (lt.contains("sick")) reportSickCount++;
+                    else if (lt.contains("earned") || lt.contains("privilege")) reportPrivilegeCount++;
+                    else if (lt.contains("work") || lt.contains("wfh")) reportWfhCount++;
+                    else reportOtherCount++;
+                }
+                model.addAttribute("reportCasualCount", reportCasualCount);
+                model.addAttribute("reportSickCount", reportSickCount);
+                model.addAttribute("reportPrivilegeCount", reportPrivilegeCount);
+                model.addAttribute("reportWfhCount", reportWfhCount);
+                model.addAttribute("reportOtherCount", reportOtherCount);
+
+                // Project statuses for reports
+                long reportOnTrackCount = 0;
+                long reportAtRiskCount = 0;
+                long reportDelayedCount = 0;
+                for (Project p : allProjects) {
+                    List<Ticket> projTickets = allTickets.stream()
+                            .filter(t -> t.getProject() != null && t.getProject().getId().equals(p.getId()))
+                            .collect(java.util.stream.Collectors.toList());
+                    long overdue = projTickets.stream()
+                            .filter(t -> !"Completed".equalsIgnoreCase(t.getStatus()))
+                            .filter(t -> t.getDeadline() != null && t.getDeadline().isBefore(LocalDate.now()))
+                            .count();
+                    if (overdue > 0) {
+                        reportAtRiskCount++;
+                    } else {
+                        reportOnTrackCount++;
+                    }
+                }
+                model.addAttribute("reportOnTrackCount", reportOnTrackCount);
+                model.addAttribute("reportAtRiskCount", reportAtRiskCount);
+                model.addAttribute("reportDelayedCount", reportDelayedCount);
+
+                // Projects progress distribution
+                long progressBucket1 = 0; // 0-25%
+                long progressBucket2 = 0; // 26-50%
+                long progressBucket3 = 0; // 51-75%
+                long progressBucket4 = 0; // 76-100%
+                for (Project p : allProjects) {
+                    List<Ticket> projTickets = allTickets.stream()
+                            .filter(t -> t.getProject() != null && t.getProject().getId().equals(p.getId()))
+                            .collect(java.util.stream.Collectors.toList());
+                    double avgProgress = 0.0;
+                    if (!projTickets.isEmpty()) {
+                        avgProgress = projTickets.stream().mapToDouble(t -> t.getProgressPercentage() != null ? t.getProgressPercentage() : 0.0).average().orElse(0.0);
+                    }
+                    if (avgProgress <= 25) progressBucket1++;
+                    else if (avgProgress <= 50) progressBucket2++;
+                    else if (avgProgress <= 75) progressBucket3++;
+                    else progressBucket4++;
+                }
+                model.addAttribute("progressBucket1", progressBucket1);
+                model.addAttribute("progressBucket2", progressBucket2);
+                model.addAttribute("progressBucket3", progressBucket3);
+                model.addAttribute("progressBucket4", progressBucket4);
 
                 return "senior_manager-reports";
         }
@@ -1842,6 +2467,13 @@ public class MySpaceController {
 
                 List<Project> projects = projectRepository.findAll();
                 model.addAttribute("projectsList", projects);
+
+                List<User> activeUsers = userRepository.findAll().stream()
+                        .filter(u -> !"CLIENT".equalsIgnoreCase(u.getRole() != null ? u.getRole().getRoleName() : ""))
+                        .filter(u -> "ACTIVE".equalsIgnoreCase(u.getStatus()))
+                        .sorted(java.util.Comparator.comparing(User::getFullName))
+                        .collect(java.util.stream.Collectors.toList());
+                model.addAttribute("activeUsers", activeUsers);
 
                 seedCommunicationData();
 
@@ -1895,10 +2527,32 @@ public class MySpaceController {
                 return "senior_manager-communication";
         }
 
-        private List<User> findUsersInGroup(String group) {
-            List<User> allUsers = userRepository.findAll();
-            if (group == null || group.equalsIgnoreCase("All")) {
+        private List<User> findUsersInGroup(String group, User loggedInUser) {
+            List<User> allUsers = userRepository.findAll().stream()
+                    .filter(u -> !"CLIENT".equalsIgnoreCase(u.getRole() != null ? u.getRole().getRoleName() : ""))
+                    .filter(u -> "ACTIVE".equalsIgnoreCase(u.getStatus()))
+                    .collect(java.util.stream.Collectors.toList());
+
+            if (group == null || group.equalsIgnoreCase("All") || group.equalsIgnoreCase("All Employees")) {
                 return allUsers;
+            }
+
+            if (group.equalsIgnoreCase("My Team")) {
+                if (loggedInUser != null) {
+                    List<User> directReports = allUsers.stream()
+                            .filter(u -> u.getManager() != null && u.getManager().getId().equals(loggedInUser.getId()))
+                            .collect(java.util.stream.Collectors.toList());
+                    if (!directReports.isEmpty()) {
+                        return directReports;
+                    }
+                    String dept = getDepartment(loggedInUser);
+                    if (!dept.isBlank()) {
+                        return allUsers.stream()
+                                .filter(u -> getDepartment(u).equalsIgnoreCase(dept) && !u.getId().equals(loggedInUser.getId()))
+                                .collect(java.util.stream.Collectors.toList());
+                    }
+                }
+                return new ArrayList<>();
             }
             
             List<User> filtered = new ArrayList<>();
@@ -1925,6 +2579,7 @@ public class MySpaceController {
         @PostMapping("/senior_manager/communication/send")
         public String sendCommunication(
                 @RequestParam("recipientGroup") String recipientGroup,
+                @RequestParam(value = "recipientUsernames", required = false) List<String> recipientUsernames,
                 @RequestParam("subject") String subject,
                 @RequestParam("priority") String priority,
                 @RequestParam("messageType") String messageType,
@@ -1937,7 +2592,17 @@ public class MySpaceController {
             String senderDesignation = (sender != null && sender.getEmployeeProfile() != null && sender.getEmployeeProfile().getDesignation() != null)
                 ? sender.getEmployeeProfile().getDesignation() : "Senior Manager";
             
-            List<User> recipients = findUsersInGroup(recipientGroup);
+            List<User> recipients;
+            String label = recipientGroup;
+            if ("Other".equalsIgnoreCase(recipientGroup) && recipientUsernames != null && !recipientUsernames.isEmpty()) {
+                recipients = userRepository.findAll().stream()
+                        .filter(u -> recipientUsernames.contains(u.getUsername()))
+                        .collect(java.util.stream.Collectors.toList());
+                label = "Custom List (" + recipients.size() + " employees)";
+            } else {
+                recipients = findUsersInGroup(recipientGroup, sender);
+            }
+
             for (User recipient : recipients) {
                 HrmsNotification notif = new HrmsNotification(
                     recipient,
@@ -1958,7 +2623,7 @@ public class MySpaceController {
             try {
                 CommunicationBroadcast cb = new CommunicationBroadcast();
                 cb.setSubject(subject);
-                cb.setSentTo(recipientGroup);
+                cb.setSentTo(label);
                 cb.setType(messageType);
                 cb.setPriority(priority);
                 cb.setSentOn(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a")));
@@ -1969,7 +2634,7 @@ public class MySpaceController {
 
                 RecentNotificationRecord rn = new RecentNotificationRecord();
                 rn.setSubject(subject);
-                rn.setNotifyTo(recipientGroup);
+                rn.setNotifyTo(label);
                 rn.setType(messageType);
                 rn.setPriority(priority);
                 rn.setSentOn(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a")));
@@ -1989,6 +2654,7 @@ public class MySpaceController {
         public String sendProjectUpdate(
                 @RequestParam("projectName") String projectName,
                 @RequestParam("recipientGroup") String recipientGroup,
+                @RequestParam(value = "recipientUsernames", required = false) List<String> recipientUsernames,
                 @RequestParam("subject") String subject,
                 @RequestParam("message") String message,
                 Principal principal,
@@ -2000,7 +2666,17 @@ public class MySpaceController {
                 ? sender.getEmployeeProfile().getDesignation() : "Senior Manager";
             
             String title = "[" + projectName + "] " + subject;
-            List<User> recipients = findUsersInGroup(recipientGroup);
+            List<User> recipients;
+            String label = recipientGroup;
+            if ("Other".equalsIgnoreCase(recipientGroup) && recipientUsernames != null && !recipientUsernames.isEmpty()) {
+                recipients = userRepository.findAll().stream()
+                        .filter(u -> recipientUsernames.contains(u.getUsername()))
+                        .collect(java.util.stream.Collectors.toList());
+                label = "Custom List (" + recipients.size() + " employees)";
+            } else {
+                recipients = findUsersInGroup(recipientGroup, sender);
+            }
+
             for (User recipient : recipients) {
                 HrmsNotification notif = new HrmsNotification(
                     recipient,
@@ -2022,7 +2698,7 @@ public class MySpaceController {
                 ProjectUpdateNotification pu = new ProjectUpdateNotification();
                 pu.setSubject(subject);
                 pu.setProject(projectName);
-                pu.setSharedWith(recipientGroup);
+                pu.setSharedWith(label);
                 pu.setSharedOn(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a")));
                 pu.setRecipients(recipients.size());
                 pu.setViews(0);
@@ -2041,6 +2717,7 @@ public class MySpaceController {
         @PostMapping("/senior_manager/communication/notification")
         public String publishNotification(
                 @RequestParam("recipientGroup") String recipientGroup,
+                @RequestParam(value = "recipientUsernames", required = false) List<String> recipientUsernames,
                 @RequestParam("messageType") String messageType,
                 @RequestParam("priority") String priority,
                 @RequestParam("subject") String subject,
@@ -2053,7 +2730,17 @@ public class MySpaceController {
             String senderDesignation = (sender != null && sender.getEmployeeProfile() != null && sender.getEmployeeProfile().getDesignation() != null)
                 ? sender.getEmployeeProfile().getDesignation() : "Senior Manager";
             
-            List<User> recipients = findUsersInGroup(recipientGroup);
+            List<User> recipients;
+            String label = recipientGroup;
+            if ("Other".equalsIgnoreCase(recipientGroup) && recipientUsernames != null && !recipientUsernames.isEmpty()) {
+                recipients = userRepository.findAll().stream()
+                        .filter(u -> recipientUsernames.contains(u.getUsername()))
+                        .collect(java.util.stream.Collectors.toList());
+                label = "Custom List (" + recipients.size() + " employees)";
+            } else {
+                recipients = findUsersInGroup(recipientGroup, sender);
+            }
+
             for (User recipient : recipients) {
                 HrmsNotification notif = new HrmsNotification(
                     recipient,
@@ -2070,7 +2757,7 @@ public class MySpaceController {
             try {
                 RecentNotificationRecord rn = new RecentNotificationRecord();
                 rn.setSubject(subject);
-                rn.setNotifyTo(recipientGroup);
+                rn.setNotifyTo(label);
                 rn.setType(messageType);
                 rn.setPriority(priority);
                 rn.setSentOn(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a")));
@@ -2102,28 +2789,24 @@ public class MySpaceController {
                 long empCount = allUsers.stream()
                         .filter(u -> u.getRole() != null && !"CLIENT".equalsIgnoreCase(u.getRole().getRoleName()))
                         .count();
-                if (empCount == 0) empCount = 245;
 
                 long mgrCount = allUsers.stream()
                         .filter(u -> u.getManager() != null)
                         .map(u -> u.getManager().getId())
                         .distinct()
                         .count();
-                if (mgrCount == 0) mgrCount = 28;
 
                 long deptCount = allUsers.stream()
                         .filter(u -> u.getDepartmentId() != null)
                         .map(User::getDepartmentId)
                         .distinct()
                         .count();
-                if (deptCount == 0) deptCount = 12;
 
                 long posCount = allUsers.stream()
                         .filter(u -> u.getDesignation() != null && !u.getDesignation().isBlank())
                         .map(User::getDesignation)
                         .distinct()
                         .count();
-                if (posCount == 0) posCount = 45;
 
                 // Statistical summaries
                 model.addAttribute("totalEmployees", empCount);
@@ -2181,14 +2864,6 @@ public class MySpaceController {
                     }
                 }
 
-                // Fallbacks in case database is empty or sparse:
-                if (topMgt == 0) topMgt = 1;
-                if (hrDept == 0) { hrDept = 24; hrMgr = 6; hrExec = 18; }
-                if (itDept == 0) itDept = 68;
-                if (finDept == 0) finDept = 34;
-                if (opsDept == 0) opsDept = 56;
-                if (salesMkt == 0) salesMkt = 62;
-
                 long totalTreeCount = topMgt + hrDept + itDept + finDept + opsDept + salesMkt;
                 if (totalTreeCount < empCount) {
                     totalTreeCount = empCount;
@@ -2204,16 +2879,42 @@ public class MySpaceController {
                 model.addAttribute("opsDeptCount", opsDept);
                 model.addAttribute("salesMktCount", salesMkt);
 
-                // Direct Reports list for Amit Sharma
+                // Direct Reports list for logged-in user dynamically
                 List<Map<String, Object>> directReports = new ArrayList<>();
-                directReports.add(Map.of("name", "Neha Verma", "position", "HR Director", "department", "HR", "status", "Full-time"));
-                directReports.add(Map.of("name", "Vikram Mehta", "position", "CTO", "department", "IT", "status", "Full-time"));
+                List<User> reports = userRepository.findAll().stream()
+                        .filter(u -> u.getManager() != null && u.getManager().getId().equals(loggedInUser.getId()))
+                        .collect(java.util.stream.Collectors.toList());
+                for (User r : reports) {
+                    directReports.add(Map.of(
+                        "name", r.getFullName(),
+                        "position", r.getDesignation() != null ? r.getDesignation() : "Employee",
+                        "department", getDepartment(r),
+                        "status", "ACTIVE".equalsIgnoreCase(r.getStatus()) ? "Full-time" : r.getStatus()
+                    ));
+                }
                 model.addAttribute("directReports", directReports);
 
-                // Recent Changes list
+                // Recent Changes list from AuditLog dynamically
                 List<Map<String, Object>> recentChanges = new ArrayList<>();
-                recentChanges.add(Map.of("change", "Dept Transfer", "employee", "Rahul Kumar", "changedBy", "HR Admin", "dateTime", "20 May 2026, 11:30 AM"));
-                recentChanges.add(Map.of("change", "Manager Assigned", "employee", "Deepak Yadav", "changedBy", "HR Admin", "dateTime", "19 May 2026, 04:15 PM"));
+                List<AuditLog> logs = auditLogRepository.findAll().stream()
+                        .sorted((a, b) -> {
+                            if (a.getTimestamp() == null && b.getTimestamp() == null) return 0;
+                            if (a.getTimestamp() == null) return 1;
+                            if (b.getTimestamp() == null) return -1;
+                            return b.getTimestamp().compareTo(a.getTimestamp());
+                        })
+                        .limit(5)
+                        .collect(java.util.stream.Collectors.toList());
+
+                DateTimeFormatter changeDtf = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+                for (AuditLog log : logs) {
+                    recentChanges.add(Map.of(
+                        "change", log.getAction() + " (" + log.getModule() + ")",
+                        "employee", log.getNewValue() != null && log.getNewValue().length() > 50 ? log.getNewValue().substring(0, 50) + "..." : (log.getNewValue() != null ? log.getNewValue() : "-"),
+                        "changedBy", log.getUsername() != null ? log.getUsername() : "System",
+                        "dateTime", log.getTimestamp() != null ? log.getTimestamp().format(changeDtf) : "-"
+                    ));
+                }
                 model.addAttribute("recentChanges", recentChanges);
 
                 return "senior_manager-hierarchy";
@@ -2235,12 +2936,30 @@ public class MySpaceController {
 
                 if (projectRepository.count() == 0 && client != null) {
                     List<String> names = List.of("CRM Develop.", "Database", "API Gateway Integration", "Mobile App");
-                    for (String name : names) {
+                    LocalDate today = LocalDate.now();
+                    for (int i = 0; i < names.size(); i++) {
+                        String name = names.get(i);
                         Project p = new Project();
                         p.setProjectName(name);
                         p.setClient(client);
                         p.setStage("Development");
+                        p.setStartDate(today.minusDays(30));
+                        p.setEndDate(today.plusDays(90));
                         projectRepository.save(p);
+
+                        // Seed project members
+                        if (!activeUsers.isEmpty()) {
+                            for (int j = 0; j < 2; j++) {
+                                int uIdx = (i * 2 + j) % activeUsers.size();
+                                User memberUser = activeUsers.get(uIdx);
+                                ProjectMember pm = new ProjectMember();
+                                pm.setProject(p);
+                                pm.setUser(memberUser);
+                                pm.setRole(j == 0 ? "Developer" : "QA Tester");
+                                pm.setBillable(true);
+                                projectMemberRepository.save(pm);
+                            }
+                        }
                     }
                 }
 
@@ -3066,5 +3785,85 @@ public class MySpaceController {
 
         return "redirect:/space/lnd/upcoming-training";
     }
-    
+
+    @org.springframework.transaction.annotation.Transactional
+    @PreAuthorize("hasRole('SENIOR_MANAGER')")
+    @PostMapping("/senior_manager/project/edit")
+    public String editProject(
+            @RequestParam Long projectId,
+            @RequestParam String projectName,
+            @RequestParam String startDate,
+            @RequestParam String endDate,
+            @RequestParam(value = "userIds", required = false) List<Long> userIds,
+            @RequestParam(value = "roles", required = false) List<String> roles,
+            @RequestParam(value = "billables", required = false) List<Boolean> billables,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+
+            try {
+                Project p = projectRepository.findById(projectId).orElseThrow();
+                p.setProjectName(projectName);
+                p.setStartDate(LocalDate.parse(startDate));
+                p.setEndDate(LocalDate.parse(endDate));
+                projectRepository.save(p);
+
+                // Delete existing members
+                projectMemberRepository.deleteByProjectId(projectId);
+
+                if (userIds != null) {
+                    for (int i = 0; i < userIds.size(); i++) {
+                        Long uId = userIds.get(i);
+                        String role = roles != null && i < roles.size() ? roles.get(i) : "Developer";
+                        Boolean billable = billables != null && i < billables.size() ? billables.get(i) : true;
+
+                        User u = userRepository.findById(uId).orElse(null);
+                        if (u != null) {
+                            ProjectMember pm = new ProjectMember();
+                            pm.setProject(p);
+                            pm.setUser(u);
+                            pm.setRole(role);
+                            pm.setBillable(billable);
+                            projectMemberRepository.save(pm);
+                        }
+                    }
+                }
+                redirectAttributes.addFlashAttribute("successMessage", "Project and team members updated successfully.");
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Error updating project: " + e.getMessage());
+            }
+            return "redirect:/senior_manager/project_work?tab=project";
+    }
+
+    @PreAuthorize("hasRole('SENIOR_MANAGER')")
+    @GetMapping("/senior_manager/attendance/details")
+    @ResponseBody
+    public List<Map<String, Object>> getAttendanceDetails(
+            @RequestParam String employeeName,
+            @RequestParam String month) {
+
+            User user = userRepository.findAll().stream()
+                    .filter(u -> employeeName.equalsIgnoreCase(u.getFullName()))
+                    .findFirst()
+                    .orElse(null);
+
+            List<Map<String, Object>> details = new ArrayList<>();
+            if (user != null) {
+                List<Attendance> list = attendanceRepository.findByUserOrderByIdDesc(user);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
+                for (Attendance a : list) {
+                    if (a.getDate() == null) continue;
+                    String dateMonth = a.getDate().getMonth().toString().substring(0, 3) + " " + a.getDate().getYear();
+                    if ("All".equalsIgnoreCase(month) || month == null || month.isBlank() || a.getDate().toString().contains(month) || dateMonth.equalsIgnoreCase(month) || month.toLowerCase().contains(a.getDate().getMonth().toString().toLowerCase().substring(0,3))) {
+                        Map<String, Object> item = new HashMap<>();
+                        item.put("date", a.getDate().format(formatter));
+                        item.put("status", a.getStatus() != null ? a.getStatus() : "Present");
+                        item.put("checkIn", a.getCheckInTime() != null ? a.getCheckInTime().toString() : "09:00 AM");
+                        item.put("checkOut", a.getCheckOutTime() != null ? a.getCheckOutTime().toString() : "06:00 PM");
+                        item.put("hours", a.getTotalHours() != null ? a.getTotalHours() : "9h 0m");
+                        details.add(item);
+                    }
+                }
+            }
+            details.sort((x, y) -> String.valueOf(y.get("date")).compareTo(String.valueOf(x.get("date"))));
+            return details;
+    }
 }

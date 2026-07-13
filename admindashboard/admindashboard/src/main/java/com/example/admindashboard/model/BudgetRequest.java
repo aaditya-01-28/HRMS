@@ -21,8 +21,17 @@ public class BudgetRequest {
     private Double amount;
     private String status;
     private LocalDate submissionDate;
+    private String assignedTo;
 
     /* GETTERS AND SETTERS */
+
+    public String getAssignedTo() {
+        return assignedTo;
+    }
+
+    public void setAssignedTo(String assignedTo) {
+        this.assignedTo = assignedTo;
+    }
 
     public Long getId() {
         return id;

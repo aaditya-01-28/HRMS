@@ -2,6 +2,7 @@ package com.example.admindashboard.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,6 +18,9 @@ public class Project {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     // The Client who owns this project
     @ManyToOne(fetch = FetchType.LAZY)
@@ -96,4 +100,10 @@ public class Project {
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public LocalDate getStartDate() { return startDate; }
+    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+
+    public LocalDate getEndDate() { return endDate; }
+    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
 }

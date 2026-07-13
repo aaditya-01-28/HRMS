@@ -381,9 +381,16 @@
                                 <span class="status-badge" th:classappend="${#strings.toUpperCase(row['status']) == 'COMPLETED'} ? ' status-completed' : ' status-active'" th:text="${row['status']}">Active</span>
                             </td>
                             <td>
-                                <button class="btn btn-sm btn-link text-dark"><i class="fa-solid fa-pencil"></i></button>
-                                <button class="btn btn-sm btn-link text-dark"><i class="fa-solid fa-ellipsis"></i></button>
+                                <button type="button" class="btn btn-sm btn-link text-dark"
+                                        th:attr="data-id=${row['projectId']}, data-name=${row['projectName']}, data-start=${row['rawStartDate']}, data-end=${row['rawEndDate']}"
+                                        onclick="openEditProjectModal(this)">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </button>
+                                <span class="d-none" th:id="'members-json-' + ${row['projectId']}">[<th:block th:each="m, iter : ${row['membersDetail']}">{"userId": <th:block th:text="${m.userId}"></th:block>, "name": "<th:block th:text="${m.name}"></th:block>", "role": "<th:block th:text="${m.role}"></th:block>", "billable": <th:block th:text="${m.billable}"></th:block>}<th:block th:if="${!iter.last}">,</th:block></th:block>]</span>
                             </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(projectsList)}">
+                            <td colspan="9" class="text-center text-muted py-4">No projects found.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -474,6 +481,9 @@
                                 <button class="btn btn-sm btn-link text-dark"><i class="fa-solid fa-ellipsis"></i></button>
                             </td>
                         </tr>
+                        <tr th:if="${#lists.isEmpty(teamworkRecords)}">
+                            <td colspan="8" class="text-center text-muted py-4">No teamwork records found.</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -556,6 +566,9 @@
                                 <button class="btn btn-sm btn-link text-dark"><i class="fa-solid fa-ellipsis"></i></button>
                             </td>
                         </tr>
+                        <tr th:if="${#lists.isEmpty(timesheetRecords)}">
+                            <td colspan="8" class="text-center text-muted py-4">No timesheets found.</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -634,6 +647,165 @@
         if (timesheetDept) timesheetDept.addEventListener('change', filterTimesheets);
         if (timesheetStatus) timesheetStatus.addEventListener('change', filterTimesheets);
     });
+
+    // Global active employees list populated from hidden select template
+    const activeEmployees = [];
+    document.querySelectorAll('#activeEmployeesTemplate option').forEach(opt => {
+        if (opt.value) {
+            activeEmployees.push({ id: opt.value, name: opt.text });
+        }
+    });
+
+    function openEditProjectModal(btn) {
+        const projectId = btn.getAttribute('data-id');
+        const projectName = btn.getAttribute('data-name');
+        const startDate = btn.getAttribute('data-start');
+        const endDate = btn.getAttribute('data-end');
+        
+        document.getElementById('modal-project-id').value = projectId;
+        document.getElementById('modal-project-name').value = projectName;
+        document.getElementById('modal-project-start').value = startDate;
+        document.getElementById('modal-project-end').value = endDate;
+        
+        const tbody = document.getElementById('members-edit-tbody');
+        tbody.innerHTML = '';
+        
+        const jsonSpan = document.getElementById('members-json-' + projectId);
+        if (jsonSpan && jsonSpan.innerText.trim() !== '') {
+            try {
+                const members = JSON.parse(jsonSpan.innerText);
+                members.forEach(m => {
+                    addMemberRow(m.userId, m.role, m.billable);
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        
+        const modal = new bootstrap.Modal(document.getElementById('editProjectModal'));
+        modal.show();
+    }
+
+    function addMemberRow(selectedUserId = '', selectedRole = 'Developer', isBillable = true) {
+        const tbody = document.getElementById('members-edit-tbody');
+        const row = document.createElement('tr');
+        
+        let selectHtml = `<select name="userIds" class="form-select" required style="border-radius: 6px;">`;
+        selectHtml += `<option value="">-- Select Member --</option>`;
+        activeEmployees.forEach(emp => {
+            const selected = emp.id == selectedUserId ? 'selected' : '';
+            selectHtml += `<option value="${emp.id}" ${selected}>${emp.name}</option>`;
+        });
+        selectHtml += `</select>`;
+        
+        row.innerHTML = `
+            <td>${selectHtml}</td>
+            <td>
+                <select name="roles" class="form-select" required style="border-radius: 6px;">
+                    <option value="Developer" ${selectedRole === 'Developer' ? 'selected' : ''}>Developer</option>
+                    <option value="Lead Developer" ${selectedRole === 'Lead Developer' ? 'selected' : ''}>Lead Developer</option>
+                    <option value="QA Tester" ${selectedRole === 'QA Tester' ? 'selected' : ''}>QA Tester</option>
+                    <option value="Project Manager" ${selectedRole === 'Project Manager' ? 'selected' : ''}>Project Manager</option>
+                    <option value="Designer" ${selectedRole === 'Designer' ? 'selected' : ''}>Designer</option>
+                </select>
+            </td>
+            <td>
+                <div class="form-check form-switch pt-1">
+                    <input class="form-check-input billable-checkbox" type="checkbox" ${isBillable ? 'checked' : ''} style="width: 40px; height: 20px; cursor: pointer;">
+                </div>
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="fa-solid fa-trash"></i></button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.querySelector('#editProjectModal form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                document.querySelectorAll('.temp-billable-input').forEach(el => el.remove());
+                
+                document.querySelectorAll('#members-edit-tbody tr').forEach(row => {
+                    const checkbox = row.querySelector('.billable-checkbox');
+                    const hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = 'billables';
+                    hidden.className = 'temp-billable-input';
+                    hidden.value = checkbox.checked ? 'true' : 'false';
+                    form.appendChild(hidden);
+                });
+            });
+        }
+    });
 </script>
+
+<!-- Edit Project Modal -->
+<div class="modal fade" id="editProjectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <form action="/senior_manager/project/edit" method="POST" class="modal-content border-0 shadow-lg" style="border-radius: 12px;">
+            <div class="modal-header text-white" style="background: #002D72; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-folder-open me-2"></i>Edit Project & Team</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" name="projectId" id="modal-project-id" />
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Project Name <span class="text-danger">*</span></label>
+                    <input type="text" name="projectName" id="modal-project-name" class="form-control" required style="border-radius: 6px;"/>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Start Date <span class="text-danger">*</span></label>
+                        <input type="date" name="startDate" id="modal-project-start" class="form-control" required style="border-radius: 6px;"/>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">End Date <span class="text-danger">*</span></label>
+                        <input type="date" name="endDate" id="modal-project-end" class="form-control" required style="border-radius: 6px;"/>
+                    </div>
+                </div>
+                
+                <hr />
+                
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-users me-2"></i>Team Members</h6>
+                    <button type="button" class="btn btn-outline-primary btn-sm fw-bold" onclick="addMemberRow()">
+                        <i class="fa-solid fa-plus me-1"></i>Add Member
+                    </button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table align-middle table-borderless" id="members-edit-table">
+                        <thead class="table-light text-secondary">
+                            <tr>
+                                <th style="width: 40%;">Name</th>
+                                <th style="width: 30%;">Role</th>
+                                <th style="width: 20%;">Billable</th>
+                                <th style="width: 10%;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="members-edit-tbody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary fw-bold px-4">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Hidden template for active employees -->
+<select id="activeEmployeesTemplate" class="d-none">
+    <option value="">-- Select Member --</option>
+    <option th:each="emp : ${activeEmployees}" th:value="${emp.id}" th:text="${emp.fullName}"></option>
+</select>
+
 </body>
 </html>

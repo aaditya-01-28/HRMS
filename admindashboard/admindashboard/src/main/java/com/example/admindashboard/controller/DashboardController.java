@@ -581,7 +581,7 @@ public class DashboardController {
             // We'll pass HR tickets as 'pendingTickets' and Accounts tickets as 'accountsTickets'
             // We also need all globally pending leaves and timesheets!
             java.util.List<LeaveRequest> allPendingLeaves = leaveRequestRepository.findAll().stream()
-                    .filter(l -> "PENDING".equalsIgnoreCase(l.getStatus()))
+                    .filter(l -> "PENDING".equalsIgnoreCase(l.getStatus()) || "PENDING_HR".equalsIgnoreCase(l.getStatus()))
                     .collect(Collectors.toList());
                     
             java.util.List<WeeklyTimesheet> allPendingTimesheets = weeklyTimesheetRepository.findAll().stream()

@@ -751,6 +751,7 @@
 
                     <div class="d-flex gap-3 ms-2 mt-5" id="action-buttons-container">
                         <button class="btn btn-outline-dark px-4 fw-bold shadow-sm bg-white" onclick="closeDetailsPane()" style="width: 140px;">Cancel</button>
+                        <button class="btn btn-outline-primary px-4 fw-bold shadow-sm bg-white" id="btn-open-edit-modal" onclick="openEditLeaveModal()" style="width: 160px;">Edit Request</button>
                         <button class="btn btn-primary px-4 fw-bold shadow-sm" id="btn-open-update-modal" onclick="openUpdateModal()" style="width: 160px;">Update Status</button>
                     </div>
                 </div>
@@ -1795,8 +1796,8 @@
         document.getElementById('detail-duration').innerText = card.getAttribute('data-days') + " days";
         
         // Format dates
-        const fromDate = new Date(card.getAttribute('data-from')).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
-        const toDate = new Date(card.getAttribute('data-to')).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+        const fromDate = new Date(card.getAttribute('data-start')).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+        const toDate = new Date(card.getAttribute('data-end')).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
         document.getElementById('detail-dates').innerText = `${fromDate} - ${toDate}`;
         
         document.getElementById('detail-reason').innerText = card.getAttribute('data-reason');
@@ -1912,6 +1913,85 @@
             c.style.backgroundColor = '';
         });
         window.currentSelectedLeaveId = null;
+    }
+
+    function openEditLeaveModal() {
+        const id = window.currentSelectedLeaveId;
+        if (!id) return;
+        
+        const card = document.querySelector(`.leave-row[data-id="${id}"]`);
+        if (!card) return;
+        
+        const type = card.getAttribute('data-type');
+        const fromDate = card.getAttribute('data-start');
+        const toDate = card.getAttribute('data-end');
+        const days = card.getAttribute('data-days');
+        
+        document.getElementById('edit-leave-type').value = type;
+        document.getElementById('edit-from-date').value = fromDate;
+        document.getElementById('edit-to-date').value = toDate;
+        document.getElementById('edit-total-days').value = days;
+        
+        const modal = new bootstrap.Modal(document.getElementById('editLeaveModal'));
+        modal.show();
+    }
+
+    async function submitEditLeave() {
+        const id = window.currentSelectedLeaveId;
+        if (!id) return;
+        
+        const leaveType = document.getElementById('edit-leave-type').value;
+        const fromDate = document.getElementById('edit-from-date').value;
+        const toDate = document.getElementById('edit-to-date').value;
+        const totalDays = document.getElementById('edit-total-days').value;
+        
+        if (!fromDate || !toDate || !totalDays) {
+            Swal.fire('Required', 'Please fill in all fields.', 'warning');
+            return;
+        }
+        
+        Swal.fire({
+            title: 'Saving...',
+            text: 'Updating leave request details...',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+        
+        const endpoint = `/api/admin/leave/edit/${id}`;
+        const formData = new URLSearchParams();
+        formData.append('leaveType', leaveType);
+        formData.append('fromDate', fromDate);
+        formData.append('toDate', toDate);
+        formData.append('totalDays', totalDays);
+        
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData.toString()
+            });
+            
+            if (response.ok) {
+                Swal.close();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Saved!',
+                    text: 'Leave request has been updated.',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                const txt = await response.text();
+                Swal.fire('Error', txt || 'Failed to edit leave request.', 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            Swal.fire('Error', 'An error occurred while saving.', 'error');
+        }
     }
 
     function openUpdateModal() {
@@ -2792,6 +2872,46 @@
                     <div class="d-flex justify-content-between">
                         <button type="button" class="btn btn-outline-dark bg-white fw-bold shadow-sm px-4" data-bs-dismiss="modal" style="border-radius: 20px;">Cancel</button>
                         <button type="button" class="btn btn-success fw-bold shadow-sm px-4 text-white" style="border-radius: 20px; background-color: #059669; border:none;" onclick="submitLeaveAction()">Update Status</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Leave Request Modal -->
+    <div class="modal fade" id="editLeaveModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow" style="border-radius: 12px;">
+                <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                    <h5 class="modal-title text-primary fw-bold">Edit Leave Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-4 pb-4 pt-3">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-1">Leave Type <span class="text-danger">*</span></label>
+                        <select class="form-select text-dark shadow-sm" id="edit-leave-type" style="border-radius: 6px;">
+                            <option value="Casual">Casual</option>
+                            <option value="Sick">Sick</option>
+                            <option value="Earned">Earned</option>
+                            <option value="CompOff">CompOff</option>
+                            <option value="LOP">LOP</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-1">From Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control shadow-sm" id="edit-from-date" style="border-radius: 6px;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-1">To Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control shadow-sm" id="edit-to-date" style="border-radius: 6px;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-1">Total Days <span class="text-danger">*</span></label>
+                        <input type="number" step="0.5" class="form-control shadow-sm" id="edit-total-days" style="border-radius: 6px;">
+                    </div>
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-outline-dark bg-white fw-bold shadow-sm px-4" data-bs-dismiss="modal" style="border-radius: 20px;">Cancel</button>
+                        <button type="button" class="btn btn-primary fw-bold shadow-sm px-4 text-white" style="border-radius: 20px;" onclick="submitEditLeave()">Save Changes</button>
                     </div>
                 </div>
             </div>

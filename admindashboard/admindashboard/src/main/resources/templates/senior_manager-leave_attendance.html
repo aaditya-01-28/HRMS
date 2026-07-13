@@ -430,6 +430,9 @@
                                         </div>
                                     </td>
                                 </tr>
+                                <tr th:if="${#lists.isEmpty(teamLeaveSummary)}">
+                                    <td colspan="5" class="text-center text-muted py-4">No team leave summary records found.</td>
+                                </tr>
                                 <tr class="table-light fw-bold">
                                     <td>Total / Average</td>
                                     <td th:text="${totalMembers}">28</td>
@@ -442,19 +445,11 @@
                     </div>
                 </div>
 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
-                    <!-- Leave Type Summary (Pie Chart) -->
-                    <div class="panel">
-                        <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-pie text-primary me-2"></i>Leave Type Summary</h6>
-                        <div style="max-height: 180px; display:flex; align-items:center; justify-content:center;">
-                            <canvas id="leaveTypeChart" style="max-width:180px; max-height:180px;"></canvas>
-                        </div>
-                    </div>
-
+                <div>
                     <!-- Balance Overview -->
                     <div class="panel">
                         <h6 class="fw-bold mb-3"><i class="fa-solid fa-wallet text-primary me-2"></i>Balance Overview</h6>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px;">
                             <div class="p-3 border rounded text-center bg-light">
                                 <div style="font-size:0.7rem; color:#64748b; font-weight:700;">ENTITLED</div>
                                 <div class="fs-4 fw-bold text-primary" th:text="${entitledLeaves}">124</div>
@@ -584,6 +579,9 @@
                                 </form>
                             </td>
                         </tr>
+                        <tr th:if="${#lists.isEmpty(escalatedRequests)}">
+                            <td colspan="9" class="text-center text-muted py-4">No escalated leave requests found.</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -621,6 +619,9 @@
                                 </td>
                                 <td th:text="${history['actionBy']}">You</td>
                                 <td th:text="${history['dateTime']}">31 May 2026, 09:30 AM</td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(overrideHistory)}">
+                                <td colspan="5" class="text-center text-muted py-4">No override history found.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -672,20 +673,16 @@
             </div>
         </div>
 
-        <div class="grid-2col">
-            <!-- Attendance Overview (Line Chart) -->
-            <div class="panel">
-                <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-line text-primary me-2"></i>Attendance Overview</h6>
-                <div style="max-height: 250px; position: relative;">
-                    <canvas id="attendanceOverviewChart" style="max-height: 250px;"></canvas>
-                </div>
-            </div>
-
+        <div>
             <!-- Attendance by Department (Donut Chart) -->
             <div class="panel">
                 <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-pie text-primary me-2"></i>Attendance by Department</h6>
                 <div style="max-height: 250px; display:flex; align-items:center; justify-content:center;">
                     <canvas id="deptAttendanceChart" style="max-width:200px; max-height:200px;"></canvas>
+                    <input type="hidden" id="deptAttendanceLabelsInput" th:value="${deptAttendanceLabels != null ? #strings.listJoin(deptAttendanceLabels, ',') : ''}" />
+                    <input type="hidden" id="deptAttendanceDataInput" th:value="${deptAttendanceData != null ? #strings.listJoin(deptAttendanceData, ',') : ''}" />
+                    <input type="hidden" id="activeTabInput" th:value="${activeTab}" />
+                    <span class="d-none" id="calendarEventsJson">[<th:block th:each="e, iter : ${calendarEvents}">{"name": "<th:block th:text="${e.name}"></th:block>", "type": "<th:block th:text="${e.type}"></th:block>", "fromDate": "<th:block th:text="${e.fromDate}"></th:block>", "toDate": "<th:block th:text="${e.toDate}"></th:block>"}<th:block th:if="${!iter.last}">,</th:block></th:block>]</span>
                 </div>
             </div>
         </div>
@@ -713,7 +710,9 @@
                     </thead>
                     <tbody>
                         <tr th:each="record : ${attendanceRecords}"
-                            th:attr="data-name=${record['employee']}, data-department=${record['department']}, data-location=${record['location']}">
+                            th:attr="data-name=${record['employee']}, data-department=${record['department']}, data-location=${record['location']}"
+                            style="cursor: pointer;"
+                            th:onclick="showEmployeeAttendanceDetails(this.getAttribute('data-name'))">
                             <td>
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:32px; height:32px; font-size:0.8rem;" th:text="${#strings.substring(record['employee'], 0, 1)}">V</div>
@@ -732,6 +731,9 @@
                             <td class="fw-bold text-primary" th:text="${#numbers.formatDecimal(record['percent'], 1, 2) + '%'}">95.45%</td>
                             <td th:text="${record['hours']}">8h 45m</td>
                         </tr>
+                        <tr th:if="${#lists.isEmpty(attendanceRecords)}">
+                            <td colspan="9" class="text-center text-muted py-4">No attendance records found.</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -739,40 +741,13 @@
     </div>
 </div>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
+<script>
     document.addEventListener("DOMContentLoaded", function() {
-        const activeTab = /*[[${activeTab}]]*/ 'leave_calendar';
+        const activeTab = document.getElementById('activeTabInput')?.value || 'leave_calendar';
 
         if (activeTab === 'leave_calendar') {
-            // Leave Type Summary Chart
-            const leaveCtx = document.getElementById('leaveTypeChart').getContext('2d');
-            new Chart(leaveCtx, {
-                type: 'pie',
-                data: {
-                    labels: ['Casual Leave', 'Sick Leave', 'Earned Leave', 'Comp Off'],
-                    datasets: [{
-                        data: [18, 12, 10, 5],
-                        backgroundColor: ['#002D72', '#10b981', '#f59e0b', '#8b5cf6'],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 10,
-                                font: { size: 9 }
-                            }
-                        }
-                    }
-                }
-            });
-
             // --- Dynamic Calendar Render Logic ---
-            const calendarEvents = /*[[${calendarEvents}]]*/ [];
+            const calendarEvents = JSON.parse(document.getElementById('calendarEventsJson')?.innerText || '[]');
             
             // Common holidays to display in calendar
             const nationalHolidays = [
@@ -919,7 +894,7 @@
                 data: {
                     labels: ['Overdue', 'Pending', 'Approved'],
                     datasets: [{
-                        data: [2, 3, 12],
+                        data: [/*[[${overdueLeaveCount}]]*/ 2, /*[[${pendingLeaveCount}]]*/ 3, /*[[${approvedLeaveCount}]]*/ 12],
                         backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
                         borderWidth: 1
                     }]
@@ -941,53 +916,26 @@
         }
 
         if (activeTab === 'attendance_reports') {
-            // Attendance Overview Line Chart
-            const attendanceCtx = document.getElementById('attendanceOverviewChart').getContext('2d');
-            new Chart(attendanceCtx, {
-                type: 'line',
-                data: {
-                    labels: ['1 May', '5 May', '10 May', '15 May', '20 May', '25 May', '30 May'],
-                    datasets: [
-                        {
-                            label: 'Present %',
-                            data: [91.20, 93.45, 92.80, 94.10, 91.50, 93.60, 92.45],
-                            borderColor: '#002D72',
-                            backgroundColor: 'rgba(0, 45, 114, 0.05)',
-                            fill: true,
-                            tension: 0.3
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            min: 80,
-                            max: 100,
-                            ticks: {
-                                callback: function(value) { return value + "%" }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-
             // Department Attendance Donut Chart
-            const deptCtx = document.getElementById('deptAttendanceChart').getContext('2d');
-            new Chart(deptCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['IT', 'Finance', 'HR', 'Operations'],
-                    datasets: [{
-                        data: [94.60, 93.20, 91.10, 89.30],
-                        backgroundColor: ['#002D72', '#10b981', '#f59e0b', '#8b5cf6'],
-                        borderWidth: 1
-                    }]
-                },
+            const deptCanvas = document.getElementById('deptAttendanceChart');
+            if (deptCanvas) {
+                const labelVal = document.getElementById('deptAttendanceLabelsInput')?.value;
+                const dataVal = document.getElementById('deptAttendanceDataInput')?.value;
+                
+                const labels = labelVal ? labelVal.split(',') : ['IT', 'Finance', 'HR', 'Operations'];
+                const data = dataVal ? dataVal.split(',').map(Number) : [94.60, 93.20, 91.10, 89.30];
+
+                const deptCtx = deptCanvas.getContext('2d');
+                new Chart(deptCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: ['#002D72', '#10b981', '#f59e0b', '#8b5cf6'],
+                            borderWidth: 1
+                        }]
+                    },
                 options: {
                     responsive: true,
                     cutout: '70%',
@@ -1002,6 +950,7 @@
                     }
                 }
             });
+            }
         }
 
         // Escalated Leave Request filters (Escalate / Override Approvals Tab)
@@ -1061,6 +1010,64 @@
             myModal.show();
         }
     }
+
+    async function showEmployeeAttendanceDetails(name) {
+        document.getElementById('modalEmployeeName').innerText = name;
+        window.currentAttendanceEmployeeName = name;
+        
+        await loadAttendanceDetailsTable(name, 'All');
+        
+        const el = document.getElementById('attendanceDetailsModal');
+        if (el) {
+            const myModal = new bootstrap.Modal(el);
+            myModal.show();
+        }
+    }
+
+    async function loadAttendanceDetailsTable(name, month) {
+        try {
+            const res = await fetch(`/senior_manager/attendance/details?employeeName=${encodeURIComponent(name)}&month=${encodeURIComponent(month)}`);
+            const data = await res.json();
+            
+            const tbody = document.getElementById('attendanceDetailsTableBody');
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">No attendance records found for this month.</td></tr>`;
+                return;
+            }
+            
+            data.forEach(row => {
+                let badgeClass = 'bg-success';
+                if (row.status.toLowerCase().includes('absent')) badgeClass = 'bg-danger';
+                else if (row.status.toLowerCase().includes('leave')) badgeClass = 'bg-warning text-dark';
+                else if (row.status.toLowerCase().includes('half')) badgeClass = 'bg-info text-dark';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${row.date}</td>
+                        <td><span class="badge ${badgeClass}">${row.status}</span></td>
+                        <td>${row.checkIn}</td>
+                        <td>${row.checkOut}</td>
+                        <td>${row.hours}</td>
+                    </tr>
+                `;
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const select = document.getElementById('modalMonthSelect');
+        if (select) {
+            select.addEventListener('change', function() {
+                if (window.currentAttendanceEmployeeName) {
+                    loadAttendanceDetailsTable(window.currentAttendanceEmployeeName, this.value);
+                }
+            });
+        }
+    });
     /*]]>*/
 </script>
 
@@ -1097,6 +1104,50 @@
                             <tr th:if="${#lists.isEmpty(calendarEvents)}">
                                 <td colspan="4" class="text-center text-muted py-4">No approved leave records found.</td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance Details Modal -->
+<div class="modal fade" id="attendanceDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px;">
+            <div class="modal-header text-white" style="background: #002D72; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-clock me-2"></i>Attendance Log - <span id="modalEmployeeName"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Filter Month:</strong>
+                        <select class="form-select form-select-sm d-inline-block ms-2" id="modalMonthSelect" style="width: auto;">
+                            <option value="All">All Months</option>
+                            <option value="May 2026">May 2026</option>
+                            <option value="Jun 2026">June 2026</option>
+                            <option value="Jul 2026">July 2026</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-responsive" style="max-height: 400px;">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-secondary">
+                            <tr>
+                                <th class="fw-bold">Date</th>
+                                <th class="fw-bold">Status</th>
+                                <th class="fw-bold">Check-In</th>
+                                <th class="fw-bold">Check-Out</th>
+                                <th class="fw-bold">Total Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceDetailsTableBody">
+                            <!-- Populated dynamically via JS -->
                         </tbody>
                     </table>
                 </div>
