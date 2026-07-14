@@ -368,6 +368,31 @@
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
+            .filter-input-row {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 5px !important;
+            }
+            .filter-label-text {
+                width: auto !important;
+            }
+            .filter-dropdown {
+                width: 100% !important;
+            }
+            .period-selector-row {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 5px !important;
+            }
+            .form-control-date {
+                width: 100% !important;
+            }
+            .custom-month-switcher {
+                gap: 15px !important;
+            }
+            .month-text {
+                font-size: 1.25rem !important;
+            }
         }
     </style>
     <link href="/css/dark-mode.css" rel="stylesheet">
@@ -520,6 +545,20 @@
     document.addEventListener('DOMContentLoaded', function() {
         fetchUserDetails();
         updateReport();
+
+        // Redirect Persistence Check (BUG-026)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('source') === 'whitecircle') {
+            sessionStorage.setItem('backRedirectSource', 'whitecircle');
+        } else if (urlParams.has('source')) {
+            sessionStorage.removeItem('backRedirectSource');
+        }
+        
+        const redirectSource = sessionStorage.getItem('backRedirectSource');
+        if (redirectSource === 'whitecircle') {
+            const backBtn = document.querySelector('.btn-floating-back-home');
+            if (backBtn) backBtn.href = '/my-whitecircle';
+        }
     });
 
     function fetchUserDetails() {

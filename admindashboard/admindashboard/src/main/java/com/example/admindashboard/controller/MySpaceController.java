@@ -2086,6 +2086,18 @@ public class MySpaceController {
                 model.addAttribute("budgetTotalRequests", budgetTotalRequests);
                 model.addAttribute("budgetTotalAmount", budgetTotalAmount);
 
+                double overallTotalAmount = expTotalAmountD + reimTotalAmountD + budgetTotalAmountD;
+                model.addAttribute("overallTotalAmount", String.format("%,.0f", overallTotalAmount));
+                
+                double expPercent = overallTotalAmount > 0 ? (expTotalAmountD / overallTotalAmount) * 100 : 0.0;
+                double reimPercent = overallTotalAmount > 0 ? (reimTotalAmountD / overallTotalAmount) * 100 : 0.0;
+                double budgetPercent = overallTotalAmount > 0 ? (budgetTotalAmountD / overallTotalAmount) * 100 : 0.0;
+                
+                model.addAttribute("expPercent", String.format("%.2f", expPercent));
+                model.addAttribute("reimPercent", String.format("%.2f", reimPercent));
+                model.addAttribute("budgetPercent", String.format("%.2f", budgetPercent));
+
+
                 return "senior_manager-expenses";
         }
 

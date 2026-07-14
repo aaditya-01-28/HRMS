@@ -250,18 +250,19 @@
 			               th:value="${user != null ? user.username : ''}" 
 			               placeholder="eg. abc123@gmail.com" required>
 			    </div>
-
 			    <div class="input-wrapper-group">
 			        <label class="input-label-caption">Password</label>
-			        <i class="fa-solid fa-lock input-icon-decor"></i>
-					<input type="password"
-					       class="sso-input-field"
-					       name="password"
-					       id="ssoPassword"
-					       placeholder="enter your password"
-					       style="padding-right: 40px;"
-					       required>
-                    <i class="fa-solid fa-eye" style="position: absolute; right: 14px; top: 41px; cursor: pointer; color: #666666;" onclick="const p = document.getElementById('ssoPassword'); if(p.type==='password'){p.type='text'; this.classList.replace('fa-eye', 'fa-eye-slash');}else{p.type='password'; this.classList.replace('fa-eye-slash', 'fa-eye');}"></i>
+                    <div style="position: relative;">
+                        <i class="fa-solid fa-lock input-icon-decor" style="top: 50%; transform: translateY(-50%);"></i>
+                        <input type="password"
+                               class="sso-input-field"
+                               name="password"
+                               id="ssoPassword"
+                               placeholder="enter your password"
+                               style="padding-right: 40px;"
+                               required>
+                        <i class="fa-solid fa-eye" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #666666;" onclick="const p = document.getElementById('ssoPassword'); if(p.type==='password'){p.type='text'; this.classList.replace('fa-eye', 'fa-eye-slash');}else{p.type='password'; this.classList.replace('fa-eye-slash', 'fa-eye');}"></i>
+                    </div>
 			    </div>
 
 				<a href="/forgot-password" class="link-forgot-password">Forgot Password?</a>

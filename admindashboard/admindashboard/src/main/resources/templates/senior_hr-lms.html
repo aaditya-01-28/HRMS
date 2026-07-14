@@ -580,7 +580,7 @@
                                             <th>Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="holiday-tbody">
                                         <tr th:each="holiday : ${holidays}" class="holiday-row">
                                             <td>
                                                 <div class="d-flex justify-content-center">
@@ -625,14 +625,7 @@
                         
                         <!-- Pagination mockup -->
                         <div class="d-flex justify-content-end mt-3">
-                            <ul class="pagination pagination-sm mb-0">
-                                <li class="page-item"><a class="page-link" href="#">&lt;</a></li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item"><a class="page-link" href="#">4</a></li>
-                                <li class="page-item"><a class="page-link" href="#">5</a></li>
-                                <li class="page-item"><a class="page-link" href="#">&gt;</a></li>
+                            <ul class="pagination pagination-sm mb-0" id="holidayPagination">
                             </ul>
                         </div>
                     </div>
@@ -1511,19 +1504,100 @@
                 .catch(err => console.error("Error fetching holiday:", err));
         }
 
-        // --- HOLIDAY SEARCH FILTER (BUG-023) ---
-        function filterHolidays() {
-            const query = (document.getElementById('searchHolidays').value || '').toLowerCase().trim();
-            const rows = document.querySelectorAll('.holiday-row');
+        // --- HOLIDAY SEARCH & PAGINATION ENGINE (BUG-025) ---
+        window.holidayCurrentPage = 1;
+
+        function paginateHolidays() {
+            const PAGE_SIZE = 10;
+            const tbody = document.getElementById('holiday-tbody');
+            if (!tbody) return;
+            const allRows = Array.from(tbody.querySelectorAll('.holiday-row'));
             
-            rows.forEach(row => {
-                const nameText = (row.querySelector('.holiday-name-text').innerText || '').toLowerCase();
-                if (query === '' || nameText.includes(query)) {
+            // Filter first by active search query
+            const query = (document.getElementById('searchHolidays') ? document.getElementById('searchHolidays').value : '').toLowerCase().trim();
+            const filteredRows = allRows.filter(row => {
+                const nameText = (row.querySelector('.holiday-name-text') ? row.querySelector('.holiday-name-text').innerText : '').toLowerCase();
+                return query === '' || nameText.includes(query);
+            });
+            
+            // Hide all rows first
+            allRows.forEach(row => row.style.display = 'none');
+            
+            const totalRows = filteredRows.length;
+            const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
+            
+            if (window.holidayCurrentPage > totalPages) window.holidayCurrentPage = totalPages;
+            if (window.holidayCurrentPage < 1) window.holidayCurrentPage = 1;
+            
+            const start = (window.holidayCurrentPage - 1) * PAGE_SIZE;
+            const end = start + PAGE_SIZE;
+            
+            filteredRows.forEach((row, idx) => {
+                if (idx >= start && idx < end) {
                     row.style.display = '';
-                } else {
-                    row.style.display = 'none';
                 }
             });
+            
+            // Build pagination buttons
+            const ul = document.getElementById('holidayPagination');
+            if (!ul) return;
+            ul.innerHTML = '';
+            
+            // Previous button
+            const prevLi = document.createElement('li');
+            prevLi.className = 'page-item' + (window.holidayCurrentPage <= 1 ? ' disabled' : '');
+            const prevA = document.createElement('a');
+            prevA.className = 'page-link';
+            prevA.href = '#';
+            prevA.innerHTML = '&lt;';
+            prevA.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (window.holidayCurrentPage > 1) {
+                    window.holidayCurrentPage--;
+                    paginateHolidays();
+                }
+            });
+            prevLi.appendChild(prevA);
+            ul.appendChild(prevLi);
+            
+            // Page numbers
+            for (let p = 1; p <= totalPages; p++) {
+                const li = document.createElement('li');
+                li.className = 'page-item' + (p === window.holidayCurrentPage ? ' active' : '');
+                const a = document.createElement('a');
+                a.className = 'page-link';
+                a.href = '#';
+                a.textContent = p;
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.holidayCurrentPage = p;
+                    paginateHolidays();
+                });
+                li.appendChild(a);
+                ul.appendChild(li);
+            }
+            
+            // Next button
+            const nextLi = document.createElement('li');
+            nextLi.className = 'page-item' + (window.holidayCurrentPage >= totalPages ? ' disabled' : '');
+            const nextA = document.createElement('a');
+            nextA.className = 'page-link';
+            nextA.href = '#';
+            nextA.innerHTML = '&gt;';
+            nextA.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (window.holidayCurrentPage < totalPages) {
+                    window.holidayCurrentPage++;
+                    paginateHolidays();
+                }
+            });
+            nextLi.appendChild(nextA);
+            ul.appendChild(nextLi);
+        }
+
+        function filterHolidays() {
+            window.holidayCurrentPage = 1;
+            paginateHolidays();
         }
 
         document.addEventListener("DOMContentLoaded", function() {
@@ -1531,6 +1605,9 @@
             if (hSearch) {
                 hSearch.addEventListener('input', filterHolidays);
             }
+            
+            // Run initial pagination
+            paginateHolidays();
             
             // Check for redirect tab parameter
             const urlParams = new URLSearchParams(window.location.search);

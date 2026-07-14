@@ -345,6 +345,7 @@
             /* Filters: wrap properly */
             .d-flex.flex-wrap.gap-2.gap-md-3 {
                 flex-wrap: wrap !important;
+                gap: 10px !important;
             }
             .form-select.w-auto {
                 width: 100% !important;
@@ -353,6 +354,11 @@
             .position-relative.flex-grow-1 {
                 max-width: 100% !important;
                 min-width: 0 !important;
+            }
+            .d-flex.gap-2.position-relative.flex-grow-1 {
+                flex-direction: row !important;
+                width: 100% !important;
+                max-width: 100% !important;
             }
 
             /* Table */
@@ -742,8 +748,9 @@
 <span th:class="${emp.status == 'ACTIVE' ? 'text-success fw-bold' : (emp.status == 'ON NOTICE' ? 'text-warning fw-bold' : 'text-danger fw-bold')}" th:text="${emp.status}">Status</span>
 </td>
 <td>
-<button class="btn btn-sm btn-link text-dark p-0 me-2"><i class="fas fa-pen"></i></button>
-<button class="btn btn-sm btn-link text-dark p-0"><i class="fas fa-ellipsis-h"></i></button>
+<button class="btn btn-sm btn-link text-dark p-0 me-2" th:onclick="'viewEmployeeDetails(' + ${emp.id} + ')'" type="button"><i class="fas fa-eye"></i></button>
+<button class="btn btn-sm btn-link text-dark p-0 me-2" th:onclick="'editCandidate(' + ${emp.id} + ')'" type="button"><i class="fas fa-pen"></i></button>
+<button class="btn btn-sm btn-link text-dark p-0" type="button"><i class="fas fa-ellipsis-h"></i></button>
 </td>
 </tr>
 </tbody>
@@ -793,6 +800,12 @@
     <option value="Manager">Manager</option>
     <option value="UI/UX Designer">UI/UX Designer</option>
     <option value="Software Engineer">Software Engineer</option>
+</select>
+<select class="form-select w-auto" id="onboardSort">
+    <option value="">Sort By...</option>
+    <option value="name-asc">Name (A-Z)</option>
+    <option value="name-desc">Name (Z-A)</option>
+    <option value="dept-asc">Department (A-Z)</option>
 </select>
 <button id="onboardFilterBtn" class="btn btn-outline-secondary"><i class="fas fa-filter"></i> Apply Filter</button>
 <button class="btn btn-primary fw-bold ms-auto" onclick="toggleOnboardingForm(true)">
@@ -1861,11 +1874,6 @@
                 const trs = tbody.getElementsByTagName("tr");
                 
                 function filterTable() {
-                    // Unhide page-hidden rows before filtering
-                    document.querySelectorAll('#offboarding-tbody tr[data-page-hidden]').forEach(function(r) {
-                        r.style.display = '';
-                        r.removeAttribute('data-page-hidden');
-                    });
                     const searchVal = (searchInput.value || "").toLowerCase().trim();
                     const deptVal = (deptSelect.value || "").toLowerCase().trim();
                     const statusVal = (statusSelect.value || "").toLowerCase().trim();
@@ -1888,9 +1896,9 @@
                         const matchRole = isRoleEmpty || roleText.includes(roleVal);
 
                         if (matchSearch && matchDept && matchStatus && matchRole) {
-                            tr.style.display = "";
+                            tr.classList.remove('filtered-out');
                         } else {
-                            tr.style.display = "none";
+                            tr.classList.add('filtered-out');
                         }
                     }
                     if (window.resetPagination) resetPagination('offboarding-tbody');
@@ -1941,17 +1949,51 @@
                         const matchRole = isRoleEmpty || roleText.includes(roleVal);
 
                         if (matchSearch && matchDept && matchLoc && matchRole) {
-                            tr.style.display = "";
+                            tr.classList.remove('filtered-out');
                         } else {
-                            tr.style.display = "none";
+                            tr.classList.add('filtered-out');
                         }
                     }
+                    sortOnboardTable();
+                }
+
+                function sortOnboardTable() {
+                    const sortVal = document.getElementById("onboardSort") ? document.getElementById("onboardSort").value : "";
+                    if (!sortVal) return;
+                    const tbody = document.getElementById("onboard-tbody");
+                    if (!tbody) return;
+                    const rows = Array.from(tbody.querySelectorAll("tr"));
+                    
+                    rows.sort((a, b) => {
+                        let valA = "";
+                        let valB = "";
+                        
+                        if (sortVal.startsWith("name")) {
+                            valA = a.cells[0].innerText.toLowerCase().trim();
+                            valB = b.cells[0].innerText.toLowerCase().trim();
+                        } else if (sortVal.startsWith("dept")) {
+                            valA = a.cells[1].innerText.toLowerCase().trim();
+                            valB = b.cells[1].innerText.toLowerCase().trim();
+                        }
+                        
+                        if (sortVal.endsWith("asc")) {
+                            return valA.localeCompare(valB);
+                        } else {
+                            return valB.localeCompare(valA);
+                        }
+                    });
+                    
+                    rows.forEach(row => tbody.appendChild(row));
                 }
 
                 onboardSearch.addEventListener("keyup", filterOnboardTable);
                 onboardDept.addEventListener("change", filterOnboardTable);
                 onboardLoc.addEventListener("change", filterOnboardTable);
                 onboardRole.addEventListener("change", filterOnboardTable);
+                const onboardSort = document.getElementById("onboardSort");
+                if (onboardSort) {
+                    onboardSort.addEventListener("change", sortOnboardTable);
+                }
                 if (onboardFilterBtn) {
                     onboardFilterBtn.addEventListener("click", filterOnboardTable);
                 }
@@ -1985,7 +2027,7 @@
                     let totalVisible = 0;
                     for (let i = 0; i < allEmpTrs.length; i++) {
                         const tr = allEmpTrs[i];
-                        if (tr.style.display !== "none") {
+                        if (!tr.classList.contains("filtered-out")) {
                             const dept = tr.cells[2].innerText.trim();
                             if (counts.hasOwnProperty(dept)) {
                                 counts[dept]++;
@@ -2050,11 +2092,6 @@
                 }
 
                 function filterAllEmpTable() {
-                    // Unhide page-hidden rows before filtering
-                    document.querySelectorAll('#all-emp-tbody tr[data-page-hidden]').forEach(function(r) {
-                        r.style.display = '';
-                        r.removeAttribute('data-page-hidden');
-                    });
                     const searchVal = (allEmpSearch.value || "").toLowerCase().trim();
                     const deptVal = (allEmpDept.value || "").toLowerCase().trim();
                     const locVal = (allEmpLoc.value || "").toLowerCase().trim();
@@ -2081,9 +2118,9 @@
                         const matchStatus = isStatusEmpty || statusText.includes(statusVal);
 
                         if (matchSearch && matchDept && matchLoc && matchRole && matchStatus) {
-                            tr.style.display = "";
+                            tr.classList.remove('filtered-out');
                         } else {
-                            tr.style.display = "none";
+                            tr.classList.add('filtered-out');
                         }
                     }
                     updateChartAndHeadcount();
@@ -2098,6 +2135,8 @@
                 if (allEmpFilterBtn) {
                     allEmpFilterBtn.addEventListener("click", filterAllEmpTable);
                 }
+                window.filterAllEmpTable = filterAllEmpTable;
+                filterAllEmpTable();
             }
 
             // Filter functionality for Past Employee / Alumni Table
@@ -2111,11 +2150,6 @@
                 const pastEmpTrs = pastEmpTbody.getElementsByTagName("tr");
                 
                 function filterPastEmpTable() {
-                    // Unhide page-hidden rows before filtering
-                    document.querySelectorAll('#past-emp-tbody tr[data-page-hidden]').forEach(function(r) {
-                        r.style.display = '';
-                        r.removeAttribute('data-page-hidden');
-                    });
                     const searchVal = (pastEmpSearch.value || "").toLowerCase().trim();
                     const deptVal = pastEmpDept ? (pastEmpDept.value || "").toLowerCase().trim() : "";
                     const roleVal = pastEmpRole ? (pastEmpRole.value || "").toLowerCase().trim() : "";
@@ -2134,9 +2168,9 @@
                         const matchRole = isRoleEmpty || roleText.includes(roleVal);
 
                         if (matchSearch && matchDept && matchRole) {
-                            tr.style.display = "";
+                            tr.classList.remove('filtered-out');
                         } else {
-                            tr.style.display = "none";
+                            tr.classList.add('filtered-out');
                         }
                     }
                     if (window.resetPagination) resetPagination('past-emp-tbody');
@@ -2399,7 +2433,88 @@
     </div>
 </div>
 
+<!-- EMPLOYEE DETAILS MODAL -->
+<div class="modal fade" id="employeeDetailsModal" tabindex="-1" aria-labelledby="employeeDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+            <div class="modal-header border-0 bg-light py-3 px-4">
+                <h5 class="modal-title fw-bold text-dark m-0" id="employeeDetailsModalLabel">Employee Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                    <img id="empDetailsAvatar" src="/images/user.png" class="rounded-circle border me-3" style="width: 55px; height: 55px; object-fit: cover;" onerror="this.src='/images/user.png';"/>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1" id="empDetailsName">Employee Name</h5>
+                        <p class="text-muted mb-0" id="empDetailsEmail" style="font-size: 0.85rem;">Email</p>
+                    </div>
+                </div>
+                <div class="row g-4">
+                    <div class="col-6">
+                        <label class="text-muted small fw-bold uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Employee ID</label>
+                        <p class="fw-semibold text-dark mb-0" id="empDetailsId">-</p>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small fw-bold uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Department</label>
+                        <p class="fw-semibold text-dark mb-0" id="empDetailsDept">-</p>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small fw-bold uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Designation</label>
+                        <p class="fw-semibold text-dark mb-0" id="empDetailsDesignation">-</p>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small fw-bold uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Location</label>
+                        <p class="fw-semibold text-dark mb-0" id="empDetailsLocation">-</p>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small fw-bold uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Joining Date</label>
+                        <p class="fw-semibold text-dark mb-0" id="empDetailsJoinDate">-</p>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small fw-bold uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Status</label>
+                        <p class="mb-0"><span class="badge bg-success px-3 py-2" style="font-size: 0.75rem; border-radius: 6px;" id="empDetailsStatus">ACTIVE</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    function viewEmployeeDetails(id) {
+        fetch(`/senior_hr/api/employee/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                if(!data.id) {
+                    alert("Failed to load employee details.");
+                    return;
+                }
+                document.getElementById('empDetailsName').innerText = data.fullName || 'N/A';
+                document.getElementById('empDetailsEmail').innerText = data.email || 'N/A';
+                document.getElementById('empDetailsId').innerText = data.employeeCode || 'N/A';
+                document.getElementById('empDetailsDept').innerText = data.department || 'N/A';
+                document.getElementById('empDetailsDesignation').innerText = data.designation || 'N/A';
+                document.getElementById('empDetailsLocation').innerText = data.city || data.workLocation || 'N/A';
+                document.getElementById('empDetailsJoinDate').innerText = data.joiningDate || 'N/A';
+                
+                const statusEl = document.getElementById('empDetailsStatus');
+                if (statusEl) {
+                    statusEl.innerText = data.status || 'ACTIVE';
+                    if (data.status === 'ACTIVE') {
+                        statusEl.className = 'badge bg-success px-3 py-2';
+                    } else if (data.status === 'ON NOTICE') {
+                        statusEl.className = 'badge bg-warning px-3 py-2';
+                    } else {
+                        statusEl.className = 'badge bg-danger px-3 py-2';
+                    }
+                }
+                
+                const modal = new bootstrap.Modal(document.getElementById('employeeDetailsModal'));
+                modal.show();
+            })
+            .catch(err => console.error("Error fetching employee details:", err));
+    }
+
     function viewAlumniDetails(id) {
         fetch(`/senior_hr/api/employee/${id}`)
             .then(res => res.json())
@@ -2627,7 +2742,7 @@
             const tbody = document.getElementById(tbodyId);
             if (!tbody) return [];
             return Array.from(tbody.querySelectorAll('tr')).filter(function(r) {
-                return r.style.display !== 'none' && !r.classList.contains('filtered-out');
+                return !r.classList.contains('filtered-out');
             });
         }
 
@@ -2639,22 +2754,23 @@
             const start = (state.currentPage - 1) * PAGE_SIZE;
             const end = start + PAGE_SIZE;
 
-            // Hide ALL rows in tbody first, then show only current page rows
             const tbody = document.getElementById(tbodyId);
             if (!tbody) return;
             const allRows = Array.from(tbody.querySelectorAll('tr'));
+            
             allRows.forEach(function(r) {
-                if (r.style.display === 'none' || r.classList.contains('filtered-out')) return; // skip already filtered
-                r.setAttribute('data-paginated', 'true');
-            });
-            // First mark all visible rows as hidden via pagination
-            rows.forEach(function(r, i) {
-                if (i >= start && i < end) {
-                    r.style.display = '';
-                    r.removeAttribute('data-page-hidden');
-                } else {
+                if (r.classList.contains('filtered-out')) {
                     r.style.display = 'none';
                     r.setAttribute('data-page-hidden', 'true');
+                } else {
+                    const idx = rows.indexOf(r);
+                    if (idx >= start && idx < end) {
+                        r.style.display = '';
+                        r.removeAttribute('data-page-hidden');
+                    } else {
+                        r.style.display = 'none';
+                        r.setAttribute('data-page-hidden', 'true');
+                    }
                 }
             });
 
@@ -2732,14 +2848,6 @@
 
     // Reset pagination after any filter runs
     window.resetPagination = function(tbodyId) {
-        // First, unhide any page-hidden rows so filters see all rows
-        var tbody = document.getElementById(tbodyId);
-        if (tbody) {
-            tbody.querySelectorAll('tr[data-page-hidden]').forEach(function(r) {
-                r.style.display = '';
-                r.removeAttribute('data-page-hidden');
-            });
-        }
         if (paginators[tbodyId]) {
             paginators[tbodyId].currentPage = 1;
             paginators[tbodyId].render();

@@ -1096,7 +1096,9 @@ public class SeniorDashboardController {
         List<com.example.admindashboard.model.User> allUsers = userRepository.findAll();
         
         List<com.example.admindashboard.model.User> employeesOnly = allUsers.stream()
-            .filter(u -> !"ONBOARDING".equalsIgnoreCase(u.getStatus()) && !"admin".equalsIgnoreCase(u.getUsername()))
+            .filter(u -> !"ONBOARDING".equalsIgnoreCase(u.getStatus()) 
+                      && !"admin".equalsIgnoreCase(u.getUsername())
+                      && (u.getEmployeeProfile() == null || u.getEmployeeProfile().isOnboardingCompleted()))
             .collect(Collectors.toList());
         
         long totalEmp = employeesOnly.size();

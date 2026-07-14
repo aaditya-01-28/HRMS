@@ -112,7 +112,9 @@
 
 		    padding:25px 40px 60px;
 
-		    min-width:1600px;
+		    min-width:100%;
+		    width:100%;
+		    overflow-x:auto;
 		}
 
 		#orgTreeSection{
@@ -216,12 +218,12 @@
 
 		.tree li:first-child::before{
 
-		    border:none;
+		    border-top:none;
 		}
 
 		.tree li:last-child::after{
 
-		    border:none;
+		    border-top:none;
 		}
 
 		/* Vertical Line */
@@ -408,6 +410,20 @@
 	<script>
 		document.addEventListener("DOMContentLoaded", () => {
 		    loadOrganizationChart();
+
+            // Redirect Persistence Check (BUG-024)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('source') === 'whitecircle') {
+                sessionStorage.setItem('backRedirectSource', 'whitecircle');
+            } else if (urlParams.has('source')) {
+                sessionStorage.removeItem('backRedirectSource');
+            }
+            
+            const redirectSource = sessionStorage.getItem('backRedirectSource');
+            if (redirectSource === 'whitecircle') {
+                const backBtn = document.querySelector('.dashboard-btn');
+                if (backBtn) backBtn.href = '/my-whitecircle';
+            }
 		});
 
 		/* =========================================
