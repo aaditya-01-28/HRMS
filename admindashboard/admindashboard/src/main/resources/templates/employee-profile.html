@@ -6,1509 +6,1931 @@
     <title>My Profile - WhiteCircle</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
         :root {
-            --sidebar-bg: #0b1120;
-            --sidebar-hover: #1e293b;
-            --sidebar-active: #1e3a8a;
-            --text-main: #0f172a;
+            --primary: #1e3a8a;
+            --primary-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            --primary-light: #eff6ff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
             --bg-body: #f8fafc;
-            --border-color: #e2e8f0;
+            --bg-card: #ffffff;
+            --border-color: #f1f5f9;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02);
         }
 
         body {
-			font-family: Arial, sans-serif;
-		    font-size: 14px;
-            background: #efefef;
-            margin: 0; padding: 0;
-            color: var(--text-main);
-            overflow-x: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            margin: 0;
+            padding: 0;
         }
-		input,
-		select,
-		textarea,
-		button,
-		label,
-		span,
-		p,
-		a,
-		div {
-		    font-family: Arial, sans-serif;
-		    font-size: 14px;
-		}
 
-        .profile-layout {
+        .profile-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* HEADER */
+        .profile-header {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
             display: flex;
-            min-height: 100vh;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
-        
-        /* MAIN CONTENT AREA */
-        
-		.profile-main {
-		    margin-left: 0;
-		    width: 100%;
-		    flex-grow: 1;
-		    display: flex;
-		    flex-direction: column;
-		}
-
-		.top-nav{
-		    display: flex;
-		    justify-content: space-between;
-		    align-items: center;
-		    padding: 12px 20px;
-		    background: #ffffff;
-		    border-bottom: 1px solid #dce3ec;
-		}
-
-		.top-nav-title{
-		    display: flex;
-		    align-items: center;
-		    gap: 10px;
-		    font-family: Arial, sans-serif;
-		    font-size: 18px;
-		    font-weight: 700;
-		    color: #233f67;
-		}
-
-		.top-nav-actions{
-		    display: flex;
-		    gap: 12px;
-		}
-
-		.top-nav-btn{
-		    min-width: 250px;
-		    padding: 8px 18px;
-		    border-radius: 4px;
-		    border: none;
-		    text-decoration: none;
-		    font-family: Arial, sans-serif;
-		    font-size: 14px;
-		    font-weight: 600;
-		    text-align: center;
-		    cursor: pointer;
-		}
-
-		.edit-btn{
-		    background: #2F6FED;
-		    color: #ffffff;
-		}
-
-		.edit-btn:hover{
-		    background: #255ED1;
-		}
-
-		.home-btn{
-		    background: #2F6FED;
-		    color: #ffffff;
-		}
-
-		.home-btn:hover{
-		    background: #255ED1;
-		}
-        .progress-wrapper { display: flex; align-items: center; gap: 15px; }
-        .progress-text { font-size: 0.85rem; font-weight: 600; color: #64748b; }
-        .progress { width: 150px; height: 8px; border-radius: 10px; background-color: #e2e8f0; }
-        .progress-bar { background: linear-gradient(90deg, #1e3a8a 0%, #38bdf8 100%); border-radius: 10px; }
-
-        .content-area { padding:15px 25px; max-width: 100%; margin: 0 auto; width: 100%; flex-grow: 1; }
-
-        .tab-pane-card {
-            background: #fff; border-radius: 16px; border: 1px solid var(--border-color);
-            padding: 35px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        .profile-title-block {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
-        .tab-header {
-            font-size: 1.3rem; font-weight: 700; color: #1e293b;
-            margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #f1f5f9;
+        .profile-title-block img {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-light);
         }
-        
-        .empty-field { color: #94a3b8; font-style: italic; }
 
-        /* FOOTER ACTIONS */
-        .action-footer {
-            margin-top: 40px; padding-top: 25px; border-top: 1px solid #e2e8f0;
-            display: flex; justify-content: flex-end; gap: 15px;
+        .profile-title-block h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
         }
-        
 
+        .profile-title-block p {
+            color: var(--text-muted);
+            margin: 2px 0 0 0;
+            font-size: 0.85rem;
+        }
+
+        /* PROGRESS TRACKER */
+        .progress-card {
+            background: var(--primary-light);
+            border-radius: var(--radius-md);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .progress-card-info h5 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0 0 4px 0;
+        }
+
+        .progress-card-info p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .progress-bar-wrapper {
+            width: 140px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* LAYOUT SPAN */
+        .profile-layout-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* SIDEBAR NAVIGATION */
+        .profile-nav-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav-tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            text-align: left;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .nav-tab-btn i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-tab-btn:hover {
+            background: var(--bg-body);
+            color: var(--text-dark);
+        }
+
+        .nav-tab-btn.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* MAIN CONTENT CARD */
+        .profile-content-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            min-height: 500px;
+        }
+
+        .tab-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 28px;
+        }
+
+        .tab-section-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tab-section-header h2 i {
+            color: var(--primary);
+        }
+
+        /* FORM GRIDS */
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px 32px;
+        }
+
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 24px 20px;
+        }
+
+        .full-width-cell {
+            grid-column: span 2;
+        }
+
+        .form-grid-3 .full-width-cell {
+            grid-column: span 3;
+        }
+
+        /* PROFILE FIELD COMPONENT */
+        .profile-field-card {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        /* VIEW STATE */
+        .view-state-box {
+            background: var(--bg-body);
+            border-radius: 8px;
+            padding: 10px 14px;
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid transparent;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .view-state-box.readonly-field {
+            background: rgba(226, 232, 240, 0.4);
+            border-style: dashed;
+            border-color: #cbd5e1;
+        }
+
+        .view-state-box.empty-val {
+            color: var(--text-muted);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .lock-badge {
+            background: #cbd5e1;
+            color: #475569;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* EDIT STATE */
+        .edit-state-box input,
+        .edit-state-box select,
+        .edit-state-box textarea {
+            width: 100%;
+            height: 42px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 0 14px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: var(--bg-card);
+            color: var(--text-dark);
+            transition: border-color 0.2s ease;
+        }
+
+        .edit-state-box input:focus,
+        .edit-state-box select:focus,
+        .edit-state-box textarea:focus {
+            border-color: var(--primary-light);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .edit-state-box textarea {
+            height: 100px;
+            padding: 10px 14px;
+            resize: none;
+        }
+
+        .edit-state-box input[readonly],
+        .edit-state-box select[disabled] {
+            background: #f1f5f9;
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* SUBSECTIONS */
+        .section-separator {
+            grid-column: span 2;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--primary);
+            margin-top: 16px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-grid-3 .section-separator {
+            grid-column: span 3;
+        }
+
+        /* FILE UPLOADS */
+        .doc-upload-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .doc-upload-card {
+            background: var(--bg-body);
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--radius-md);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .doc-upload-card:hover {
+            border-color: var(--primary-light);
+            background: var(--primary-light);
+        }
+
+        .doc-upload-icon {
+            font-size: 2rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .doc-upload-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .doc-upload-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .doc-file-preview {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .doc-file-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 180px;
+        }
+
+        .doc-file-remove {
+            color: var(--danger);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        .doc-file-remove:hover {
+            color: #b91c1c;
+        }
+
+        .existing-doc-link {
+            font-size: 0.75rem;
+            color: var(--success);
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+            background: var(--success-light);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        /* BUTTONS */
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-action-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-action-primary:hover {
+            box-shadow: 0 6px 10px -1px rgba(59, 130, 246, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-action-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-action-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-action-outline {
+            border: 1px solid #cbd5e1;
+            background: transparent;
+            color: var(--text-dark);
+        }
+
+        .btn-action-outline:hover {
+            background: var(--bg-body);
+        }
+
+        /* TOGGLE STATES */
+        body:not(.editing) .edit-state {
+            display: none !important;
+        }
+
+        body.editing .view-state {
+            display: none !important;
+        }
+
+        /* RESPONSIVE */
         @media (max-width: 991px) {
-            .profile-sidebar { width: 80px; }
-            .user-summary { padding: 20px 0; }
-            .avatar-circle { width: 50px; height: 50px; font-size: 1.2rem; }
-            .user-name, .user-desig { display: none; }
-            .nav-pills .nav-link span { display: none; }
-            .nav-pills .nav-link i { margin-right: 0; margin: 0 auto; font-size: 1.3rem; }
-            .profile-main { margin-left: 0; }
-            .top-header { padding: 15px 20px !important; }
-            .content-area { padding: 20px; }
-        }
-
-        @media (max-width: 768px) {
-            .profile-tabs {
-                display: flex !important;
-                overflow-x: auto !important;
-                white-space: nowrap !important;
-                width: 100% !important;
+            .profile-layout-grid {
+                grid-template-columns: 1fr;
             }
-            .tab-btn {
-                flex: 0 0 auto !important;
-                padding: 12px 15px !important;
+            .profile-nav-card {
+                flex-direction: row;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding: 10px;
             }
-            .top-header {
-                flex-direction: column !important;
-                align-items: center !important;
-                gap: 12px !important;
-                padding: 15px 10px !important;
-            }
-            .page-title span {
-                font-size: 1.1rem !important;
-            }
-            .d-flex.gap-3.align-items-center {
-                flex-direction: row !important;
-                flex-wrap: wrap !important;
-                justify-content: center !important;
-                gap: 10px !important;
-            }
-            .btn {
-                padding: 6px 12px !important;
-                font-size: 12px !important;
-            }
-            .btn-back-home {
-                padding: 6px 12px !important;
-                font-size: 12px !important;
-            }
-            .general-grid,
-            .classification-grid,
-            .statutory-grid,
-            .address-grid,
-            .hr-category-grid,
-            .documents-grid {
-                grid-template-columns: 1fr !important;
-                gap: 15px !important;
-                padding: 15px 10px !important;
+            .nav-tab-btn {
+                flex: 0 0 auto;
+                padding: 10px 14px;
             }
         }
-		.profile-tabs{
-		    display:grid;
-		    grid-template-columns:repeat(7,1fr);
-		    width:100%;
-		    background:#dfe8f2;
-		    border-top:1px solid #cfd8e3;
-		    border-bottom:1px solid #cfd8e3;
-		}
 
-		.tab-btn{
-		    flex:1;
-		    text-align:center;
-		    border:none;
-		    background:transparent;
-		    padding:16px 10px;
-			font-family: Arial, sans-serif;
-			font-size:14px;
-		    font-weight:700;
-		    color:#233f67;
-		    border-bottom:3px solid transparent;
-		}
-
-		.tab-btn.active{
-		    color:#0066cc;
-		    border-bottom:3px solid #0066cc;
-		}
-
-		.tab-pane-card{
-		    border:none;
-		    box-shadow:none;
-		    background:#efefef;
-		    padding:20px;
-		}
-
-		.tab-header{
-		    display:none;
-		}
-		#v-pills-personal{
-		    display:block;
-		}
-
-		#v-pills-edu,
-		#v-pills-jobdata,
-		#v-pills-work,
-		#v-pills-project,
-		#v-pills-reporting,
-		#v-pills-emergency{
-		    display:none;
-		}
-		
-		.general-grid{
-		    display:grid;
-		    grid-template-columns:1fr 1fr;
-		    gap:28px 70px;
-		    max-width:1250px;
-		    margin:0 auto;
-		    padding:20px 80px;
-		}
-
-		.field-group{
-		    display:flex;
-		    flex-direction:column;
-		}
-
-		.field-group label{
-			font-family: Arial, sans-serif;
-		    font-size:14px;
-		    font-weight:700;
-		    margin-bottom:10px;
-		    color:#111;
-		}
-
-		.field-group input,
-		.field-group select{
-			font-family: Arial, sans-serif;
-			font-size:14px;
-		    height:38px;
-		    border:1px solid #666;
-		    border-radius:3px;
-		    padding:0 10px;
-		    background:#fff;
-		}
-
-		.field-group textarea{
-			font-family: Arial, sans-serif;
-			font-size:14px; 
-		    height:120px;
-		    border:1px solid #666;
-		    border-radius:3px;
-		    resize:none;
-		    padding:10px;
-		}
-
-		.notes-group{
-		    grid-row:span 2;
-		}
-
-		.tab-pane-card{
-		    background:#efefef;
-		    padding:0;
-		}
-		
-		.classification-grid{
-		    display:grid;
-		    grid-template-columns:1fr 1fr;
-		    gap:28px 70px;
-		    max-width:1100px;
-		    margin:0 auto;
-		    padding:20px 50px;
-		}
-		
-		.statutory-grid{
-		    display:grid;
-		    grid-template-columns:1fr 1fr;
-		    gap:35px 70px;
-		    max-width:1000px;
-		    margin:0 auto;
-		    padding:20px 50px;
-		}
-		.address-grid{
-		    display:grid;
-		    grid-template-columns:1fr 1fr 1fr;
-		    gap:30px 50px;
-		    max-width:1300px;
-		    margin:0 auto;
-		    padding:20px 30px;
-		}
-
-		.address-section-title{
-		    font-size:16px;
-		    font-weight:700;
-		    color:#0033cc;
-		    margin-bottom:15px;
-		}
-
-		.address-column{
-		    display:flex;
-		    flex-direction:column;
-		    gap:18px;
-		}
-		.hr-category-grid{
-		    display:grid;
-		    grid-template-columns:1fr 1fr;
-		    gap:35px 70px;
-		    max-width:900px;
-		    margin:0 auto;
-		    padding:25px 40px;
-		}
-		
-		.documents-grid{
-		    display:grid;
-		    grid-template-columns:repeat(2, 1fr);
-		    gap:60px 120px;
-		    max-width:1200px;
-		    margin:0 auto;
-		    padding:40px 80px;
-		}
-
-		.document-card{
-		    display:flex;
-		    flex-direction:column;
-		    align-items:center;
-		}
-
-		.document-card.center{
-		    grid-column:1 / 3;
-		    justify-self:center;
-		}
-
-		.document-title{
-		    font-size:16px;
-		    font-weight:700;
-		    margin-bottom:15px;
-		    text-align:center;
-		}
-
-		.upload-box{
-			width:280px;
-			height:170px;
-		    border:1px dashed #666;
-		    display:flex;
-		    flex-direction:column;
-		    justify-content:center;
-		    align-items:center;
-		    background:#fff;
-		    cursor:pointer;
-		}
-
-		.upload-icon{
-		    font-size:42px;
-		    color:#777;
-		    margin-bottom:8px;
-		}
-
-		.upload-text{
-		    font-size:14px;
-		    font-weight:600;
-		    color:#111;
-		}
-
-		.upload-browse{
-		    color:#0d6efd;
-		    font-weight:600;
-		    margin-top:4px;
-		}
-
-		.upload-box input{
-		    display:none;
-		}
-		
-		.file-name{
-		    margin-top:8px;
-		    font-family:Arial,sans-serif;
-		    font-size:12px;
-		    color:#233f67;
-		    text-align:center;
-		    word-break:break-word;
-		}
-		.file-preview{
-		    margin-top:10px;
-		    display:flex;
-		    justify-content:center;
-		    align-items:center;
-		    gap:8px;
-		    font-size:12px;
-		    color:#233f67;
-		    word-break:break-word;
-		}
-
-		.remove-file{
-		    color:#dc3545;
-		    font-size:16px;
-		    font-weight:bold;
-		    cursor:pointer;
-		}
-
-		.remove-file:hover{
-		    color:#b02a37;
-		}
+        @media (max-width: 767px) {
+            .form-grid-2, .form-grid-3 {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .full-width-cell, .form-grid-3 .full-width-cell {
+                grid-column: span 1;
+            }
+            .profile-header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .profile-title-block {
+                flex-direction: column;
+            }
+            .progress-card {
+                justify-content: center;
+            }
+            .profile-content-card {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="profile-layout">
-    <!-- LEFT SIDEBAR -->
-    
+<div class="profile-container">
+    <!-- TOP HEADER -->
+    <header class="profile-header">
+        <div class="profile-title-block">
+            <img th:src="${employeeProfile.photoDocPath != null && !employeeProfile.photoDocPath.isEmpty() ? employeeProfile.photoDocPath : 'https://ui-avatars.com/api/?name=' + user.fullName + '&background=1e3a8a&color=fff&size=100'}" alt="User Avatar">
+            <div>
+                <h1 th:text="${user.fullName}">Akash Sahu</h1>
+                <p th:text="${employeeProfile.designation != null ? employeeProfile.designation : 'Employee'}">Software Engineer</p>
+            </div>
+        </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="profile-main">
-		<header class="top-header d-flex justify-content-between align-items-center px-4 py-3 bg-white w-100 shadow-sm" style="position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #e2e8f0;">
-		    <div class="page-title d-flex align-items-center">
-		        <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.fullName} + '&background=1e3a8a&color=fff&size=50'}"
-                     class="rounded-circle shadow-sm" alt="User" style="width: 40px; height: 40px;">
-		        <span class="fw-bold text-dark" style="border-left: 2px solid #cbd5e1; padding-left: 17px; margin-left: 15px; font-size: 1.5rem; letter-spacing: 0.5px;">
-		            My Profile
-		        </span>
-		    </div>
+        <!-- PROGRESS BAR -->
+        <div class="progress-card">
+            <div class="progress-card-info">
+                <h5>Profile Status</h5>
+                <p>Completion Rate</p>
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span id="percentLabel" class="fw-bold text-primary" style="font-size: 0.85rem;">0%</span>
+                </div>
+                <div class="progress-bar-wrapper">
+                    <div id="completionBar" class="progress-bar-fill"></div>
+                </div>
+            </div>
+        </div>
 
-		    <div class="d-flex align-items-center gap-3">
+        <!-- HEADER ACTIONS -->
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn-action btn-action-primary" id="editProfileBtn">
+                <i class="fas fa-edit"></i> Edit Details
+            </button>
+            <button type="submit" form="masterProfileForm" class="btn-action btn-action-primary" id="saveProfileBtn" style="display:none; background: var(--success);">
+                <i class="fas fa-check"></i> Save Changes
+            </button>
+            <button type="button" class="btn-action btn-action-secondary" id="cancelEditBtn" style="display:none;">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <a href="/default-redirect" class="btn-action btn-action-outline" id="backHomeBtn">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </header>
 
-				<button type="button"
-				        class="btn btn-primary fw-bold px-4"
-				        id="editProfileBtn">
-				    Edit Details
-				</button>
+    <div class="profile-layout-grid">
+        <!-- SIDEBAR NAVIGATION -->
+        <nav class="profile-nav-card">
+            <button class="nav-tab-btn active" onclick="showProfileTab('v-pills-personal', this)">
+                <i class="fas fa-user-circle"></i> Personal Details
+            </button>
+            <button class="nav-tab-btn" onclick="showProfileTab('v-pills-employment', this)">
+                <i class="fas fa-briefcase"></i> Employment Details
+            </button>
+            <button class="nav-tab-btn" onclick="showProfileTab('v-pills-project', this)">
+                <i class="fas fa-project-diagram"></i> Project & Client Info
+            </button>
+            <button class="nav-tab-btn" onclick="showProfileTab('v-pills-edu', this)">
+                <i class="fas fa-graduation-cap"></i> Education Details
+            </button>
+            <button class="nav-tab-btn" onclick="showProfileTab('v-pills-bank', this)">
+                <i class="fas fa-university"></i> Bank & Compensation
+            </button>
+            <button class="nav-tab-btn" onclick="showProfileTab('v-pills-address', this)">
+                <i class="fas fa-map-marker-alt"></i> Address & Contact
+            </button>
+            <button class="nav-tab-btn" onclick="showProfileTab('v-pills-statutory', this)">
+                <i class="fas fa-id-card"></i> Identity & Statutory
+            </button>
+            <button class="nav-tab-btn" onclick="showProfileTab('v-pills-documents', this)">
+                <i class="fas fa-folder-open"></i> Document Uploads
+            </button>
+        </nav>
 
-				<button type="submit"
-				        form="masterProfileForm"
-				        class="btn btn-success fw-bold px-4"
-				        id="saveProfileBtn"
-				        style="display:none;">
-				    Save Changes
-				</button>
-
-				<button type="button"
-				        class="btn btn-secondary fw-bold px-4"
-				        id="cancelEditBtn"
-				        style="display:none;">
-				    Cancel
-				</button>
-
-				<a href="/default-redirect"
-				   class="btn btn-outline-primary fw-bold px-4 btn-back-home"
-				   id="backHomeBtn">
-				    <i class="fas fa-arrow-left me-2"></i> Back to Home
-				</a>
-
-		    </div>
-
-		</header>
-
-		<div class="profile-tabs" style="position: sticky; top: 68px; z-index: 999; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-
-		    <button class="tab-btn active"
-		            onclick="showProfileTab('v-pills-personal',this)">
-		        General
-		    </button>
-
-		    <button class="tab-btn"
-		            onclick="showProfileTab('v-pills-edu',this)">
-		        Classification
-		    </button>
-
-		    <button class="tab-btn"
-		            onclick="showProfileTab('v-pills-jobdata',this)">
-		        Job Data
-		    </button>
-
-		    <button class="tab-btn"
-		            onclick="showProfileTab('v-pills-work',this)">
-		        Statutory
-		    </button>
-
-		    <button class="tab-btn"
-		            onclick="showProfileTab('v-pills-project',this)">
-		        Address
-		    </button>
-
-		    <button class="tab-btn"
-		            onclick="showProfileTab('v-pills-reporting',this)">
-		        HR Category
-		    </button>
-
-		    <button class="tab-btn"
-		            onclick="showProfileTab('v-pills-emergency',this)">
-		        Documents
-		    </button>
-
-		</div>
-		
-       
-
-        <div class="content-area">
-            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show fw-bold shadow-sm mb-4" role="alert">
+        <!-- MAIN CONTENT AREA -->
+        <main class="profile-content-card">
+            <!-- FLASH SUCCESS MESSAGE -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show fw-bold shadow-sm mb-4" role="alert" style="border-radius: 8px; border-left: 4px solid var(--success);">
                 <i class="fas fa-check-circle me-2"></i> <span th:text="${successMessage}"></span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
-            <div class="tab-pane-card">
-				<form id="masterProfileForm"
-				      th:action="@{/employee/profile/save-detailed}"
-				      method="POST"
-				      enctype="multipart/form-data">
-                    <!-- HIDDEN FIELD FOR REDIRECT -->
-                    <input type="hidden" name="returnUrl" value="/employee/profile">
+            <form id="masterProfileForm" th:action="@{/employee/profile/save-detailed}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="returnUrl" value="/employee/profile">
+
+                <!-- 1. PERSONAL DETAILS TAB -->
+                <div id="v-pills-personal" class="tab-pane">
+                    <div class="tab-section-header">
+                        <h2><i class="fas fa-user-circle"></i> Personal Details</h2>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="profile-field-card">
+                            <div class="field-label">Employee ID</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${user.username}">EMP0002</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="employeeId" th:value="${user.username}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Full Name</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${user.fullName}">Akash Sahu</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="fullName" th:value="${user.fullName}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Gender</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.gender)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.gender) ? employeeProfile.gender : 'Not Provided'}">Male</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <select name="gender" class="tracked-field">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male" th:selected="${employeeProfile.gender == 'Male'}">Male</option>
+                                    <option value="Female" th:selected="${employeeProfile.gender == 'Female'}">Female</option>
+                                    <option value="Other" th:selected="${employeeProfile.gender == 'Other'}">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Date of Birth</div>
+                            <div class="view-state view-state-box" th:classappend="${employeeProfile.dob == null} ? 'empty-val'">
+                                <span th:text="${employeeProfile.dob != null ? employeeProfile.dob : 'Not Provided'}">1995-10-12</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="date" name="dob" th:value="${employeeProfile.dob}" class="tracked-field">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Marital Status</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.maritalStatus)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.maritalStatus) ? employeeProfile.maritalStatus : 'Not Provided'}">Single</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <select name="maritalStatus" class="tracked-field">
+                                    <option value="">Select Marital Status</option>
+                                    <option value="Single" th:selected="${employeeProfile.maritalStatus == 'Single'}">Single</option>
+                                    <option value="Married" th:selected="${employeeProfile.maritalStatus == 'Married'}">Married</option>
+                                    <option value="Divorced" th:selected="${employeeProfile.maritalStatus == 'Divorced'}">Divorced</option>
+                                    <option value="Widowed" th:selected="${employeeProfile.maritalStatus == 'Widowed'}">Widowed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Spouse Name</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.spouseName)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.spouseName) ? employeeProfile.spouseName : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="spouseName" th:value="${employeeProfile.spouseName}" placeholder="Enter Spouse Name">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Father's Name</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.fatherName)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.fatherName) ? employeeProfile.fatherName : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="fatherName" th:value="${employeeProfile.fatherName}" placeholder="Enter Father's Name" class="tracked-field">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Mother's Name</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.motherName)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.motherName) ? employeeProfile.motherName : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="motherName" th:value="${employeeProfile.motherName}" placeholder="Enter Mother's Name" class="tracked-field">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Nationality</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.nationality)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.nationality) ? employeeProfile.nationality : 'Not Provided'}">Indian</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="nationality" th:value="${employeeProfile.nationality}" placeholder="Enter Nationality">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Physically Challenged</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.physicallyChallenged)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.physicallyChallenged) ? employeeProfile.physicallyChallenged : 'Not Provided'}">No</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <select name="physicallyChallenged">
+                                    <option value="">Select Option</option>
+                                    <option value="No" th:selected="${employeeProfile.physicallyChallenged == 'No'}">No</option>
+                                    <option value="Yes" th:selected="${employeeProfile.physicallyChallenged == 'Yes'}">Yes</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Caste Category</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.casteCategory)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.casteCategory) ? employeeProfile.casteCategory : 'Not Provided'}">General</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <select name="casteCategory">
+                                    <option value="">Select Category</option>
+                                    <option value="General" th:selected="${employeeProfile.casteCategory == 'General'}">General</option>
+                                    <option value="OBC" th:selected="${employeeProfile.casteCategory == 'OBC'}">OBC</option>
+                                    <option value="SC" th:selected="${employeeProfile.casteCategory == 'SC'}">SC</option>
+                                    <option value="ST" th:selected="${employeeProfile.casteCategory == 'ST'}">ST</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Blood Group</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.bloodGroup)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.bloodGroup) ? employeeProfile.bloodGroup : 'Not Provided'}">O+</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <select name="bloodGroup" class="tracked-field">
+                                    <option value="">Select Blood Group</option>
+                                    <option value="A+" th:selected="${employeeProfile.bloodGroup == 'A+'}">A+</option>
+                                    <option value="A-" th:selected="${employeeProfile.bloodGroup == 'A-'}">A-</option>
+                                    <option value="B+" th:selected="${employeeProfile.bloodGroup == 'B+'}">B+</option>
+                                    <option value="B-" th:selected="${employeeProfile.bloodGroup == 'B-'}">B-</option>
+                                    <option value="AB+" th:selected="${employeeProfile.bloodGroup == 'AB+'}">AB+</option>
+                                    <option value="AB-" th:selected="${employeeProfile.bloodGroup == 'AB-'}">AB-</option>
+                                    <option value="O+" th:selected="${employeeProfile.bloodGroup == 'O+'}">O+</option>
+                                    <option value="O-" th:selected="${employeeProfile.bloodGroup == 'O-'}">O-</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. EMPLOYMENT DETAILS TAB -->
+                <div id="v-pills-employment" class="tab-pane" style="display:none;">
+                    <div class="tab-section-header">
+                        <h2><i class="fas fa-briefcase"></i> Employment Details</h2>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="profile-field-card">
+                            <div class="field-label">Department</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${employeeProfile.department}">Engineering</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="department" th:value="${employeeProfile.department}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Designation</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${employeeProfile.designation}">Software Engineer</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="designation" th:value="${employeeProfile.designation}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Employee Role</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.roleName)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.roleName) ? employeeProfile.roleName : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="roleName" th:value="${employeeProfile.roleName}" placeholder="Enter Employee Role">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Employment Category</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${employeeProfile.category}">Full-Time</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="category" th:value="${employeeProfile.category}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Branch</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${employeeProfile.branch}">Headquarters</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="branch" th:value="${employeeProfile.branch}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Work Location</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.workLocation)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.workLocation) ? employeeProfile.workLocation : 'Not Provided'}">Mumbai</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="workLocation" th:value="${employeeProfile.workLocation}" placeholder="Enter Work Location">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Date of Joining</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${user.employeeProfile?.joiningDate}">17-11-2025</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="date" id="jobJoiningDate" name="joiningDate" th:value="${user.employeeProfile?.joiningDate}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Probation Period (in days)</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${employeeProfile.probationPeriod}">180</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="number" name="probationPeriod" th:value="${employeeProfile.probationPeriod}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Capability Center</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.capabilityCenter)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.capabilityCenter) ? employeeProfile.capabilityCenter : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <select name="capabilityCenter">
+                                    <option value="">Select Capability Center</option>
+                                    <option value="AI" th:selected="${employeeProfile.capabilityCenter == 'AI'}">AI</option>
+                                    <option value="Data Science" th:selected="${employeeProfile.capabilityCenter == 'Data Science'}">Data Science</option>
+                                    <option value="Fintech" th:selected="${employeeProfile.capabilityCenter == 'Fintech'}">Fintech</option>
+                                    <option value="BFSI" th:selected="${employeeProfile.capabilityCenter == 'BFSI'}">BFSI</option>
+                                    <option value="Big Data" th:selected="${employeeProfile.capabilityCenter == 'Big Data'}">Big Data</option>
+                                    <option value="Infra" th:selected="${employeeProfile.capabilityCenter == 'Infra'}">Infra</option>
+                                    <option value="Support" th:selected="${employeeProfile.capabilityCenter == 'Support'}">Support</option>
+                                    <option value="SD" th:selected="${employeeProfile.capabilityCenter == 'SD'}">SD</option>
+                                    <option value="Cybersecurity" th:selected="${employeeProfile.capabilityCenter == 'Cybersecurity'}">Cybersecurity</option>
+                                    <option value="Business" th:selected="${employeeProfile.capabilityCenter == 'Business'}">Business</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Company Name</div>
+                            <div class="view-state view-state-box">
+                                <span th:text="${employeeProfile.companyName != null && !employeeProfile.companyName.isEmpty() ? employeeProfile.companyName : 'WhiteCircle Group(WCG)'}">WhiteCircle Group(WCG)</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="companyName" th:value="${employeeProfile.companyName != null && !employeeProfile.companyName.isEmpty() ? employeeProfile.companyName : 'WhiteCircle Group(WCG)'}" placeholder="Company Name">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Vertical Head</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.verticalHead)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.verticalHead) ? employeeProfile.verticalHead : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="verticalHead" th:value="${employeeProfile.verticalHead}" placeholder="Vertical Head Name">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Business Unit</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.businessUnit)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.businessUnit) ? employeeProfile.businessUnit : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="businessUnit" th:value="${employeeProfile.businessUnit}" placeholder="Enter Business Unit">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Reporting Manager</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.reportingManager)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.reportingManager) ? employeeProfile.reportingManager : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="reportingManager" th:value="${employeeProfile.reportingManager}" placeholder="Manager Name">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Reporting Manager L2</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.reportingManagerL2)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.reportingManagerL2) ? employeeProfile.reportingManagerL2 : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="reportingManagerL2" th:value="${employeeProfile.reportingManagerL2}" placeholder="L2 Manager Name">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Senior Manager L3</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.seniorManagerL3)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.seniorManagerL3) ? employeeProfile.seniorManagerL3 : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="seniorManagerL3" th:value="${employeeProfile.seniorManagerL3}" placeholder="L3 Manager Name">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Project Manager</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.projectManager)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.projectManager) ? employeeProfile.projectManager : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="projectManager" th:value="${employeeProfile.projectManager}" placeholder="Project Manager Name">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">BU HR Contact</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.buHrContact)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.buHrContact) ? employeeProfile.buHrContact : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="buHrContact" th:value="${employeeProfile.buHrContact}" placeholder="HR Contact Name">
+                            </div>
+                        </div>
+
+                        <!-- Experience Sub-section -->
+                        <div class="section-separator"><i class="fas fa-history"></i> Experience Details</div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Current Experience</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span id="currentExperienceSpan">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" id="currentExperience" class="form-control" readonly>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Previous Relevant Experience (Years)</div>
+                            <div class="view-state view-state-box" th:classappend="${employeeProfile.previousExperience == null} ? 'empty-val'">
+                                <span th:text="${employeeProfile.previousExperience != null ? employeeProfile.previousExperience + ' Years' : '0 Years'}">0 Years</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="number" step="0.1" id="previousExperience" name="previousExperience" th:value="${employeeProfile.previousExperience}" placeholder="Enter Previous Years" oninput="calculateExperiences()">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Total Experience</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span id="totalExperienceSpan">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" id="totalExperience" class="form-control" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. PROJECT & CLIENT INFO TAB -->
+                <div id="v-pills-project" class="tab-pane" style="display:none;">
+                    <div class="tab-section-header">
+                        <h2><i class="fas fa-project-diagram"></i> Project & Client Info</h2>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="profile-field-card">
+                            <div class="field-label">Project Name</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.projectName)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.projectName) ? employeeProfile.projectName : 'Not Assigned'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="projectName" th:value="${employeeProfile.projectName}" placeholder="Project Name">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Project Code</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.projectCode)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.projectCode) ? employeeProfile.projectCode : 'Not Assigned'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="projectCode" th:value="${employeeProfile.projectCode}" placeholder="Project Code">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Team / Group</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.teamGroup)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.teamGroup) ? employeeProfile.teamGroup : 'Not Assigned'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="teamGroup" th:value="${employeeProfile.teamGroup}" placeholder="Team or Group Name">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Customer Name</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.customerName)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.customerName) ? employeeProfile.customerName : 'Not Assigned'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="customerName" th:value="${employeeProfile.customerName}" placeholder="Customer/Client Name">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Vertical Name</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.verticalName)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.verticalName) ? employeeProfile.verticalName : 'Not Assigned'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="verticalName" th:value="${employeeProfile.verticalName}" placeholder="Vertical Name">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Domain / Industry</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.domainIndustry)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.domainIndustry) ? employeeProfile.domainIndustry : 'Not Assigned'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="domainIndustry" th:value="${employeeProfile.domainIndustry}" placeholder="E.g., Banking, Healthcare">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. EDUCATION DETAILS TAB -->
+                <div id="v-pills-edu" class="tab-pane" style="display:none;">
+                    <div class="tab-section-header">
+                        <h2><i class="fas fa-graduation-cap"></i> Education Details</h2>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="profile-field-card full-width-cell">
+                            <div class="field-label">Highest Qualification</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.qualification)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.qualification) ? employeeProfile.qualification : 'Not Provided'}">Master's</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <select name="qualification" class="tracked-field">
+                                    <option value="">Select Qualification</option>
+                                    <option value="High School" th:selected="${employeeProfile.qualification == 'High School'}">High School</option>
+                                    <option value="Diploma" th:selected="${employeeProfile.qualification == 'Diploma'}">Diploma</option>
+                                    <option value="Bachelor of Science (BSc)" th:selected="${employeeProfile.qualification == 'Bachelor of Science (BSc)'}">Bachelor of Science (BSc)</option>
+                                    <option value="Bachelor of Technology (BTech)" th:selected="${employeeProfile.qualification == 'Bachelor of Technology (BTech)'}">Bachelor of Technology (BTech)</option>
+                                    <option value="Bachelor of Engineering (BE)" th:selected="${employeeProfile.qualification == 'Bachelor of Engineering (BE)'}">Bachelor of Engineering (BE)</option>
+                                    <option value="Master of Science (MSc)" th:selected="${employeeProfile.qualification == 'Master of Science (MSc)'}">Master of Science (MSc)</option>
+                                    <option value="Master of Technology (MTech)" th:selected="${employeeProfile.qualification == 'Master of Technology (MTech)'}">Master of Technology (MTech)</option>
+                                    <option value="Master of Business Administration (MBA)" th:selected="${employeeProfile.qualification == 'Master of Business Administration (MBA)'}">Master of Business Administration (MBA)</option>
+                                    <option value="PhD" th:selected="${employeeProfile.qualification == 'PhD'}">PhD</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Qual 1 -->
+                        <div class="section-separator"><i class="fas fa-award"></i> Qualification 1 Details</div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Degree Title / Specialization</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.qual1Title)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.qual1Title) ? employeeProfile.qual1Title : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="qual1Title" th:value="${employeeProfile.qual1Title}" placeholder="Degree Title">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Institution / University</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.qual1Inst)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.qual1Inst) ? employeeProfile.qual1Inst : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="qual1Inst" th:value="${employeeProfile.qual1Inst}" placeholder="College/University">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Year of Passing</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.qual1Year)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.qual1Year) ? employeeProfile.qual1Year : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="qual1Year" th:value="${employeeProfile.qual1Year}" placeholder="E.g., 2018">
+                            </div>
+                        </div>
+
+                        <!-- Qual 2 -->
+                        <div class="section-separator"><i class="fas fa-award"></i> Qualification 2 Details</div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Degree Title / Specialization</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.qual2Title)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.qual2Title) ? employeeProfile.qual2Title : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="qual2Title" th:value="${employeeProfile.qual2Title}" placeholder="Degree Title">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Institution / University</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.qual2Inst)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.qual2Inst) ? employeeProfile.qual2Inst : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="qual2Inst" th:value="${employeeProfile.qual2Inst}" placeholder="College/University">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Year of Passing</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.qual2Year)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.qual2Year) ? employeeProfile.qual2Year : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="qual2Year" th:value="${employeeProfile.qual2Year}" placeholder="E.g., 2020">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. BANK & COMPENSATION TAB -->
+                <div id="v-pills-bank" class="tab-pane" style="display:none;">
+                    <div class="tab-section-header">
+                        <h2><i class="fas fa-university"></i> Bank & Compensation Details</h2>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="profile-field-card">
+                            <div class="field-label">Bank Name</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.bankName)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.bankName) ? employeeProfile.bankName : 'Not Provided'}">SBI</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="bankName" th:value="${employeeProfile.bankName}" placeholder="Bank Name" class="tracked-field">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Account Holder Name</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.bankAccountHolder)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.bankAccountHolder) ? employeeProfile.bankAccountHolder : 'Not Provided'}">Akash Sahu</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="bankAccountHolder" th:value="${employeeProfile.bankAccountHolder}" placeholder="Account Holder Name">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Bank Account Number</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.bankAccountNumber)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.bankAccountNumber) ? employeeProfile.bankAccountNumber : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="bankAccountNumber" th:value="${employeeProfile.bankAccountNumber}" placeholder="Account Number" class="tracked-field">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Account Type</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.bankAccountType)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.bankAccountType) ? employeeProfile.bankAccountType : 'Not Provided'}">Savings</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <select name="bankAccountType">
+                                    <option value="">Select Account Type</option>
+                                    <option value="Savings" th:selected="${employeeProfile.bankAccountType == 'Savings'}">Savings</option>
+                                    <option value="Current" th:selected="${employeeProfile.bankAccountType == 'Current'}">Current</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Bank Branch</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.bankBranch)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.bankBranch) ? employeeProfile.bankBranch : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="bankBranch" th:value="${employeeProfile.bankBranch}" placeholder="Bank Branch">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">IFSC Code</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.bankIfscCode)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.bankIfscCode) ? employeeProfile.bankIfscCode : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="bankIfscCode" th:value="${employeeProfile.bankIfscCode}" placeholder="IFSC Code" maxlength="11" class="tracked-field" style="text-transform: uppercase;">
+                            </div>
+                        </div>
+
+                        <!-- System Policies -->
+                        <div class="section-separator"><i class="fas fa-shield-alt"></i> System Allocation Policies (Readonly)</div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Salary Structure</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${employeeProfile.salaryStructure}">Standard Base</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="salaryStructure" th:value="${employeeProfile.salaryStructure}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Leave Policy</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${employeeProfile.leavePolicy}">Casual & Sick</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="leavePolicy" th:value="${employeeProfile.leavePolicy}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Attendance Structure</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${employeeProfile.attendanceStructure}">Biometric Shift</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="attendanceStructure" th:value="${employeeProfile.attendanceStructure}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Timesheet Policy</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${employeeProfile.timesheetPolicy}">Weekly Submission</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="timesheetPolicy" th:value="${employeeProfile.timesheetPolicy}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">T & A Shift Policy</div>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${employeeProfile.taPolicy}">General Shift (9:30 AM - 6:30 PM)</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="taPolicy" th:value="${employeeProfile.taPolicy}" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. ADDRESS & CONTACT TAB -->
+                <div id="v-pills-address" class="tab-pane" style="display:none;">
+                    <div class="tab-section-header">
+                        <h2><i class="fas fa-map-marker-alt"></i> Address & Contact</h2>
+                    </div>
+                    <div class="form-grid-3">
+                        <!-- Present Address -->
+                        <div class="profile-field-card">
+                            <div class="section-separator mt-0"><i class="fas fa-home"></i> Present Address</div>
+                            
+                            <div class="mb-3">
+                                <div class="field-label mb-1">Residential Name</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.presentResidentialName)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.presentResidentialName) ? employeeProfile.presentResidentialName : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="presentResidentialName" th:value="${employeeProfile.presentResidentialName}" placeholder="Apartment / Villa Name">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="field-label mb-1">Street / Locality</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.presentStreet)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.presentStreet) ? employeeProfile.presentStreet : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="presentStreet" th:value="${employeeProfile.presentStreet}" placeholder="Street Detail">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="field-label mb-1">City</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.presentCity)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.presentCity) ? employeeProfile.presentCity : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="presentCity" th:value="${employeeProfile.presentCity}" placeholder="City" class="tracked-field">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="field-label mb-1">State</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.presentState)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.presentState) ? employeeProfile.presentState : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="presentState" th:value="${employeeProfile.presentState}" placeholder="State">
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="field-label mb-1">Pincode</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.presentPincode)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.presentPincode) ? employeeProfile.presentPincode : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="presentPincode" th:value="${employeeProfile.presentPincode}" placeholder="Pincode" maxlength="6">
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <div class="field-label mb-1">Country</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.presentCountry)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.presentCountry) ? employeeProfile.presentCountry : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="presentCountry" th:value="${employeeProfile.presentCountry}" placeholder="Country">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Permanent Address -->
+                        <div class="profile-field-card">
+                            <div class="section-separator mt-0"><i class="fas fa-building"></i> Permanent Address</div>
+
+                            <div class="mb-3">
+                                <div class="field-label mb-1">Residential Name</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.permanentResidentialName)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.permanentResidentialName) ? employeeProfile.permanentResidentialName : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="permanentResidentialName" th:value="${employeeProfile.permanentResidentialName}" placeholder="Apartment / Villa Name">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="field-label mb-1">Street / Locality</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.permanentStreet)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.permanentStreet) ? employeeProfile.permanentStreet : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="permanentStreet" th:value="${employeeProfile.permanentStreet}" placeholder="Street Detail">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="field-label mb-1">City</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.permanentCity)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.permanentCity) ? employeeProfile.permanentCity : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="permanentCity" th:value="${employeeProfile.permanentCity}" placeholder="City">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="field-label mb-1">State</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.permanentState)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.permanentState) ? employeeProfile.permanentState : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="permanentState" th:value="${employeeProfile.permanentState}" placeholder="State">
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="field-label mb-1">Pincode</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.permanentPincode)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.permanentPincode) ? employeeProfile.permanentPincode : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="permanentPincode" th:value="${employeeProfile.permanentPincode}" placeholder="Pincode" maxlength="6">
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <div class="field-label mb-1">Country</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.permanentCountry)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.permanentCountry) ? employeeProfile.permanentCountry : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="permanentCountry" th:value="${employeeProfile.permanentCountry}" placeholder="Country">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact & Emergency -->
+                        <div class="profile-field-card">
+                            <div class="section-separator mt-0"><i class="fas fa-phone-alt"></i> Contact & Emergency</div>
+
+                            <div class="mb-3">
+                                <div class="field-label mb-1">Mobile Number</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.mobileNumber)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.mobileNumber) ? employeeProfile.mobileNumber : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="mobileNumber" th:value="${employeeProfile.mobileNumber}" placeholder="Primary Phone" maxlength="10" class="tracked-field">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="field-label mb-1">Alternate Phone</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.altMobile)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.altMobile) ? employeeProfile.altMobile : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="altMobile" th:value="${employeeProfile.altMobile}" placeholder="Alt Phone" maxlength="10">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="field-label mb-1">Personal Email</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.personalEmail)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.personalEmail) ? employeeProfile.personalEmail : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="email" name="personalEmail" th:value="${employeeProfile.personalEmail}" placeholder="Personal Email" class="tracked-field">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="field-label mb-1">Official Email</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.officialEmail)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.officialEmail) ? employeeProfile.officialEmail : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="email" name="officialEmail" th:value="${employeeProfile.officialEmail}" placeholder="Official Email">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="field-label mb-1">Emergency Contact Name</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.emergencyContactName)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.emergencyContactName) ? employeeProfile.emergencyContactName : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="emergencyContactName" th:value="${employeeProfile.emergencyContactName}" placeholder="Emergency Contact Name">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="field-label mb-1">Emergency Relationship</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.relationWithEmployee)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.relationWithEmployee) ? employeeProfile.relationWithEmployee : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="relationWithEmployee" th:value="${employeeProfile.relationWithEmployee}" placeholder="E.g., Spouse, Mother">
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="field-label mb-1">Emergency Phone</div>
+                                <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.emergencyPhone)} ? 'empty-val'">
+                                    <span th:text="${!#strings.isEmpty(employeeProfile.emergencyPhone) ? employeeProfile.emergencyPhone : 'Not Provided'}">—</span>
+                                </div>
+                                <div class="edit-state edit-state-box">
+                                    <input type="text" name="emergencyPhone" th:value="${employeeProfile.emergencyPhone}" placeholder="Emergency Phone" maxlength="10">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. IDENTITY & STATUTORY TAB -->
+                <div id="v-pills-statutory" class="tab-pane" style="display:none;">
+                    <div class="tab-section-header">
+                        <h2><i class="fas fa-id-card"></i> Identity & Statutory Details</h2>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="profile-field-card">
+                            <div class="field-label">Aadhaar Card No.</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.aadharNo)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.aadharNo) ? employeeProfile.aadharNo : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="aadharNo" th:value="${employeeProfile.aadharNo}" placeholder="12-digit Aadhaar Number" maxlength="12" class="tracked-field">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">PAN Card No.</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.panNo)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.panNo) ? employeeProfile.panNo : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="panNo" th:value="${employeeProfile.panNo}" placeholder="Format: ABCDE1234F" maxlength="10" style="text-transform: uppercase;" class="tracked-field">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Passport No.</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.passportNumber)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.passportNumber) ? employeeProfile.passportNumber : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="passportNumber" th:value="${employeeProfile.passportNumber}" placeholder="E.g., A1234567" maxlength="8" style="text-transform: uppercase;">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">PF Account Number</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.pfNumber)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.pfNumber) ? employeeProfile.pfNumber : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="pfNumber" th:value="${employeeProfile.pfNumber}" placeholder="Enter PF Number">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">ESI Number</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.esiNumber)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.esiNumber) ? employeeProfile.esiNumber : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="esiNumber" th:value="${employeeProfile.esiNumber}" placeholder="Enter ESI Number">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">UAN (Universal Account Number)</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.uanNumber)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.uanNumber) ? employeeProfile.uanNumber : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="uanNumber" th:value="${employeeProfile.uanNumber}" placeholder="12-digit UAN" maxlength="12">
+                            </div>
+                        </div>
+
+                        <div class="profile-field-card">
+                            <div class="field-label">Driving License No.</div>
+                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.drivingLicenseNo)} ? 'empty-val'">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.drivingLicenseNo) ? employeeProfile.drivingLicenseNo : 'Not Provided'}">—</span>
+                            </div>
+                            <div class="edit-state edit-state-box">
+                                <input type="text" name="drivingLicenseNo" th:value="${employeeProfile.drivingLicenseNo}" placeholder="Driving License Number">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. DOCUMENT UPLOADS TAB -->
+                <div id="v-pills-documents" class="tab-pane" style="display:none;">
+                    <div class="tab-section-header">
+                        <h2><i class="fas fa-folder-open"></i> Document Attachments</h2>
+                    </div>
                     
-                    <div class="tab-content" id="v-pills-tabContent">
-                        
-						<!-- GENERAL TAB -->
-						<div id="v-pills-personal">
-
-						    <div class="general-grid">
-
-						        <div class="field-group">
-						            <label>Employee ID *</label>
-						            <input type="text"
-						                   name="employeeId"
-						                   th:value="${user.username}" class="employee-readonly">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Spouse Name</label>
-									<input type="text"
-									       name="spouseName"
-									       th:value="${employeeProfile.spouseName}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Full Name *</label>
-						            <input type="text"
-						                   name="fullName"
-						                   th:value="${user.fullName}" class="employee-readonly">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Date of Joining</label>
-						            <input type="date"
-						                   name="joiningDate"
-						                   th:value="${user.employeeProfile?.joiningDate}" class="employee-readonly">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Gender *</label>
-						            <select name="gender">
-										<option value="">Select Gender</option>
-										<option value="Male"
-										        th:selected="${employeeProfile.gender == 'Male'}">Male</option>
-										<option value="Female"
-										        th:selected="${employeeProfile.gender == 'Female'}">Female</option>
-										<option value="Other"
-										        th:selected="${employeeProfile.gender == 'Other'}">Other</option>
-						            </select>
-						        </div>
-
-						        <div class="field-group">
-						            <label>Father's Name</label>
-						            <input type="text"
-						                   name="fatherName"
-										   th:value="${employeeProfile.fatherName}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Probation Period (in days)</label>
-									<input type="number"
-									       name="probationPeriod"
-									       th:value="${employeeProfile.probationPeriod}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Mother's Name</label>
-						            <input type="text"
-						                   name="motherName"
-										   th:value="${employeeProfile.motherName}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Marital Status *</label>
-						            <select name="maritalStatus">
-										<option value="">Select Marital Status</option>
-										<option value="Single"
-										        th:selected="${employeeProfile.maritalStatus == 'Single'}">Single</option>
-										<option value="Married"
-										        th:selected="${employeeProfile.maritalStatus == 'Married'}">Married</option>
-										<option value="Divorced"
-										        th:selected="${employeeProfile.maritalStatus == 'Divorced'}">Divorced</option>
-										<option value="Widowed"
-										        th:selected="${employeeProfile.maritalStatus == 'Widowed'}">Widowed</option>
-						            </select>
-						        </div>
-
-						        <!-- Contact Information sub-section -->
-						        <div class="section-title mt-4" style="grid-column: span 2; font-weight: bold; font-size: 1.1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; color: #1e3a8a;">Contact Information</div>
-
-						        <div class="field-group">
-						            <label>Address Line 1</label>
-						            <input type="text" name="presentStreet" th:value="${employeeProfile.presentStreet}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Address Line 2</label>
-						            <input type="text" name="presentArea" th:value="${employeeProfile.presentArea}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>City</label>
-						            <input type="text" name="presentCity" th:value="${employeeProfile.presentCity}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Pincode</label>
-						            <input type="text" name="presentPincode" th:value="${employeeProfile.presentPincode}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Phone</label>
-						            <input type="text" name="mobileNumber" th:value="${employeeProfile.mobileNumber}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Email</label>
-						            <input type="email" name="personalEmail" th:value="${employeeProfile.personalEmail}">
-						        </div>
-
-						    </div>
-
-						</div>
-
-						<!-- CLASSIFICATION TAB -->
-						<div id="v-pills-edu" style="display:none;">
-
-						    <div class="classification-grid">
-
-						        <div class="field-group">
-						            <label>Branch</label>
-						            <input type="text" name="branch"
-									th:value="${employeeProfile.branch}" class="employee-readonly">
-						        </div>
-
-						        <div class="field-group">
-									<label>Designation</label>
-									<select name="designation" class="employee-readonly">
-									    <option value="">Select Designation</option>
-
-										<option value="Software Engineer" th:selected="${employeeProfile.designation == 'Software Engineer'}">Software Engineer</option>
-										<option value="Senior Software Engineer" th:selected="${employeeProfile.designation == 'Senior Software Engineer'}">Senior Software Engineer</option>
-										<option value="Tech Lead" th:selected="${employeeProfile.designation == 'Tech Lead'}">Tech Lead</option>
-										<option value="Engineering Manager" th:selected="${employeeProfile.designation == 'Engineering Manager'}">Engineering Manager</option>
-										<option value="HR Executive" th:selected="${employeeProfile.designation == 'HR Executive'}">HR Executive</option>
-										<option value="HR Manager" th:selected="${employeeProfile.designation == 'HR Manager'}">HR Manager</option>
-										<option value="Recruiter" th:selected="${employeeProfile.designation == 'Recruiter'}">Recruiter</option>
-										<option value="Accountant" th:selected="${employeeProfile.designation == 'Accountant'}">Accountant</option>
-										<option value="Finance Manager" th:selected="${employeeProfile.designation == 'Finance Manager'}">Finance Manager</option>
-										<option value="Sales Executive" th:selected="${employeeProfile.designation == 'Sales Executive'}">Sales Executive</option>
-										<option value="Sales Manager" th:selected="${employeeProfile.designation == 'Sales Manager'}">Sales Manager</option>
-										<option value="Marketing Executive" th:selected="${employeeProfile.designation == 'Marketing Executive'}">Marketing Executive</option>
-										<option value="Marketing Manager" th:selected="${employeeProfile.designation == 'Marketing Manager'}">Marketing Manager</option>
-										<option value="Product Manager" th:selected="${employeeProfile.designation == 'Product Manager'}">Product Manager</option>
-										<option value="UI/UX Designer" th:selected="${employeeProfile.designation == 'UI/UX Designer'}">UI/UX Designer</option>
-										<option value="QA Engineer" th:selected="${employeeProfile.designation == 'QA Engineer'}">QA Engineer</option>
-										<option value="DevOps Engineer" th:selected="${employeeProfile.designation == 'DevOps Engineer'}">DevOps Engineer</option>
-										<option value="System Administrator" th:selected="${employeeProfile.designation == 'System Administrator'}">System Administrator</option>
-										<option value="Intern" th:selected="${employeeProfile.designation == 'Intern'}">Intern</option>
-										<option value="Trainee" th:selected="${employeeProfile.designation == 'Trainee'}">Trainee</option>
-
-									</select>
-						        </div>
-
-						        <div class="field-group">
-						            <label>Salary Structure</label>
-									<select name="salaryStructure" class="employee-readonly">
-										<option value="">Select Salary Structure</option>
-										<option value="Basic" th:selected="${employeeProfile.salaryStructure == 'Basic'}">Basic</option>
-										<option value="HRA" th:selected="${employeeProfile.salaryStructure == 'HRA'}">HRA</option>
-										<option value="Special Allowance" th:selected="${employeeProfile.salaryStructure == 'Special Allowance'}">Special Allowance</option>
-										<option value="PF" th:selected="${employeeProfile.salaryStructure == 'PF'}">PF</option>
-										<option value="Professional Tax" th:selected="${employeeProfile.salaryStructure == 'Professional Tax'}">Professional Tax</option>
-
-									</select>
-						        </div>
-
-						        <div class="field-group">
-									<label>Bank Name</label>
-									<input type="text"
-									       name="bankName"
-									       th:value="${employeeProfile.bankName}"
-									       placeholder="Enter Bank Name">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Leave Policy</label>
-									<select name="leavePolicy" class="employee-readonly">
-										<option value="">Select Leave Policy</option>
-										<option value="Casual Leave" th:selected="${employeeProfile.leavePolicy == 'Casual Leave'}">Casual Leave</option>
-										<option value="Sick Leave" th:selected="${employeeProfile.leavePolicy == 'Sick Leave'}">Sick Leave</option>
-										<option value="Earned Leave" th:selected="${employeeProfile.leavePolicy == 'Earned Leave'}">Earned Leave</option>
-										<option value="Comp Off" th:selected="${employeeProfile.leavePolicy == 'Comp Off'}">Comp Off</option>
-										<option value="Maternity Leave" th:selected="${employeeProfile.leavePolicy == 'Maternity Leave'}">Maternity Leave</option>
-										<option value="Paternity Leave" th:selected="${employeeProfile.leavePolicy == 'Paternity Leave'}">Paternity Leave</option>
-										<option value="Marriage Leave" th:selected="${employeeProfile.leavePolicy == 'Marriage Leave'}">Marriage Leave</option>
-										<option value="Bereavement Leave" th:selected="${employeeProfile.leavePolicy == 'Bereavement Leave'}">Bereavement Leave</option>
-										<option value="Loss of Pay" th:selected="${employeeProfile.leavePolicy == 'Loss of Pay'}">Loss of Pay</option>
-									</select>
-						        </div>
-
-						        <div class="field-group">
-						            <label>A/C No.</label>
-									<input type="text"
-									       name="bankAccountNumber"
-									       th:value="${employeeProfile.bankAccountNumber}"
-									       placeholder="Enter Account Number">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Attendance Structure</label>
-									<select name="attendanceStructure" class="employee-readonly">
-										<option value="">Select Attendance Structure</option>
-										<option value="Casual Leave" th:selected="${employeeProfile.attendanceStructure == 'Casual Leave'}">Casual Leave</option>
-										<option value="Hourly" th:selected="${employeeProfile.attendanceStructure == 'Hourly'}">Hourly</option>
-										<option value="Sick Leave" th:selected="${employeeProfile.attendanceStructure == 'Sick Leave'}">Sick Leave</option>
-										<option value="Test" th:selected="${employeeProfile.attendanceStructure == 'Test'}">Test</option>
-
-									</select>
-						        </div>
-
-						        <div class="field-group">
-						            <label>IFSC Code</label>
-									<input type="text"
-									       name="bankIfscCode"
-									       th:value="${employeeProfile.bankIfscCode}"
-									       placeholder="Enter IFSC Code"
-										   maxlength="11"
-								         pattern="^[A-Z]{4}0[A-Z0-9]{6}$"
-								         title="Example: SBIN0001234"
-								         style="text-transform: uppercase;">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Timesheet Policy</label>
-									<select name="timesheetPolicy" class="employee-readonly">
-										<option value="">Select Timesheet Policy</option>
-										<option value="Daily" th:selected="${employeeProfile.timesheetPolicy == 'Daily'}">Daily</option>
-										<option value="Weekly" th:selected="${employeeProfile.timesheetPolicy == 'Weekly'}">Weekly</option>
-										<option value="Monthly" th:selected="${employeeProfile.timesheetPolicy == 'Monthly'}">Monthly</option>
-
-									</select>
-						        </div>
-
-						        <div class="field-group">
-									<label>Department</label>
-									<select name="department"
-									        th:value="${employeeProfile.department}" class="employee-readonly">
-											<option value="">Select Department</option>
-
-											    <option value="Engineering"
-											            th:selected="${employeeProfile.department == 'Engineering'}">
-											        Engineering
-											    </option>
-
-											    <option value="Human Resources"
-											            th:selected="${employeeProfile.department == 'Human Resources'}">
-											        Human Resources
-											    </option>
-
-											    <option value="Finance"
-											            th:selected="${employeeProfile.department == 'Finance'}">
-											        Finance
-											    </option>
-
-											    <option value="Sales"
-											            th:selected="${employeeProfile.department == 'Sales'}">
-											        Sales
-											    </option>
-
-											    <option value="Marketing"
-											            th:selected="${employeeProfile.department == 'Marketing'}">
-											        Marketing
-											    </option>
-
-											    <option value="Product"
-											            th:selected="${employeeProfile.department == 'Product'}">
-											        Product
-											    </option>
-
-											    <option value="Design"
-											            th:selected="${employeeProfile.department == 'Design'}">
-											        Design
-											    </option>
-
-											    <option value="Quality Assurance"
-											            th:selected="${employeeProfile.department == 'Quality Assurance'}">
-											        Quality Assurance
-											    </option>
-
-											    <option value="DevOps"
-											            th:selected="${employeeProfile.department == 'DevOps'}">
-											        DevOps
-											    </option>
-
-											    <option value="IT Support"
-											            th:selected="${employeeProfile.department == 'IT Support'}">
-											        IT Support
-											    </option>
-
-											    <option value="Operations"
-											            th:selected="${employeeProfile.department == 'Operations'}">
-											        Operations
-											    </option>
-
-											    <option value="Customer Support"
-											            th:selected="${employeeProfile.department == 'Customer Support'}">
-											        Customer Support
-											    </option>
-
-											    <option value="Legal"
-											            th:selected="${employeeProfile.department == 'Legal'}">
-											        Legal
-											    </option>
-
-											    <option value="Administration"
-											            th:selected="${employeeProfile.department == 'Administration'}">
-											        Administration
-											    </option>
-									</select>
-						        </div>
-
-						        <div class="field-group">
-									<label>T & A Policy</label>
-									<select name="taPolicy" class="employee-readonly">
-										<option value="">Select T & A Policy</option>
-
-										    <option value="General Shift (9:30 AM - 6:30 PM)"
-										            th:selected="${employeeProfile.taPolicy == 'General Shift (9:30 AM - 6:30 PM)'}">
-										        General Shift (9:30 AM - 6:30 PM)
-										    </option>
-
-										    <option value="Flexible Shift"
-										            th:selected="${employeeProfile.taPolicy == 'Flexible Shift'}">
-										        Flexible Shift
-										    </option>
-
-										    <option value="Strict Punch In/Out"
-										            th:selected="${employeeProfile.taPolicy == 'Strict Punch In/Out'}">
-										        Strict Punch In/Out
-										    </option>
-
-										    <option value="Work From Home"
-										            th:selected="${employeeProfile.taPolicy == 'Work From Home'}">
-										        Work From Home
-										    </option>
-
-										    <option value="Hybrid Mode"
-										            th:selected="${employeeProfile.taPolicy == 'Hybrid Mode'}">
-										        Hybrid Mode
-										    </option>
-
-										    <option value="Field Work"
-										            th:selected="${employeeProfile.taPolicy == 'Field Work'}">
-										        Field Work
-										    </option>
-
-										    <option value="Night Shift"
-										            th:selected="${employeeProfile.taPolicy == 'Night Shift'}">
-										        Night Shift
-										    </option>
-
-										    <option value="Rotational Shift"
-										            th:selected="${employeeProfile.taPolicy == 'Rotational Shift'}">
-										        Rotational Shift
-										    </option>
-
-										    <option value="Geo-Tracking Enabled"
-										            th:selected="${employeeProfile.taPolicy == 'Geo-Tracking Enabled'}">
-										        Geo-Tracking Enabled
-										    </option>
-
-										    <option value="Biometric Attendance"
-										            th:selected="${employeeProfile.taPolicy == 'Biometric Attendance'}">
-										        Biometric Attendance
-										    </option>
-
-									</select>
-						        </div>
-
-						        <div class="field-group">
-									<label>Category</label>
-									<select name="category" class="employee-readonly">
-										<option value="">Select Category</option>
-										<option value="Full-Time" th:selected="${employeeProfile.category == 'Full-Time'}">Full-Time</option>
-										<option value="Part-Time" th:selected="${employeeProfile.category == 'Part-Time'}">Part-Time</option>
-										<option value="Contract" th:selected="${employeeProfile.category == 'Contract'}">Contract</option>
-										<option value="Intern" th:selected="${employeeProfile.category == 'Intern'}">Intern</option>
-										<option value="Consultant" th:selected="${employeeProfile.category == 'Consultant'}">Consultant</option>
-										<option value="Freelancer" th:selected="${employeeProfile.category == 'Freelancer'}">Freelancer</option>
-										<option value="Temporary" th:selected="${employeeProfile.category == 'Temporary'}">Temporary</option>
-										<option value="Probation" th:selected="${employeeProfile.category == 'Probation'}">Probation</option>
-
-									</select>
-						        </div>
-
-						    </div>
-
-						</div>
-						<!-- JOB DATA TAB -->
-						<div id="v-pills-jobdata" style="display:none;">
-
-						    <div class="general-grid">
-
-						        <!-- Position & Organization sub-section -->
-						        <div class="section-title" style="grid-column: span 2; font-weight: bold; font-size: 1.1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; color: #1e3a8a;">Position &amp; Organization</div>
-
-						        <div class="field-group">
-						            <label>Position / Designation</label>
-						            <input type="text" name="designation" th:value="${employeeProfile.designation}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Company Name</label>
-						            <input type="text" name="companyName" th:value="${employeeProfile.companyName}">
-						        </div>
-
-						        <!-- Job Information sub-section -->
-						        <div class="section-title mt-4" style="grid-column: span 2; font-weight: bold; font-size: 1.1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; color: #1e3a8a;">Job Information</div>
-
-						        <div class="field-group">
-						            <label>Vertical Head</label>
-						            <input type="text" name="verticalHead" th:value="${employeeProfile.verticalHead}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Seating Location / Seat Place</label>
-						            <input type="text" name="seatingLocation" th:value="${employeeProfile.seatingLocation}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Assigned HR L2</label>
-						            <input type="text" name="assignedHrL2" th:value="${employeeProfile.assignedHrL2}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Assigned HR L3</label>
-						            <input type="text" name="assignedHrL3" th:value="${employeeProfile.assignedHrL3}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Date of Joining</label>
-						            <input type="date" id="jobJoiningDate" name="joiningDate" th:value="${user.employeeProfile?.joiningDate}" class="employee-readonly" readonly>
-						        </div>
-
-						        <div class="field-group">
-						            <label>Current Experience</label>
-						            <input type="text" id="currentExperience" class="employee-readonly" readonly>
-						        </div>
-
-						        <div class="field-group">
-						            <label>Previous Relevant Experience (Years)</label>
-						            <input type="number" step="0.1" id="previousExperience" name="previousExperience" th:value="${employeeProfile.previousExperience}" oninput="calculateExperiences()">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Total Experience</label>
-						            <input type="text" id="totalExperience" class="employee-readonly" readonly>
-						        </div>
-
-						    </div>
-
-						</div>
-						<!-- STATUTORY TAB -->
-						<div id="v-pills-work" style="display:none;">
-
-						    <div class="statutory-grid">
-
-						        <div class="field-group">
-						            <label>Aadhar Card No.</label>
-									<input type="text"
-									       name="aadharNo"
-									       th:value="${employeeProfile.aadharNo}"
-									       placeholder="XXXX XXXX XXXX"
-										   maxlength="12"
-								         pattern="[0-9]{12}"
-								         title="Aadhaar number must be 12 digits">
-						        </div>
-
-						        <div class="field-group">
-						            <label>PF No.</label>
-									<input type="text"
-									       name="pfNumber"
-									       th:value="${employeeProfile.pfNumber}"
-									       placeholder="Enter PF Number">
-						        </div>
-
-						        <div class="field-group">
-						            <label>PAN Card No.</label>
-									<input type="text"
-									       name="panNo"
-									       th:value="${employeeProfile.panNo}"
-									       placeholder="Enter PAN Number"
-										   maxlength="10"
-								          pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
-								          title="Format: ABCDE1234F"
-								          style="text-transform: uppercase;">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Passport No.</label>
-									<input type="text"
-									       name="passportNumber"
-									       th:value="${employeeProfile.passportNumber}"
-									       placeholder="Enter Passport Number"
-										   maxlength="8"
-								         pattern="[A-Z]{1}[0-9]{7}"
-								         title="Example: A1234567"
-								         style="text-transform: uppercase;">
-						        </div>
-
-						        <div class="field-group">
-						            <label>ESI No.</label>
-									<input type="text"
-									       name="esiNumber"
-									       th:value="${employeeProfile.esiNumber}"
-									       placeholder="Enter ESI Number">
-						        </div>
-
-						        <div class="field-group">
-						            <label>UAN</label>
-									<input type="text"
-									       name="uanNumber"
-									       th:value="${employeeProfile.uanNumber}"
-									       placeholder="Enter UAN Number"
-										   maxlength="12"
-								        pattern="[0-9]{12}"
-								        title="UAN must be 12 digits">
-						        </div>
-
-						    </div>
-
-						</div>
-
-						<!-- ADDRESS TAB -->
-						<div id="v-pills-project" style="display:none;">
-
-						    <div class="address-grid">
-
-						        <!-- Present Address -->
-						        <div class="address-column">
-
-						            <div class="address-section-title">
-						                Present Address
-						            </div>
-
-						            <div class="field-group">
-						                <label>Residential Name</label>
-						                <input type="text" name="presentResidentialName"
-										th:value="${employeeProfile.presentResidentialName}">
-						            </div>
-
-						            <div class="field-group">
-						                <label>Street</label>
-						                <input type="text" name="presentStreet"
-										th:value="${employeeProfile.presentStreet}">
-						            </div>
-
-						            <div class="field-group">
-						                <label>City</label>
-						                <input type="text" name="presentCity"
-										th:value="${employeeProfile.presentCity}">
-						            </div>
-
-						            <div class="field-group">
-						                <label>State</label>
-						                <input type="text" name="presentState"
-										th:value="${employeeProfile.presentState}">
-						            </div>
-
-						            <div class="field-group">
-						                <label>Pincode</label>
-						                <input type="text" name="presentPincode"
-										th:value="${employeeProfile.presentPincode}"
-										maxlength="6"
-								      pattern="[0-9]{6}"
-								      title="Enter a valid 6-digit pincode">
-						            </div>
-
-						        </div>
-
-						        <!-- Permanent Address -->
-						        <div class="address-column">
-
-						            <div class="address-section-title">
-						                Permanent Address
-						            </div>
-
-						            <div class="field-group">
-						                <label>Residential Name</label>
-						                <input type="text" name="permanentResidentialName"
-										th:value="${employeeProfile.permanentResidentialName}">
-						            </div>
-
-						            <div class="field-group">
-						                <label>Street</label>
-						                <input type="text" name="permanentStreet"
-										 th:value="${employeeProfile.permanentStreet}">
-						            </div>
-
-						            <div class="field-group">
-						                <label>City</label>
-						                <input type="text" name="permanentCity"
-										th:value="${employeeProfile.permanentCity}">
-						            </div>
-
-						            <div class="field-group">
-						                <label>State</label>
-						                <input type="text" name="permanentState"
-										th:value="${employeeProfile.permanentState}">
-						            </div>
-
-						            <div class="field-group">
-						                <label>Pincode</label>
-						                <input type="text" name="permanentPincode"
-										th:value="${employeeProfile.permanentPincode}"
-										maxlength="6"
-								      pattern="[0-9]{6}"
-								      title="Enter a valid 6-digit pincode">
-						            </div>
-
-						        </div>
-
-						        <!-- Contact Info -->
-						        <div class="address-column">
-
-						            <div class="address-section-title">
-						                Contact Info
-						            </div>
-
-						            <div class="field-group">
-						                <label>Mobile No.</label>
-						                <input type="text" name="mobileNo"
-										th:value="${employeeProfile.mobileNumber}"
-										maxlength="10"
-								        pattern="[0-9]{10}"
-								        title="Enter a valid 10-digit mobile number">
-						            </div>
-
-						            <div class="field-group">
-						                <label>Alternate Mobile No.</label>
-						                <input type="text" name="alternateMobileNo"
-										th:value="${employeeProfile.altMobile}"
-										maxlength="10"
-								       pattern="[0-9]{10}"
-								       title="Enter a valid 10-digit mobile number">
-						            </div>
-
-						            <div class="field-group">
-						                <label>Official Email ID</label>
-						                <input type="email" name="officialEmail"
-										th:value="${employeeProfile.officialEmail}">
-						            </div>
-
-						            <div class="field-group">
-						                <label>Alternate Email ID</label>
-						                <input type="email" name="alternateEmail"
-										 th:value="${employeeProfile.alternateEmail}">
-						            </div>
-
-						            <div class="field-group">
-						                <label>Emergency No.</label>
-						                <input type="text" name="emergencyNo"
-										th:value="${employeeProfile.emergencyPhone}">
-						            </div>
-
-						        </div>
-
-						    </div>
-
-						</div>
-						<!-- HR CATEGORY TAB -->
-						<div id="v-pills-reporting" style="display:none;">
-
-						    <div class="hr-category-grid">
-
-						        <div class="field-group">
-						            <label>Blood Group</label>
-						            <select name="bloodGroup">
-										<option value="">Select Blood Group</option>
-										<option value="A+" th:selected="${employeeProfile.bloodGroup == 'A+'}">A+</option>
-										<option value="A-" th:selected="${employeeProfile.bloodGroup == 'A-'}">A-</option>
-										<option value="B+" th:selected="${employeeProfile.bloodGroup == 'B+'}">B+</option>
-										<option value="B-" th:selected="${employeeProfile.bloodGroup == 'B-'}">B-</option>
-										<option value="AB+" th:selected="${employeeProfile.bloodGroup == 'AB+'}">AB+</option>
-										<option value="AB-" th:selected="${employeeProfile.bloodGroup == 'AB-'}">AB-</option>
-										<option value="O+" th:selected="${employeeProfile.bloodGroup == 'O+'}">O+</option>
-										<option value="O-" th:selected="${employeeProfile.bloodGroup == 'O-'}">O-</option>
-						            </select>
-						        </div>
-
-						        <div class="field-group">
-						            <label>Caste Category</label>
-						            <select name="casteCategory">
-										<option value="">Select Category</option>
-										<option value="General" th:selected="${employeeProfile.casteCategory == 'General'}">General</option>
-										<option value="OBC" th:selected="${employeeProfile.casteCategory == 'OBC'}">OBC</option>
-										<option value="SC" th:selected="${employeeProfile.casteCategory == 'SC'}">SC</option>
-										<option value="ST" th:selected="${employeeProfile.casteCategory == 'ST'}">ST</option>
-						            </select>
-						        </div>
-
-						        <div class="field-group">
-									<label>Qualification</label>
-									<select name="qualification">
-										<option value="">Select Qualification</option>
-
-										   <option value="High School"
-										           th:selected="${employeeProfile.qualification == 'High School'}">
-										       High School
-										   </option>
-
-										   <option value="Diploma"
-										           th:selected="${employeeProfile.qualification == 'Diploma'}">
-										       Diploma
-										   </option>
-
-										   <option value="Bachelor of Arts (BA)"
-										           th:selected="${employeeProfile.qualification == 'Bachelor of Arts (BA)'}">
-										       Bachelor of Arts (BA)
-										   </option>
-
-										   <option value="Bachelor of Science (BSc)"
-										           th:selected="${employeeProfile.qualification == 'Bachelor of Science (BSc)'}">
-										       Bachelor of Science (BSc)
-										   </option>
-
-										   <option value="Bachelor of Commerce (BCom)"
-										           th:selected="${employeeProfile.qualification == 'Bachelor of Commerce (BCom)'}">
-										       Bachelor of Commerce (BCom)
-										   </option>
-
-										   <option value="Bachelor of Technology (BTech)"
-										           th:selected="${employeeProfile.qualification == 'Bachelor of Technology (BTech)'}">
-										       Bachelor of Technology (BTech)
-										   </option>
-
-										   <option value="Bachelor of Engineering (BE)"
-										           th:selected="${employeeProfile.qualification == 'Bachelor of Engineering (BE)'}">
-										       Bachelor of Engineering (BE)
-										   </option>
-
-										   <option value="Master of Arts (MA)"
-										           th:selected="${employeeProfile.qualification == 'Master of Arts (MA)'}">
-										       Master of Arts (MA)
-										   </option>
-
-										   <option value="Master of Science (MSc)"
-										           th:selected="${employeeProfile.qualification == 'Master of Science (MSc)'}">
-										       Master of Science (MSc)
-										   </option>
-
-										   <option value="Master of Commerce (MCom)"
-										           th:selected="${employeeProfile.qualification == 'Master of Commerce (MCom)'}">
-										       Master of Commerce (MCom)
-										   </option>
-
-										   <option value="Master of Technology (MTech)"
-										           th:selected="${employeeProfile.qualification == 'Master of Technology (MTech)'}">
-										       Master of Technology (MTech)
-										   </option>
-
-										   <option value="Master of Business Administration (MBA)"
-										           th:selected="${employeeProfile.qualification == 'Master of Business Administration (MBA)'}">
-										       Master of Business Administration (MBA)
-										   </option>
-
-										   <option value="PhD"
-										           th:selected="${employeeProfile.qualification == 'PhD'}">
-										       PhD
-										   </option>
-
-										   <option value="Certification Course"
-										           th:selected="${employeeProfile.qualification == 'Certification Course'}">
-										       Certification Course
-										   </option>
-
-										   <option value="Professional Certification"
-										           th:selected="${employeeProfile.qualification == 'Professional Certification'}">
-										       Professional Certification
-										   </option>
-
-									</select>
-						        </div>
-
-						        <div class="field-group">
-						            <label>Close Friend's Name</label>
-									<input type="text"
-									       name="closeFriendName"
-									       th:value="${employeeProfile.closeFriendName}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Driving License No.</label>
-									<input type="text"
-									       name="drivingLicenseNo"
-									       th:value="${employeeProfile.drivingLicenseNo}">
-						        </div>
-
-						        <div class="field-group">
-						            <label>Nationality</label>
-									<input type="text"
-									       name="nationality"
-									       th:value="${employeeProfile.nationality}">
-						        </div>
-
-						    </div>
-
-						</div>
-                        
-						<!-- DOCUMENTS TAB -->
-						<div id="v-pills-emergency" style="display:none;">
-
-						    <div class="documents-grid">
-
-						        <!-- Present Address Image -->
-						        <div class="document-card">
-
-						            <div class="document-title">
-						                Present Address Image
-						            </div>
-
-									<label class="upload-box" for="presentAddressImage">
-
-									    <div class="upload-icon">
-									        <i class="fas fa-cloud-upload-alt"></i>
-									    </div>
-
-									    <div class="upload-text">
-									        Upload files here
-									    </div>
-
-									    <div>or</div>
-
-									    <div class="upload-browse">
-									        Browse
-									    </div>
-
-										<div class="file-preview" id="presentAddressImagePreview" style="display:none;">
-										    <span id="presentAddressImageName"></span>
-											<span class="remove-file"
-											      onclick="removeFile(event,
-											                          'presentAddressImage',
-											                          'presentAddressImageName',
-											                          'presentAddressImagePreview')">
-											    ✕
-											</span>
-										</div>
-
-									    <input type="file"
-									           id="presentAddressImage"
-									           name="presentAddressImage"
-									           accept=".jpg,.jpeg,.png,.pdf"
-									           hidden>
-
-									</label>
-
-						        </div>
-
-						        <!-- Aadhar Card Proof -->
-						        <div class="document-card">
-
-						            <div class="document-title">
-						                Aadhar Card Proof
-						            </div>
-
-									<label class="upload-box" for="aadharProof">
-
-									    <div class="upload-icon">
-									        <i class="fas fa-cloud-upload-alt"></i>
-									    </div>
-
-									    <div class="upload-text">
-									        Upload files here
-									    </div>
-
-									    <div>or</div>
-
-									    <div class="upload-browse">
-									        Browse
-									    </div>
-
-										<div class="file-preview" id="aadharProofPreview" style="display:none;">
-										    <span id="aadharProofName"></span>
-											<span class="remove-file"
-											      onclick="removeFile(event,
-											                          'aadharProof',
-											                          'aadharProofName',
-											                          'aadharProofPreview')">
-											    ✕
-											</span>
-										</div>
-
-									    <input type="file"
-									           id="aadharProof"
-									           name="aadharProof"
-									           accept=".jpg,.jpeg,.png,.pdf"
-									           hidden>
-
-									</label>
-
-						        </div>
-
-						        <!-- PAN Card Proof -->
-						        <div class="document-card center">
-
-						            <div class="document-title">
-						                PAN Card Proof
-						            </div>
-
-									<label class="upload-box" for="panProof">
-
-									    <div class="upload-icon">
-									        <i class="fas fa-cloud-upload-alt"></i>
-									    </div>
-
-									    <div class="upload-text">
-									        Upload files here
-									    </div>
-
-									    <div>or</div>
-
-									    <div class="upload-browse">
-									        Browse
-									    </div>
-
-										<div class="file-preview" id="panProofPreview" style="display:none;">
-										    <span id="panProofName"></span>
-											<span class="remove-file"
-											      onclick="removeFile(event,
-											                          'panProof',
-											                          'panProofName',
-											                          'panProofPreview')">
-											    ✕
-											</span>
-										</div>
-
-									    <input type="file"
-									           id="panProof"
-									           name="panProof"
-									           accept=".jpg,.jpeg,.png,.pdf"
-									           hidden>
-
-									</label>
-
-						        </div>
-
-						    </div>
-
-						</div>
-						
-					</div>
-
-                </form>
-            </div>
-        </div>
+                    <div class="doc-upload-grid">
+                        <!-- Profile Photo -->
+                        <div class="doc-upload-card" onclick="document.getElementById('photoFile').click()">
+                            <div class="doc-upload-icon"><i class="fas fa-camera"></i></div>
+                            <div class="doc-upload-title">Profile Photo</div>
+                            <div class="doc-upload-desc">JPG or PNG (max 2MB)</div>
+                            <input type="file" id="photoFile" name="photoFile" accept=".jpg,.jpeg,.png" hidden>
+                            
+                            <!-- File Previews -->
+                            <div class="doc-file-preview" id="photoFilePreview" style="display:none;">
+                                <span class="doc-file-name" id="photoFileName"></span>
+                                <span class="doc-file-remove" onclick="removeUploadedFile(event, 'photoFile', 'photoFilePreview')">✕</span>
+                            </div>
+                            <a th:if="${employeeProfile.photoDocPath != null && !employeeProfile.photoDocPath.isEmpty()}" th:href="${employeeProfile.photoDocPath}" target="_blank" class="existing-doc-link" onclick="event.stopPropagation();"><i class="fas fa-external-link-alt"></i> View Photo</a>
+                        </div>
+
+                        <!-- Resume -->
+                        <div class="doc-upload-card" onclick="document.getElementById('resumeFile').click()">
+                            <div class="doc-upload-icon"><i class="fas fa-file-pdf"></i></div>
+                            <div class="doc-upload-title">Resume / CV</div>
+                            <div class="doc-upload-desc">PDF or DOCX format</div>
+                            <input type="file" id="resumeFile" name="resumeFile" accept=".pdf,.doc,.docx" hidden>
+                            
+                            <div class="doc-file-preview" id="resumeFilePreview" style="display:none;">
+                                <span class="doc-file-name" id="resumeFileName"></span>
+                                <span class="doc-file-remove" onclick="removeUploadedFile(event, 'resumeFile', 'resumeFilePreview')">✕</span>
+                            </div>
+                            <a th:if="${employeeProfile.resumeDocPath != null && !employeeProfile.resumeDocPath.isEmpty()}" th:href="${employeeProfile.resumeDocPath}" target="_blank" class="existing-doc-link" onclick="event.stopPropagation();"><i class="fas fa-external-link-alt"></i> View Resume</a>
+                        </div>
+
+                        <!-- Address Proof -->
+                        <div class="doc-upload-card" onclick="document.getElementById('presentAddressImage').click()">
+                            <div class="doc-upload-icon"><i class="fas fa-home"></i></div>
+                            <div class="doc-upload-title">Address Proof</div>
+                            <div class="doc-upload-desc">PDF, PNG or JPG</div>
+                            <input type="file" id="presentAddressImage" name="presentAddressImage" accept=".pdf,.jpg,.jpeg,.png" hidden>
+                            
+                            <div class="doc-file-preview" id="presentAddressImagePreview" style="display:none;">
+                                <span class="doc-file-name" id="presentAddressImageName"></span>
+                                <span class="doc-file-remove" onclick="removeUploadedFile(event, 'presentAddressImage', 'presentAddressImagePreview')">✕</span>
+                            </div>
+                        </div>
+
+                        <!-- Aadhaar Proof -->
+                        <div class="doc-upload-card" onclick="document.getElementById('aadharProof').click()">
+                            <div class="doc-upload-icon"><i class="fas fa-address-card"></i></div>
+                            <div class="doc-upload-title">Aadhaar Card Proof</div>
+                            <div class="doc-upload-desc">PDF or Image scan</div>
+                            <input type="file" id="aadharProof" name="aadharProof" accept=".pdf,.jpg,.jpeg,.png" hidden>
+                            
+                            <div class="doc-file-preview" id="aadharProofPreview" style="display:none;">
+                                <span class="doc-file-name" id="aadharProofName"></span>
+                                <span class="doc-file-remove" onclick="removeUploadedFile(event, 'aadharProof', 'aadharProofPreview')">✕</span>
+                            </div>
+                            <a th:if="${employeeProfile.aadhaarDocPath != null && !employeeProfile.aadhaarDocPath.isEmpty()}" th:href="${employeeProfile.aadhaarDocPath}" target="_blank" class="existing-doc-link" onclick="event.stopPropagation();"><i class="fas fa-external-link-alt"></i> View Aadhaar</a>
+                        </div>
+
+                        <!-- PAN Card Proof -->
+                        <div class="doc-upload-card" onclick="document.getElementById('panProof').click()">
+                            <div class="doc-upload-icon"><i class="fas fa-credit-card"></i></div>
+                            <div class="doc-upload-title">PAN Card Proof</div>
+                            <div class="doc-upload-desc">PDF or Image scan</div>
+                            <input type="file" id="panProof" name="panProof" accept=".pdf,.jpg,.jpeg,.png" hidden>
+                            
+                            <div class="doc-file-preview" id="panProofPreview" style="display:none;">
+                                <span class="doc-file-name" id="panProofName"></span>
+                                <span class="doc-file-remove" onclick="removeUploadedFile(event, 'panProof', 'panProofPreview')">✕</span>
+                            </div>
+                            <a th:if="${employeeProfile.panDocPath != null && !employeeProfile.panDocPath.isEmpty()}" th:href="${employeeProfile.panDocPath}" target="_blank" class="existing-doc-link" onclick="event.stopPropagation();"><i class="fas fa-external-link-alt"></i> View PAN</a>
+                        </div>
+
+                        <!-- Educational Certificate -->
+                        <div class="doc-upload-card" onclick="document.getElementById('eduFile').click()">
+                            <div class="doc-upload-icon"><i class="fas fa-graduation-cap"></i></div>
+                            <div class="doc-upload-title">Education Certificates</div>
+                            <div class="doc-upload-desc">PDF format</div>
+                            <input type="file" id="eduFile" name="eduFile" accept=".pdf" hidden>
+                            
+                            <div class="doc-file-preview" id="eduFilePreview" style="display:none;">
+                                <span class="doc-file-name" id="eduFileName"></span>
+                                <span class="doc-file-remove" onclick="removeUploadedFile(event, 'eduFile', 'eduFilePreview')">✕</span>
+                            </div>
+                            <a th:if="${employeeProfile.educationalDocPath != null && !employeeProfile.educationalDocPath.isEmpty()}" th:href="${employeeProfile.educationalDocPath}" target="_blank" class="existing-doc-link" onclick="event.stopPropagation();"><i class="fas fa-external-link-alt"></i> View Education</a>
+                        </div>
+
+                        <!-- Experience Certificate -->
+                        <div class="doc-upload-card" onclick="document.getElementById('expFile').click()">
+                            <div class="doc-upload-icon"><i class="fas fa-file-signature"></i></div>
+                            <div class="doc-upload-title">Experience Certificate</div>
+                            <div class="doc-upload-desc">PDF format</div>
+                            <input type="file" id="expFile" name="expFile" accept=".pdf" hidden>
+                            
+                            <div class="doc-file-preview" id="expFilePreview" style="display:none;">
+                                <span class="doc-file-name" id="expFileName"></span>
+                                <span class="doc-file-remove" onclick="removeUploadedFile(event, 'expFile', 'expFilePreview')">✕</span>
+                            </div>
+                            <a th:if="${employeeProfile.experienceDocPath != null && !employeeProfile.experienceDocPath.isEmpty()}" th:href="${employeeProfile.experienceDocPath}" target="_blank" class="existing-doc-link" onclick="event.stopPropagation();"><i class="fas fa-external-link-alt"></i> View Experience</a>
+                        </div>
+
+                        <!-- Offer Letter -->
+                        <div class="doc-upload-card" onclick="document.getElementById('offerFile').click()">
+                            <div class="doc-upload-icon"><i class="fas fa-envelope-open-text"></i></div>
+                            <div class="doc-upload-title">Offer Letter</div>
+                            <div class="doc-upload-desc">PDF format</div>
+                            <input type="file" id="offerFile" name="offerFile" accept=".pdf" hidden>
+                            
+                            <div class="doc-file-preview" id="offerFilePreview" style="display:none;">
+                                <span class="doc-file-name" id="offerFileName"></span>
+                                <span class="doc-file-remove" onclick="removeUploadedFile(event, 'offerFile', 'offerFilePreview')">✕</span>
+                            </div>
+                            <a th:if="${employeeProfile.offerDocPath != null && !employeeProfile.offerDocPath.isEmpty()}" th:href="${employeeProfile.offerDocPath}" target="_blank" class="existing-doc-link" onclick="event.stopPropagation();"><i class="fas fa-external-link-alt"></i> View Offer Letter</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </main>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Tab switching engine
+    function showProfileTab(tabId, btn) {
+        const tabs = [
+            'v-pills-personal',
+            'v-pills-employment',
+            'v-pills-project',
+            'v-pills-edu',
+            'v-pills-bank',
+            'v-pills-address',
+            'v-pills-statutory',
+            'v-pills-documents'
+        ];
 
-    // Initialization
-    window.onload = function() {
-        // Format empty info boxes
-        document.querySelectorAll('.info-value-text').forEach(span => {
-            if (!span.innerText || span.innerText.trim() === "") {
-                span.innerText = "-";
-                span.classList.add('empty-field');
+        tabs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+
+        const activeEl = document.getElementById(tabId);
+        if (activeEl) activeEl.style.display = 'block';
+
+        document.querySelectorAll('.nav-tab-btn').forEach(t => {
+            t.classList.remove('active');
+        });
+
+        if (btn) btn.classList.add('active');
+    }
+
+    // Toggle Edit Mode
+    const editBtn = document.getElementById('editProfileBtn');
+    const saveBtn = document.getElementById('saveProfileBtn');
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    const backBtn = document.getElementById('backHomeBtn');
+
+    editBtn.addEventListener('click', () => {
+        document.body.classList.add('editing');
+        editBtn.style.display = 'none';
+        backBtn.style.display = 'none';
+        saveBtn.style.display = 'inline-flex';
+        cancelBtn.style.display = 'inline-flex';
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        window.location.reload();
+    });
+
+    saveBtn.addEventListener('click', function(e) {
+        const form = document.getElementById('masterProfileForm');
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            const invalidEl = form.querySelector(':invalid');
+            if (invalidEl) {
+                const pane = invalidEl.closest('.tab-pane');
+                if (pane) {
+                    const paneId = pane.id;
+                    const tabBtn = document.querySelector(`.nav-tab-btn[onclick*="${paneId}"]`);
+                    if (tabBtn) {
+                        showProfileTab(paneId, tabBtn);
+                    }
+                }
+                form.reportValidity();
+            }
+        }
+    });
+
+    // File uploads listener setups
+    function setupFileUploadListeners(inputId, previewId, nameId) {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        const nameSpan = document.getElementById(nameId);
+
+        if (!input || !preview || !nameSpan) return;
+
+        input.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                nameSpan.innerText = this.files[0].name;
+                preview.style.display = 'flex';
             }
         });
-        calculateCompletion();
+    }
 
-        // Redirect Persistence Check (BUG-021)
+    // Remove file wrapper
+    function removeUploadedFile(event, inputId, previewId) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+
+        if (input) input.value = '';
+        if (preview) preview.style.display = 'none';
+    }
+
+    // Init Upload Listeners
+    setupFileUploadListeners('photoFile', 'photoFilePreview', 'photoFileName');
+    setupFileUploadListeners('resumeFile', 'resumeFilePreview', 'resumeFileName');
+    setupFileUploadListeners('presentAddressImage', 'presentAddressImagePreview', 'presentAddressImageName');
+    setupFileUploadListeners('aadharProof', 'aadharProofPreview', 'aadharProofName');
+    setupFileUploadListeners('panProof', 'panProofPreview', 'panProofName');
+    setupFileUploadListeners('eduFile', 'eduFilePreview', 'eduFileName');
+    setupFileUploadListeners('expFile', 'expFilePreview', 'expFileName');
+    setupFileUploadListeners('offerFile', 'offerFilePreview', 'offerFileName');
+
+    // Completion calculator
+    function calculateCompletion() {
+        const trackedFields = document.querySelectorAll('.tracked-field');
+        if (trackedFields.length === 0) return;
+
+        let filled = 0;
+        trackedFields.forEach(f => {
+            if (f.tagName === 'SELECT') {
+                if (f.value && f.value !== "") filled++;
+            } else {
+                if (f.value && f.value.trim() !== "") filled++;
+            }
+        });
+
+        let percent = Math.round((filled / trackedFields.length) * 100);
+        const completionBar = document.getElementById('completionBar');
+        const percentLabel = document.getElementById('percentLabel');
+
+        if (completionBar) completionBar.style.width = percent + '%';
+        if (percentLabel) percentLabel.innerText = percent + '%';
+    }
+
+    function calculateExperiences() {
+        const joiningDateInput = document.getElementById('jobJoiningDate');
+        const prevExpInput = document.getElementById('previousExperience');
+        
+        if (!joiningDateInput || !prevExpInput) return;
+        
+        const joiningDateVal = joiningDateInput.value;
+        const prevExpVal = parseFloat(prevExpInput.value) || 0;
+        
+        if (!joiningDateVal) {
+            updateExperienceDisplays("0 Months", formatYearsMonths(prevExpVal));
+            return;
+        }
+        
+        const joinDate = new Date(joiningDateVal);
+        const today = new Date();
+        
+        let years = today.getFullYear() - joinDate.getFullYear();
+        let months = today.getMonth() - joinDate.getMonth();
+        let days = today.getDate() - joinDate.getDate();
+        
+        if (days < 0) {
+            months--;
+            const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+            days += prevMonth.getDate();
+        }
+        
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+        
+        let currentExpStr = "";
+        if (years > 0) currentExpStr += years + " Year" + (years > 1 ? "s" : "") + " ";
+        if (months > 0) currentExpStr += months + " Month" + (months > 1 ? "s" : "") + " ";
+        currentExpStr = currentExpStr.trim();
+        if (currentExpStr === "") currentExpStr = "0 Months";
+        
+        // Total = current in years + previous in years
+        const currentYearsDecimal = years + (months / 12);
+        const totalYearsDecimal = currentYearsDecimal + prevExpVal;
+        
+        const totalYears = Math.floor(totalYearsDecimal);
+        const totalMonths = Math.round((totalYearsDecimal - totalYears) * 12);
+        
+        let totalExpStr = "";
+        if (totalYears > 0) totalExpStr += totalYears + " Year" + (totalYears > 1 ? "s" : "") + " ";
+        if (totalMonths > 0) totalExpStr += totalMonths + " Month" + (totalMonths > 1 ? "s" : "") + " ";
+        totalExpStr = totalExpStr.trim();
+        if (totalExpStr === "") totalExpStr = "0 Months";
+        
+        updateExperienceDisplays(currentExpStr, totalExpStr);
+    }
+
+    function formatYearsMonths(yearsDecimal) {
+        const years = Math.floor(yearsDecimal);
+        const months = Math.round((yearsDecimal - years) * 12);
+        let str = "";
+        if (years > 0) str += years + " Year" + (years > 1 ? "s" : "") + " ";
+        if (months > 0) str += months + " Month" + (months > 1 ? "s" : "") + " ";
+        str = str.trim();
+        return str === "" ? "0 Months" : str;
+    }
+
+    function updateExperienceDisplays(currentStr, totalStr) {
+        const currInput = document.getElementById('currentExperience');
+        const currSpan = document.getElementById('currentExperienceSpan');
+        const totInput = document.getElementById('totalExperience');
+        const totSpan = document.getElementById('totalExperienceSpan');
+
+        if (currInput) currInput.value = currentStr;
+        if (currSpan) currSpan.innerText = currentStr;
+        if (totInput) totInput.value = totalStr;
+        if (totSpan) totSpan.innerText = totalStr;
+    }
+
+    // Redirect persistence logic (BUG-021)
+    document.addEventListener("DOMContentLoaded", () => {
+        calculateCompletion();
+        calculateExperiences();
+
+        // Calculate progress again whenever inputs change in edit mode
+        document.querySelectorAll('.tracked-field').forEach(f => {
+            f.addEventListener('change', calculateCompletion);
+            f.addEventListener('input', calculateCompletion);
+        });
+
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('source') === 'whitecircle') {
             sessionStorage.setItem('backRedirectSource', 'whitecircle');
@@ -1518,284 +1940,10 @@
         
         const redirectSource = sessionStorage.getItem('backRedirectSource');
         if (redirectSource === 'whitecircle') {
-            const backBtn = document.getElementById('backHomeBtn');
-            if (backBtn) backBtn.href = '/my-whitecircle';
+            const homeBtn = document.getElementById('backHomeBtn');
+            if (homeBtn) homeBtn.href = '/my-whitecircle';
         }
-    };
-
-    function calculateCompletion() {
-        const trackedFields = document.querySelectorAll('.tracked-field');
-        if (trackedFields.length === 0) return;
-
-        let filled = 0;
-        trackedFields.forEach(f => {
-            if(f.value && f.value.trim() !== "") filled++;
-        });
-
-        let percent = Math.round((filled / trackedFields.length) * 100);
-        document.getElementById('completionBar').style.width = percent + '%';
-        document.getElementById('percentLabel').innerText = percent + '%';
-    }
-
-    function toggleEditMode() {
-        const body = document.body;
-        const btn = document.getElementById('editToggleBtn');
-        const form = document.getElementById('masterProfileForm');
-
-        if (!body.classList.contains('editing')) {
-            // ENTER EDIT MODE
-            body.classList.add('editing');
-            btn.innerHTML = '<i class="fas fa-save me-2"></i> Save Profile';
-            btn.classList.replace('btn-primary', 'btn-success');
-            btn.style.backgroundColor = '#16a34a';
-            btn.style.color = '#fff';
-            
-            // Clean up placeholders
-            document.querySelectorAll('.info-value-text.empty-field').forEach(span => {
-                span.innerText = "";
-            });
-        } else {
-            // SAVE LOGIC - Check validation across all tabs
-            if (form.checkValidity()) {
-                form.submit();
-            } else {
-                // Find first invalid element
-                const invalidElement = form.querySelector(':invalid');
-                if (invalidElement) {
-                    // Find which tabpane it belongs to
-                    const tabPane = invalidElement.closest('.tab-pane');
-                    if (tabPane) {
-                        // Activate that tab using Bootstrap Tab API
-                        const tabId = tabPane.getAttribute('id');
-                        const tabTrigger = document.querySelector(`[data-bs-target="#${tabId}"]`);
-                        if(tabTrigger) {
-                            const tab = new bootstrap.Tab(tabTrigger);
-                            tab.show();
-                        }
-                    }
-                    // Trigger browser's native validation UI
-                    form.reportValidity();
-                }
-            }
-        }
-    }
-	function showProfileTab(tabId, btn) {
-
-	    const tabs = [
-	        'v-pills-personal',
-	        'v-pills-edu',
-	        'v-pills-jobdata',
-	        'v-pills-work',
-	        'v-pills-project',
-	        'v-pills-reporting',
-	        'v-pills-emergency'
-	    ];
-
-	    tabs.forEach(id => {
-	        document.getElementById(id).style.display = 'none';
-	    });
-
-	    document.getElementById(tabId).style.display = 'block';
-
-	    document.querySelectorAll('.tab-btn').forEach(t => {
-	        t.classList.remove('active');
-	    });
-
-	    btn.classList.add('active');
-	}
-	
-	function setupFileUpload(inputId, nameId, previewId) {
-	    const input = document.getElementById(inputId);
-
-	    input.addEventListener("change", function () {
-	        if (this.files.length > 0) {
-	            document.getElementById(nameId).textContent =
-	                this.files[0].name;
-
-	            document.getElementById(previewId).style.display = "flex";
-	        }
-	    });
-	}
-
-	function removeFile(event, inputId, nameId, previewId) {
-
-	    event.preventDefault();
-	    event.stopPropagation();
-
-	    document.getElementById(inputId).value = "";
-
-	    document.getElementById(nameId).textContent = "";
-
-	    document.getElementById(previewId).style.display = "none";
-	}
-
-	setupFileUpload(
-	    "presentAddressImage",
-	    "presentAddressImageName",
-	    "presentAddressImagePreview"
-	);
-
-	setupFileUpload(
-	    "aadharProof",
-	    "aadharProofName",
-	    "aadharProofPreview"
-	);
-
-	setupFileUpload(
-	    "panProof",
-	    "panProofName",
-	    "panProofPreview"
-	);
-	document.addEventListener("DOMContentLoaded", function () {
-
-	    disableProfileFields();
-
-	});
-
-	function disableProfileFields() {
-
-	    document.querySelectorAll(
-	        '#masterProfileForm input,' +
-	        '#masterProfileForm textarea'
-	    ).forEach(field => {
-
-	        if (field.type === "hidden" || field.type === "file") return;
-
-	        field.readOnly = true;
-	    });
-
-	    document.querySelectorAll(
-	        '#masterProfileForm select'
-	    ).forEach(field => {
-
-	        field.disabled = true;
-	    });
-
-	    document.querySelectorAll(
-	        '#masterProfileForm input[type="file"]'
-	    ).forEach(field => {
-
-	        field.disabled = true;
-	    });
-	}
-	document.getElementById("editProfileBtn")
-	    .addEventListener("click", function () {
-
-	    // Enable inputs and textareas
-		document.querySelectorAll(
-		    '#masterProfileForm input,' +
-		    '#masterProfileForm textarea'
-		).forEach(field => {
-
-		    if (
-		        field.type !== "hidden" &&
-		        field.type !== "file" &&
-		        !field.classList.contains("employee-readonly")
-		    ) {
-		        field.readOnly = false;
-		    }
-		});
-
-	    // Enable selects
-		document.querySelectorAll(
-		    '#masterProfileForm select'
-		).forEach(field => {
-
-		    if (!field.classList.contains("employee-readonly")) {
-		        field.disabled = false;
-		    }
-		});
-
-	    // Enable file uploads
-	    document.querySelectorAll(
-	        '#masterProfileForm input[type="file"]'
-	    ).forEach(field => {
-
-	        field.disabled = false;
-	    });
-
-	    // Change buttons
-	    document.getElementById("editProfileBtn").style.display = "none";
-	    document.getElementById("backHomeBtn").style.display = "none";
-		document.getElementById("saveProfileBtn").style.display = "inline-block";
-	    document.getElementById("cancelEditBtn").style.display = "inline-block";
-	});
-	document.getElementById("saveProfileBtn")
-	    .addEventListener("click", function (e) {
-
-	        const form = document.getElementById("masterProfileForm");
-
-	        if (!form.checkValidity()) {
-	            form.reportValidity();
-	            return;
-	        }
-
-	        form.submit();
-	});	
-	document.getElementById("cancelEditBtn")
-	    .addEventListener("click", function () {
-
-	    window.location.reload();
-
-	});
-
-	function calculateExperiences() {
-	    const joiningDateInput = document.getElementById('jobJoiningDate');
-	    const prevExpInput = document.getElementById('previousExperience');
-	    
-	    if (!joiningDateInput || !prevExpInput) return;
-	    
-	    const joiningDateVal = joiningDateInput.value;
-	    const prevExpVal = parseFloat(prevExpInput.value) || 0;
-	    
-	    if (!joiningDateVal) {
-	        document.getElementById('currentExperience').value = "0 Days";
-	        document.getElementById('totalExperience').value = prevExpVal + " Year" + (prevExpVal !== 1 ? "s" : "");
-	        return;
-	    }
-	    
-	    const joinDate = new Date(joiningDateVal);
-	    const today = new Date();
-	    
-	    let years = today.getFullYear() - joinDate.getFullYear();
-	    let months = today.getMonth() - joinDate.getMonth();
-	    let days = today.getDate() - joinDate.getDate();
-	    
-	    if (days < 0) {
-	        months--;
-	        const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-	        days += prevMonth.getDate();
-	    }
-	    
-	    if (months < 0) {
-	        years--;
-	        months += 12;
-	    }
-	    
-	    let currentExpStr = "";
-	    if (years > 0) currentExpStr += years + " Year" + (years > 1 ? "s" : "") + " ";
-	    if (months > 0) currentExpStr += months + " Month" + (months > 1 ? "s" : "") + " ";
-	    if (days > 0 || currentExpStr === "") currentExpStr += days + " Day" + (days > 1 ? "s" : "");
-	    currentExpStr = currentExpStr.trim();
-	    
-	    document.getElementById('currentExperience').value = currentExpStr;
-	    
-	    // Calculate Total Experience
-	    const currentYearsDecimal = years + (months / 12) + (days / 365);
-	    const totalYearsDecimal = currentYearsDecimal + prevExpVal;
-	    
-	    const totalYears = Math.floor(totalYearsDecimal);
-	    const totalMonths = Math.round((totalYearsDecimal - totalYears) * 12);
-	    
-	    let totalExpStr = "";
-	    if (totalYears > 0) totalExpStr += totalYears + " Year" + (totalYears > 1 ? "s" : "") + " ";
-	    if (totalMonths > 0) totalExpStr += totalMonths + " Month" + (totalMonths > 1 ? "s" : "");
-	    if (totalExpStr === "") totalExpStr = "0 Days";
-	    
-	    document.getElementById('totalExperience').value = totalExpStr.trim();
-	}
-
-	window.addEventListener('DOMContentLoaded', calculateExperiences);
+    });
 </script>
 </body>
 </html>

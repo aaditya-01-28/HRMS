@@ -134,6 +134,15 @@ public class SeniorDashboardController {
     private com.example.admindashboard.repository.RewardProgramRepository rewardProgramRepository;
 
     @Autowired
+    private com.example.admindashboard.repository.RewardRuleRepository rewardRuleRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.TeamPointAllocationRepository teamPointAllocationRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.BudgetActivityRepository budgetActivityRepository;
+
+    @Autowired
     private com.example.admindashboard.repository.ThanksWalletRepository thanksWalletRepository;
 
     @Autowired
@@ -375,6 +384,24 @@ public class SeniorDashboardController {
                 .filter(t -> "REWARDS".equalsIgnoreCase(t.getType()))
                 .collect(Collectors.toList());
 
+        // Split programs by type
+        List<com.example.admindashboard.model.RewardProgram> peerPrograms = programs.stream()
+                .filter(p -> "PEER_TO_PEER".equalsIgnoreCase(p.getProgramType()) || p.getProgramType() == null)
+                .collect(Collectors.toList());
+        List<com.example.admindashboard.model.RewardProgram> spotPrograms = programs.stream()
+                .filter(p -> "SPOT".equalsIgnoreCase(p.getProgramType()))
+                .collect(Collectors.toList());
+        List<com.example.admindashboard.model.RewardProgram> perfPrograms = programs.stream()
+                .filter(p -> "PERFORMANCE".equalsIgnoreCase(p.getProgramType()))
+                .collect(Collectors.toList());
+        List<com.example.admindashboard.model.RewardProgram> milestonePrograms = programs.stream()
+                .filter(p -> "MILESTONE".equalsIgnoreCase(p.getProgramType()))
+                .collect(Collectors.toList());
+
+        List<com.example.admindashboard.model.RewardRule> rules = rewardRuleRepository.findAll();
+        List<com.example.admindashboard.model.TeamPointAllocation> teamAllocations = teamPointAllocationRepository.findAll();
+        List<com.example.admindashboard.model.BudgetActivity> budgetActivities = budgetActivityRepository.findAll();
+
         // Stats calculation
         long totalTickets = rewardsTickets.size();
         long pendingTickets = rewardsTickets.stream().filter(t -> "Open".equalsIgnoreCase(t.getStatus())).count();
@@ -391,6 +418,13 @@ public class SeniorDashboardController {
         model.addAttribute("merchandiseList", merchandiseList);
         model.addAttribute("budgets", budgets);
         model.addAttribute("programs", programs);
+        model.addAttribute("peerPrograms", peerPrograms);
+        model.addAttribute("spotPrograms", spotPrograms);
+        model.addAttribute("perfPrograms", perfPrograms);
+        model.addAttribute("milestonePrograms", milestonePrograms);
+        model.addAttribute("rules", rules);
+        model.addAttribute("teamAllocations", teamAllocations);
+        model.addAttribute("budgetActivities", budgetActivities);
         model.addAttribute("wallets", wallets);
         model.addAttribute("tickets", rewardsTickets);
         model.addAttribute("topEmployees", topEmployees);
@@ -450,6 +484,36 @@ public class SeniorDashboardController {
     @PostMapping("/senior_rewards/merchandise/delete/{id}")
     public String deleteMerchandise(@PathVariable Long id) {
         rewardMerchandiseRepository.deleteById(id);
+        return "redirect:/senior_rewards/my_space?tab=merchandise";
+    }
+
+    @PostMapping("/senior_rewards/merchandise/edit")
+    public String editMerchandise(
+            @RequestParam Long id,
+            @RequestParam String itemName,
+            @RequestParam String category,
+            @RequestParam(required=false) String brand,
+            @RequestParam String description,
+            @RequestParam Integer redemptionPoints,
+            @RequestParam Integer totalStocks,
+            @RequestParam Integer perUserLimit,
+            @RequestParam(required=false) String imagePath) {
+
+        com.example.admindashboard.model.RewardMerchandise m = rewardMerchandiseRepository.findById(id).orElse(null);
+        if (m != null) {
+            m.setItemName(itemName);
+            m.setCategory(category);
+            m.setBrand(brand != null ? brand : "N/A");
+            m.setDescription(description);
+            m.setRedemptionPoints(redemptionPoints);
+            m.setTotalStocks(totalStocks);
+            m.setPerUserLimit(perUserLimit);
+            if (imagePath != null && !imagePath.isBlank()) {
+                m.setImagePath(imagePath);
+            }
+            rewardMerchandiseRepository.save(m);
+        }
+
         return "redirect:/senior_rewards/my_space?tab=merchandise";
     }
 
@@ -527,6 +591,210 @@ public class SeniorDashboardController {
         b.setFiscalYear(fiscalYear);
         rewardBudgetRepository.save(b);
         return "redirect:/senior_rewards/my_space?tab=budget";
+    }
+
+    @PostMapping("/senior_rewards/program/add")
+    public String addProgram(
+            @RequestParam String programName,
+            @RequestParam String programType,
+            @RequestParam(required=false) String description,
+            @RequestParam Integer pointsValue,
+            @RequestParam(required=false) String eligibility,
+            @RequestParam(required=false) String department,
+            @RequestParam(required=false) String location,
+            @RequestParam(required=false) String frequency,
+            @RequestParam(required=false) Integer maxLimit,
+            @RequestParam(required=false, defaultValue="false") Boolean requiresApproval,
+            @RequestParam(required=false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required=false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate validTill,
+            @RequestParam(required=false) String awardCategory,
+            @RequestParam(required=false) String programOwner,
+            @RequestParam(required=false) String criteriaType,
+            @RequestParam(required=false) String criteriaValue,
+            @RequestParam(required=false) String milestoneType,
+            @RequestParam(required=false) String milestoneValue) {
+
+        com.example.admindashboard.model.RewardProgram p = new com.example.admindashboard.model.RewardProgram();
+        p.setProgramName(programName);
+        p.setProgramType(programType);
+        p.setDescription(description);
+        p.setPointsValue(pointsValue != null ? pointsValue : 0);
+        p.setEligibility(eligibility != null ? eligibility : "All Employees");
+        p.setDepartment(department != null ? department : "All");
+        p.setLocation(location != null ? location : "All");
+        p.setFrequency(frequency);
+        p.setMaxLimit(maxLimit);
+        p.setRequiresApproval(requiresApproval != null ? requiresApproval : false);
+        p.setStartDate(startDate);
+        p.setValidTill(validTill);
+        p.setAwardCategory(awardCategory);
+        p.setProgramOwner(programOwner != null ? programOwner : "HR Team");
+        p.setCriteriaType(criteriaType);
+        p.setCriteriaValue(criteriaValue);
+        p.setMilestoneType(milestoneType);
+        p.setMilestoneValue(milestoneValue);
+        p.setStatus("ACTIVE");
+
+        rewardProgramRepository.save(p);
+        return "redirect:/senior_rewards/my_space?tab=programs";
+    }
+
+    @PostMapping("/senior_rewards/program/edit")
+    public String editProgram(
+            @RequestParam Long id,
+            @RequestParam String programName,
+            @RequestParam String programType,
+            @RequestParam(required=false) String description,
+            @RequestParam Integer pointsValue,
+            @RequestParam(required=false) String eligibility,
+            @RequestParam(required=false) String department,
+            @RequestParam(required=false) String location,
+            @RequestParam(required=false) String frequency,
+            @RequestParam(required=false) Integer maxLimit,
+            @RequestParam(required=false, defaultValue="false") Boolean requiresApproval,
+            @RequestParam(required=false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required=false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate validTill,
+            @RequestParam(required=false) String awardCategory,
+            @RequestParam(required=false) String programOwner,
+            @RequestParam(required=false) String criteriaType,
+            @RequestParam(required=false) String criteriaValue,
+            @RequestParam(required=false) String milestoneType,
+            @RequestParam(required=false) String milestoneValue) {
+
+        com.example.admindashboard.model.RewardProgram p = rewardProgramRepository.findById(id).orElse(null);
+        if (p != null) {
+            p.setProgramName(programName);
+            p.setProgramType(programType);
+            p.setDescription(description);
+            p.setPointsValue(pointsValue != null ? pointsValue : 0);
+            p.setEligibility(eligibility != null ? eligibility : "All Employees");
+            p.setDepartment(department != null ? department : "All");
+            p.setLocation(location != null ? location : "All");
+            p.setFrequency(frequency);
+            p.setMaxLimit(maxLimit);
+            p.setRequiresApproval(requiresApproval != null ? requiresApproval : false);
+            p.setStartDate(startDate);
+            p.setValidTill(validTill);
+            p.setAwardCategory(awardCategory);
+            p.setProgramOwner(programOwner != null ? programOwner : "HR Team");
+            p.setCriteriaType(criteriaType);
+            p.setCriteriaValue(criteriaValue);
+            p.setMilestoneType(milestoneType);
+            p.setMilestoneValue(milestoneValue);
+            rewardProgramRepository.save(p);
+        }
+        return "redirect:/senior_rewards/my_space?tab=programs";
+    }
+
+    @PostMapping("/senior_rewards/program/delete/{id}")
+    public String deleteProgram(@PathVariable Long id) {
+        rewardProgramRepository.deleteById(id);
+        return "redirect:/senior_rewards/my_space?tab=programs";
+    }
+
+    @PostMapping("/senior_rewards/program/toggle/{id}")
+    public String toggleProgram(@PathVariable Long id) {
+        com.example.admindashboard.model.RewardProgram p = rewardProgramRepository.findById(id).orElse(null);
+        if (p != null) {
+            if ("ACTIVE".equalsIgnoreCase(p.getStatus())) {
+                p.setStatus("INACTIVE");
+            } else {
+                p.setStatus("ACTIVE");
+            }
+            rewardProgramRepository.save(p);
+        }
+        return "redirect:/senior_rewards/my_space?tab=programs";
+    }
+
+    @PostMapping("/senior_rewards/rule/add")
+    public String addRule(
+            @RequestParam String ruleName,
+            @RequestParam String ruleType,
+            @RequestParam String description,
+            @RequestParam Integer pointsPerTransaction,
+            @RequestParam String targetGroup,
+            @RequestParam(required=false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required=false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        com.example.admindashboard.model.RewardRule r = new com.example.admindashboard.model.RewardRule();
+        r.setRuleName(ruleName);
+        r.setRuleType(ruleType);
+        r.setDescription(description);
+        r.setPointsPerTransaction(pointsPerTransaction != null ? pointsPerTransaction : 0);
+        r.setTargetGroup(targetGroup);
+        r.setStartDate(startDate != null ? startDate : LocalDate.now());
+        r.setEndDate(endDate);
+        r.setStatus("ACTIVE");
+        rewardRuleRepository.save(r);
+        return "redirect:/senior_rewards/my_space?tab=wallet";
+    }
+
+    @PostMapping("/senior_rewards/team_allocation/add")
+    public String addTeamAllocation(
+            @RequestParam String teamName,
+            @RequestParam Integer allocatedPoints,
+            @RequestParam String description) {
+
+        com.example.admindashboard.model.TeamPointAllocation ta = new com.example.admindashboard.model.TeamPointAllocation();
+        ta.setTeamName(teamName);
+        ta.setAllocatedPoints(allocatedPoints != null ? allocatedPoints : 0);
+        ta.setDistributedPoints(0);
+        ta.setRemainingPoints(allocatedPoints != null ? allocatedPoints : 0);
+        ta.setActionDate(LocalDate.now());
+        ta.setDescription(description);
+        teamPointAllocationRepository.save(ta);
+        return "redirect:/senior_rewards/my_space?tab=wallet";
+    }
+
+    @PostMapping("/senior_rewards/budget_activity/add")
+    public String addBudgetActivity(
+            @RequestParam String activityName,
+            @RequestParam String department,
+            @RequestParam Integer pointsValue,
+            @RequestParam String activityType) {
+
+        com.example.admindashboard.model.BudgetActivity ba = new com.example.admindashboard.model.BudgetActivity();
+        ba.setActivityName(activityName);
+        ba.setDepartment(department);
+        ba.setPointsValue(pointsValue != null ? pointsValue : 0);
+        ba.setActivityType(activityType);
+        ba.setActionDate(LocalDate.now());
+        ba.setStatus("PENDING");
+        budgetActivityRepository.save(ba);
+        return "redirect:/senior_rewards/my_space?tab=budget";
+    }
+
+    @PostMapping("/senior_rewards/budget_activity/action")
+    public String handleBudgetActivityAction(
+            @RequestParam Long id,
+            @RequestParam String action) {
+
+        com.example.admindashboard.model.BudgetActivity ba = budgetActivityRepository.findById(id).orElse(null);
+        if (ba != null) {
+            if ("Approve".equalsIgnoreCase(action)) {
+                ba.setStatus("APPROVED");
+                if ("Allocation".equalsIgnoreCase(ba.getActivityType())) {
+                    com.example.admindashboard.model.RewardBudget budget = rewardBudgetRepository.findAll().stream()
+                            .filter(b -> b.getDepartment().equalsIgnoreCase(ba.getDepartment()))
+                            .findFirst().orElse(null);
+                    if (budget != null) {
+                        budget.setAllocatedPoints(budget.getAllocatedPoints() + ba.getPointsValue());
+                        rewardBudgetRepository.save(budget);
+                    } else {
+                        com.example.admindashboard.model.RewardBudget newB = new com.example.admindashboard.model.RewardBudget();
+                        newB.setDepartment(ba.getDepartment());
+                        newB.setAllocatedPoints(ba.getPointsValue());
+                        newB.setSpentPoints(0);
+                        newB.setFiscalYear("2026-27");
+                        rewardBudgetRepository.save(newB);
+                    }
+                }
+            } else if ("Reject".equalsIgnoreCase(action)) {
+                ba.setStatus("REJECTED");
+            }
+            budgetActivityRepository.save(ba);
+        }
+        return "redirect:/senior_rewards/my_space?tab=approvals";
     }
 
     @PreAuthorize("hasAuthority('admin_dashboard_view')")

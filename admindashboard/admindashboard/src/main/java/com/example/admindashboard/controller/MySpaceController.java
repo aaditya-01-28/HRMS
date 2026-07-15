@@ -549,6 +549,49 @@ public class MySpaceController {
         }
 
         @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @PostMapping("/senior_manager/myspace/edit_custom_team")
+        @org.springframework.transaction.annotation.Transactional
+        public String editCustomTeam(
+                @RequestParam("teamId") Long teamId,
+                @RequestParam("teamName") String teamName,
+                @RequestParam(value = "description", required = false) String description,
+                @RequestParam(value = "teamMembers", required = false) List<String> teamMembers,
+                Authentication authentication) {
+                
+                String currentUsername = authentication.getName();
+                User loggedInUser = userRepository.findByUsername(currentUsername).orElse(null);
+                if (loggedInUser == null) {
+                        return "redirect:/login";
+                }
+                
+                com.example.admindashboard.model.Team team = teamRepository.findById(teamId).orElse(null);
+                if (team == null || !team.getManager().getId().equals(loggedInUser.getId())) {
+                        return "redirect:/senior_manager/myspace?tab=my_teams&error=UnauthorizedOrNotFound";
+                }
+                
+                team.setTeamName(teamName);
+                team.setDescription(description);
+                teamRepository.save(team);
+                
+                teamMemberRepository.deleteByTeam(team);
+                teamMemberRepository.flush();
+                
+                if (teamMembers != null && !teamMembers.isEmpty()) {
+                        for (String username : teamMembers) {
+                                User user = userRepository.findByUsername(username).orElse(null);
+                                if (user != null) {
+                                        com.example.admindashboard.model.TeamMember tm = new com.example.admindashboard.model.TeamMember();
+                                        tm.setTeam(team);
+                                        tm.setUser(user);
+                                        teamMemberRepository.save(tm);
+                                }
+                        }
+                }
+                
+                return "redirect:/senior_manager/myspace?tab=my_teams&success=TeamUpdated";
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
         @GetMapping("/senior_manager/leave_attendance")
         public String showLeaveAttendance(
                 @RequestParam(value = "tab", defaultValue = "leave_calendar") String tab,

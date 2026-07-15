@@ -48,6 +48,8 @@ public class EmployeeProfile {
     private String workLocation;
     private String city;
     private String country;
+    private String presentCountry;
+    private String permanentCountry;
     private String permanentAddress;
     private String workingAddress;
     private String deliveryAddressType;
@@ -57,8 +59,11 @@ public class EmployeeProfile {
     // SECTION 4: REPORTING LINES (Moved from User)
     // Note: The actual security hierarchy is User.manager, but these are kept for display/HR records
     private String reportingManager;
+    private String reportingManagerL2;
+    private String seniorManagerL3;
     private String projectManager;
     private String buHrContact;
+    private String capabilityCenter;
 
     // SECTION 5: PERSONAL & LEGAL (Original Profile Data)
     private LocalDate dob;
@@ -345,6 +350,12 @@ public class EmployeeProfile {
     public String getCountry() { return country; }
     public void setCountry(String country) { this.country = country; }
 
+    public String getPresentCountry() { return presentCountry; }
+    public void setPresentCountry(String presentCountry) { this.presentCountry = presentCountry; }
+
+    public String getPermanentCountry() { return permanentCountry; }
+    public void setPermanentCountry(String permanentCountry) { this.permanentCountry = permanentCountry; }
+
     public String getPermanentAddress() { return permanentAddress; }
     public void setPermanentAddress(String permanentAddress) { this.permanentAddress = permanentAddress; }
 
@@ -353,6 +364,15 @@ public class EmployeeProfile {
 
     public String getReportingManager() { return reportingManager; }
     public void setReportingManager(String reportingManager) { this.reportingManager = reportingManager; }
+
+    public String getReportingManagerL2() { return reportingManagerL2; }
+    public void setReportingManagerL2(String reportingManagerL2) { this.reportingManagerL2 = reportingManagerL2; }
+
+    public String getSeniorManagerL3() { return seniorManagerL3; }
+    public void setSeniorManagerL3(String seniorManagerL3) { this.seniorManagerL3 = seniorManagerL3; }
+
+    public String getCapabilityCenter() { return capabilityCenter; }
+    public void setCapabilityCenter(String capabilityCenter) { this.capabilityCenter = capabilityCenter; }
 
     public String getProjectManager() { return projectManager; }
     public void setProjectManager(String projectManager) { this.projectManager = projectManager; }

@@ -1,5 +1,6 @@
 package com.example.admindashboard.repository;
 
+import com.example.admindashboard.model.Team;
 import com.example.admindashboard.model.TeamMember;
 import com.example.admindashboard.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,4 +11,5 @@ import java.util.List;
 @Repository
 public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
     List<TeamMember> findByUser(User user);
+    void deleteByTeam(Team team);
 }

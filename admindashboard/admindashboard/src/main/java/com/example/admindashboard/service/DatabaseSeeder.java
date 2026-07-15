@@ -72,6 +72,15 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Autowired
     private com.example.admindashboard.repository.RewardProgramRepository rewardProgramRepository;
 
+    @Autowired
+    private com.example.admindashboard.repository.RewardRuleRepository rewardRuleRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.TeamPointAllocationRepository teamPointAllocationRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.BudgetActivityRepository budgetActivityRepository;
+
     @Override
     public void run(String... args) throws Exception {
                 // Always update existing seeded users to ensure they have correct employeeCode and department
@@ -1505,26 +1514,208 @@ public class DatabaseSeeder implements CommandLineRunner {
 
         // Seed Reward Programs
         if (rewardProgramRepository.count() == 0) {
+            // PEER_TO_PEER
             RewardProgram p1 = new RewardProgram();
-            p1.setProgramName("Spot Award");
-            p1.setDescription("Instant recognition for exemplary performance on critical tasks.");
-            p1.setPointsValue(500);
+            p1.setProgramName("High Five Recognition");
+            p1.setProgramType("PEER_TO_PEER");
+            p1.setAwardCategory("Peer to peer thanks");
+            p1.setDescription("Recognition mechanism for general peer collaboration.");
+            p1.setEligibility("All Employees");
+            p1.setPointsValue(50);
             p1.setStatus("ACTIVE");
+            p1.setValidTill(LocalDate.of(2026, 12, 31));
+            p1.setProgramOwner("HR Team");
             rewardProgramRepository.save(p1);
 
             RewardProgram p2 = new RewardProgram();
-            p2.setProgramName("Peer to Peer Thanks");
-            p2.setDescription("Thank a colleague for helping out. Maximum 5 awards per month.");
-            p2.setPointsValue(50);
+            p2.setProgramName("Team Collaborator");
+            p2.setProgramType("PEER_TO_PEER");
+            p2.setAwardCategory("Team thanks");
+            p2.setDescription("Simple thanks award for support between cross-functional teams.");
+            p2.setEligibility("All Employees");
+            p2.setPointsValue(100);
             p2.setStatus("ACTIVE");
+            p2.setValidTill(LocalDate.of(2026, 12, 31));
+            p2.setProgramOwner("HR Team");
             rewardProgramRepository.save(p2);
 
             RewardProgram p3 = new RewardProgram();
-            p3.setProgramName("Service Milestone");
-            p3.setDescription("Awarded to employees completing 1, 3, or 5 years of service.");
-            p3.setPointsValue(1000);
-            p3.setStatus("ACTIVE");
+            p3.setProgramName("Above & Beyond");
+            p3.setProgramType("PEER_TO_PEER");
+            p3.setAwardCategory("Peer to peer extra effort");
+            p3.setDescription("Peer award acknowledging exceptional work beyond the core job description.");
+            p3.setEligibility("All Employees");
+            p3.setPointsValue(200);
+            p3.setStatus("INACTIVE");
+            p3.setValidTill(LocalDate.of(2026, 6, 30));
+            p3.setProgramOwner("HR Team");
             rewardProgramRepository.save(p3);
+
+            RewardProgram p4 = new RewardProgram();
+            p4.setProgramName("New Joiner Welcome");
+            p4.setProgramType("PEER_TO_PEER");
+            p4.setAwardCategory("Peer to peer welcome");
+            p4.setDescription("Welcome gift of points for joining the organization.");
+            p4.setEligibility("All Employees");
+            p4.setPointsValue(50);
+            p4.setStatus("ACTIVE");
+            p4.setValidTill(LocalDate.of(2026, 12, 31));
+            p4.setProgramOwner("HR Team");
+            rewardProgramRepository.save(p4);
+
+            // SPOT
+            RewardProgram s1 = new RewardProgram();
+            s1.setProgramName("Quick Thanks");
+            s1.setProgramType("SPOT");
+            s1.setAwardCategory("Spot");
+            s1.setDescription("Instant recognition for resolving critical issues immediately.");
+            s1.setEligibility("All Employees");
+            s1.setPointsValue(50);
+            s1.setStatus("ACTIVE");
+            s1.setValidTill(LocalDate.of(2026, 12, 31));
+            s1.setProgramOwner("HR Team");
+            rewardProgramRepository.save(s1);
+
+            RewardProgram s2 = new RewardProgram();
+            s2.setProgramName("Bravo Spot");
+            s2.setProgramType("SPOT");
+            s2.setAwardCategory("Spot");
+            s2.setDescription("Supervisor award for standout performance on a key deliverable.");
+            s2.setEligibility("All Employees");
+            s2.setPointsValue(150);
+            s2.setStatus("ACTIVE");
+            s2.setValidTill(LocalDate.of(2026, 12, 31));
+            s2.setProgramOwner("HR Team");
+            rewardProgramRepository.save(s2);
+
+            RewardProgram s3 = new RewardProgram();
+            s3.setProgramName("Star Performer");
+            s3.setProgramType("SPOT");
+            s3.setAwardCategory("Spot");
+            s3.setDescription("Awarded to outstanding stars of the month.");
+            s3.setEligibility("All Employees");
+            s3.setPointsValue(500);
+            s3.setStatus("ACTIVE");
+            s3.setValidTill(LocalDate.of(2026, 3, 31));
+            s3.setProgramOwner("HR Team");
+            rewardProgramRepository.save(s3);
+
+            RewardProgram s4 = new RewardProgram();
+            s4.setProgramName("Exceptional Effort");
+            s4.setProgramType("SPOT");
+            s4.setAwardCategory("Spot");
+            s4.setDescription("Acknowledge extraordinary effort to keep clients happy.");
+            s4.setEligibility("Customer Support Team");
+            s4.setPointsValue(300);
+            s4.setStatus("INACTIVE");
+            s4.setValidTill(LocalDate.of(2026, 8, 31));
+            s4.setProgramOwner("CS Team");
+            rewardProgramRepository.save(s4);
+
+            // PERFORMANCE
+            RewardProgram pf1 = new RewardProgram();
+            pf1.setProgramName("Top Performer Award");
+            pf1.setProgramType("PERFORMANCE");
+            pf1.setCriteriaType("Rating");
+            pf1.setCriteriaValue("4.5+ Rating");
+            pf1.setEligibility("High Performers (L1/L2)");
+            pf1.setDepartment("All");
+            pf1.setPointsValue(1000);
+            pf1.setStatus("ACTIVE");
+            pf1.setProgramOwner("HR Team");
+            rewardProgramRepository.save(pf1);
+
+            RewardProgram pf2 = new RewardProgram();
+            pf2.setProgramName("Sales Achievement");
+            pf2.setProgramType("PERFORMANCE");
+            pf2.setCriteriaType("Achievement");
+            pf2.setCriteriaValue("Sales Target Met");
+            pf2.setEligibility("Sales Team");
+            pf2.setDepartment("Sales");
+            pf2.setPointsValue(800);
+            pf2.setStatus("ACTIVE");
+            pf2.setProgramOwner("Sales Manager");
+            rewardProgramRepository.save(pf2);
+
+            RewardProgram pf3 = new RewardProgram();
+            pf3.setProgramName("Quarterly Innovation");
+            pf3.setProgramType("PERFORMANCE");
+            pf3.setCriteriaType("Rating");
+            pf3.setCriteriaValue("Innovative Project Approved");
+            pf3.setEligibility("All Employees");
+            pf3.setDepartment("Engineering");
+            pf3.setPointsValue(1500);
+            pf3.setStatus("ACTIVE");
+            pf3.setProgramOwner("Tech Lead");
+            rewardProgramRepository.save(pf3);
+
+            RewardProgram pf4 = new RewardProgram();
+            pf4.setProgramName("Team Champion Award");
+            pf4.setProgramType("PERFORMANCE");
+            pf4.setCriteriaType("Achievement");
+            pf4.setCriteriaValue("Outstanding Team Contribution");
+            pf4.setEligibility("Dev Team");
+            pf4.setDepartment("Engineering");
+            pf4.setPointsValue(1200);
+            pf4.setStatus("INACTIVE");
+            pf4.setProgramOwner("Engineering Head");
+            rewardProgramRepository.save(pf4);
+
+            // MILESTONE
+            RewardProgram m1 = new RewardProgram();
+            m1.setProgramName("Work Anniversary");
+            m1.setProgramType("MILESTONE");
+            m1.setMilestoneType("Work Anniversary");
+            m1.setMilestoneValue("Per Year");
+            m1.setEligibility("All Employees");
+            m1.setPointsValue(500);
+            m1.setStatus("ACTIVE");
+            m1.setProgramOwner("HR Team");
+            rewardProgramRepository.save(m1);
+
+            RewardProgram m2 = new RewardProgram();
+            m2.setProgramName("Birthday Special");
+            m2.setProgramType("MILESTONE");
+            m2.setMilestoneType("Birthday");
+            m2.setMilestoneValue("Per Year");
+            m2.setEligibility("All Employees");
+            m2.setPointsValue(200);
+            m2.setStatus("ACTIVE");
+            m2.setProgramOwner("HR Team");
+            rewardProgramRepository.save(m2);
+
+            RewardProgram m3 = new RewardProgram();
+            m3.setProgramName("5 Years Milestone");
+            m3.setProgramType("MILESTONE");
+            m3.setMilestoneType("Work Anniversary");
+            m3.setMilestoneValue("5 Years");
+            m3.setEligibility("Employees with 5 years tenure");
+            m3.setPointsValue(2000);
+            m3.setStatus("ACTIVE");
+            m3.setProgramOwner("HR Team");
+            rewardProgramRepository.save(m3);
+
+            RewardProgram m4 = new RewardProgram();
+            m4.setProgramName("10 Years Milestone");
+            m4.setProgramType("MILESTONE");
+            m4.setMilestoneType("Work Anniversary");
+            m4.setMilestoneValue("10 Years");
+            m4.setEligibility("Employees with 10 years tenure");
+            m4.setPointsValue(5000);
+            m4.setStatus("ACTIVE");
+            m4.setProgramOwner("HR Team");
+            rewardProgramRepository.save(m4);
+
+            RewardProgram m5 = new RewardProgram();
+            m5.setProgramName("1 Year Milestone");
+            m5.setProgramType("MILESTONE");
+            m5.setMilestoneType("Work Anniversary");
+            m5.setMilestoneValue("1 Year");
+            m5.setEligibility("Employees with 1 year tenure");
+            m5.setPointsValue(1000);
+            m5.setStatus("ACTIVE");
+            m5.setProgramOwner("HR Team");
+            rewardProgramRepository.save(m5);
         }
 
         // Seed Reward ServiceRequests (tickets) if not present
@@ -1534,6 +1725,107 @@ public class DatabaseSeeder implements CommandLineRunner {
             seedRewardsTicket("T-103", "EMP129", "Saumya Katare", "Gift Cards", "Amazon Gift card Rs. 500", 500, "Open", "Amazon Gift card Rs. 500", "N/A");
             seedRewardsTicket("T-104", "EMP114", "Om Tripathi", "Certificate Rewards", "AWS Practitioner Voucher", 1200, "Rejected", "Completed AWS Cloud Practitioner certification exam", "N/A");
             seedRewardsTicket("T-105", "EMP187", "Om Singrore", "Points Transfer", "Peer Points Transfer", 25, "Approved", "Received from Amit Kumar", "N/A");
+        }
+
+        // Seed Reward Rules
+        if (rewardRuleRepository.count() == 0) {
+            com.example.admindashboard.model.RewardRule r1 = new com.example.admindashboard.model.RewardRule();
+            r1.setRuleName("Peer-to-Peer Rule");
+            r1.setRuleType("Peer recognition");
+            r1.setDescription("Daily/weekly peers appreciation allocations");
+            r1.setPointsPerTransaction(50);
+            r1.setTargetGroup("All Employees");
+            r1.setStatus("ACTIVE");
+            r1.setStartDate(LocalDate.of(2026, 1, 1));
+            rewardRuleRepository.save(r1);
+
+            com.example.admindashboard.model.RewardRule r2 = new com.example.admindashboard.model.RewardRule();
+            r2.setRuleName("Milestone Service Reward");
+            r2.setRuleType("Milestone");
+            r2.setDescription("5 year and 10 year service milestone awards");
+            r2.setPointsPerTransaction(1000);
+            r2.setTargetGroup("Specific Employees");
+            r2.setStatus("ACTIVE");
+            r2.setStartDate(LocalDate.of(2026, 1, 1));
+            rewardRuleRepository.save(r2);
+        }
+
+        // Seed Team Point Allocations
+        if (teamPointAllocationRepository.count() == 0) {
+            com.example.admindashboard.model.TeamPointAllocation ta1 = new com.example.admindashboard.model.TeamPointAllocation();
+            ta1.setTeamName("Engineering Team");
+            ta1.setAllocatedPoints(20000);
+            ta1.setDistributedPoints(12000);
+            ta1.setRemainingPoints(8000);
+            ta1.setActionDate(LocalDate.of(2026, 11, 12));
+            ta1.setDescription("Q4 developer recognition allocation");
+            teamPointAllocationRepository.save(ta1);
+
+            com.example.admindashboard.model.TeamPointAllocation ta2 = new com.example.admindashboard.model.TeamPointAllocation();
+            ta2.setTeamName("Marketing Team");
+            ta2.setAllocatedPoints(15000);
+            ta2.setDistributedPoints(10000);
+            ta2.setRemainingPoints(5000);
+            ta2.setActionDate(LocalDate.of(2026, 11, 18));
+            ta2.setDescription("Campaign success appreciation allocation");
+            teamPointAllocationRepository.save(ta2);
+
+            com.example.admindashboard.model.TeamPointAllocation ta3 = new com.example.admindashboard.model.TeamPointAllocation();
+            ta3.setTeamName("Sales Team");
+            ta3.setAllocatedPoints(30000);
+            ta3.setDistributedPoints(22000);
+            ta3.setRemainingPoints(8000);
+            ta3.setActionDate(LocalDate.of(2026, 12, 5));
+            ta3.setDescription("Q4 target achievement allocation");
+            teamPointAllocationRepository.save(ta3);
+        }
+
+        // Seed Budget Activities
+        if (budgetActivityRepository.count() == 0) {
+            com.example.admindashboard.model.BudgetActivity ba1 = new com.example.admindashboard.model.BudgetActivity();
+            ba1.setActivityName("Engineering budget allocation");
+            ba1.setDepartment("Engineering");
+            ba1.setPointsValue(40000);
+            ba1.setActivityType("Allocation");
+            ba1.setActionDate(LocalDate.of(2026, 11, 10));
+            ba1.setStatus("APPROVED");
+            budgetActivityRepository.save(ba1);
+
+            com.example.admindashboard.model.BudgetActivity ba2 = new com.example.admindashboard.model.BudgetActivity();
+            ba2.setActivityName("QA Department allocation");
+            ba2.setDepartment("QA");
+            ba2.setPointsValue(15000);
+            ba2.setActivityType("Allocation");
+            ba2.setActionDate(LocalDate.of(2026, 11, 12));
+            ba2.setStatus("APPROVED");
+            budgetActivityRepository.save(ba2);
+
+            com.example.admindashboard.model.BudgetActivity ba3 = new com.example.admindashboard.model.BudgetActivity();
+            ba3.setActivityName("Amazon Vouchers spent");
+            ba3.setDepartment("HR");
+            ba3.setPointsValue(5000);
+            ba3.setActivityType("Spending");
+            ba3.setActionDate(LocalDate.of(2026, 11, 18));
+            ba3.setStatus("APPROVED");
+            budgetActivityRepository.save(ba3);
+
+            com.example.admindashboard.model.BudgetActivity ba4 = new com.example.admindashboard.model.BudgetActivity();
+            ba4.setActivityName("Team Champion spending");
+            ba4.setDepartment("Engineering");
+            ba4.setPointsValue(1200);
+            ba4.setActivityType("Spending");
+            ba4.setActionDate(LocalDate.of(2026, 11, 20));
+            ba4.setStatus("APPROVED");
+            budgetActivityRepository.save(ba4);
+
+            com.example.admindashboard.model.BudgetActivity ba5 = new com.example.admindashboard.model.BudgetActivity();
+            ba5.setActivityName("L3 Special Request");
+            ba5.setDepartment("Sales");
+            ba5.setPointsValue(10000);
+            ba5.setActivityType("Allocation");
+            ba5.setActionDate(LocalDate.of(2026, 12, 5));
+            ba5.setStatus("PENDING");
+            budgetActivityRepository.save(ba5);
         }
 
         // Seed Facility Vendors

@@ -1124,6 +1124,14 @@ public class DashboardController {
         existingProfile.setEmergencyContactName(formProfile.getEmergencyContactName());
         existingProfile.setRelationWithEmployee(formProfile.getRelationWithEmployee());
 
+        // Newly added fields
+        existingProfile.setReportingManagerL2(formProfile.getReportingManagerL2());
+        existingProfile.setSeniorManagerL3(formProfile.getSeniorManagerL3());
+        existingProfile.setCapabilityCenter(formProfile.getCapabilityCenter());
+        existingProfile.setPresentCountry(formProfile.getPresentCountry());
+        existingProfile.setPermanentCountry(formProfile.getPermanentCountry());
+        existingProfile.setRoleName(formProfile.getRoleName());
+
         // FILE UPLOADS PROCESSING
         String uploadsDir = "uploads/docs/";
         java.io.File dir = new java.io.File(uploadsDir);
