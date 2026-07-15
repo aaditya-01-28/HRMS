@@ -18,6 +18,44 @@
             --card-border-radius: 16px;
         }
 
+        /* Brand Color Custom Overrides */
+        .btn-primary {
+            background-color: var(--primary) !important;
+            border-color: var(--primary) !important;
+        }
+        .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+            background-color: #152a66 !important;
+            border-color: #152a66 !important;
+        }
+        .btn-outline-primary {
+            color: var(--primary) !important;
+            border-color: var(--primary) !important;
+        }
+        .btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary:active {
+            background-color: var(--primary) !important;
+            color: white !important;
+        }
+        .text-primary {
+            color: var(--primary) !important;
+        }
+        .bg-primary {
+            background-color: var(--primary) !important;
+        }
+        .nav-pills .nav-link.active {
+            background-color: var(--primary) !important;
+        }
+        .progress-bar {
+            background-color: var(--primary) !important;
+        }
+        .form-check-input:checked {
+            background-color: var(--primary) !important;
+            border-color: var(--primary) !important;
+        }
+        .badge.bg-primary {
+            background-color: var(--primary) !important;
+        }
+
+
         body {
             background-color: var(--bg-color);
             overflow-x: hidden;
@@ -130,6 +168,58 @@
             height: 40px;
             border-radius: 50%;
             border: 2px solid var(--primary-light);
+        }
+
+        /* Transition rules for sidebar toggle */
+        .myspace-sidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        .myspace-header {
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        .myspace-main {
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        /* Collapsed Sidebar overrides */
+        body.sidebar-collapsed {
+            --sidebar-width: 70px;
+        }
+        body.sidebar-collapsed .myspace-sidebar .brand-area div {
+            display: none !important;
+        }
+        body.sidebar-collapsed .myspace-sidebar .brand-area {
+            justify-content: center;
+            padding: 15px 0;
+        }
+        body.sidebar-collapsed .myspace-sidebar .nav-link-item span {
+            display: none !important;
+        }
+        body.sidebar-collapsed .myspace-sidebar .nav-link-item {
+            justify-content: center;
+            padding: 12px 0;
+            gap: 0;
+        }
+        body.sidebar-collapsed .myspace-sidebar .nav-link-item i {
+            font-size: 1.25rem;
+        }
+        body.sidebar-collapsed .myspace-sidebar .mt-auto span {
+            display: none !important;
+        }
+        body.sidebar-collapsed .myspace-sidebar .mt-auto a {
+            padding: 8px 0;
+            width: 40px !important;
+            margin: 0 auto;
+            border-radius: 50% !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        body.sidebar-collapsed .myspace-sidebar .mt-auto a i {
+            margin: 0 !important;
+        }
+        body.sidebar-collapsed .myspace-sidebar .mt-auto {
+            padding: 15px 0 !important;
         }
 
         /* --- MAIN WRAPPER --- */
@@ -248,37 +338,42 @@
         </div>
         <div class="nav-links">
             <a class="nav-link-item" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}" onclick="switchTab('dashboard')">
-                <i class="fas fa-chart-line"></i> Dashboard
+                <i class="fas fa-chart-line"></i> <span>Dashboard</span>
             </a>
             <a class="nav-link-item" th:classappend="${activeTab == 'approvals' ? 'active' : ''}" onclick="switchTab('approvals')">
-                <i class="fas fa-check-circle"></i> Approvals
+                <i class="fas fa-check-circle"></i> <span>Approvals</span>
             </a>
             <a class="nav-link-item" th:classappend="${activeTab == 'merchandise' ? 'active' : ''}" onclick="switchTab('merchandise')">
-                <i class="fas fa-boxes"></i> Merchandise
+                <i class="fas fa-boxes"></i> <span>Merchandise</span>
             </a>
             <a class="nav-link-item" th:classappend="${activeTab == 'programs' ? 'active' : ''}" onclick="switchTab('programs')">
-                <i class="fas fa-hand-holding-heart"></i> Rewards Program Management
+                <i class="fas fa-hand-holding-heart"></i> <span>Rewards Program Management</span>
             </a>
             <a class="nav-link-item" th:classappend="${activeTab == 'catalog' ? 'active' : ''}" onclick="switchTab('catalog')">
-                <i class="fas fa-book-open"></i> Rewards Catalog
+                <i class="fas fa-book-open"></i> <span>Rewards Catalog</span>
             </a>
             <a class="nav-link-item" th:classappend="${activeTab == 'wallet' ? 'active' : ''}" onclick="switchTab('wallet')">
-                <i class="fas fa-wallet"></i> Wallet Management
+                <i class="fas fa-wallet"></i> <span>Wallet Management</span>
             </a>
             <a class="nav-link-item" th:classappend="${activeTab == 'budget' ? 'active' : ''}" onclick="switchTab('budget')">
-                <i class="fas fa-sliders-h"></i> Budget Control
+                <i class="fas fa-sliders-h"></i> <span>Budget Control</span>
             </a>
         </div>
         <div class="mt-auto border-top p-3 text-center">
             <a href="/senior_rewards/login" class="btn btn-sm btn-outline-danger w-100 rounded-pill fw-bold">
-                <i class="fas fa-sign-out-alt me-1"></i> Exit My Space
+                <i class="fas fa-sign-out-alt me-1"></i> <span>Exit My Space</span>
             </a>
         </div>
     </div>
 
     <!-- TOP HEADER -->
     <div class="myspace-header">
-        <div class="header-title" id="tabTitle">Rewards Admin My Space</div>
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-link text-dark p-0 me-2 border-0 shadow-none" id="sidebarToggle" onclick="toggleSidebar()" style="font-size: 1.25rem;">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-title" id="tabTitle">Rewards Admin My Space</div>
+        </div>
         <div>
             <a href="/senior_rewards/dashboard" class="btn btn-outline-primary rounded-pill fw-bold" style="font-size: 0.85rem; padding: 6px 16px;">
                 <i class="fas fa-arrow-left me-2"></i>Back to Portal
@@ -290,7 +385,7 @@
     <div class="myspace-main">
         
         <!-- ==================== DASHBOARD TAB ==================== -->
-        <div id="tab-dashboard" class="tab-pane" th:style="${activeTab == 'dashboard' ? 'display:block' : 'display:none'}">
+        <div id="tab-dashboard" class="myspace-tab-pane" th:style="${activeTab == 'dashboard' ? 'display:block' : 'display:none'}">
             <!-- Stats row -->
             <div class="row g-4 mb-4">
                 <div class="col-md-3">
@@ -403,345 +498,114 @@
         </div>
 
         <!-- ==================== APPROVALS TAB ==================== -->
-        <div id="tab-approvals" class="tab-pane" th:style="${activeTab == 'approvals' ? 'display:block' : 'display:none'}">
-            
-            <!-- Sub-tabs Navigation -->
-            <ul class="nav nav-pills nav-fill mb-4 p-1 bg-light rounded-pill shadow-sm" id="approvalTabs" role="tablist" style="border: 1px solid #e2e8f0;">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active rounded-pill fw-bold py-2" id="redemption-approvals-tab" data-bs-toggle="pill" data-bs-target="#tab-redemption-approvals" type="button" role="tab" style="font-size: 0.9rem;">
-                        <i class="fas fa-shopping-cart me-2"></i>Redemption Approvals
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link rounded-pill fw-bold py-2" id="budget-approvals-tab" data-bs-toggle="pill" data-bs-target="#tab-budget-approvals" type="button" role="tab" style="font-size: 0.9rem;">
-                        <i class="fas fa-file-invoice-dollar me-2"></i>Budget Approvals
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link rounded-pill fw-bold py-2" id="exceptions-tab" data-bs-toggle="pill" data-bs-target="#tab-exceptions" type="button" role="tab" style="font-size: 0.9rem;">
-                        <i class="fas fa-exclamation-triangle me-2"></i>Exceptions
-                    </button>
-                </li>
-            </ul>
-
-            <div class="tab-content" id="approvalTabsContent">
+        <div id="tab-approvals" class="myspace-tab-pane" th:style="${activeTab == 'approvals' ? 'display:block' : 'display:none'}">
+            <div class="custom-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold text-dark mb-0">Approvals Checklist</h5>
+                    <!-- Filters -->
+                    <div class="d-flex gap-2">
+                        <input type="text" id="approvalSearch" class="form-control form-control-sm rounded-pill" placeholder="Search employee..." onkeyup="filterApprovals()">
+                        <select id="categoryFilter" class="form-select form-select-sm rounded-pill" onchange="filterApprovals()">
+                            <option value="">All Types</option>
+                            <option value="Redemption Store">Redemption Store</option>
+                            <option value="Points Transfer">Points Transfer</option>
+                            <option value="Gift Cards">Gift Cards</option>
+                            <option value="Certificate Rewards">Certificate Rewards</option>
+                        </select>
+                    </div>
+                </div>
                 
-                <!-- Sub-tab 1: Redemption Approvals -->
-                <div class="tab-pane fade show active" id="tab-redemption-approvals" role="tabpanel">
-                    <div class="custom-card">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div>
-                                <h5 class="fw-bold text-dark mb-1">Redemption Approvals</h5>
-                                <p class="text-muted small mb-0">Checklist of pending items requested by employees.</p>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <input type="text" id="approvalSearch" class="form-control form-control-sm rounded-pill" placeholder="Search employee..." onkeyup="filterApprovals()">
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table align-middle table-hover" id="approvalsTable">
-                                <thead>
-                                    <tr class="table-light">
-                                        <th>Ticket ID</th>
-                                        <th>Type</th>
-                                        <th>Employee</th>
-                                        <th>Description</th>
-                                        <th>Points</th>
-                                        <th>Status</th>
-                                        <th class="text-end">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="t : ${tickets}">
-                                        <td class="fw-bold" th:text="${t.ticketId}">T-101</td>
-                                        <td class="category-col" th:text="${t.category}">Redemption Store</td>
-                                        <td class="employee-col" th:text="${t.employeeName}">Neha Sharma</td>
-                                        <td th:text="${t.justification}">Redeemed WCG T-shirt</td>
-                                        <td th:text="${t.durationOrLevel}">600</td>
-                                        <td>
-                                            <span class="badge" th:classappend="${t.status == 'Open' ? 'bg-warning text-dark' : (t.status == 'Approved' ? 'bg-success' : 'bg-danger')}" th:text="${t.status}">Open</span>
-                                        </td>
-                                        <td class="text-end">
-                                            <button class="btn btn-sm btn-primary rounded-pill px-3" 
-                                                    th:onclick="showTicketDetails([[${t.ticketId}]], [[${t.category}]], [[${t.employeeName}]], [[${t.employeeId}]], [[${t.justification}]], [[${t.durationOrLevel}]], [[${t.location}]], [[${t.status}]])">
-                                                <i class="fas fa-eye me-1"></i> Review
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover" id="approvalsTable">
+                        <thead>
+                            <tr class="table-light">
+                                <th>Ticket ID</th>
+                                <th>Type</th>
+                                <th>Employee</th>
+                                <th>Description</th>
+                                <th>Points</th>
+                                <th>Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="t : ${tickets}">
+                                <td class="fw-bold" th:text="${t.ticketId}">T-101</td>
+                                <td class="category-col" th:text="${t.category}">Redemption Store</td>
+                                <td class="employee-col" th:text="${t.employeeName}">Neha Sharma</td>
+                                <td th:text="${t.justification}">Redeemed WCG T-shirt</td>
+                                <td th:text="${t.durationOrLevel}">600</td>
+                                <td>
+                                    <span class="badge" th:classappend="${t.status == 'Open' ? 'bg-warning text-dark' : (t.status == 'Approved' ? 'bg-success' : 'bg-danger')}" th:text="${t.status}">Open</span>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-primary rounded-pill px-3" 
+                                            th:onclick="showTicketDetails([[${t.ticketId}]], [[${t.category}]], [[${t.employeeName}]], [[${t.employeeId}]], [[${t.justification}]], [[${t.durationOrLevel}]], [[${t.location}]], [[${t.status}]])">
+                                        <i class="fas fa-eye me-1"></i> Review
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-
-                <!-- Sub-tab 2: Budget Approvals -->
-                <div class="tab-pane fade" id="tab-budget-approvals" role="tabpanel">
-                    <div class="custom-card">
-                        <h5 class="fw-bold text-dark mb-4">Budget Approvals Request</h5>
-                        <div class="table-responsive">
-                            <table class="table align-middle">
-                                <thead>
-                                    <tr class="table-light">
-                                        <th>Request ID</th>
-                                        <th>Request Name</th>
-                                        <th>Department</th>
-                                        <th>Allocated Points</th>
-                                        <th>Request Type</th>
-                                        <th>Status</th>
-                                        <th class="text-end">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="ba : ${budgetActivities}" th:if="${ba.status == 'PENDING'}">
-                                        <td class="fw-bold text-dark" th:text="${'B-REQ-' + ba.id}">B-REQ-101</td>
-                                        <td th:text="${ba.activityName}">Allocation</td>
-                                        <td th:text="${ba.department}">Sales</td>
-                                        <td class="fw-bold text-primary" th:text="${ba.pointsValue + ' Pts'}">10000 Pts</td>
-                                        <td th:text="${ba.activityType}">Allocation</td>
-                                        <td><span class="badge bg-warning text-dark">Pending</span></td>
-                                        <td class="text-end d-flex gap-2 justify-content-end">
-                                            <form th:action="@{/senior_rewards/budget_activity/action}" method="post">
-                                                <input type="hidden" name="id" th:value="${ba.id}">
-                                                <input type="hidden" name="action" value="Approve">
-                                                <button class="btn btn-sm btn-success rounded-pill px-3 fw-bold" type="submit">Approve</button>
-                                            </form>
-                                            <form th:action="@{/senior_rewards/budget_activity/action}" method="post">
-                                                <input type="hidden" name="id" th:value="${ba.id}">
-                                                <input type="hidden" name="action" value="Reject">
-                                                <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" type="submit">Reject</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sub-tab 3: Exceptions -->
-                <div class="tab-pane fade" id="tab-exceptions" role="tabpanel">
-                    <div class="custom-card text-center py-5">
-                        <i class="fas fa-clipboard-check text-muted mb-3" style="font-size: 3rem;"></i>
-                        <h5 class="fw-bold text-dark">No Exceptions Found</h5>
-                        <p class="text-muted small mb-0">All user point requests and transfers conform to defined budget thresholds.</p>
-                    </div>
-                </div>
-
             </div>
         </div>
 
         <!-- ==================== MERCHANDISE TAB ==================== -->
-        <div id="tab-merchandise" class="tab-pane" th:style="${activeTab == 'merchandise' ? 'display:block' : 'display:none'}">
-            
-            <!-- Sub-tabs Navigation -->
-            <ul class="nav nav-pills nav-fill mb-4 p-1 bg-light rounded-pill shadow-sm" id="catalogSubTabs" role="tablist" style="border: 1px solid #e2e8f0;">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active rounded-pill fw-bold py-2" id="all-items-tab" data-bs-toggle="pill" data-bs-target="#tab-all-items" type="button" role="tab" style="font-size: 0.9rem;">
-                        <i class="fas fa-th-large me-2"></i>All Items
+        <div id="tab-merchandise" class="myspace-tab-pane" th:style="${activeTab == 'merchandise' ? 'display:block' : 'display:none'}">
+            <div class="custom-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold text-dark mb-0">Merchandise Inventory</h5>
+                    <button class="btn btn-primary rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#addMerchandiseModal">
+                        <i class="fas fa-plus me-1"></i> Add New Merchandise
                     </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link rounded-pill fw-bold py-2" id="merch-items-tab" data-bs-toggle="pill" data-bs-target="#tab-merch-items" type="button" role="tab" style="font-size: 0.9rem;">
-                        <i class="fas fa-tshirt me-2"></i>Merchandise
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link rounded-pill fw-bold py-2" id="vouchers-tab" data-bs-toggle="pill" data-bs-target="#tab-vouchers" type="button" role="tab" style="font-size: 0.9rem;">
-                        <i class="fas fa-ticket-alt me-2"></i>Points and Vouchers
-                    </button>
-                </li>
-            </ul>
-
-            <!-- Filter Row -->
-            <div class="custom-card mb-4">
-                <div class="row g-2 align-items-center">
-                    <div class="col-md-4">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="fas fa-search"></i></span>
-                            <input type="text" id="catalogSearchInput" class="form-control border-start-0 rounded-end-3" placeholder="Search by name, brand or category..." onkeyup="filterCatalogTable()">
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <select id="catalogCategorySelect" class="form-select form-select-sm rounded-3" onchange="filterCatalogTable()">
-                            <option value="">All Categories</option>
-                            <option value="Audio">Audio</option>
-                            <option value="Apparel">Apparel</option>
-                            <option value="Gift Cards">Gift Cards</option>
-                            <option value="Certificates">Certificates</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <select id="catalogStockSelect" class="form-select form-select-sm rounded-3" onchange="filterCatalogTable()">
-                            <option value="">All Stock Status</option>
-                            <option value="instock">In Stock</option>
-                            <option value="outofstock">Out of Stock</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 text-end">
-                        <button class="btn btn-primary btn-sm rounded-pill fw-bold w-100" data-bs-toggle="modal" data-bs-target="#addMerchandiseModal">
-                            <i class="fas fa-plus me-1"></i> Add Reward
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-content" id="catalogSubTabsContent">
-                
-                <!-- Tab 1: All Items -->
-                <div class="tab-pane fade show active" id="tab-all-items" role="tabpanel">
-                    <div class="custom-card">
-                        <div class="table-responsive">
-                            <table class="table align-middle" id="allCatalogTable">
-                                <thead>
-                                    <tr class="table-light">
-                                        <th>Reward Item</th>
-                                        <th>Category</th>
-                                        <th>Valuation</th>
-                                        <th>Total Stock</th>
-                                        <th>Status</th>
-                                        <th class="text-end">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="m : ${merchandiseList}" class="catalog-row-item" th:data-category="${m.category}" th:data-stock="${m.totalStocks}">
-                                        <td>
-                                            <div class="d-flex align-items-center gap-3">
-                                                <img th:src="${m.imagePath}" alt="Reward" class="rounded border" style="width: 45px; height: 45px; object-fit: cover;" onerror="this.src='https://placehold.co/45x45?text=Reward'">
-                                                <div>
-                                                    <div class="fw-bold text-dark item-name-text" th:text="${m.itemName}">Reward Name</div>
-                                                    <div class="small text-muted" th:text="${m.brand}">Brand</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td th:text="${m.category}">Category</td>
-                                        <td class="fw-bold text-primary" th:text="${m.redemptionPoints + ' Pts'}">600 Pts</td>
-                                        <td th:text="${m.totalStocks}">15</td>
-                                        <td>
-                                            <span class="badge" th:classappend="${m.totalStocks > 0 ? 'bg-success' : 'bg-danger'}" th:text="${m.totalStocks > 0 ? 'Active' : 'Inactive'}">Active</span>
-                                        </td>
-                                        <td class="text-end">
-                                            <button class="btn btn-sm btn-outline-primary rounded-circle p-2 me-1" type="button"
-                                                    th:onclick="openEditMerchandiseModal([[${m.id}]], [[${m.itemName}]], [[${m.category}]], [[${m.brand}]], [[${m.description}]], [[${m.redemptionPoints}]], [[${m.totalStocks}]], [[${m.perUserLimit}]], [[${m.imagePath}]])">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <form th:action="@{'/senior_rewards/merchandise/delete/' + ${m.id}}" method="post" class="d-inline">
-                                                <button class="btn btn-sm btn-outline-danger rounded-circle p-2" type="submit" onclick="return confirm('Delete this reward item?')">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- Tab 2: Merchandise -->
-                <div class="tab-pane fade" id="tab-merch-items" role="tabpanel">
-                    <div class="custom-card">
-                        <div class="table-responsive">
-                            <table class="table align-middle">
-                                <thead>
-                                    <tr class="table-light">
-                                        <th>Reward Item</th>
-                                        <th>Category</th>
-                                        <th>Valuation</th>
-                                        <th>Total Stock</th>
-                                        <th>Status</th>
-                                        <th class="text-end">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="m : ${merchandiseList}" th:if="${m.category == 'Audio' || m.category == 'Apparel' || m.category == 'Merchandise'}">
-                                        <td>
-                                            <div class="d-flex align-items-center gap-3">
-                                                <img th:src="${m.imagePath}" alt="Reward" class="rounded border" style="width: 45px; height: 45px; object-fit: cover;" onerror="this.src='https://placehold.co/45x45?text=Reward'">
-                                                <div>
-                                                    <div class="fw-bold text-dark" th:text="${m.itemName}">Reward Name</div>
-                                                    <div class="small text-muted" th:text="${m.brand}">Brand</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td th:text="${m.category}">Category</td>
-                                        <td class="fw-bold text-primary" th:text="${m.redemptionPoints + ' Pts'}">600 Pts</td>
-                                        <td th:text="${m.totalStocks}">15</td>
-                                        <td>
-                                            <span class="badge" th:classappend="${m.totalStocks > 0 ? 'bg-success' : 'bg-danger'}" th:text="${m.totalStocks > 0 ? 'Active' : 'Inactive'}">Active</span>
-                                        </td>
-                                        <td class="text-end">
-                                            <button class="btn btn-sm btn-outline-primary rounded-circle p-2 me-1" type="button"
-                                                    th:onclick="openEditMerchandiseModal([[${m.id}]], [[${m.itemName}]], [[${m.category}]], [[${m.brand}]], [[${m.description}]], [[${m.redemptionPoints}]], [[${m.totalStocks}]], [[${m.perUserLimit}]], [[${m.imagePath}]])">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <form th:action="@{'/senior_rewards/merchandise/delete/' + ${m.id}}" method="post" class="d-inline">
-                                                <button class="btn btn-sm btn-outline-danger rounded-circle p-2" type="submit" onclick="return confirm('Delete this reward item?')">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr class="table-light">
+                                <th>Item Image</th>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Brand</th>
+                                <th>Redemption Points</th>
+                                <th>Stocks Available</th>
+                                <th>Limit Per User</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="m : ${merchandiseList}">
+                                <td>
+                                    <img th:src="${m.imagePath}" alt="Merchandise" class="rounded border" style="width: 45px; height: 45px; object-fit: cover;" onerror="this.src='https://placehold.co/45x45?text=Img'">
+                                </td>
+                                <td class="fw-bold" th:text="${m.itemName}">WCG T-Shirt</td>
+                                <td th:text="${m.category}">Apparel</td>
+                                <td th:text="${m.brand}">WCG Custom</td>
+                                <td class="fw-bold text-primary" th:text="${m.redemptionPoints + ' Pts'}">600 Pts</td>
+                                <td th:text="${m.totalStocks}">15</td>
+                                <td th:text="${m.perUserLimit}">1</td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-primary rounded-circle p-2 me-1" type="button"
+                                            th:onclick="openEditMerchandiseModal([[${m.id}]], [[${m.itemName}]], [[${m.category}]], [[${m.brand}]], [[${m.description}]], [[${m.redemptionPoints}]], [[${m.totalStocks}]], [[${m.perUserLimit}]], [[${m.imagePath}]])">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form th:action="@{'/senior_rewards/merchandise/delete/' + ${m.id}}" method="post" class="d-inline">
+                                        <button class="btn btn-sm btn-outline-danger rounded-circle p-2" type="submit" onclick="return confirm('Delete this merchandise item?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-
-                <!-- Tab 3: Points and Vouchers -->
-                <div class="tab-pane fade" id="tab-vouchers" role="tabpanel">
-                    <div class="custom-card">
-                        <div class="table-responsive">
-                            <table class="table align-middle">
-                                <thead>
-                                    <tr class="table-light">
-                                        <th>Reward Item</th>
-                                        <th>Category</th>
-                                        <th>Valuation</th>
-                                        <th>Total Stock</th>
-                                        <th>Status</th>
-                                        <th class="text-end">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="m : ${merchandiseList}" th:if="${m.category == 'Gift Cards' || m.category == 'Certificates' || m.category == 'Vouchers'}">
-                                        <td>
-                                            <div class="d-flex align-items-center gap-3">
-                                                <img th:src="${m.imagePath}" alt="Reward" class="rounded border" style="width: 45px; height: 45px; object-fit: cover;" onerror="this.src='https://placehold.co/45x45?text=Reward'">
-                                                <div>
-                                                    <div class="fw-bold text-dark" th:text="${m.itemName}">Reward Name</div>
-                                                    <div class="small text-muted" th:text="${m.brand}">Brand</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td th:text="${m.category}">Category</td>
-                                        <td class="fw-bold text-primary" th:text="${m.redemptionPoints + ' Pts'}">600 Pts</td>
-                                        <td th:text="${m.totalStocks}">15</td>
-                                        <td>
-                                            <span class="badge" th:classappend="${m.totalStocks > 0 ? 'bg-success' : 'bg-danger'}" th:text="${m.totalStocks > 0 ? 'Active' : 'Inactive'}">Active</span>
-                                        </td>
-                                        <td class="text-end">
-                                            <button class="btn btn-sm btn-outline-primary rounded-circle p-2 me-1" type="button"
-                                                    th:onclick="openEditMerchandiseModal([[${m.id}]], [[${m.itemName}]], [[${m.category}]], [[${m.brand}]], [[${m.description}]], [[${m.redemptionPoints}]], [[${m.totalStocks}]], [[${m.perUserLimit}]], [[${m.imagePath}]])">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <form th:action="@{'/senior_rewards/merchandise/delete/' + ${m.id}}" method="post" class="d-inline">
-                                                <button class="btn btn-sm btn-outline-danger rounded-circle p-2" type="submit" onclick="return confirm('Delete this reward item?')">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
 
         <!-- ==================== PROGRAMS TAB ==================== -->
-        <div id="tab-programs" class="tab-pane" th:style="${activeTab == 'programs' ? 'display:block' : 'display:none'}">
+        <div id="tab-programs" class="myspace-tab-pane" th:style="${activeTab == 'programs' ? 'display:block' : 'display:none'}">
             
             <!-- Program Tabs Navigation -->
             <ul class="nav nav-pills nav-fill mb-4 p-1 bg-light rounded-pill shadow-sm" id="programTabs" role="tablist" style="border: 1px solid #e2e8f0;">
@@ -1012,7 +876,7 @@
         </div>
 
         <!-- ==================== CATALOG TAB ==================== -->
-        <div id="tab-catalog" class="tab-pane" th:style="${activeTab == 'catalog' ? 'display:block' : 'display:none'}">
+        <div id="tab-catalog" class="myspace-tab-pane" th:style="${activeTab == 'catalog' ? 'display:block' : 'display:none'}">
             <h5 class="fw-bold text-dark mb-4">Rewards Store Preview</h5>
             <div class="row g-4">
                 <div th:each="m : ${merchandiseList}" class="col-md-3">
@@ -1033,7 +897,7 @@
         </div>
 
         <!-- ==================== WALLET TAB ==================== -->
-        <div id="tab-wallet" class="tab-pane" th:style="${activeTab == 'wallet' ? 'display:block' : 'display:none'}">
+        <div id="tab-wallet" class="myspace-tab-pane" th:style="${activeTab == 'wallet' ? 'display:block' : 'display:none'}">
             
             <!-- Cards Section -->
             <div class="row g-3 mb-4">
@@ -1217,7 +1081,7 @@
         </div>
 
         <!-- ==================== BUDGET TAB ==================== -->
-        <div id="tab-budget" class="tab-pane" th:style="${activeTab == 'budget' ? 'display:block' : 'display:none'}">
+        <div id="tab-budget" class="myspace-tab-pane" th:style="${activeTab == 'budget' ? 'display:block' : 'display:none'}">
             
             <!-- Cards Section -->
             <div class="row g-3 mb-4">
@@ -2217,10 +2081,23 @@
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script th:inline="javascript">
+        // Sidebar toggle logic with local storage persistence
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-collapsed');
+            const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+            localStorage.setItem('sidebar-collapsed', isCollapsed);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('sidebar-collapsed') === 'true') {
+                document.body.classList.add('sidebar-collapsed');
+            }
+        });
+
         // Tab switching logic
         function switchTab(tabId) {
             // Hide all tab panes
-            document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.myspace-tab-pane').forEach(el => el.style.display = 'none');
             // Show requested tab pane
             document.getElementById('tab-' + tabId).style.display = 'block';
             

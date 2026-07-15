@@ -1513,7 +1513,8 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
 
         // Seed Reward Programs
-        if (rewardProgramRepository.count() == 0) {
+        if (rewardProgramRepository.count() <= 3) {
+            rewardProgramRepository.deleteAll();
             // PEER_TO_PEER
             RewardProgram p1 = new RewardProgram();
             p1.setProgramName("High Five Recognition");
