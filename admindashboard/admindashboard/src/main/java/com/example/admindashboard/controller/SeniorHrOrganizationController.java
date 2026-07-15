@@ -88,17 +88,38 @@ public class SeniorHrOrganizationController {
             dto.setEmail(u.getEmail());
             dto.setProfileImage(u.getProfileImage());
             
-            if (u.getDepartmentId() != null && deptMap.containsKey(u.getDepartmentId())) {
-                dto.setDepartment(deptMap.get(u.getDepartmentId()));
-            } else {
-                dto.setDepartment("N/A");
-            }
+            dto.setDepartment(getDynamicDepartment(u));
             
             if (u.getEmployeeProfile() != null && u.getEmployeeProfile().getMobileNumber() != null) {
                 dto.setPhone(u.getEmployeeProfile().getMobileNumber());
             } else {
                 dto.setPhone("-");
             }
+            
+            // L2 Manager: Direct manager
+            if (u.getManager() != null) {
+                dto.setL2Manager(u.getManager().getFullName());
+            } else {
+                dto.setL2Manager("N/A (Top Management)");
+            }
+            
+            // L3 Manager: Senior Manager (Manager's manager)
+            if (u.getManager() != null && u.getManager().getManager() != null) {
+                dto.setL3Manager(u.getManager().getManager().getFullName());
+            } else if (u.getManager() != null) {
+                dto.setL3Manager(u.getManager().getFullName() + " (Directly reports to Top)");
+            } else {
+                dto.setL3Manager("N/A");
+            }
+            
+            // Assigned HR
+            String hrAssigned = "Neha Verma"; // default/fallback HR
+            if (u.getEmployeeProfile() != null && u.getEmployeeProfile().getAssignedHrL2() != null && !u.getEmployeeProfile().getAssignedHrL2().isEmpty()) {
+                hrAssigned = u.getEmployeeProfile().getAssignedHrL2();
+            } else if (u.getEmployeeProfile() != null && u.getEmployeeProfile().getBuHrContact() != null && !u.getEmployeeProfile().getBuHrContact().isEmpty()) {
+                hrAssigned = u.getEmployeeProfile().getBuHrContact();
+            }
+            dto.setAssignedHr(hrAssigned);
             
             nodes.add(dto);
         }
@@ -172,5 +193,28 @@ public class SeniorHrOrganizationController {
             return ResponseEntity.ok(Map.of("success", true));
         }
         return ResponseEntity.badRequest().build();
+    }
+
+    private String getDynamicDepartment(User u) {
+        if (u == null) return "N/A";
+        if (u.getEmployeeProfile() != null && u.getEmployeeProfile().getDepartment() != null && !u.getEmployeeProfile().getDepartment().isBlank()) {
+            String epDept = u.getEmployeeProfile().getDepartment().trim().toLowerCase();
+            if (epDept.contains("hr") || epDept.contains("human resources")) return "Human Resources";
+            if (epDept.contains("it") || epDept.contains("information technology") || epDept.equals("engineering")) return "Information Technology";
+            if (epDept.contains("finance") || epDept.contains("accounts")) return "Finance";
+            if (epDept.contains("facilities") || epDept.contains("operations") || epDept.contains("transport")) return "Operations";
+            if (epDept.contains("design") || epDept.contains("product")) return "Sales & Marketing";
+            // Capitalize first letter
+            return u.getEmployeeProfile().getDepartment().substring(0, 1).toUpperCase() + u.getEmployeeProfile().getDepartment().substring(1);
+        }
+        if (u.getRole() != null && u.getRole().getRoleName() != null) {
+            String role = u.getRole().getRoleName().trim().toUpperCase();
+            if (role.contains("HR") || role.contains("RECRUITER")) return "Human Resources";
+            if (role.contains("IT") || role.contains("SUPPORT")) return "Information Technology";
+            if (role.contains("FINANCE") || role.contains("ACCOUNTS")) return "Finance";
+            if (role.contains("TRANSPORT") || role.contains("FACILITY")) return "Operations";
+            if (role.contains("SUPER_ADMIN") || role.contains("SENIOR_MANAGER") || role.contains("ADMIN")) return "Top Management";
+        }
+        return "Operations";
     }
 }

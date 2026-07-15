@@ -15,6 +15,10 @@ public class HierarchyNodeDTO {
     private int teamSize;
     private List<HierarchyNodeDTO> children = new ArrayList<>();
 
+    private String l2Manager;
+    private String l3Manager;
+    private String assignedHr;
+
     public HierarchyNodeDTO() {}
 
     public Long getId() { return id; }
@@ -37,4 +41,11 @@ public class HierarchyNodeDTO {
     public void setTeamSize(int teamSize) { this.teamSize = teamSize; }
     public List<HierarchyNodeDTO> getChildren() { return children; }
     public void setChildren(List<HierarchyNodeDTO> children) { this.children = children; }
+
+    public String getL2Manager() { return l2Manager; }
+    public void setL2Manager(String l2Manager) { this.l2Manager = l2Manager; }
+    public String getL3Manager() { return l3Manager; }
+    public void setL3Manager(String l3Manager) { this.l3Manager = l3Manager; }
+    public String getAssignedHr() { return assignedHr; }
+    public void setAssignedHr(String assignedHr) { this.assignedHr = assignedHr; }
 }

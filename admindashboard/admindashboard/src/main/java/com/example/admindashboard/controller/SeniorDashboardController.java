@@ -125,6 +125,18 @@ public class SeniorDashboardController {
     private ReferralRepository referralRepository;
 
     @Autowired
+    private com.example.admindashboard.repository.RewardMerchandiseRepository rewardMerchandiseRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.RewardBudgetRepository rewardBudgetRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.RewardProgramRepository rewardProgramRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.ThanksWalletRepository thanksWalletRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -311,10 +323,210 @@ public class SeniorDashboardController {
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_rewards/dashboard")
     public String showSeniorRewardsDashboard(Model model, Principal principal, HttpServletRequest request) {
-    	loadDashboardData(model);
+        String currentUserId = principal.getName();
+        List<com.example.admindashboard.model.ServiceRequest> recentTickets =
+                serviceRequestRepository.findTop3ByEmployeeIdOrderByIdDesc(currentUserId);
+        model.addAttribute("recentTickets", recentTickets);
+        model.addAttribute("pendingMeetingInvites", getPendingMeetingInvites(currentUserId));
         model.addAttribute("isSeniorManager", true);
         model.addAttribute("workflowUrl", "/senior_rewards/workflow");
-    	return "employee-dashboard";
+        return "senior_rewards-dashboard";
+    }
+
+    @GetMapping("/senior_rewards/login")
+    public String showSeniorRewardsLogin() {
+        return "senior_rewards-login";
+    }
+
+    @PostMapping("/senior_rewards/login")
+    public String processSeniorRewardsLogin(
+            @RequestParam String username,
+            @RequestParam String password,
+            Model model) {
+
+        User user = userRepository
+                .findByUsername(username.toUpperCase())
+                .orElse(null);
+
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+            model.addAttribute("authError", "Invalid username or password");
+            return "senior_rewards-login";
+        }
+
+        String role = user.getRole() != null ? user.getRole().getRoleName() : "";
+        if (!"SENIOR_REWARDS_HEAD".equalsIgnoreCase(role)) {
+            model.addAttribute("authError", "Only Rewards Head credentials can access this My Space");
+            return "senior_rewards-login";
+        }
+
+        return "redirect:/senior_rewards/my_space";
+    }
+
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @GetMapping("/senior_rewards/my_space")
+    public String showSeniorRewardsMySpace(Model model, Principal principal, @RequestParam(name="tab", defaultValue="dashboard") String tab) {
+        // Core entities
+        List<com.example.admindashboard.model.RewardMerchandise> merchandiseList = rewardMerchandiseRepository.findAll();
+        List<com.example.admindashboard.model.RewardBudget> budgets = rewardBudgetRepository.findAll();
+        List<com.example.admindashboard.model.RewardProgram> programs = rewardProgramRepository.findAll();
+        List<com.example.admindashboard.model.ThanksWallet> wallets = thanksWalletRepository.findAll();
+        
+        List<com.example.admindashboard.model.ServiceRequest> rewardsTickets = serviceRequestRepository.findAll().stream()
+                .filter(t -> "REWARDS".equalsIgnoreCase(t.getType()))
+                .collect(Collectors.toList());
+
+        // Stats calculation
+        long totalTickets = rewardsTickets.size();
+        long pendingTickets = rewardsTickets.stream().filter(t -> "Open".equalsIgnoreCase(t.getStatus())).count();
+        long approvedTickets = rewardsTickets.stream().filter(t -> "Approved".equalsIgnoreCase(t.getStatus())).count();
+        long rejectedTickets = rewardsTickets.stream().filter(t -> "Rejected".equalsIgnoreCase(t.getStatus())).count();
+
+        // Top Employees by Wallet point balance or points earned
+        List<com.example.admindashboard.model.ThanksWallet> topEmployees = wallets.stream()
+                .sorted((w1, w2) -> w2.getTotalPointsEarned().compareTo(w1.getTotalPointsEarned()))
+                .limit(5)
+                .collect(Collectors.toList());
+
+        // Model binding
+        model.addAttribute("merchandiseList", merchandiseList);
+        model.addAttribute("budgets", budgets);
+        model.addAttribute("programs", programs);
+        model.addAttribute("wallets", wallets);
+        model.addAttribute("tickets", rewardsTickets);
+        model.addAttribute("topEmployees", topEmployees);
+        model.addAttribute("activeTab", tab);
+
+        model.addAttribute("totalTickets", totalTickets);
+        model.addAttribute("pendingTickets", pendingTickets);
+        model.addAttribute("approvedTickets", approvedTickets);
+        model.addAttribute("rejectedTickets", rejectedTickets);
+
+        // Chart distributions (Categories counts)
+        long ptsTransferCount = rewardsTickets.stream().filter(t -> "Points Transfer".equalsIgnoreCase(t.getCategory())).count();
+        long redemptionCount = rewardsTickets.stream().filter(t -> "Redemption Store".equalsIgnoreCase(t.getCategory())).count();
+        long giftCardCount = rewardsTickets.stream().filter(t -> "Gift Cards".equalsIgnoreCase(t.getCategory())).count();
+        long certCount = rewardsTickets.stream().filter(t -> "Certificate Rewards".equalsIgnoreCase(t.getCategory()) || "Certificate point".equalsIgnoreCase(t.getCategory())).count();
+        long totalChartCount = ptsTransferCount + redemptionCount + giftCardCount + certCount;
+
+        model.addAttribute("ptsTransferCount", ptsTransferCount);
+        model.addAttribute("redemptionCount", redemptionCount);
+        model.addAttribute("giftCardCount", giftCardCount);
+        model.addAttribute("certCount", certCount);
+        model.addAttribute("totalChartCount", totalChartCount == 0 ? 1 : totalChartCount);
+
+        return "senior_rewards-myspace";
+    }
+
+    @PostMapping("/senior_rewards/merchandise/add")
+    public String addMerchandise(
+            @RequestParam String itemName,
+            @RequestParam String category,
+            @RequestParam(required=false) String brand,
+            @RequestParam String description,
+            @RequestParam Integer redemptionPoints,
+            @RequestParam Integer totalStocks,
+            @RequestParam Integer perUserLimit,
+            @RequestParam(required=false) String imagePath) {
+
+        com.example.admindashboard.model.RewardMerchandise m = new com.example.admindashboard.model.RewardMerchandise();
+        m.setItemName(itemName);
+        m.setCategory(category);
+        m.setBrand(brand != null ? brand : "N/A");
+        m.setDescription(description);
+        m.setRedemptionPoints(redemptionPoints);
+        m.setTotalStocks(totalStocks);
+        m.setPerUserLimit(perUserLimit);
+        m.setStatus("PUBLISHED");
+        if (imagePath != null && !imagePath.isBlank()) {
+            m.setImagePath(imagePath);
+        } else {
+            m.setImagePath("/images/wcg-logo.jpg");
+        }
+
+        rewardMerchandiseRepository.save(m);
+        return "redirect:/senior_rewards/my_space?tab=merchandise";
+    }
+
+    @PostMapping("/senior_rewards/merchandise/delete/{id}")
+    public String deleteMerchandise(@PathVariable Long id) {
+        rewardMerchandiseRepository.deleteById(id);
+        return "redirect:/senior_rewards/my_space?tab=merchandise";
+    }
+
+    @PostMapping("/senior_rewards/request/action")
+    public String handleRequestAction(
+            @RequestParam String ticketId,
+            @RequestParam String action,
+            @RequestParam(required=false) String comments) {
+
+        com.example.admindashboard.model.ServiceRequest req = serviceRequestRepository.findByTicketId(ticketId).orElse(null);
+        if (req != null) {
+            String targetStatus = "Open";
+            if ("Close Ticket".equalsIgnoreCase(action)) {
+                targetStatus = "Close";
+            } else if ("Approve".equalsIgnoreCase(action)) {
+                targetStatus = "Approved";
+                
+                // Deduct points from ThanksWallet if approved
+                int pointsRequired = 0;
+                try {
+                    pointsRequired = Integer.parseInt(req.getDurationOrLevel());
+                } catch (Exception ex) {}
+
+                if (pointsRequired > 0) {
+                    com.example.admindashboard.model.User emp = userRepository.findByUsername(req.getEmployeeId()).orElse(null);
+                    if (emp != null && emp.getThanksWallet() != null) {
+                        com.example.admindashboard.model.ThanksWallet wallet = emp.getThanksWallet();
+                        wallet.setWalletBalance(Math.max(0, wallet.getWalletBalance() - pointsRequired));
+                        wallet.setRewardsReceived(wallet.getRewardsReceived() + 1);
+                        thanksWalletRepository.save(wallet);
+                    }
+                }
+            } else if ("Reject".equalsIgnoreCase(action)) {
+                targetStatus = "Rejected";
+            }
+
+            req.setStatus(targetStatus);
+            req.setAdminComments(comments);
+            req.setActionDate(LocalDate.now());
+            serviceRequestRepository.save(req);
+        }
+
+        return "redirect:/senior_rewards/my_space?tab=approvals";
+    }
+
+    @PostMapping("/senior_rewards/wallet/adjust")
+    public String adjustWallet(
+            @RequestParam Long walletId,
+            @RequestParam Integer points,
+            @RequestParam String action) {
+
+        com.example.admindashboard.model.ThanksWallet wallet = thanksWalletRepository.findById(walletId).orElse(null);
+        if (wallet != null) {
+            if ("add".equalsIgnoreCase(action)) {
+                wallet.setWalletBalance(wallet.getWalletBalance() + points);
+                wallet.setTotalPointsEarned(wallet.getTotalPointsEarned() + points);
+            } else if ("deduct".equalsIgnoreCase(action)) {
+                wallet.setWalletBalance(Math.max(0, wallet.getWalletBalance() - points));
+            }
+            thanksWalletRepository.save(wallet);
+        }
+        return "redirect:/senior_rewards/my_space?tab=wallet";
+    }
+
+    @PostMapping("/senior_rewards/budget/add")
+    public String addBudget(
+            @RequestParam String department,
+            @RequestParam Integer allocatedPoints,
+            @RequestParam String fiscalYear) {
+
+        com.example.admindashboard.model.RewardBudget b = new com.example.admindashboard.model.RewardBudget();
+        b.setDepartment(department);
+        b.setAllocatedPoints(allocatedPoints);
+        b.setSpentPoints(0);
+        b.setFiscalYear(fiscalYear);
+        rewardBudgetRepository.save(b);
+        return "redirect:/senior_rewards/my_space?tab=budget";
     }
 
     @PreAuthorize("hasAuthority('admin_dashboard_view')")

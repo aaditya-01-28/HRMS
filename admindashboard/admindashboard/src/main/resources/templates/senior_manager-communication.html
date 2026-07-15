@@ -455,16 +455,18 @@
                         </select>
                     </div>
 
-                    <div id="otherSelectContainerComm" class="mb-3" style="display:none; grid-column: span 4; border:1px solid #e2e8f0; border-radius:8px; padding:15px; background-color:#f8fafc;">
+                    <div id="otherSelectContainerComm" class="mb-3" style="display:none; grid-column: span 2;">
                         <label class="form-label-custom fw-bold text-dark mb-2">Select Recipient Employees</label>
+                        <div id="commSelectedTags" class="d-flex flex-wrap gap-2 mb-2"></div>
                         <div class="mb-2 position-relative">
-                            <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left:12px; top:50%; transform:translateY(-50%);"></i>
-                            <input type="text" id="commEmpSearchInput" onkeyup="filterCommEmployees()" class="form-control" placeholder="Type name to filter list..." style="padding-left:36px; height:38px; border-radius:6px;"/>
-                        </div>
-                        <div id="commEmployeesListContainer" class="d-flex flex-wrap gap-2" style="max-height: 180px; overflow-y: auto; padding: 10px; border:1px solid #cbd5e1; border-radius:6px; background-color:#fff;">
-                            <div th:each="user : ${activeUsers}" class="comm-user-item p-1 px-2 border rounded d-flex align-items-center gap-2" style="font-size:0.88rem; background-color:#f1f5f9; cursor:pointer;" th:attr="data-name=${user.fullName}">
-                                <input type="checkbox" name="recipientUsernames" th:value="${user.username}" class="form-check-input comm-user-checkbox"/>
-                                <span th:text="${user.fullName + ' (' + user.username + ')'}">John Doe (john)</span>
+                            <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left:12px; top:50%; transform:translateY(-50%); z-index:4;"></i>
+                            <input type="text" id="commEmpSearchInput" onkeyup="filterDropdown('comm')" onfocus="showDropdown('comm')" onblur="hideDropdownWithDelay('comm')" class="form-control" placeholder="Type name to search and select..." style="padding-left:36px; height:38px; border-radius:6px;"/>
+                            
+                            <div id="commDropdownList" class="position-absolute w-100 bg-white border rounded shadow-sm mt-1" style="display:none; max-height: 200px; overflow-y: auto; z-index: 10;">
+                                <div th:each="user : ${activeUsers}" class="dropdown-item comm-user-item p-2 border-bottom" style="cursor:pointer; font-size:0.9rem;" th:attr="data-name=${user.fullName}, data-username=${user.username}" onmousedown="selectUser('comm', this); event.preventDefault();">
+                                    <span th:text="${user.fullName + ' (' + user.username + ')'}">John Doe (john)</span>
+                                </div>
+                                <div class="p-2 text-muted no-results" style="display:none; font-size:0.88rem;">No matches found</div>
                             </div>
                         </div>
                     </div>
@@ -613,16 +615,18 @@
                             </select>
                         </div>
 
-                        <div id="otherSelectContainerProject" class="mb-3" style="display:none; grid-column: span 3; border:1px solid #e2e8f0; border-radius:8px; padding:15px; background-color:#f8fafc;">
+                        <div id="otherSelectContainerProject" class="mb-3" style="display:none; grid-column: span 2;">
                             <label class="form-label-custom fw-bold text-dark mb-2">Select Recipient Employees</label>
+                            <div id="projectSelectedTags" class="d-flex flex-wrap gap-2 mb-2"></div>
                             <div class="mb-2 position-relative">
-                                <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left:12px; top:50%; transform:translateY(-50%);"></i>
-                                <input type="text" id="projectEmpSearchInput" onkeyup="filterProjectEmployees()" class="form-control" placeholder="Type name to filter list..." style="padding-left:36px; height:38px; border-radius:6px;"/>
-                            </div>
-                            <div id="projectEmployeesListContainer" class="d-flex flex-wrap gap-2" style="max-height: 180px; overflow-y: auto; padding: 10px; border:1px solid #cbd5e1; border-radius:6px; background-color:#fff;">
-                                <div th:each="user : ${activeUsers}" class="project-user-item p-1 px-2 border rounded d-flex align-items-center gap-2" style="font-size:0.88rem; background-color:#f1f5f9; cursor:pointer;" th:attr="data-name=${user.fullName}">
-                                    <input type="checkbox" name="recipientUsernames" th:value="${user.username}" class="form-check-input project-user-checkbox"/>
-                                    <span th:text="${user.fullName + ' (' + user.username + ')'}">John Doe (john)</span>
+                                <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left:12px; top:50%; transform:translateY(-50%); z-index:4;"></i>
+                                <input type="text" id="projectEmpSearchInput" onkeyup="filterDropdown('project')" onfocus="showDropdown('project')" onblur="hideDropdownWithDelay('project')" class="form-control" placeholder="Type name to search and select..." style="padding-left:36px; height:38px; border-radius:6px;"/>
+                                
+                                <div id="projectDropdownList" class="position-absolute w-100 bg-white border rounded shadow-sm mt-1" style="display:none; max-height: 200px; overflow-y: auto; z-index: 10;">
+                                    <div th:each="user : ${activeUsers}" class="dropdown-item project-user-item p-2 border-bottom" style="cursor:pointer; font-size:0.9rem;" th:attr="data-name=${user.fullName}, data-username=${user.username}" onmousedown="selectUser('project', this); event.preventDefault();">
+                                        <span th:text="${user.fullName + ' (' + user.username + ')'}">John Doe (john)</span>
+                                    </div>
+                                    <div class="p-2 text-muted no-results" style="display:none; font-size:0.88rem;">No matches found</div>
                                 </div>
                             </div>
                         </div>
@@ -903,21 +907,6 @@
         }
     }
 
-    function filterCommEmployees() {
-        const input = document.getElementById('commEmpSearchInput');
-        const filter = input.value.toLowerCase();
-        const container = document.getElementById('commEmployeesListContainer');
-        const items = container.getElementsByClassName('comm-user-item');
-        for (let i = 0; i < items.length; i++) {
-            const name = items[i].getAttribute('data-name').toLowerCase();
-            if (name.includes(filter)) {
-                items[i].style.display = 'flex';
-            } else {
-                items[i].style.display = 'none';
-            }
-        }
-    }
-
     function toggleProjectOtherRecipients() {
         const select = document.getElementById('projectRecipientGroupSelect');
         const container = document.getElementById('otherSelectContainerProject');
@@ -928,19 +917,82 @@
         }
     }
 
-    function filterProjectEmployees() {
-        const input = document.getElementById('projectEmpSearchInput');
+    function showDropdown(prefix) {
+        document.getElementById(prefix + 'DropdownList').style.display = 'block';
+        filterDropdown(prefix);
+    }
+
+    function hideDropdownWithDelay(prefix) {
+        setTimeout(() => {
+            const dropdown = document.getElementById(prefix + 'DropdownList');
+            if(dropdown) dropdown.style.display = 'none';
+        }, 200);
+    }
+
+    function filterDropdown(prefix) {
+        const input = document.getElementById(prefix + 'EmpSearchInput');
         const filter = input.value.toLowerCase();
-        const container = document.getElementById('projectEmployeesListContainer');
-        const items = container.getElementsByClassName('project-user-item');
+        const container = document.getElementById(prefix + 'DropdownList');
+        const items = container.getElementsByClassName(prefix + '-user-item');
+        let hasVisible = false;
+
         for (let i = 0; i < items.length; i++) {
             const name = items[i].getAttribute('data-name').toLowerCase();
-            if (name.includes(filter)) {
-                items[i].style.display = 'flex';
+            const username = items[i].getAttribute('data-username');
+            
+            // check if already selected
+            const tagExists = document.getElementById(prefix + '_tag_' + username);
+            
+            if (name.includes(filter) && !tagExists) {
+                items[i].style.display = 'block';
+                hasVisible = true;
             } else {
                 items[i].style.display = 'none';
             }
         }
+        
+        const noResults = container.querySelector('.no-results');
+        if(hasVisible) {
+            noResults.style.display = 'none';
+        } else {
+            noResults.style.display = 'block';
+        }
+    }
+
+    function selectUser(prefix, element) {
+        const name = element.getAttribute('data-name');
+        const username = element.getAttribute('data-username');
+        const tagContainer = document.getElementById(prefix + 'SelectedTags');
+        
+        // Prevent duplicate
+        if(document.getElementById(prefix + '_tag_' + username)) return;
+
+        const tag = document.createElement('div');
+        tag.id = prefix + '_tag_' + username;
+        tag.className = 'badge bg-primary d-flex align-items-center gap-1 p-2';
+        tag.style.fontSize = '0.85rem';
+        tag.innerHTML = `
+            ${name} (${username})
+            <input type="hidden" name="recipientUsernames" value="${username}"/>
+            <i class="fa-solid fa-xmark ms-1" style="cursor:pointer;" onclick="removeUser('${prefix}', '${username}')"></i>
+        `;
+        tagContainer.appendChild(tag);
+        
+        // Clear input and focus back
+        const input = document.getElementById(prefix + 'EmpSearchInput');
+        input.value = '';
+        input.focus();
+        
+        // Refilter to hide selected
+        filterDropdown(prefix);
+    }
+
+    function removeUser(prefix, username) {
+        const tag = document.getElementById(prefix + '_tag_' + username);
+        if(tag) {
+            tag.remove();
+        }
+        filterDropdown(prefix);
     }
     /*]]>*/
 </script>

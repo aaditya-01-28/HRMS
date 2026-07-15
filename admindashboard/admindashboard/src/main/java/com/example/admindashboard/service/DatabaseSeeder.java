@@ -63,6 +63,15 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Autowired
     private com.example.admindashboard.repository.ServiceRequestRepository serviceRequestRepository;
 
+    @Autowired
+    private com.example.admindashboard.repository.RewardMerchandiseRepository rewardMerchandiseRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.RewardBudgetRepository rewardBudgetRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.RewardProgramRepository rewardProgramRepository;
+
     @Override
     public void run(String... args) throws Exception {
                 // Always update existing seeded users to ensure they have correct employeeCode and department
@@ -1228,6 +1237,50 @@ public class DatabaseSeeder implements CommandLineRunner {
         updateSeededEmployee("EMP201", "HR", "HR Director");
         updateSeededEmployee("ADMIN001", "IT", "Company Admin / IT Admin");
 
+        // Ensure proper L2/L3 managers and HRs are assigned to all EmployeeProfiles
+        List<User> allSeedUsers = userRepository.findAll();
+        for (User u : allSeedUsers) {
+            if (u.getRole() != null && "CLIENT".equalsIgnoreCase(u.getRole().getRoleName())) {
+                continue;
+            }
+            EmployeeProfile p = u.getEmployeeProfile();
+            if (p == null) {
+                p = new EmployeeProfile();
+                p.setUser(u);
+            }
+            
+            p.setEmployeeCode(u.getUsername());
+            
+            // Direct manager (L2 Manager)
+            if (u.getManager() != null) {
+                p.setReportingManager(u.getManager().getFullName());
+                p.setReportsTo(u.getManager().getFullName());
+                
+                // Senior manager (L3 Manager)
+                if (u.getManager().getManager() != null) {
+                    p.setDepartmentHead(u.getManager().getManager().getFullName());
+                } else {
+                    p.setDepartmentHead(u.getManager().getFullName() + " (Direct)");
+                }
+            } else {
+                p.setReportingManager("N/A (Top Management)");
+                p.setReportsTo("N/A");
+                p.setDepartmentHead("N/A");
+            }
+            
+            // Assign L2 and L3 HR partners
+            if ("HR".equalsIgnoreCase(p.getDepartment()) || "Human Resources".equalsIgnoreCase(p.getDepartment())) {
+                p.setAssignedHrL2("Priya Sharma");
+                p.setAssignedHrL3("Neha Verma");
+            } else {
+                p.setAssignedHrL2("Pooja Singh");
+                p.setAssignedHrL3("Priya Sharma");
+            }
+            
+            u.setEmployeeProfile(p);
+            userRepository.save(u);
+        }
+
         System.out.println("=========================================================");
 	        
         
@@ -1324,6 +1377,163 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             userRepository.save(user);
             System.out.println("✅ Seeded user: ADMIN105");
+        }
+
+        Role rewardsL2Role = getOrCreateRole("REWARDS");
+        Role rewardsL3Role = getOrCreateRole("SENIOR_REWARDS_HEAD");
+
+        if (userRepository.findByUsername("EMP1002").isEmpty()) {
+            User user = new User();
+            user.setUsername("EMP1002");
+            user.setPassword("{noop}Welcome@123");
+            user.setRole(rewardsL2Role);
+            user.setFullName("Neha Sharma");
+            user.setEmail("rewards.l2@wcg.com");
+            user.setDesignation("Rewards Manager");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("Rewards Manager");
+            profile.setDepartment("Rewards");
+            profile.setJoiningDate(LocalDate.now());
+            profile.setWorkLocation("Raipur");
+            profile.setEmployeeCode("EMP1002");
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+            System.out.println("✅ Seeded user: EMP1002 (Rewards Manager)");
+        }
+
+        if (userRepository.findByUsername("EMP0007").isEmpty()) {
+            User user = new User();
+            user.setUsername("EMP0007");
+            user.setPassword("{noop}Welcome@123");
+            user.setRole(rewardsL3Role);
+            user.setFullName("Rohit Sharma");
+            user.setEmail("rewards.adminwcg@gmail.com");
+            user.setDesignation("Rewards Admin");
+
+            EmployeeProfile profile = new EmployeeProfile();
+            profile.setDesignation("Rewards Admin");
+            profile.setDepartment("Rewards");
+            profile.setJoiningDate(LocalDate.now());
+            profile.setWorkLocation("Delhi");
+            profile.setEmployeeCode("EMP0007");
+
+            profile.setUser(user);
+            user.setEmployeeProfile(profile);
+
+            userRepository.save(user);
+            System.out.println("✅ Seeded user: EMP0007 (Rewards Head)");
+        }
+
+        // Seed Reward Merchandise
+        if (rewardMerchandiseRepository.count() == 0) {
+            RewardMerchandise m1 = new RewardMerchandise();
+            m1.setItemName("WCG T-Shirt");
+            m1.setCategory("Apparel");
+            m1.setBrand("WCG Custom");
+            m1.setDescription("Premium quality white cotton t-shirt with WhiteCircle logo.");
+            m1.setRedemptionPoints(600);
+            m1.setTotalStocks(15);
+            m1.setPerUserLimit(1);
+            m1.setImagePath("/images/wcg-tshirt.png");
+            m1.setStatus("PUBLISHED");
+            rewardMerchandiseRepository.save(m1);
+
+            RewardMerchandise m2 = new RewardMerchandise();
+            m2.setItemName("Wireless Headphones");
+            m2.setCategory("Audio");
+            m2.setBrand("Boat");
+            m2.setDescription("High quality wireless noise cancelling over-ear headphones.");
+            m2.setRedemptionPoints(600);
+            m2.setTotalStocks(10);
+            m2.setPerUserLimit(1);
+            m2.setImagePath("/images/boat-headphones.png");
+            m2.setStatus("PUBLISHED");
+            rewardMerchandiseRepository.save(m2);
+
+            RewardMerchandise m3 = new RewardMerchandise();
+            m3.setItemName("Amazon Gift Card Rs. 500");
+            m3.setCategory("Gift Cards");
+            m3.setBrand("Amazon");
+            m3.setDescription("E-Gift voucher worth Rs. 500 redeemable on Amazon India.");
+            m3.setRedemptionPoints(500);
+            m3.setTotalStocks(50);
+            m3.setPerUserLimit(5);
+            m3.setImagePath("/images/amazon-giftcard.png");
+            m3.setStatus("PUBLISHED");
+            rewardMerchandiseRepository.save(m3);
+
+            RewardMerchandise m4 = new RewardMerchandise();
+            m4.setItemName("AWS Cloud Practitioner Exam Voucher");
+            m4.setCategory("Certificates");
+            m4.setBrand("AWS");
+            m4.setDescription("100% discount voucher for AWS Cloud Practitioner certification exam.");
+            m4.setRedemptionPoints(1200);
+            m4.setTotalStocks(5);
+            m4.setPerUserLimit(1);
+            m4.setImagePath("/images/aws-voucher.png");
+            m4.setStatus("PUBLISHED");
+            rewardMerchandiseRepository.save(m4);
+        }
+
+        // Seed Reward Budgets
+        if (rewardBudgetRepository.count() == 0) {
+            RewardBudget b1 = new RewardBudget();
+            b1.setDepartment("Engineering");
+            b1.setAllocatedPoints(50000);
+            b1.setSpentPoints(12500);
+            b1.setFiscalYear("2026-27");
+            rewardBudgetRepository.save(b1);
+
+            RewardBudget b2 = new RewardBudget();
+            b2.setDepartment("Product");
+            b2.setAllocatedPoints(30000);
+            b2.setSpentPoints(8400);
+            b2.setFiscalYear("2026-27");
+            rewardBudgetRepository.save(b2);
+
+            RewardBudget b3 = new RewardBudget();
+            b3.setDepartment("HR");
+            b3.setAllocatedPoints(20000);
+            b3.setSpentPoints(4500);
+            b3.setFiscalYear("2026-27");
+            rewardBudgetRepository.save(b3);
+        }
+
+        // Seed Reward Programs
+        if (rewardProgramRepository.count() == 0) {
+            RewardProgram p1 = new RewardProgram();
+            p1.setProgramName("Spot Award");
+            p1.setDescription("Instant recognition for exemplary performance on critical tasks.");
+            p1.setPointsValue(500);
+            p1.setStatus("ACTIVE");
+            rewardProgramRepository.save(p1);
+
+            RewardProgram p2 = new RewardProgram();
+            p2.setProgramName("Peer to Peer Thanks");
+            p2.setDescription("Thank a colleague for helping out. Maximum 5 awards per month.");
+            p2.setPointsValue(50);
+            p2.setStatus("ACTIVE");
+            rewardProgramRepository.save(p2);
+
+            RewardProgram p3 = new RewardProgram();
+            p3.setProgramName("Service Milestone");
+            p3.setDescription("Awarded to employees completing 1, 3, or 5 years of service.");
+            p3.setPointsValue(1000);
+            p3.setStatus("ACTIVE");
+            rewardProgramRepository.save(p3);
+        }
+
+        // Seed Reward ServiceRequests (tickets) if not present
+        if (serviceRequestRepository.findAll().stream().noneMatch(t -> "REWARDS".equalsIgnoreCase(t.getType()))) {
+            seedRewardsTicket("T-101", "EMP114", "Om Tripathi", "Redemption Store", "WCG T-shirt", 600, "Open", "Redeemed WCG T-shirt", "Sector 30, Raigarh, Chhattisgarh");
+            seedRewardsTicket("T-102", "EMP187", "Om Singrore", "Points Transfer", "Peer Points Transfer", 30, "Open", "Send points to Saumya Katare", "N/A");
+            seedRewardsTicket("T-103", "EMP129", "Saumya Katare", "Gift Cards", "Amazon Gift card Rs. 500", 500, "Open", "Amazon Gift card Rs. 500", "N/A");
+            seedRewardsTicket("T-104", "EMP114", "Om Tripathi", "Certificate Rewards", "AWS Practitioner Voucher", 1200, "Rejected", "Completed AWS Cloud Practitioner certification exam", "N/A");
+            seedRewardsTicket("T-105", "EMP187", "Om Singrore", "Points Transfer", "Peer Points Transfer", 25, "Approved", "Received from Amit Kumar", "N/A");
         }
 
         // Seed Facility Vendors
@@ -1711,6 +1921,24 @@ public class DatabaseSeeder implements CommandLineRunner {
         req.setSubmissionDate(submissionDate);
         req.setJustification(justification);
         req.setDepartment("Facilities");
+        serviceRequestRepository.save(req);
+    }
+
+    private void seedRewardsTicket(String ticketId, String employeeId, String employeeName, String category, String detailItem, int points, String status, String justification, String location) {
+        ServiceRequest req = new ServiceRequest();
+        req.setTicketId(ticketId);
+        req.setEmployeeId(employeeId);
+        req.setEmployeeName(employeeName);
+        req.setType("REWARDS");
+        req.setCategory(category);
+        req.setDetailItem(detailItem);
+        req.setPriority("Medium");
+        req.setStatus(status);
+        req.setSubmissionDate(LocalDate.now().minusDays(3));
+        req.setJustification(justification);
+        req.setDepartment("Rewards");
+        req.setLocation(location);
+        req.setDurationOrLevel(String.valueOf(points));
         serviceRequestRepository.save(req);
     }
 }

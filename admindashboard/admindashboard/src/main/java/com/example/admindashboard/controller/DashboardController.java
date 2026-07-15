@@ -658,6 +658,12 @@ public class DashboardController {
             model.addAttribute("pendingLeaves", allPendingLeaves);
             model.addAttribute("pendingTimesheets", allPendingTimesheets);
             
+            String backUrl = "/rewards-manager/dashboard";
+            if (uri.contains("senior")) {
+                backUrl = "/senior_rewards/my_space?tab=dashboard";
+            }
+            model.addAttribute("backUrl", backUrl);
+
             model.addAttribute("allItTickets", rewardsTickets);
             model.addAttribute("pendingTickets", pendingRewardsTickets);
             model.addAttribute("otherTickets", new java.util.ArrayList<>());
@@ -976,13 +982,21 @@ public class DashboardController {
 
     @PostMapping("/employee/profile/save-detailed")
     public String saveDetailedProfile(
-    		 @ModelAttribute EmployeeProfile formProfile,
+             @ModelAttribute EmployeeProfile formProfile,
             @RequestParam(value = "mobileNumber", required = false) String mobileNumber,
             @RequestParam(value = "city", required = false) String city,
             @RequestParam(value = "country", required = false) String country,
             @RequestParam(value = "experience", required = false) String experience,
-            @RequestParam(value = "joiningDate", required = false) LocalDate joiningDate,
+            @RequestParam(value = "joiningDate", required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate joiningDate,
             @RequestParam(value = "returnUrl", defaultValue = "/employee/profile") String returnUrl,
+            @RequestParam(value = "presentAddressImage", required = false) org.springframework.web.multipart.MultipartFile presentAddressImage,
+            @RequestParam(value = "aadharProof", required = false) org.springframework.web.multipart.MultipartFile aadharProof,
+            @RequestParam(value = "panProof", required = false) org.springframework.web.multipart.MultipartFile panProof,
+            @RequestParam(value = "photoFile", required = false) org.springframework.web.multipart.MultipartFile photoFile,
+            @RequestParam(value = "resumeFile", required = false) org.springframework.web.multipart.MultipartFile resumeFile,
+            @RequestParam(value = "eduFile", required = false) org.springframework.web.multipart.MultipartFile eduFile,
+            @RequestParam(value = "expFile", required = false) org.springframework.web.multipart.MultipartFile expFile,
+            @RequestParam(value = "offerFile", required = false) org.springframework.web.multipart.MultipartFile offerFile,
             Principal principal,
             RedirectAttributes redirectAttributes, Model model) {
 
@@ -1091,6 +1105,90 @@ public class DashboardController {
         // Emails
         existingProfile.setOfficialEmail(formProfile.getOfficialEmail());
         existingProfile.setAlternateEmail(formProfile.getAlternateEmail());
+
+        // EXTRA FIELDS & DATA MAPPINGS
+        existingProfile.setPhysicallyChallenged(formProfile.getPhysicallyChallenged());
+        existingProfile.setReportingManager(formProfile.getReportingManager());
+        existingProfile.setProjectManager(formProfile.getProjectManager());
+        existingProfile.setBuHrContact(formProfile.getBuHrContact());
+        existingProfile.setProjectName(formProfile.getProjectName());
+        existingProfile.setProjectCode(formProfile.getProjectCode());
+        existingProfile.setTeamGroup(formProfile.getTeamGroup());
+        existingProfile.setCustomerName(formProfile.getCustomerName());
+        existingProfile.setVerticalName(formProfile.getVerticalName());
+        existingProfile.setDomainIndustry(formProfile.getDomainIndustry());
+        existingProfile.setWorkLocation(formProfile.getWorkLocation());
+        existingProfile.setDeliveryAddressType(formProfile.getDeliveryAddressType());
+        existingProfile.setDeliveryAddress(formProfile.getDeliveryAddress());
+        existingProfile.setDeliveryPincode(formProfile.getDeliveryPincode());
+        existingProfile.setEmergencyContactName(formProfile.getEmergencyContactName());
+        existingProfile.setRelationWithEmployee(formProfile.getRelationWithEmployee());
+
+        // FILE UPLOADS PROCESSING
+        String uploadsDir = "uploads/docs/";
+        java.io.File dir = new java.io.File(uploadsDir);
+        if (!dir.exists()) dir.mkdirs();
+
+        try {
+            if (photoFile != null && !photoFile.isEmpty()) {
+                String originalName = photoFile.getOriginalFilename();
+                String ext = originalName.substring(originalName.lastIndexOf("."));
+                String filename = java.util.UUID.randomUUID().toString() + ext;
+                java.nio.file.Path path = java.nio.file.Paths.get(uploadsDir + filename);
+                java.nio.file.Files.copy(photoFile.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                existingProfile.setPhotoDocPath("/uploads/docs/" + filename);
+            }
+            if (resumeFile != null && !resumeFile.isEmpty()) {
+                String originalName = resumeFile.getOriginalFilename();
+                String ext = originalName.substring(originalName.lastIndexOf("."));
+                String filename = java.util.UUID.randomUUID().toString() + ext;
+                java.nio.file.Path path = java.nio.file.Paths.get(uploadsDir + filename);
+                java.nio.file.Files.copy(resumeFile.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                existingProfile.setResumeDocPath("/uploads/docs/" + filename);
+            }
+            if (aadharProof != null && !aadharProof.isEmpty()) {
+                String originalName = aadharProof.getOriginalFilename();
+                String ext = originalName.substring(originalName.lastIndexOf("."));
+                String filename = java.util.UUID.randomUUID().toString() + ext;
+                java.nio.file.Path path = java.nio.file.Paths.get(uploadsDir + filename);
+                java.nio.file.Files.copy(aadharProof.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                existingProfile.setAadhaarDocPath("/uploads/docs/" + filename);
+            }
+            if (panProof != null && !panProof.isEmpty()) {
+                String originalName = panProof.getOriginalFilename();
+                String ext = originalName.substring(originalName.lastIndexOf("."));
+                String filename = java.util.UUID.randomUUID().toString() + ext;
+                java.nio.file.Path path = java.nio.file.Paths.get(uploadsDir + filename);
+                java.nio.file.Files.copy(panProof.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                existingProfile.setPanDocPath("/uploads/docs/" + filename);
+            }
+            if (eduFile != null && !eduFile.isEmpty()) {
+                String originalName = eduFile.getOriginalFilename();
+                String ext = originalName.substring(originalName.lastIndexOf("."));
+                String filename = java.util.UUID.randomUUID().toString() + ext;
+                java.nio.file.Path path = java.nio.file.Paths.get(uploadsDir + filename);
+                java.nio.file.Files.copy(eduFile.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                existingProfile.setEducationalDocPath("/uploads/docs/" + filename);
+            }
+            if (expFile != null && !expFile.isEmpty()) {
+                String originalName = expFile.getOriginalFilename();
+                String ext = originalName.substring(originalName.lastIndexOf("."));
+                String filename = java.util.UUID.randomUUID().toString() + ext;
+                java.nio.file.Path path = java.nio.file.Paths.get(uploadsDir + filename);
+                java.nio.file.Files.copy(expFile.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                existingProfile.setExperienceDocPath("/uploads/docs/" + filename);
+            }
+            if (offerFile != null && !offerFile.isEmpty()) {
+                String originalName = offerFile.getOriginalFilename();
+                String ext = originalName.substring(originalName.lastIndexOf("."));
+                String filename = java.util.UUID.randomUUID().toString() + ext;
+                java.nio.file.Path path = java.nio.file.Paths.get(uploadsDir + filename);
+                java.nio.file.Files.copy(offerFile.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                existingProfile.setOfferDocPath("/uploads/docs/" + filename);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         user.setEmployeeProfile(existingProfile);
         userRepository.save(user);

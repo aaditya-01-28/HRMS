@@ -209,7 +209,6 @@
             margin-left: 10px;
         }
 
-        /* Org Chart Styling */
         .org-chart-viewport {
             background: #f8fafc;
             border: 1px solid var(--border);
@@ -218,9 +217,13 @@
             position: relative;
             overflow-x: auto;
             min-height: 480px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            text-align: center;
+        }
+
+        .org-tree {
+            display: inline-block;
+            margin: 0 auto;
+            text-align: left;
         }
 
         .org-chart-node {
@@ -297,15 +300,90 @@
         .badge-it { background-color: #f3e8ff; color: #6b21a8; }
         .badge-finance { background-color: #fee2e2; color: #991b1b; }
 
-        @media (max-width: 1200px) {
-            .layout-grid-hierarchy, .layout-grid-bottom { grid-template-columns: 1fr; }
+        /* Dynamic Tree Structure Styling */
+        .org-tree * {margin: 0; padding: 0;}
+        .org-tree ul {
+            padding-top: 20px; position: relative;
+            transition: all 0.5s;
+            display: flex;
+            justify-content: center;
+        }
+        .org-tree li {
+            text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 20px 10px 0 10px;
+            transition: all 0.5s;
+            display: inline-block;
+            vertical-align: top;
+        }
+        .org-tree li::before, .org-tree li::after{
+            content: '';
+            position: absolute; top: 0; right: 50%;
+            border-top: 2px solid #cbd5e1;
+            width: 50%; height: 20px;
+        }
+        .org-tree li::after{
+            right: auto; left: 50%;
+            border-left: 2px solid #cbd5e1;
+        }
+        .org-tree li:only-child::after, .org-tree li:only-child::before {
+            display: none;
+        }
+        .org-tree li:only-child{ padding-top: 0;}
+        .org-tree li:first-child::before, .org-tree li:last-child::after{
+            border: 0 none;
+        }
+        .org-tree li:last-child::before{
+            border-right: 2px solid #cbd5e1;
+            border-radius: 0 5px 0 0;
+        }
+        .org-tree li:first-child::after{
+            border-radius: 5px 0 0 0;
+        }
+        .org-tree ul ul::before{
+            content: '';
+            position: absolute; top: 0; left: 50%;
+            border-left: 2px solid #cbd5e1;
+            width: 0; height: 20px;
         }
 
-        @media (max-width: 768px) {
-            .myspace-sidebar { transform: translateX(-100%); }
-            body.sidebar-toggled .myspace-sidebar { transform: translateX(0); }
-            .top-navbar { left: 0; padding: 0 10px; }
-            .myspace-main { margin-left: 0; padding: 10px; }
+        .org-node-card {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: inline-block;
+            min-width: 220px;
+            text-align: left;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
+        .org-node-card:hover {
+            border-color: #2563eb;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1), 0 4px 6px -2px rgba(37, 99, 235, 0.05);
+            transform: translateY(-2px);
+        }
+        .node-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e2e8f0;
+        }
+        .org-node-card-root {
+            border-color: #2563eb;
+            box-shadow: 0 4px 10px rgba(37,99,235,0.15);
+        }
+        .node-meta-item {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+            color: #475569;
+            font-size: 0.72rem;
+            line-height: 1.3;
         }
     </style>
 </head>
@@ -395,87 +473,9 @@
             </div>
 
             <div class="org-chart-viewport" id="chartViewport">
-                <div class="d-flex flex-column align-items-center" id="zoomContainer" style="transform-origin: top center; transition: transform 0.2s;">
-                    <!-- ROOT NODE (CEO) -->
-                    <div class="org-chart-node org-chart-node-root">
-                        <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:40px; height:40px; font-size:0.95rem;">AS</div>
-                        <div>
-                            <div class="fw-bold text-dark" style="font-size:0.9rem;">Amit Sharma</div>
-                            <small class="text-muted d-block" style="font-size:0.75rem;">CEO</small>
-                            <span class="level-badge badge-top-mgt mt-1 d-inline-block">TOP MANAGEMENT</span>
-                        </div>
-                    </div>
-
-                    <!-- CONNECTOR -->
-                    <div class="org-chart-connector-vertical"></div>
-
-                    <!-- LEVEL 2 NODES -->
-                    <div class="org-chart-level">
-                        <div class="org-chart-connector-horizontal"></div>
-
-                        <!-- Neha Verma -->
-                        <div class="d-flex flex-column align-items-center">
-                            <div class="org-chart-node org-chart-node-sub">
-                                <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px; font-size:0.85rem;">NV</div>
-                                <div>
-                                    <div class="fw-bold text-dark" style="font-size:0.82rem;">Neha Verma</div>
-                                    <small class="text-muted d-block" style="font-size:0.7rem;">HR Director</small>
-                                    <span class="level-badge badge-hr mt-1 d-inline-block">Human Resources</span>
-                                </div>
-                            </div>
-                            <div class="org-chart-connector-vertical" style="height:30px;"></div>
-                            <!-- LEVEL 3 SUB-NODES -->
-                            <div class="d-flex gap-2">
-                                <div class="org-chart-card-mini">
-                                    <div class="fw-bold text-dark">Rahul Kumar</div>
-                                    <small class="text-muted">HR Manager</small>
-                                </div>
-                                <div class="org-chart-card-mini">
-                                    <div class="fw-bold text-dark">Priya Singh</div>
-                                    <small class="text-muted">HR Executive</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Vikram Mehta -->
-                        <div class="d-flex flex-column align-items-center">
-                            <div class="org-chart-node org-chart-node-sub">
-                                <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px; font-size:0.85rem;">VM</div>
-                                <div>
-                                    <div class="fw-bold text-dark" style="font-size:0.82rem;">Vikram Mehta</div>
-                                    <small class="text-muted d-block" style="font-size:0.7rem;">CTO</small>
-                                    <span class="level-badge badge-it mt-1 d-inline-block">Information Tech</span>
-                                </div>
-                            </div>
-                            <div class="org-chart-connector-vertical" style="height:30px;"></div>
-                            <!-- LEVEL 3 SUB-NODES -->
-                            <div class="d-flex gap-2">
-                                <div class="org-chart-card-mini">
-                                    <div class="fw-bold text-dark">Ankit Patel</div>
-                                    <small class="text-muted">IT Manager</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Pooja Desai -->
-                        <div class="d-flex flex-column align-items-center">
-                            <div class="org-chart-node org-chart-node-sub">
-                                <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px; font-size:0.85rem;">PD</div>
-                                <div>
-                                    <div class="fw-bold text-dark" style="font-size:0.82rem;">Pooja Desai</div>
-                                    <small class="text-muted d-block" style="font-size:0.7rem;">Finance Director</small>
-                                    <span class="level-badge badge-finance mt-1 d-inline-block">Finance</span>
-                                </div>
-                            </div>
-                            <div class="org-chart-connector-vertical" style="height:30px;"></div>
-                            <!-- LEVEL 3 SUB-NODES -->
-                            <div class="d-flex gap-2">
-                                <div class="org-chart-card-mini">
-                                    <div class="fw-bold text-dark">Karan Malhotra</div>
-                                    <small class="text-muted">Finance Manager</small>
-                                </div>
-                            </div>
-                        </div>
+                <div id="zoomContainer" style="transform-origin: top center; transition: transform 0.2s;">
+                    <div class="org-tree" id="orgTreeContainer">
+                        <!-- Populated dynamically -->
                     </div>
                 </div>
             </div>
@@ -630,9 +630,72 @@
         }
     }
 
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchHierarchy();
+    });
+
+    function fetchHierarchy() {
+        fetch('/senior_hr/api/organization/hierarchy')
+            .then(response => response.json())
+            .then(data => {
+                renderHierarchyTree(data, document.getElementById('orgTreeContainer'));
+            })
+            .catch(err => {
+                console.error("Failed to load hierarchy", err);
+                document.getElementById('orgTreeContainer').innerHTML = '<div class="text-danger p-3">Failed to load organization hierarchy.</div>';
+            });
+    }
+
+    function renderHierarchyTree(roots, container) {
+        if (!roots || roots.length === 0) {
+            container.innerHTML = '<div class="text-muted p-3">No hierarchy data available.</div>';
+            return;
+        }
+        container.innerHTML = '';
+        
+        const buildUl = (nodes, isRoot) => {
+            const ul = document.createElement('ul');
+            nodes.forEach(node => {
+                const li = document.createElement('li');
+                
+                const card = document.createElement('div');
+                card.className = isRoot ? 'org-node-card org-node-card-root' : 'org-node-card';
+                
+                let fallbackName = encodeURIComponent(node.name);
+                let initial = node.name.charAt(0);
+                
+                card.innerHTML = `
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <img class="node-avatar" src="${node.profileImage || ''}" alt="${initial}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${fallbackName}&background=random'">
+                        <div class="text-start">
+                            <div class="fw-bold text-dark" style="font-size:0.88rem; line-height:1.2;">${node.name}</div>
+                            <div class="text-muted" style="font-size:0.75rem;">${node.designation}</div>
+                            <div class="text-primary fw-semibold text-uppercase" style="font-size:0.65rem; margin-top:2px;">${node.department}</div>
+                        </div>
+                    </div>
+                    <div class="border-top pt-2" style="font-size:0.72rem; color: #475569;">
+                        <div class="node-meta-item"><span>L2 Manager:</span> <span class="fw-semibold text-dark">${node.l2Manager || 'N/A'}</span></div>
+                        <div class="node-meta-item"><span>L3 Manager:</span> <span class="fw-semibold text-dark">${node.l3Manager || 'N/A'}</span></div>
+                        <div class="node-meta-item"><span>HR assigned:</span> <span class="fw-semibold text-dark">${node.assignedHr || 'N/A'}</span></div>
+                    </div>
+                `;
+                
+                li.appendChild(card);
+                
+                if (node.children && node.children.length > 0) {
+                    li.appendChild(buildUl(node.children, false));
+                }
+                ul.appendChild(li);
+            });
+            return ul;
+        };
+        
+        container.appendChild(buildUl(roots, true));
+    }
+
     document.getElementById('orgSearchInput').addEventListener('input', function(e) {
         const query = e.target.value.toLowerCase();
-        document.querySelectorAll('.org-chart-node, .org-chart-card-mini').forEach(card => {
+        document.querySelectorAll('.org-node-card').forEach(card => {
             const text = card.innerText.toLowerCase();
             if (query && !text.includes(query)) {
                 card.style.opacity = '0.3';

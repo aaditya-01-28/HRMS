@@ -1,6 +1,7 @@
 package com.example.admindashboard.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import com.example.admindashboard.model.User;
 import com.example.admindashboard.model.HrmsNotification;
@@ -100,6 +101,9 @@ public class MySpaceController {
         private LeaveRequestRepository leaveRequestRepository;
 
         @Autowired
+        private com.example.admindashboard.repository.DepartmentEntityRepository departmentRepository;
+
+        @Autowired
         private WeeklyTimesheetRepository weeklyTimesheetRepository;
 
         @Autowired
@@ -137,6 +141,13 @@ public class MySpaceController {
 
         @Autowired
         private CandidateRepository candidateRepository;
+
+        @Autowired
+        private com.example.admindashboard.repository.TeamRepository teamRepository;
+
+        @Autowired
+        private com.example.admindashboard.repository.TeamMemberRepository teamMemberRepository;
+
 
         @Autowired
         private InterviewRepository interviewRepository;
@@ -267,7 +278,7 @@ public class MySpaceController {
                 return "redirect:/space/transport/dashboard";
 
             case "SENIOR_REWARDS_HEAD":
-                return "redirect:/space/rewards/dashboard";
+                return "redirect:/senior_rewards/dashboard";
 
             case "SENIOR_FACILITY_HEAD":
                 return "redirect:/senior_facility/dashboard";
@@ -380,6 +391,31 @@ public class MySpaceController {
                                     card.put("profileImage", u.getProfileImage());
                                     card.put("isCurrentUser", u.getId() != null && u.getId().equals(loggedInUser.getId()));
 
+                                     // L2 Manager: Direct manager
+                                     String l2Mgr = "N/A";
+                                     if (u.getManager() != null) {
+                                         l2Mgr = u.getManager().getFullName();
+                                     }
+                                     card.put("l2Manager", l2Mgr);
+                                     
+                                     // L3 Manager: Senior manager
+                                     String l3Mgr = "N/A";
+                                     if (u.getManager() != null && u.getManager().getManager() != null) {
+                                         l3Mgr = u.getManager().getManager().getFullName();
+                                     } else if (u.getManager() != null) {
+                                         l3Mgr = u.getManager().getFullName() + " (L2 is top)";
+                                     }
+                                     card.put("l3Manager", l3Mgr);
+                                     
+                                     // Assigned HR
+                                     String assignedHr = "Neha Verma"; // default/fallback HR
+                                     if (u.getEmployeeProfile() != null && u.getEmployeeProfile().getAssignedHrL2() != null && !u.getEmployeeProfile().getAssignedHrL2().isEmpty()) {
+                                         assignedHr = u.getEmployeeProfile().getAssignedHrL2();
+                                     } else if (u.getEmployeeProfile() != null && u.getEmployeeProfile().getBuHrContact() != null && !u.getEmployeeProfile().getBuHrContact().isEmpty()) {
+                                         assignedHr = u.getEmployeeProfile().getBuHrContact();
+                                     }
+                                     card.put("assignedHr", assignedHr);
+
                                     if (L4_ROLES.contains(roleName)) hLevel4.add(card);
                                     else if (L3_ROLES.contains(roleName)) hLevel3.add(card);
                                     else if (L2_ROLES.contains(roleName)) hLevel2.add(card);
@@ -419,10 +455,11 @@ public class MySpaceController {
                                 Map<String, Long> pendingSummaryByType = pendingActions.stream()
                                                 .collect(java.util.stream.Collectors.groupingBy(a -> String.valueOf(a.get("actionType")), java.util.LinkedHashMap::new, java.util.stream.Collectors.counting()));
 
-                                String safeTab = List.of("directory", "hierarchy", "pending", "recommendations").contains(tab) ? tab : "directory";
+                                String safeTab = List.of("directory", "hierarchy", "pending", "recommendations", "my_teams").contains(tab) ? tab : "directory";
 
                                 model.addAttribute("activeTab", safeTab);
                                 model.addAttribute("managerUser", loggedInUser);
+                                model.addAttribute("allUsers", allUsers);
                                 model.addAttribute("teamMembers", teamMembers);
                                 model.addAttribute("totalTeamMembers", teamMembers.size());
                                 model.addAttribute("activeEmployees", activeEmployees);
@@ -441,8 +478,74 @@ public class MySpaceController {
                                 model.addAttribute("approvedRecommendations", approvedRecommendations);
                                 model.addAttribute("pendingRecommendations", pendingRecommendations);
                                 model.addAttribute("declinedRecommendations", declinedRecommendations);
+                                
+                                List<com.example.admindashboard.model.Team> myCustomTeams = teamRepository.findByManager(loggedInUser);
+                                model.addAttribute("myCustomTeams", myCustomTeams);
 
                 return "senior_manager-myspace";
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @PostMapping("/senior_manager/myspace/add_team_members")
+        public String addTeamMembers(
+                @RequestParam(value = "teamMembers", required = false) List<String> teamMembers,
+                Authentication authentication) {
+                
+                if (teamMembers == null || teamMembers.isEmpty()) {
+                        return "redirect:/senior_manager/myspace?tab=hierarchy&error=NoMembersSelected";
+                }
+                
+                String currentUsername = authentication.getName();
+                User loggedInUser = userRepository.findByUsername(currentUsername).orElse(null);
+                if (loggedInUser == null) {
+                        return "redirect:/login";
+                }
+                
+                for (String username : teamMembers) {
+                        User user = userRepository.findByUsername(username).orElse(null);
+                        if (user != null) {
+                                user.setManager(loggedInUser);
+                                userRepository.save(user);
+                        }
+                }
+                
+                return "redirect:/senior_manager/myspace?tab=hierarchy&success=MembersAdded";
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @PostMapping("/senior_manager/myspace/create_custom_team")
+        public String createCustomTeam(
+                @RequestParam("teamName") String teamName,
+                @RequestParam(value = "description", required = false) String description,
+                @RequestParam(value = "teamMembers", required = false) List<String> teamMembers,
+                Authentication authentication) {
+                
+                String currentUsername = authentication.getName();
+                User loggedInUser = userRepository.findByUsername(currentUsername).orElse(null);
+                if (loggedInUser == null) {
+                        return "redirect:/login";
+                }
+                
+                com.example.admindashboard.model.Team team = new com.example.admindashboard.model.Team();
+                team.setTeamName(teamName);
+                team.setDescription(description);
+                team.setManager(loggedInUser);
+                
+                teamRepository.save(team);
+                
+                if (teamMembers != null && !teamMembers.isEmpty()) {
+                        for (String username : teamMembers) {
+                                User user = userRepository.findByUsername(username).orElse(null);
+                                if (user != null) {
+                                        com.example.admindashboard.model.TeamMember tm = new com.example.admindashboard.model.TeamMember();
+                                        tm.setTeam(team);
+                                        tm.setUser(user);
+                                        teamMemberRepository.save(tm);
+                                }
+                        }
+                }
+                
+                return "redirect:/senior_manager/myspace?tab=my_teams&success=TeamCreated";
         }
 
         @PreAuthorize("hasRole('SENIOR_MANAGER')")
@@ -1263,6 +1366,7 @@ public class MySpaceController {
                     }
                 }
                 model.addAttribute("departments", departments);
+                model.addAttribute("allUsers", allUsers);
 
                 return "senior_manager-performance";
         }
@@ -2975,11 +3079,7 @@ public class MySpaceController {
                         .distinct()
                         .count();
 
-                long deptCount = allUsers.stream()
-                        .filter(u -> u.getDepartmentId() != null)
-                        .map(User::getDepartmentId)
-                        .distinct()
-                        .count();
+                long deptCount = departmentRepository.count();
 
                 long posCount = allUsers.stream()
                         .filter(u -> u.getDesignation() != null && !u.getDesignation().isBlank())
@@ -3011,35 +3111,46 @@ public class MySpaceController {
                     String dept = getDepartment(u).trim().toLowerCase();
                     String designation = u.getDesignation() != null ? u.getDesignation().trim().toLowerCase() : "";
 
-                    // Top Management
-                    if ("ceo".equals(designation) || "cto".equals(designation) || designation.contains("director") || "top management".equalsIgnoreCase(role)) {
+                    // 1. Top Management
+                    if ("ceo".equals(designation) || "cto".equals(designation) || designation.contains("director") 
+                        || "top management".equalsIgnoreCase(role) || "SUPER_ADMIN".equalsIgnoreCase(role)
+                        || "ADMIN".equalsIgnoreCase(role) || "SENIOR_MANAGER".equalsIgnoreCase(role)) {
                         topMgt++;
                     }
-
-                    // Human Resources
-                    if (dept.contains("human resources") || dept.equals("hr")) {
+                    // 2. Human Resources
+                    else if (dept.contains("human resources") || dept.equals("hr") || dept.contains("recruitment")
+                        || role.contains("HR") || "RECRUITER".equalsIgnoreCase(role)) {
                         hrDept++;
-                        if (designation.contains("manager")) {
+                        if (designation.contains("manager") || role.contains("MANAGER")) {
                             hrMgr++;
                         } else {
                             hrExec++;
                         }
                     }
-                    // Information Technology
-                    else if (dept.contains("information technology") || dept.startsWith("it")) {
+                    // 3. Information Technology
+                    else if (dept.contains("information technology") || dept.startsWith("it") 
+                        || dept.contains("engineering") || dept.contains("product") || dept.contains("design")
+                        || "IT_SUPPORT".equalsIgnoreCase(role) || designation.contains("developer") || designation.contains("engineer")) {
                         itDept++;
                     }
-                    // Finance
-                    else if (dept.contains("finance") || dept.contains("accounts")) {
+                    // 4. Finance
+                    else if (dept.contains("finance") || dept.contains("accounts") 
+                        || "FINANCE".equalsIgnoreCase(role) || "ACCOUNTS".equalsIgnoreCase(role)) {
                         finDept++;
                     }
-                    // Operations
-                    else if (dept.contains("operations") || dept.contains("admin")) {
+                    // 5. Operations
+                    else if (dept.contains("operations") || dept.contains("facilities") || dept.contains("transport")
+                        || role.contains("TRANSPORT") || role.contains("FACILITY")) {
                         opsDept++;
                     }
-                    // Sales & Marketing
-                    else if (dept.contains("sales") || dept.contains("marketing")) {
+                    // 6. Sales & Marketing / Rewards
+                    else if (dept.contains("sales") || dept.contains("marketing") || dept.contains("rewards")
+                        || role.contains("REWARDS")) {
                         salesMkt++;
+                    }
+                    // Fallback default
+                    else {
+                        opsDept++;
                     }
                 }
 

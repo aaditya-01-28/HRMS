@@ -27,4 +27,6 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
             String type,
             String status
     );
+
+    java.util.Optional<ServiceRequest> findByTicketId(String ticketId);
 }
