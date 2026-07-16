@@ -15,7 +15,7 @@ public class TestThymeleaf {
         engine.setTemplateResolver(resolver);
 
         try {
-            engine.process("hr-workflow", new Context());
+            engine.process("senior_manager-myspace", new Context());
             System.out.println("Success! No parsing errors.");
         } catch (TemplateInputException e) {
             System.err.println("TemplateInputException: " + e.getMessage());

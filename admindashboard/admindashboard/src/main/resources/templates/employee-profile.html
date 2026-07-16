@@ -22,8 +22,8 @@
             --success-light: #ecfdf5;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --radius-lg: 16px;
-            --radius-md: 12px;
+            --radius-lg: 0px;
+            --radius-md: 0px;
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02);
@@ -274,15 +274,41 @@
         }
 
         .lock-badge {
-            background: #cbd5e1;
-            color: #475569;
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            display: none !important;
+        }
+
+        /* Sharp squared edge custom overrides */
+        .profile-header,
+        .profile-nav-card,
+        .profile-content-card,
+        .nav-tab-btn,
+        .view-state-box,
+        .edit-state-box input,
+        .edit-state-box select,
+        .edit-state-box textarea,
+        .doc-upload-card,
+        .doc-file-preview,
+        .existing-doc-link,
+        .btn-action,
+        .btn,
+        .alert,
+        .progress-bar-wrapper,
+        .progress-card {
+            border-radius: 0px !important;
+        }
+
+        /* Force readonly state for specific tabs even when body has .editing class */
+        body.editing #v-pills-employment .view-state,
+        body.editing #v-pills-project .view-state,
+        body.editing #v-pills-bank .view-state,
+        body.editing #v-pills-statutory .view-state {
+            display: flex !important;
+        }
+        body.editing #v-pills-employment .edit-state,
+        body.editing #v-pills-project .edit-state,
+        body.editing #v-pills-bank .edit-state,
+        body.editing #v-pills-statutory .edit-state {
+            display: none !important;
         }
 
         /* EDIT STATE */
@@ -1759,6 +1785,17 @@
         backBtn.style.display = 'none';
         saveBtn.style.display = 'inline-flex';
         cancelBtn.style.display = 'inline-flex';
+
+        // Disable inputs inside readonly tab panes so they are not editable or submitted
+        const readonlyTabs = ['v-pills-employment', 'v-pills-project', 'v-pills-bank', 'v-pills-statutory'];
+        readonlyTabs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.querySelectorAll('input, select, textarea').forEach(input => {
+                    input.setAttribute('disabled', 'true');
+                });
+            }
+        });
     });
 
     cancelBtn.addEventListener('click', () => {

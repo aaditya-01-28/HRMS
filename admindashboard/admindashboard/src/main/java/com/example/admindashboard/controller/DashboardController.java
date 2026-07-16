@@ -69,6 +69,18 @@ public class DashboardController {
     private HrmsNotificationRepository hrmsNotificationRepository;
 
     @Autowired
+    private com.example.admindashboard.repository.PerformanceFeedbackRequestRepository performanceFeedbackRequestRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.FeedbackRequestFieldRepository feedbackRequestFieldRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.EmployeeFeedbackRepository employeeFeedbackRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.PerformanceReviewRepository performanceReviewRepository;
+
+    @Autowired
     private RoleRepository roleRepository;
 
     @Autowired
@@ -2679,5 +2691,123 @@ public class DashboardController {
         model.addAttribute("user", user);
         
         return "employee-notifications";
+    }
+
+    @GetMapping("/employee/performance/feedback")
+    public String showEmployeePerformanceFeedback(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        User employee = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (employee == null) {
+            return "redirect:/login";
+        }
+
+        List<com.example.admindashboard.model.PerformanceFeedbackRequest> requests = 
+            performanceFeedbackRequestRepository.findByEmployee(employee);
+        
+        model.addAttribute("requests", requests);
+        model.addAttribute("user", employee);
+        return "employee-performance-feedback";
+    }
+
+    @PostMapping("/employee/performance/feedback/submit")
+    @org.springframework.transaction.annotation.Transactional
+    public String submitEmployeePerformanceFeedback(
+            @RequestParam("requestId") Long requestId,
+            @RequestParam("rating") Double rating,
+            @RequestParam("comments") String comments,
+            @RequestParam(value = "fieldId", required = false) List<Long> fieldIds,
+            @RequestParam(value = "fieldValue", required = false) List<String> fieldValues,
+            @RequestParam(value = "newFieldName", required = false) List<String> newFieldNames,
+            @RequestParam(value = "newFieldDesc", required = false) List<String> newFieldDescs,
+            @RequestParam(value = "newFieldRating", required = false) List<Double> newFieldRatings,
+            @RequestParam(value = "newFieldValue", required = false) List<String> newFieldValues,
+            Principal principal,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        User employee = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (employee == null) {
+            return "redirect:/login";
+        }
+
+        com.example.admindashboard.model.PerformanceFeedbackRequest req = 
+            performanceFeedbackRequestRepository.findById(requestId).orElse(null);
+        
+        if (req == null || !req.getEmployee().getId().equals(employee.getId())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Request not found or unauthorized.");
+            return "redirect:/employee/performance/feedback";
+        }
+
+        req.setRating(rating);
+        req.setComments(comments);
+        req.setStatus("COMPLETED");
+        req.setSubmittedAt(java.time.LocalDate.now());
+        performanceFeedbackRequestRepository.save(req);
+
+        // Save Answers to dynamic fields
+        if (fieldIds != null && fieldValues != null) {
+            for (int i = 0; i < fieldIds.size(); i++) {
+                if (i < fieldValues.size()) {
+                    com.example.admindashboard.model.FeedbackRequestField f = 
+                        feedbackRequestFieldRepository.findById(fieldIds.get(i)).orElse(null);
+                    if (f != null && f.getFeedbackRequest().getId().equals(requestId)) {
+                        f.setFieldValue(fieldValues.get(i));
+                        feedbackRequestFieldRepository.save(f);
+                    }
+                }
+            }
+        }
+
+        // Save new dynamic fields added by employee
+        if (newFieldNames != null) {
+            for (int i = 0; i < newFieldNames.size(); i++) {
+                String name = newFieldNames.get(i);
+                if (name != null && !name.trim().isEmpty()) {
+                    String desc = (newFieldDescs != null && i < newFieldDescs.size()) ? newFieldDescs.get(i) : "";
+                    Double r = (newFieldRatings != null && i < newFieldRatings.size()) ? newFieldRatings.get(i) : 0.0;
+                    String val = (newFieldValues != null && i < newFieldValues.size()) ? newFieldValues.get(i) : "";
+                    
+                    com.example.admindashboard.model.FeedbackRequestField f = new com.example.admindashboard.model.FeedbackRequestField();
+                    f.setFeedbackRequest(req);
+                    f.setFieldName(name);
+                    f.setDescription(desc);
+                    f.setFieldValue("Rating: " + r + " / 5.0\nComments: " + val);
+                    feedbackRequestFieldRepository.save(f);
+                }
+            }
+        }
+
+        // Save standard compatibility review: EmployeeFeedback
+        com.example.admindashboard.model.EmployeeFeedback feedback = new com.example.admindashboard.model.EmployeeFeedback();
+        feedback.setEmployee(employee);
+        feedback.setReviewer(req.getManager());
+        feedback.setRoleLevel(req.getRoleLevel());
+        feedback.setRating1(rating);
+        feedback.setRating2(rating);
+        feedback.setRating3(rating);
+        feedback.setComments(comments);
+        feedback.setSubmittedAt(java.time.LocalDate.now());
+        employeeFeedbackRepository.save(feedback);
+
+        // Update PerformanceReview status to Completed
+        PerformanceReview review = performanceReviewRepository.findAll().stream()
+            .filter(pr -> pr.getEmployee() != null && pr.getEmployee().getId().equals(employee.getId()))
+            .findFirst()
+            .orElse(null);
+        
+        if (review != null) {
+            review.setStatus("Completed");
+            review.setSelfRating(rating); // Self review rating
+            review.setFinalRating(rating);
+            review.setReviewDate(java.time.LocalDate.now());
+            performanceReviewRepository.save(review);
+        }
+
+        redirectAttributes.addFlashAttribute("successMessage", "Your performance feedback was submitted successfully!");
+        return "redirect:/employee/performance/feedback";
     }
 }

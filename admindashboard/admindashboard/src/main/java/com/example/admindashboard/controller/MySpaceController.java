@@ -148,6 +148,12 @@ public class MySpaceController {
         @Autowired
         private com.example.admindashboard.repository.TeamMemberRepository teamMemberRepository;
 
+        @Autowired
+        private com.example.admindashboard.repository.PerformanceFeedbackRequestRepository performanceFeedbackRequestRepository;
+
+        @Autowired
+        private com.example.admindashboard.repository.FeedbackRequestFieldRepository feedbackRequestFieldRepository;
+
 
         @Autowired
         private InterviewRepository interviewRepository;
@@ -294,6 +300,7 @@ public class MySpaceController {
 
         @PreAuthorize("hasRole('SENIOR_MANAGER')")
         @GetMapping({"/senior_manager/myspace", "/space/manager/dashboard"})
+        @org.springframework.transaction.annotation.Transactional(readOnly = true)
         public String showSeniorManagerMySpace(
                         @RequestParam(value = "tab", defaultValue = "directory") String tab,
                         Model model,
@@ -483,6 +490,32 @@ public class MySpaceController {
                                 model.addAttribute("myCustomTeams", myCustomTeams);
 
                 return "senior_manager-myspace";
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @GetMapping("/senior_manager/myspace/debug_teams")
+        @ResponseBody
+        public String debugTeams(Principal principal) {
+                try {
+                        User loggedInUser = userRepository.findByUsername(principal.getName()).orElse(null);
+                        List<com.example.admindashboard.model.Team> teams = teamRepository.findByManager(loggedInUser);
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("LoggedInUser: ").append(loggedInUser.getUsername()).append(" (ID: ").append(loggedInUser.getId()).append(")\n");
+                        sb.append("Teams count: ").append(teams.size()).append("\n");
+                        for (com.example.admindashboard.model.Team t : teams) {
+                                sb.append("Team: ").append(t.getTeamName()).append(" (ID: ").append(t.getId()).append("), CreatedAt: ").append(t.getCreatedAt()).append("\n");
+                                sb.append("  Members count: ").append(t.getMembers().size()).append("\n");
+                                for (com.example.admindashboard.model.TeamMember tm : t.getMembers()) {
+                                        sb.append("    Member ID: ").append(tm.getId()).append(", User: ").append(tm.getUser().getFullName()).append(" (").append(tm.getUser().getUsername()).append(")\n");
+                                }
+                        }
+                        return sb.toString();
+                } catch (Exception e) {
+                        java.io.StringWriter sw = new java.io.StringWriter();
+                        java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+                        e.printStackTrace(pw);
+                        return "ERROR:\n" + sw.toString();
+                }
         }
 
         @PreAuthorize("hasRole('SENIOR_MANAGER')")
@@ -1410,6 +1443,9 @@ public class MySpaceController {
                 }
                 model.addAttribute("departments", departments);
                 model.addAttribute("allUsers", allUsers);
+                
+                model.addAttribute("myCustomTeams", teamRepository.findByManager(loggedInUser));
+                model.addAttribute("feedbackRequests", performanceFeedbackRequestRepository.findByManager(loggedInUser));
 
                 return "senior_manager-performance";
         }
@@ -2400,6 +2436,166 @@ public class MySpaceController {
             redirectAttributes.addFlashAttribute("successMessage", "Feedback for " + (employee != null ? employee.getFullName() : employeeCode) + " submitted successfully!");
             return "redirect:/senior_manager/performance";
         }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @PostMapping("/senior_manager/performance/initiate_feedback")
+        @org.springframework.transaction.annotation.Transactional
+        public String initiatePerformanceFeedback(
+                @RequestParam(value = "teamMembers", required = false) List<String> teamMembers,
+                @RequestParam(value = "teamId", required = false) Long teamId,
+                @RequestParam("roleLevel") String roleLevel,
+                @RequestParam(value = "fieldName", required = false) List<String> fieldNames,
+                @RequestParam(value = "fieldDesc", required = false) List<String> fieldDescs,
+                Principal principal,
+                org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+
+            User manager = principal != null ? userRepository.findByUsername(principal.getName()).orElse(null) : null;
+            if (manager == null) {
+                return "redirect:/login";
+            }
+
+            java.util.Set<User> targets = new java.util.HashSet<>();
+
+            // 1. Resolve team if selected
+            if (teamId != null) {
+                com.example.admindashboard.model.Team team = teamRepository.findById(teamId).orElse(null);
+                if (team != null) {
+                    for (com.example.admindashboard.model.TeamMember tm : team.getMembers()) {
+                        targets.add(tm.getUser());
+                    }
+                }
+            }
+
+            // 2. Resolve individual employees
+            if (teamMembers != null) {
+                for (String username : teamMembers) {
+                    User u = userRepository.findByUsername(username).orElse(null);
+                    if (u != null) {
+                        targets.add(u);
+                    }
+                }
+            }
+
+            if (targets.isEmpty()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "No employees selected to initiate feedback.");
+                return "redirect:/senior_manager/performance?tab=team_reviews";
+            }
+
+            for (User employee : targets) {
+                // Save Request
+                com.example.admindashboard.model.PerformanceFeedbackRequest req = new com.example.admindashboard.model.PerformanceFeedbackRequest();
+                req.setEmployee(employee);
+                req.setManager(manager);
+                req.setRoleLevel(roleLevel);
+                req.setStatus("PENDING");
+                performanceFeedbackRequestRepository.save(req);
+
+                // Save Dynamic Fields
+                if (fieldNames != null && fieldDescs != null) {
+                    for (int i = 0; i < fieldNames.size(); i++) {
+                        if (i < fieldDescs.size() && !fieldNames.get(i).isBlank()) {
+                            com.example.admindashboard.model.FeedbackRequestField f = new com.example.admindashboard.model.FeedbackRequestField();
+                            f.setFeedbackRequest(req);
+                            f.setFieldName(fieldNames.get(i));
+                            f.setDescription(fieldDescs.get(i));
+                            feedbackRequestFieldRepository.save(f);
+                        }
+                    }
+                }
+
+                // Add Notification
+                HrmsNotification notif = new HrmsNotification(
+                    employee,
+                    "Performance Feedback Required",
+                    "Your manager " + manager.getFullName() + " has requested performance feedback. Please fill out the form.",
+                    "NOTIFICATION",
+                    "High",
+                    manager.getFullName(),
+                    manager.getDesignation()
+                );
+                hrmsNotificationRepository.save(notif);
+                
+                // Create/Update PerformanceReview status to In Progress
+                PerformanceReview review = performanceReviewRepository.findAll().stream()
+                    .filter(pr -> pr.getEmployee() != null && pr.getEmployee().getId().equals(employee.getId()))
+                    .findFirst()
+                    .orElse(null);
+                
+                if (review == null) {
+                    review = new PerformanceReview();
+                    review.setEmployee(employee);
+                    review.setDepartment(getDepartment(employee));
+                    review.setDesignation(employee.getDesignation());
+                    review.setReviewType("Annual Review");
+                    review.setReviewPeriod("FY 2025-26");
+                    review.setDueDate(LocalDate.now().plusWeeks(2));
+                }
+                review.setStatus("In Progress");
+                performanceReviewRepository.save(review);
+            }
+
+            redirectAttributes.addFlashAttribute("successMessage", "Performance feedback request initiated successfully for " + targets.size() + " employees.");
+            return "redirect:/senior_manager/performance?tab=team_reviews";
+        }
+
+        @PreAuthorize("hasRole('SENIOR_MANAGER')")
+        @PostMapping("/senior_manager/performance/edit_feedback")
+        @org.springframework.transaction.annotation.Transactional
+        public String editPerformanceFeedback(
+                @RequestParam("requestId") Long requestId,
+                @RequestParam("rating") Double rating,
+                @RequestParam("comments") String comments,
+                @RequestParam(value = "fieldId", required = false) List<Long> fieldIds,
+                @RequestParam(value = "fieldValue", required = false) List<String> fieldValues,
+                Principal principal,
+                org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+
+            User manager = principal != null ? userRepository.findByUsername(principal.getName()).orElse(null) : null;
+            if (manager == null) {
+                return "redirect:/login";
+            }
+
+            com.example.admindashboard.model.PerformanceFeedbackRequest req = performanceFeedbackRequestRepository.findById(requestId).orElse(null);
+            if (req == null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Feedback request not found.");
+                return "redirect:/senior_manager/performance?tab=team_reviews";
+            }
+
+            req.setRating(rating);
+            req.setComments(comments);
+            req.setSubmittedAt(LocalDate.now());
+            performanceFeedbackRequestRepository.save(req);
+
+            // Update dynamic fields
+            if (fieldIds != null && fieldValues != null) {
+                for (int i = 0; i < fieldIds.size(); i++) {
+                    if (i < fieldValues.size()) {
+                        com.example.admindashboard.model.FeedbackRequestField f = feedbackRequestFieldRepository.findById(fieldIds.get(i)).orElse(null);
+                        if (f != null && f.getFeedbackRequest().getId().equals(requestId)) {
+                            f.setFieldValue(fieldValues.get(i));
+                            feedbackRequestFieldRepository.save(f);
+                        }
+                    }
+                }
+            }
+
+            // Sync with PerformanceReview
+            User employee = req.getEmployee();
+            PerformanceReview review = performanceReviewRepository.findAll().stream()
+                .filter(pr -> pr.getEmployee() != null && pr.getEmployee().getId().equals(employee.getId()))
+                .findFirst()
+                .orElse(null);
+            
+            if (review != null) {
+                review.setFinalRating(rating);
+                review.setManagerRating(rating);
+                performanceReviewRepository.save(review);
+            }
+
+            redirectAttributes.addFlashAttribute("successMessage", "Feedback for " + employee.getFullName() + " updated successfully.");
+            return "redirect:/senior_manager/performance?tab=team_reviews";
+        }
+
 
         @PreAuthorize("hasRole('SENIOR_MANAGER')")
         @GetMapping("/senior_manager/reports")

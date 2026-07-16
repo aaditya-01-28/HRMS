@@ -9,5 +9,6 @@ import java.util.List;
 
 @Repository
 public interface TeamRepository extends JpaRepository<Team, Long> {
-    List<Team> findByManager(User manager);
+    @org.springframework.data.jpa.repository.Query("SELECT DISTINCT t FROM Team t LEFT JOIN FETCH t.members m LEFT JOIN FETCH m.user WHERE t.manager = :manager")
+    List<Team> findByManager(@org.springframework.data.repository.query.Param("manager") User manager);
 }
