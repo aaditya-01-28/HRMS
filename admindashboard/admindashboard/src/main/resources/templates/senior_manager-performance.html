@@ -231,13 +231,27 @@
             body.sidebar-toggled .myspace-sidebar { transform: translateX(0); }
             .top-navbar { left: 0; padding: 0 10px; }
             .myspace-main { margin-left: 0; padding: 10px; }
+        /* Sharp squared edge custom overrides */
+        .brand-area img,
+        .stat-card,
+        .panel,
+        .progress-bar-custom,
+        .progress-bar-fill,
+        .btn,
+        .form-control,
+        .form-select,
+        .alert,
+        .badge,
+        .modal-content,
+        .card {
+            border-radius: 0px !important;
         }
     </style>
 </head>
 <body>
 <div class="myspace-sidebar shadow-sm">
     <div class="brand-area">
-        <img src="/images/wcg-logo.jpg" alt="Logo"/>
+        <img src="/images/white-logo.png" alt="Logo"/>
         <div>
             <div class="brand-title">WhiteCircle</div>
             <div class="brand-sub">Manager Admin</div>
@@ -675,18 +689,22 @@
                             </td>
                             <td th:text="${req.createdAt}">Date</td>
                             <td>
-                                <div th:if="${req.status == 'COMPLETED'}" class="text-warning text-nowrap">
-                                    <i th:each="star : ${#numbers.sequence(1, 5)}" th:class="${star <= req.rating ? 'fas fa-star' : 'far fa-star'}"></i>
-                                    <span class="text-dark small fw-bold ms-1" th:text="${req.rating}">4.0</span>
+                                <div th:if="${req.status == 'COMPLETED'}">
+                                    <div class="small"><span class="fw-bold text-secondary">Self:</span> <span class="text-warning"><i class="fas fa-star fa-xs"></i></span> <span th:text="${req.rating}">3.0</span></div>
+                                    <div class="small"><span class="fw-bold text-primary">Mgr:</span> <span class="text-warning"><i class="fas fa-star fa-xs" th:if="${req.managerRating != null}"></i></span> <span th:text="${req.managerRating != null ? req.managerRating : '-'}">4.0</span></div>
                                 </div>
                                 <span th:if="${req.status == 'PENDING'}">-</span>
                             </td>
                             <td class="text-muted small">
-                                <span class="d-inline-block text-truncate" style="max-width: 150px;" th:text="${req.comments != null ? req.comments : '-'}" th:title="${req.comments}">Comments</span>
+                                <div th:if="${req.status == 'COMPLETED'}">
+                                    <div class="text-truncate" style="max-width: 200px;" th:title="${req.comments}"><span class="fw-bold text-secondary">Self:</span> <span th:text="${req.comments}">Comments</span></div>
+                                    <div class="text-truncate" style="max-width: 200px;" th:title="${req.managerComments}"><span class="fw-bold text-primary">Mgr:</span> <span th:text="${req.managerComments != null ? req.managerComments : '-'}">Comments</span></div>
+                                </div>
+                                <span th:if="${req.status == 'PENDING'}">-</span>
                             </td>
                             <td class="text-end text-nowrap">
                                 <button th:if="${req.status == 'COMPLETED'}" class="btn btn-sm btn-outline-primary" 
-                                        th:attr="data-id=${req.id}, data-name=${req.employee.fullName}, data-rating=${req.rating}, data-comments=${req.comments}, data-fields=${#strings.listJoin(req.additionalFields.![id + '::' + fieldName + '::' + description + '::' + fieldValue], '||')}"
+                                        th:attr="data-id=${req.id}, data-name=${req.employee.fullName}, data-rating=${req.rating}, data-comments=${req.comments}, data-manager-rating=${req.managerRating != null ? req.managerRating : ''}, data-manager-comments=${req.managerComments != null ? req.managerComments : ''}, data-fields=${#strings.listJoin(req.additionalFields.![id + '::' + fieldName + '::' + description + '::' + fieldValue], '||')}"
                                         onclick="openEditFeedbackModal(this)">
                                     <i class="fa-solid fa-pen fa-sm"></i> Edit
                                 </button>
@@ -1146,8 +1164,24 @@
                         <input type="text" id="editEmployeeName" class="form-control text-muted" readonly style="background-color:#f8fafc;" />
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-dark">Overall Rating (1-5)</label>
+                    <!-- Employee Self-Review Info (Read-only) -->
+                    <div class="mb-4 bg-light p-3 border">
+                        <h6 class="fw-bold text-dark mb-2">Employee Self-Review Info</h6>
+                        <div class="mb-2">
+                            <label class="form-label fw-bold text-muted small uppercase mb-1">Employee Self-Rating</label>
+                            <div class="d-flex align-items-center">
+                                <div id="selfRatingStars" class="text-warning me-2" style="font-size: 1.2rem;"></div>
+                                <span id="selfRatingVal" class="fw-bold text-dark"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label fw-bold text-muted small uppercase mb-1">Employee Self-Comments</label>
+                            <div id="selfCommentsText" class="text-dark bg-white p-2 border" style="white-space: pre-wrap; font-size: 0.9rem; min-height: 40px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 border-top pt-3">
+                        <label class="form-label fw-bold text-dark">Manager Overall Rating (1-5)</label>
                         <div class="d-flex flex-column">
                             <div class="edit-star-rating d-inline-flex flex-row-reverse justify-content-end mb-2" style="font-size:2rem; cursor:pointer;">
                                 <input type="radio" id="edit-star5" name="rating" value="5.0" />
@@ -1176,8 +1210,8 @@
                     </div>
 
                     <div class="mb-3 border-top pt-3">
-                        <label class="form-label fw-bold text-dark">Self Comments & Feedback</label>
-                        <textarea name="comments" id="editComments" class="form-control" rows="4" required></textarea>
+                        <label class="form-label fw-bold text-dark">Manager Comments & Feedback</label>
+                        <textarea name="comments" id="editComments" class="form-control" rows="4" placeholder="Provide overall feedback regarding employee performance, guidance and actions..." required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
@@ -1319,16 +1353,34 @@
         const name = btn.getAttribute('data-name');
         const rating = btn.getAttribute('data-rating');
         const comments = btn.getAttribute('data-comments');
+        const mRating = btn.getAttribute('data-manager-rating');
+        const mComments = btn.getAttribute('data-manager-comments');
         const fieldsStr = btn.getAttribute('data-fields'); // format: id::name::desc::val||id::name::desc::val
 
         document.getElementById('editRequestId').value = id;
         document.getElementById('editEmployeeName').value = name;
-        document.getElementById('editComments').value = comments || '';
+        
+        // Populate employee self-review read-only info
+        const selfRatingVal = parseFloat(rating) || 0;
+        document.getElementById('selfRatingVal').innerText = selfRatingVal.toFixed(1) + ' / 5.0';
+        let starsHtml = '';
+        for (let i = 1; i <= 5; i++) {
+            if (i <= Math.round(selfRatingVal)) {
+                starsHtml += '<i class="fas fa-star me-1"></i>';
+            } else {
+                starsHtml += '<i class="far fa-star me-1"></i>';
+            }
+        }
+        document.getElementById('selfRatingStars').innerHTML = starsHtml;
+        document.getElementById('selfCommentsText').innerText = comments || 'No comments provided.';
 
-        // Set star rating
-        const numRating = parseFloat(rating) || 0;
-        const intRating = Math.round(numRating);
-        setEditStars(intRating);
+        // Populate manager comments input
+        document.getElementById('editComments').value = mComments || '';
+
+        // Set interactive manager star rating
+        const numMRating = parseFloat(mRating) || 0;
+        const intMRating = Math.round(numMRating);
+        setEditStars(intMRating);
 
         // Populate dynamic fields
         const container = document.getElementById('editDynamicFieldsContainer');

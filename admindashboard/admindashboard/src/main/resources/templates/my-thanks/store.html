@@ -329,125 +329,32 @@
             
             <select class="category-select">
                 <option value="all">All Categories</option>
-                <option value="merch">Merchandise</option>
-                <option value="giftcards">Gift Cards</option>
-                <option value="vouchers">Vouchers</option>
+                <option th:each="cat : ${uniqueCategories}" th:value="${cat}" th:text="${cat}"></option>
             </select>
         </div>
     </div>
 
     <!-- Tabs -->
     <div class="store-tabs">
-        <a href="#" class="store-tab active">All</a>
-        <a href="#" class="store-tab">Merchandise</a>
-        <a href="#" class="store-tab">Gift Cards</a>
-        <a href="#" class="store-tab">Vouchers</a>
+        <a href="#" class="store-tab active" data-tab-category="all">All</a>
+        <a href="#" th:each="cat : ${uniqueCategories}" class="store-tab" th:data-tab-category="${cat}" th:text="${cat}"></a>
     </div>
 
     <!-- Product Grid -->
     <div class="product-grid">
         
-        <!-- Product 1 -->
-        <div class="product-card">
+        <!-- Dynamic Products from database -->
+        <div th:each="m : ${merchandiseList}" class="product-card" th:data-db-category="${m.category}">
             <div class="product-img-wrapper" style="background-color: transparent;">
-                <img src="/images/tshirt.png" alt="White Circle T-shirt">
+                <img th:src="${m.imagePath}" th:alt="${m.itemName}" onerror="this.src='https://placehold.co/200x150?text=WCG+Merchandise'">
             </div>
-            <div class="product-title">White Circle T-shirt</div>
-            <div class="product-pts">600 PTS</div>
+            <div class="product-title" th:text="${m.itemName}">Product Title</div>
+            <div class="product-pts" th:text="${m.redemptionPoints + ' PTS'}">0 PTS</div>
             <div class="action-buttons">
-                <button class="btn btn-redeem" onclick="openConfirmModal('White Circle T-shirt', 600, 'merch', '/images/tshirt.png')">Redeem Now</button>
-                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'White Circle T-shirt', 600, 'merch', '/images/tshirt.png')"><i class="fas fa-cart-plus"></i></button>
-            </div>
-        </div>
-
-        <!-- Product 2 -->
-        <div class="product-card">
-            <div class="product-img-wrapper" style="background-color: transparent;">
-                <img src="/images/mug.png" alt="White Circle Cup">
-            </div>
-            <div class="product-title">White Circle Cup</div>
-            <div class="product-pts">200 PTS</div>
-            <div class="action-buttons">
-                <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Cup', 200, 'merch', '/images/mug.png')">Redeem Now</button>
-                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'White Circle Cup', 200, 'merch', '/images/mug.png')"><i class="fas fa-cart-plus"></i></button>
-            </div>
-        </div>
-
-        <!-- Product 3 -->
-        <div class="product-card">
-            <div class="product-img-wrapper" style="background-color: transparent;">
-                <img src="/images/bottle.png" alt="White Circle Bottle">
-            </div>
-            <div class="product-title">White Circle Bottle</div>
-            <div class="product-pts">150 PTS</div>
-            <div class="action-buttons">
-                <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Bottle', 150, 'merch', '/images/bottle.png')">Redeem Now</button>
-                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'White Circle Bottle', 150, 'merch', '/images/bottle.png')"><i class="fas fa-cart-plus"></i></button>
-            </div>
-        </div>
-
-        <!-- Product 4 -->
-        <div class="product-card">
-            <div class="product-img-wrapper" style="background-color: transparent;">
-                <img src="/images/keychain.png" alt="White Circle Key Chain">
-            </div>
-            <div class="product-title">White Circle Key Chain</div>
-            <div class="product-pts">100 PTS</div>
-            <div class="action-buttons">
-                <button class="btn btn-redeem" onclick="openConfirmModal('White Circle Key Chain', 100, 'merch', '/images/keychain.png')">Redeem Now</button>
-                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'White Circle Key Chain', 100, 'merch', '/images/keychain.png')"><i class="fas fa-cart-plus"></i></button>
-            </div>
-        </div>
-
-        <!-- Product 5 -->
-        <div class="product-card">
-            <div class="product-img-wrapper" style="background-color: transparent;">
-                <img src="/images/amazon.png" alt="Amazon Gift Card">
-            </div>
-            <div class="product-title">Amazon Gift Card</div>
-            <div class="product-pts">500 PTS</div>
-            <div class="action-buttons">
-                <button class="btn btn-redeem" onclick="openConfirmModal('AMAZON Gift Card', 500, 'voucher', '/images/amazon.png', 'Amazon')">Redeem Now</button>
-                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'AMAZON Gift Card', 500, 'voucher', '/images/amazon.png')"><i class="fas fa-cart-plus"></i></button>
-            </div>
-        </div>
-
-        <!-- Product 6 -->
-        <div class="product-card">
-            <div class="product-img-wrapper" style="background-color: transparent;">
-                <img src="/images/flipkart.png" alt="Flipkart Gift Card">
-            </div>
-            <div class="product-title">Flipkart Gift Card</div>
-            <div class="product-pts">500 PTS</div>
-            <div class="action-buttons">
-                <button class="btn btn-redeem" onclick="openConfirmModal('FLIPKART Gift Card', 500, 'voucher', '/images/flipkart.png', 'Flipkart')">Redeem Now</button>
-                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'FLIPKART Gift Card', 500, 'voucher', '/images/flipkart.png')"><i class="fas fa-cart-plus"></i></button>
-            </div>
-        </div>
-
-        <!-- Product 7 -->
-        <div class="product-card">
-            <div class="product-img-wrapper" style="background-color: transparent;">
-                <img src="/images/zomato.png" alt="Zomato Gift Card">
-            </div>
-            <div class="product-title">Zomato Gift Card</div>
-            <div class="product-pts">500 PTS</div>
-            <div class="action-buttons">
-                <button class="btn btn-redeem" onclick="openConfirmModal('ZOMATO Gift Card', 500, 'voucher', '/images/zomato.png', 'Zomato')">Redeem Now</button>
-                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'ZOMATO Gift Card', 500, 'voucher', '/images/zomato.png')"><i class="fas fa-cart-plus"></i></button>
-            </div>
-        </div>
-
-        <!-- Product 8 -->
-        <div class="product-card">
-            <div class="product-img-wrapper" style="background-color: #fc8019;">
-                <span class="text-white fw-bold fs-5">SWIGGY</span>
-            </div>
-            <div class="product-title">Swiggy Gift Voucher</div>
-            <div class="product-pts">500 PTS</div>
-            <div class="action-buttons">
-                <button class="btn btn-redeem" onclick="openConfirmModal('SWIGGY Gift Voucher', 500, 'voucher', null, 'Swiggy')">Redeem Now</button>
-                <button class="btn btn-cart" title="Add to Cart" onclick="addToCart(event, 'SWIGGY Gift Voucher', 500, 'voucher', null)"><i class="fas fa-cart-plus"></i></button>
+                <button class="btn btn-redeem" 
+                        th:onclick="openConfirmModal([[${m.itemName}]], [[${m.redemptionPoints}]], [[${m.category == 'Gift Cards' || m.category == 'Certificates' ? 'voucher' : 'merch'}]], [[${m.imagePath}]], [[${m.brand}]])">Redeem Now</button>
+                <button class="btn btn-cart" title="Add to Cart" 
+                        th:onclick="addToCart(event, [[${m.itemName}]], [[${m.redemptionPoints}]], [[${m.category == 'Gift Cards' || m.category == 'Certificates' ? 'voucher' : 'merch'}]], [[${m.imagePath}]])"><i class="fas fa-cart-plus"></i></button>
             </div>
         </div>
 
@@ -596,32 +503,24 @@
             const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
             const selectedCategory = categorySelect ? categorySelect.value : 'all';
             
-            let activeTab = 'all';
+            let activeTabCategory = 'all';
             document.querySelectorAll('.store-tab').forEach(t => {
-                if(t.classList.contains('active')) activeTab = t.innerText.toLowerCase();
+                if(t.classList.contains('active')) {
+                    activeTabCategory = t.getAttribute('data-tab-category') || 'all';
+                }
             });
-
+ 
             document.querySelectorAll('.product-card').forEach(card => {
                 const titleElement = card.querySelector('.product-title');
                 if (!titleElement) return;
                 
                 const title = titleElement.innerText.toLowerCase();
-                const btnHTML = card.querySelector('.btn-redeem').outerHTML.toLowerCase();
-                
-                let category = 'merch';
-                if(btnHTML.includes("'voucher'")) {
-                    category = 'vouchers';
-                    if(title.includes('gift card')) category = 'giftcards';
-                }
-
+                const dbCategory = card.getAttribute('data-db-category') || '';
+ 
                 const matchesSearch = title.includes(searchTerm);
-                const matchesSelect = selectedCategory === 'all' || category === selectedCategory;
-                
-                let matchesTab = true;
-                if(activeTab === 'merchandise') matchesTab = (category === 'merch');
-                else if(activeTab === 'gift cards') matchesTab = (category === 'giftcards');
-                else if(activeTab === 'vouchers') matchesTab = (category === 'vouchers');
-
+                const matchesSelect = selectedCategory === 'all' || dbCategory === selectedCategory;
+                const matchesTab = activeTabCategory === 'all' || dbCategory === activeTabCategory;
+ 
                 if (matchesSearch && matchesSelect && matchesTab) {
                     card.style.display = 'block';
                 } else {

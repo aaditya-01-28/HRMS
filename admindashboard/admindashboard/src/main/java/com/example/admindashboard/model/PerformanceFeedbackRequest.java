@@ -72,6 +72,17 @@ public class PerformanceFeedbackRequest {
     public String getComments() { return comments; }
     public void setComments(String comments) { this.comments = comments; }
 
+    private Double managerRating;
+
+    @Column(columnDefinition = "TEXT")
+    private String managerComments;
+
+    public Double getManagerRating() { return managerRating; }
+    public void setManagerRating(Double managerRating) { this.managerRating = managerRating; }
+
+    public String getManagerComments() { return managerComments; }
+    public void setManagerComments(String managerComments) { this.managerComments = managerComments; }
+
     public List<FeedbackRequestField> getAdditionalFields() { return additionalFields; }
     public void setAdditionalFields(List<FeedbackRequestField> additionalFields) { this.additionalFields = additionalFields; }
 }

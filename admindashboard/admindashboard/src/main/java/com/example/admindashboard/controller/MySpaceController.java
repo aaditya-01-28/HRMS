@@ -2558,11 +2558,11 @@ public class MySpaceController {
             com.example.admindashboard.model.PerformanceFeedbackRequest req = performanceFeedbackRequestRepository.findById(requestId).orElse(null);
             if (req == null) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Feedback request not found.");
-                return "redirect:/senior_manager/performance?tab=team_reviews";
+                return "redirect:/senior_manager/performance?tab=feedback_requests";
             }
 
-            req.setRating(rating);
-            req.setComments(comments);
+            req.setManagerRating(rating);
+            req.setManagerComments(comments);
             req.setSubmittedAt(LocalDate.now());
             performanceFeedbackRequestRepository.save(req);
 
@@ -2593,7 +2593,7 @@ public class MySpaceController {
             }
 
             redirectAttributes.addFlashAttribute("successMessage", "Feedback for " + employee.getFullName() + " updated successfully.");
-            return "redirect:/senior_manager/performance?tab=team_reviews";
+            return "redirect:/senior_manager/performance?tab=feedback_requests";
         }
 
 

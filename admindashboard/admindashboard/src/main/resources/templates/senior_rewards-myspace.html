@@ -1380,12 +1380,10 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-dark">Category</label>
-                                <select class="form-select rounded-3" id="wizardCategory" name="category" required>
-                                    <option value="Audio">Audio</option>
-                                    <option value="Apparel">Apparel</option>
-                                    <option value="Gift Cards">Gift Cards</option>
-                                    <option value="Certificates">Certificates</option>
-                                </select>
+                                <input type="text" class="form-control rounded-3" id="wizardCategory" name="category" list="categoryDatalist" required placeholder="Select or type a category">
+                                <datalist id="categoryDatalist">
+                                    <option th:each="cat : ${existingCategories}" th:value="${cat}"></option>
+                                </datalist>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-dark">Brand (Optional)</label>
@@ -1479,12 +1477,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold text-dark">Category</label>
-                            <select class="form-select rounded-3" id="editCategory" name="category" required>
-                                <option value="Audio">Audio</option>
-                                <option value="Apparel">Apparel</option>
-                                <option value="Gift Cards">Gift Cards</option>
-                                <option value="Certificates">Certificates</option>
-                            </select>
+                            <input type="text" class="form-control rounded-3" id="editCategory" name="category" list="categoryDatalist" required placeholder="Select or type a category">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold text-dark">Brand</label>

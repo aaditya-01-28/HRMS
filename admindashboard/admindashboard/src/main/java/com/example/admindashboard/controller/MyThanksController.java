@@ -2,8 +2,10 @@ package com.example.admindashboard.controller;
 
 import com.example.admindashboard.model.ThanksCartItem;
 import com.example.admindashboard.model.User;
+import com.example.admindashboard.model.RewardMerchandise;
 import com.example.admindashboard.repository.ThanksCartItemRepository;
 import com.example.admindashboard.repository.UserRepository;
+import com.example.admindashboard.repository.RewardMerchandiseRepository;
 import com.example.admindashboard.service.ThanksService;
 
 import java.util.ArrayList;
@@ -34,6 +36,9 @@ public class MyThanksController {
 
     @Autowired
     private ThanksCartItemRepository thanksCartItemRepository;
+
+    @Autowired
+    private RewardMerchandiseRepository rewardMerchandiseRepository;
 
     /* ---------- SESSION CHECK ---------- */
     private boolean isThanksAuthenticated(HttpSession session) {
@@ -103,11 +108,49 @@ public class MyThanksController {
         if (principal == null) {
             return "redirect:/my-thanks/login";
         }
+
+        if (rewardMerchandiseRepository.count() == 0) {
+            seedDefaultMerchandise("White Circle T-shirt", "Apparel", "WCG", "Premium cotton branded t-shirt", 600, 100, 2, "/images/tshirt.png");
+            seedDefaultMerchandise("White Circle Cup", "Apparel", "WCG", "Ceramic branded coffee mug", 200, 100, 5, "/images/mug.png");
+            seedDefaultMerchandise("White Circle Bottle", "Apparel", "WCG", "Aluminium vacuum insulated sports bottle", 150, 100, 5, "/images/bottle.png");
+            seedDefaultMerchandise("White Circle Key Chain", "Apparel", "WCG", "Metal engraved keychain with brand logo", 100, 200, 10, "/images/keychain.png");
+            seedDefaultMerchandise("Amazon Gift Card", "Gift Cards", "Amazon", "Amazon digital shopping voucher", 500, 500, 10, "/images/amazon.png");
+            seedDefaultMerchandise("Flipkart Gift Card", "Gift Cards", "Flipkart", "Flipkart digital shopping voucher", 500, 500, 10, "/images/flipkart.png");
+            seedDefaultMerchandise("Zomato Gift Card", "Gift Cards", "Zomato", "Zomato dining/delivery food voucher", 500, 500, 10, "/images/zomato.png");
+            seedDefaultMerchandise("Swiggy Gift Voucher", "Certificates", "Swiggy", "Swiggy food delivery digital voucher", 500, 500, 10, null);
+        }
+
+        List<com.example.admindashboard.model.RewardMerchandise> merchandiseList = rewardMerchandiseRepository.findAll().stream()
+                .filter(m -> "PUBLISHED".equalsIgnoreCase(m.getStatus()))
+                .collect(java.util.stream.Collectors.toList());
+
+        List<String> uniqueCategories = merchandiseList.stream()
+                .map(m -> m.getCategory())
+                .filter(c -> c != null && !c.isBlank())
+                .distinct()
+                .collect(java.util.stream.Collectors.toList());
+
         User user = getAuthenticatedUser(session, principal);
         model.addAttribute("user", user);
         model.addAttribute("wallet", thanksService.getOrCreateWallet(user));
+        model.addAttribute("merchandiseList", merchandiseList);
+        model.addAttribute("uniqueCategories", uniqueCategories);
         model.addAttribute("activeMenu", "store");
         return "my-thanks/store";
+    }
+
+    private void seedDefaultMerchandise(String itemName, String category, String brand, String description, Integer points, Integer stocks, Integer limit, String imgPath) {
+        com.example.admindashboard.model.RewardMerchandise m = new com.example.admindashboard.model.RewardMerchandise();
+        m.setItemName(itemName);
+        m.setCategory(category);
+        m.setBrand(brand);
+        m.setDescription(description);
+        m.setRedemptionPoints(points);
+        m.setTotalStocks(stocks);
+        m.setPerUserLimit(limit);
+        m.setImagePath(imgPath != null ? imgPath : "/images/wcg-logo.jpg");
+        m.setStatus("PUBLISHED");
+        rewardMerchandiseRepository.save(m);
     }
 
     /* ---------- SEND THANKS ---------- */

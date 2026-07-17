@@ -35,10 +35,12 @@
             border-left: 5px solid #002D72;
             box-shadow: 0 4px 6px rgba(0,0,0,0.02);
             transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
         }
         .notification-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+            background-color: #f8fafc;
         }
         .notification-card.priority-High {
             border-left-color: #dc3545;
@@ -104,6 +106,18 @@
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
+
+        /* Sharp squared edge custom overrides */
+        .header-section,
+        .notification-card,
+        .priority-badge,
+        .btn-back,
+        .btn,
+        .alert,
+        .badge,
+        .empty-state {
+            border-radius: 0px !important;
+        }
     </style>
 </head>
 <body>
@@ -143,5 +157,24 @@
     </div>
 </div>
 
+<script>
+    document.querySelectorAll('.notification-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const titleEl = card.querySelector('.notif-title');
+            const bodyEl = card.querySelector('.notif-body');
+            
+            const title = titleEl ? titleEl.innerText.toLowerCase() : '';
+            const body = bodyEl ? bodyEl.innerText.toLowerCase() : '';
+            
+            if (title.includes('performance') || title.includes('feedback') || body.includes('performance') || body.includes('feedback')) {
+                window.location.href = '/employee/performance/feedback';
+            } else if (title.includes('project') || body.includes('project')) {
+                window.location.href = '/employee/profile';
+            } else {
+                window.location.href = '/employee/dashboard';
+            }
+        });
+    });
+</script>
 </body>
 </html>

@@ -414,6 +414,17 @@ public class SeniorDashboardController {
                 .limit(5)
                 .collect(Collectors.toList());
 
+        // Extract unique categories for L3 autocomplete
+        List<String> existingCategories = merchandiseList.stream()
+                .map(m -> m.getCategory())
+                .filter(c -> c != null && !c.isBlank())
+                .distinct()
+                .collect(Collectors.toList());
+        if (existingCategories.isEmpty()) {
+            existingCategories = java.util.List.of("Audio", "Apparel", "Gift Cards", "Certificates");
+        }
+        model.addAttribute("existingCategories", existingCategories);
+
         // Model binding
         model.addAttribute("merchandiseList", merchandiseList);
         model.addAttribute("budgets", budgets);
