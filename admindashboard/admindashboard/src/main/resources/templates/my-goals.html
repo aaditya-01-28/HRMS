@@ -769,6 +769,11 @@
 		        width:130px;
 		        height:130px;
 		    }
+		    .goal-modal {
+		        width: 90% !important;
+		        max-width: 400px !important;
+		        padding: 15px !important;
+		    }
 		}
 
 	        @media(max-width:992px){
@@ -891,10 +896,16 @@
 
 		    </div>
 
-		    <button class="create-btn">
-		        <i class="fa-solid fa-plus"></i>
-		        Create New Goal
-		    </button>
+		    <div style="display: flex; gap: 10px;">
+			    <button class="create-btn" id="overallChartUpdateBtn" style="background: #10b981; border-color: #10b981;">
+			        <i class="fa-regular fa-pen-to-square"></i>
+			        Update Progress
+			    </button>
+			    <button class="create-btn" id="createNewGoalBtn">
+			        <i class="fa-solid fa-plus"></i>
+			        Create New Goal
+			    </button>
+		    </div>
 
 		</div>
 
@@ -1030,20 +1041,10 @@
 	        <!-- Goal Burn Chart -->
 
 	        <div class="chart-card">
-
 				<div class="chart-header">
-
 					<div class="chart-title">
 					    Goal Burn Chart
 					</div>
-
-					<button class="update-btn"
-					        id="burnChartUpdateBtn">
-
-					    Update Progress
-
-					</button>
-
 				</div>
 
 	            <div class="burn-chart-container">
@@ -1052,23 +1053,11 @@
 
 	        </div>
 
-	        <!-- Overall Progress -->
-
 	        <div class="chart-card">
-
 	            <div class="chart-header">
-
 					<div class="chart-title">
 					    Overall Progress
 					</div>
-
-					<button class="update-btn"
-					        id="overallChartUpdateBtn">
-
-					    Update Progress
-
-					</button>
-
 	            </div>
 
 	            <div class="overall-wrapper">
@@ -1127,7 +1116,7 @@
 	            </span>
 	        </div>
 
-			<form th:action="@{/employee/my-goals/create}" method="post">
+			<form th:action="@{/employee/my-goals/create}" method="post" id="createGoalForm">
 
 			    <div class="modal-body">
 
@@ -1613,9 +1602,12 @@
     });
 	const modal = document.getElementById("goalModal");
 
-	document.querySelector(".create-btn").addEventListener("click", () => {
-	    modal.classList.add("show");
-	});
+	const createGoalBtn = document.getElementById("createNewGoalBtn");
+	if (createGoalBtn) {
+		createGoalBtn.addEventListener("click", () => {
+			modal.classList.add("show");
+		});
+	}
 
 	document.getElementById("closeModal").addEventListener("click", () => {
 	    modal.classList.remove("show");
@@ -1643,6 +1635,41 @@
 	    });
 
 	});
+
+	// Submit validation for Create Goal form (BUG-018 & BUG-019)
+	const createGoalForm = document.getElementById("createGoalForm");
+	if (createGoalForm) {
+		createGoalForm.addEventListener("submit", function(e) {
+			const priority = document.getElementById("priorityInput").value;
+			if (!priority) {
+				e.preventDefault();
+				alert("Please select a Priority (High, Medium, or Low) before creating the goal.");
+				return false;
+			}
+			const startVal = new Date(document.getElementById("startDate").value);
+			const endVal = new Date(document.getElementById("endDate").value);
+			if (endVal < startVal) {
+				e.preventDefault();
+				alert("End Date cannot be before Start Date.");
+				return false;
+			}
+		});
+	}
+
+	// Submit validation for Update Progress form (BUG-020)
+	const updateProgressForm = document.getElementById("updateForm");
+	if (updateProgressForm) {
+		updateProgressForm.addEventListener("submit", function(e) {
+			const progressInput = this.querySelector('input[name="progressPercentage"]');
+			const progressVal = parseInt(progressInput.value, 10);
+			if (isNaN(progressVal) || progressVal < 0 || progressVal > 100) {
+				e.preventDefault();
+				alert("Progress must be between 0% and 100%.");
+				return false;
+			}
+		});
+	}
+
 	const updateModal =
 	        document.getElementById("updateModal");
 	function openProgressModal(){
@@ -1656,11 +1683,11 @@
 	            .action = "";
 	}
 
-	document.getElementById("burnChartUpdateBtn")
-	    .addEventListener("click", openProgressModal);
+	const burnBtn = document.getElementById("burnChartUpdateBtn");
+	if (burnBtn) burnBtn.addEventListener("click", openProgressModal);
 
-	document.getElementById("overallChartUpdateBtn")
-	    .addEventListener("click", openProgressModal);
+	const overallBtn = document.getElementById("overallChartUpdateBtn");
+	if (overallBtn) overallBtn.addEventListener("click", openProgressModal);
 
 	document.getElementById("closeUpdateModal")
 	    .addEventListener("click", () => {

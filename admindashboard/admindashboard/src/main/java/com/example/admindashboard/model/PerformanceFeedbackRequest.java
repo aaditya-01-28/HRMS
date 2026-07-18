@@ -85,4 +85,27 @@ public class PerformanceFeedbackRequest {
 
     public List<FeedbackRequestField> getAdditionalFields() { return additionalFields; }
     public void setAdditionalFields(List<FeedbackRequestField> additionalFields) { this.additionalFields = additionalFields; }
+
+    private String serialNumber;
+
+    public String getSerialNumber() { return serialNumber; }
+    public void setSerialNumber(String serialNumber) { this.serialNumber = serialNumber; }
+
+    @Transient
+    public String getFieldsString() {
+        if (additionalFields == null || additionalFields.isEmpty()) {
+            return "";
+        }
+        List<String> parts = new ArrayList<>();
+        for (FeedbackRequestField f : additionalFields) {
+            String fId = String.valueOf(f.getId());
+            String fName = f.getFieldName() != null ? f.getFieldName().replace(":", "").replace("|", "") : "";
+            String fDesc = f.getDescription() != null ? f.getDescription().replace(":", "").replace("|", "") : "";
+            String fVal = f.getFieldValue() != null ? f.getFieldValue().replace(":", "").replace("|", "") : "";
+            String empR = f.getEmployeeRating() != null ? String.valueOf(f.getEmployeeRating()) : "";
+            String mgrR = f.getManagerRating() != null ? String.valueOf(f.getManagerRating()) : "";
+            parts.add(fId + "::" + fName + "::" + fDesc + "::" + fVal + "::" + empR + "::" + mgrR);
+        }
+        return String.join("||", parts);
+    }
 }

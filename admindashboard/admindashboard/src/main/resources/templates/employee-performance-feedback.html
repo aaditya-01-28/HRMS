@@ -120,120 +120,286 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
-    <!-- Feedback Requests List -->
-    <div class="feedback-requests-section">
-        <h5 class="fw-bold mb-3 text-dark">Active Review Requests</h5>
+    <!-- Feedback Tabs -->
+    <ul class="nav nav-tabs mb-4" id="feedbackTabs" role="tablist" style="border-radius: 0;">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold text-primary" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true" style="border-radius: 0;">
+                <i class="fa-solid fa-clock me-2"></i>Pending & Drafts
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold text-secondary" id="submitted-tab" data-bs-toggle="tab" data-bs-target="#submitted" type="button" role="tab" aria-controls="submitted" aria-selected="false" style="border-radius: 0;">
+                <i class="fa-solid fa-square-check me-2"></i>Submitted Feedback
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="feedbackTabsContent">
         
-        <div th:each="req : ${requests}" th:class="'request-card status-' + ${req.status}">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-                <div>
-                    <h5 class="fw-bold text-dark mb-1" th:text="'Initiated by ' + ${req.manager.fullName}">Manager Name</h5>
-                    <span class="badge bg-light text-secondary border px-2 py-1 small" th:text="'Role Level: ' + ${req.roleLevel}">L1</span>
-                </div>
-                <div>
-                    <span th:if="${req.status == 'PENDING'}" class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold">Pending Review</span>
-                    <span th:if="${req.status == 'COMPLETED'}" class="badge bg-success text-white px-3 py-2 rounded-pill fw-bold">Submitted</span>
-                </div>
-            </div>
-
-            <!-- Pending Form -->
-            <form th:if="${req.status == 'PENDING'}" action="/employee/performance/feedback/submit" method="POST">
-                <input type="hidden" name="requestId" th:value="${req.id}" />
-                
-                <!-- 5-Star Rating Section -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-dark">Overall Rating <span class="text-danger">*</span></label>
-                    <div class="d-flex flex-column">
-                        <div class="star-rating mb-2">
-                            <input type="radio" th:id="'star5-' + ${req.id}" name="rating" value="5.0" required th:onclick="'updateRatingDesc(' + ${req.id} + ', 5)'"/>
-                            <label th:for="'star5-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 5)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="5 Star: Deep experience can lead mentor and solve complex problem, certificate required"><i class="fas fa-star"></i></label>
-                            
-                            <input type="radio" th:id="'star4-' + ${req.id}" name="rating" value="4.0" th:onclick="'updateRatingDesc(' + ${req.id} + ', 4)'"/>
-                            <label th:for="'star4-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 4)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="4 Star: Strong, practical experience. can work independently, certificate required"><i class="fas fa-star"></i></label>
-                            
-                            <input type="radio" th:id="'star3-' + ${req.id}" name="rating" value="3.0" th:onclick="'updateRatingDesc(' + ${req.id} + ', 3)'"/>
-                            <label th:for="'star3-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 3)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="3 Star: Hand on experience with certifications (required)"><i class="fas fa-star"></i></label>
-                            
-                            <input type="radio" th:id="'star2-' + ${req.id}" name="rating" value="2.0" th:onclick="'updateRatingDesc(' + ${req.id} + ', 2)'"/>
-                            <label th:for="'star2-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 2)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="2 Star: hand on experience, training & certification completed; minimal practical exposure; certificate optional"><i class="fas fa-star"></i></label>
-                            
-                            <input type="radio" th:id="'star1-' + ${req.id}" name="rating" value="1.0" th:onclick="'updateRatingDesc(' + ${req.id} + ', 1)'"/>
-                            <label th:for="'star1-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 1)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="1 Star: limited knowledge basic understanding , no certificate required"><i class="fas fa-star"></i></label>
-                        </div>
-                        <div class="rating-desc-box" th:id="'rating-desc-' + ${req.id}">
-                            <span class="text-muted italic">Hover over the stars to see detailed criteria...</span>
-                        </div>
+        <!-- PENDING & DRAFTS TAB PANEL -->
+        <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+            <div th:each="req : ${pendingRequests}" th:class="'request-card status-' + ${req.status}">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1" th:text="${req.serialNumber != null ? req.serialNumber : 'FB-' + (1000 + req.id)}">FB-1001</h5>
+                        <p class="text-muted small mb-1" th:text="'Initiated by ' + ${req.manager.fullName}">Manager Name</p>
+                        <span class="badge bg-light text-secondary border px-2 py-1 small" th:text="'Role Level: ' + ${req.roleLevel}">L1</span>
+                    </div>
+                    <div>
+                        <span th:if="${req.status == 'PENDING'}" class="badge bg-warning text-dark px-3 py-2 fw-bold">Pending Review</span>
+                        <span th:if="${req.status == 'DRAFT'}" class="badge bg-secondary text-white px-3 py-2 fw-bold">Draft</span>
                     </div>
                 </div>
 
-                <!-- Custom/Dynamic Fields -->
-                <div th:each="field : ${req.additionalFields}" class="mb-3 border-top pt-3">
-                    <label class="form-label fw-bold text-dark" th:text="${field.fieldName}">Question</label>
-                    <p class="text-muted small mb-2" th:text="${field.description}">Description</p>
-                    <input type="hidden" name="fieldId" th:value="${field.id}" />
-                    <textarea name="fieldValue" class="form-control" rows="3" required placeholder="Write your response here..."></textarea>
-                </div>
+                <!-- Pending/Draft Form -->
+                <form action="/employee/performance/feedback/submit" method="POST">
+                    <input type="hidden" name="requestId" th:value="${req.id}" />
+                    
+                    <!-- 5-Star Rating Section -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark">Overall Self Rating <span class="text-danger">*</span></label>
+                        <div class="d-flex flex-column">
+                            <div class="star-rating mb-2">
+                                <input type="radio" th:id="'star5-' + ${req.id}" name="rating" value="5.0" required th:checked="${req.rating == 5.0}" th:onclick="'updateRatingDesc(' + ${req.id} + ', 5)'"/>
+                                <label th:for="'star5-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 5)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="5 Star: Deep experience can lead mentor and solve complex problem, certificate required"><i class="fas fa-star"></i></label>
+                                
+                                <input type="radio" th:id="'star4-' + ${req.id}" name="rating" value="4.0" th:checked="${req.rating == 4.0}" th:onclick="'updateRatingDesc(' + ${req.id} + ', 4)'"/>
+                                <label th:for="'star4-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 4)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="4 Star: Strong, practical experience. can work independently, certificate required"><i class="fas fa-star"></i></label>
+                                
+                                <input type="radio" th:id="'star3-' + ${req.id}" name="rating" value="3.0" th:checked="${req.rating == 3.0}" th:onclick="'updateRatingDesc(' + ${req.id} + ', 3)'"/>
+                                <label th:for="'star3-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 3)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="3 Star: Hand on experience with certifications (required)"><i class="fas fa-star"></i></label>
+                                
+                                <input type="radio" th:id="'star2-' + ${req.id}" name="rating" value="2.0" th:checked="${req.rating == 2.0}" th:onclick="'updateRatingDesc(' + ${req.id} + ', 2)'"/>
+                                <label th:for="'star2-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 2)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="2 Star: hand on experience, training & certification completed; minimal practical exposure; certificate optional"><i class="fas fa-star"></i></label>
+                                
+                                <input type="radio" th:id="'star1-' + ${req.id}" name="rating" value="1.0" th:checked="${req.rating == 1.0}" th:onclick="'updateRatingDesc(' + ${req.id} + ', 1)'"/>
+                                <label th:for="'star1-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 1)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="1 Star: limited knowledge basic understanding , no certificate required"><i class="fas fa-star"></i></label>
+                            </div>
+                            <div class="rating-desc-box" th:id="'rating-desc-' + ${req.id}">
+                                <span th:if="${req.rating != null}" class="text-success fw-bold" th:text="${req.rating == 5.0 ? '5 Star: Deep experience can lead mentor and solve complex problem, certificate required' : (req.rating == 4.0 ? '4 Star: Strong, practical experience. can work independently, certificate required' : (req.rating == 3.0 ? '3 Star: Hand on experience with certifications (required)' : (req.rating == 2.0 ? '2 Star: hand on experience, training & certification completed; minimal practical exposure; certificate optional' : '1 Star: limited knowledge basic understanding , no certificate required')))}"></span>
+                                <span th:if="${req.rating == null}" class="text-muted italic">Hover over the stars to see detailed criteria...</span>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- Custom Dynamic Review Fields Section -->
-                <div class="mb-4 border-top pt-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <label class="form-label fw-bold text-dark mb-0">Custom Self-Review Criteria</label>
-                        <button type="button" class="btn btn-sm btn-outline-primary fw-bold" th:onclick="'addCustomField(' + ${req.id} + ')'" style="border-radius: 0;">
-                            <i class="fas fa-plus me-1"></i> Add Rating Field
+                    <!-- Custom/Dynamic Fields -->
+                    <div th:each="field : ${req.additionalFields}" class="mb-3 border-top pt-3">
+                        <label class="form-label fw-bold text-dark" th:text="${field.fieldName}">Question</label>
+                        <p class="text-muted small mb-2" th:text="${field.description}">Description</p>
+                        <input type="hidden" name="fieldId" th:value="${field.id}" />
+                        <div class="row g-2 mb-2">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small text-dark mb-1">Self Rating <span class="text-danger">*</span></label>
+                                <select name="fieldEmployeeRating" class="form-select form-select-sm" required style="border-radius: 0;">
+                                    <option value="">Select...</option>
+                                    <option value="5.0" th:selected="${field.employeeRating == 5.0}">5.0 (Excellent)</option>
+                                    <option value="4.0" th:selected="${field.employeeRating == 4.0}">4.0 (Very Good)</option>
+                                    <option value="3.0" th:selected="${field.employeeRating == 3.0}">3.0 (Good)</option>
+                                    <option value="2.0" th:selected="${field.employeeRating == 2.0}">2.0 (Fair)</option>
+                                    <option value="1.0" th:selected="${field.employeeRating == 1.0}">1.0 (Basic)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-9">
+                                <label class="form-label fw-bold small text-dark mb-1">Comments / Justification <span class="text-danger">*</span></label>
+                                <textarea name="fieldValue" class="form-control form-control-sm" rows="2" required placeholder="Write your response here..." style="border-radius: 0;" th:text="${field.fieldValue}"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Dynamic Review Fields Section -->
+                    <div class="mb-4 border-top pt-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <label class="form-label fw-bold text-dark mb-0">Custom Self-Review Criteria</label>
+                                <div class="text-muted small">If fields are not available, define your custom field name and description here.</div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary fw-bold" th:onclick="'addCustomField(' + ${req.id} + ')'" style="border-radius: 0;">
+                                <i class="fas fa-plus me-1"></i> Add Custom Field
+                            </button>
+                        </div>
+                        <div th:id="'custom-fields-container-' + ${req.id}">
+                            <!-- Dynamic fields will be appended here -->
+                        </div>
+                    </div>
+
+                    <!-- Comments -->
+                    <div class="mb-4 border-top pt-3">
+                        <label class="form-label fw-bold text-dark">Detailed Feedback & Comments <span class="text-danger">*</span></label>
+                        <textarea name="comments" class="form-control" rows="4" placeholder="Provide overall feedback regarding your performance, accomplishments and areas of improvement..." required th:text="${req.comments}"></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary fw-bold" 
+                                th:data-id="${req.id}"
+                                th:data-serial="${req.serialNumber != null ? req.serialNumber : 'FB-' + (1000 + req.id)}"
+                                th:data-manager="${req.manager.fullName}"
+                                th:data-role="${req.roleLevel}"
+                                th:data-status="${req.status}"
+                                th:data-rating="${req.rating}"
+                                th:data-comments="${req.comments}"
+                                th:data-fields="${req.fieldsString}"
+                                onclick="previewFeedback(this)" style="border-radius:0;">
+                            <i class="fa-solid fa-eye me-1"></i> Preview Form
                         </button>
-                    </div>
-                    <div th:id="'custom-fields-container-' + ${req.id}">
-                        <!-- Dynamic fields will be appended here -->
-                    </div>
-                </div>
-
-                <!-- Comments -->
-                <div class="mb-4 border-top pt-3">
-                    <label class="form-label fw-bold text-dark">Detailed Feedback & Comments <span class="text-danger">*</span></label>
-                    <textarea name="comments" class="form-control" rows="4" placeholder="Provide overall feedback regarding your performance, accomplishments and areas of improvement..." required></textarea>
-                </div>
-
-                <div class="text-end">
-                    <button type="submit" class="btn btn-primary px-4 fw-bold">Submit Feedback</button>
-                </div>
-            </form>
-
-            <!-- Completed View -->
-            <div th:if="${req.status == 'COMPLETED'}" class="border-top pt-3">
-                <div class="mb-3">
-                    <label class="fw-bold text-muted small uppercase">Overall Self Rating</label>
-                    <div class="d-flex align-items-center mt-1">
-                        <div class="text-warning me-2" style="font-size: 1.25rem;">
-                            <i th:each="star : ${#numbers.sequence(1, 5)}" 
-                               th:class="${star <= req.rating ? 'fas fa-star' : 'far fa-star'}"></i>
+                        <div>
+                            <button type="submit" name="action" value="saveDraft" class="btn btn-outline-primary px-4 fw-bold me-2" style="border-radius:0;">
+                                <i class="fa-solid fa-floppy-disk me-1"></i> Save as Draft
+                            </button>
+                            <button type="submit" name="action" value="submit" class="btn btn-primary px-4 fw-bold" style="border-radius:0;">
+                                <i class="fa-solid fa-paper-plane me-1"></i> Submit Feedback
+                            </button>
                         </div>
-                        <span class="fw-bold text-dark" th:text="${req.rating + ' / 5.0'}">4.0 / 5.0</span>
                     </div>
-                </div>
-
-                <!-- Completed Dynamic Fields -->
-                <div th:each="field : ${req.additionalFields}" class="mb-3 bg-light p-3 rounded">
-                    <label class="fw-bold text-dark small d-block mb-1" th:text="${field.fieldName}">Question</label>
-                    <p class="text-muted small mb-2" th:text="${field.description}">Description</p>
-                    <div class="bg-white p-2 border rounded" style="white-space: pre-wrap;" th:text="${field.fieldValue}">Response</div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="fw-bold text-muted small uppercase">Self Comments & Feedback</label>
-                    <div class="bg-light p-3 rounded mt-1" style="white-space: pre-wrap;" th:text="${req.comments}">Comments</div>
-                </div>
-
-                <div class="text-muted small text-end">
-                    Submitted on: <span th:text="${#temporals.format(req.submittedAt, 'dd MMM yyyy')}">Date</span>
-                </div>
+                </form>
+            </div>
+            
+            <!-- Empty state for pending -->
+            <div th:if="${#lists.isEmpty(pendingRequests)}" class="text-center py-5 bg-white border">
+                <i class="fa-solid fa-circle-info text-muted mb-3" style="font-size: 3rem;"></i>
+                <h5 class="text-dark fw-bold">No Pending Requests</h5>
+                <p class="text-muted mb-0">You do not have any pending performance feedback requests at this time.</p>
             </div>
         </div>
 
-        <!-- Empty State -->
-        <div th:if="${#lists.isEmpty(requests)}" class="text-center py-5 bg-white rounded shadow-sm">
-            <i class="fa-solid fa-clipboard-check text-muted mb-3" style="font-size: 3rem;"></i>
-            <h5 class="text-dark fw-bold">No Review Requests</h5>
-            <p class="text-muted">You do not have any pending performance feedback requests at this time.</p>
+        <!-- SUBMITTED TAB PANEL -->
+        <div class="tab-pane fade" id="submitted" role="tabpanel" aria-labelledby="submitted-tab">
+            <div th:each="req : ${completedRequests}" class="request-card status-COMPLETED">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1" th:text="${req.serialNumber != null ? req.serialNumber : 'FB-' + (1000 + req.id)}">FB-1001</h5>
+                        <p class="text-muted small mb-1" th:text="'Initiated by ' + ${req.manager.fullName}">Manager Name</p>
+                        <span class="badge bg-light text-secondary border px-2 py-1 small" th:text="'Role Level: ' + ${req.roleLevel}">L1</span>
+                    </div>
+                    <div>
+                        <span class="badge bg-success text-white px-3 py-2 fw-bold">Submitted</span>
+                    </div>
+                </div>
+
+                <div class="border-top pt-3">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="fw-bold text-muted small uppercase">Overall Self Rating</label>
+                            <div class="d-flex align-items-center mt-1">
+                                <div class="text-warning me-2" style="font-size: 1.25rem;">
+                                    <i th:each="star : ${#numbers.sequence(1, 5)}" 
+                                       th:class="${star <= req.rating ? 'fas fa-star' : 'far fa-star'}"></i>
+                                </div>
+                                <span class="fw-bold text-dark" th:text="${req.rating + ' / 5.0'}">4.0 / 5.0</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6" th:if="${req.managerRating != null}">
+                            <label class="fw-bold text-muted small uppercase">Final Manager Rating</label>
+                            <div class="d-flex align-items-center mt-1">
+                                <div class="text-warning me-2" style="font-size: 1.25rem;">
+                                    <i th:each="star : ${#numbers.sequence(1, 5)}" 
+                                       th:class="${star <= req.managerRating ? 'fas fa-star' : 'far fa-star'}"></i>
+                                </div>
+                                <span class="fw-bold text-dark" th:text="${req.managerRating + ' / 5.0'}">4.0 / 5.0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 text-end">
+                        <button type="button" class="btn btn-sm btn-outline-secondary fw-bold" 
+                                th:data-id="${req.id}"
+                                th:data-serial="${req.serialNumber != null ? req.serialNumber : 'FB-' + (1000 + req.id)}"
+                                th:data-manager="${req.manager.fullName}"
+                                th:data-role="${req.roleLevel}"
+                                th:data-status="${req.status}"
+                                th:data-rating="${req.rating}"
+                                th:data-comments="${req.comments}"
+                                th:data-mrating="${req.managerRating}"
+                                th:data-mcomments="${req.managerComments}"
+                                th:data-fields="${req.fieldsString}"
+                                onclick="previewFeedback(this)" style="border-radius:0;">
+                            <i class="fa-solid fa-eye me-1"></i> Preview Submitted Form
+                        </button>
+                    </div>
+
+                    <div class="text-muted small text-end border-top pt-2">
+                        Submitted on: <span th:text="${#temporals.format(req.submittedAt, 'dd MMM yyyy')}">Date</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Empty state for submitted -->
+            <div th:if="${#lists.isEmpty(completedRequests)}" class="text-center py-5 bg-white border">
+                <i class="fa-solid fa-clipboard-list text-muted mb-3" style="font-size: 3rem;"></i>
+                <h5 class="text-dark fw-bold">No Submitted Feedback</h5>
+                <p class="text-muted mb-0">You have not submitted any performance feedback yet.</p>
+            </div>
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewFeedbackModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius:0;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold text-dark mb-0" id="previewTitle">Feedback Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="text-muted small uppercase fw-bold">Initiated By</label>
+                        <p class="fw-bold text-dark" id="previewManager"></p>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="text-muted small uppercase fw-bold">Role Level</label>
+                        <p class="text-dark" id="previewRoleLevel"></p>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="text-muted small uppercase fw-bold">Status</label>
+                        <p class="fw-bold" id="previewStatus"></p>
+                    </div>
+                </div>
+
+                <!-- Self Review Section -->
+                <div class="card p-3 mb-4 bg-light border-0 shadow-sm" style="border-radius: 0;">
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-user me-2"></i>Employee Self-Review Info</h6>
+                    <div class="mb-3">
+                        <label class="text-muted small uppercase fw-bold">Overall Self-Rating</label>
+                        <div class="d-flex align-items-center mt-1">
+                            <div id="previewSelfStars" class="text-warning me-2" style="font-size: 1.25rem;"></div>
+                            <span class="fw-bold text-dark" id="previewSelfRatingVal"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small uppercase fw-bold">Overall Self-Comments</label>
+                        <div class="bg-white p-2 border text-dark" style="white-space: pre-wrap; font-size: 0.9rem;" id="previewSelfComments"></div>
+                    </div>
+                </div>
+
+                <!-- Criteria/Fields Section -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-list-check me-2"></i>Criteria-Wise Ratings & Responses</h6>
+                    <div id="previewFieldsContainer" class="border p-3 bg-white"></div>
+                </div>
+
+                <!-- Manager Review Section -->
+                <div class="card p-3 mb-2 bg-light border-0 shadow-sm" id="previewManagerCard" style="display: none; border-radius: 0;">
+                    <h6 class="fw-bold text-success mb-3"><i class="fa-solid fa-user-tie me-2"></i>Manager Review & Final Rating</h6>
+                    <div class="mb-3">
+                        <label class="text-muted small uppercase fw-bold">Final Manager Rating</label>
+                        <div class="d-flex align-items-center mt-1">
+                            <div id="previewManagerStars" class="text-warning me-2" style="font-size: 1.25rem;"></div>
+                            <span class="fw-bold text-dark" id="previewManagerRatingVal"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small uppercase fw-bold">Manager Comments</label>
+                        <div class="bg-white p-2 border text-dark" style="white-space: pre-wrap; font-size: 0.9rem;" id="previewManagerComments"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:0;">Close</button>
+            </div>
         </div>
     </div>
 </div>
@@ -284,6 +450,7 @@
             descBox.classList.add('text-success');
         }
     }
+
     function addCustomField(reqId) {
         const container = document.getElementById('custom-fields-container-' + reqId);
         if (!container) return;
@@ -325,6 +492,99 @@
             </div>
         `;
         container.appendChild(fieldDiv);
+    }
+
+    function previewFeedback(btn) {
+        const id = btn.getAttribute('data-id');
+        const serial = btn.getAttribute('data-serial');
+        const managerName = btn.getAttribute('data-manager');
+        const roleLevel = btn.getAttribute('data-role');
+        const status = btn.getAttribute('data-status');
+        const rating = btn.getAttribute('data-rating');
+        const comments = btn.getAttribute('data-comments');
+        const mRating = btn.getAttribute('data-mrating');
+        const mComments = btn.getAttribute('data-mcomments');
+        const fieldsStr = btn.getAttribute('data-fields');
+
+        document.getElementById('previewTitle').innerText = 'Feedback Details - ' + serial;
+        document.getElementById('previewManager').innerText = managerName;
+        document.getElementById('previewRoleLevel').innerText = roleLevel;
+        
+        const statusBadge = document.getElementById('previewStatus');
+        statusBadge.innerText = status;
+        statusBadge.className = 'badge ' + (status === 'COMPLETED' ? 'bg-success text-white' : (status === 'DRAFT' ? 'bg-secondary text-white' : 'bg-warning text-dark'));
+
+        // Overall Self Rating
+        const selfRatingVal = parseFloat(rating) || 0;
+        document.getElementById('previewSelfRatingVal').innerText = selfRatingVal > 0 ? selfRatingVal.toFixed(1) + ' / 5.0' : 'Not Rated Yet';
+        
+        let selfStarsHtml = '';
+        if (selfRatingVal > 0) {
+            for (let i = 1; i <= 5; i++) {
+                selfStarsHtml += i <= Math.round(selfRatingVal) ? '<i class="fas fa-star me-1"></i>' : '<i class="far fa-star me-1"></i>';
+            }
+        } else {
+            selfStarsHtml = '—';
+        }
+        document.getElementById('previewSelfStars').innerHTML = selfStarsHtml;
+        document.getElementById('previewSelfComments').innerText = comments || 'No comments provided.';
+
+        // Criteria/Fields
+        const container = document.getElementById('previewFieldsContainer');
+        container.innerHTML = '';
+
+        if (fieldsStr && fieldsStr.trim().length > 0) {
+            const fields = fieldsStr.split('||');
+            fields.forEach(field => {
+                const parts = field.split('::');
+                if (parts.length >= 2) {
+                    const fName = parts[1];
+                    const fDesc = parts[2] || '';
+                    const fVal = parts[3] || '';
+                    const empRating = parseFloat(parts[4]) || 0;
+                    const mgrRating = parseFloat(parts[5]) || 0;
+
+                    const row = document.createElement('div');
+                    row.className = 'border-bottom py-2';
+                    row.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong class="text-dark">${fName}</strong>
+                                ${fDesc ? `<p class="text-muted small mb-1">${fDesc}</p>` : ''}
+                                <p class="mb-1 text-secondary" style="font-size: 0.9rem;"><strong>Response:</strong> ${fVal || '—'}</p>
+                            </div>
+                            <div class="text-end" style="min-width: 180px;">
+                                <div class="small"><span class="text-muted">Self Rating:</span> <strong class="text-primary">${empRating > 0 ? empRating.toFixed(1) + ' ★' : '—'}</strong></div>
+                                <div class="small"><span class="text-muted">Manager Rating:</span> <strong class="text-success">${mgrRating > 0 ? mgrRating.toFixed(1) + ' ★' : '—'}</strong></div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(row);
+                }
+            });
+        } else {
+            container.innerHTML = '<p class="text-muted italic small mb-0">No specific criteria fields defined.</p>';
+        }
+
+        // Manager Card
+        const managerCard = document.getElementById('previewManagerCard');
+        if (status === 'COMPLETED' && mRating) {
+            managerCard.style.display = 'block';
+            const managerRatingVal = parseFloat(mRating) || 0;
+            document.getElementById('previewManagerRatingVal').innerText = managerRatingVal.toFixed(1) + ' / 5.0';
+            
+            let mStarsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                mStarsHtml += i <= Math.round(managerRatingVal) ? '<i class="fas fa-star me-1"></i>' : '<i class="far fa-star me-1"></i>';
+            }
+            document.getElementById('previewManagerStars').innerHTML = mStarsHtml;
+            document.getElementById('previewManagerComments').innerText = mComments || 'No comments provided.';
+        } else {
+            managerCard.style.display = 'none';
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('previewFeedbackModal'));
+        modal.show();
     }
 </script>
 </body>

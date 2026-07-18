@@ -39,4 +39,13 @@ public class FeedbackRequestField {
 
     public String getFieldValue() { return fieldValue; }
     public void setFieldValue(String fieldValue) { this.fieldValue = fieldValue; }
+
+    private Double employeeRating;
+    private Double managerRating;
+
+    public Double getEmployeeRating() { return employeeRating; }
+    public void setEmployeeRating(Double employeeRating) { this.employeeRating = employeeRating; }
+
+    public Double getManagerRating() { return managerRating; }
+    public void setManagerRating(Double managerRating) { this.managerRating = managerRating; }
 }

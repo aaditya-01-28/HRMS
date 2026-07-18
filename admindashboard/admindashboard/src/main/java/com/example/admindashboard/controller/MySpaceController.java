@@ -1445,7 +1445,26 @@ public class MySpaceController {
                 model.addAttribute("allUsers", allUsers);
                 
                 model.addAttribute("myCustomTeams", teamRepository.findByManager(loggedInUser));
-                model.addAttribute("feedbackRequests", performanceFeedbackRequestRepository.findByManager(loggedInUser));
+                
+                List<com.example.admindashboard.model.PerformanceFeedbackRequest> allFeedbackRequests = 
+                    performanceFeedbackRequestRepository.findByManager(loggedInUser);
+                
+                List<com.example.admindashboard.model.PerformanceFeedbackRequest> pendingReview = allFeedbackRequests.stream()
+                    .filter(r -> "COMPLETED".equalsIgnoreCase(r.getStatus()) && r.getManagerRating() == null)
+                    .toList();
+                    
+                List<com.example.admindashboard.model.PerformanceFeedbackRequest> completedReview = allFeedbackRequests.stream()
+                    .filter(r -> "COMPLETED".equalsIgnoreCase(r.getStatus()) && r.getManagerRating() != null)
+                    .toList();
+                    
+                List<com.example.admindashboard.model.PerformanceFeedbackRequest> pendingEmpResponse = allFeedbackRequests.stream()
+                    .filter(r -> "PENDING".equalsIgnoreCase(r.getStatus()) || "DRAFT".equalsIgnoreCase(r.getStatus()))
+                    .toList();
+                
+                model.addAttribute("feedbackRequests", allFeedbackRequests);
+                model.addAttribute("pendingReviewRequests", pendingReview);
+                model.addAttribute("completedReviewRequests", completedReview);
+                model.addAttribute("pendingEmpRequests", pendingEmpResponse);
 
                 return "senior_manager-performance";
         }
@@ -2481,14 +2500,29 @@ public class MySpaceController {
                 return "redirect:/senior_manager/performance?tab=team_reviews";
             }
 
+            int initiatedCount = 0;
+            int skippedCount = 0;
             for (User employee : targets) {
+                // Enforce one active feedback request at a time per user
+                boolean hasActive = performanceFeedbackRequestRepository.findByEmployee(employee).stream()
+                    .anyMatch(r -> "PENDING".equalsIgnoreCase(r.getStatus()) || "DRAFT".equalsIgnoreCase(r.getStatus()));
+                if (hasActive) {
+                    skippedCount++;
+                    continue;
+                }
+
                 // Save Request
                 com.example.admindashboard.model.PerformanceFeedbackRequest req = new com.example.admindashboard.model.PerformanceFeedbackRequest();
                 req.setEmployee(employee);
                 req.setManager(manager);
                 req.setRoleLevel(roleLevel);
                 req.setStatus("PENDING");
+                req = performanceFeedbackRequestRepository.save(req);
+
+                // Auto-generate serial number
+                req.setSerialNumber("FB-" + (1000 + req.getId()));
                 performanceFeedbackRequestRepository.save(req);
+                initiatedCount++;
 
                 // Save Dynamic Fields
                 if (fieldNames != null && fieldDescs != null) {
@@ -2534,7 +2568,15 @@ public class MySpaceController {
                 performanceReviewRepository.save(review);
             }
 
-            redirectAttributes.addFlashAttribute("successMessage", "Performance feedback request initiated successfully for " + targets.size() + " employees.");
+            if (initiatedCount == 0 && skippedCount > 0) {
+                redirectAttributes.addFlashAttribute("errorMessage", "All selected employees already have an active/pending feedback request.");
+            } else {
+                String msg = "Performance feedback request initiated successfully for " + initiatedCount + " employees.";
+                if (skippedCount > 0) {
+                    msg += " (" + skippedCount + " skipped due to existing active requests)";
+                }
+                redirectAttributes.addFlashAttribute("successMessage", msg);
+            }
             return "redirect:/senior_manager/performance?tab=team_reviews";
         }
 
@@ -2547,6 +2589,7 @@ public class MySpaceController {
                 @RequestParam("comments") String comments,
                 @RequestParam(value = "fieldId", required = false) List<Long> fieldIds,
                 @RequestParam(value = "fieldValue", required = false) List<String> fieldValues,
+                @RequestParam(value = "fieldManagerRating", required = false) List<Double> fieldManagerRatings,
                 Principal principal,
                 org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
 
@@ -2566,15 +2609,18 @@ public class MySpaceController {
             req.setSubmittedAt(LocalDate.now());
             performanceFeedbackRequestRepository.save(req);
 
-            // Update dynamic fields
-            if (fieldIds != null && fieldValues != null) {
+            // Update dynamic fields & save manager final ratings per criteria
+            if (fieldIds != null) {
                 for (int i = 0; i < fieldIds.size(); i++) {
-                    if (i < fieldValues.size()) {
-                        com.example.admindashboard.model.FeedbackRequestField f = feedbackRequestFieldRepository.findById(fieldIds.get(i)).orElse(null);
-                        if (f != null && f.getFeedbackRequest().getId().equals(requestId)) {
+                    com.example.admindashboard.model.FeedbackRequestField f = feedbackRequestFieldRepository.findById(fieldIds.get(i)).orElse(null);
+                    if (f != null && f.getFeedbackRequest().getId().equals(requestId)) {
+                        if (fieldValues != null && i < fieldValues.size()) {
                             f.setFieldValue(fieldValues.get(i));
-                            feedbackRequestFieldRepository.save(f);
                         }
+                        if (fieldManagerRatings != null && i < fieldManagerRatings.size()) {
+                            f.setManagerRating(fieldManagerRatings.get(i));
+                        }
+                        feedbackRequestFieldRepository.save(f);
                     }
                 }
             }

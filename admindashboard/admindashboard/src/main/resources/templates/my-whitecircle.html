@@ -209,18 +209,28 @@
 
     <style>
         @media (max-width: 991px) {
-
-            .btn-circular-back-hub { width: 36px !important; height: 36px !important; font-size: 1rem !important; margin-right: 12px !important; }
-            .mockup-badge-container { width: 38px !important; height: 30px !important; margin-right: 10px !important; }
-            .mockup-icon-user { font-size: 1.5rem !important; }
-            .mockup-icon-card { font-size: 1.2rem !important; }
-            .header-separator { margin-right: 15px !important; height: 25px !important; }
-            .header-title-text { font-size: 1.4rem !important; }
-            .main-content-canvas { margin-top: 110px !important; padding: 0 15px !important; }
-            .section-headline-title { font-size: 1.3rem !important; margin-bottom: 25px !important; }
-            .action-box { height: 120px !important; border-radius: 12px !important; }
-            .icon-wrapper-flat { font-size: 1.8rem !important; }
+            .top-header {
+                padding: 10px 15px !important;
+                height: 70px !important;
+            }
+            .btn-circular-back-hub { width: 30px !important; height: 30px !important; font-size: 0.85rem !important; margin-right: 8px !important; }
+            .btn-back-hub {
+                padding: 6px 12px !important;
+                font-size: 12px !important;
+            }
+            .mockup-badge-container { width: 30px !important; height: 26px !important; margin-right: 8px !important; padding-right: 8px !important; }
+            .mockup-icon-user { font-size: 1.2rem !important; }
+            .mockup-icon-card { font-size: 1rem !important; }
+            .header-separator { margin-right: 10px !important; height: 20px !important; }
+            .header-title-text { font-size: 1.1rem !important; }
+            .main-content-canvas { margin-top: 90px !important; padding: 0 15px !important; }
+            .section-headline-title { font-size: 1.2rem !important; margin-bottom: 20px !important; }
+            .action-box { height: 100px !important; border-radius: 12px !important; padding: 10px 5px !important; gap: 6px !important; }
+            .icon-wrapper-flat { font-size: 1.5rem !important; }
             .box-title { font-size: 0.75rem !important; }
+            .custom-grid-row {
+                row-gap: 20px !important;
+            }
         }
     </style>
     <link href="/css/dark-mode.css" rel="stylesheet">
@@ -291,7 +301,7 @@
 		</div>
 
         <div class="col">
-            <div class="action-box" onclick="window.location.href='/coming-soon'">
+            <div class="action-box" onclick="window.location.href='/learning/dashboard'">
                 <div class="icon-wrapper-flat"><i class="fa-solid fa-graduation-cap"></i></div>
                 <div class="box-title">View Learning</div>
             </div>
@@ -305,14 +315,14 @@
         </div>
 
         <div class="col">
-            <div class="action-box" onclick="window.location.href='/coming-soon'">
+            <div class="action-box" onclick="window.location.href='/my-approvals'">
                 <div class="icon-wrapper-flat"><i class="fa-solid fa-list-check"></i></div>
                 <div class="box-title">Pending Workflows</div>
             </div>
         </div>
 
         <div class="col">
-            <div class="action-box" onclick="window.location.href='/coming-soon'">
+            <div class="action-box" onclick="window.location.href='/employee/notifications'">
                 <div class="icon-wrapper-flat"><i class="fa-solid fa-bell"></i></div>
                 <div class="box-title">View Reminder</div>
             </div>

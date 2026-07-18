@@ -426,6 +426,16 @@
             }
 		});
 
+		function formatRole(node) {
+			if (node.designation && node.designation.trim() !== "") {
+				return node.designation;
+			}
+			let r = node.role || "-";
+			return r.split('_')
+					.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+					.join(' ');
+		}
+
 		/* =========================================
 		   LOAD ORGANIZATION TREE
 		========================================= */
@@ -547,7 +557,7 @@
 		            </div>
 
 		            <div class="employee-role">
-		                ${node.designation || node.role || "-"}
+		                ${formatRole(node)}
 		            </div>
 
 		        </div>

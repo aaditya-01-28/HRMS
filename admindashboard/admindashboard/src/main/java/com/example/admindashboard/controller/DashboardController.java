@@ -260,6 +260,13 @@ public class DashboardController {
                 .stream().filter(m -> "PENDING".equals(m.getStatus()) && !m.getOrganizer().getUsername().equals(username)).toList();
                 
         return allPending.stream().filter(meeting -> {
+            String approvedIds = meeting.getApprovedEmployeeIds();
+            if (approvedIds != null && !approvedIds.trim().isEmpty()) {
+                List<String> approvedList = List.of(approvedIds.split(","));
+                if (approvedList.contains(username)) {
+                    return false;
+                }
+            }
             if (meeting.getSpecificEmployeeIds() != null && meeting.getSpecificEmployeeIds().contains(username)) return true;
             EmployeeProfile myProfile = currentUser != null ? currentUser.getEmployeeProfile() : null;
             EmployeeProfile organizerProfile = meeting.getOrganizer() != null ? meeting.getOrganizer().getEmployeeProfile() : null;
@@ -1257,16 +1264,29 @@ public class DashboardController {
                 .toList();
 
         List<Meeting> upcomingMeetings = allUpcomingMeetings.stream().filter(meeting -> {
-            // Only show CONFIRMED meetings in the schedule
-            if (!"CONFIRMED".equals(meeting.getStatus())) return false;
+            boolean isUserInvited = false;
+            if (meeting.getSpecificEmployeeIds() != null && meeting.getSpecificEmployeeIds().contains(currentUsername)) {
+                isUserInvited = true;
+            } else if (meeting.getOrganizer().getUsername().equals(currentUsername)) {
+                isUserInvited = true;
+            } else {
+                EmployeeProfile myProfile = currentUser != null ? currentUser.getEmployeeProfile() : null;
+                EmployeeProfile organizerProfile = meeting.getOrganizer() != null ? meeting.getOrganizer().getEmployeeProfile() : null;
+                if ("TEAM".equals(meeting.getParticipantType()) && myProfile != null && myProfile.getBusinessUnit() != null) {
+                    if (organizerProfile != null && myProfile.getBusinessUnit().equals(organizerProfile.getBusinessUnit())) {
+                        isUserInvited = true;
+                    }
+                }
+            }
 
-            if (meeting.getSpecificEmployeeIds() != null && meeting.getSpecificEmployeeIds().contains(currentUsername)) return true;
+            if (!isUserInvited) return false;
 
-            EmployeeProfile myProfile = currentUser != null ? currentUser.getEmployeeProfile() : null;
-            EmployeeProfile organizerProfile = meeting.getOrganizer() != null ? meeting.getOrganizer().getEmployeeProfile() : null;
+            if ("CONFIRMED".equals(meeting.getStatus())) return true;
 
-            if ("TEAM".equals(meeting.getParticipantType()) && myProfile != null && myProfile.getBusinessUnit() != null) {
-                if (organizerProfile != null && myProfile.getBusinessUnit().equals(organizerProfile.getBusinessUnit())) {
+            String approvedIds = meeting.getApprovedEmployeeIds();
+            if (approvedIds != null && !approvedIds.trim().isEmpty()) {
+                List<String> approvedList = List.of(approvedIds.split(","));
+                if (approvedList.contains(currentUsername)) {
                     return true;
                 }
             }
@@ -2706,7 +2726,17 @@ public class DashboardController {
         List<com.example.admindashboard.model.PerformanceFeedbackRequest> requests = 
             performanceFeedbackRequestRepository.findByEmployee(employee);
         
+        List<com.example.admindashboard.model.PerformanceFeedbackRequest> pendingRequests = requests.stream()
+            .filter(r -> "PENDING".equalsIgnoreCase(r.getStatus()) || "DRAFT".equalsIgnoreCase(r.getStatus()))
+            .toList();
+            
+        List<com.example.admindashboard.model.PerformanceFeedbackRequest> completedRequests = requests.stream()
+            .filter(r -> "COMPLETED".equalsIgnoreCase(r.getStatus()))
+            .toList();
+
         model.addAttribute("requests", requests);
+        model.addAttribute("pendingRequests", pendingRequests);
+        model.addAttribute("completedRequests", completedRequests);
         model.addAttribute("user", employee);
         return "employee-performance-feedback";
     }
@@ -2719,10 +2749,12 @@ public class DashboardController {
             @RequestParam("comments") String comments,
             @RequestParam(value = "fieldId", required = false) List<Long> fieldIds,
             @RequestParam(value = "fieldValue", required = false) List<String> fieldValues,
+            @RequestParam(value = "fieldEmployeeRating", required = false) List<Double> fieldEmployeeRatings,
             @RequestParam(value = "newFieldName", required = false) List<String> newFieldNames,
             @RequestParam(value = "newFieldDesc", required = false) List<String> newFieldDescs,
             @RequestParam(value = "newFieldRating", required = false) List<Double> newFieldRatings,
             @RequestParam(value = "newFieldValue", required = false) List<String> newFieldValues,
+            @RequestParam(value = "action", required = false) String action,
             Principal principal,
             org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
 
@@ -2742,22 +2774,27 @@ public class DashboardController {
             return "redirect:/employee/performance/feedback";
         }
 
+        boolean isDraft = "saveDraft".equalsIgnoreCase(action);
+
         req.setRating(rating);
         req.setComments(comments);
-        req.setStatus("COMPLETED");
+        req.setStatus(isDraft ? "DRAFT" : "COMPLETED");
         req.setSubmittedAt(java.time.LocalDate.now());
         performanceFeedbackRequestRepository.save(req);
 
         // Save Answers to dynamic fields
-        if (fieldIds != null && fieldValues != null) {
+        if (fieldIds != null) {
             for (int i = 0; i < fieldIds.size(); i++) {
-                if (i < fieldValues.size()) {
-                    com.example.admindashboard.model.FeedbackRequestField f = 
-                        feedbackRequestFieldRepository.findById(fieldIds.get(i)).orElse(null);
-                    if (f != null && f.getFeedbackRequest().getId().equals(requestId)) {
+                com.example.admindashboard.model.FeedbackRequestField f = 
+                    feedbackRequestFieldRepository.findById(fieldIds.get(i)).orElse(null);
+                if (f != null && f.getFeedbackRequest().getId().equals(requestId)) {
+                    if (fieldValues != null && i < fieldValues.size()) {
                         f.setFieldValue(fieldValues.get(i));
-                        feedbackRequestFieldRepository.save(f);
                     }
+                    if (fieldEmployeeRatings != null && i < fieldEmployeeRatings.size()) {
+                        f.setEmployeeRating(fieldEmployeeRatings.get(i));
+                    }
+                    feedbackRequestFieldRepository.save(f);
                 }
             }
         }
@@ -2775,13 +2812,19 @@ public class DashboardController {
                     f.setFeedbackRequest(req);
                     f.setFieldName(name);
                     f.setDescription(desc);
-                    f.setFieldValue("Rating: " + r + " / 5.0\nComments: " + val);
+                    f.setEmployeeRating(r);
+                    f.setFieldValue(val);
                     feedbackRequestFieldRepository.save(f);
                 }
             }
         }
 
-        // Save standard compatibility review: EmployeeFeedback
+        if (isDraft) {
+            redirectAttributes.addFlashAttribute("successMessage", "Feedback draft saved successfully!");
+            return "redirect:/employee/performance/feedback";
+        }
+
+        // Save standard compatibility review: EmployeeFeedback (Only for final submission)
         com.example.admindashboard.model.EmployeeFeedback feedback = new com.example.admindashboard.model.EmployeeFeedback();
         feedback.setEmployee(employee);
         feedback.setReviewer(req.getManager());
@@ -2793,7 +2836,7 @@ public class DashboardController {
         feedback.setSubmittedAt(java.time.LocalDate.now());
         employeeFeedbackRepository.save(feedback);
 
-        // Update PerformanceReview status to Completed
+        // Update PerformanceReview status to Completed (Only for final submission)
         PerformanceReview review = performanceReviewRepository.findAll().stream()
             .filter(pr -> pr.getEmployee() != null && pr.getEmployee().getId().equals(employee.getId()))
             .findFirst()

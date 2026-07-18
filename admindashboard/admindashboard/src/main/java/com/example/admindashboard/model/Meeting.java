@@ -36,6 +36,9 @@ public class Meeting {
 
     private String status = "PENDING"; // Can be PENDING or CONFIRMED
 
+    @Column(length = 1000)
+    private String approvedEmployeeIds; // Comma separated IDs of employees who approved
+
     // GETTERS AND SETTERS
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -72,4 +75,7 @@ public class Meeting {
 
     public String getStatus() { return status == null ? "PENDING" : status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getApprovedEmployeeIds() { return approvedEmployeeIds == null ? "" : approvedEmployeeIds; }
+    public void setApprovedEmployeeIds(String approvedEmployeeIds) { this.approvedEmployeeIds = approvedEmployeeIds; }
 }

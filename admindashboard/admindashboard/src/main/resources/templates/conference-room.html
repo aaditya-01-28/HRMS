@@ -761,8 +761,17 @@
             return;
         }
 
-        // ---PAST TIME TODAY CHECK ---
-        const todayStr = new Date().toISOString().split('T')[0];
+        // --- PAST DATE & TIME CHECK ---
+        const todayLocal = new Date();
+        const offset = todayLocal.getTimezoneOffset();
+        const localDate = new Date(todayLocal.getTime() - (offset*60*1000));
+        const todayStr = localDate.toISOString().split('T')[0];
+
+        if (payload.meetingDate < todayStr) {
+            Swal.fire({ icon: 'error', title: 'Invalid Date', text: 'You cannot schedule a meeting in the past. Please select a valid date.', confirmButtonColor: '#1e3a8a' });
+            return;
+        }
+
         if (payload.meetingDate === todayStr) {
             const now = new Date();
             const currentTotalMins = (now.getHours() * 60) + now.getMinutes();
@@ -847,7 +856,10 @@
     });
 
     // NEW: Prevent booking past dates by setting the minimum date to today
-    const today = new Date().toISOString().split('T')[0];
+    const todayLocal = new Date();
+    const offset = todayLocal.getTimezoneOffset();
+    const localDate = new Date(todayLocal.getTime() - (offset*60*1000));
+    const today = localDate.toISOString().split('T')[0];
     const meetingDateInput = document.getElementById('meetingDate');
 
     if (meetingDateInput) {
@@ -967,7 +979,9 @@
 <script th:inline="javascript">
     const allEmployees = [];
     /*[# th:each="u : ${allUsers}"]*/
-    allEmployees.push({ id: /*[[${u.username}]]*/ "", name: /*[[${u.fullName}]]*/ "" });
+    if (/*[[${u.username}]]*/ "" !== /*[[${user.username}]]*/ "") {
+        allEmployees.push({ id: /*[[${u.username}]]*/ "", name: /*[[${u.fullName}]]*/ "" });
+    }
     /*[/]*/
 
     const selectedTags = new Set();

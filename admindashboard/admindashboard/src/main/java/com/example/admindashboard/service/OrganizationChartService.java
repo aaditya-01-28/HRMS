@@ -19,138 +19,44 @@ public class OrganizationChartService {
     }
 
     public OrganizationNode buildOrganizationTree() {
+        User rootUser = userRepository.findFirstByRole_RoleNameAndStatus("SUPER_ADMIN", "ACTIVE")
+                .orElseGet(() -> userRepository.findFirstByRole_RoleNameAndStatus("ADMIN", "ACTIVE").orElse(null));
 
-        User superAdmin =
-                userRepository
-                        .findFirstByRole_RoleNameAndStatus(
-                                "SUPER_ADMIN",
-                                "ACTIVE"
-                        )
-                        .orElse(null);
-
-        if (superAdmin == null) {
-            return null;
+        if (rootUser == null) {
+            List<User> all = userRepository.findAll();
+            if (all.isEmpty()) return null;
+            rootUser = all.get(0);
         }
 
-        OrganizationNode superparentNode =
-                createNode(superAdmin);
-
-        User admin =
-                userRepository
-                        .findFirstByRole_RoleNameAndStatus(
-                                "ADMIN",
-                                "ACTIVE"
-                        )
-                        .orElse(null);
-
-        OrganizationNode parentNode;
-
-        if (admin == null) {
-
-            parentNode = superparentNode;
-
-        } else {
-
-            parentNode = createNode(admin);
-
-            superparentNode
-                    .getChildren()
-                    .add(parentNode);
+        OrganizationNode rootNode = createNode(rootUser);
+        List<User> allUsers = userRepository.findAll();
+        
+        java.util.Map<Long, OrganizationNode> nodeMap = new java.util.HashMap<>();
+        nodeMap.put(rootUser.getId(), rootNode);
+        
+        for (User user : allUsers) {
+            if (user.getId().equals(rootUser.getId())) continue;
+            nodeMap.put(user.getId(), createNode(user));
         }
-
-        addRoleUsers(
-                parentNode,
-                "HR_MANAGER"
-        );
-
-        addRoleUsers(
-                parentNode,
-                "HR_ADMIN"
-        );
-
-        addRoleUsers(
-                parentNode,
-                "HR_EXECUTIVE"
-        );
-
-        addRoleUsers(
-                parentNode,
-                "IT_ADMIN"
-        );
-
-        addRoleUsers(
-                parentNode,
-                "IT_SUPPORT"
-        );
-
-        addRoleUsers(
-                parentNode,
-                "FINANCE"
-        );
-
-        addRoleUsers(
-                parentNode,
-                "RECRUITER"
-        );
-
-        addRoleUsers(
-                parentNode,
-                "PROJECT_MANAGER"
-        );
-
-        addRoleUsers(
-                parentNode,
-                "AUDITOR"
-        );
-
-        addRoleUsers(
-                parentNode,
-                "TRANSPORT"
-        );
-
-        addRoleUsers(
-                parentNode,
-                "LND"
-        );
-
-        addRoleUsers(
-                parentNode,
-                "MANAGER"
-        );
-
-        OrganizationNode hrManagerNode =
-                findRoleNode(
-                        parentNode,
-                        "HR_MANAGER"
-                );
-
-        if (hrManagerNode != null) {
-
-            List<User> employees =
-                    userRepository
-                            .findByRole_RoleName(
-                                    "EMPLOYEE"
-                            );
-
-            employees.forEach(employee -> {
-
-                hrManagerNode
-                        .getChildren()
-                        .add(
-                                createNode(employee)
-                        );
-
-            });
+        
+        for (User user : allUsers) {
+            if (user.getId().equals(rootUser.getId())) continue;
+            OrganizationNode node = nodeMap.get(user.getId());
+            User manager = user.getManager();
+            if (manager != null && nodeMap.containsKey(manager.getId())) {
+                nodeMap.get(manager.getId()).getChildren().add(node);
+            } else {
+                rootNode.getChildren().add(node);
+            }
         }
-
-        return superparentNode;
+        
+        return rootNode;
     }
 
     private void addRoleUsers(
             OrganizationNode parent,
             String roleName
     ) {
-
         List<User> users =
                 userRepository
                         .findByRole_RoleName(
@@ -158,23 +64,19 @@ public class OrganizationChartService {
                         );
 
         users.forEach(user -> {
-
             parent.getChildren()
                     .add(
                             createNode(user)
                     );
-
         });
     }
 
     private OrganizationNode createNode(
             User user
     ) {
-
         String designation = "";
 
         if (user.getEmployeeProfile() != null) {
-
             designation =
                     user.getEmployeeProfile()
                             .getDesignation();
@@ -192,18 +94,15 @@ public class OrganizationChartService {
             OrganizationNode node,
             String roleName
     ) {
-
         for (OrganizationNode child :
                 node.getChildren()) {
 
             if (roleName.equals(
                     child.getRole()
             )) {
-
                 return child;
             }
         }
-
         return null;
     }
     public EmployeeRelationshipResponse getEmployeeRelationship(Long id) {

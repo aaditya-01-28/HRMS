@@ -237,6 +237,11 @@
             .btn-back {
                 position: static !important;
             }
+            #signature-capture-area {
+                min-width: 100% !important;
+                width: 100% !important;
+                padding: 15px !important;
+            }
             .sig-wrapper {
                 flex-direction: column;
                 gap: 20px;
@@ -253,6 +258,18 @@
             }
             .sub-text-2 {
                 margin-bottom: 30px !important;
+            }
+            .emp-name {
+                font-size: 16px !important;
+            }
+            .emp-designation {
+                font-size: 13px !important;
+            }
+            .contact-item {
+                font-size: 11px !important;
+            }
+            .company-name {
+                font-size: 18px !important;
             }
         }
     </style>
@@ -309,12 +326,12 @@
 	                <div class="sig-left">
                         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
                             <div style="color: #1e3a8a; font-weight: 700; font-size: 14px; margin-bottom: 15px;">Thanks &amp; Regards,</div>
-	                        <img src="/images/wcg-logo.jpg" style="width: 75px; height: 75px; object-fit: contain; margin-bottom: 10px;">
+	                        <img src="/images/white-logo.png" style="width: 75px; height: 75px; object-fit: contain; margin-bottom: 10px; border-radius: 12px;">
                             <div style="font-weight: 700; font-size: 16px; color: #000;">WhiteCircle Group</div>
                             <div style="font-size: 11px; color: #555; font-style: italic;">"Innovating the future"</div>
                         </div>
 	                </div>
-
+ 
 	                <div class="sig-right" th:object="${user}">
 	                    <div class="emp-name" th:text="*{fullName}"></div>
 	                    <div class="emp-designation" style="font-size: 16px; color: #000; font-weight: 500; margin-top: 5px;">
@@ -329,7 +346,7 @@
 	                    <div class="contact-item">
 	                        <i class="fas fa-envelope" style="width:16px;"></i>
 	                        <span style="color:#000;">E:</span>
-	                        <a style="color:#1e3a8a; text-decoration:none;" th:text="*{email}" th:href="'mailto:' + *{email}"></a>
+	                        <a style="color:#1e3a8a; text-decoration:none;" th:text="*{email != null && !email.isEmpty() ? email : username + '@whitecirclegroup.com'}" th:href="'mailto:' + *{email != null && !email.isEmpty() ? email : username + '@whitecirclegroup.com'}"></a>
 	                    </div>
                         <div class="contact-item">
 	                        <i class="fas fa-globe" style="width:16px;"></i>
@@ -360,7 +377,7 @@
 	                    <div class="contact-item">
 	                        <i class="fas fa-envelope" style="width:16px;"></i>
 	                        <span style="color:#000;">E:</span>
-	                        <a style="color:#1e3a8a; text-decoration:none;" th:text="*{email}" th:href="'mailto:' + *{email}"></a>
+	                        <a style="color:#1e3a8a; text-decoration:none;" th:text="*{email != null && !email.isEmpty() ? email : username + '@whitecirclegroup.com'}" th:href="'mailto:' + *{email != null && !email.isEmpty() ? email : username + '@whitecirclegroup.com'}"></a>
 	                    </div>
                         <div class="contact-item">
 	                        <i class="fas fa-globe" style="width:16px;"></i>
@@ -408,7 +425,7 @@
 	                    <div class="contact-item">
 	                        <i class="fas fa-envelope" style="width:16px;"></i>
 	                        <span style="color:#000;">E:</span>
-	                        <a style="color:#1e3a8a; text-decoration:none;" th:text="*{email}" th:href="'mailto:' + *{email}"></a>
+	                        <a style="color:#1e3a8a; text-decoration:none;" th:text="*{email != null && !email.isEmpty() ? email : username + '@whitecirclegroup.com'}" th:href="'mailto:' + *{email != null && !email.isEmpty() ? email : username + '@whitecirclegroup.com'}"></a>
 	                    </div>
                         <div class="contact-item">
 	                        <i class="fas fa-globe" style="width:16px;"></i>

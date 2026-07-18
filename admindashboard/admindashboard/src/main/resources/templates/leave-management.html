@@ -1351,6 +1351,17 @@
 
         if (!confirmResult.isConfirmed) return;
 
+        function parseLocalDate(dateVal) {
+            if (!dateVal) return null;
+            if (Array.isArray(dateVal)) {
+                return new Date(dateVal[0], dateVal[1] - 1, dateVal[2]);
+            }
+            if (typeof dateVal === 'string') {
+                return new Date(dateVal);
+            }
+            return new Date(dateVal);
+        }
+
         const payload = {
             leaveType, leaveMode: 'Offline', fromDate, toDate,
             totalDays: requestedDays,
@@ -1376,7 +1387,7 @@
         }
     }
 
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 11. FETCH ABSENCE REQUESTS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // —————————————————————— 11. FETCH ABSENCE REQUESTS —————————————————————— 
     async function fetchAbsenceRequests() {
         const container = document.getElementById('absenceRequestsContainer');
         try {
@@ -1399,8 +1410,11 @@
                 else if (status === 'AUTO_APPROVED' || status === 'AUTO APPROVED') { statusClass = 'status-auto-approved'; statusText = 'Auto Approved'; iconBg = '#ecfdf5'; iconColor = '#059669'; }
                 else if (status === 'REJECTED') { statusClass = 'status-rejected'; statusText = 'Rejected'; iconBg = '#fef2f2'; iconColor = '#ef4444'; }
 
-                const fromDate = leave.fromDate ? new Date(leave.fromDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '\u2014';
-                const toDate = leave.toDate ? new Date(leave.toDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '\u2014';
+                const fromDateObj = parseLocalDate(leave.fromDate);
+                const toDateObj = parseLocalDate(leave.toDate);
+
+                const fromDate = (fromDateObj && !isNaN(fromDateObj)) ? fromDateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '\u2014';
+                const toDate = (toDateObj && !isNaN(toDateObj)) ? toDateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '\u2014';
 
                 let typeIcon = 'fa-calendar-minus';
                 const lt = (leave.leaveType || '').toLowerCase();
@@ -1439,6 +1453,17 @@
     }
 
     // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 12. LEAVE DETAILS (SweetAlert) â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    function parseLocalDate(dateVal) {
+        if (!dateVal) return null;
+        if (Array.isArray(dateVal)) {
+            return new Date(dateVal[0], dateVal[1] - 1, dateVal[2]);
+        }
+        if (typeof dateVal === 'string') {
+            return new Date(dateVal);
+        }
+        return new Date(dateVal);
+    }
+
     function showLeaveDetails(index) {
         if (!absenceData || !absenceData[index]) return;
         const leave = absenceData[index];
@@ -1448,8 +1473,11 @@
         if (status === 'APPROVED' || status === 'AUTO_APPROVED') { statusColor = '#15803d'; statusBg = '#f0fdf4'; statusText = status.replace(/_/g, ' '); }
         else if (status === 'REJECTED') { statusColor = '#b91c1c'; statusBg = '#fef2f2'; statusText = 'Rejected'; }
 
-        const fmtFrom = leave.fromDate ? new Date(leave.fromDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '\u2014';
-        const fmtTo = leave.toDate ? new Date(leave.toDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '\u2014';
+        const fromDateObj = parseLocalDate(leave.fromDate);
+        const toDateObj = parseLocalDate(leave.toDate);
+
+        const fmtFrom = (fromDateObj && !isNaN(fromDateObj)) ? fromDateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '\u2014';
+        const fmtTo = (toDateObj && !isNaN(toDateObj)) ? toDateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '\u2014';
 
         let detailsHTML = '<div style="text-align:left; font-family:Inter,sans-serif;">' +
             '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">' +
@@ -1483,9 +1511,11 @@
 
     // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• DOM CONTENT LOADED â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     document.addEventListener('DOMContentLoaded', () => {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('fromDate').min = today;
-        document.getElementById('toDate').min = today;
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+        document.getElementById('fromDate').min = tomorrowStr;
+        document.getElementById('toDate').min = tomorrowStr;
 
         fetchUpcomingHolidays();
         fetchLeaveWallet();

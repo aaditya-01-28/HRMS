@@ -657,70 +657,215 @@
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h6 class="mb-0 fw-bold fs-5 text-dark">Initiated Feedback Requests</h6>
             </div>
-            
-            <div class="table-responsive" th:if="${!#lists.isEmpty(feedbackRequests)}">
-                <table class="table align-middle table-hover">
-                    <thead>
-                        <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
-                            <th>Employee</th>
-                            <th>Role Level</th>
-                            <th>Status</th>
-                            <th>Date Initiated</th>
-                            <th>Rating</th>
-                            <th>Comments</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="req : ${feedbackRequests}">
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px; font-size:0.85rem;" th:text="${#strings.substring(req.employee.fullName, 0, 1)}">E</div>
-                                    <div>
-                                        <div class="fw-bold text-dark" th:text="${req.employee.fullName}">Name</div>
-                                        <small class="text-muted" th:text="${req.employee.username}">username</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td th:text="${req.roleLevel}">L1</td>
-                            <td>
-                                <span th:if="${req.status == 'PENDING'}" class="badge bg-warning text-dark">Pending</span>
-                                <span th:if="${req.status == 'COMPLETED'}" class="badge bg-success text-white">Completed</span>
-                            </td>
-                            <td th:text="${req.createdAt}">Date</td>
-                            <td>
-                                <div th:if="${req.status == 'COMPLETED'}">
-                                    <div class="small"><span class="fw-bold text-secondary">Self:</span> <span class="text-warning"><i class="fas fa-star fa-xs"></i></span> <span th:text="${req.rating}">3.0</span></div>
-                                    <div class="small"><span class="fw-bold text-primary">Mgr:</span> <span class="text-warning"><i class="fas fa-star fa-xs" th:if="${req.managerRating != null}"></i></span> <span th:text="${req.managerRating != null ? req.managerRating : '-'}">4.0</span></div>
-                                </div>
-                                <span th:if="${req.status == 'PENDING'}">-</span>
-                            </td>
-                            <td class="text-muted small">
-                                <div th:if="${req.status == 'COMPLETED'}">
-                                    <div class="text-truncate" style="max-width: 200px;" th:title="${req.comments}"><span class="fw-bold text-secondary">Self:</span> <span th:text="${req.comments}">Comments</span></div>
-                                    <div class="text-truncate" style="max-width: 200px;" th:title="${req.managerComments}"><span class="fw-bold text-primary">Mgr:</span> <span th:text="${req.managerComments != null ? req.managerComments : '-'}">Comments</span></div>
-                                </div>
-                                <span th:if="${req.status == 'PENDING'}">-</span>
-                            </td>
-                            <td class="text-end text-nowrap">
-                                <button th:if="${req.status == 'COMPLETED'}" class="btn btn-sm btn-outline-primary" 
-                                        th:attr="data-id=${req.id}, data-name=${req.employee.fullName}, data-rating=${req.rating}, data-comments=${req.comments}, data-manager-rating=${req.managerRating != null ? req.managerRating : ''}, data-manager-comments=${req.managerComments != null ? req.managerComments : ''}, data-fields=${#strings.listJoin(req.additionalFields.![id + '::' + fieldName + '::' + description + '::' + fieldValue], '||')}"
-                                        onclick="openEditFeedbackModal(this)">
-                                    <i class="fa-solid fa-pen fa-sm"></i> Edit
-                                </button>
-                                <span th:if="${req.status == 'PENDING'}">-</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
 
-            <!-- Empty State -->
-            <div th:if="${#lists.isEmpty(feedbackRequests)}" class="text-center py-5">
-                <i class="fa-solid fa-clipboard-question text-muted mb-3" style="font-size: 3rem;"></i>
-                <h5 class="text-dark fw-bold">No Feedback Requests</h5>
-                <p class="text-muted">You haven't initiated any performance feedback requests yet.</p>
+            <!-- Feedback Tabs -->
+            <ul class="nav nav-tabs mb-4" id="l3FeedbackTabs" role="tablist" style="border-radius:0;">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active fw-bold text-primary" id="l3-pending-review-tab" data-bs-toggle="tab" data-bs-target="#l3-pending-review" type="button" role="tab" style="border-radius:0;">
+                        <i class="fa-solid fa-clock me-2"></i>Pending Review
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold text-success" id="l3-completed-tab" data-bs-toggle="tab" data-bs-target="#l3-completed" type="button" role="tab" style="border-radius:0;">
+                        <i class="fa-solid fa-check-double me-2"></i>Completed Reviews
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold text-secondary" id="l3-pending-emp-tab" data-bs-toggle="tab" data-bs-target="#l3-pending-emp" type="button" role="tab" style="border-radius:0;">
+                        <i class="fa-solid fa-user-clock me-2"></i>Waiting for Employee
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="l3FeedbackTabsContent">
+                
+                <!-- PENDING REVIEW TAB -->
+                <div class="tab-pane fade show active" id="l3-pending-review" role="tabpanel">
+                    <div class="table-responsive" th:if="${!#lists.isEmpty(pendingReviewRequests)}">
+                        <table class="table align-middle table-hover">
+                            <thead>
+                                <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                                    <th>Serial</th>
+                                    <th>Employee</th>
+                                    <th>Role Level</th>
+                                    <th>Date Initiated</th>
+                                    <th>Self-Rating</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="req : ${pendingReviewRequests}">
+                                    <td class="fw-bold" th:text="${req.serialNumber != null ? req.serialNumber : 'FB-' + (1000 + req.id)}">FB-1001</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px; font-size:0.85rem;" th:text="${#strings.substring(req.employee.fullName, 0, 1)}">E</div>
+                                            <div>
+                                                <div class="fw-bold text-dark" th:text="${req.employee.fullName}">Name</div>
+                                                <small class="text-muted" th:text="${req.employee.username}">username</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td th:text="${req.roleLevel}">L1</td>
+                                    <td th:text="${#temporals.format(req.createdAt, 'dd MMM yyyy')}">Date</td>
+                                    <td>
+                                        <span class="text-warning"><i class="fas fa-star fa-xs"></i></span> <span th:text="${req.rating}">3.0</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-primary fw-bold" 
+                                                th:data-id="${req.id}"
+                                                th:data-serial="${req.serialNumber != null ? req.serialNumber : 'FB-' + (1000 + req.id)}"
+                                                th:data-name="${req.employee.fullName}"
+                                                th:data-rating="${req.rating}"
+                                                th:data-comments="${req.comments}"
+                                                th:data-manager-rating="${req.managerRating != null ? req.managerRating : ''}"
+                                                th:data-manager-comments="${req.managerComments != null ? req.managerComments : ''}"
+                                                th:data-fields="${req.fieldsString}"
+                                                onclick="openEditFeedbackModal(this)" style="border-radius:0;">
+                                            <i class="fa-solid fa-star me-1"></i> Review & Rate
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div th:if="${#lists.isEmpty(pendingReviewRequests)}" class="text-center py-5 bg-light border">
+                        <i class="fa-solid fa-circle-info text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h5 class="text-dark fw-bold">No Feedbacks Pending Review</h5>
+                        <p class="text-muted mb-0">You have no employee-submitted feedbacks waiting for manager final rating.</p>
+                    </div>
+                </div>
+
+                <!-- COMPLETED REVIEWS TAB -->
+                <div class="tab-pane fade" id="l3-completed" role="tabpanel">
+                    <div class="table-responsive" th:if="${!#lists.isEmpty(completedReviewRequests)}">
+                        <table class="table align-middle table-hover">
+                            <thead>
+                                <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                                    <th>Serial</th>
+                                    <th>Employee</th>
+                                    <th>Role Level</th>
+                                    <th>Self-Rating</th>
+                                    <th>Manager Rating</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="req : ${completedReviewRequests}">
+                                    <td class="fw-bold" th:text="${req.serialNumber != null ? req.serialNumber : 'FB-' + (1000 + req.id)}">FB-1001</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="avatar bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px; font-size:0.85rem;" th:text="${#strings.substring(req.employee.fullName, 0, 1)}">E</div>
+                                            <div>
+                                                <div class="fw-bold text-dark" th:text="${req.employee.fullName}">Name</div>
+                                                <small class="text-muted" th:text="${req.employee.username}">username</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td th:text="${req.roleLevel}">L1</td>
+                                    <td>
+                                        <span class="text-warning"><i class="fas fa-star fa-xs"></i></span> <span th:text="${req.rating}">3.0</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-warning"><i class="fas fa-star fa-xs"></i></span> <span class="fw-bold text-success" th:text="${req.managerRating}">4.0</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary fw-bold me-2" 
+                                                th:data-id="${req.id}"
+                                                th:data-serial="${req.serialNumber != null ? req.serialNumber : 'FB-' + (1000 + req.id)}"
+                                                th:data-name="${req.employee.fullName}"
+                                                th:data-rating="${req.rating}"
+                                                th:data-comments="${req.comments}"
+                                                th:data-manager-rating="${req.managerRating}"
+                                                th:data-manager-comments="${req.managerComments}"
+                                                th:data-fields="${req.fieldsString}"
+                                                onclick="openEditFeedbackModal(this)" style="border-radius:0;">
+                                            <i class="fa-solid fa-pen-to-square me-1"></i> Edit Review
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary fw-bold" 
+                                                th:data-id="${req.id}"
+                                                th:data-serial="${req.serialNumber != null ? req.serialNumber : 'FB-' + (1000 + req.id)}"
+                                                th:data-name="${req.employee.fullName}"
+                                                th:data-rating="${req.rating}"
+                                                th:data-comments="${req.comments}"
+                                                th:data-mrating="${req.managerRating}"
+                                                th:data-mcomments="${req.managerComments}"
+                                                th:data-fields="${req.fieldsString}"
+                                                onclick="previewL3Feedback(this)" style="border-radius:0;">
+                                            <i class="fa-solid fa-eye me-1"></i> Preview
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div th:if="${#lists.isEmpty(completedReviewRequests)}" class="text-center py-5 bg-light border">
+                        <i class="fa-solid fa-circle-check text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h5 class="text-dark fw-bold">No Completed Reviews</h5>
+                        <p class="text-muted mb-0">You have not finalized any reviews yet.</p>
+                    </div>
+                </div>
+
+                <!-- WAITING FOR EMPLOYEE TAB -->
+                <div class="tab-pane fade" id="l3-pending-emp" role="tabpanel">
+                    <div class="table-responsive" th:if="${!#lists.isEmpty(pendingEmpRequests)}">
+                        <table class="table align-middle table-hover">
+                            <thead>
+                                <tr class="text-muted fw-bold" style="font-size:0.8rem; text-transform:uppercase;">
+                                    <th>Serial</th>
+                                    <th>Employee</th>
+                                    <th>Role Level</th>
+                                    <th>Status</th>
+                                    <th>Date Initiated</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="req : ${pendingEmpRequests}">
+                                    <td class="fw-bold" th:text="${req.serialNumber != null ? req.serialNumber : 'FB-' + (1000 + req.id)}">FB-1001</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px; font-size:0.85rem;" th:text="${#strings.substring(req.employee.fullName, 0, 1)}">E</div>
+                                            <div>
+                                                <div class="fw-bold text-dark" th:text="${req.employee.fullName}">Name</div>
+                                                <small class="text-muted" th:text="${req.employee.username}">username</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td th:text="${req.roleLevel}">L1</td>
+                                    <td>
+                                        <span th:if="${req.status == 'PENDING'}" class="badge bg-warning text-dark">Pending</span>
+                                        <span th:if="${req.status == 'DRAFT'}" class="badge bg-secondary text-white">Draft</span>
+                                    </td>
+                                    <td th:text="${#temporals.format(req.createdAt, 'dd MMM yyyy')}">Date</td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-secondary fw-bold" 
+                                                th:data-id="${req.id}"
+                                                th:data-serial="${req.serialNumber != null ? req.serialNumber : 'FB-' + (1000 + req.id)}"
+                                                th:data-name="${req.employee.fullName}"
+                                                th:data-rating="${req.rating}"
+                                                th:data-comments="${req.comments}"
+                                                th:data-mrating="${req.managerRating}"
+                                                th:data-mcomments="${req.managerComments}"
+                                                th:data-fields="${req.fieldsString}"
+                                                onclick="previewL3Feedback(this)" style="border-radius:0;">
+                                            <i class="fa-solid fa-eye me-1"></i> Preview Request
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div th:if="${#lists.isEmpty(pendingEmpRequests)}" class="text-center py-5 bg-light border">
+                        <i class="fa-solid fa-user-check text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h5 class="text-dark fw-bold">All Employees Responded</h5>
+                        <p class="text-muted mb-0">No feedback requests are currently waiting for employee responses.</p>
+                    </div>
+                </div>
+
             </div>
+        </div>
+    </div>
         </div>
     </div>
 </div>
@@ -1223,6 +1368,65 @@
     </div>
 </div>
 
+<!-- L3 Preview Modal -->
+<div class="modal fade" id="l3PreviewFeedbackModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius:12px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold text-dark mb-0" id="l3PreviewTitle">Feedback Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="mb-3">
+                    <label class="text-muted small uppercase fw-bold">Employee</label>
+                    <p class="fw-bold text-dark" id="l3PreviewEmployee"></p>
+                </div>
+
+                <!-- Self Review Section -->
+                <div class="card p-3 mb-4 bg-light border-0 shadow-sm" style="border-radius: 8px;">
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-user me-2"></i>Employee Self-Review Info</h6>
+                    <div class="mb-3">
+                        <label class="text-muted small uppercase fw-bold">Overall Self-Rating</label>
+                        <div class="d-flex align-items-center mt-1">
+                            <div id="l3PreviewSelfStars" class="text-warning me-2" style="font-size: 1.25rem;"></div>
+                            <span class="fw-bold text-dark" id="l3PreviewSelfRatingVal"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small uppercase fw-bold">Overall Self-Comments</label>
+                        <div class="bg-white p-2 border text-dark" style="white-space: pre-wrap; font-size: 0.9rem;" id="l3PreviewSelfComments"></div>
+                    </div>
+                </div>
+
+                <!-- Criteria/Fields Section -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-list-check me-2"></i>Criteria-Wise Ratings & Responses</h6>
+                    <div id="l3PreviewFieldsContainer" class="border p-3 bg-white"></div>
+                </div>
+
+                <!-- Manager Review Section -->
+                <div class="card p-3 mb-2 bg-light border-0 shadow-sm" id="l3PreviewManagerCard" style="display: none; border-radius: 8px;">
+                    <h6 class="fw-bold text-success mb-3"><i class="fa-solid fa-user-tie me-2"></i>Manager Review & Final Rating</h6>
+                    <div class="mb-3">
+                        <label class="text-muted small uppercase fw-bold">Final Manager Rating</label>
+                        <div class="d-flex align-items-center mt-1">
+                            <div id="l3PreviewManagerStars" class="text-warning me-2" style="font-size: 1.25rem;"></div>
+                            <span class="fw-bold text-dark" id="l3PreviewManagerRatingVal"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small uppercase fw-bold">Manager Comments</label>
+                        <div class="bg-white p-2 border text-dark" style="white-space: pre-wrap; font-size: 0.9rem;" id="l3PreviewManagerComments"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     function openInitiateFeedbackModal() {
         var modal = new bootstrap.Modal(document.getElementById('initiateFeedbackModal'));
@@ -1355,7 +1559,7 @@
         const comments = btn.getAttribute('data-comments');
         const mRating = btn.getAttribute('data-manager-rating');
         const mComments = btn.getAttribute('data-manager-comments');
-        const fieldsStr = btn.getAttribute('data-fields'); // format: id::name::desc::val||id::name::desc::val
+        const fieldsStr = btn.getAttribute('data-fields'); // format: id::name::desc::val::empRating::mgrRating
 
         document.getElementById('editRequestId').value = id;
         document.getElementById('editEmployeeName').value = name;
@@ -1395,14 +1599,42 @@
                     const fName = parts[1];
                     const fDesc = parts[2];
                     const fVal = parts[3] || '';
+                    const empRating = parseFloat(parts[4]) || 0;
+                    const mgrRating = parseFloat(parts[5]) || 0;
 
                     const row = document.createElement('div');
-                    row.className = 'mb-3';
+                    row.className = 'mb-3 border p-3 bg-light';
+                    row.style.borderRadius = '0';
                     row.innerHTML = `
-                        <label class="form-label fw-bold text-dark">${fName}</label>
-                        <p class="text-muted small mb-2">${fDesc}</p>
-                        <input type="hidden" name="fieldId" value="${fId}" />
-                        <textarea name="fieldValue" class="form-control" rows="3" required>${fVal}</textarea>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label fw-bold text-dark mb-0">${fName}</label>
+                            <span class="badge bg-white text-primary border fw-bold">Employee Self-Rating: ${empRating > 0 ? empRating.toFixed(1) + ' ★' : 'Not Rated'}</span>
+                        </div>
+                        ${fDesc ? `<p class="text-muted small mb-2">${fDesc}</p>` : ''}
+                        
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold text-muted mb-1">Employee Self-Comments</label>
+                            <div class="bg-white p-2 border small" style="white-space: pre-wrap; min-height: 38px;">${fVal || 'No comment provided.'}</div>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-dark mb-1">Final Manager Rating <span class="text-danger">*</span></label>
+                                <select name="fieldManagerRating" class="form-select form-select-sm" required style="border-radius: 0;">
+                                    <option value="">Select final rating...</option>
+                                    <option value="5.0" ${mgrRating === 5.0 ? 'selected' : ''}>5.0 (Excellent)</option>
+                                    <option value="4.0" ${mgrRating === 4.0 ? 'selected' : ''}>4.0 (Very Good)</option>
+                                    <option value="3.0" ${mgrRating === 3.0 ? 'selected' : ''}>3.0 (Good)</option>
+                                    <option value="2.0" ${mgrRating === 2.0 ? 'selected' : ''}>2.0 (Fair)</option>
+                                    <option value="1.0" ${mgrRating === 1.0 ? 'selected' : ''}>1.0 (Basic)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label small fw-bold text-dark mb-1">Response Comments</label>
+                                <input type="hidden" name="fieldId" value="${fId}" />
+                                <textarea name="fieldValue" class="form-control form-control-sm" rows="1" style="border-radius: 0;">${fVal}</textarea>
+                            </div>
+                        </div>
                     `;
                     container.appendChild(row);
                 }
@@ -1410,6 +1642,92 @@
         }
 
         var modal = new bootstrap.Modal(document.getElementById('editFeedbackModal'));
+        modal.show();
+    }
+
+    function previewL3Feedback(btn) {
+        const id = btn.getAttribute('data-id');
+        const serial = btn.getAttribute('data-serial');
+        const name = btn.getAttribute('data-name');
+        const rating = btn.getAttribute('data-rating');
+        const comments = btn.getAttribute('data-comments');
+        const mRating = btn.getAttribute('data-mrating');
+        const mComments = btn.getAttribute('data-mcomments');
+        const fieldsStr = btn.getAttribute('data-fields');
+
+        document.getElementById('l3PreviewTitle').innerText = 'Feedback Details - ' + serial;
+        document.getElementById('l3PreviewEmployee').innerText = name;
+        
+        // Self Review Section
+        const selfRatingVal = parseFloat(rating) || 0;
+        document.getElementById('l3PreviewSelfRatingVal').innerText = selfRatingVal > 0 ? selfRatingVal.toFixed(1) + ' / 5.0' : 'Not Rated Yet';
+        
+        let selfStarsHtml = '';
+        if (selfRatingVal > 0) {
+            for (let i = 1; i <= 5; i++) {
+                selfStarsHtml += i <= Math.round(selfRatingVal) ? '<i class="fas fa-star me-1"></i>' : '<i class="far fa-star me-1"></i>';
+            }
+        } else {
+            selfStarsHtml = '—';
+        }
+        document.getElementById('l3PreviewSelfStars').innerHTML = selfStarsHtml;
+        document.getElementById('l3PreviewSelfComments').innerText = comments || 'No comments provided.';
+
+        // Criteria/Fields
+        const container = document.getElementById('l3PreviewFieldsContainer');
+        container.innerHTML = '';
+
+        if (fieldsStr && fieldsStr.trim().length > 0) {
+            const fields = fieldsStr.split('||');
+            fields.forEach(field => {
+                const parts = field.split('::');
+                if (parts.length >= 2) {
+                    const fName = parts[1];
+                    const fDesc = parts[2] || '';
+                    const fVal = parts[3] || '';
+                    const empRating = parseFloat(parts[4]) || 0;
+                    const mgrRating = parseFloat(parts[5]) || 0;
+
+                    const row = document.createElement('div');
+                    row.className = 'border-bottom py-2';
+                    row.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong class="text-dark">${fName}</strong>
+                                ${fDesc ? `<p class="text-muted small mb-1">${fDesc}</p>` : ''}
+                                <p class="mb-1 text-secondary" style="font-size: 0.9rem;"><strong>Employee Response:</strong> ${fVal || '—'}</p>
+                            </div>
+                            <div class="text-end" style="min-width: 180px;">
+                                <div class="small"><span class="text-muted">Self Rating:</span> <strong class="text-primary">${empRating > 0 ? empRating.toFixed(1) + ' ★' : '—'}</strong></div>
+                                <div class="small"><span class="text-muted">Final Manager Rating:</span> <strong class="text-success">${mgrRating > 0 ? mgrRating.toFixed(1) + ' ★' : '—'}</strong></div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(row);
+                }
+            });
+        } else {
+            container.innerHTML = '<p class="text-muted italic small mb-0">No specific criteria fields defined.</p>';
+        }
+
+        // Manager Review Section
+        const managerCard = document.getElementById('l3PreviewManagerCard');
+        if (mRating) {
+            managerCard.style.display = 'block';
+            const managerRatingVal = parseFloat(mRating) || 0;
+            document.getElementById('l3PreviewManagerRatingVal').innerText = managerRatingVal.toFixed(1) + ' / 5.0';
+            
+            let mStarsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                mStarsHtml += i <= Math.round(managerRatingVal) ? '<i class="fas fa-star me-1"></i>' : '<i class="far fa-star me-1"></i>';
+            }
+            document.getElementById('l3PreviewManagerStars').innerHTML = mStarsHtml;
+            document.getElementById('l3PreviewManagerComments').innerText = mComments || 'No comments provided.';
+        } else {
+            managerCard.style.display = 'none';
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('l3PreviewFeedbackModal'));
         modal.show();
     }
 </script>

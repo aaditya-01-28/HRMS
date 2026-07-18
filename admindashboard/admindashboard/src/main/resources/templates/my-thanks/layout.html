@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="page(content, activeMenu, pageTitle)">
 <head>
     <meta charset="UTF-8">
@@ -276,19 +276,27 @@
             }
 
             .top-bar {
-                flex-wrap: wrap;
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                justify-content: space-between !important;
+                align-items: center !important;
                 gap: 10px;
                 margin-bottom: 20px;
             }
             .top-bar-right {
-                gap: 10px;
+                gap: 6px !important;
             }
             .top-bar-right .action-btn {
-                padding: 6px 10px;
-                font-size: 0.85rem;
+                padding: 4px 8px !important;
+                font-size: 0.75rem !important;
             }
             .page-title {
-                font-size: 1.2rem;
+                font-size: 1rem !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 130px;
             }
 
             .content-area {
@@ -306,7 +314,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo-container">
-            <img src="/images/wcg-logo.jpg" alt="White Circle">
+            <img src="/images/white-logo.png" alt="White Circle">
         </div>
         
         <div class="nav-item">

@@ -31,6 +31,10 @@ public class GoalUpdateController {
             @RequestParam(required = false) MultipartFile evidence,
             HttpSession session) {
 
+        if (progressPercentage < 0 || progressPercentage > 100) {
+            return "redirect:/employee/my-goals?error=invalid_progress";
+        }
+
         User user =
                 (User) session.getAttribute("loggedInUser");
 

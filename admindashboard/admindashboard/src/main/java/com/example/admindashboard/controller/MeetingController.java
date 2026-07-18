@@ -2,6 +2,7 @@ package com.example.admindashboard.controller;
 
 import com.example.admindashboard.model.Meeting;
 import com.example.admindashboard.model.User;
+import com.example.admindashboard.model.EmployeeProfile;
 import com.example.admindashboard.repository.MeetingRepository;
 import com.example.admindashboard.repository.UserRepository;
 import com.example.admindashboard.service.EmailService; // Added Email Service
@@ -136,10 +137,28 @@ public class MeetingController {
                             }
                         });
                     }
+                } else if ("TEAM".equalsIgnoreCase(savedMeeting.getParticipantType())) {
+                    EmployeeProfile organizerProfile = organizer.getEmployeeProfile();
+                    if (organizerProfile != null && organizerProfile.getBusinessUnit() != null) {
+                        String bu = organizerProfile.getBusinessUnit();
+                        List<User> allUsers = userRepository.findAll();
+                        for (User invitee : allUsers) {
+                            if (invitee.getUsername().equalsIgnoreCase(organizer.getUsername())) {
+                                continue;
+                            }
+                            if (invitee.getEmployeeProfile() != null && bu.equalsIgnoreCase(invitee.getEmployeeProfile().getBusinessUnit())) {
+                                if (invitee.getEmail() != null && !invitee.getEmail().isEmpty()) {
+                                    emailService.sendMeetingInvite(
+                                            invitee.getEmail(),
+                                            invitee.getFullName(),
+                                            savedMeeting.getMeetingTitle(),
+                                            emailData
+                                    );
+                                }
+                            }
+                        }
+                    }
                 }
-
-                // Note: If you want to automatically email everyone in a BU when ParticipantType is "TEAM",
-                // you can easily add an 'else if' block here later to fetch all users by BU and loop through them!
 
             } catch (Exception e) {
                 System.err.println("⚠️ Warning: Could not send meeting invites: " + e.getMessage());
@@ -159,8 +178,41 @@ public class MeetingController {
             Meeting meeting = meetingRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Meeting not found"));
             
-            // Assume any authenticated user can approve it for now (if they see it on their dashboard, they are invited)
-            meeting.setStatus("CONFIRMED");
+            String username = principal.getName();
+            String approved = meeting.getApprovedEmployeeIds();
+            if (approved == null || approved.trim().isEmpty()) {
+                meeting.setApprovedEmployeeIds(username);
+            } else {
+                List<String> list = new ArrayList<>(List.of(approved.split(",")));
+                if (!list.contains(username)) {
+                    list.add(username);
+                    meeting.setApprovedEmployeeIds(String.join(",", list));
+                }
+            }
+
+            // Check if all specific employees have approved
+            if ("SPECIFIC_EMP".equalsIgnoreCase(meeting.getParticipantType()) || "SPECIFIC_ADM".equalsIgnoreCase(meeting.getParticipantType())) {
+                String invited = meeting.getSpecificEmployeeIds();
+                if (invited != null && !invited.trim().isEmpty()) {
+                    String[] invitedArr = invited.split(",");
+                    boolean allApproved = true;
+                    String approvedStr = meeting.getApprovedEmployeeIds();
+                    List<String> approvedList = approvedStr == null ? new ArrayList<>() : List.of(approvedStr.split(","));
+                    for (String inv : invitedArr) {
+                        if (!approvedList.contains(inv.trim())) {
+                            allApproved = false;
+                            break;
+                        }
+                    }
+                    if (allApproved) {
+                        meeting.setStatus("CONFIRMED");
+                    }
+                }
+            } else {
+                // For other types, any approval tracks it in approvedEmployeeIds.
+                // It remains PENDING, but is confirmed for that individual user side in queries.
+            }
+            
             meetingRepository.save(meeting);
             
             return ResponseEntity.ok("Meeting confirmed!");

@@ -213,8 +213,8 @@
                 font-size: 12px !important;
             }
             .page-content {
-                margin-top: 90px !important;
-                padding: 12px 10px !important;
+                margin-top: 70px !important;
+                padding: 10px !important;
             }
             .custom-tabs {
                 overflow-x: auto;
@@ -636,8 +636,8 @@
             const searchVal = document.getElementById('leaveSearch').value.toLowerCase();
             
             let visibleCount = 0;
-            document.querySelectorAll('#leaveTable tbody tr').forEach(row => {
-                const type = row.getAttribute('data-type').toLowerCase();
+            document.querySelectorAll('#leaveTable > tbody > tr').forEach(row => {
+                const type = row.getAttribute('data-type') ? row.getAttribute('data-type').toLowerCase() : '';
                 const status = row.getAttribute('data-status');
                 const text = row.innerText.toLowerCase();
                 
@@ -662,7 +662,7 @@
             const searchVal = document.getElementById('timesheetSearch').value.toLowerCase();
             
             let visibleCount = 0;
-            document.querySelectorAll('#timesheetTable tbody tr').forEach(row => {
+            document.querySelectorAll('#timesheetTable > tbody > tr').forEach(row => {
                 const status = row.getAttribute('data-status');
                 const text = row.innerText.toLowerCase();
                 
@@ -686,7 +686,7 @@
             const searchVal = document.getElementById('attendanceSearch').value.toLowerCase();
             
             let visibleCount = 0;
-            document.querySelectorAll('#attendanceTable tbody tr').forEach(row => {
+            document.querySelectorAll('#attendanceTable > tbody > tr').forEach(row => {
                 const status = row.getAttribute('data-status');
                 const text = row.innerText.toLowerCase();
                 
