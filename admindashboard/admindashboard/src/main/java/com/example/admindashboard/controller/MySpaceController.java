@@ -1454,7 +1454,7 @@ public class MySpaceController {
                     .toList();
                     
                 List<com.example.admindashboard.model.PerformanceFeedbackRequest> completedReview = allFeedbackRequests.stream()
-                    .filter(r -> "COMPLETED".equalsIgnoreCase(r.getStatus()) && r.getManagerRating() != null)
+                    .filter(r -> "FORWARDED_TO_HR".equalsIgnoreCase(r.getStatus()) || ("COMPLETED".equalsIgnoreCase(r.getStatus()) && r.getManagerRating() != null))
                     .toList();
                     
                 List<com.example.admindashboard.model.PerformanceFeedbackRequest> pendingEmpResponse = allFeedbackRequests.stream()
@@ -2586,7 +2586,7 @@ public class MySpaceController {
         public String editPerformanceFeedback(
                 @RequestParam("requestId") Long requestId,
                 @RequestParam("rating") Double rating,
-                @RequestParam("comments") String comments,
+                @RequestParam(value = "comments", required = false) String comments,
                 @RequestParam(value = "fieldId", required = false) List<Long> fieldIds,
                 @RequestParam(value = "fieldValue", required = false) List<String> fieldValues,
                 @RequestParam(value = "fieldManagerRating", required = false) List<Double> fieldManagerRatings,
@@ -2605,7 +2605,8 @@ public class MySpaceController {
             }
 
             req.setManagerRating(rating);
-            req.setManagerComments(comments);
+            req.setManagerComments(comments != null ? comments : "");
+            req.setStatus("FORWARDED_TO_HR");
             req.setSubmittedAt(LocalDate.now());
             performanceFeedbackRequestRepository.save(req);
 
@@ -4089,8 +4090,69 @@ public class MySpaceController {
                     user.getEmail());
         }
 
-        return "learning-admin-dashboard";
+        return "learning/learning-admin-dashboard";
     }
+
+    @GetMapping("/space/lnd/reports")
+    public String lndReports(Model model, Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (user != null) {
+            model.addAttribute("loggedInUserName", user.getFullName());
+            model.addAttribute("loggedInEmail", user.getEmail());
+        }
+        return "learning/learning-reports";
+    }
+
+    @GetMapping("/space/lnd/roi")
+    public String lndRoi(Model model, Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (user != null) {
+            model.addAttribute("loggedInUserName", user.getFullName());
+            model.addAttribute("loggedInEmail", user.getEmail());
+        }
+        return "learning/learning-roi";
+    }
+
+    @GetMapping("/space/lnd/courses")
+    public String lndCourses(Model model, Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (user != null) {
+            model.addAttribute("loggedInUserName", user.getFullName());
+            model.addAttribute("loggedInEmail", user.getEmail());
+        }
+        return "learning/learning-courses";
+    }
+
+    @GetMapping("/space/lnd/integrations")
+    public String lndIntegrations(Model model, Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (user != null) {
+            model.addAttribute("loggedInUserName", user.getFullName());
+            model.addAttribute("loggedInEmail", user.getEmail());
+        }
+        return "learning/learning-integrations";
+    }
+
+    @GetMapping("/space/lnd/vendors")
+    public String lndVendors(Model model, Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (user != null) {
+            model.addAttribute("loggedInUserName", user.getFullName());
+            model.addAttribute("loggedInEmail", user.getEmail());
+        }
+        return "learning/learning-vendors";
+    }
+
+    @GetMapping("/space/lnd/budgets")
+    public String lndBudgets(Model model, Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (user != null) {
+            model.addAttribute("loggedInUserName", user.getFullName());
+            model.addAttribute("loggedInEmail", user.getEmail());
+        }
+        return "learning/learning-budgets";
+    }
+
     @GetMapping("/space/lnd/approvals")
     public String learningApprovals(Model model,
                                     Principal principal) {
@@ -4120,7 +4182,7 @@ public class MySpaceController {
                         .getApprovalRequests()
                         .size());
 
-        return "learning-approvals";
+        return "learning/learning-approvals";
     }
     
     @GetMapping("/space/lnd/course-addition")
@@ -4359,6 +4421,106 @@ public class MySpaceController {
         trainingRepository.save(training);
 
         return "redirect:/space/lnd/upcoming-training";
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    @PreAuthorize("hasRole('SENIOR_MANAGER')")
+    @PostMapping("/senior_manager/project/create")
+    public String createProject(
+            @RequestParam String projectName,
+            @RequestParam String startDate,
+            @RequestParam String endDate,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Long projectManagerId,
+            @RequestParam(required = false) String status,
+            @RequestParam(value = "userIds", required = false) List<Long> userIds,
+            @RequestParam(value = "roles", required = false) List<String> roles,
+            @RequestParam(value = "billables", required = false) List<Boolean> billables,
+            @RequestParam(value = "taskName", required = false) List<String> taskNames,
+            @RequestParam(value = "taskDesc", required = false) List<String> taskDescs,
+            @RequestParam(value = "taskAssigneeId", required = false) List<Long> taskAssigneeIds,
+            @RequestParam(value = "taskDueDate", required = false) List<String> taskDueDates,
+            @RequestParam(value = "taskPriority", required = false) List<String> taskPriorities,
+            Principal principal,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+
+        try {
+            Project p = new Project();
+            p.setProjectName(projectName);
+            p.setStartDate(LocalDate.parse(startDate));
+            p.setEndDate(LocalDate.parse(endDate));
+            p.setDescription(description != null ? description : "");
+            p.setStage(status != null ? status : "Active");
+
+            if (projectManagerId != null) {
+                User pm = userRepository.findById(projectManagerId).orElse(null);
+                p.setProjectManager(pm);
+            }
+
+            // A project must have a client. Let's find any client in the database, or assign a default user as client.
+            User client = userRepository.findAll().stream()
+                .filter(u -> u.getRole() != null && "CLIENT".equalsIgnoreCase(u.getRole().getRoleName()))
+                .findFirst()
+                .orElse(null);
+            if (client == null) {
+                client = userRepository.findAll().stream().findFirst().orElse(null);
+            }
+            p.setClient(client);
+
+            projectRepository.save(p);
+
+            // Save Project Members
+            if (userIds != null) {
+                for (int i = 0; i < userIds.size(); i++) {
+                    Long uId = userIds.get(i);
+                    String role = roles != null && i < roles.size() ? roles.get(i) : "Developer";
+                    Boolean billable = billables != null && i < billables.size() ? billables.get(i) : true;
+
+                    User u = userRepository.findById(uId).orElse(null);
+                    if (u != null) {
+                        ProjectMember pm = new ProjectMember();
+                        pm.setProject(p);
+                        pm.setUser(u);
+                        pm.setRole(role);
+                        pm.setBillable(billable);
+                        projectMemberRepository.save(pm);
+                    }
+                }
+            }
+
+            // Save Tasks (Tickets)
+            if (taskNames != null) {
+                for (int i = 0; i < taskNames.size(); i++) {
+                    String tName = taskNames.get(i);
+                    if (tName == null || tName.trim().isEmpty()) continue;
+
+                    String tDesc = taskDescs != null && i < taskDescs.size() ? taskDescs.get(i) : "";
+                    Long assigneeId = taskAssigneeIds != null && i < taskAssigneeIds.size() ? taskAssigneeIds.get(i) : null;
+                    String dueDateStr = taskDueDates != null && i < taskDueDates.size() ? taskDueDates.get(i) : "";
+                    String tPriority = taskPriorities != null && i < taskPriorities.size() ? taskPriorities.get(i) : "Medium";
+
+                    Ticket t = new Ticket();
+                    t.setProject(p);
+                    t.setTitle(tName);
+                    t.setDescription(tDesc);
+                    t.setPriority(tPriority);
+                    t.setStatus("Open");
+                    if (assigneeId != null) {
+                        User assignee = userRepository.findById(assigneeId).orElse(null);
+                        t.setAssignedTo(assignee);
+                    }
+                    if (dueDateStr != null && !dueDateStr.trim().isEmpty()) {
+                        t.setDeadline(LocalDate.parse(dueDateStr));
+                    }
+                    ticketRepository.save(t);
+                }
+            }
+
+            redirectAttributes.addFlashAttribute("successMessage", "Project created successfully with members and tasks.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error creating project: " + e.getMessage());
+        }
+        return "redirect:/senior_manager/project_work?tab=project";
     }
 
     @org.springframework.transaction.annotation.Transactional

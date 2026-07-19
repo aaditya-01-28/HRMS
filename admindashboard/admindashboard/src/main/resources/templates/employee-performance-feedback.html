@@ -184,8 +184,8 @@
                     </div>
 
                     <!-- Custom/Dynamic Fields -->
-                    <div th:each="field : ${req.additionalFields}" class="mb-3 border-top pt-3">
-                        <label class="form-label fw-bold text-dark" th:text="${field.fieldName}">Question</label>
+                    <div th:each="field, iter : ${req.additionalFields}" class="mb-3 border-top pt-3">
+                        <label class="form-label fw-bold text-dark" th:text="${iter.count + '. ' + field.fieldName}">Question</label>
                         <p class="text-muted small mb-2" th:text="${field.description}">Description</p>
                         <input type="hidden" name="fieldId" th:value="${field.id}" />
                         <div class="row g-2 mb-2">
@@ -218,15 +218,9 @@
                                 <i class="fas fa-plus me-1"></i> Add Custom Field
                             </button>
                         </div>
-                        <div th:id="'custom-fields-container-' + ${req.id}">
+                        <div th:id="'custom-fields-container-' + ${req.id}" th:data-predefined-count="${req.additionalFields.size()}">
                             <!-- Dynamic fields will be appended here -->
                         </div>
-                    </div>
-
-                    <!-- Comments -->
-                    <div class="mb-4 border-top pt-3">
-                        <label class="form-label fw-bold text-dark">Detailed Feedback & Comments <span class="text-danger">*</span></label>
-                        <textarea name="comments" class="form-control" rows="4" placeholder="Provide overall feedback regarding your performance, accomplishments and areas of improvement..." required th:text="${req.comments}"></textarea>
                     </div>
 
                     <div class="d-flex justify-content-between">
@@ -369,10 +363,6 @@
                             <span class="fw-bold text-dark" id="previewSelfRatingVal"></span>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="text-muted small uppercase fw-bold">Overall Self-Comments</label>
-                        <div class="bg-white p-2 border text-dark" style="white-space: pre-wrap; font-size: 0.9rem;" id="previewSelfComments"></div>
-                    </div>
                 </div>
 
                 <!-- Criteria/Fields Section -->
@@ -390,10 +380,6 @@
                             <div id="previewManagerStars" class="text-warning me-2" style="font-size: 1.25rem;"></div>
                             <span class="fw-bold text-dark" id="previewManagerRatingVal"></span>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="text-muted small uppercase fw-bold">Manager Comments</label>
-                        <div class="bg-white p-2 border text-dark" style="white-space: pre-wrap; font-size: 0.9rem;" id="previewManagerComments"></div>
                     </div>
                 </div>
             </div>
@@ -455,13 +441,17 @@
         const container = document.getElementById('custom-fields-container-' + reqId);
         if (!container) return;
 
+        const numPredefined = parseInt(container.getAttribute('data-predefined-count')) || 0;
+        const numCustom = container.querySelectorAll('.custom-field-card').length;
+        const serialNo = numPredefined + numCustom + 1;
+
         const fieldDiv = document.createElement('div');
         fieldDiv.className = 'custom-field-card bg-light p-3 border mb-3 position-relative';
         fieldDiv.style.borderRadius = '0';
 
         fieldDiv.innerHTML = `
             <div class="mb-2">
-                <label class="form-label fw-bold small text-dark mb-1">Title / Criteria Name <span class="text-danger">*</span></label>
+                <label class="form-label fw-bold small text-dark mb-1">Title / Criteria Name (${serialNo}) <span class="text-danger">*</span></label>
                 <input type="text" name="newFieldName" class="form-control form-control-sm" placeholder="e.g. Technical Leadership" required style="border-radius: 0;">
             </div>
             <div class="mb-2">
@@ -486,12 +476,29 @@
                 </div>
             </div>
             <div class="text-end">
-                <button type="button" class="btn btn-sm btn-outline-danger py-1 px-3 fw-bold" onclick="this.closest('.custom-field-card').remove()" style="border-radius: 0; font-size: 0.75rem;">
+                <button type="button" class="btn btn-sm btn-outline-danger py-1 px-3 fw-bold" onclick="removeCustomField(this, '${reqId}')" style="border-radius: 0; font-size: 0.75rem;">
                     <i class="fas fa-trash me-1"></i> Remove Field
                 </button>
             </div>
         `;
         container.appendChild(fieldDiv);
+    }
+
+    function removeCustomField(btn, reqId) {
+        const card = btn.closest('.custom-field-card');
+        const container = document.getElementById('custom-fields-container-' + reqId);
+        card.remove();
+
+        // Re-index remaining custom fields
+        const numPredefined = parseInt(container.getAttribute('data-predefined-count')) || 0;
+        const customCards = container.querySelectorAll('.custom-field-card');
+        customCards.forEach((card, index) => {
+            const label = card.querySelector('label');
+            if (label) {
+                const serialNo = numPredefined + index + 1;
+                label.innerHTML = `Title / Criteria Name (${serialNo}) <span class="text-danger">*</span>`;
+            }
+        });
     }
 
     function previewFeedback(btn) {
@@ -501,9 +508,7 @@
         const roleLevel = btn.getAttribute('data-role');
         const status = btn.getAttribute('data-status');
         const rating = btn.getAttribute('data-rating');
-        const comments = btn.getAttribute('data-comments');
         const mRating = btn.getAttribute('data-mrating');
-        const mComments = btn.getAttribute('data-mcomments');
         const fieldsStr = btn.getAttribute('data-fields');
 
         document.getElementById('previewTitle').innerText = 'Feedback Details - ' + serial;
@@ -512,7 +517,7 @@
         
         const statusBadge = document.getElementById('previewStatus');
         statusBadge.innerText = status;
-        statusBadge.className = 'badge ' + (status === 'COMPLETED' ? 'bg-success text-white' : (status === 'DRAFT' ? 'bg-secondary text-white' : 'bg-warning text-dark'));
+        statusBadge.className = 'badge ' + (status === 'COMPLETED' || status === 'FORWARDED_TO_HR' ? 'bg-success text-white' : (status === 'DRAFT' ? 'bg-secondary text-white' : 'bg-warning text-dark'));
 
         // Overall Self Rating
         const selfRatingVal = parseFloat(rating) || 0;
@@ -527,7 +532,6 @@
             selfStarsHtml = '—';
         }
         document.getElementById('previewSelfStars').innerHTML = selfStarsHtml;
-        document.getElementById('previewSelfComments').innerText = comments || 'No comments provided.';
 
         // Criteria/Fields
         const container = document.getElementById('previewFieldsContainer');
@@ -535,6 +539,7 @@
 
         if (fieldsStr && fieldsStr.trim().length > 0) {
             const fields = fieldsStr.split('||');
+            let counter = 1;
             fields.forEach(field => {
                 const parts = field.split('::');
                 if (parts.length >= 2) {
@@ -549,7 +554,7 @@
                     row.innerHTML = `
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <strong class="text-dark">${fName}</strong>
+                                <strong class="text-dark">${counter}. ${fName}</strong>
                                 ${fDesc ? `<p class="text-muted small mb-1">${fDesc}</p>` : ''}
                                 <p class="mb-1 text-secondary" style="font-size: 0.9rem;"><strong>Response:</strong> ${fVal || '—'}</p>
                             </div>
@@ -560,6 +565,7 @@
                         </div>
                     `;
                     container.appendChild(row);
+                    counter++;
                 }
             });
         } else {
@@ -568,7 +574,7 @@
 
         // Manager Card
         const managerCard = document.getElementById('previewManagerCard');
-        if (status === 'COMPLETED' && mRating) {
+        if ((status === 'COMPLETED' || status === 'FORWARDED_TO_HR') && mRating) {
             managerCard.style.display = 'block';
             const managerRatingVal = parseFloat(mRating) || 0;
             document.getElementById('previewManagerRatingVal').innerText = managerRatingVal.toFixed(1) + ' / 5.0';
@@ -578,7 +584,6 @@
                 mStarsHtml += i <= Math.round(managerRatingVal) ? '<i class="fas fa-star me-1"></i>' : '<i class="far fa-star me-1"></i>';
             }
             document.getElementById('previewManagerStars').innerHTML = mStarsHtml;
-            document.getElementById('previewManagerComments').innerText = mComments || 'No comments provided.';
         } else {
             managerCard.style.display = 'none';
         }

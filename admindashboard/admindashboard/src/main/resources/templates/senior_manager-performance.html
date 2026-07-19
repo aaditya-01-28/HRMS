@@ -1325,6 +1325,15 @@
                         </div>
                     </div>
 
+                    <!-- Recommended Rating Layout -->
+                    <div class="mb-3 border-top pt-3 bg-light p-3 border">
+                        <div class="d-flex justify-content-between align-items-center fw-bold">
+                            <span class="text-dark"><i class="fa-solid fa-calculator me-1"></i> Recommended Overall Rating (Average):</span>
+                            <span id="recommendedRatingVal" class="text-primary font-monospace" style="font-size: 1.1rem;">—</span>
+                        </div>
+                        <div class="text-muted small mt-1">This is dynamically calculated as the average of criteria ratings. You can still manually override the stars below.</div>
+                    </div>
+
                     <div class="mb-4 border-top pt-3">
                         <label class="form-label fw-bold text-dark">Manager Overall Rating (1-5)</label>
                         <div class="d-flex flex-column">
@@ -1353,15 +1362,10 @@
                     <!-- Dynamic Additional Fields populated by JS -->
                     <div class="mb-3 border-top pt-3" id="editDynamicFieldsContainer">
                     </div>
-
-                    <div class="mb-3 border-top pt-3">
-                        <label class="form-label fw-bold text-dark">Manager Comments & Feedback</label>
-                        <textarea name="comments" id="editComments" class="form-control" rows="4" placeholder="Provide overall feedback regarding employee performance, guidance and actions..." required></textarea>
-                    </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                    <button type="submit" class="btn btn-primary px-4">Forward to HR</button>
                 </div>
             </form>
         </div>
@@ -1392,10 +1396,6 @@
                             <span class="fw-bold text-dark" id="l3PreviewSelfRatingVal"></span>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="text-muted small uppercase fw-bold">Overall Self-Comments</label>
-                        <div class="bg-white p-2 border text-dark" style="white-space: pre-wrap; font-size: 0.9rem;" id="l3PreviewSelfComments"></div>
-                    </div>
                 </div>
 
                 <!-- Criteria/Fields Section -->
@@ -1413,10 +1413,6 @@
                             <div id="l3PreviewManagerStars" class="text-warning me-2" style="font-size: 1.25rem;"></div>
                             <span class="fw-bold text-dark" id="l3PreviewManagerRatingVal"></span>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="text-muted small uppercase fw-bold">Manager Comments</label>
-                        <div class="bg-white p-2 border text-dark" style="white-space: pre-wrap; font-size: 0.9rem;" id="l3PreviewManagerComments"></div>
                     </div>
                 </div>
             </div>
@@ -1550,6 +1546,28 @@
             descBox.innerHTML = `<strong>${editRatingCriteria[rating]}</strong>`;
             descBox.className = "rating-desc-box text-success";
         }
+    }    function calculateRecommendedRating() {
+        const selects = document.querySelectorAll('#editDynamicFieldsContainer select[name="fieldManagerRating"]');
+        let sum = 0;
+        let count = 0;
+        selects.forEach(select => {
+            const val = parseFloat(select.value);
+            if (!isNaN(val) && val > 0) {
+                sum += val;
+                count++;
+            }
+        });
+        const avg = count > 0 ? (sum / count) : 0;
+        const recommendedValEl = document.getElementById('recommendedRatingVal');
+        if (recommendedValEl) {
+            if (avg > 0) {
+                recommendedValEl.innerText = avg.toFixed(2) + ' / 5.0';
+                const roundedAvg = Math.round(avg);
+                setEditStars(roundedAvg);
+            } else {
+                recommendedValEl.innerText = '—';
+            }
+        }
     }
 
     function openEditFeedbackModal(btn) {
@@ -1558,7 +1576,6 @@
         const rating = btn.getAttribute('data-rating');
         const comments = btn.getAttribute('data-comments');
         const mRating = btn.getAttribute('data-manager-rating');
-        const mComments = btn.getAttribute('data-manager-comments');
         const fieldsStr = btn.getAttribute('data-fields'); // format: id::name::desc::val::empRating::mgrRating
 
         document.getElementById('editRequestId').value = id;
@@ -1566,20 +1583,21 @@
         
         // Populate employee self-review read-only info
         const selfRatingVal = parseFloat(rating) || 0;
-        document.getElementById('selfRatingVal').innerText = selfRatingVal.toFixed(1) + ' / 5.0';
+        document.getElementById('selfRatingVal').innerText = selfRatingVal > 0 ? selfRatingVal.toFixed(1) + ' / 5.0' : 'Not Rated Yet';
         let starsHtml = '';
-        for (let i = 1; i <= 5; i++) {
-            if (i <= Math.round(selfRatingVal)) {
-                starsHtml += '<i class="fas fa-star me-1"></i>';
-            } else {
-                starsHtml += '<i class="far fa-star me-1"></i>';
+        if (selfRatingVal > 0) {
+            for (let i = 1; i <= 5; i++) {
+                if (i <= Math.round(selfRatingVal)) {
+                    starsHtml += '<i class="fas fa-star me-1"></i>';
+                } else {
+                    starsHtml += '<i class="far fa-star me-1"></i>';
+                }
             }
+        } else {
+            starsHtml = '—';
         }
         document.getElementById('selfRatingStars').innerHTML = starsHtml;
         document.getElementById('selfCommentsText').innerText = comments || 'No comments provided.';
-
-        // Populate manager comments input
-        document.getElementById('editComments').value = mComments || '';
 
         // Set interactive manager star rating
         const numMRating = parseFloat(mRating) || 0;
@@ -1592,6 +1610,7 @@
 
         if (fieldsStr && fieldsStr.trim().length > 0) {
             const fields = fieldsStr.split('||');
+            let counter = 1;
             fields.forEach(field => {
                 const parts = field.split('::');
                 if (parts.length >= 3) {
@@ -1607,7 +1626,7 @@
                     row.style.borderRadius = '0';
                     row.innerHTML = `
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label class="form-label fw-bold text-dark mb-0">${fName}</label>
+                            <label class="form-label fw-bold text-dark mb-0">${counter}. ${fName}</label>
                             <span class="badge bg-white text-primary border fw-bold">Employee Self-Rating: ${empRating > 0 ? empRating.toFixed(1) + ' ★' : 'Not Rated'}</span>
                         </div>
                         ${fDesc ? `<p class="text-muted small mb-2">${fDesc}</p>` : ''}
@@ -1637,11 +1656,19 @@
                         </div>
                     `;
                     container.appendChild(row);
+                    
+                    // Attach change listener to trigger recommended rating calculation
+                    row.querySelector('select[name="fieldManagerRating"]').addEventListener('change', calculateRecommendedRating);
+                    
+                    counter++;
                 }
             });
         }
 
-        var modal = new bootstrap.Modal(document.getElementById('editFeedbackModal'));
+        // Calculate initial recommended rating average
+        calculateRecommendedRating();
+
+        const modal = new bootstrap.Modal(document.getElementById('editFeedbackModal'));
         modal.show();
     }
 
@@ -1650,9 +1677,7 @@
         const serial = btn.getAttribute('data-serial');
         const name = btn.getAttribute('data-name');
         const rating = btn.getAttribute('data-rating');
-        const comments = btn.getAttribute('data-comments');
         const mRating = btn.getAttribute('data-mrating');
-        const mComments = btn.getAttribute('data-mcomments');
         const fieldsStr = btn.getAttribute('data-fields');
 
         document.getElementById('l3PreviewTitle').innerText = 'Feedback Details - ' + serial;
@@ -1671,7 +1696,6 @@
             selfStarsHtml = '—';
         }
         document.getElementById('l3PreviewSelfStars').innerHTML = selfStarsHtml;
-        document.getElementById('l3PreviewSelfComments').innerText = comments || 'No comments provided.';
 
         // Criteria/Fields
         const container = document.getElementById('l3PreviewFieldsContainer');
@@ -1679,6 +1703,7 @@
 
         if (fieldsStr && fieldsStr.trim().length > 0) {
             const fields = fieldsStr.split('||');
+            let counter = 1;
             fields.forEach(field => {
                 const parts = field.split('::');
                 if (parts.length >= 2) {
@@ -1693,7 +1718,7 @@
                     row.innerHTML = `
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <strong class="text-dark">${fName}</strong>
+                                <strong class="text-dark">${counter}. ${fName}</strong>
                                 ${fDesc ? `<p class="text-muted small mb-1">${fDesc}</p>` : ''}
                                 <p class="mb-1 text-secondary" style="font-size: 0.9rem;"><strong>Employee Response:</strong> ${fVal || '—'}</p>
                             </div>
@@ -1704,6 +1729,7 @@
                         </div>
                     `;
                     container.appendChild(row);
+                    counter++;
                 }
             });
         } else {
@@ -1722,7 +1748,6 @@
                 mStarsHtml += i <= Math.round(managerRatingVal) ? '<i class="fas fa-star me-1"></i>' : '<i class="far fa-star me-1"></i>';
             }
             document.getElementById('l3PreviewManagerStars').innerHTML = mStarsHtml;
-            document.getElementById('l3PreviewManagerComments').innerText = mComments || 'No comments provided.';
         } else {
             managerCard.style.display = 'none';
         }

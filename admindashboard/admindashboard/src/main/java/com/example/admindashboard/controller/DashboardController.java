@@ -2731,7 +2731,7 @@ public class DashboardController {
             .toList();
             
         List<com.example.admindashboard.model.PerformanceFeedbackRequest> completedRequests = requests.stream()
-            .filter(r -> "COMPLETED".equalsIgnoreCase(r.getStatus()))
+            .filter(r -> "COMPLETED".equalsIgnoreCase(r.getStatus()) || "FORWARDED_TO_HR".equalsIgnoreCase(r.getStatus()))
             .toList();
 
         model.addAttribute("requests", requests);
@@ -2746,7 +2746,7 @@ public class DashboardController {
     public String submitEmployeePerformanceFeedback(
             @RequestParam("requestId") Long requestId,
             @RequestParam("rating") Double rating,
-            @RequestParam("comments") String comments,
+            @RequestParam(value = "comments", required = false) String comments,
             @RequestParam(value = "fieldId", required = false) List<Long> fieldIds,
             @RequestParam(value = "fieldValue", required = false) List<String> fieldValues,
             @RequestParam(value = "fieldEmployeeRating", required = false) List<Double> fieldEmployeeRatings,
@@ -2777,7 +2777,7 @@ public class DashboardController {
         boolean isDraft = "saveDraft".equalsIgnoreCase(action);
 
         req.setRating(rating);
-        req.setComments(comments);
+        req.setComments(comments != null ? comments : "");
         req.setStatus(isDraft ? "DRAFT" : "COMPLETED");
         req.setSubmittedAt(java.time.LocalDate.now());
         performanceFeedbackRequestRepository.save(req);

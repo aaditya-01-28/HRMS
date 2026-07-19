@@ -175,7 +175,7 @@
         /* Filter Controls */
         .filters-row {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1.2fr;
+            grid-template-columns: 2fr 1fr 1fr 1.2fr auto;
             gap: 12px;
             margin-bottom: 20px;
         }
@@ -296,6 +296,14 @@
 </nav>
 
 <div class="myspace-main">
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-3" role="alert" style="border-radius: 8px; background-color: #dcfce7; color: #15803d; font-weight: 600;">
+        <i class="fa-solid fa-circle-check me-2"></i><span th:text="${successMessage}">Success!</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-3" role="alert" style="border-radius: 8px; background-color: #fee2e2; color: #b91c1c; font-weight: 600;">
+        <i class="fa-solid fa-circle-exclamation me-2"></i><span th:text="${errorMessage}">Error!</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     <div class="tabs-strip">
         <a th:classappend="${activeTab == 'project'} ? ' active' : ''" class="tab-link" href="/senior_manager/project_work?tab=project">Project</a>
         <a th:classappend="${activeTab == 'teamwork'} ? ' active' : ''" class="tab-link" href="/senior_manager/project_work?tab=teamwork">My TeamWork</a>
@@ -338,6 +346,9 @@
                     <option value="Completed">Completed</option>
                 </select>
                 <input type="text" placeholder="DD-MM-YYYY" style="background:#fff;"/>
+                <button type="button" class="btn btn-primary fw-bold px-3 d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addProjectModal" style="border-radius: 8px; height: 40px; white-space: nowrap;">
+                    <i class="fa-solid fa-plus"></i> Add Project
+                </button>
             </div>
 
             <div class="table-responsive">
@@ -801,11 +812,347 @@
     </div>
 </div>
 
+<!-- Add Project Modal -->
+<div class="modal fade" id="addProjectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <form action="/senior_manager/project/create" method="POST" class="modal-content border-0 shadow-lg" style="border-radius: 12px;">
+            <div class="modal-header text-white" style="background: #002D72; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                <div>
+                    <h5 class="modal-title fw-bold mb-0"><i class="fa-solid fa-folder-plus me-2"></i>Add Project</h5>
+                    <small class="text-white-50">Create a new project and assign team members, tasks and workload.</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body p-4 bg-light">
+                <!-- 1. Project Details -->
+                <div class="card p-3 mb-4 border-0 shadow-sm" style="border-radius: 8px;">
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-circle-info me-2"></i>1. Project Details</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-dark mb-1">Project Name <span class="text-danger">*</span></label>
+                            <input type="text" name="projectName" class="form-control form-control-sm" placeholder="Enter project name" required style="border-radius: 6px;"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-dark mb-1">Project Code <span class="text-muted">(Optional)</span></label>
+                            <input type="text" name="projectCode" class="form-control form-control-sm" placeholder="Enter project code" style="border-radius: 6px;"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-dark mb-1">Department <span class="text-danger">*</span></label>
+                            <select name="department" class="form-select form-select-sm" required style="border-radius: 6px;">
+                                <option value="">Select department</option>
+                                <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-dark mb-1">Project Manager <span class="text-danger">*</span></label>
+                            <select name="projectManagerId" class="form-select form-select-sm" required style="border-radius: 6px;">
+                                <option value="">Select project manager</option>
+                                <option th:each="emp : ${activeEmployees}" th:value="${emp.id}" th:text="${emp.fullName}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-dark mb-1">Start Date <span class="text-danger">*</span></label>
+                            <input type="date" name="startDate" class="form-control form-control-sm" required style="border-radius: 6px;"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-dark mb-1">End Date <span class="text-danger">*</span></label>
+                            <input type="date" name="endDate" class="form-control form-control-sm" required style="border-radius: 6px;"/>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-dark mb-1">Description <span class="text-muted">(Optional)</span></label>
+                            <textarea name="description" class="form-control form-control-sm" rows="3" placeholder="Enter project description" maxlength="300" style="border-radius: 6px;"></textarea>
+                            <div class="text-end text-muted small mt-1">0/300</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-dark mb-1">Priority <span class="text-danger">*</span></label>
+                            <select name="priority" class="form-select form-select-sm" required style="border-radius: 6px;">
+                                <option value="High">High</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-dark mb-1">Status <span class="text-danger">*</span></label>
+                            <select name="status" class="form-select form-select-sm" required style="border-radius: 6px;">
+                                <option value="Active" selected>Active</option>
+                                <option value="Development">Development</option>
+                                <option value="Planning">Planning</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Assign Employees to Project -->
+                <div class="card p-3 mb-4 border-0 shadow-sm" style="border-radius: 8px;">
+                    <h6 class="fw-bold text-primary mb-1"><i class="fa-solid fa-users me-2"></i>2. Assign Employees to Project</h6>
+                    <p class="text-muted small mb-3">Add team members and allocate their workload.</p>
+                    
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-9">
+                            <select id="projectMemberSelect" class="form-select form-select-sm" style="border-radius: 6px;">
+                                <option value="">-- Search & Select Employee --</option>
+                                <option th:each="emp : ${activeEmployees}" 
+                                        th:value="${emp.id}" 
+                                        th:text="${emp.fullName}"
+                                        th:data-dept="${emp.employeeProfile != null ? emp.employeeProfile.department : 'IT Department'}"
+                                        th:data-designation="${emp.designation != null ? emp.designation : 'Developer'}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-sm btn-outline-primary w-100 fw-bold" onclick="addEmployeeRowToModal()" style="border-radius: 6px; height: 31px;">
+                                <i class="fa-solid fa-plus me-1"></i> Add Employee
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle table-borderless" id="modal-members-table">
+                            <thead class="table-light text-secondary small">
+                                <tr>
+                                    <th style="width: 35%;">Employee</th>
+                                    <th style="width: 20%;">Role</th>
+                                    <th style="width: 20%;">Department</th>
+                                    <th style="width: 12%;">Allocation (%)</th>
+                                    <th style="width: 8%;">Billable</th>
+                                    <th style="width: 5%;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalEmployeesTableBody">
+                                <!-- Appended dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2 border-top pt-2">
+                        <span class="fw-bold text-dark" style="font-size:0.9rem;">Total Allocation: <span id="modalTotalAllocationText" class="text-primary font-monospace">0%</span></span>
+                    </div>
+                </div>
+
+                <!-- 3. Tasks / Workload (Optional) -->
+                <div class="card p-3 border-0 shadow-sm" style="border-radius: 8px;">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <h6 class="fw-bold text-primary mb-0"><i class="fa-solid fa-list-check me-2"></i>3. Tasks / Workload <span class="text-muted font-normal">(Optional)</span></h6>
+                        <button type="button" class="btn btn-sm btn-outline-primary fw-bold" onclick="addTaskRowToModal()" style="border-radius: 6px;">
+                            <i class="fa-solid fa-plus me-1"></i> Add Task
+                        </button>
+                    </div>
+                    <p class="text-muted small mb-3">Define key tasks or workload for this project.</p>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle table-borderless" id="modal-tasks-table">
+                            <thead class="table-light text-secondary small">
+                                <tr>
+                                    <th style="width: 5%;"></th>
+                                    <th style="width: 25%;">Task Name</th>
+                                    <th style="width: 30%;">Description</th>
+                                    <th style="width: 20%;">Assigned To</th>
+                                    <th style="width: 10%;">Due Date</th>
+                                    <th style="width: 8%;">Priority</th>
+                                    <th style="width: 2%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalTasksTableBody">
+                                <!-- Appended dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 bg-white">
+                <button type="button" class="btn btn-outline-secondary fw-bold px-4" data-bs-dismiss="modal" style="border-radius: 6px;">Cancel</button>
+                <button type="submit" class="btn btn-primary fw-bold px-4" style="border-radius: 6px; background-color: #002D72;">Create Project</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Hidden template for active employees -->
 <select id="activeEmployeesTemplate" class="d-none">
     <option value="">-- Select Member --</option>
-    <option th:each="emp : ${activeEmployees}" th:value="${emp.id}" th:text="${emp.fullName}"></option>
+    <option th:each="emp : ${activeEmployees}" 
+            th:value="${emp.id}" 
+            th:text="${emp.fullName}"
+            th:data-dept="${emp.employeeProfile != null ? emp.employeeProfile.department : 'IT Department'}"
+            th:data-designation="${emp.designation != null ? emp.designation : 'Developer'}"></option>
 </select>
+
+<script>
+    function addEmployeeRowToModal() {
+        const select = document.getElementById('projectMemberSelect');
+        if (!select || !select.value) {
+            alert('Please select an employee first.');
+            return;
+        }
+
+        const userId = select.value;
+        const selectedOpt = select.options[select.selectedIndex];
+        const fullName = selectedOpt.text;
+        const dept = selectedOpt.getAttribute('data-dept') || 'IT Department';
+        const designation = selectedOpt.getAttribute('data-designation') || 'Developer';
+
+        // Check if already added
+        const existingRow = document.querySelector(`#modalEmployeesTableBody input[value="${userId}"]`);
+        if (existingRow) {
+            alert('Employee is already assigned to this project.');
+            return;
+        }
+
+        const tbody = document.getElementById('modalEmployeesTableBody');
+        const row = document.createElement('tr');
+        row.className = 'align-middle';
+
+        // Build avatar initials
+        const nameParts = fullName.split(' ');
+        const initials = nameParts.map(p => p[0]).join('').substring(0, 2).toUpperCase();
+
+        row.innerHTML = `
+            <td>
+                <div class="d-flex align-items-center gap-2">
+                    <input type="hidden" name="userIds" value="${userId}"/>
+                    <div class="avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 0.75rem;">${initials}</div>
+                    <div>
+                        <div class="fw-bold text-dark text-start">${fullName}</div>
+                        <small class="text-muted text-start d-block" style="font-size:0.75rem;">${designation}</small>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <select name="roles" class="form-select form-select-sm" required style="border-radius: 6px;">
+                    <option value="Developer">Developer</option>
+                    <option value="Lead Developer">Lead Developer</option>
+                    <option value="QA Tester">QA Tester</option>
+                    <option value="Project Manager">Project Manager</option>
+                    <option value="Designer">Designer</option>
+                </select>
+            </td>
+            <td>
+                <select name="memberDepartments" class="form-select form-select-sm" style="border-radius: 6px;" disabled>
+                    <option value="${dept}">${dept}</option>
+                </select>
+            </td>
+            <td>
+                <div class="input-group input-group-sm" style="width: 100px;">
+                    <input type="number" name="allocations" class="form-control form-control-sm" value="100" min="0" max="100" required oninput="calculateTotalAllocation()" style="border-radius: 6px;"/>
+                    <span class="input-group-text">%</span>
+                </div>
+            </td>
+            <td>
+                <div class="form-check form-switch pt-1">
+                    <input class="form-check-input modal-member-billable-checkbox" type="checkbox" checked style="width: 40px; height: 20px; cursor: pointer;">
+                </div>
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="removeEmployeeRowFromModal(this)">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+        calculateTotalAllocation();
+        updateTaskAssigneeDropdowns();
+    }
+
+    function removeEmployeeRowFromModal(btn) {
+        btn.closest('tr').remove();
+        calculateTotalAllocation();
+        updateTaskAssigneeDropdowns();
+    }
+
+    function calculateTotalAllocation() {
+        let total = 0;
+        document.querySelectorAll('#modalEmployeesTableBody input[name="allocations"]').forEach(input => {
+            const val = parseInt(input.value) || 0;
+            total += val;
+        });
+        document.getElementById('modalTotalAllocationText').innerText = total + '%';
+    }
+
+    function updateTaskAssigneeDropdowns() {
+        // Collect all employees currently assigned
+        const employees = [];
+        document.querySelectorAll('#modalEmployeesTableBody tr').forEach(row => {
+            const hiddenIdInput = row.querySelector('input[name="userIds"]');
+            if (hiddenIdInput) {
+                const empId = hiddenIdInput.value;
+                const empName = row.querySelector('.fw-bold.text-dark').innerText;
+                employees.push({ id: empId, name: empName });
+            }
+        });
+
+        // Update all task assignee select options
+        document.querySelectorAll('.task-assignee-select').forEach(select => {
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">Select Assignee</option>';
+            employees.forEach(emp => {
+                const selected = emp.id == currentVal ? 'selected' : '';
+                select.innerHTML += `<option value="${emp.id}" ${selected}>${emp.name}</option>`;
+            });
+        });
+    }
+
+    function addTaskRowToModal() {
+        const tbody = document.getElementById('modalTasksTableBody');
+        const row = document.createElement('tr');
+        row.className = 'align-middle';
+
+        row.innerHTML = `
+            <td>
+                <i class="fa-solid fa-grip-vertical text-muted cursor-grab"></i>
+            </td>
+            <td>
+                <input type="text" name="taskName" class="form-control form-control-sm" placeholder="Task Name" required style="border-radius: 6px;"/>
+            </td>
+            <td>
+                <input type="text" name="taskDesc" class="form-control form-control-sm" placeholder="Description" style="border-radius: 6px;"/>
+            </td>
+            <td>
+                <select name="taskAssigneeId" class="form-select form-select-sm task-assignee-select" required style="border-radius: 6px;">
+                    <option value="">Select Assignee</option>
+                </select>
+            </td>
+            <td>
+                <input type="date" name="taskDueDate" class="form-control form-control-sm" required style="border-radius: 6px;"/>
+            </td>
+            <td>
+                <select name="taskPriority" class="form-select form-select-sm" style="border-radius: 6px;">
+                    <option value="High">High</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="this.closest('tr').remove()">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+        updateTaskAssigneeDropdowns();
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const addForm = document.querySelector('#addProjectModal form');
+        if (addForm) {
+            addForm.addEventListener('submit', function(e) {
+                // Remove any previous temporary inputs
+                document.querySelectorAll('.add-temp-billable-input').forEach(el => el.remove());
+                
+                document.querySelectorAll('#modalEmployeesTableBody tr').forEach(row => {
+                    const checkbox = row.querySelector('.modal-member-billable-checkbox');
+                    const hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = 'billables';
+                    hidden.className = 'add-temp-billable-input';
+                    hidden.value = checkbox && checkbox.checked ? 'true' : 'false';
+                    addForm.appendChild(hidden);
+                });
+            });
+        }
+    });
+</script>
 
 </body>
 </html>
