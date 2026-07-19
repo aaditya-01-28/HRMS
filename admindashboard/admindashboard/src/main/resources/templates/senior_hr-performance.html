@@ -288,6 +288,9 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="cycles-tab" data-bs-toggle="tab" data-bs-target="#cycles-pane" type="button" role="tab">Appraisal Cycles</button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="forwarded-tab" data-bs-toggle="tab" data-bs-target="#forwarded-pane" type="button" role="tab">Forwarded Reviews</button>
+                </li>
             </ul>
 
             <div class="tab-content" id="performanceTabsContent">
@@ -480,6 +483,79 @@
                         </ul>
                     </div>
 
+                </div>
+
+                <!-- FORWARDED REVIEWS PANE -->
+                <div class="tab-pane fade" id="forwarded-pane" role="tabpanel">
+                    <div class="card border-0 shadow-sm p-4" style="border-radius: 8px;">
+                        <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-file-invoice me-2 text-primary"></i>Forwarded Performance Reviews</h5>
+                        <p class="text-muted small mb-4">View performance reviews submitted by L3 managers and forwarded to HR.</p>
+                        
+                        <div class="table-responsive" th:if="${!#lists.isEmpty(forwardedRequests)}">
+                            <table class="table align-middle table-hover">
+                                <thead>
+                                    <tr class="text-muted fw-bold" style="font-size:0.85rem; text-transform:uppercase;">
+                                        <th>Serial</th>
+                                        <th>Employee</th>
+                                        <th>Role Level</th>
+                                        <th>Self Rating</th>
+                                        <th>Manager Rating</th>
+                                        <th>Overall Rating</th>
+                                        <th>Manager Name</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="req : ${forwardedRequests}">
+                                        <td class="fw-bold" th:text="${req.serialNumber != null ? req.serialNumber : 'FB-' + (1000 + req.id)}">FB-1001</td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="avatar bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px; font-size:0.85rem;" th:text="${#strings.substring(req.employee.fullName, 0, 1)}">E</div>
+                                                <div>
+                                                    <div class="fw-bold text-dark" th:text="${req.employee.fullName}">Name</div>
+                                                    <small class="text-muted" th:text="${req.employee.username}">username</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td th:text="${req.roleLevel}">L1</td>
+                                        <td>
+                                            <span class="text-warning"><i class="fas fa-star fa-xs"></i></span> <span th:text="${req.rating}">3.0</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-warning"><i class="fas fa-star fa-xs"></i></span> <span class="fw-bold text-success" th:text="${req.managerRating}">4.0</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-primary"><i class="fas fa-star fa-xs"></i></span> 
+                                            <span class="fw-bold text-primary" th:text="${(req.rating != null && req.managerRating != null) ? #numbers.formatDecimal((req.rating + req.managerRating) / 2.0, 1, 1) : (req.managerRating != null ? req.managerRating : (req.rating != null ? req.rating : '—'))}">3.5</span>
+                                        </td>
+                                        <td class="fw-bold text-dark" th:text="${req.manager != null ? req.manager.fullName : 'L3 Manager'}">L3 Manager</td>
+                                        <td>
+                                            <span class="badge bg-success text-white" style="border-radius:0;">Forwarded to HR</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-secondary fw-bold" 
+                                                    th:data-id="${req.id}"
+                                                    th:data-serial="${req.serialNumber != null ? req.serialNumber : 'FB-' + (1000 + req.id)}"
+                                                    th:data-name="${req.employee.fullName}"
+                                                    th:data-rating="${req.rating}"
+                                                    th:data-mrating="${req.managerRating}"
+                                                    th:data-fields="${req.fieldsString}"
+                                                    onclick="previewHRFeedback(this)" style="border-radius:0;">
+                                                <i class="fa-solid fa-eye me-1"></i> Preview Details
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div th:if="${#lists.isEmpty(forwardedRequests)}" class="text-center py-5 bg-light border">
+                            <i class="fa-solid fa-folder-open text-muted mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="text-dark fw-bold">No Forwarded Reviews</h5>
+                            <p class="text-muted mb-0">No performance reviews have been forwarded to HR yet.</p>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -780,6 +856,132 @@
                 }
             });
         });
+    </script>
+    <!-- Preview HR Feedback Modal -->
+    <div class="modal fade" id="previewHRFeedbackModal" tabindex="-1" aria-labelledby="previewHRFeedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 0; border: none;">
+                <div class="modal-header bg-light border-bottom">
+                    <h5 class="modal-title fw-bold text-dark" id="previewHRFeedbackModalLabel">Performance Evaluation Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h4 class="fw-bold text-primary mb-1" id="previewHREmpName">Employee Name</h4>
+                                <span class="badge bg-light text-secondary border px-2 py-1 small" id="previewHRSerial">FB-1001</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="card p-3 bg-light border-0" style="border-radius:0;">
+                                <label class="fw-bold text-muted small text-uppercase mb-2">Overall Self-Rating</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="text-warning" id="previewHRSelfStars" style="font-size: 1.25rem;">
+                                        <!-- Stars populated dynamically -->
+                                    </div>
+                                    <span class="fw-bold text-dark" id="previewHRSelfRatingVal" style="font-size: 1.1rem;">3.0 / 5.0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card p-3 bg-light border-0" style="border-radius:0;">
+                                <label class="fw-bold text-muted small text-uppercase mb-2">Overall Manager Rating</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="text-warning" id="previewHRManagerStars" style="font-size: 1.25rem;">
+                                        <!-- Stars populated dynamically -->
+                                    </div>
+                                    <span class="fw-bold text-success" id="previewHRManagerRatingVal" style="font-size: 1.1rem;">4.0 / 5.0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Skillset & Criteria Ratings Breakdown</h6>
+                    <div id="previewHRSkillsetContainer">
+                        <!-- Dynamic rows populated by script -->
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-secondary px-4 fw-bold" data-bs-dismiss="modal" style="border-radius: 0;">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function previewHRFeedback(btn) {
+            const id = btn.getAttribute('data-id');
+            const serial = btn.getAttribute('data-serial');
+            const name = btn.getAttribute('data-name');
+            const rating = btn.getAttribute('data-rating');
+            const mRating = btn.getAttribute('data-mrating');
+            const fieldsString = btn.getAttribute('data-fields');
+
+            document.getElementById('previewHREmpName').innerText = name;
+            document.getElementById('previewHRSerial').innerText = serial;
+
+            // Populate Self Rating
+            const selfVal = parseFloat(rating) || 0;
+            document.getElementById('previewHRSelfRatingVal').innerText = selfVal.toFixed(1) + ' / 5.0';
+            let selfStars = '';
+            for(let i=1; i<=5; i++) {
+                selfStars += i <= Math.round(selfVal) ? '<i class="fas fa-star me-1"></i>' : '<i class="far fa-star me-1"></i>';
+            }
+            document.getElementById('previewHRSelfStars').innerHTML = selfStars;
+
+            // Populate Manager Rating
+            const managerVal = parseFloat(mRating) || 0;
+            document.getElementById('previewHRManagerRatingVal').innerText = managerVal.toFixed(1) + ' / 5.0';
+            let managerStars = '';
+            for(let i=1; i<=5; i++) {
+                managerStars += i <= Math.round(managerVal) ? '<i class="fas fa-star me-1"></i>' : '<i class="far fa-star me-1"></i>';
+            }
+            document.getElementById('previewHRManagerStars').innerHTML = managerStars;
+
+            // Populate skillsets breakdown
+            const container = document.getElementById('previewHRSkillsetContainer');
+            container.innerHTML = '';
+            if (fieldsString) {
+                const fields = JSON.parse(fieldsString);
+                fields.forEach((field, index) => {
+                    const fName = field.fieldName || '';
+                    const fDesc = field.description || '';
+                    const fVal = field.fieldValue || '';
+                    const fRating = parseFloat(field.employeeRating) || 0;
+                    const fmRating = parseFloat(field.managerRating) || 0;
+                    const fmComment = field.managerComments || 'No manager justification provided.';
+
+                    const row = document.createElement('div');
+                    row.className = 'border-bottom py-3';
+                    row.innerHTML = `
+                        <div class="fw-bold text-dark mb-1">${index + 1}. ${fName}</div>
+                        ${fDesc ? `<p class="text-muted small mb-2">${fDesc}</p>` : ''}
+                        <div class="row g-2 mb-2">
+                            <div class="col-md-6 border-end">
+                                <span class="fw-bold small text-muted text-uppercase d-block mb-1">Employee Self-Evaluation</span>
+                                <span class="badge bg-light text-warning border mb-1">Rating: ${fRating.toFixed(1)} / 5.0</span>
+                                <p class="text-dark small mb-0">${fVal || 'No response provided.'}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="fw-bold small text-muted text-uppercase d-block mb-1">L3 Manager Evaluation</span>
+                                <span class="badge bg-light text-success border mb-1">Rating: ${fmRating.toFixed(1)} / 5.0</span>
+                                <p class="text-dark small mb-0">${fmComment}</p>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(row);
+                });
+            } else {
+                container.innerHTML = '<p class="text-muted italic text-center py-3">No skillset breakdown available.</p>';
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('previewHRFeedbackModal'));
+            modal.show();
+        }
     </script>
 </body>
 </html>

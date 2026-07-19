@@ -747,6 +747,8 @@
                                     <th>Role Level</th>
                                     <th>Self-Rating</th>
                                     <th>Manager Rating</th>
+                                    <th>Overall Rating</th>
+                                    <th>Status</th>
                                     <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
@@ -768,6 +770,14 @@
                                     </td>
                                     <td>
                                         <span class="text-warning"><i class="fas fa-star fa-xs"></i></span> <span class="fw-bold text-success" th:text="${req.managerRating}">4.0</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-primary"><i class="fas fa-star fa-xs"></i></span> 
+                                        <span class="fw-bold text-primary" th:text="${(req.rating != null && req.managerRating != null) ? #numbers.formatDecimal((req.rating + req.managerRating) / 2.0, 1, 1) : (req.managerRating != null ? req.managerRating : (req.rating != null ? req.rating : '—'))}">3.5</span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${#strings.toUpperCase(req.status) == 'FORWARDED_TO_HR'}" class="badge bg-success text-white" style="border-radius:0;">Forwarded to HR</span>
+                                        <span th:if="${#strings.toUpperCase(req.status) != 'FORWARDED_TO_HR'}" class="badge bg-secondary text-white" style="border-radius:0;">Completed</span>
                                     </td>
                                     <td class="text-end">
                                         <button class="btn btn-sm btn-outline-primary fw-bold me-2" 

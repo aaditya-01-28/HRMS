@@ -156,25 +156,19 @@
                 <form action="/employee/performance/feedback/submit" method="POST">
                     <input type="hidden" name="requestId" th:value="${req.id}" />
                     
-                    <!-- 5-Star Rating Section -->
+                    <!-- 5-Star Rating Section (Read-Only calculated rating) -->
                     <div class="mb-4">
                         <label class="form-label fw-bold text-dark">Overall Self Rating <span class="text-danger">*</span></label>
                         <div class="d-flex flex-column">
-                            <div class="star-rating mb-2">
-                                <input type="radio" th:id="'star5-' + ${req.id}" name="rating" value="5.0" required th:checked="${req.rating == 5.0}" th:onclick="'updateRatingDesc(' + ${req.id} + ', 5)'"/>
-                                <label th:for="'star5-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 5)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="5 Star: Deep experience can lead mentor and solve complex problem, certificate required"><i class="fas fa-star"></i></label>
-                                
-                                <input type="radio" th:id="'star4-' + ${req.id}" name="rating" value="4.0" th:checked="${req.rating == 4.0}" th:onclick="'updateRatingDesc(' + ${req.id} + ', 4)'"/>
-                                <label th:for="'star4-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 4)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="4 Star: Strong, practical experience. can work independently, certificate required"><i class="fas fa-star"></i></label>
-                                
-                                <input type="radio" th:id="'star3-' + ${req.id}" name="rating" value="3.0" th:checked="${req.rating == 3.0}" th:onclick="'updateRatingDesc(' + ${req.id} + ', 3)'"/>
-                                <label th:for="'star3-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 3)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="3 Star: Hand on experience with certifications (required)"><i class="fas fa-star"></i></label>
-                                
-                                <input type="radio" th:id="'star2-' + ${req.id}" name="rating" value="2.0" th:checked="${req.rating == 2.0}" th:onclick="'updateRatingDesc(' + ${req.id} + ', 2)'"/>
-                                <label th:for="'star2-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 2)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="2 Star: hand on experience, training & certification completed; minimal practical exposure; certificate optional"><i class="fas fa-star"></i></label>
-                                
-                                <input type="radio" th:id="'star1-' + ${req.id}" name="rating" value="1.0" th:checked="${req.rating == 1.0}" th:onclick="'updateRatingDesc(' + ${req.id} + ', 1)'"/>
-                                <label th:for="'star1-' + ${req.id}" th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 1)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" title="1 Star: limited knowledge basic understanding , no certificate required"><i class="fas fa-star"></i></label>
+                            <!-- Hidden input to submit the calculated value -->
+                            <input type="hidden" name="rating" th:id="'overall-rating-input-' + ${req.id}" th:value="${req.rating != null ? req.rating : 0.0}" />
+                            
+                            <div class="star-rating-readonly mb-2" style="font-size: 2rem; color: #cbd5e1; display: flex; gap: 8px;">
+                                <span th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 1)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" style="cursor: pointer;"><i th:id="'overall-star-' + ${req.id} + '-1'" class="far fa-star"></i></span>
+                                <span th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 2)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" style="cursor: pointer;"><i th:id="'overall-star-' + ${req.id} + '-2'" class="far fa-star"></i></span>
+                                <span th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 3)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" style="cursor: pointer;"><i th:id="'overall-star-' + ${req.id} + '-3'" class="far fa-star"></i></span>
+                                <span th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 4)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" style="cursor: pointer;"><i th:id="'overall-star-' + ${req.id} + '-4'" class="far fa-star"></i></span>
+                                <span th:onmouseover="'hoverRatingDesc(' + ${req.id} + ', 5)'" th:onmouseout="'resetRatingDesc(' + ${req.id} + ')'" style="cursor: pointer;"><i th:id="'overall-star-' + ${req.id} + '-5'" class="far fa-star"></i></span>
                             </div>
                             <div class="rating-desc-box" th:id="'rating-desc-' + ${req.id}">
                                 <span th:if="${req.rating != null}" class="text-success fw-bold" th:text="${req.rating == 5.0 ? '5 Star: Deep experience can lead mentor and solve complex problem, certificate required' : (req.rating == 4.0 ? '4 Star: Strong, practical experience. can work independently, certificate required' : (req.rating == 3.0 ? '3 Star: Hand on experience with certifications (required)' : (req.rating == 2.0 ? '2 Star: hand on experience, training & certification completed; minimal practical exposure; certificate optional' : '1 Star: limited knowledge basic understanding , no certificate required')))}"></span>
@@ -191,7 +185,7 @@
                         <div class="row g-2 mb-2">
                             <div class="col-md-3">
                                 <label class="form-label fw-bold small text-dark mb-1">Self Rating <span class="text-danger">*</span></label>
-                                <select name="fieldEmployeeRating" class="form-select form-select-sm" required style="border-radius: 0;">
+                                <select name="fieldEmployeeRating" class="form-select form-select-sm" required style="border-radius: 0;" th:onchange="'calculateOverallSelfRating(' + ${req.id} + ')'">
                                     <option value="">Select...</option>
                                     <option value="5.0" th:selected="${field.employeeRating == 5.0}">5.0 (Excellent)</option>
                                     <option value="4.0" th:selected="${field.employeeRating == 4.0}">4.0 (Very Good)</option>
@@ -246,6 +240,11 @@
                         </div>
                     </div>
                 </form>
+                <script th:inline="javascript">
+                    /*<![CDATA[*/
+                    calculateOverallSelfRating([[${req.id}]]);
+                    /*]]>*/
+                </script>
             </div>
             
             <!-- Empty state for pending -->
@@ -461,7 +460,7 @@
             <div class="row g-2 mb-2">
                 <div class="col-md-4">
                     <label class="form-label fw-bold small text-dark mb-1">Self Rating <span class="text-danger">*</span></label>
-                    <select name="newFieldRating" class="form-select form-select-sm" required style="border-radius: 0;">
+                    <select name="newFieldRating" class="form-select form-select-sm" required style="border-radius: 0;" onchange="calculateOverallSelfRating('${reqId}')">
                         <option value="">Select...</option>
                         <option value="5.0">5.0 (Excellent)</option>
                         <option value="4.0">4.0 (Very Good)</option>
@@ -499,6 +498,66 @@
                 label.innerHTML = `Title / Criteria Name (${serialNo}) <span class="text-danger">*</span>`;
             }
         });
+
+        // Recalculate rating
+        calculateOverallSelfRating(reqId);
+    }
+
+    function calculateOverallSelfRating(reqId) {
+        const form = document.querySelector(`form[action*="submit"]`);
+        if (!form) return;
+        const predefinedSelects = form.querySelectorAll(`select[name="fieldEmployeeRating"]`);
+        const customSelects = form.querySelectorAll(`select[name="newFieldRating"]`);
+        
+        let sum = 0;
+        let count = 0;
+        
+        predefinedSelects.forEach(sel => {
+            const val = parseFloat(sel.value);
+            if (!isNaN(val) && val > 0) {
+                sum += val;
+                count++;
+            }
+        });
+        
+        customSelects.forEach(sel => {
+            const val = parseFloat(sel.value);
+            if (!isNaN(val) && val > 0) {
+                sum += val;
+                count++;
+            }
+        });
+        
+        const avg = count > 0 ? (sum / count) : 0.0;
+        
+        // Update the hidden input
+        const hiddenInput = document.getElementById('overall-rating-input-' + reqId);
+        if (hiddenInput) {
+            hiddenInput.value = avg > 0 ? avg.toFixed(1) : '0.0';
+        }
+        
+        // Update read-only stars in UI
+        const roundedAvg = Math.round(avg);
+        for (let i = 1; i <= 5; i++) {
+            const starIcon = document.getElementById(`overall-star-${reqId}-${i}`);
+            if (starIcon) {
+                if (i <= roundedAvg) {
+                    starIcon.className = 'fas fa-star text-warning';
+                } else {
+                    starIcon.className = 'far fa-star text-secondary';
+                }
+            }
+        }
+        
+        // Update description dynamically
+        const descBox = document.getElementById('rating-desc-' + reqId);
+        if (descBox) {
+            if (avg > 0) {
+                descBox.innerHTML = `<span class="text-success fw-bold">Calculated Self-Rating: ${avg.toFixed(2)} / 5.0</span>`;
+            } else {
+                descBox.innerHTML = `<span class="text-muted italic">Select criteria ratings to calculate overall rating...</span>`;
+            }
+        }
     }
 
     function previewFeedback(btn) {

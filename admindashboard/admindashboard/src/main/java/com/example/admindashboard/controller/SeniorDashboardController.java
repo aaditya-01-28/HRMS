@@ -134,6 +134,9 @@ public class SeniorDashboardController {
     private com.example.admindashboard.repository.RewardProgramRepository rewardProgramRepository;
 
     @Autowired
+    private com.example.admindashboard.repository.PerformanceFeedbackRequestRepository performanceFeedbackRequestRepository;
+
+    @Autowired
     private com.example.admindashboard.repository.RewardRuleRepository rewardRuleRepository;
 
     @Autowired
@@ -2027,6 +2030,13 @@ public class SeniorDashboardController {
         }
         model.addAttribute("appraisals", list);
         model.addAttribute("allUsers", userRepository.findAll());
+
+        // Fetch performance reviews forwarded to HR by L3 managers
+        List<com.example.admindashboard.model.PerformanceFeedbackRequest> forwardedRequests = performanceFeedbackRequestRepository.findAll().stream()
+            .filter(r -> "FORWARDED_TO_HR".equalsIgnoreCase(r.getStatus()))
+            .collect(Collectors.toList());
+        model.addAttribute("forwardedRequests", forwardedRequests);
+
         return "senior_hr-performance";
     }
 
