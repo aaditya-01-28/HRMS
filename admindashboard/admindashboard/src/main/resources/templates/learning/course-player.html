@@ -245,7 +245,37 @@
             font-size: 16px;
         }
 
-    </style>
+        
+    /* Sidebar Toggle Enhanced */
+    .sidebar { transition: width 0.3s; position: relative; }
+    .sidebar.collapsed { width: 80px; }
+    .sidebar.collapsed .company-details, .sidebar.collapsed .menu-item span, .sidebar.collapsed .logout-text { display: none; }
+    .sidebar.collapsed .sidebar-header { justify-content: center; padding: 20px 0; }
+    
+    .sidebar-header { padding:20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eaeaea; }
+    
+    .toggle-sidebar-btn { 
+        position: absolute; 
+        right: -14px; 
+        top: 25px; 
+        background: #fff; 
+        border: 1px solid #eaeaea; 
+        border-radius: 50%; 
+        width: 28px; 
+        height: 28px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        cursor: pointer; 
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: transform 0.3s;
+        color: #555;
+    }
+    .toggle-sidebar-btn:hover { background: #f4f7fb; color: #0052cc; }
+    .sidebar.collapsed .toggle-sidebar-btn { transform: rotate(180deg); }
+    .sidebar.collapsed .company-logo { width: 32px; height: 32px; }
+</style>
 </head>
 <body>
 
@@ -314,24 +344,16 @@
 
         <!-- Curriculum Sidebar -->
         <div class="curriculum-sidebar">
-            <div class="sidebar-header">
-                <h3>Course Content</h3>
+                    <div class="sidebar-header">
+            <div style="display:flex; align-items:center; gap:12px;" class="logo-wrapper">
+                <img src="/images/wcg-logo.jpg" alt="WCG Logo" class="company-logo" onerror="this.src='https://ui-avatars.com/api/?name=WCG&background=0D8ABC&color=fff'">
+                <div class="company-details">
+                    <h3>WhiteCircle</h3>
+                    <span>Learning Admin L3</span>
+                </div>
             </div>
-            
-            <div class="module-list" id="curriculumList">
-                <!-- Hardcoded for simulation of the player state -->
-                <div class="module-item">
-                    <div class="module-header">
-                        <span>Section 1: Introduction</span>
-                        <i class="fa-solid fa-chevron-up"></i>
-                    </div>
-                    <ul class="module-lessons">
-                        <li class="lesson-item active">
-                            <i class="fa-regular fa-circle-play lesson-icon"></i>
-                            <div class="lesson-title">
-                                <div>1. Introduction to Spring Boot</div>
-                                <div class="lesson-duration">15:20</div>
-                            </div>
+            <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="Collapse Sidebar"><i class="fa-solid fa-angle-left"></i></button>
+        </div>
                         </li>
                         <li class="lesson-item">
                             <i class="fa-regular fa-file-lines lesson-icon"></i>
@@ -377,6 +399,15 @@
             btnElement.classList.add('active');
         }
     </script>
+<script>
+    function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('collapsed');
+    }
+</script>
 </body>
 </html>
+
+
+
+
 

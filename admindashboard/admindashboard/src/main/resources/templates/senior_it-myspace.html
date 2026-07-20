@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteCircle | IT Head - My Space</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --bg-color: #f8fafc;
+            --card-border-radius: 16px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary) !important;
+            border-color: var(--primary) !important;
+        }
+        .btn-primary:hover {
+            background-color: #152a66 !important;
+            border-color: #152a66 !important;
+        }
+        .text-primary {
+            color: var(--primary) !important;
+        }
+        .bg-primary {
+            background-color: var(--primary) !important;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            overflow-x: hidden;
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        /* --- SIDEBAR --- */
+        .myspace-sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1001;
+            transition: transform 0.3s ease;
+        }
+
+        .myspace-sidebar .brand-area {
+            padding: 20px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .myspace-sidebar .brand-area img {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .myspace-sidebar .brand-area .brand-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .myspace-sidebar .brand-area .brand-sub {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .myspace-sidebar .nav-links {
+            padding: 15px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .myspace-sidebar .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .myspace-sidebar .nav-link-item:hover {
+            background-color: #f1f5f9;
+            color: var(--primary);
+        }
+        .myspace-sidebar .nav-link-item.active {
+            background-color: #eff6ff;
+            color: var(--primary);
+        }
+
+        body.sidebar-collapsed .myspace-sidebar {
+            transform: translateX(-100%);
+        }
+        body.sidebar-collapsed .myspace-header {
+            left: 0;
+        }
+        body.sidebar-collapsed .myspace-main {
+            margin-left: 0;
+        }
+
+        /* --- TOP HEADER --- */
+        .myspace-header {
+            height: var(--header-height);
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: var(--sidebar-width);
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 1000;
+        }
+        .myspace-header .header-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .myspace-main {
+            margin-top: var(--header-height);
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        .myspace-tab-pane {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: var(--card-border-radius);
+            padding: 24px;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stats-card .stats-info h3 {
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 4px 0;
+        }
+
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="myspace-sidebar">
+        <div class="brand-area">
+            <img src="/images/wcg-logo.jpg" alt="WhiteCircle">
+            <div>
+                <div class="brand-title">WhiteCircle</div>
+                <div class="brand-sub">IT Head My Space</div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a class="nav-link-item" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}" onclick="switchTab('dashboard')">
+                <i class="fas fa-chart-pie"></i> <span>Dashboard</span>
+            </a>
+            <a class="nav-link-item" th:classappend="${activeTab == 'user-access' ? 'active' : ''}" onclick="switchTab('user-access')">
+                <i class="fas fa-users-cog"></i> <span>User & Access</span>
+            </a>
+            <a class="nav-link-item" th:classappend="${activeTab == 'system-app' ? 'active' : ''}" onclick="switchTab('system-app')">
+                <i class="fas fa-cubes"></i> <span>System & App</span>
+            </a>
+            <a class="nav-link-item" th:classappend="${activeTab == 'tickets' ? 'active' : ''}" onclick="switchTab('tickets')">
+                <i class="fas fa-ticket-alt"></i> <span>Tickets</span>
+            </a>
+            <a class="nav-link-item" th:classappend="${activeTab == 'devices' ? 'active' : ''}" onclick="switchTab('devices')">
+                <i class="fas fa-laptop"></i> <span>Device & Asset</span>
+            </a>
+            <a class="nav-link-item" th:classappend="${activeTab == 'security' ? 'active' : ''}" onclick="switchTab('security')">
+                <i class="fas fa-shield-alt"></i> <span>Security</span>
+            </a>
+            <a class="nav-link-item" th:classappend="${activeTab == 'backup' ? 'active' : ''}" onclick="switchTab('backup')">
+                <i class="fas fa-database"></i> <span>Backup & Logs</span>
+            </a>
+            <a class="nav-link-item" th:classappend="${activeTab == 'reports' ? 'active' : ''}" onclick="switchTab('reports')">
+                <i class="fas fa-chart-line"></i> <span>Reports</span>
+            </a>
+            <a class="nav-link-item" th:classappend="${activeTab == 'communication' ? 'active' : ''}" onclick="switchTab('communication')">
+                <i class="fas fa-bullhorn"></i> <span>Communication</span>
+            </a>
+            <a class="nav-link-item" th:classappend="${activeTab == 'hierarchy' ? 'active' : ''}" onclick="switchTab('hierarchy')">
+                <i class="fas fa-sitemap"></i> <span>Hierarchy</span>
+            </a>
+        </div>
+        <div class="mt-auto border-top p-3 text-center">
+            <a href="/senior_it/dashboard" class="btn btn-sm btn-outline-danger w-100 rounded-pill fw-bold">
+                <i class="fas fa-sign-out-alt me-1"></i> <span>Exit My Space</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- TOP HEADER -->
+    <div class="myspace-header">
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-light border" id="sidebarToggle" onclick="toggleSidebar()" style="width: 40px; height: 40px; border-radius: 8px;">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a href="/senior_it/dashboard" class="btn btn-light border d-flex align-items-center gap-2 px-3" style="height: 40px; border-radius: 8px; font-weight: 600; color: #475569; text-decoration: none;">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back</span>
+            </a>
+            <div class="header-title ms-2" id="tabTitle">IT Admin My Space</div>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <span class="text-muted fw-semibold" th:text="${currentUser != null ? currentUser.fullName : 'Rajesh Kumar'}">Rajesh Kumar</span>
+            <div class="w-10 rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">RK</div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="myspace-main">
+
+        <!-- ==================== TAB: DASHBOARD ==================== -->
+        <div id="tab-dashboard" class="myspace-tab-pane" th:style="${activeTab == 'dashboard' ? 'display:block' : 'display:none'}">
+            <!-- 5 Stats Cards Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-2-4 col-sm-6 col-xs-12">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Total Tickets</span>
+                            <h3 th:text="${totalTicketsCount}">10</h3>
+                        </div>
+                        <i class="fas fa-list-ol text-primary fa-lg"></i>
+                    </div>
+                </div>
+                <div class="col-md-2-4 col-sm-6 col-xs-12">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Pending Tickets</span>
+                            <h3 th:text="${pendingTicketsCount}">5</h3>
+                        </div>
+                        <i class="fas fa-clock text-warning fa-lg"></i>
+                    </div>
+                </div>
+                <div class="col-md-2-4 col-sm-6 col-xs-12">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">In Progress</span>
+                            <h3 th:text="${inProgressTicketsCount}">2</h3>
+                        </div>
+                        <i class="fas fa-spinner text-info fa-lg"></i>
+                    </div>
+                </div>
+                <div class="col-md-2-4 col-sm-6 col-xs-12">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Resolved Today</span>
+                            <h3 th:text="${resolvedTodayCount}">3</h3>
+                        </div>
+                        <i class="fas fa-check-circle text-success fa-lg"></i>
+                    </div>
+                </div>
+                <div class="col-md-2-4 col-sm-6 col-xs-12">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Avg Response</span>
+                            <h3 th:text="${avgResolutionTime}">4.2 hrs</h3>
+                        </div>
+                        <i class="fas fa-bolt text-danger fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts and List Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-lg-4">
+                    <div class="card p-3 border-0 shadow-sm" style="border-radius:12px;">
+                        <h6 class="fw-bold mb-3">Ticket Status Overview</h6>
+                        <div style="height:220px; position:relative;" class="d-flex justify-content-center align-items-center">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card p-3 border-0 shadow-sm" style="border-radius:12px; height:100%;">
+                        <h6 class="fw-bold mb-3">Tickets by Category</h6>
+                        <div class="d-flex flex-column gap-3 mt-2">
+                            <div>
+                                <div class="d-flex justify-content-between text-muted small fw-bold mb-1">
+                                    <span>Software Issues</span>
+                                    <span th:text="${softwareCount}">3</span>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" th:style="'width: ' + ${softwarePercent} + '%'"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="d-flex justify-content-between text-muted small fw-bold mb-1">
+                                    <span>Hardware Issues</span>
+                                    <span th:text="${hardwareCount}">2</span>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-success" role="progressbar" th:style="'width: ' + ${hardwarePercent} + '%'"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="d-flex justify-content-between text-muted small fw-bold mb-1">
+                                    <span>Access & Permissions</span>
+                                    <span th:text="${accessCount}">3</span>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-info" role="progressbar" th:style="'width: ' + ${accessPercent} + '%'"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="d-flex justify-content-between text-muted small fw-bold mb-1">
+                                    <span>Network Issues</span>
+                                    <span th:text="${networkCount}">2</span>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" role="progressbar" th:style="'width: ' + ${networkPercent} + '%'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card p-3 border-0 shadow-sm" style="border-radius:12px;">
+                        <h6 class="fw-bold mb-3">Recent Ticket Activities</h6>
+                        <div class="d-flex flex-column gap-2" style="max-height:220px; overflow-y:auto;">
+                            <div th:each="ticket : ${recentTickets}" class="p-2 border rounded bg-light d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="small fw-bold text-dark" th:text="${ticket.ticketId}">#TKT-101</span>
+                                    <p class="small text-muted mb-0" th:text="${ticket.employeeName}">Om Tripathi</p>
+                                </div>
+                                <span class="badge" th:classappend="${ticket.status == 'Open' ? 'bg-danger' : (ticket.status == 'In Progress' ? 'bg-primary' : 'bg-success')}" th:text="${ticket.status}">Open</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: USER & ACCESS ==================== -->
+        <div id="tab-user-access" class="myspace-tab-pane" th:style="${activeTab == 'user-access' ? 'display:block' : 'display:none'}">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">System Users Directory</h5>
+                <button class="btn btn-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <i class="fas fa-plus me-1"></i> Add User & Access
+                </button>
+            </div>
+            <div class="card border-0 shadow-sm" style="border-radius:12px;">
+                <div class="table-responsive p-3">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Emp ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Designation</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${users}">
+                                <td class="fw-bold" th:text="${user.username}">EMP0001</td>
+                                <td th:text="${user.fullName}">Rajesh Kumar</td>
+                                <td th:text="${user.employeeProfile != null ? user.employeeProfile.department : 'N/A'}">IT</td>
+                                <td th:text="${user.employeeProfile != null ? user.employeeProfile.designation : 'N/A'}">Senior IT Head</td>
+                                <td>
+                                    <span class="badge bg-secondary" th:text="${user.role != null ? (user.role.roleCode != null ? user.role.roleCode : user.role.roleName) : 'No Role'}">SENIOR_IT_HEAD</span>
+                                </td>
+                                <td>
+                                    <span class="badge" th:classappend="${user.status == 'ACTIVE' ? 'bg-success' : 'bg-danger'}" th:text="${user.status}">ACTIVE</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" th:data-username="${user.username}" onclick="assignRoleModal(this.getAttribute('data-username'))">Assign Role</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: SYSTEM & APP ==================== -->
+        <div id="tab-system-app" class="myspace-tab-pane" th:style="${activeTab == 'system-app' ? 'display:block' : 'display:none'}">
+            <h5 class="fw-bold mb-3">System Applications Inventory</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Active Applications</span>
+                            <h3>14</h3>
+                        </div>
+                        <i class="fas fa-check-double text-success fa-lg"></i>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">System Health</span>
+                            <h3>99.9%</h3>
+                        </div>
+                        <i class="fas fa-heartbeat text-danger fa-lg"></i>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Licenses Expiring</span>
+                            <h3>2</h3>
+                        </div>
+                        <i class="fas fa-exclamation-circle text-warning fa-lg"></i>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Database Server</span>
+                            <h3>Online</h3>
+                        </div>
+                        <i class="fas fa-server text-primary fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm" style="border-radius:12px;">
+                <div class="table-responsive p-3">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>App Name</th>
+                                <th>Version</th>
+                                <th>Status</th>
+                                <th>Last Updated</th>
+                                <th>Host / Server</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold">HRMS Portal</td>
+                                <td>v2.4.1</td>
+                                <td><span class="badge bg-success">Running</span></td>
+                                <td>Today, 10:15 AM</td>
+                                <td>Prod-Cluster-01</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">LMS System</td>
+                                <td>v1.8.0</td>
+                                <td><span class="badge bg-success">Running</span></td>
+                                <td>Yesterday</td>
+                                <td>Prod-Cluster-02</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Payroll Engine</td>
+                                <td>v3.1.2</td>
+                                <td><span class="badge bg-success">Running</span></td>
+                                <td>3 days ago</td>
+                                <td>Finance-DB-01</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Broadcasting Service</td>
+                                <td>v1.1.0</td>
+                                <td><span class="badge bg-warning">Maintenance</span></td>
+                                <td>1 week ago</td>
+                                <td>IT-Notify-05</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: TICKETS ==================== -->
+        <div id="tab-tickets" class="myspace-tab-pane" th:style="${activeTab == 'tickets' ? 'display:block' : 'display:none'}">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">IT Service Tickets</h5>
+                <button class="btn btn-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#createTicketModal">
+                    <i class="fas fa-plus me-1"></i> Log New Ticket
+                </button>
+            </div>
+            <div class="card border-0 shadow-sm" style="border-radius:12px;">
+                <div class="table-responsive p-3">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Employee</th>
+                                <th>Category</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Assigned To</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="ticket : ${recentTickets}">
+                                <td class="fw-bold" th:text="${ticket.ticketId}">IT-TKT-101</td>
+                                <td th:text="${ticket.employeeName}">Om Tripathi</td>
+                                <td th:text="${ticket.category}">Software Issue</td>
+                                <td>
+                                    <span class="badge" th:classappend="${ticket.priority == 'High' ? 'bg-danger' : (ticket.priority == 'Medium' ? 'bg-warning text-dark' : 'bg-info')}" th:text="${ticket.priority}">High</span>
+                                </td>
+                                <td>
+                                    <span class="badge" th:classappend="${ticket.status == 'Open' ? 'bg-danger' : (ticket.status == 'In Progress' ? 'bg-primary' : 'bg-success')}" th:text="${ticket.status}">Open</span>
+                                </td>
+                                <td th:text="${ticket.assignedTo != null ? ticket.assignedTo : 'Unassigned'}">IT Admin</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" th:data-id="${ticket.id}" th:data-status="${ticket.status}" th:data-assigned-to="${ticket.assignedTo}" onclick="updateTicketModal(this.getAttribute('data-id'), this.getAttribute('data-status'), this.getAttribute('data-assigned-to'))">Manage</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: DEVICES ==================== -->
+        <div id="tab-devices" class="myspace-tab-pane" th:style="${activeTab == 'devices' ? 'display:block' : 'display:none'}">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Device & Asset Management</h5>
+                <button class="btn btn-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#addAssetModal">
+                    <i class="fas fa-plus me-1"></i> Add New Asset
+                </button>
+            </div>
+            <!-- Stats -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Active Inventory</span>
+                            <h3 th:text="${activeAssetsCount}">8</h3>
+                        </div>
+                        <i class="fas fa-laptop text-success fa-lg"></i>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">In Maintenance</span>
+                            <h3 th:text="${maintenanceAssetsCount}">1</h3>
+                        </div>
+                        <i class="fas fa-tools text-warning fa-lg"></i>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Disposed</span>
+                            <h3 th:text="${disposedAssetsCount}">1</h3>
+                        </div>
+                        <i class="fas fa-trash-alt text-danger fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- Table -->
+            <div class="card border-0 shadow-sm" style="border-radius:12px;">
+                <div class="table-responsive p-3">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Asset Tag</th>
+                                <th>Type</th>
+                                <th>Brand & Model</th>
+                                <th>Serial No</th>
+                                <th>Assigned To</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="asset : ${assets}">
+                                <td class="fw-bold text-primary" th:text="${asset.assetTag}">IT-AST-001</td>
+                                <td th:text="${asset.assetType}">Laptop</td>
+                                <td th:text="${asset.brand + ' ' + asset.model}">Dell Latitude</td>
+                                <td th:text="${asset.serialNumber}">DL12345</td>
+                                <td th:text="${asset.assignedTo}">EMP0001</td>
+                                <td>
+                                    <span class="badge" th:classappend="${asset.status == 'Active' ? 'bg-success' : (asset.status == 'Maintenance' ? 'bg-warning text-dark' : 'bg-danger')}" th:text="${asset.status}">Active</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" th:data-id="${asset.id}" th:data-status="${asset.status}" th:data-assigned-to="${asset.assignedTo}" th:data-location="${asset.location}" onclick="updateAssetModal(this.getAttribute('data-id'), this.getAttribute('data-status'), this.getAttribute('data-assigned-to'), this.getAttribute('data-location'))">Update</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: SECURITY ==================== -->
+        <div id="tab-security" class="myspace-tab-pane" th:style="${activeTab == 'security' ? 'display:block' : 'display:none'}">
+            <h5 class="fw-bold mb-3">Security & Compliance Dashboard</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Active Policies</span>
+                            <h3 th:text="${activePoliciesCount}">3</h3>
+                        </div>
+                        <i class="fas fa-shield-alt text-success fa-lg"></i>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Under Review</span>
+                            <h3 th:text="${reviewPoliciesCount}">1</h3>
+                        </div>
+                        <i class="fas fa-search text-warning fa-lg"></i>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Non-Compliant</span>
+                            <h3 th:text="${nonCompliantPoliciesCount}">1</h3>
+                        </div>
+                        <i class="fas fa-times-circle text-danger fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm" style="border-radius:12px;">
+                <div class="table-responsive p-3">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Policy Name</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Last Audit</th>
+                                <th>Next Review</th>
+                                <th>Compliance Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="policy : ${securityPolicies}">
+                                <td class="fw-bold" th:text="${policy.policyName}">Firewall Policy</td>
+                                <td th:text="${policy.category}">Firewall</td>
+                                <td>
+                                    <span class="badge" th:classappend="${policy.status == 'Active' ? 'bg-success' : (policy.status == 'Under Review' ? 'bg-warning text-dark' : 'bg-danger')}" th:text="${policy.status}">Active</span>
+                                </td>
+                                <td th:text="${policy.lastAuditDate}">2026-06-20</td>
+                                <td th:text="${policy.nextReviewDate}">2026-12-20</td>
+                                <td class="fw-bold text-primary" th:text="${policy.complianceScore + '%'}">98%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: BACKUP ==================== -->
+        <div id="tab-backup" class="myspace-tab-pane" th:style="${activeTab == 'backup' ? 'display:block' : 'display:none'}">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Database Backups & Access Logs</h5>
+                <button class="btn btn-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#createBackupModal">
+                    <i class="fas fa-plus me-1"></i> Trigger Backup
+                </button>
+            </div>
+            <!-- Stats -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Completed Backups</span>
+                            <h3 th:text="${completedBackupsCount}">3</h3>
+                        </div>
+                        <i class="fas fa-check-circle text-success fa-lg"></i>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Scheduled</span>
+                            <h3 th:text="${scheduledBackupsCount}">1</h3>
+                        </div>
+                        <i class="fas fa-clock text-info fa-lg"></i>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stats-info">
+                            <span class="text-muted small fw-bold">Failed Backups</span>
+                            <h3 th:text="${failedBackupsCount}">1</h3>
+                        </div>
+                        <i class="fas fa-times-circle text-danger fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm" style="border-radius:12px;">
+                <div class="table-responsive p-3">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Backup Name</th>
+                                <th>Type</th>
+                                <th>Frequency</th>
+                                <th>Destination</th>
+                                <th>Size</th>
+                                <th>Last Run</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="backup : ${backupSchedules}">
+                                <td class="fw-bold" th:text="${backup.backupName}">Daily Incremental</td>
+                                <td th:text="${backup.backupType}">Incremental</td>
+                                <td th:text="${backup.frequency}">Daily</td>
+                                <td th:text="${backup.destination}">/backup/daily</td>
+                                <td th:text="${backup.sizeGB + ' GB'}">12.5 GB</td>
+                                <td th:text="${backup.lastRunDate}">Today</td>
+                                <td>
+                                    <span class="badge" th:classappend="${backup.status == 'Completed' ? 'bg-success' : (backup.status == 'Scheduled' ? 'bg-primary' : 'bg-danger')}" th:text="${backup.status}">Completed</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: REPORTS ==================== -->
+        <div id="tab-reports" class="myspace-tab-pane" th:style="${activeTab == 'reports' ? 'display:block' : 'display:none'}">
+            <h5 class="fw-bold mb-3">IT Performance Reports & Analytics</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-lg-6">
+                    <div class="card p-3 border-0 shadow-sm" style="border-radius:12px;">
+                        <h6 class="fw-bold mb-3">Ticket Categorization Matrix</h6>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr class="table-light">
+                                    <th>Category</th>
+                                    <th>Priority High</th>
+                                    <th>Priority Medium</th>
+                                    <th>Priority Low</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Software Issue</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>Hardware Issue</td>
+                                    <td>0</td>
+                                    <td>2</td>
+                                    <td>0</td>
+                                    <td>2</td>
+                                </tr>
+                                <tr>
+                                    <td>Access/Permission</td>
+                                    <td>2</td>
+                                    <td>1</td>
+                                    <td>0</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>Network/Connectivity</td>
+                                    <td>0</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>2</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card p-3 border-0 shadow-sm" style="border-radius:12px; height:100%;">
+                        <h6 class="fw-bold mb-3">Resolution SLA Compliance</h6>
+                        <div class="text-center py-4">
+                            <i class="fas fa-award text-success fa-3x mb-3"></i>
+                            <h4 class="fw-bold text-success">96.8%</h4>
+                            <p class="text-muted small">SLA Resolution Rate within Target Resolution Window</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: COMMUNICATION ==================== -->
+        <div id="tab-communication" class="myspace-tab-pane" th:style="${activeTab == 'communication' ? 'display:block' : 'display:none'}">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">System Broadcasts & Announcements</h5>
+                <button class="btn btn-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#createBroadcastModal">
+                    <i class="fas fa-plus me-1"></i> New Announcement
+                </button>
+            </div>
+            <div class="row g-3">
+                <div th:each="broadcast : ${broadcasts}" class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm p-3 h-100" style="border-radius:12px; display:flex; flex-direction:column; justify-content:space-between;">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge" th:classappend="${broadcast.priority == 'High' ? 'bg-danger' : 'bg-primary'}" th:text="${broadcast.priority}">High</span>
+                                <span class="badge bg-secondary" th:text="${broadcast.category}">Maintenance</span>
+                            </div>
+                            <h6 class="fw-bold text-dark mb-2" th:text="${broadcast.title}">Maintenance</h6>
+                            <p class="text-muted small mb-3" th:text="${broadcast.message}">Message</p>
+                        </div>
+                        <div class="border-top pt-2 d-flex justify-content-between align-items-center mt-3">
+                            <span class="text-muted" style="font-size:0.75rem;" th:text="'Expires: ' + ${broadcast.expiryDate}">Date</span>
+                            <form th:action="@{/senior_it/broadcast/delete/{id}(id=${broadcast.id})}" method="POST" onsubmit="return confirm('Are you sure you want to delete this broadcast?')">
+                                <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: HIERARCHY ==================== -->
+        <div id="tab-hierarchy" class="myspace-tab-pane" th:style="${activeTab == 'hierarchy' ? 'display:block' : 'display:none'}">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Hierarchy & System Role Matrix</h5>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#assignRoleModal">
+                        Assign Role
+                    </button>
+                    <button class="btn btn-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#addRoleModal">
+                        <i class="fas fa-plus me-1"></i> Add Role Position
+                    </button>
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm" style="border-radius:12px;">
+                <div class="table-responsive p-3">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Role Code</th>
+                                <th>Role Name</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="roleItem : ${roles}">
+                                <td class="fw-bold text-primary" th:text="${roleItem.roleCode}">SENIOR_IT_HEAD</td>
+                                <td th:text="${roleItem.roleName}">ROLE_SENIOR_IT_HEAD</td>
+                                <td th:text="${roleItem.category != null ? roleItem.category : 'System Role'}">IT Department</td>
+                                <td th:text="${roleItem.description != null ? roleItem.description : 'Standard system role'}">Description</td>
+                                <td>
+                                    <span class="badge" th:classappend="${roleItem.status == 'Active' ? 'bg-success' : 'bg-danger'}" th:text="${roleItem.status}">Active</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL: ADD USER -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/senior_it/users/add}" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add User & Access</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Employee ID (username)</label>
+                            <input type="text" class="form-control" name="username" placeholder="e.g. EMP0002" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" name="fullName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Designation</label>
+                            <input type="text" class="form-control" name="designation" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Department</label>
+                            <input type="text" class="form-control" name="department" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <select class="form-select" name="roleName" required>
+                                <option th:each="r : ${roles}" th:value="${r.roleName}" th:text="${r.roleName}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Work Location</label>
+                            <input type="text" class="form-control" name="workLocation" value="Delhi" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ASSIGN ROLE -->
+    <div class="modal fade" id="assignRoleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/senior_it/roles/assign}" method="POST">
+                    <input type="hidden" name="tab" id="assignRoleTab" value="hierarchy">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Assign System Role Matrix</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Employee ID</label>
+                            <input type="text" class="form-control" name="username" id="assignRoleEmpId" placeholder="EMP0001" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Select System Role</label>
+                            <select class="form-select" name="roleName" required>
+                                <option th:each="r : ${roles}" th:value="${r.roleName}" th:text="${r.roleName}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Assign Role</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CREATE TICKET -->
+    <div class="modal fade" id="createTicketModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/senior_it/tickets/create}" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Log New IT Ticket</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" name="category" required>
+                                <option value="Software Issue">Software Issue</option>
+                                <option value="Hardware Issue">Hardware Issue</option>
+                                <option value="Access/Permission">Access/Permission</option>
+                                <option value="Network/Connectivity">Network/Connectivity</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Detail Item</label>
+                            <input type="text" class="form-control" name="detailItem" placeholder="e.g. IntelliJ license renewal" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" name="priority" required>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Justification / Description</label>
+                            <textarea class="form-control" name="justification" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create Ticket</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: MANAGE TICKET -->
+    <div class="modal fade" id="updateTicketModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/senior_it/tickets/update}" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Manage Ticket Status & Assignment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="ticketId" id="updateTicketId">
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status" id="updateTicketStatus" required>
+                                <option value="Open">Open</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Resolved">Resolved</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Assigned Technician</label>
+                            <input type="text" class="form-control" name="assignedTo" id="updateTicketAssignedTo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Admin Comments</label>
+                            <textarea class="form-control" name="adminComments" id="updateTicketComments" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD ASSET -->
+    <div class="modal fade" id="addAssetModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/senior_it/assets/add}" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add New IT Asset</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Asset Tag</label>
+                            <input type="text" class="form-control" name="assetTag" placeholder="e.g. IT-AST-011" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Asset Type</label>
+                            <select class="form-select" name="assetType" required>
+                                <option value="Laptop">Laptop</option>
+                                <option value="Monitor">Monitor</option>
+                                <option value="Keyboard">Keyboard</option>
+                                <option value="Mouse">Mouse</option>
+                                <option value="Server">Server</option>
+                                <option value="Printer">Printer</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Brand</label>
+                            <input type="text" class="form-control" name="brand" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Model</label>
+                            <input type="text" class="form-control" name="model" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Serial Number</label>
+                            <input type="text" class="form-control" name="serialNumber" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Assigned To (Emp ID / Department)</label>
+                            <input type="text" class="form-control" name="assignedTo" placeholder="e.g. EMP0001 or UNASSIGNED" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            <input type="text" class="form-control" name="location" value="Delhi Office" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add Asset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: UPDATE ASSET -->
+    <div class="modal fade" id="updateAssetModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/senior_it/assets/update}" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Update Asset Status</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="assetId" id="updateAssetId">
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status" id="updateAssetStatus" required>
+                                <option value="Active">Active</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Disposed">Disposed</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Assigned To</label>
+                            <input type="text" class="form-control" name="assignedTo" id="updateAssetAssignedTo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            <input type="text" class="form-control" name="location" id="updateAssetLocation" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TRIGGER BACKUP -->
+    <div class="modal fade" id="createBackupModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/senior_it/backup/create}" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Trigger Database Backup</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Backup Name</label>
+                            <input type="text" class="form-control" name="backupName" placeholder="e.g. Manual Database Dump" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Backup Type</label>
+                            <select class="form-select" name="backupType" required>
+                                <option value="Full">Full</option>
+                                <option value="Incremental">Incremental</option>
+                                <option value="Differential">Differential</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Frequency</label>
+                            <select class="form-select" name="frequency" required>
+                                <option value="Manual">Manual</option>
+                                <option value="Daily">Daily</option>
+                                <option value="Weekly">Weekly</option>
+                                <option value="Monthly">Monthly</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Source Path</label>
+                            <input type="text" class="form-control" name="source" value="/db/prod" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Destination Path</label>
+                            <input type="text" class="form-control" name="destination" value="/backup/manual" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Expected Size (GB)</label>
+                            <input type="number" step="0.1" class="form-control" name="sizeGB" value="45.5" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Start Backup</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CREATE BROADCAST -->
+    <div class="modal fade" id="createBroadcastModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/senior_it/broadcast/create}" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">New Announcement Broadcast</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" name="priority" required>
+                                <option value="Normal">Normal</option>
+                                <option value="High">High</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" name="category" required>
+                                <option value="General">General</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Security">Security</option>
+                                <option value="Outage">Outage</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Message Content</label>
+                            <textarea class="form-control" name="message" rows="4" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Expiry Date</label>
+                            <input type="date" class="form-control" name="expiryDate" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Publish Broadcast</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD ROLE POSITION -->
+    <div class="modal fade" id="addRoleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form th:action="@{/senior_it/roles/add}" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create New System Role Position</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Role Name (Human Readable)</label>
+                                <input type="text" class="form-control" name="roleName" placeholder="e.g. IT Security Specialist" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Role Code (System Code)</label>
+                                <input type="text" class="form-control" name="roleCode" placeholder="e.g. IT_SECURITY_SPEC" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Department / Category</label>
+                                <input type="text" class="form-control" name="category" value="IT Department" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="status" required>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="2" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Assign Permissions (Select all that apply)</label>
+                            <div class="row" style="max-height: 200px; overflow-y: auto; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <div class="col-md-6 mb-2" th:each="perm : ${permissions}">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="permissionIds" th:value="${perm.id}" th:id="'perm-' + ${perm.id}">
+                                        <label class="form-check-label small" th:for="'perm-' + ${perm.id}" th:text="${perm.permissionName}"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create Role Position</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        // Tab switching logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.myspace-tab-pane').forEach(el => el.style.display = 'none');
+            const target = document.getElementById('tab-' + tabId);
+            if (target) target.style.display = 'block';
+
+            document.querySelectorAll('.nav-link-item').forEach(el => el.classList.remove('active'));
+            // Find current event source or class item
+            if (window.event) {
+                window.event.currentTarget.classList.add('active');
+            }
+
+            const titleMap = {
+                'dashboard': 'IT Service Desk Dashboard',
+                'user-access': 'User & Access Directory',
+                'system-app': 'System & Application Health',
+                'tickets': 'IT Service Tickets Management',
+                'devices': 'Device & Asset Inventory',
+                'security': 'Security Compliance Scorecard',
+                'backup': 'Backup Schedule & Access Logs',
+                'reports': 'IT Performance Reports',
+                'communication': 'Broadcasting & Alerts',
+                'hierarchy': 'Department Hierarchy & Role Matrix'
+            };
+            document.getElementById('tabTitle').textContent = titleMap[tabId] || 'IT Admin My Space';
+        }
+
+        // Initialize status donut chart
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('statusChart').getContext('2d');
+            
+            const pending = [[${pendingTicketsCount}]];
+            const progress = [[${inProgressTicketsCount}]];
+            const resolved = [[${resolvedTodayCount}]];
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pending', 'In Progress', 'Resolved'],
+                    datasets: [{
+                        data: [pending, progress, resolved],
+                        backgroundColor: ['#f59e0b', '#06b6d4', '#10b981'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        });
+
+        // Helper modal trigger functions
+        function assignRoleModal(username) {
+            document.getElementById('assignRoleEmpId').value = username || '';
+            document.getElementById('assignRoleTab').value = username ? 'user-access' : 'hierarchy';
+            const modal = new bootstrap.Modal(document.getElementById('assignRoleModal'));
+            modal.show();
+        }
+
+        function updateTicketModal(id, status, assignedTo) {
+            document.getElementById('updateTicketId').value = id;
+            document.getElementById('updateTicketStatus').value = status;
+            document.getElementById('updateTicketAssignedTo').value = assignedTo || '';
+            const modal = new bootstrap.Modal(document.getElementById('updateTicketModal'));
+            modal.show();
+        }
+
+        function updateAssetModal(id, status, assignedTo, location) {
+            document.getElementById('updateAssetId').value = id;
+            document.getElementById('updateAssetStatus').value = status;
+            document.getElementById('updateAssetAssignedTo').value = assignedTo || '';
+            document.getElementById('updateAssetLocation').value = location || '';
+            const modal = new bootstrap.Modal(document.getElementById('updateAssetModal'));
+            modal.show();
+        }
+
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-collapsed');
+        }
+    </script>
+</body>
+</html>

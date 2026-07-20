@@ -147,6 +147,8 @@ public class DashboardController {
             return "redirect:/senior_rewards/dashboard";
         } else if (request.isUserInRole("SENIOR_FACILITY_HEAD")) {
             return "redirect:/senior_facility/dashboard";
+        } else if (request.isUserInRole("SENIOR_IT_HEAD")) {
+            return "redirect:/senior_it/dashboard";
         } else if (request.isUserInRole("FACILITY_L2")) {
             return "redirect:/facility/dashboard";
         } else if (request.isUserInRole("SUPER_ADMIN") || request.isUserInRole("HR_ADMIN") ||
@@ -373,7 +375,8 @@ public class DashboardController {
         "/senior_transport/workflow",
         "/senior_rewards/workflow",
         "/facility/workflow",
-        "/senior_facility/workflow"
+        "/senior_facility/workflow",
+        "/senior_it/workflow"
     })
     public String showManagerWorkflow(org.springframework.ui.Model model, java.security.Principal principal, jakarta.servlet.http.HttpServletRequest request) {
         String currentUserId = principal.getName();
@@ -726,7 +729,8 @@ public class DashboardController {
                     || "SENIOR_LND_HEAD".equals(roleName)
                     || "SENIOR_ACCOUNTS_HEAD".equals(roleName)
                     || "SENIOR_TRANSPORT_HEAD".equals(roleName)
-                    || "SENIOR_REWARDS_HEAD".equals(roleName);
+                    || "SENIOR_REWARDS_HEAD".equals(roleName)
+                    || "SENIOR_IT_HEAD".equals(roleName);
         }
         System.out.println("================================");
         System.out.println("USERNAME = " + currentUserId);

@@ -285,4 +285,66 @@ public class ThymeleafSyntaxTest {
             org.junit.jupiter.api.Assertions.fail(e.getMessage());
         }
     }
+
+    @Test
+    public void testSeniorItMyspaceSyntax() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRequestURI("/senior_it/my_space");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockServletContext servletContext = new MockServletContext();
+
+        JakartaServletWebApplication application = JakartaServletWebApplication.buildApplication(servletContext);
+        IWebExchange exchange = application.buildExchange(request, response);
+
+        WebContext context = new WebContext(exchange);
+        
+        // Mock User
+        com.example.admindashboard.model.User currentUser = new com.example.admindashboard.model.User();
+        currentUser.setUsername("EMP0001");
+        currentUser.setFullName("Rajesh Kumar");
+        com.example.admindashboard.model.EmployeeProfile profile = new com.example.admindashboard.model.EmployeeProfile();
+        profile.setDepartment("IT");
+        profile.setDesignation("Senior IT Head");
+        currentUser.setEmployeeProfile(profile);
+        
+        context.setVariable("currentUser", currentUser);
+        context.setVariable("activeTab", "dashboard");
+        context.setVariable("totalTicketsCount", 10L);
+        context.setVariable("pendingTicketsCount", 3L);
+        context.setVariable("inProgressTicketsCount", 2L);
+        context.setVariable("resolvedTodayCount", 5L);
+        context.setVariable("avgResolutionTime", "4.2 hrs");
+        context.setVariable("softwareCount", 4L);
+        context.setVariable("hardwareCount", 3L);
+        context.setVariable("accessCount", 2L);
+        context.setVariable("networkCount", 1L);
+        context.setVariable("softwarePercent", 40L);
+        context.setVariable("hardwarePercent", 30L);
+        context.setVariable("accessPercent", 20L);
+        context.setVariable("networkPercent", 10L);
+        context.setVariable("recentTickets", Collections.emptyList());
+        
+        // Users list
+        context.setVariable("users", Collections.singletonList(currentUser));
+        context.setVariable("roles", Collections.emptyList());
+        context.setVariable("permissions", Collections.emptyList());
+        context.setVariable("assets", Collections.emptyList());
+        context.setVariable("activeAssetsCount", 10L);
+        context.setVariable("maintenanceAssetsCount", 2L);
+        context.setVariable("disposedAssetsCount", 1L);
+        context.setVariable("securityPolicies", Collections.emptyList());
+        context.setVariable("backupSchedules", Collections.emptyList());
+        context.setVariable("broadcasts", Collections.emptyList());
+        context.setVariable("departments", Collections.singletonList("IT"));
+
+        System.out.println("TEST_START_RENDER_IT_MYSPACE");
+        try {
+            String result = templateEngine.process("senior_it-myspace", context);
+            System.out.println("TEST_SUCCESS: RENDERED IT MYSPACE OK");
+        } catch (Exception e) {
+            System.out.println("TEST_FAILURE IT MYSPACE: " + e.getMessage());
+            e.printStackTrace();
+            org.junit.jupiter.api.Assertions.fail(e.getMessage());
+        }
+    }
 }

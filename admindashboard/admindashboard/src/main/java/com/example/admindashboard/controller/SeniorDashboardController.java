@@ -374,6 +374,50 @@ public class SeniorDashboardController {
         return "redirect:/senior_rewards/my_space";
     }
 
+    // --- SENIOR IT HEAD ROUTES ---
+
+    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @GetMapping("/senior_it/dashboard")
+    public String showSeniorItDashboard(Model model, Principal principal, HttpServletRequest request) {
+        String currentUserId = principal.getName();
+        List<com.example.admindashboard.model.ServiceRequest> recentTickets =
+                serviceRequestRepository.findTop3ByEmployeeIdOrderByIdDesc(currentUserId);
+        model.addAttribute("recentTickets", recentTickets);
+        model.addAttribute("pendingMeetingInvites", getPendingMeetingInvites(currentUserId));
+        model.addAttribute("isSeniorManager", true);
+        model.addAttribute("workflowUrl", "/senior_it/workflow");
+        return "senior_it-dashboard";
+    }
+
+    @GetMapping("/senior_it/login")
+    public String showSeniorItLogin() {
+        return "senior_it-login";
+    }
+
+    @PostMapping("/senior_it/login")
+    public String processSeniorItLogin(
+            @RequestParam String username,
+            @RequestParam String password,
+            Model model) {
+
+        User user = userRepository
+                .findByUsername(username.toUpperCase())
+                .orElse(null);
+
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+            model.addAttribute("authError", "Invalid username or password");
+            return "senior_it-login";
+        }
+
+        String role = user.getRole() != null ? user.getRole().getRoleName() : "";
+        if (!"SENIOR_IT_HEAD".equalsIgnoreCase(role)) {
+            model.addAttribute("authError", "Only IT Head credentials can access this My Space");
+            return "senior_it-login";
+        }
+
+        return "redirect:/senior_it/my_space";
+    }
+
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_rewards/my_space")
     public String showSeniorRewardsMySpace(Model model, Principal principal, @RequestParam(name="tab", defaultValue="dashboard") String tab) {

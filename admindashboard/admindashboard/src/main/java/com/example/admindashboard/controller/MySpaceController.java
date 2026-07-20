@@ -289,6 +289,9 @@ public class MySpaceController {
             case "SENIOR_FACILITY_HEAD":
                 return "redirect:/senior_facility/dashboard";
 
+            case "SENIOR_IT_HEAD":
+                return "redirect:/senior_it/dashboard";
+
             default:
 
                 model.addAttribute("authError",
@@ -354,7 +357,7 @@ public class MySpaceController {
 
                                 // ===== ROLE-BASED HIERARCHY (L1-L4) =====
                                 java.util.Set<String> L4_ROLES = java.util.Set.of("SUPER_ADMIN", "ADMIN");
-                                java.util.Set<String> L3_ROLES = java.util.Set.of("SENIOR_MANAGER", "SENIOR_HR", "SENIOR_LND_HEAD", "SENIOR_ACCOUNTS_HEAD", "SENIOR_TRANSPORT_HEAD", "SENIOR_REWARDS_HEAD", "SENIOR_FACILITY_HEAD");
+                                java.util.Set<String> L3_ROLES = java.util.Set.of("SENIOR_MANAGER", "SENIOR_HR", "SENIOR_LND_HEAD", "SENIOR_ACCOUNTS_HEAD", "SENIOR_TRANSPORT_HEAD", "SENIOR_REWARDS_HEAD", "SENIOR_FACILITY_HEAD", "SENIOR_IT_HEAD");
                                 java.util.Set<String> L2_ROLES = java.util.Set.of("HR_ADMIN", "HR_EXECUTIVE", "MANAGER", "HR_MANAGER", "PROJECT_MANAGER", "FINANCE", "RECRUITER", "IT_ADMIN", "IT_SUPPORT", "AUDITOR", "TRANSPORT", "LND", "REWARDS", "FACILITY_L2");
                                 // L1 = EMPLOYEE + CLIENT + anyone not in L2/L3/L4
 

@@ -1,0 +1,609 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget & Resource Planning</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', Arial, sans-serif; }
+    body { background:#f4f7fb; color:#333; font-size:14px; overflow-x:hidden; }
+
+    /* Layout */
+    .learning-dashboard { display:flex; min-height:100vh; }
+    .sidebar { width:250px; background:#fff; border-right:1px solid #eaeaea; display:flex; flex-direction:column; }
+    .dashboard-content { flex:1; padding:20px 30px; display:flex; flex-direction:column; position: relative; }
+
+    /* Sidebar */
+    .sidebar-header { padding:20px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #eaeaea; }
+    .company-logo { width:36px; height:36px; object-fit:contain; border-radius: 4px; }
+    .company-details h3 { font-size:16px; font-weight:700; color:#002D72; margin-bottom: 2px;}
+    .company-details span { font-size:12px; color:#888; }
+    .sidebar-menu { margin-top:15px; }
+    .menu-item { display:flex; align-items:center; gap:12px; text-decoration:none; color:#555; padding:12px 20px; font-size:14px; font-weight: 500; transition:.2s; border-left: 3px solid transparent;}
+    .menu-item:hover { background:#f8fafc; color: #002D72;}
+    .menu-item.active { background:#eef4ff; color:#002D72; border-left-color: #002D72; font-weight: 600;}
+    .menu-item i { width:18px; text-align: center; font-size: 16px;}
+
+    /* Top Header */
+    .dashboard-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
+    .header-left .page-title { font-size:22px; font-weight:700; color:#111; margin-bottom: 4px;}
+    .header-left .page-subtitle { font-size:13px; color:#666; }
+    
+    .header-right { display:flex; align-items:center; gap:15px; }
+    .btn-primary { background:#0052cc; border:none; padding:8px 15px; border-radius:6px; font-size:13px; color:#fff; display:flex; align-items:center; gap:8px; cursor:pointer; font-weight: 500; text-decoration: none; transition: 0.2s;}
+    .btn-primary:hover { background: #0043a6;}
+    .header-profile { display:flex; align-items:center; gap:10px; margin-left: 15px; padding-left: 15px; border-left: 1px solid #ddd;}
+    .profile-image { width:38px; height:38px; border-radius:50%; object-fit:cover; }
+    .profile-name { font-size:14px; font-weight:600; color:#222; }
+
+    /* Tabs */
+    .tabs-container { border-bottom: 1px solid #ddd; margin-bottom: 25px; display: flex; gap: 30px; }
+    .tab-item { text-decoration: none; color: #666; font-size: 14px; font-weight: 500; padding-bottom: 10px; border-bottom: 3px solid transparent; cursor: pointer;}
+    .tab-item.active { color: #002D72; border-bottom-color: #002D72; font-weight: 600; }
+    .tab-item:hover:not(.active) { color: #333; }
+
+    /* Stats Grid */
+    .stats-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; margin-bottom:25px; }
+    .stat-card { background:#fff; padding:20px; border-radius:10px; border:1px solid #eaeaea; display:flex; flex-direction:row; align-items: center; justify-content:space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.02);}
+    .stat-info { display: flex; flex-direction: column; gap: 4px; }
+    .stat-title { font-size:13px; color:#666; font-weight: 500;}
+    .stat-value { font-size:22px; font-weight:700; color:#111; }
+    .stat-icon { width: 42px; height: 42px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .icon-blue { background: #eef4ff; color: #0052cc; }
+    .icon-orange { background: #fffae6; color: #ff8b00; }
+    .icon-green { background: #e3fcef; color: #00875a; }
+
+    /* Main Area Split */
+    .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+    
+    /* Main Card */
+    .card { background:#fff; border-radius:10px; border:1px solid #eaeaea; padding:20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+    .card-title { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 15px; }
+    
+    /* Table */
+    .table-container { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 15px 12px; text-align: left; border-bottom: 1px solid #eaeaea; font-size: 13px; }
+    th { font-weight: 600; color: #666; background: #f9fafc; }
+    td { color: #333; }
+    
+    .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;}
+    .status-ok { background: #e3fcef; color: #00875a; }
+    .status-warn { background: #fffae6; color: #ff8b00; }
+    .status-over { background: #ffebe6; color: #de350b; }
+    
+    .action-icon { color: #0052cc; cursor: pointer; font-size: 16px; margin-left: 10px;}
+    
+    /* Progress Bars in Table */
+    .prog-bg { width: 100px; height: 6px; background: #eee; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: 8px;}
+    .prog-fill { height: 100%; border-radius: 3px; background: #0052cc;}
+    
+    /* Modal Styles */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: #fff; width: 450px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; max-height: 90vh;}
+    .modal-header { padding: 15px 20px; border-bottom: 1px solid #eaeaea; display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-size: 16px; font-weight: 600; color: #111; }
+    .close-btn { background: none; border: none; font-size: 18px; color: #666; cursor: pointer; }
+    .modal-body { padding: 20px; overflow-y: auto; }
+    .modal-footer { padding: 15px 20px; border-top: 1px solid #eaeaea; display: flex; justify-content: flex-end; gap: 10px; }
+    
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 500; color: #555; margin-bottom: 6px; }
+    .form-control { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
+    .form-control:focus { outline: none; border-color: #0052cc; }
+    
+    .btn-secondary { background: #f4f5f7; border: 1px solid #ddd; padding: 8px 15px; border-radius: 6px; font-size: 13px; color: #333; cursor: pointer; font-weight: 500; }
+    .btn-secondary:hover { background: #ebecf0; }
+
+    /* Views */
+    #budgetView { display: block; }
+    #resourceView { display: none; }
+
+    
+    /* Sidebar Toggle Enhanced */
+    .sidebar { transition: width 0.3s; position: relative; }
+    .sidebar.collapsed { width: 80px; }
+    .sidebar.collapsed .company-details, .sidebar.collapsed .menu-item span, .sidebar.collapsed .logout-text { display: none; }
+    .sidebar.collapsed .sidebar-header { justify-content: center; padding: 20px 0; }
+    
+    .sidebar-header { padding:20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eaeaea; }
+    
+    .toggle-sidebar-btn { 
+        position: absolute; 
+        right: -14px; 
+        top: 25px; 
+        background: #fff; 
+        border: 1px solid #eaeaea; 
+        border-radius: 50%; 
+        width: 28px; 
+        height: 28px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        cursor: pointer; 
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: transform 0.3s;
+        color: #555;
+    }
+    .toggle-sidebar-btn:hover { background: #f4f7fb; color: #0052cc; }
+    .sidebar.collapsed .toggle-sidebar-btn { transform: rotate(180deg); }
+    .sidebar.collapsed .company-logo { width: 32px; height: 32px; }
+</style>
+</head>
+<body>
+
+<div class="learning-dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+                <div class="sidebar-header">
+            <div style="display:flex; align-items:center; gap:12px;" class="logo-wrapper">
+                <img src="/images/wcg-logo.jpg" alt="WCG Logo" class="company-logo" onerror="this.src='https://ui-avatars.com/api/?name=WCG&background=0D8ABC&color=fff'">
+                <div class="company-details">
+                    <h3>WhiteCircle</h3>
+                    <span>Learning Admin L3</span>
+                </div>
+            </div>
+            <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="Collapse Sidebar"><i class="fa-solid fa-angle-left"></i></button>
+        </div>
+                <nav class="sidebar-menu">
+            <a href="/space/lnd/dashboard" class="menu-item" id="nav-dashboard">
+                <i class="fa-solid fa-shapes"></i><span>Dashboard</span>
+            </a>
+            <a href="/space/lnd/approvals" class="menu-item" id="nav-approvals">
+                <i class="fa-regular fa-square-check"></i><span>Approvals</span>
+            </a>
+            <a href="#" class="menu-item" id="nav-strategy">
+                <i class="fa-solid fa-chart-line"></i><span>Strategy & Program Mgt</span>
+            </a>
+            <a href="/space/lnd/courses" class="menu-item" id="nav-courses">
+                <i class="fa-solid fa-book-open"></i><span>Course & Content Mgt</span>
+            </a>
+            <a href="/space/lnd/integrations" class="menu-item" id="nav-integrations">
+                <i class="fa-solid fa-link"></i><span>Performance & Learning Int</span>
+            </a>
+            <a href="#" class="menu-item" id="nav-certification">
+                <i class="fa-solid fa-certificate"></i><span>Certification & Assessment</span>
+            </a>
+            <a href="/space/lnd/reports" class="menu-item" id="nav-analytics">
+                <i class="fa-solid fa-chart-simple"></i><span>Analytics & Evaluation</span>
+            </a>
+            <a href="/space/lnd/vendors" class="menu-item" id="nav-vendors">
+                <i class="fa-solid fa-users-gear"></i><span>Trainer & Vendor Mgt</span>
+            </a>
+            <a href="/space/lnd/budgets" class="menu-item active" id="nav-budgets">
+                <i class="fa-solid fa-wallet"></i><span>Budget & Resource Planning</span>
+            </a>
+                </nav>
+        <div style="margin-top: auto; padding: 20px; border-top: 1px solid #eaeaea;">
+            <a href="/logout" style="display:flex; align-items:center; gap:12px; text-decoration:none; color:#de350b; font-weight:600; font-size:14px;">
+                <i class="fa-solid fa-arrow-right-from-bracket" style="width:18px; text-align:center; font-size:16px;"></i><span class="logout-text">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1 class="page-title">Budget & Resource Planning</h1>
+                <p class="page-subtitle">Allocate budgets, manage expenses and plan learning resources</p>
+            </div>
+            <div class="header-right">
+                <button class="btn-primary" id="headerActionBtn" onclick="openModal('allocateBudgetModal')">
+                    <i class="fa-solid fa-plus"></i> Allocate Budget
+                </button>
+                
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <a class="tab-item active" onclick="switchView('budget', this)">Budget Allocation</a>
+            <a class="tab-item" onclick="switchView('resource', this)">Resource Planning</a>
+        </div>
+
+        <!-- BUDGET VIEW -->
+        <div id="budgetView">
+            <!-- Stats Grid -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Total Budget</div>
+                        <div class="stat-value" id="totBudget">â‚¹ 0</div>
+                    </div>
+                    <div class="stat-icon icon-blue"><i class="fa-solid fa-sack-dollar"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Budget Spent</div>
+                        <div class="stat-value" id="totSpent">â‚¹ 0</div>
+                    </div>
+                    <div class="stat-icon icon-orange"><i class="fa-solid fa-money-bill-wave"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Budget Remaining</div>
+                        <div class="stat-value" id="totRemain">â‚¹ 0</div>
+                    </div>
+                    <div class="stat-icon icon-green"><i class="fa-solid fa-piggy-bank"></i></div>
+                </div>
+            </section>
+
+            <section class="main-grid">
+                <div class="card">
+                    <div class="card-title">Program Budget Summary</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Program / Dept</th>
+                                    <th>Allocated</th>
+                                    <th>Spent</th>
+                                    <th>Remaining</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="budgetTableBody">
+                                <!-- Fetched from API -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Budget Utilization</div>
+                    <div style="height: 220px; display:flex; justify-content:center; align-items:center; position:relative;">
+                        <canvas id="budgetChart"></canvas>
+                        <div style="position:absolute; text-align:center;">
+                            <div style="font-size:24px; font-weight:700; color:#111;" id="utilPercent">0%</div>
+                            <div style="font-size:12px; color:#666;">Utilized</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- RESOURCE VIEW -->
+        <div id="resourceView">
+            <div class="card">
+                <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
+                    Resource Planning Summary
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Resource Name</th>
+                                <th>Role / Type</th>
+                                <th>Allocation</th>
+                                <th>Availability</th>
+                                <th>Utilization</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resourceTableBody">
+                            <!-- Fetched from API -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Allocate Budget Modal -->
+<div class="modal-overlay" id="allocateBudgetModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Allocate Budget</div>
+            <button class="close-btn" onclick="closeModal('allocateBudgetModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="budgetForm">
+                <div class="form-group">
+                    <label>Department or Program</label>
+                    <select id="bDept" class="form-control">
+                        <option value="Leadership Masterclass">Leadership Masterclass</option>
+                        <option value="Sales Training Q3">Sales Training Q3</option>
+                        <option value="IT Security Compliance">IT Security Compliance</option>
+                        <option value="General Onboarding">General Onboarding</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Allocated Amount (â‚¹)</label>
+                    <input type="number" id="bAllocated" class="form-control" placeholder="e.g. 500000" required>
+                </div>
+                <div class="form-group">
+                    <label>Spent Amount (â‚¹) - Initial</label>
+                    <input type="number" id="bSpent" class="form-control" placeholder="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Budget Period</label>
+                    <select id="bPeriod" class="form-control">
+                        <option value="Q1 2026">Q1 2026</option>
+                        <option value="Q2 2026">Q2 2026</option>
+                        <option value="Q3 2026">Q3 2026</option>
+                        <option value="Q4 2026">Q4 2026</option>
+                        <option value="FY 2026">FY 2026</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal('allocateBudgetModal')">Cancel</button>
+            <button class="btn-primary" onclick="submitBudget()">Save Budget</button>
+        </div>
+    </div>
+</div>
+
+<!-- Plan New Resource Modal -->
+<div class="modal-overlay" id="planResourceModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Plan New Resource</div>
+            <button class="close-btn" onclick="closeModal('planResourceModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="resourceForm">
+                <div class="form-group">
+                    <label>Resource Name</label>
+                    <input type="text" id="rName" class="form-control" placeholder="Enter name" required>
+                </div>
+                <div class="form-group" style="display:flex; gap:15px;">
+                    <div style="flex:1;">
+                        <label>Role / Type</label>
+                        <select id="rRole" class="form-control">
+                            <option value="Trainer">Trainer</option>
+                            <option value="Instructional Designer">Instructional Designer</option>
+                            <option value="SME">Subject Matter Expert (SME)</option>
+                            <option value="LMS Admin">LMS Admin</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label>Allocation %</label>
+                        <input type="number" id="rAlloc" class="form-control" placeholder="e.g. 50" max="100">
+                    </div>
+                </div>
+                <div class="form-group" style="display:flex; gap:15px;">
+                    <div style="flex:1;">
+                        <label>Availability</label>
+                        <select id="rAvail" class="form-control">
+                            <option value="Available">Available</option>
+                            <option value="Booked">Booked</option>
+                            <option value="Partially Available">Partially Available</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label>Current Utilization %</label>
+                        <input type="number" id="rUtil" class="form-control" placeholder="e.g. 80" max="100">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal('planResourceModal')">Cancel</button>
+            <button class="btn-primary" onclick="submitResource()">Add Resource</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let bChart = null;
+
+    function switchView(view, tabElement) {
+        document.getElementById('budgetView').style.display = view === 'budget' ? 'block' : 'none';
+        document.getElementById('resourceView').style.display = view === 'resource' ? 'block' : 'none';
+        
+        document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+        tabElement.classList.add('active');
+        
+        const actionBtn = document.getElementById('headerActionBtn');
+        if(view === 'budget') {
+            actionBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Allocate Budget';
+            actionBtn.setAttribute('onclick', "openModal('allocateBudgetModal')");
+        } else {
+            actionBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Plan Resource';
+            actionBtn.setAttribute('onclick', "openModal('planResourceModal')");
+        }
+    }
+
+    function openModal(id) {
+        document.getElementById(id).style.display = 'flex';
+    }
+    
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    // --- Budgets API ---
+    async function loadBudgets() {
+        try {
+            const res = await fetch('/api/lnd/budgets');
+            const data = await res.json();
+            const tbody = document.getElementById('budgetTableBody');
+            tbody.innerHTML = '';
+            
+            let tAlloc = 0, tSpent = 0, tRemain = 0;
+
+            if(data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">No budgets allocated yet.</td></tr>';
+                updateChart(0, 100);
+                return;
+            }
+
+            data.forEach(b => {
+                tAlloc += b.allocatedAmount || 0;
+                tSpent += b.spentAmount || 0;
+                tRemain += b.remainingAmount || 0;
+                
+                let pct = b.allocatedAmount ? Math.round(((b.spentAmount||0)/b.allocatedAmount)*100) : 0;
+                let statusCls = pct > 90 ? 'status-over' : (pct > 75 ? 'status-warn' : 'status-ok');
+                let statusTxt = pct > 90 ? 'Overbudget' : (pct > 75 ? 'Warning' : 'On Track');
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${b.departmentOrProgram}</strong></td>
+                        <td>â‚¹ ${b.allocatedAmount.toLocaleString('en-IN')}</td>
+                        <td>â‚¹ ${b.spentAmount.toLocaleString('en-IN')}</td>
+                        <td>â‚¹ ${b.remainingAmount.toLocaleString('en-IN')}</td>
+                        <td><span class="status-badge ${statusCls}"><i class="fa-solid fa-circle" style="font-size:6px;"></i> ${statusTxt}</span></td>
+                        <td>
+                            <i class="fa-regular fa-trash-can action-icon" style="color:#de350b;" onclick="deleteBudget(${b.id})"></i>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            document.getElementById('totBudget').innerText = 'â‚¹ ' + tAlloc.toLocaleString('en-IN');
+            document.getElementById('totSpent').innerText = 'â‚¹ ' + tSpent.toLocaleString('en-IN');
+            document.getElementById('totRemain').innerText = 'â‚¹ ' + tRemain.toLocaleString('en-IN');
+            
+            let ut = tAlloc > 0 ? Math.round((tSpent / tAlloc)*100) : 0;
+            document.getElementById('utilPercent').innerText = ut + '%';
+            updateChart(tSpent, tRemain);
+
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function submitBudget() {
+        const payload = {
+            departmentOrProgram: document.getElementById('bDept').value,
+            allocatedAmount: parseFloat(document.getElementById('bAllocated').value),
+            spentAmount: parseFloat(document.getElementById('bSpent').value) || 0,
+            budgetPeriod: document.getElementById('bPeriod').value
+        };
+        
+        if(!payload.allocatedAmount) return alert("Allocated amount required");
+
+        await fetch('/api/lnd/budgets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        closeModal('allocateBudgetModal');
+        document.getElementById('budgetForm').reset();
+        loadBudgets();
+    }
+
+    async function deleteBudget(id) {
+        if(confirm("Delete budget?")) {
+            await fetch('/api/lnd/budgets/' + id, { method: 'DELETE' });
+            loadBudgets();
+        }
+    }
+
+    // --- Resources API ---
+    async function loadResources() {
+        try {
+            const res = await fetch('/api/lnd/resources');
+            const data = await res.json();
+            const tbody = document.getElementById('resourceTableBody');
+            tbody.innerHTML = '';
+            
+            if(data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">No resources planned yet.</td></tr>';
+                return;
+            }
+
+            data.forEach(r => {
+                let avCls = r.availabilityStatus === 'Available' ? 'status-ok' : (r.availabilityStatus === 'Booked' ? 'status-over' : 'status-warn');
+                let utilCls = r.utilizationPercentage > 85 ? 'background:#de350b;' : 'background:#0052cc;';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <img src="https://ui-avatars.com/api/?name=${r.resourceName}&background=eaeaea&color=333" style="width:32px; height:32px; border-radius:50%;">
+                                <strong>${r.resourceName}</strong>
+                            </div>
+                        </td>
+                        <td>${r.roleType}</td>
+                        <td>${r.allocationPercentage}% Dedicated</td>
+                        <td><span class="status-badge ${avCls}">${r.availabilityStatus}</span></td>
+                        <td>
+                            <div class="prog-bg"><div class="prog-fill" style="width:${r.utilizationPercentage}%; ${utilCls}"></div></div> ${r.utilizationPercentage}%
+                        </td>
+                        <td>
+                            <i class="fa-regular fa-trash-can action-icon" style="color:#de350b;" onclick="deleteResource(${r.id})"></i>
+                        </td>
+                    </tr>
+                `;
+            });
+        } catch (e) { console.error(e); }
+    }
+
+    async function submitResource() {
+        const payload = {
+            resourceName: document.getElementById('rName').value,
+            roleType: document.getElementById('rRole').value,
+            allocationPercentage: parseInt(document.getElementById('rAlloc').value) || 0,
+            utilizationPercentage: parseInt(document.getElementById('rUtil').value) || 0,
+            availabilityStatus: document.getElementById('rAvail').value
+        };
+        
+        if(!payload.resourceName) return alert("Resource name required");
+
+        await fetch('/api/lnd/resources', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        closeModal('planResourceModal');
+        document.getElementById('resourceForm').reset();
+        loadResources();
+    }
+    
+    async function deleteResource(id) {
+        if(confirm("Delete resource?")) {
+            await fetch('/api/lnd/resources/' + id, { method: 'DELETE' });
+            loadResources();
+        }
+    }
+
+    function updateChart(spent, remain) {
+        const ctx = document.getElementById('budgetChart').getContext('2d');
+        if(bChart) bChart.destroy();
+        bChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Spent', 'Remaining'],
+                datasets: [{
+                    data: [spent, Math.max(remain, 0)],
+                    backgroundColor: ['#ff8b00', '#eaeaea'],
+                    borderWidth: 0,
+                    cutout: '80%'
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } }
+            }
+        });
+    }
+
+    // Initialize
+    loadBudgets();
+    loadResources();
+</script>
+
+<script>
+    function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('collapsed');
+    }
+</script>
+</body>
+</html>
+
+
+
+

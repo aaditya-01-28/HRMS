@@ -1,0 +1,307 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course Management - Content Library</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', Arial, sans-serif; }
+    body { background:#f4f7fb; color:#333; font-size:14px; overflow-x:hidden; }
+
+    /* Layout */
+    .learning-dashboard { display:flex; min-height:100vh; }
+    .sidebar { width:250px; background:#fff; border-right:1px solid #eaeaea; display:flex; flex-direction:column; }
+    .dashboard-content { flex:1; padding:20px 30px; display:flex; flex-direction:column; }
+
+    /* Sidebar */
+    .sidebar-header { padding:20px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #eaeaea; }
+    .company-logo { width:36px; height:36px; object-fit:contain; border-radius: 4px; }
+    .company-details h3 { font-size:16px; font-weight:700; color:#002D72; margin-bottom: 2px;}
+    .company-details span { font-size:12px; color:#888; }
+    .sidebar-menu { margin-top:15px; }
+    .menu-item { display:flex; align-items:center; gap:12px; text-decoration:none; color:#555; padding:12px 20px; font-size:14px; font-weight: 500; transition:.2s; border-left: 3px solid transparent;}
+    .menu-item:hover { background:#f8fafc; color: #002D72;}
+    .menu-item.active { background:#eef4ff; color:#002D72; border-left-color: #002D72; font-weight: 600;}
+    .menu-item i { width:18px; text-align: center; font-size: 16px;}
+
+    /* Top Header */
+    .dashboard-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
+    .header-left .page-title { font-size:22px; font-weight:700; color:#111; margin-bottom: 4px;}
+    .header-left .page-subtitle { font-size:13px; color:#666; }
+    
+    .header-right { display:flex; align-items:center; gap:15px; }
+    .btn-primary { background:#0052cc; border:none; padding:8px 15px; border-radius:6px; font-size:13px; color:#fff; display:flex; align-items:center; gap:8px; cursor:pointer; font-weight: 500; text-decoration: none;}
+    .header-profile { display:flex; align-items:center; gap:10px; margin-left: 15px; padding-left: 15px; border-left: 1px solid #ddd;}
+    .profile-image { width:38px; height:38px; border-radius:50%; object-fit:cover; }
+    .profile-name { font-size:14px; font-weight:600; color:#222; }
+
+    /* Main Card */
+    .card { background:#fff; border-radius:10px; border:1px solid #eaeaea; padding:20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin-bottom: 20px; flex: 1;}
+    .card-header-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; }
+    
+    .search-filter-group { display: flex; gap: 15px; align-items: center;}
+    .search-input { padding: 8px 12px 8px 35px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; width: 300px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="%23999" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>') no-repeat 10px center; }
+    .filter-select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; color: #555; background: #fff;}
+    
+    /* Table */
+    .table-container { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 15px 12px; text-align: left; border-bottom: 1px solid #eaeaea; font-size: 13px; }
+    th { font-weight: 600; color: #666; background: #f9fafc; }
+    td { color: #333; }
+    
+    .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;}
+    .status-active { background: #e3fcef; color: #00875a; }
+    .status-draft { background: #eae6ff; color: #5243aa; }
+    
+    .action-icon { color: #0052cc; cursor: pointer; font-size: 16px; margin-left: 10px;}
+    
+    .course-info { display: flex; align-items: center; gap: 12px; }
+    .course-img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; background: #eee;}
+    
+    /* Sidebar Toggle Enhanced */
+    .sidebar { transition: width 0.3s; position: relative; }
+    .sidebar.collapsed { width: 80px; }
+    .sidebar.collapsed .company-details, .sidebar.collapsed .menu-item span, .sidebar.collapsed .logout-text { display: none; }
+    .sidebar.collapsed .sidebar-header { justify-content: center; padding: 20px 0; }
+    
+    .sidebar-header { padding:20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eaeaea; }
+    
+    .toggle-sidebar-btn { 
+        position: absolute; 
+        right: -14px; 
+        top: 25px; 
+        background: #fff; 
+        border: 1px solid #eaeaea; 
+        border-radius: 50%; 
+        width: 28px; 
+        height: 28px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        cursor: pointer; 
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: transform 0.3s;
+        color: #555;
+    }
+    .toggle-sidebar-btn:hover { background: #f4f7fb; color: #0052cc; }
+    .sidebar.collapsed .toggle-sidebar-btn { transform: rotate(180deg); }
+    .sidebar.collapsed .company-logo { width: 32px; height: 32px; }
+</style>
+</head>
+<body>
+
+<div class="learning-dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+                <div class="sidebar-header">
+            <div style="display:flex; align-items:center; gap:12px;" class="logo-wrapper">
+                <img src="/images/wcg-logo.jpg" alt="WCG Logo" class="company-logo" onerror="this.src='https://ui-avatars.com/api/?name=WCG&background=0D8ABC&color=fff'">
+                <div class="company-details">
+                    <h3>WhiteCircle</h3>
+                    <span>Learning Admin L3</span>
+                </div>
+            </div>
+            <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="Collapse Sidebar"><i class="fa-solid fa-angle-left"></i></button>
+        </div>
+                <nav class="sidebar-menu">
+            <a href="/space/lnd/dashboard" class="menu-item" id="nav-dashboard">
+                <i class="fa-solid fa-shapes"></i><span>Dashboard</span>
+            </a>
+            <a href="/space/lnd/approvals" class="menu-item" id="nav-approvals">
+                <i class="fa-regular fa-square-check"></i><span>Approvals</span>
+            </a>
+            <a href="#" class="menu-item" id="nav-strategy">
+                <i class="fa-solid fa-chart-line"></i><span>Strategy & Program Mgt</span>
+            </a>
+            <a href="/space/lnd/courses" class="menu-item active" id="nav-courses">
+                <i class="fa-solid fa-book-open"></i><span>Course & Content Mgt</span>
+            </a>
+            <a href="/space/lnd/integrations" class="menu-item" id="nav-integrations">
+                <i class="fa-solid fa-link"></i><span>Performance & Learning Int</span>
+            </a>
+            <a href="#" class="menu-item" id="nav-certification">
+                <i class="fa-solid fa-certificate"></i><span>Certification & Assessment</span>
+            </a>
+            <a href="/space/lnd/reports" class="menu-item" id="nav-analytics">
+                <i class="fa-solid fa-chart-simple"></i><span>Analytics & Evaluation</span>
+            </a>
+            <a href="/space/lnd/vendors" class="menu-item" id="nav-vendors">
+                <i class="fa-solid fa-users-gear"></i><span>Trainer & Vendor Mgt</span>
+            </a>
+            <a href="/space/lnd/budgets" class="menu-item" id="nav-budgets">
+                <i class="fa-solid fa-wallet"></i><span>Budget & Resource Planning</span>
+            </a>
+                </nav>
+        <div style="margin-top: auto; padding: 20px; border-top: 1px solid #eaeaea;">
+            <a href="/logout" style="display:flex; align-items:center; gap:12px; text-decoration:none; color:#de350b; font-weight:600; font-size:14px;">
+                <i class="fa-solid fa-arrow-right-from-bracket" style="width:18px; text-align:center; font-size:16px;"></i><span class="logout-text">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1 class="page-title">Course Management</h1>
+                <p class="page-subtitle">Manage courses, training modules and content library</p>
+            </div>
+            <div class="header-right">
+                <a href="/space/lnd/course-addition" class="btn-primary" style="background: #fff; color: #0052cc; border: 1px solid #0052cc;">
+                    <i class="fa-solid fa-upload"></i> Upload Course
+                </a>
+                <a href="/space/lnd/course-addition" class="btn-primary">
+                    <i class="fa-solid fa-plus"></i> Create Course
+                </a>
+                
+            </div>
+        </header>
+
+        <!-- Main Card -->
+        <div class="card">
+            <div class="card-header-bar">
+                <div class="search-filter-group">
+                    <input type="text" class="search-input" placeholder="Search courses by name or ID...">
+                    <select class="filter-select">
+                        <option>All Categories</option>
+                        <option>Leadership</option>
+                        <option>Technical</option>
+                        <option>Compliance</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>All Statuses</option>
+                        <option>Active</option>
+                        <option>Draft</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Course Info</th>
+                            <th>Category</th>
+                            <th>Duration</th>
+                            <th>Enrolled</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="course-info">
+                                    <img src="https://ui-avatars.com/api/?name=LS&background=eef4ff&color=0052cc" class="course-img">
+                                    <div>
+                                        <div style="font-weight:600; color:#111;">Leadership Skills for Managers</div>
+                                        <div style="font-size:12px; color:#777;">ID: CRS-1001</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Leadership</td>
+                            <td>4 Weeks</td>
+                            <td>1,245</td>
+                            <td><span class="status-badge status-active"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Active</span></td>
+                            <td>
+                                <i class="fa-regular fa-eye action-icon"></i>
+                                <i class="fa-regular fa-pen-to-square action-icon"></i>
+                                <i class="fa-solid fa-ellipsis-vertical action-icon" style="color:#999;"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="course-info">
+                                    <img src="https://ui-avatars.com/api/?name=AE&background=e3fcef&color=00875a" class="course-img">
+                                    <div>
+                                        <div style="font-weight:600; color:#111;">Advanced Excel Data Analysis</div>
+                                        <div style="font-size:12px; color:#777;">ID: CRS-1002</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Technical</td>
+                            <td>2 Weeks</td>
+                            <td>850</td>
+                            <td><span class="status-badge status-active"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Active</span></td>
+                            <td>
+                                <i class="fa-regular fa-eye action-icon"></i>
+                                <i class="fa-regular fa-pen-to-square action-icon"></i>
+                                <i class="fa-solid fa-ellipsis-vertical action-icon" style="color:#999;"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="course-info">
+                                    <img src="https://ui-avatars.com/api/?name=IS&background=fffae6&color=ff8b00" class="course-img">
+                                    <div>
+                                        <div style="font-weight:600; color:#111;">Information Security Training</div>
+                                        <div style="font-size:12px; color:#777;">ID: CRS-1003</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Compliance</td>
+                            <td>1 Day</td>
+                            <td>2,100</td>
+                            <td><span class="status-badge status-active"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Active</span></td>
+                            <td>
+                                <i class="fa-regular fa-eye action-icon"></i>
+                                <i class="fa-regular fa-pen-to-square action-icon"></i>
+                                <i class="fa-solid fa-ellipsis-vertical action-icon" style="color:#999;"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="course-info">
+                                    <img src="https://ui-avatars.com/api/?name=SM&background=eae6ff&color=5243aa" class="course-img">
+                                    <div>
+                                        <div style="font-weight:600; color:#111;">Sales Masterclass 2026</div>
+                                        <div style="font-size:12px; color:#777;">ID: CRS-1004</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Sales</td>
+                            <td>6 Weeks</td>
+                            <td>0</td>
+                            <td><span class="status-badge status-draft"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Draft</span></td>
+                            <td>
+                                <i class="fa-regular fa-eye action-icon"></i>
+                                <i class="fa-regular fa-pen-to-square action-icon"></i>
+                                <i class="fa-solid fa-ellipsis-vertical action-icon" style="color:#999;"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 20px; font-size: 13px; color: #666;">
+                <div>Showing 1 to 4 of 42 entries</div>
+                <div style="display:flex; gap:5px;">
+                    <button style="padding:5px 10px; border:1px solid #ddd; background:#fff; border-radius:4px; cursor:pointer;">Previous</button>
+                    <button style="padding:5px 10px; border:1px solid #0052cc; background:#0052cc; color:#fff; border-radius:4px; cursor:pointer;">1</button>
+                    <button style="padding:5px 10px; border:1px solid #ddd; background:#fff; border-radius:4px; cursor:pointer;">2</button>
+                    <button style="padding:5px 10px; border:1px solid #ddd; background:#fff; border-radius:4px; cursor:pointer;">3</button>
+                    <button style="padding:5px 10px; border:1px solid #ddd; background:#fff; border-radius:4px; cursor:pointer;">Next</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('collapsed');
+    }
+</script>
+</body>
+</html>
+
+
+
+

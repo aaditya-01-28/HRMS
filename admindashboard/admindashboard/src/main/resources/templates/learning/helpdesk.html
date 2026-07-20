@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -59,5 +59,14 @@
 
     <!-- API Integration -->
     <script th:src="@{/js/learning-api.js}"></script>
+<script>
+    function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('collapsed');
+    }
+</script>
 </body>
 </html>
+
+
+
+

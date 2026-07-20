@@ -81,6 +81,18 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Autowired
     private com.example.admindashboard.repository.BudgetActivityRepository budgetActivityRepository;
 
+    @Autowired
+    private com.example.admindashboard.repository.ItAssetRepository itAssetRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.SecurityPolicyRepository securityPolicyRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.BackupScheduleRepository backupScheduleRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.ItBroadcastRepository itBroadcastRepository;
+
     @Override
     public void run(String... args) throws Exception {
                 // Always update existing seeded users to ensure they have correct employeeCode and department
@@ -89,6 +101,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         updateSeededEmployee("EMP129", "Engineering", "IOS Developer");
         updateSeededEmployee("EMP201", "HR", "HR Director");
         updateSeededEmployee("ADMIN001", "IT", "Company Admin / IT Admin");
+        updateSeededEmployee("EMP0001", "IT", "Senior IT Head");
 
         System.out.println("=========================================================");
         System.out.println("🔄 Checking database for roles, permissions, and default accounts...");
@@ -154,6 +167,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         Role seniorRewardsHeadRole = getOrCreateRole("SENIOR_REWARDS_HEAD");
         Role facilityL2Role = getOrCreateRole("FACILITY_L2");
         Role seniorFacilityHeadRole = getOrCreateRole("SENIOR_FACILITY_HEAD");
+        Role seniorItHeadRole = getOrCreateRole("SENIOR_IT_HEAD");
 
         // ==========================================
         // THE MATRIX MAPPING (Strict 1:1 with BRD)
@@ -441,6 +455,12 @@ public class DatabaseSeeder implements CommandLineRunner {
                 adminDashView, empView
         )));
         roleRepository.save(seniorFacilityHeadRole);
+
+        // SENIOR IT HEAD
+        seniorItHeadRole.setPermissions(new HashSet<>(Arrays.asList(
+                adminDashView, empView, assetAdd, assetAssign, assetView, docUpload, docView, docDelete, settingRoles
+        )));
+        roleRepository.save(seniorItHeadRole);
 
         // REWARDS
         rewardsRole.setPermissions(new HashSet<>(Arrays.asList(
@@ -1245,6 +1265,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         updateSeededEmployee("EMP129", "Engineering", "IOS Developer");
         updateSeededEmployee("EMP201", "HR", "HR Director");
         updateSeededEmployee("ADMIN001", "IT", "Company Admin / IT Admin");
+        updateSeededEmployee("EMP0001", "IT", "Senior IT Head");
 
         // Ensure proper L2/L3 managers and HRs are assigned to all EmployeeProfiles
         List<User> allSeedUsers = userRepository.findAll();
@@ -1387,6 +1408,33 @@ public class DatabaseSeeder implements CommandLineRunner {
             userRepository.save(user);
             System.out.println("✅ Seeded user: ADMIN105");
         }
+
+        Role itL3 = getOrCreateRole("SENIOR_IT_HEAD");
+        User userIt = userRepository.findByUsername("EMP0001").orElse(null);
+        if (userIt == null) {
+            userIt = new User();
+            userIt.setUsername("EMP0001");
+        }
+        userIt.setPassword("{noop}Welcome@123");
+        userIt.setRole(itL3);
+        userIt.setFullName("Rajesh Kumar");
+        userIt.setEmail("it.head@wcg.com");
+        userIt.setDesignation("Senior IT Head");
+
+        EmployeeProfile profileIt = userIt.getEmployeeProfile();
+        if (profileIt == null) {
+            profileIt = new EmployeeProfile();
+            profileIt.setUser(userIt);
+            userIt.setEmployeeProfile(profileIt);
+        }
+        profileIt.setDesignation("Senior IT Head");
+        profileIt.setDepartment("IT");
+        profileIt.setJoiningDate(LocalDate.now());
+        profileIt.setWorkLocation("Delhi");
+        profileIt.setEmployeeCode("EMP0001");
+
+        userRepository.save(userIt);
+        System.out.println("✅ Seeded/Updated user: EMP0001");
 
         Role rewardsL2Role = getOrCreateRole("REWARDS");
         Role rewardsL3Role = getOrCreateRole("SENIOR_REWARDS_HEAD");
@@ -2145,6 +2193,63 @@ public class DatabaseSeeder implements CommandLineRunner {
             seedFacilityTicket("TKT-1036", "EMP129", "Saumya Katare", "Access Control", "Temporary visitor pass", "High", "Closed", LocalDate.now().minusDays(6), "Visitor pass for client delegation.");
             System.out.println("✅ Seeded Facilities Service Requests.");
         }
+
+        // Seed IT Data
+        if (itAssetRepository.count() == 0) {
+            seedItAsset("IT-AST-001", "Laptop", "Dell", "Latitude 5420", "DL12345", "EMP0001", "Active", LocalDate.now().minusYears(1), LocalDate.now().plusYears(2), "Delhi Office");
+            seedItAsset("IT-AST-002", "Monitor", "HP", "EliteDisplay E243", "HP8877", "EMP201", "Active", LocalDate.now().minusYears(2), LocalDate.now().plusYears(1), "Mumbai Office");
+            seedItAsset("IT-AST-003", "Keyboard", "Logitech", "MX Keys", "LT9988", "EMP0001", "Active", LocalDate.now().minusMonths(6), LocalDate.now().plusYears(2), "Delhi Office");
+            seedItAsset("IT-AST-004", "Laptop", "Apple", "MacBook Pro 16", "MB5544", "EMP114", "Maintenance", LocalDate.now().minusYears(1), LocalDate.now().plusYears(1), "Home Office");
+            seedItAsset("IT-AST-005", "Laptop", "Lenovo", "ThinkPad T14", "LN3322", "EMP187", "Active", LocalDate.now().minusMonths(8), LocalDate.now().plusYears(2), "Delhi Office");
+            seedItAsset("IT-AST-006", "Server", "Dell", "PowerEdge R740", "SRV1122", "IT-ROOM", "Active", LocalDate.now().minusYears(3), LocalDate.now().plusYears(2), "Server Room A");
+            seedItAsset("IT-AST-007", "Printer", "HP", "LaserJet Pro", "PR7766", "FLOOR-2", "Active", LocalDate.now().minusYears(2), LocalDate.now().plusYears(1), "Floor 2 Bay B");
+            seedItAsset("IT-AST-008", "Laptop", "HP", "ProBook 450", "HP4455", "UNASSIGNED", "Active", LocalDate.now().minusMonths(3), LocalDate.now().plusYears(2), "IT Storage");
+            seedItAsset("IT-AST-009", "Monitor", "Dell", "UltraSharp U2720Q", "DL5566", "EMP301", "Active", LocalDate.now().minusYears(1), LocalDate.now().plusYears(2), "Delhi Office");
+            seedItAsset("IT-AST-010", "Laptop", "Lenovo", "ThinkPad X1", "LN4488", "EMP129", "Disposed", LocalDate.now().minusYears(4), LocalDate.now().minusYears(1), "Scrap Storage");
+            System.out.println("✅ Seeded IT Assets.");
+        }
+
+        if (securityPolicyRepository.count() == 0) {
+            seedSecurityPolicy("Firewall Policy", "Firewall", "Configures inbound and outbound traffic rules for WhiteCircle corporate network.", "Active", LocalDate.now().minusMonths(1), LocalDate.now().plusMonths(5), 98);
+            seedSecurityPolicy("Data Encryption Policy", "Encryption", "Mandates AES-256 encryption for all data-at-rest on company laptops and databases.", "Active", LocalDate.now().minusWeeks(2), LocalDate.now().plusMonths(6), 100);
+            seedSecurityPolicy("Multi-Factor Authentication", "Access Control", "Requires MFA for accessing VPN, emails, and internal HRMS portal from outside office.", "Active", LocalDate.now().minusMonths(3), LocalDate.now().plusMonths(3), 95);
+            seedSecurityPolicy("BYOD Security Policy", "Access Control", "Defines MDM security profiles required for personal mobile devices used for work.", "Under Review", LocalDate.now().minusMonths(5), LocalDate.now().plusWeeks(2), 75);
+            seedSecurityPolicy("Wireless Network Security", "Network Security", "Standardizes WPA3 security and guest network isolation across branches.", "Non-Compliant", LocalDate.now().minusMonths(6), LocalDate.now().minusDays(2), 45);
+            System.out.println("✅ Seeded Security Policies.");
+        }
+
+        if (backupScheduleRepository.count() == 0) {
+            seedBackupSchedule("Daily Incremental Backup", "Incremental", "Daily", "/data/users", "/backup/daily", "Completed", LocalDate.now().minusDays(1), LocalDate.now(), 12.5);
+            seedBackupSchedule("Weekly Full Backup", "Full", "Weekly", "/data/all", "/backup/weekly", "Completed", LocalDate.now().minusDays(3), LocalDate.now().plusDays(4), 150.0);
+            seedBackupSchedule("Database Dump Backup", "Full", "Daily", "/db/prod", "/backup/db", "Completed", LocalDate.now().minusDays(1), LocalDate.now(), 45.2);
+            seedBackupSchedule("System Image Backup", "Full", "Monthly", "/system/OS", "/backup/image", "Scheduled", LocalDate.now().minusDays(15), LocalDate.now().plusDays(15), 80.0);
+            seedBackupSchedule("Configuration Files Backup", "Differential", "Weekly", "/config", "/backup/config", "Failed", LocalDate.now().minusDays(5), LocalDate.now().plusDays(2), 1.2);
+            System.out.println("✅ Seeded Backup Schedules.");
+        }
+
+        if (itBroadcastRepository.count() == 0) {
+            seedItBroadcast("Scheduled Network Maintenance", "We will be performing scheduled maintenance on the primary switch this Saturday from 10 PM to 2 AM. Expect brief network interruptions.", "High", "Maintenance", "Active", "EMP0001", LocalDate.now(), LocalDate.now().plusDays(5));
+            seedItBroadcast("Update Critical Security Patch", "A critical security update for Windows OS has been released. Please restart your systems before leaving today to apply the updates.", "High", "Security", "Active", "EMP0001", LocalDate.now().minusDays(1), LocalDate.now().plusDays(3));
+            seedItBroadcast("Server Migration Complete", "The migration of the staging environment to the new cloud server is complete. Please update your host files accordingly.", "Normal", "General", "Active", "EMP0001", LocalDate.now().minusDays(2), LocalDate.now().plusDays(10));
+            System.out.println("✅ Seeded IT Broadcasts.");
+        }
+
+        long itTicketCount = serviceRequestRepository.findAll().stream()
+                .filter(t -> "IT".equalsIgnoreCase(t.getType()))
+                .count();
+        if (itTicketCount == 0) {
+            seedItTicket("IT-TKT-101", "EMP114", "Om Tripathi", "Software Issue", "IntelliJ License Expired", "High", "Open", LocalDate.now(), "IntelliJ IDEA Ultimate license has expired. Need renewal key.", "EMP0001");
+            seedItTicket("IT-TKT-102", "EMP601", "Neha Verma", "Hardware Issue", "Laptop Battery Replacement", "Medium", "In Progress", LocalDate.now().minusDays(1), "Laptop battery draining in less than 30 minutes. Requesting replacement.", "EMP0001");
+            seedItTicket("IT-TKT-103", "EMP129", "Saumya Katare", "Access/Permission", "GitHub Repo Access Request", "High", "Open", LocalDate.now(), "Need read/write access to HRMS project repository on GitHub.", "EMP0001");
+            seedItTicket("IT-TKT-104", "EMP187", "Om Singrore", "Network/Connectivity", "VPN Disconnects Frequently", "Medium", "Closed", LocalDate.now().minusDays(4), "GlobalProtect VPN disconnects every 10 minutes when working from home.", "EMP0001");
+            seedItTicket("IT-TKT-105", "EMP201", "Priya Sharma", "Software Issue", "MS Office Activation", "Low", "Closed", LocalDate.now().minusDays(5), "Microsoft Excel showing 'Activation Required' error.", "EMP0001");
+            seedItTicket("IT-TKT-106", "EMP301", "Kavita Finance", "Access/Permission", "Database Access - Prod ReadOnly", "High", "Closed", LocalDate.now().minusDays(8), "Need readonly credentials to production database for audit verification.", "EMP0001");
+            seedItTicket("IT-TKT-107", "EMP401", "Sneha Gupta", "Hardware Issue", "Dual Monitor Setup Request", "Medium", "Open", LocalDate.now().minusDays(2), "Requesting an extra 24-inch monitor for recruiter dashboard operations.", "EMP0001");
+            seedItTicket("IT-TKT-108", "EMP501", "Ravi IT", "Network/Connectivity", "Wi-Fi Connectivity in Cafeteria", "Low", "Closed", LocalDate.now().minusDays(12), "No signal or slow speed in the cafeteria area.", "EMP0001");
+            seedItTicket("IT-TKT-109", "EMP1101", "Pooja Singh", "Software Issue", "Docker Desktop Startup Fail", "High", "Open", LocalDate.now().minusDays(1), "Docker Desktop failing to start after recent Windows update.", "EMP0001");
+            seedItTicket("IT-TKT-110", "EMP701", "Amit Project", "Access/Permission", "Jira Project Board Access", "Medium", "Open", LocalDate.now(), "Need developer access to WhiteCircle HRMS project board.", "EMP0001");
+            System.out.println("✅ Seeded IT Service Requests.");
+        }
     }
 
 
@@ -2232,6 +2337,77 @@ public class DatabaseSeeder implements CommandLineRunner {
         req.setDepartment("Rewards");
         req.setLocation(location);
         req.setDurationOrLevel(String.valueOf(points));
+        serviceRequestRepository.save(req);
+    }
+
+    private void seedItAsset(String assetTag, String assetType, String brand, String model, String serialNumber, String assignedTo, String status, LocalDate purchaseDate, LocalDate warrantyExpiry, String location) {
+        ItAsset asset = new ItAsset();
+        asset.setAssetTag(assetTag);
+        asset.setAssetType(assetType);
+        asset.setBrand(brand);
+        asset.setModel(model);
+        asset.setSerialNumber(serialNumber);
+        asset.setAssignedTo(assignedTo);
+        asset.setStatus(status);
+        asset.setPurchaseDate(purchaseDate);
+        asset.setWarrantyExpiry(warrantyExpiry);
+        asset.setLocation(location);
+        itAssetRepository.save(asset);
+    }
+
+    private void seedSecurityPolicy(String policyName, String category, String description, String status, LocalDate lastAuditDate, LocalDate nextReviewDate, Integer complianceScore) {
+        SecurityPolicy policy = new SecurityPolicy();
+        policy.setPolicyName(policyName);
+        policy.setCategory(category);
+        policy.setDescription(description);
+        policy.setStatus(status);
+        policy.setLastAuditDate(lastAuditDate);
+        policy.setNextReviewDate(nextReviewDate);
+        policy.setComplianceScore(complianceScore);
+        securityPolicyRepository.save(policy);
+    }
+
+    private void seedBackupSchedule(String backupName, String backupType, String frequency, String source, String destination, String status, LocalDate lastRunDate, LocalDate nextRunDate, Double sizeGB) {
+        BackupSchedule backup = new BackupSchedule();
+        backup.setBackupName(backupName);
+        backup.setBackupType(backupType);
+        backup.setFrequency(frequency);
+        backup.setSource(source);
+        backup.setDestination(destination);
+        backup.setStatus(status);
+        backup.setLastRunDate(lastRunDate);
+        backup.setNextRunDate(nextRunDate);
+        backup.setSizeGB(sizeGB);
+        backupScheduleRepository.save(backup);
+    }
+
+    private void seedItBroadcast(String title, String message, String priority, String category, String status, String createdBy, LocalDate createdDate, LocalDate expiryDate) {
+        ItBroadcast broadcast = new ItBroadcast();
+        broadcast.setTitle(title);
+        broadcast.setMessage(message);
+        broadcast.setPriority(priority);
+        broadcast.setCategory(category);
+        broadcast.setStatus(status);
+        broadcast.setCreatedBy(createdBy);
+        broadcast.setCreatedDate(createdDate);
+        broadcast.setExpiryDate(expiryDate);
+        itBroadcastRepository.save(broadcast);
+    }
+
+    private void seedItTicket(String ticketId, String employeeId, String employeeName, String category, String detailItem, String priority, String status, LocalDate submissionDate, String justification, String assignedTo) {
+        ServiceRequest req = new ServiceRequest();
+        req.setTicketId(ticketId);
+        req.setEmployeeId(employeeId);
+        req.setEmployeeName(employeeName);
+        req.setType("IT");
+        req.setCategory(category);
+        req.setDetailItem(detailItem);
+        req.setPriority(priority);
+        req.setStatus(status);
+        req.setSubmissionDate(submissionDate);
+        req.setJustification(justification);
+        req.setDepartment("IT");
+        req.setAssignedTo(assignedTo);
         serviceRequestRepository.save(req);
     }
 }

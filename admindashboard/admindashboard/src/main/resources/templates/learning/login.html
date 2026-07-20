@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -213,7 +213,37 @@
                 padding: 40px 30px;
             }
         }
-    </style>
+        
+    /* Sidebar Toggle Enhanced */
+    .sidebar { transition: width 0.3s; position: relative; }
+    .sidebar.collapsed { width: 80px; }
+    .sidebar.collapsed .company-details, .sidebar.collapsed .menu-item span, .sidebar.collapsed .logout-text { display: none; }
+    .sidebar.collapsed .sidebar-header { justify-content: center; padding: 20px 0; }
+    
+    .sidebar-header { padding:20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eaeaea; }
+    
+    .toggle-sidebar-btn { 
+        position: absolute; 
+        right: -14px; 
+        top: 25px; 
+        background: #fff; 
+        border: 1px solid #eaeaea; 
+        border-radius: 50%; 
+        width: 28px; 
+        height: 28px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        cursor: pointer; 
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: transform 0.3s;
+        color: #555;
+    }
+    .toggle-sidebar-btn:hover { background: #f4f7fb; color: #0052cc; }
+    .sidebar.collapsed .toggle-sidebar-btn { transform: rotate(180deg); }
+    .sidebar.collapsed .company-logo { width: 32px; height: 32px; }
+</style>
 </head>
 <body>
 
@@ -284,6 +314,15 @@
 
 </div>
 
+<script>
+    function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('collapsed');
+    }
+</script>
 </body>
 </html>
+
+
+
+
 
