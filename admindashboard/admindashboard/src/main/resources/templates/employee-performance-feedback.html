@@ -185,14 +185,14 @@
                         <div class="row g-2 mb-2">
                             <div class="col-md-3">
                                 <label class="form-label fw-bold small text-dark mb-1">Self Rating <span class="text-danger">*</span></label>
-                                <select name="fieldEmployeeRating" class="form-select form-select-sm" required style="border-radius: 0;" th:onchange="'calculateOverallSelfRating(' + ${req.id} + ')'">
-                                    <option value="">Select...</option>
-                                    <option value="5.0" th:selected="${field.employeeRating == 5.0}">5.0 (Excellent)</option>
-                                    <option value="4.0" th:selected="${field.employeeRating == 4.0}">4.0 (Very Good)</option>
-                                    <option value="3.0" th:selected="${field.employeeRating == 3.0}">3.0 (Good)</option>
-                                    <option value="2.0" th:selected="${field.employeeRating == 2.0}">2.0 (Fair)</option>
-                                    <option value="1.0" th:selected="${field.employeeRating == 1.0}">1.0 (Basic)</option>
-                                </select>
+                                <input type="hidden" name="fieldEmployeeRating" th:id="'field-rating-' + ${field.id}" th:value="${field.employeeRating}" class="employee-field-rating-input" required />
+                                <div class="d-inline-flex flex-row-reverse justify-content-end mb-1 custom-star-rating" style="font-size:1.5rem; cursor:pointer;">
+                                    <i class="fas fa-star text-secondary" th:classappend="${field.employeeRating != null && field.employeeRating >= 5.0} ? 'text-warning' : ''" th:onclick="'setFieldRating(' + ${field.id} + ', 5.0, ' + ${req.id} + ')'" title="5 Star: Deep experience can lead mentor and solve complex problem, certificate required" th:id="'field-' + ${field.id} + '-star-5'"></i>
+                                    <i class="fas fa-star text-secondary" th:classappend="${field.employeeRating != null && field.employeeRating >= 4.0} ? 'text-warning' : ''" th:onclick="'setFieldRating(' + ${field.id} + ', 4.0, ' + ${req.id} + ')'" title="4 Star: Strong, practical experience. can work independently, certificate required" th:id="'field-' + ${field.id} + '-star-4'"></i>
+                                    <i class="fas fa-star text-secondary" th:classappend="${field.employeeRating != null && field.employeeRating >= 3.0} ? 'text-warning' : ''" th:onclick="'setFieldRating(' + ${field.id} + ', 3.0, ' + ${req.id} + ')'" title="3 Star: Hand on experience with certifications (required)" th:id="'field-' + ${field.id} + '-star-3'"></i>
+                                    <i class="fas fa-star text-secondary" th:classappend="${field.employeeRating != null && field.employeeRating >= 2.0} ? 'text-warning' : ''" th:onclick="'setFieldRating(' + ${field.id} + ', 2.0, ' + ${req.id} + ')'" title="2 Star: hand on experience, training & certification completed; minimal practical exposure; certificate optional" th:id="'field-' + ${field.id} + '-star-2'"></i>
+                                    <i class="fas fa-star text-secondary" th:classappend="${field.employeeRating != null && field.employeeRating >= 1.0} ? 'text-warning' : ''" th:onclick="'setFieldRating(' + ${field.id} + ', 1.0, ' + ${req.id} + ')'" title="1 Star: limited knowledge basic understanding , no certificate required" th:id="'field-' + ${field.id} + '-star-1'"></i>
+                                </div>
                             </div>
                             <div class="col-md-9">
                                 <label class="form-label fw-bold small text-dark mb-1">Comments / Justification <span class="text-danger">*</span></label>
@@ -460,14 +460,14 @@
             <div class="row g-2 mb-2">
                 <div class="col-md-4">
                     <label class="form-label fw-bold small text-dark mb-1">Self Rating <span class="text-danger">*</span></label>
-                    <select name="newFieldRating" class="form-select form-select-sm" required style="border-radius: 0;" onchange="calculateOverallSelfRating('${reqId}')">
-                        <option value="">Select...</option>
-                        <option value="5.0">5.0 (Excellent)</option>
-                        <option value="4.0">4.0 (Very Good)</option>
-                        <option value="3.0">3.0 (Good)</option>
-                        <option value="2.0">2.0 (Fair)</option>
-                        <option value="1.0">1.0 (Basic)</option>
-                    </select>
+                    <input type="hidden" name="newFieldRating" id="new-field-rating-${fieldIndex}" class="employee-field-rating-input" required />
+                    <div class="d-inline-flex flex-row-reverse justify-content-end mb-1 custom-star-rating" style="font-size:1.5rem; cursor:pointer;">
+                        <i class="fas fa-star text-secondary" onclick="setNewFieldRating(${fieldIndex}, 5.0, '${reqId}')" title="5 Star: Deep experience can lead mentor and solve complex problem, certificate required" id="new-field-${fieldIndex}-star-5"></i>
+                        <i class="fas fa-star text-secondary" onclick="setNewFieldRating(${fieldIndex}, 4.0, '${reqId}')" title="4 Star: Strong, practical experience. can work independently, certificate required" id="new-field-${fieldIndex}-star-4"></i>
+                        <i class="fas fa-star text-secondary" onclick="setNewFieldRating(${fieldIndex}, 3.0, '${reqId}')" title="3 Star: Hand on experience with certifications (required)" id="new-field-${fieldIndex}-star-3"></i>
+                        <i class="fas fa-star text-secondary" onclick="setNewFieldRating(${fieldIndex}, 2.0, '${reqId}')" title="2 Star: hand on experience, training & certification completed; minimal practical exposure; certificate optional" id="new-field-${fieldIndex}-star-2"></i>
+                        <i class="fas fa-star text-secondary" onclick="setNewFieldRating(${fieldIndex}, 1.0, '${reqId}')" title="1 Star: limited knowledge basic understanding , no certificate required" id="new-field-${fieldIndex}-star-1"></i>
+                    </div>
                 </div>
                 <div class="col-md-8">
                     <label class="form-label fw-bold small text-dark mb-1">Detailed comments / Justification <span class="text-danger">*</span></label>
@@ -506,22 +506,13 @@
     function calculateOverallSelfRating(reqId) {
         const form = document.querySelector(`form[action*="submit"]`);
         if (!form) return;
-        const predefinedSelects = form.querySelectorAll(`select[name="fieldEmployeeRating"]`);
-        const customSelects = form.querySelectorAll(`select[name="newFieldRating"]`);
+        const ratingInputs = form.querySelectorAll(`.employee-field-rating-input`);
         
         let sum = 0;
         let count = 0;
         
-        predefinedSelects.forEach(sel => {
-            const val = parseFloat(sel.value);
-            if (!isNaN(val) && val > 0) {
-                sum += val;
-                count++;
-            }
-        });
-        
-        customSelects.forEach(sel => {
-            const val = parseFloat(sel.value);
+        ratingInputs.forEach(inp => {
+            const val = parseFloat(inp.value);
             if (!isNaN(val) && val > 0) {
                 sum += val;
                 count++;
@@ -558,6 +549,41 @@
                 descBox.innerHTML = `<span class="text-muted italic">Select criteria ratings to calculate overall rating...</span>`;
             }
         }
+        }
+    }
+
+    function setFieldRating(fieldId, rating, reqId) {
+        document.getElementById('field-rating-' + fieldId).value = rating;
+        for (let i = 1; i <= 5; i++) {
+            const star = document.getElementById('field-' + fieldId + '-star-' + i);
+            if (star) {
+                if (i <= rating) {
+                    star.classList.remove('text-secondary');
+                    star.classList.add('text-warning');
+                } else {
+                    star.classList.remove('text-warning');
+                    star.classList.add('text-secondary');
+                }
+            }
+        }
+        calculateOverallSelfRating(reqId);
+    }
+
+    function setNewFieldRating(fieldIndex, rating, reqId) {
+        document.getElementById('new-field-rating-' + fieldIndex).value = rating;
+        for (let i = 1; i <= 5; i++) {
+            const star = document.getElementById('new-field-' + fieldIndex + '-star-' + i);
+            if (star) {
+                if (i <= rating) {
+                    star.classList.remove('text-secondary');
+                    star.classList.add('text-warning');
+                } else {
+                    star.classList.remove('text-warning');
+                    star.classList.add('text-secondary');
+                }
+            }
+        }
+        calculateOverallSelfRating(reqId);
     }
 
     function previewFeedback(btn) {
@@ -618,8 +644,8 @@
                                 <p class="mb-1 text-secondary" style="font-size: 0.9rem;"><strong>Response:</strong> ${fVal || '—'}</p>
                             </div>
                             <div class="text-end" style="min-width: 180px;">
-                                <div class="small"><span class="text-muted">Self Rating:</span> <strong class="text-primary">${empRating > 0 ? empRating.toFixed(1) + ' ★' : '—'}</strong></div>
-                                <div class="small"><span class="text-muted">Manager Rating:</span> <strong class="text-success">${mgrRating > 0 ? mgrRating.toFixed(1) + ' ★' : '—'}</strong></div>
+                                <div class="small"><span class="text-muted">Self Rating:</span> <strong class="text-primary">${empRating > 0 ? empRating.toFixed(1) + ' <i class="fa-solid fa-star text-warning"></i>' : '—'}</strong></div>
+                                <div class="small"><span class="text-muted">Manager Rating:</span> <strong class="text-success">${mgrRating > 0 ? mgrRating.toFixed(1) + ' <i class="fa-solid fa-star text-warning"></i>' : '—'}</strong></div>
                             </div>
                         </div>
                     `;
