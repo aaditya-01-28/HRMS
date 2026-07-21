@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -95,8 +95,8 @@
                             <span class="fw-bold ms-1" th:text="${dependent.fullName}">Dependent Name</span>
 
                             <div class="small text-muted mt-1"
-                                 th:text="${dependent.relationship + ' â€¢ ' + (dependent.isCovered ? 'Covered' : 'Not Covered')}">
-                                Relationship â€¢ Status
+                                 th:text="${dependent.relationship + ' &bull; ' + (dependent.isCovered ? 'Covered' : 'Not Covered')}">
+                                Relationship &bull; Status
                             </div>
                         </div>
                     </div>

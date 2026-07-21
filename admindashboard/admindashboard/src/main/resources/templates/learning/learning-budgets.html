@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
@@ -157,7 +157,7 @@
             <a href="/space/lnd/approvals" class="menu-item" id="nav-approvals">
                 <i class="fa-regular fa-square-check"></i><span>Approvals</span>
             </a>
-            <a href="#" class="menu-item" id="nav-strategy">
+            <a href="/space/lnd/strategy" class="menu-item" id="nav-strategy">
                 <i class="fa-solid fa-chart-line"></i><span>Strategy & Program Mgt</span>
             </a>
             <a href="/space/lnd/courses" class="menu-item" id="nav-courses">
@@ -166,7 +166,7 @@
             <a href="/space/lnd/integrations" class="menu-item" id="nav-integrations">
                 <i class="fa-solid fa-link"></i><span>Performance & Learning Int</span>
             </a>
-            <a href="#" class="menu-item" id="nav-certification">
+            <a href="/space/lnd/assessment" class="menu-item" id="nav-certification">
                 <i class="fa-solid fa-certificate"></i><span>Certification & Assessment</span>
             </a>
             <a href="/space/lnd/reports" class="menu-item" id="nav-analytics">
@@ -215,21 +215,21 @@
                 <div class="stat-card">
                     <div class="stat-info">
                         <div class="stat-title">Total Budget</div>
-                        <div class="stat-value" id="totBudget">â‚¹ 0</div>
+                        <div class="stat-value" id="totBudget">&#8377; 0</div>
                     </div>
                     <div class="stat-icon icon-blue"><i class="fa-solid fa-sack-dollar"></i></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-info">
                         <div class="stat-title">Budget Spent</div>
-                        <div class="stat-value" id="totSpent">â‚¹ 0</div>
+                        <div class="stat-value" id="totSpent">&#8377; 0</div>
                     </div>
                     <div class="stat-icon icon-orange"><i class="fa-solid fa-money-bill-wave"></i></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-info">
                         <div class="stat-title">Budget Remaining</div>
-                        <div class="stat-value" id="totRemain">â‚¹ 0</div>
+                        <div class="stat-value" id="totRemain">&#8377; 0</div>
                     </div>
                     <div class="stat-icon icon-green"><i class="fa-solid fa-piggy-bank"></i></div>
                 </div>
@@ -318,11 +318,11 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Allocated Amount (â‚¹)</label>
+                    <label>Allocated Amount (&#8377;)</label>
                     <input type="number" id="bAllocated" class="form-control" placeholder="e.g. 500000" required>
                 </div>
                 <div class="form-group">
-                    <label>Spent Amount (â‚¹) - Initial</label>
+                    <label>Spent Amount (&#8377;) - Initial</label>
                     <input type="number" id="bSpent" class="form-control" placeholder="0" value="0">
                 </div>
                 <div class="form-group">
@@ -451,9 +451,9 @@
                 tbody.innerHTML += `
                     <tr>
                         <td><strong>${b.departmentOrProgram}</strong></td>
-                        <td>â‚¹ ${b.allocatedAmount.toLocaleString('en-IN')}</td>
-                        <td>â‚¹ ${b.spentAmount.toLocaleString('en-IN')}</td>
-                        <td>â‚¹ ${b.remainingAmount.toLocaleString('en-IN')}</td>
+                        <td>&#8377; ${b.allocatedAmount.toLocaleString('en-IN')}</td>
+                        <td>&#8377; ${b.spentAmount.toLocaleString('en-IN')}</td>
+                        <td>&#8377; ${b.remainingAmount.toLocaleString('en-IN')}</td>
                         <td><span class="status-badge ${statusCls}"><i class="fa-solid fa-circle" style="font-size:6px;"></i> ${statusTxt}</span></td>
                         <td>
                             <i class="fa-regular fa-trash-can action-icon" style="color:#de350b;" onclick="deleteBudget(${b.id})"></i>
@@ -462,9 +462,9 @@
                 `;
             });
             
-            document.getElementById('totBudget').innerText = 'â‚¹ ' + tAlloc.toLocaleString('en-IN');
-            document.getElementById('totSpent').innerText = 'â‚¹ ' + tSpent.toLocaleString('en-IN');
-            document.getElementById('totRemain').innerText = 'â‚¹ ' + tRemain.toLocaleString('en-IN');
+            document.getElementById('totBudget').innerText = '&#8377; ' + tAlloc.toLocaleString('en-IN');
+            document.getElementById('totSpent').innerText = '&#8377; ' + tSpent.toLocaleString('en-IN');
+            document.getElementById('totRemain').innerText = '&#8377; ' + tRemain.toLocaleString('en-IN');
             
             let ut = tAlloc > 0 ? Math.round((tSpent / tAlloc)*100) : 0;
             document.getElementById('utilPercent').innerText = ut + '%';

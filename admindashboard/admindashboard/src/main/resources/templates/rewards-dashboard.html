@@ -833,6 +833,12 @@
                 <div class="widget-body">
                     <div class="row g-2">
                         <div class="col-md-6">
+                            <a th:href="${workflowUrl != null ? workflowUrl : '/rewards/workflow'}" class="app-btn" style="border: 2px solid #1e3a8a; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
+                                <i class="fas fa-project-diagram text-primary me-2 fs-5"></i>
+                                <span class="app-text fw-bold">Manage Workflow</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
                             <a href="/conference-room" class="app-btn">
                                 <i class="fas fa-handshake text-primary me-2 fs-5"></i>
                                 <span class="app-text">Conference Room</span>
@@ -869,9 +875,21 @@
                             </a>
                         </div>
                         <div class="col-md-6">
-                            <a href="/rewards-manager/workflow" class="app-btn" style="border: 2px solid #1e3a8a; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
-                                <i class="fas fa-project-diagram text-primary me-2 fs-5"></i>
-                                <span class="app-text fw-bold">Manage Workflow</span>
+                            <a href="/employee/referral" class="app-btn">
+                                <i class="fas fa-user-plus text-primary me-2 fs-5"></i>
+                                <span class="app-text">Referral</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/employee/resignation" class="app-btn">
+                                <i class="fas fa-sign-out-alt text-primary me-2 fs-5"></i>
+                                <span class="app-text">Resignation</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/employee/performance/feedback" class="app-btn">
+                                <i class="fas fa-star-half-stroke text-primary me-2 fs-5"></i>
+                                <span class="app-text">Performance Feedback</span>
                             </a>
                         </div>
                     </div>

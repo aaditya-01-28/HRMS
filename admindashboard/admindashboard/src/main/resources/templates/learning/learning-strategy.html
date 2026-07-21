@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Strategy & Program Management</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', Arial, sans-serif; }
+    body { background:#f4f7fb; color:#333; font-size:14px; overflow-x:hidden; }
+
+    /* Layout */
+    .learning-dashboard { display:flex; min-height:100vh; }
+    .sidebar { width:250px; background:#fff; border-right:1px solid #eaeaea; display:flex; flex-direction:column; transition: width 0.3s; position: relative; }
+    .dashboard-content { flex:1; padding:20px 30px; display:flex; flex-direction:column; position: relative; }
+
+    /* Sidebar */
+    .sidebar-header { padding:20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eaeaea; }
+    .company-logo { width:36px; height:36px; object-fit:contain; border-radius: 4px; }
+    .company-details h3 { font-size:16px; font-weight:700; color:#002D72; margin-bottom: 2px;}
+    .company-details span { font-size:12px; color:#888; }
+    .sidebar-menu { margin-top:15px; }
+    .menu-item { display:flex; align-items:center; gap:12px; text-decoration:none; color:#555; padding:12px 20px; font-size:14px; font-weight: 500; transition:.2s; border-left: 3px solid transparent;}
+    .menu-item:hover { background:#f8fafc; color: #002D72;}
+    .menu-item.active { background:#eef4ff; color:#002D72; border-left-color: #002D72; font-weight: 600;}
+    .menu-item i { width:18px; text-align: center; font-size: 16px;}
+
+    .toggle-sidebar-btn { 
+        position: absolute; right: -14px; top: 25px; background: #fff; border: 1px solid #eaeaea; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.3s; color: #555;
+    }
+    .toggle-sidebar-btn:hover { background: #f4f7fb; color: #0052cc; }
+    .sidebar.collapsed { width: 80px; }
+    .sidebar.collapsed .company-details, .sidebar.collapsed .menu-item span { display: none; }
+    .sidebar.collapsed .sidebar-header { justify-content: center; padding: 20px 0; }
+    .sidebar.collapsed .toggle-sidebar-btn { transform: rotate(180deg); }
+
+    /* Breadcrumb & Header */
+    .breadcrumb { font-size: 12px; color: #0052cc; font-weight: 500; margin-bottom: 8px; }
+    .breadcrumb span { color: #888; margin-left: 4px; }
+    .dashboard-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
+    .header-left .page-title { font-size:22px; font-weight:700; color:#111; margin-bottom: 4px;}
+    .header-left .page-subtitle { font-size:13px; color:#666; }
+    .header-right { display:flex; align-items:center; gap:15px; }
+    
+    .btn-primary { background:#0052cc; border:none; padding:9px 18px; border-radius:6px; font-size:13px; color:#fff; display:flex; align-items:center; gap:8px; cursor:pointer; font-weight: 600; text-decoration: none; transition: 0.2s;}
+    .btn-primary:hover { background: #0043a6;}
+
+    .header-profile { display:flex; align-items:center; gap:10px; margin-left: 15px; padding-left: 15px; border-left: 1px solid #ddd;}
+    .profile-image { width:38px; height:38px; border-radius:50%; object-fit:cover; }
+    .profile-name { font-size:14px; font-weight:600; color:#222; }
+
+    /* Tabs */
+    .tabs-container { border-bottom: 1px solid #ddd; margin-bottom: 25px; display: flex; gap: 30px; }
+    .tab-item { text-decoration: none; color: #666; font-size: 14px; font-weight: 500; padding-bottom: 10px; border-bottom: 3px solid transparent; cursor: pointer;}
+    .tab-item.active { color: #002D72; border-bottom-color: #002D72; font-weight: 600; }
+    .tab-item:hover:not(.active) { color: #333; }
+
+    /* Stats Grid - 4 columns */
+    .stats-grid-4 { display:grid; grid-template-columns:repeat(4, 1fr); gap:20px; margin-bottom:25px; }
+    .stat-card { background:#fff; padding:20px; border-radius:10px; border:1px solid #eaeaea; display:flex; flex-direction:row; align-items: center; justify-content:space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.02);}
+    .stat-info { display: flex; flex-direction: column; gap: 4px; }
+    .stat-title { font-size:11px; color:#666; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+    .stat-value { font-size:24px; font-weight:700; color:#111; }
+    .stat-sub { font-size:11px; color:#888; }
+    .stat-icon { width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .icon-blue { background: #eef4ff; color: #0052cc; }
+    .icon-green { background: #e3fcef; color: #00875a; }
+    .icon-purple { background: #f3e8ff; color: #9333ea; }
+    .icon-orange { background: #fff7ed; color: #ea580c; }
+    .icon-pink { background: #fdf2f8; color: #db2777; }
+
+    /* Filters Bar */
+    .filters-bar { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filters-left { display: flex; align-items: center; gap: 12px; }
+    .filter-select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; color: #444; background: #fff; outline: none; cursor: pointer; }
+    .btn-filter-icon { background: #fff; border: 1px solid #ddd; padding: 8px 14px; border-radius: 6px; font-size: 13px; color: #444; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .search-input-box { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #ddd; padding: 8px 12px; border-radius: 6px; width: 300px; }
+    .search-input-box input { border: none; outline: none; width: 100%; font-size: 13px; }
+    .search-input-box i { color: #888; }
+
+    /* Card & Table */
+    .card { background:#fff; border-radius:10px; border:1px solid #eaeaea; padding:20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin-bottom: 25px; }
+    .card-title { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 18px; }
+    
+    .table-container { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 14px 14px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+    th { font-weight: 700; color: #666; background: #f9fafc; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { color: #333; }
+    
+    .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block;}
+    .status-active, .status-published { background: #e3fcef; color: #00875a; }
+    .status-draft { background: #fff7ed; color: #ea580c; }
+    .status-archived, .status-closed { background: #f1f5f9; color: #64748b; }
+    
+    .scope-badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; background: #f1f5f9; color: #475569; display: inline-block; margin-top: 3px; }
+    
+    .prog-icon-box { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+
+    .action-btn { background: none; border: 1px solid #ddd; border-radius: 4px; color: #666; cursor: pointer; font-size: 13px; padding: 4px 8px; margin-right: 4px; }
+    .action-btn:hover { color: #0052cc; border-color: #0052cc; }
+
+    .table-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 12px; color: #666; }
+    .pagination { display: flex; gap: 6px; align-items: center; }
+    .page-btn { padding: 5px 10px; border: 1px solid #ddd; background: #fff; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .page-btn.active { background: #0052cc; color: #fff; border-color: #0052cc; font-weight: 600; }
+
+    /* Bottom Chart Section */
+    .chart-container { display: flex; align-items: center; justify-content: space-between; gap: 40px; padding: 10px 20px; }
+    .chart-wrapper { width: 220px; height: 220px; position: relative; }
+    .chart-center-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+    .chart-center-text .num { font-size: 22px; font-weight: 700; color: #111; }
+    .chart-center-text .lbl { font-size: 10px; color: #888; font-weight: 700; text-transform: uppercase; }
+    .legend-list { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .legend-item { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+    .legend-left { display: flex; align-items: center; gap: 10px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="learning-dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div style="display:flex; align-items:center; gap:12px;" class="logo-wrapper">
+                <img src="/images/wcg-logo.jpg" alt="WCG Logo" class="company-logo" onerror="this.src='https://ui-avatars.com/api/?name=WCG&background=0D8ABC&color=fff'">
+                <div class="company-details">
+                    <h3>WhiteCircle</h3>
+                    <span>Learning Admin L3</span>
+                </div>
+            </div>
+            <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="Collapse Sidebar"><i class="fa-solid fa-angle-left"></i></button>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="/space/lnd/dashboard" class="menu-item" id="nav-dashboard">
+                <i class="fa-solid fa-shapes"></i><span>Dashboard</span>
+            </a>
+            <a href="/space/lnd/approvals" class="menu-item" id="nav-approvals">
+                <i class="fa-regular fa-square-check"></i><span>Approvals</span>
+            </a>
+            <a href="/space/lnd/strategy" class="menu-item active" id="nav-strategy">
+                <i class="fa-solid fa-chart-line"></i><span>Strategy & Program Mgt</span>
+            </a>
+            <a href="/space/lnd/courses" class="menu-item" id="nav-courses">
+                <i class="fa-solid fa-book-open"></i><span>Course & Content Mgt</span>
+            </a>
+            <a href="/space/lnd/integrations" class="menu-item" id="nav-integrations">
+                <i class="fa-solid fa-link"></i><span>Performance & Learning Int</span>
+            </a>
+            <a href="/space/lnd/assessment" class="menu-item" id="nav-certification">
+                <i class="fa-solid fa-certificate"></i><span>Certification & Assessment</span>
+            </a>
+            <a href="/space/lnd/reports" class="menu-item" id="nav-analytics">
+                <i class="fa-solid fa-chart-simple"></i><span>Analytics & Evaluation</span>
+            </a>
+            <a href="/space/lnd/vendors" class="menu-item" id="nav-vendors">
+                <i class="fa-solid fa-users-gear"></i><span>Trainer & Vendor Mgt</span>
+            </a>
+            <a href="/space/lnd/budgets" class="menu-item" id="nav-budgets">
+                <i class="fa-solid fa-wallet"></i><span>Budget & Resource Planning</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+        <div class="breadcrumb" id="breadcrumbText">Learning Strategy & Program Management <span>&gt; Overview</span></div>
+        
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1 class="page-title" id="pageTitleText">Learning Strategy & Program Management</h1>
+                <p class="page-subtitle" id="pageSubText">Design, manage and align learning strategies and programs with organizational goals.</p>
+            </div>
+            <div class="header-right">
+                <a href="/space/lnd/program/create" class="btn-primary">
+                    <i class="fa-solid fa-plus"></i> Create Program
+                </a>
+                <div class="header-profile">
+                    <img src="https://ui-avatars.com/api/?name=Learning+Admin&background=0D8ABC&color=fff" alt="User" class="profile-image">
+                    <span class="profile-name" th:text="${loggedInUserName != null ? loggedInUserName : 'Rahul Singh'}">Rahul Singh</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <a class="tab-item active" id="tabStrategyBtn" onclick="switchMainTab('strategy')">Learning Strategy</a>
+            <a class="tab-item" id="tabProgramsBtn" onclick="switchMainTab('programs')">Programs</a>
+        </div>
+
+        <!-- Tab 1: Strategy View -->
+        <div id="strategyTabContent" class="tab-content active">
+            <!-- Stats Grid -->
+            <section class="stats-grid-4">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Active Programs</div>
+                        <div class="stat-value" th:text="${activeProgramsCount != null ? activeProgramsCount : 24}">24</div>
+                        <div class="stat-sub">Across all departments</div>
+                    </div>
+                    <div class="stat-icon icon-blue"><i class="fa-solid fa-layer-group"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Learning Paths</div>
+                        <div class="stat-value" th:text="${learningPathsCount != null ? learningPathsCount : 16}">16</div>
+                        <div class="stat-sub">Role/Department based</div>
+                    </div>
+                    <div class="stat-icon icon-green"><i class="fa-solid fa-route"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Enrolled Learners</div>
+                        <div class="stat-value" th:text="${#numbers.formatInteger(enrolledLearnersCount != null ? enrolledLearnersCount : 3842, 0, 'COMMA')}">3,842</div>
+                        <div class="stat-sub">Across all programs</div>
+                    </div>
+                    <div class="stat-icon icon-purple"><i class="fa-solid fa-user-graduate"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Program Completion Rate</div>
+                        <div class="stat-value" th:text="${(completionRatePct != null ? completionRatePct : 68) + '%'}">68%</div>
+                        <div class="stat-sub">Average completion</div>
+                    </div>
+                    <div class="stat-icon icon-orange"><i class="fa-solid fa-chart-pie"></i></div>
+                </div>
+            </section>
+
+            <!-- Filters Bar -->
+            <div class="filters-bar">
+                <div class="filters-left">
+                    <select class="filter-select">
+                        <option value="">All Departments</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Leadership">Leadership</option>
+                        <option value="Sales">Sales & Support</option>
+                    </select>
+                    <select class="filter-select">
+                        <option value="">All Program Types</option>
+                        <option value="Certification">Certification</option>
+                        <option value="Workshop">Workshop</option>
+                    </select>
+                    <select class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Draft">Draft</option>
+                    </select>
+                    <button class="btn-filter-icon"><i class="fa-solid fa-sliders"></i> Filters</button>
+                </div>
+                <div class="search-input-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Search employee, program, course..." onkeyup="filterStrategyTable()">
+                </div>
+            </div>
+
+            <!-- Table Card -->
+            <div class="card">
+                <div class="card-title">Learning Strategy Overview</div>
+                <div class="table-container">
+                    <table id="strategyTable">
+                        <thead>
+                            <tr>
+                                <th>Strategy Name</th>
+                                <th>Description</th>
+                                <th>Business Goal</th>
+                                <th>Target Audience</th>
+                                <th>Status</th>
+                                <th>Last Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="s : ${strategies}">
+                                <td class="fw-bold" style="font-weight:700; color:#111;" th:text="${s.name}">Future Ready Workforce</td>
+                                <td th:text="${s.description}">Build future skills across the organization</td>
+                                <td th:text="${s.businessGoal}">Improve capability for digital transformation</td>
+                                <td th:text="${s.targetAudience}">All Employees</td>
+                                <td>
+                                    <span class="status-badge" 
+                                          th:classappend="${s.status == 'Active' ? 'status-active' : 'status-draft'}"
+                                          th:text="${s.status}">Active</span>
+                                </td>
+                                <td th:text="${s.lastUpdated}">08 July 2026</td>
+                                <td>
+                                    <button class="action-btn" title="Options"><i class="fa-solid fa-ellipsis"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-footer">
+                    <div>Showing 1 to <span th:text="${strategies != null ? strategies.size() : 4}">4</span> of <span th:text="${strategies != null ? strategies.size() : 4}">4</span> strategies</div>
+                    <div class="pagination">
+                        <select class="filter-select" style="padding:4px 8px; font-size:12px;">
+                            <option>10 / page</option>
+                        </select>
+                        <button class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Program Categories Chart Card -->
+            <div class="card">
+                <div class="card-title">Top Program Categories</div>
+                <div class="chart-container">
+                    <div class="chart-wrapper">
+                        <canvas id="categoryChart"></canvas>
+                        <div class="chart-center-text">
+                            <div class="num" th:text="${programs != null ? programs.size() : 24}">24</div>
+                            <div class="lbl">Total Programs</div>
+                        </div>
+                    </div>
+                    <div class="legend-list">
+                        <div class="legend-item">
+                            <div class="legend-left"><div class="legend-dot" style="background:#0052cc;"></div><span>Technical</span></div>
+                            <strong style="color:#444;">10 (41.7%)</strong>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-left"><div class="legend-dot" style="background:#00875a;"></div><span>Behavioral</span></div>
+                            <strong style="color:#444;">6 (25.0%)</strong>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-left"><div class="legend-dot" style="background:#ff8b00;"></div><span>Leadership</span></div>
+                            <strong style="color:#444;">4 (16.7%)</strong>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-left"><div class="legend-dot" style="background:#9333ea;"></div><span>Compliance</span></div>
+                            <strong style="color:#444;">2 (8.3%)</strong>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-left"><div class="legend-dot" style="background:#888;"></div><span>Others</span></div>
+                            <strong style="color:#444;">2 (8.3%)</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Programs View (Screenshot 3) -->
+        <div id="programsTabContent" class="tab-content">
+            <!-- 4 Stat Cards -->
+            <section class="stats-grid-4">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Total Programs</div>
+                        <div class="stat-value" th:text="${programs != null ? programs.size() : 24}">24</div>
+                        <div class="stat-sub">Across all departments</div>
+                    </div>
+                    <div class="stat-icon icon-blue"><i class="fa-solid fa-graduation-cap"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Published Programs</div>
+                        <div class="stat-value">16</div>
+                        <div class="stat-sub">Active and visible</div>
+                    </div>
+                    <div class="stat-icon icon-green"><i class="fa-regular fa-file-code"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Draft Programs</div>
+                        <div class="stat-value">5</div>
+                        <div class="stat-sub">Under development</div>
+                    </div>
+                    <div class="stat-icon icon-purple"><i class="fa-solid fa-pen-to-square"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Archived Programs</div>
+                        <div class="stat-value">3</div>
+                        <div class="stat-sub">No longer active</div>
+                    </div>
+                    <div class="stat-icon icon-orange"><i class="fa-regular fa-trash-can"></i></div>
+                </div>
+            </section>
+
+            <!-- Filters Bar -->
+            <div class="filters-bar">
+                <div class="filters-left">
+                    <select class="filter-select">
+                        <option value="">All Departments</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Leadership">Leadership</option>
+                        <option value="Sales">Sales & Support</option>
+                    </select>
+                    <select class="filter-select">
+                        <option value="">All Program Types</option>
+                        <option value="Technical">Technical</option>
+                        <option value="Leadership">Leadership</option>
+                        <option value="Behavioral">Behavioral</option>
+                    </select>
+                    <select class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="Published">Published</option>
+                        <option value="Draft">Draft</option>
+                    </select>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="search-input-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="progSearchInput" placeholder="Search programs..." onkeyup="filterProgramsTable()">
+                    </div>
+                    <button class="btn-filter-icon"><i class="fa-solid fa-sliders"></i> Filters</button>
+                </div>
+            </div>
+
+            <!-- Programs Table Card -->
+            <div class="card">
+                <div class="table-container">
+                    <table id="programsTable">
+                        <thead>
+                            <tr>
+                                <th>Program Name</th>
+                                <th>Program Type</th>
+                                <th>Department / Scope</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                                <th>Created On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${programs}">
+                                <td>
+                                    <div style="display:flex; align-items:center; gap:12px;">
+                                        <div class="prog-icon-box" th:classappend="${p.category == 'Technical' ? 'icon-green' : (p.category == 'Leadership' ? 'icon-orange' : 'icon-purple')}">
+                                            <i class="fa-solid" th:classappend="${p.category == 'Technical' ? 'fa-desktop' : (p.category == 'Leadership' ? 'fa-user-tie' : 'fa-star')}"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight:700; color:#111;" th:text="${p.name}">Future Ready Workforce</div>
+                                            <div style="font-size:11px; color:#888;" th:text="${p.description}">Build future skills across the organization</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="font-weight:600;" th:text="${p.category != null ? p.category : p.programType}">Technical</td>
+                                <td>
+                                    <div style="font-weight:600;" th:text="${p.department}">All Departments</div>
+                                    <span class="scope-badge">Organization-wide</span>
+                                </td>
+                                <td>
+                                    <div style="display:flex; align-items:center; gap:6px;">
+                                        <i class="fa-regular fa-clock" style="color:#888;"></i>
+                                        <div>
+                                            <strong th:text="${p.duration}">12 Weeks</strong>
+                                            <small style="color:#888; display:block;" th:text="'(' + ${p.modeOfDelivery} + ')'">(Blended)</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge" 
+                                          th:classappend="${p.status == 'Active' or p.status == 'Published' ? 'status-published' : 'status-draft'}"
+                                          th:text="${p.status == 'Active' ? 'Published' : p.status}">Published</span>
+                                </td>
+                                <td>
+                                    <div style="font-weight:600;" th:text="${p.startDate != null ? p.startDate : '08 July 2026'}">08 July 2026</div>
+                                    <small style="color:#888;" th:text="'by ' + ${p.programOwner != null ? p.programOwner : 'Learning Admin'}">by Learning Admin</small>
+                                </td>
+                                <td>
+                                    <button class="action-btn" title="View"><i class="fa-regular fa-eye"></i></button>
+                                    <button class="action-btn" title="Options"><i class="fa-solid fa-ellipsis"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-footer">
+                    <div>Showing 1 to <span th:text="${programs != null ? programs.size() : 4}">4</span> of <span th:text="${programs != null ? programs.size() : 4}">4</span> programs</div>
+                    <div class="pagination">
+                        <select class="filter-select" style="padding:4px 8px; font-size:12px;">
+                            <option>10 / page</option>
+                        </select>
+                        <button class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('collapsed');
+    }
+
+    function switchMainTab(tab) {
+        document.getElementById('tabStrategyBtn').classList.toggle('active', tab === 'strategy');
+        document.getElementById('tabProgramsBtn').classList.toggle('active', tab === 'programs');
+        
+        document.getElementById('strategyTabContent').classList.toggle('active', tab === 'strategy');
+        document.getElementById('programsTabContent').classList.toggle('active', tab === 'programs');
+
+        if(tab === 'programs') {
+            document.getElementById('breadcrumbText').innerHTML = 'Learning Strategy & Program Management <span>/ Programs</span>';
+            document.getElementById('pageTitleText').innerText = 'Programs';
+            document.getElementById('pageSubText').innerText = 'Create and manage training programs across the organization.';
+        } else {
+            document.getElementById('breadcrumbText').innerHTML = 'Learning Strategy & Program Management <span>&gt; Overview</span>';
+            document.getElementById('pageTitleText').innerText = 'Learning Strategy & Program Management';
+            document.getElementById('pageSubText').innerText = 'Design, manage and align learning strategies and programs with organizational goals.';
+        }
+    }
+
+    function filterStrategyTable() {
+        const input = document.getElementById("searchInput").value.toUpperCase();
+        const trs = document.querySelectorAll("#strategyTable tbody tr");
+        trs.forEach(tr => {
+            const text = tr.innerText.toUpperCase();
+            tr.style.display = text.indexOf(input) > -1 ? "" : "none";
+        });
+    }
+
+    function filterProgramsTable() {
+        const input = document.getElementById("progSearchInput").value.toUpperCase();
+        const trs = document.querySelectorAll("#programsTable tbody tr");
+        trs.forEach(tr => {
+            const text = tr.innerText.toUpperCase();
+            tr.style.display = text.indexOf(input) > -1 ? "" : "none";
+        });
+    }
+
+    // Chart.js Donut Chart
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Technical', 'Behavioral', 'Leadership', 'Compliance', 'Others'],
+                datasets: [{
+                    data: [10, 6, 4, 2, 2],
+                    backgroundColor: ['#0052cc', '#00875a', '#ff8b00', '#9333ea', '#888888'],
+                    borderWidth: 0,
+                    cutout: '75%'
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    });
+</script>
+</body>
+</html>

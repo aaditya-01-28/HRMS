@@ -93,6 +93,18 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Autowired
     private com.example.admindashboard.repository.ItBroadcastRepository itBroadcastRepository;
 
+    @Autowired
+    private com.example.admindashboard.repository.LearningStrategyRepository learningStrategyRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.LearningProgramRepository learningProgramRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.AssessmentRepository assessmentRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.CertificationRepository certificationRepository;
+
     @Override
     public void run(String... args) throws Exception {
                 // Always update existing seeded users to ensure they have correct employeeCode and department
@@ -2250,6 +2262,8 @@ public class DatabaseSeeder implements CommandLineRunner {
             seedItTicket("IT-TKT-110", "EMP701", "Amit Project", "Access/Permission", "Jira Project Board Access", "Medium", "Open", LocalDate.now(), "Need developer access to WhiteCircle HRMS project board.", "EMP0001");
             System.out.println("✅ Seeded IT Service Requests.");
         }
+
+        seedLndData();
     }
 
 
@@ -2409,5 +2423,70 @@ public class DatabaseSeeder implements CommandLineRunner {
         req.setDepartment("IT");
         req.setAssignedTo(assignedTo);
         serviceRequestRepository.save(req);
+    }
+
+    private void seedLndData() {
+        if (learningStrategyRepository.count() == 0) {
+            learningStrategyRepository.save(new com.example.admindashboard.model.LearningStrategy("Future Ready Workforce", "Build future skills across the organization", "Improve capability for digital transformation", "All Employees", "Active", "08 July 2026"));
+            learningStrategyRepository.save(new com.example.admindashboard.model.LearningStrategy("Leadership Excellence", "Develop leadership and management capabilities", "Strengthen leadership bench strength", "Managers & Above", "Active", "08 July 2026"));
+            learningStrategyRepository.save(new com.example.admindashboard.model.LearningStrategy("Technical Upskilling", "Enhance domain and technical competencies", "Improve product & engineering performance", "Engineering Teams", "Active", "08 July 2026"));
+            learningStrategyRepository.save(new com.example.admindashboard.model.LearningStrategy("Customer Centricity", "Improve customer focus and experience", "Increase customer satisfaction", "Sales & Support Teams", "Draft", "08 July 2026"));
+        }
+
+        if (learningProgramRepository.count() == 0) {
+            // Technical (10)
+            learningProgramRepository.save(new com.example.admindashboard.model.LearningProgram("Full Stack Developer Mastery", "Technical", "Certification", "Comprehensive full-stack development skills", "Engineering", "Software Engineers", "Build digital capabilities", "Rahul Mehta", "6 Months", "Online", "2026-01-15", "2026-07-15", "Intermediate", "Java, React, Spring", "Master Frontend and Backend Architecture", "Active"));
+            learningProgramRepository.save(new com.example.admindashboard.model.LearningProgram("Cloud Architecture & DevOps", "Technical", "Workshop", "Modern cloud and container orchestration", "Engineering", "DevOps & Cloud Engineers", "Accelerate cloud transition", "Arjun Kapoor", "3 Months", "Blended", "2026-02-01", "2026-05-01", "Advanced", "AWS, Kubernetes, Docker", "Implement CI/CD pipelines", "Active"));
+            for (int i = 3; i <= 10; i++) {
+                learningProgramRepository.save(new com.example.admindashboard.model.LearningProgram("Technical Specialization " + i, "Technical", "Training", "Domain specific technical skills", "Engineering", "Engineering Teams", "Improve performance", "Rahul Mehta", "2 Months", "Online", "2026-03-01", "2026-05-01", "Intermediate", "Tech", "Technical proficiency", "Active"));
+            }
+            // Behavioral (6)
+            for (int i = 1; i <= 6; i++) {
+                learningProgramRepository.save(new com.example.admindashboard.model.LearningProgram("Behavioral & Soft Skills " + i, "Behavioral", "Workshop", "Workplace communication and teamwork", "All Departments", "All Employees", "Enhance collaboration", "Sneha Patil", "1 Month", "Offline", "2026-04-01", "2026-05-01", "Basic", "Soft Skills", "Effective communication", "Active"));
+            }
+            // Leadership (4)
+            for (int i = 1; i <= 4; i++) {
+                learningProgramRepository.save(new com.example.admindashboard.model.LearningProgram("Leadership Track " + i, "Leadership", "Executive", "Management and strategic thinking", "Leadership", "Managers & Above", "Bench strength", "Vivek Nair", "4 Months", "Blended", "2026-01-10", "2026-05-10", "Advanced", "Leadership", "Executive leadership", "Active"));
+            }
+            // Compliance (2)
+            for (int i = 1; i <= 2; i++) {
+                learningProgramRepository.save(new com.example.admindashboard.model.LearningProgram("Mandatory Compliance " + i, "Compliance", "Compliance", "Regulatory & POSH ethics training", "HR & Legal", "All Employees", "Maintain compliance", "Neha Verma", "2 Weeks", "Online", "2026-05-01", "2026-05-15", "Basic", "Compliance", "100% compliance adherence", "Active"));
+            }
+            // Others (2)
+            for (int i = 1; i <= 2; i++) {
+                learningProgramRepository.save(new com.example.admindashboard.model.LearningProgram("General Skills " + i, "Others", "General", "Cross-functional productivity skills", "Operations", "All Staff", "Operational excellence", "Rahul Mehta", "1 Month", "Online", "2026-06-01", "2026-07-01", "Basic", "General", "Productivity enhancement", "Active"));
+            }
+        }
+
+        if (assessmentRepository.count() == 0) {
+            assessmentRepository.save(new com.example.admindashboard.model.Assessment("ASMT-001", "Leadership Skills Assessment", "Assessment", "Rahul Mehta", "Leadership", "70% or above", 70, "Active", 245, 82.0, "Managers & Above", "Intermediate", 45, 30, 2, 60, false, true, "Online", "28 May 2026"));
+            assessmentRepository.save(new com.example.admindashboard.model.Assessment("QUIZ-012", "Sales Knowledge Quiz", "Quiz", "Sneha Patil", "Sales & Marketing", "60% or above", 60, "Active", 312, 74.0, "Sales Executives", "Basic", 20, 15, 2, 30, false, true, "Online", "28 May 2026"));
+            assessmentRepository.save(new com.example.admindashboard.model.Assessment("ASMT-018", "Excel Advanced Test", "Assessment", "Arjun Kapoor", "Finance", "65% or above", 65, "Active", 189, 68.0, "Finance & Accounts", "Advanced", 60, 25, 4, 100, true, true, "Online", "28 May 2026"));
+            assessmentRepository.save(new com.example.admindashboard.model.Assessment("QUIZ-021", "Compliance Awareness Quiz", "Quiz", "Neha Verma", "HR", "80% or above", 80, "Draft", 0, 0.0, "All Employees", "Basic", 15, 10, 2, 20, false, false, "Online", "28 May 2026"));
+            assessmentRepository.save(new com.example.admindashboard.model.Assessment("ASMT-027", "Customer Service Assessment", "Assessment", "Vivek Nair", "Customer Support", "70% or above", 70, "Closed", 156, 71.0, "Support Team", "Intermediate", 30, 20, 5, 100, false, true, "Online", "28 May 2026"));
+
+            // Add remaining active/draft/closed/expired assessments to reach total 56
+            for (int i = 6; i <= 32; i++) {
+                assessmentRepository.save(new com.example.admindashboard.model.Assessment("ASMT-0" + i, "Technical Competency Assessment " + i, "Assessment", "Rahul Mehta", "Engineering", "70% or above", 70, "Active", 120 + i, 75.0, "Engineering Teams", "Intermediate", 45, 30, 2, 60, false, true, "Online", "28 May 2026"));
+            }
+            for (int i = 33; i <= 44; i++) {
+                assessmentRepository.save(new com.example.admindashboard.model.Assessment("QUIZ-0" + i, "Domain Knowledge Quiz " + i, "Quiz", "Sneha Patil", "Product", "60% or above", 60, "Draft", 0, 0.0, "Product Managers", "Basic", 15, 10, 2, 20, false, false, "Online", "28 May 2026"));
+            }
+            for (int i = 45; i <= 52; i++) {
+                assessmentRepository.save(new com.example.admindashboard.model.Assessment("ASMT-0" + i, "Legacy Skill Evaluation " + i, "Assessment", "Arjun Kapoor", "Operations", "65% or above", 65, "Closed", 85, 62.0, "Operations Staff", "Intermediate", 30, 20, 5, 100, false, true, "Online", "28 May 2026"));
+            }
+            for (int i = 53; i <= 56; i++) {
+                assessmentRepository.save(new com.example.admindashboard.model.Assessment("ASMT-0" + i, "Archived Certification Exam " + i, "Assessment", "Neha Verma", "HR", "75% or above", 75, "Expired", 45, 55.0, "HR Team", "Advanced", 60, 40, 2, 100, true, true, "Online", "28 May 2026"));
+            }
+        }
+
+        if (certificationRepository.count() == 0) {
+            certificationRepository.save(new com.example.admindashboard.model.Certification("CERT-001", "Certified Agile Practitioner", "L&D Academy", "Engineering", "2 Years", 142, "Active"));
+            certificationRepository.save(new com.example.admindashboard.model.Certification("CERT-002", "Leadership Excellence Certificate", "Executive Board", "Management", "Lifetime", 86, "Active"));
+            certificationRepository.save(new com.example.admindashboard.model.Certification("CERT-003", "Data Privacy & GDPR Specialist", "Compliance Office", "Legal & Compliance", "1 Year", 210, "Active"));
+            for (int i = 4; i <= 34; i++) {
+                certificationRepository.save(new com.example.admindashboard.model.Certification("CERT-0" + i, "Professional Competency Cert " + i, "WhiteCircle L&D", "General", "2 Years", 50 + i, "Active"));
+            }
+        }
     }
 }

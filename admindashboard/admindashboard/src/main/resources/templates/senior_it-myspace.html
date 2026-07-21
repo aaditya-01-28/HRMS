@@ -110,13 +110,45 @@
         }
 
         body.sidebar-collapsed .myspace-sidebar {
-            transform: translateX(-100%);
+            width: 70px;
+            transform: none;
         }
         body.sidebar-collapsed .myspace-header {
-            left: 0;
+            left: 70px;
         }
         body.sidebar-collapsed .myspace-main {
-            margin-left: 0;
+            margin-left: 70px;
+        }
+
+        /* Hide text in sidebar when collapsed */
+        body.sidebar-collapsed .myspace-sidebar .brand-title,
+        body.sidebar-collapsed .myspace-sidebar .brand-sub,
+        body.sidebar-collapsed .myspace-sidebar .nav-link-item span {
+            display: none;
+        }
+
+        /* Adjust padding/alignment for collapsed sidebar */
+        body.sidebar-collapsed .myspace-sidebar .brand-area {
+            padding: 20px 10px;
+            justify-content: center;
+        }
+        
+        body.sidebar-collapsed .myspace-sidebar .nav-link-item {
+            justify-content: center;
+            padding: 12px 0;
+        }
+
+        body.sidebar-collapsed .myspace-sidebar .nav-link-item i {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        /* Exit button text hide */
+        body.sidebar-collapsed .myspace-sidebar .btn span {
+            display: none;
+        }
+        body.sidebar-collapsed .myspace-sidebar .btn i {
+            margin: 0 !important;
         }
 
         /* --- TOP HEADER --- */
@@ -240,15 +272,14 @@
             <button class="btn btn-light border" id="sidebarToggle" onclick="toggleSidebar()" style="width: 40px; height: 40px; border-radius: 8px;">
                 <i class="fas fa-bars"></i>
             </button>
+
+            <div class="header-title" id="tabTitle">IT Admin My Space</div>
+        </div>
+        <div class="d-flex align-items-center gap-3">
             <a href="/senior_it/dashboard" class="btn btn-light border d-flex align-items-center gap-2 px-3" style="height: 40px; border-radius: 8px; font-weight: 600; color: #475569; text-decoration: none;">
                 <i class="fas fa-arrow-left"></i>
                 <span>Back</span>
             </a>
-            <div class="header-title ms-2" id="tabTitle">IT Admin My Space</div>
-        </div>
-        <div class="d-flex align-items-center gap-3">
-            <span class="text-muted fw-semibold" th:text="${currentUser != null ? currentUser.fullName : 'Rajesh Kumar'}">Rajesh Kumar</span>
-            <div class="w-10 rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">RK</div>
         </div>
     </div>
 
@@ -962,6 +993,18 @@
                             <label class="form-label">Select System Role</label>
                             <select class="form-select" name="roleName" required>
                                 <option th:each="r : ${roles}" th:value="${r.roleName}" th:text="${r.roleName}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Assign Department</label>
+                            <select class="form-select" name="departmentId">
+                                <option value="">-- Select Department --</option>
+                                <option th:each="d : ${departments}" th:value="${d}" th:text="${d}"></option>
+                                <option value="IT">IT</option>
+                                <option value="HR">HR</option>
+                                <option value="FINANCE">FINANCE</option>
+                                <option value="FACILITY">FACILITY</option>
+                                <option value="ADMIN">ADMIN</option>
                             </select>
                         </div>
                     </div>

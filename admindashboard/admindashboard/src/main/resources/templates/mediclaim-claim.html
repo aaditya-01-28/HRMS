@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -166,11 +166,11 @@
                 <h5 class="fw-bold mb-4 text-dark">Financial Details</h5>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label class="form-label">Total Hospital Bill (â‚¹)</label>
+                        <label class="form-label">Total Hospital Bill (&#8377;)</label>
                         <input type="number" name="totalBill" class="form-control auto-save" id="totalBill" placeholder="0.00" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Amount Claimed (â‚¹)</label>
+                        <label class="form-label">Amount Claimed (&#8377;)</label>
                         <input type="number" name="claimAmount" class="form-control auto-save" id="claimAmount" placeholder="0.00" required>
                     </div>
                 </div>
@@ -213,7 +213,7 @@
 
                 <div class="summary-box bg-primary bg-opacity-10 border-primary border-opacity-25">
                     <div class="summary-row"><span class="summary-label text-primary">Claim Type</span><span class="summary-value text-primary" id="sumType">-</span></div>
-                    <div class="summary-row"><span class="summary-label text-primary">Claim Amount</span><span class="summary-value text-primary fs-5" id="sumAmount">â‚¹0</span></div>
+                    <div class="summary-row"><span class="summary-label text-primary">Claim Amount</span><span class="summary-value text-primary fs-5" id="sumAmount">&#8377;0</span></div>
                 </div>
 
                 <div class="form-check mt-4">
@@ -268,7 +268,7 @@
                             <div class="small text-muted" th:text="${claim.diagnosis}">Diagnosis</div>
                         </td>
                         <td th:text="${claim.claimType}">Reimbursement</td>
-                        <td class="fw-bold" th:text="'â‚¹' + ${#numbers.formatDecimal(claim.claimAmount, 0, 'COMMA', 0, 'POINT')}">â‚¹0</td>
+                        <td class="fw-bold" th:text="'&#8377;' + ${#numbers.formatDecimal(claim.claimAmount, 0, 'COMMA', 0, 'POINT')}">&#8377;0</td>
                         <td>
                                 <span class="badge-status"
                                       th:classappend="${claim.status == 'Pending' ? 'status-pending' : (claim.status == 'Approved' or claim.status == 'Settled' ? 'status-approved' : 'status-rejected')}"
@@ -393,7 +393,7 @@
             const d2 = document.getElementById('dateDischarge').value;
             document.getElementById('sumDates').innerText = (d1 && d2) ? `${d1} to ${d2}` : '-';
             document.getElementById('sumType').innerText = document.getElementById('claimType').value;
-            document.getElementById('sumAmount').innerText = 'â‚¹' + (document.getElementById('claimAmount').value || '0');
+            document.getElementById('sumAmount').innerText = '&#8377;' + (document.getElementById('claimAmount').value || '0');
         }
 
         // Auto-save UI

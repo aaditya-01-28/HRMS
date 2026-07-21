@@ -492,12 +492,12 @@
                                               class="badge rounded-pill status-badge-dynamic"></span>
                                     </div>
                                     <div class="text-muted mb-2" style="font-size: 0.9rem; font-weight: 500;">
-                                        <span th:text="${meeting.platform}">Platform</span> â€¢ 
+                                        <span th:text="${meeting.platform}">Platform</span> &bull; 
                                         <span th:text="${meeting.organizer.fullName}">Name</span>
                                     </div>
                                     <div class="text-muted" style="font-size: 0.85rem;">
                                         <i class="far fa-calendar-alt me-1"></i>
-                                        <span th:text="${#temporals.format(meeting.meetingDate, 'dd MMMM yyyy')}">01 June 2026</span> â€¢ 
+                                        <span th:text="${#temporals.format(meeting.meetingDate, 'dd MMMM yyyy')}">01 June 2026</span> &bull; 
                                         <span th:text="${#temporals.format(meeting.startTime, 'hh:mm a')}">10:00 AM</span> - <span th:text="${#temporals.format(meeting.endTime, 'hh:mm a')}">11:00 AM</span>
                                     </div>
                                 </div>
@@ -536,12 +536,12 @@
                                         <span th:if="${meeting.status == 'CONFIRMED'}" class="badge rounded-pill bg-success text-white" style="font-weight: 600; padding: 6px 14px; font-size: 0.75rem;">Confirmed</span>
                                     </div>
                                     <div class="text-muted mb-2" style="font-size: 0.9rem; font-weight: 500;">
-                                        <span th:text="${meeting.platform}">Platform</span> â€¢ 
+                                        <span th:text="${meeting.platform}">Platform</span> &bull; 
                                         <span>Organized by You</span>
                                     </div>
                                     <div class="text-muted" style="font-size: 0.85rem;">
                                         <i class="far fa-calendar-alt me-1"></i>
-                                        <span th:text="${#temporals.format(meeting.meetingDate, 'dd MMMM yyyy')}">01 June 2026</span> â€¢ 
+                                        <span th:text="${#temporals.format(meeting.meetingDate, 'dd MMMM yyyy')}">01 June 2026</span> &bull; 
                                         <span th:text="${#temporals.format(meeting.startTime, 'hh:mm a')}">10:00 AM</span> - <span th:text="${#temporals.format(meeting.endTime, 'hh:mm a')}">11:00 AM</span>
                                     </div>
                                 </div>

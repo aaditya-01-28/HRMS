@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Certification & Assessment Management</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', Arial, sans-serif; }
+    body { background:#f4f7fb; color:#333; font-size:14px; overflow-x:hidden; }
+
+    /* Layout */
+    .learning-dashboard { display:flex; min-height:100vh; }
+    .sidebar { width:250px; background:#fff; border-right:1px solid #eaeaea; display:flex; flex-direction:column; transition: width 0.3s; position: relative; }
+    .dashboard-content { flex:1; padding:20px 30px; display:flex; flex-direction:column; position: relative; }
+
+    /* Sidebar */
+    .sidebar-header { padding:20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eaeaea; }
+    .company-logo { width:36px; height:36px; object-fit:contain; border-radius: 4px; }
+    .company-details h3 { font-size:16px; font-weight:700; color:#002D72; margin-bottom: 2px;}
+    .company-details span { font-size:12px; color:#888; }
+    .sidebar-menu { margin-top:15px; }
+    .menu-item { display:flex; align-items:center; gap:12px; text-decoration:none; color:#555; padding:12px 20px; font-size:14px; font-weight: 500; transition:.2s; border-left: 3px solid transparent;}
+    .menu-item:hover { background:#f8fafc; color: #002D72;}
+    .menu-item.active { background:#eef4ff; color:#002D72; border-left-color: #002D72; font-weight: 600;}
+    .menu-item i { width:18px; text-align: center; font-size: 16px;}
+
+    .toggle-sidebar-btn { 
+        position: absolute; right: -14px; top: 25px; background: #fff; border: 1px solid #eaeaea; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.3s; color: #555;
+    }
+    .toggle-sidebar-btn:hover { background: #f4f7fb; color: #0052cc; }
+    .sidebar.collapsed { width: 80px; }
+    .sidebar.collapsed .company-details, .sidebar.collapsed .menu-item span { display: none; }
+    .sidebar.collapsed .sidebar-header { justify-content: center; padding: 20px 0; }
+    .sidebar.collapsed .toggle-sidebar-btn { transform: rotate(180deg); }
+
+    /* Breadcrumb & Header */
+    .breadcrumb { font-size: 12px; color: #0052cc; font-weight: 500; margin-bottom: 8px; }
+    .breadcrumb span { color: #888; margin-left: 4px; }
+    .dashboard-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
+    .header-left .page-title { font-size:22px; font-weight:700; color:#111; margin-bottom: 4px;}
+    .header-left .page-subtitle { font-size:13px; color:#666; }
+    .header-right { display:flex; align-items:center; gap:15px; }
+    
+    .btn-primary { background:#0052cc; border:none; padding:9px 18px; border-radius:6px; font-size:13px; color:#fff; display:flex; align-items:center; gap:8px; cursor:pointer; font-weight: 600; text-decoration: none; transition: 0.2s;}
+    .btn-primary:hover { background: #0043a6;}
+
+    /* Tabs */
+    .tabs-container { border-bottom: 1px solid #ddd; margin-bottom: 25px; display: flex; gap: 30px; }
+    .tab-item { text-decoration: none; color: #666; font-size: 14px; font-weight: 500; padding-bottom: 10px; border-bottom: 3px solid transparent; cursor: pointer;}
+    .tab-item.active { color: #002D72; border-bottom-color: #002D72; font-weight: 600; }
+    .tab-item:hover:not(.active) { color: #333; }
+
+    /* Stats Grid - 5 columns */
+    .stats-grid-5 { display:grid; grid-template-columns:repeat(5, 1fr); gap:16px; margin-bottom:25px; }
+    .stats-grid-4 { display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:25px; }
+    .stat-card { background:#fff; padding:16px; border-radius:10px; border:1px solid #eaeaea; display:flex; flex-direction:row; align-items: center; justify-content:space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.02);}
+    .stat-info { display: flex; flex-direction: column; gap: 4px; }
+    .stat-title { font-size:10px; color:#666; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+    .stat-value { font-size:22px; font-weight:700; color:#111; }
+    .stat-sub { font-size:11px; color:#888; }
+    .stat-sub.up { color: #00875a; font-weight: 600; }
+    .stat-icon { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .icon-blue { background: #eef4ff; color: #0052cc; }
+    .icon-green { background: #e3fcef; color: #00875a; }
+    .icon-purple { background: #f3e8ff; color: #9333ea; }
+    .icon-orange { background: #fff7ed; color: #ea580c; }
+    .icon-teal { background: #e6fffa; color: #0d9488; }
+
+    /* Filters Bar */
+    .filters-bar { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filters-left { display: flex; align-items: center; gap: 12px; }
+    .filter-select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; color: #444; background: #fff; outline: none; cursor: pointer; }
+    .btn-filter-icon { background: #fff; border: 1px solid #ddd; padding: 8px 14px; border-radius: 6px; font-size: 13px; color: #444; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .search-input-box { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #ddd; padding: 8px 12px; border-radius: 6px; width: 280px; }
+    .search-input-box input { border: none; outline: none; width: 100%; font-size: 13px; }
+    .search-input-box i { color: #888; }
+
+    /* Main Area Split (Table + Sidebar Widgets) */
+    .assessment-split { display: grid; grid-template-columns: 1fr 300px; gap: 20px; margin-bottom: 20px; }
+
+    /* Card & Table */
+    .card { background:#fff; border-radius:10px; border:1px solid #eaeaea; padding:20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin-bottom: 20px; }
+    .card-title { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 18px; }
+    
+    .table-container { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+    th { font-weight: 700; color: #666; background: #f9fafc; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { color: #333; }
+    
+    .asmt-name-cell { display: flex; align-items: center; gap: 12px; }
+    .asmt-icon-box { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .box-blue { background: #eef4ff; color: #0052cc; }
+    .box-purple { background: #f3e8ff; color: #9333ea; }
+    .box-teal { background: #e6fffa; color: #0d9488; }
+    .box-orange { background: #fff7ed; color: #ea580c; }
+    .box-green { background: #e3fcef; color: #00875a; }
+    .box-yellow { background: #fffae6; color: #d97706; }
+    
+    .user-avatar-small { width: 24px; height: 24px; border-radius: 50%; background: #0052cc; color: #fff; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+
+    .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block;}
+    .status-active { background: #e3fcef; color: #00875a; }
+    .status-draft { background: #fff7ed; color: #ea580c; }
+    .status-closed { background: #f1f5f9; color: #64748b; }
+    .status-expiring { background: #fff7ed; color: #ea580c; }
+
+    .dist-chips { display: flex; gap: 8px; font-size: 11px; font-weight: 700; }
+    .chip { display: flex; align-items: center; gap: 4px; }
+    .chip-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+    .prog-bar-sm { width: 60px; height: 5px; background: #e2e8f0; border-radius: 3px; display: inline-block; vertical-align: middle; margin-left: 8px; }
+    .prog-fill-sm { height: 100%; border-radius: 3px; background: #00875a; }
+
+    .table-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 12px; color: #666; }
+    .pagination { display: flex; gap: 6px; align-items: center; }
+    .page-btn { padding: 5px 10px; border: 1px solid #ddd; background: #fff; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .page-btn.active { background: #0052cc; color: #fff; border-color: #0052cc; font-weight: 600; }
+
+    /* Right Widgets */
+    .widget-card { background: #fff; border-radius: 10px; border: 1px solid #eaeaea; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+    .widget-title { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    
+    .chart-center-wrapper { position: relative; width: 160px; height: 160px; margin: 0 auto 20px; }
+    .chart-center-val { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+    .chart-center-val .num { font-size: 20px; font-weight: 700; color: #111; }
+    .chart-center-val .lbl { font-size: 10px; color: #888; text-transform: uppercase; font-weight: 700; }
+
+    .status-list { display: flex; flex-direction: column; gap: 8px; font-size: 12px; }
+    .status-item { display: flex; justify-content: space-between; align-items: center; }
+    .status-left { display: flex; align-items: center; gap: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    .activity-list { display: flex; flex-direction: column; gap: 14px; }
+    .activity-item { display: flex; gap: 12px; align-items: flex-start; }
+    .act-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+    .act-text { font-size: 12px; }
+    .act-text strong { color: #111; font-weight: 600; }
+    .act-text .time { font-size: 10px; color: #888; margin-top: 2px; }
+
+    .dept-rank-list { display: flex; flex-direction: column; gap: 12px; }
+    .dept-rank-item { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+    .dept-name { font-weight: 600; color: #111; width: 110px; }
+    .dept-part { color: #666; width: 40px; text-align: right; }
+    .dept-bar-wrap { flex: 1; margin: 0 10px; display: flex; align-items: center; gap: 8px; }
+    .dept-bar { height: 6px; background: #00875a; border-radius: 3px; }
+    .dept-pct { font-weight: 700; color: #111; font-size: 11px; }
+
+    /* Bottom Banner Note */
+    .note-banner { background: #eef4ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; font-size: 13px; color: #1e3a8a; }
+    .note-banner i { font-size: 18px; color: #0052cc; }
+
+    /* Multi-step Wizard Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-wizard { background: #fff; width: 750px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; }
+    
+    .wizard-header { padding: 20px 25px 15px; border-bottom: 1px solid #eaeaea; display: flex; justify-content: space-between; align-items: flex-start; }
+    .wizard-title h3 { font-size: 18px; font-weight: 700; color: #111; margin-bottom: 4px; }
+    .wizard-title p { font-size: 12px; color: #666; }
+    .close-modal-btn { background: none; border: none; font-size: 20px; color: #888; cursor: pointer; }
+    
+    /* Stepper Bar */
+    .stepper-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background: #fafafa; border-bottom: 1px solid #eaeaea; position: relative; }
+    .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 2; position: relative; cursor: pointer; }
+    .step-circle { width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 2px solid #cbd5e1; color: #64748b; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .step-item.active .step-circle { background: #0052cc; border-color: #0052cc; color: #fff; }
+    .step-item.completed .step-circle { background: #0052cc; border-color: #0052cc; color: #fff; }
+    .step-lbl { font-size: 11px; font-weight: 600; color: #64748b; }
+    .step-item.active .step-lbl { color: #0052cc; font-weight: 700; }
+    .stepper-line { position: absolute; top: 30px; left: 60px; right: 60px; height: 2px; background: #e2e8f0; z-index: 1; }
+
+    .wizard-body { padding: 25px; overflow-y: auto; max-height: 60vh; }
+    .wizard-step-panel { display: none; }
+    .wizard-step-panel.active { display: block; }
+
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 16px; }
+    .form-group-full { margin-bottom: 16px; }
+    .form-group-full label, .form-grid-2 label { display: block; font-size: 12px; font-weight: 700; color: #444; margin-bottom: 6px; }
+    .form-group-full label .req, .form-grid-2 label .req { color: #e11d48; margin-left: 2px; }
+    
+    .form-control-modal { width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; background: #fff; }
+    .form-control-modal:focus { border-color: #0052cc; }
+
+    /* Drag Drop Upload */
+    .dropzone { border: 2px dashed #cbd5e1; border-radius: 8px; padding: 25px; text-align: center; background: #f8fafc; cursor: pointer; transition: 0.2s; margin-top: 6px; }
+    .dropzone:hover { border-color: #0052cc; background: #eef4ff; }
+    .dropzone i { font-size: 28px; color: #0052cc; margin-bottom: 8px; }
+    .dropzone .txt { font-size: 12px; color: #64748b; }
+    .dropzone .txt strong { color: #0052cc; }
+
+    /* Radio Group & Toggle Switch */
+    .radio-group { display: flex; gap: 20px; align-items: center; margin-top: 8px; }
+    .radio-lbl { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+    
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background-color: #0052cc; }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    .wizard-footer { padding: 15px 25px; border-top: 1px solid #eaeaea; display: flex; justify-content: flex-end; gap: 12px; background: #fafafa; }
+    .btn-wiz-back { background: #fff; border: 1px solid #cbd5e1; padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #475569; cursor: pointer; }
+    .btn-wiz-next { background: #0052cc; border: none; padding: 8px 22px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #fff; cursor: pointer; }
+    .btn-wiz-next:hover { background: #0043a6; }
+
+    .tab-content-panel { display: none; }
+    .tab-content-panel.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="learning-dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div style="display:flex; align-items:center; gap:12px;" class="logo-wrapper">
+                <img src="/images/wcg-logo.jpg" alt="WCG Logo" class="company-logo" onerror="this.src='https://ui-avatars.com/api/?name=WCG&background=0D8ABC&color=fff'">
+                <div class="company-details">
+                    <h3>WhiteCircle</h3>
+                    <span>Learning Admin L3</span>
+                </div>
+            </div>
+            <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="Collapse Sidebar"><i class="fa-solid fa-angle-left"></i></button>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="/space/lnd/dashboard" class="menu-item" id="nav-dashboard">
+                <i class="fa-solid fa-shapes"></i><span>Dashboard</span>
+            </a>
+            <a href="/space/lnd/approvals" class="menu-item" id="nav-approvals">
+                <i class="fa-regular fa-square-check"></i><span>Approvals</span>
+            </a>
+            <a href="/space/lnd/strategy" class="menu-item" id="nav-strategy">
+                <i class="fa-solid fa-chart-line"></i><span>Strategy & Program Mgt</span>
+            </a>
+            <a href="/space/lnd/courses" class="menu-item" id="nav-courses">
+                <i class="fa-solid fa-book-open"></i><span>Course & Content Mgt</span>
+            </a>
+            <a href="/space/lnd/integrations" class="menu-item" id="nav-integrations">
+                <i class="fa-solid fa-link"></i><span>Performance & Learning Int</span>
+            </a>
+            <a href="/space/lnd/assessment" class="menu-item active" id="nav-certification">
+                <i class="fa-solid fa-certificate"></i><span>Certification & Assessment</span>
+            </a>
+            <a href="/space/lnd/reports" class="menu-item" id="nav-analytics">
+                <i class="fa-solid fa-chart-simple"></i><span>Analytics & Evaluation</span>
+            </a>
+            <a href="/space/lnd/vendors" class="menu-item" id="nav-vendors">
+                <i class="fa-solid fa-users-gear"></i><span>Trainer & Vendor Mgt</span>
+            </a>
+            <a href="/space/lnd/budgets" class="menu-item" id="nav-budgets">
+                <i class="fa-solid fa-wallet"></i><span>Budget & Resource Planning</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+        <div class="breadcrumb">Learning Admin <span>/ Certification & Assessment Management</span></div>
+        
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1 class="page-title">Certification & Assessment Management</h1>
+                <p class="page-subtitle">Create and manage assessments, quizzes, certifications, define passing criteria and monitor results.</p>
+            </div>
+            <div class="header-right">
+                <button class="btn-primary" id="topActionBtn" onclick="openModal('createAssessmentModal')">
+                    <i class="fa-solid fa-plus"></i> Create New <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:4px;"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <a class="tab-item active" id="tabAsmtBtn" onclick="switchAsmtTab('assessments')">Assessments</a>
+            <a class="tab-item" id="tabCertBtn" onclick="switchAsmtTab('certifications')">Certifications</a>
+            <a class="tab-item" id="tabAnalyticsBtn" onclick="switchAsmtTab('analytics')">Results & Analytics</a>
+        </div>
+
+        <!-- TAB 1: ASSESSMENTS (Existing) -->
+        <div id="tabAssessmentsPanel" class="tab-content-panel active">
+            <!-- 5 Stats Cards Grid -->
+            <section class="stats-grid-5">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Total Assessments</div>
+                        <div class="stat-value" th:text="${totalAssessmentsCount != null ? totalAssessmentsCount : 56}">56</div>
+                        <div class="stat-sub">Across all departments</div>
+                    </div>
+                    <div class="stat-icon icon-blue"><i class="fa-regular fa-file-code"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Total Quizzes</div>
+                        <div class="stat-value" th:text="${totalQuizzesCount != null ? totalQuizzesCount : 28}">28</div>
+                        <div class="stat-sub">Across all programs</div>
+                    </div>
+                    <div class="stat-icon icon-green"><i class="fa-solid fa-circle-check"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Total Certifications</div>
+                        <div class="stat-value" th:text="${totalCertificationsCount != null ? totalCertificationsCount : 34}">34</div>
+                        <div class="stat-sub">Active certifications</div>
+                    </div>
+                    <div class="stat-icon icon-purple"><i class="fa-solid fa-award"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Assessments Completed</div>
+                        <div class="stat-value" th:text="${#numbers.formatInteger(completedCount != null ? completedCount : 1248, 0, 'COMMA')}">1,248</div>
+                        <div class="stat-sub up"><i class="fa-solid fa-arrow-up"></i> This month 18%</div>
+                    </div>
+                    <div class="stat-icon icon-orange"><i class="fa-solid fa-user-check"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Average Pass Rate</div>
+                        <div class="stat-value" th:text="${(avgPassRate != null ? avgPassRate : 76) + '%'}">76%</div>
+                        <div class="stat-sub up"><i class="fa-solid fa-arrow-up"></i> This month 9%</div>
+                    </div>
+                    <div class="stat-icon icon-teal"><i class="fa-solid fa-chart-column"></i></div>
+                </div>
+            </section>
+
+            <!-- Filters Bar -->
+            <div class="filters-bar">
+                <div class="filters-left">
+                    <select class="filter-select">
+                        <option value="">All Departments</option>
+                        <option value="Leadership">Leadership</option>
+                        <option value="Sales & Marketing">Sales & Marketing</option>
+                        <option value="Finance">Finance</option>
+                        <option value="HR">HR</option>
+                    </select>
+                    <select class="filter-select">
+                        <option value="">All Assessment Types</option>
+                        <option value="Assessment">Assessment</option>
+                        <option value="Quiz">Quiz</option>
+                    </select>
+                    <select class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Draft">Draft</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                    <button class="btn-filter-icon"><i class="fa-regular fa-calendar"></i> 01 May 2026 - 30 Jun 2026</button>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="search-input-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="asmtSearchInput" placeholder="Search assessments, quizzes..." onkeyup="filterAsmtTable()">
+                    </div>
+                    <button class="btn-filter-icon"><i class="fa-solid fa-sliders"></i> Filters</button>
+                </div>
+            </div>
+
+            <!-- Split View (Table + Right Widgets) -->
+            <div class="assessment-split">
+                <!-- Table Card -->
+                <div class="card">
+                    <div class="card-title">Assessment Overview</div>
+                    <div class="table-container">
+                        <table id="asmtTable">
+                            <thead>
+                                <tr>
+                                    <th>Assessment Name</th>
+                                    <th>Type</th>
+                                    <th>Created By</th>
+                                    <th>Department</th>
+                                    <th>Passing Criteria</th>
+                                    <th>Status</th>
+                                    <th>Attempts</th>
+                                    <th>Pass Rate</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="a : ${assessments}">
+                                    <td>
+                                        <div class="asmt-name-cell">
+                                            <div class="asmt-icon-box" th:classappend="${a.type == 'Quiz' ? 'box-purple' : 'box-blue'}">
+                                                <i class="fa-regular" th:classappend="${a.type == 'Quiz' ? 'fa-lightbulb' : 'fa-file-code'}"></i>
+                                            </div>
+                                            <div>
+                                                <div style="font-weight:700; color:#111;" th:text="${a.name}">Leadership Skills Assessment</div>
+                                                <small style="color:#888; font-size:11px;" th:text="'ID: ' + ${a.code}">ID: ASMT-001</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td th:text="${a.type}">Assessment</td>
+                                    <td>
+                                        <div style="display:flex; align-items:center; gap:6px;">
+                                            <div class="user-avatar-small" th:text="${#strings.substring(a.createdBy != null ? a.createdBy : 'U', 0, 1)}">R</div>
+                                            <span th:text="${a.createdBy}">Rahul Mehta</span>
+                                        </div>
+                                    </td>
+                                    <td th:text="${a.department}">Leadership</td>
+                                    <td th:text="${a.passingCriteria}">70% or above</td>
+                                    <td>
+                                        <span class="status-badge" 
+                                              th:classappend="${a.status == 'Active' ? 'status-active' : (a.status == 'Draft' ? 'status-draft' : 'status-closed')}"
+                                              th:text="${a.status}">Active</span>
+                                    </td>
+                                    <td th:text="${a.attemptsCount}">245</td>
+                                    <td>
+                                        <span th:text="${a.passRate > 0 ? a.passRate + '%' : '-'}">82%</span>
+                                        <div class="prog-bar-sm" th:if="${a.passRate > 0}">
+                                            <div class="prog-fill-sm" th:style="'width:' + ${a.passRate} + '%'"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button class="action-btn" title="Options"><i class="fa-solid fa-ellipsis"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-footer">
+                        <div>Showing 1 to <span th:text="${assessments != null ? assessments.size() : 5}">5</span> of <span th:text="${assessments != null ? assessments.size() : 56}">56</span> assessments</div>
+                        <div class="pagination">
+                            <select class="filter-select" style="padding:4px 8px; font-size:12px;">
+                                <option>10 / page</option>
+                            </select>
+                            <button class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar Widgets -->
+                <div>
+                    <div class="widget-card">
+                        <div class="widget-title"><span>Assessment Status</span></div>
+                        <div class="chart-center-wrapper">
+                            <canvas id="asmtStatusChart"></canvas>
+                            <div class="chart-center-val">
+                                <div class="num">24</div>
+                                <div class="lbl">Total</div>
+                            </div>
+                        </div>
+                        <div class="status-list">
+                            <div class="status-item"><div class="status-left"><div class="dot" style="background:#0052cc;"></div><span>Active</span></div><strong>32 (57%)</strong></div>
+                            <div class="status-item"><div class="status-left"><div class="dot" style="background:#ff8b00;"></div><span>Draft</span></div><strong>12 (21%)</strong></div>
+                            <div class="status-item"><div class="status-left"><div class="dot" style="background:#888;"></div><span>Closed</span></div><strong>8 (14%)</strong></div>
+                            <div class="status-item"><div class="status-left"><div class="dot" style="background:#e11d48;"></div><span>Expired</span></div><strong>4 (7%)</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="widget-card">
+                        <div class="widget-title"><span>Recent Activity</span><a href="#" style="font-size:12px; color:#0052cc; text-decoration:none;">View all</a></div>
+                        <div class="activity-list">
+                            <div class="activity-item"><div class="act-icon box-blue"><i class="fa-regular fa-file-code"></i></div><div class="act-text"><div><strong>Leadership Skills Assessment</strong> created</div><div class="time">by Rahul Mehta &bull; 28 May 2026</div></div></div>
+                            <div class="activity-item"><div class="act-icon box-purple"><i class="fa-regular fa-lightbulb"></i></div><div class="act-text"><div><strong>Sales Knowledge Quiz</strong> published</div><div class="time">by Sneha Patil &bull; 28 May 2026</div></div></div>
+                            <div class="activity-item"><div class="act-icon box-teal"><i class="fa-solid fa-check"></i></div><div class="act-text"><div><strong>Excel Advanced Test</strong> closed</div><div class="time">by Arjun Kapoor &bull; 28 May 2026</div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: CERTIFICATIONS (Screenshot 1) -->
+        <div id="tabCertificationsPanel" class="tab-content-panel">
+            <!-- 4 Stat Cards -->
+            <section class="stats-grid-4">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Total Certifications</div>
+                        <div class="stat-value" th:text="${certifications != null ? certifications.size() : 34}">34</div>
+                        <div class="stat-sub">Across all programs</div>
+                    </div>
+                    <div class="stat-icon icon-blue"><i class="fa-regular fa-clock"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Active Certifications</div>
+                        <div class="stat-value">28</div>
+                        <div class="stat-sub up"><i class="fa-solid fa-arrow-up"></i> 82% of total certifications</div>
+                    </div>
+                    <div class="stat-icon icon-green"><i class="fa-solid fa-circle-check"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Issued Certificates</div>
+                        <div class="stat-value">1,248</div>
+                        <div class="stat-sub up"><i class="fa-solid fa-arrow-up"></i> This month 18%</div>
+                    </div>
+                    <div class="stat-icon icon-purple"><i class="fa-solid fa-award"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Expiring Soon</div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-sub">Within next 30 days</div>
+                    </div>
+                    <div class="stat-icon icon-orange"><i class="fa-regular fa-hourglass-half"></i></div>
+                </div>
+            </section>
+
+            <!-- Filters Bar -->
+            <div class="filters-bar">
+                <div class="filters-left">
+                    <select class="filter-select">
+                        <option value="">All Departments</option>
+                        <option value="Leadership">Leadership</option>
+                        <option value="Sales">Sales & Marketing</option>
+                        <option value="Finance">Finance</option>
+                    </select>
+                    <select class="filter-select">
+                        <option value="">All Certification Types</option>
+                        <option value="Professional">Professional</option>
+                        <option value="Role-based">Role-based</option>
+                        <option value="Technical">Technical</option>
+                        <option value="Mandatory">Mandatory</option>
+                    </select>
+                    <select class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Expiring Soon">Expiring Soon</option>
+                        <option value="Draft">Draft</option>
+                    </select>
+                    <button class="btn-filter-icon"><i class="fa-regular fa-calendar"></i> 01 May 2026 - 30 Jun 2026</button>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="search-input-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="certSearchInput" placeholder="Search certifications..." onkeyup="filterCertTable()">
+                    </div>
+                    <button class="btn-filter-icon"><i class="fa-solid fa-sliders"></i> Filters</button>
+                </div>
+            </div>
+
+            <!-- Split View (Cert Table + Widgets) -->
+            <div class="assessment-split">
+                <!-- Certifications Table Card -->
+                <div class="card">
+                    <div class="card-title">Certifications Overview</div>
+                    <div class="table-container">
+                        <table id="certTable">
+                            <thead>
+                                <tr>
+                                    <th>Certification Name</th>
+                                    <th>Type</th>
+                                    <th>Created By</th>
+                                    <th>Department</th>
+                                    <th>Validity Period</th>
+                                    <th>Passing Criteria</th>
+                                    <th>Status</th>
+                                    <th>Issued</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="c : ${certifications}">
+                                    <td>
+                                        <div class="asmt-name-cell">
+                                            <div class="asmt-icon-box box-blue">
+                                                <i class="fa-solid fa-code"></i>
+                                            </div>
+                                            <div>
+                                                <div style="font-weight:700; color:#111;" th:text="${c.title}">Leadership Excellence Certification</div>
+                                                <small style="color:#888; font-size:11px;" th:text="'ID: ' + ${c.code}">ID: CERT-001</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td th:text="${c.issuedBy != null ? 'Professional' : 'Role-based'}">Professional</td>
+                                    <td>
+                                        <div style="display:flex; align-items:center; gap:6px;">
+                                            <div class="user-avatar-small">R</div>
+                                            <span>Rahul Mehta</span>
+                                        </div>
+                                    </td>
+                                    <td th:text="${c.department}">Leadership</td>
+                                    <td>
+                                        <strong th:text="${c.validityPeriod}">12 Months</strong>
+                                        <small style="color:#888; display:block;">(01 Jun 2026 - 31 May 2027)</small>
+                                    </td>
+                                    <td>Min. 70% Score</td>
+                                    <td>
+                                        <span class="status-badge" 
+                                              th:classappend="${c.status == 'Active' ? 'status-active' : 'status-expiring'}"
+                                              th:text="${c.status}">Active</span>
+                                    </td>
+                                    <td th:text="${c.totalIssued}">245</td>
+                                    <td>
+                                        <button class="action-btn" title="Options"><i class="fa-solid fa-ellipsis"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-footer">
+                        <div>Showing 1 to <span th:text="${certifications != null ? certifications.size() : 5}">5</span> of <span th:text="${certifications != null ? certifications.size() : 34}">34</span> certifications</div>
+                        <div class="pagination">
+                            <select class="filter-select" style="padding:4px 8px; font-size:12px;">
+                                <option>10 / page</option>
+                            </select>
+                            <button class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar Widgets for Certifications -->
+                <div>
+                    <div class="widget-card">
+                        <div class="widget-title"><span>Certification Status</span></div>
+                        <div class="chart-center-wrapper">
+                            <canvas id="certStatusChart"></canvas>
+                            <div class="chart-center-val">
+                                <div class="num">34</div>
+                                <div class="lbl">Total</div>
+                            </div>
+                        </div>
+                        <div class="status-list">
+                            <div class="status-item"><div class="status-left"><div class="dot" style="background:#00875a;"></div><span>Active</span></div><strong>28 (82%)</strong></div>
+                            <div class="status-item"><div class="status-left"><div class="dot" style="background:#ff8b00;"></div><span>Expiring Soon</span></div><strong>12 (12%)</strong></div>
+                            <div class="status-item"><div class="status-left"><div class="dot" style="background:#888;"></div><span>Draft</span></div><strong>3 (9%)</strong></div>
+                            <div class="status-item"><div class="status-left"><div class="dot" style="background:#e11d48;"></div><span>Expired</span></div><strong>1 (3%)</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="widget-card">
+                        <div class="widget-title"><span>Recent Activity</span><a href="#" style="font-size:12px; color:#0052cc; text-decoration:none;">View all</a></div>
+                        <div class="activity-list">
+                            <div class="activity-item"><div class="act-icon box-blue"><i class="fa-solid fa-award"></i></div><div class="act-text"><div><strong>Leadership Excellence Certification</strong> published</div><div class="time">by Rahul Mehta &bull; 28 May 2026</div></div></div>
+                            <div class="activity-item"><div class="act-icon box-purple"><i class="fa-solid fa-rotate"></i></div><div class="act-text"><div><strong>Sales Performance Certification</strong> updated</div><div class="time">by Sneha Patil &bull; 28 May 2026</div></div></div>
+                            <div class="activity-item"><div class="act-icon box-green"><i class="fa-solid fa-certificate"></i></div><div class="act-text"><div><strong>Excel Advanced Certification</strong> issued to 25 employees</div><div class="time">by Arjun Kapoor &bull; 24 May 2026</div></div></div>
+                            <div class="activity-item"><div class="act-icon box-orange"><i class="fa-regular fa-clock"></i></div><div class="act-text"><div><strong>Compliance & Ethics Certification</strong> expiring soon</div><div class="time">by Neha Verma &bull; 22 May 2026</div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: RESULTS & ANALYTICS (Screenshot 2) -->
+        <div id="tabAnalyticsPanel" class="tab-content-panel">
+            <!-- 5 Stats Cards Grid -->
+            <section class="stats-grid-5">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Total Assessments</div>
+                        <div class="stat-value">56</div>
+                        <div class="stat-sub">Across all programs</div>
+                    </div>
+                    <div class="stat-icon icon-blue"><i class="fa-regular fa-file-lines"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Total Participants</div>
+                        <div class="stat-value">1,248</div>
+                        <div class="stat-sub up"><i class="fa-solid fa-arrow-up"></i> This period 18%</div>
+                    </div>
+                    <div class="stat-icon icon-green"><i class="fa-solid fa-users"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Average Pass Rate</div>
+                        <div class="stat-value">76%</div>
+                        <div class="stat-sub up"><i class="fa-solid fa-arrow-up"></i> This period 9%</div>
+                    </div>
+                    <div class="stat-icon icon-purple"><i class="fa-solid fa-chart-line"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Assessments Completed</div>
+                        <div class="stat-value">1,248</div>
+                        <div class="stat-sub up"><i class="fa-solid fa-arrow-up"></i> This period 18%</div>
+                    </div>
+                    <div class="stat-icon icon-orange"><i class="fa-solid fa-circle-check"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-title">Certificates Issued</div>
+                        <div class="stat-value">1,056</div>
+                        <div class="stat-sub up"><i class="fa-solid fa-arrow-up"></i> This period 16%</div>
+                    </div>
+                    <div class="stat-icon icon-teal"><i class="fa-solid fa-award"></i></div>
+                </div>
+            </section>
+
+            <!-- Filters Bar -->
+            <div class="filters-bar">
+                <div class="filters-left">
+                    <select class="filter-select"><option>All Departments</option></select>
+                    <select class="filter-select"><option>All Programs</option></select>
+                    <select class="filter-select"><option>All Assessment Types</option></select>
+                    <select class="filter-select"><option>All Status</option></select>
+                    <button class="btn-filter-icon"><i class="fa-regular fa-calendar"></i> 01 May 2026 - 30 Jun 2026</button>
+                </div>
+                <button class="btn-filter-icon"><i class="fa-solid fa-sliders"></i> Filters</button>
+            </div>
+
+            <!-- Split View (Performance Overview + Trend & Dept Widgets) -->
+            <div class="assessment-split">
+                <!-- Performance Overview Table Card -->
+                <div class="card">
+                    <div class="card-title">Performance Overview</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Assessment / Certification</th>
+                                    <th>Type</th>
+                                    <th>Participants</th>
+                                    <th>Avg. Score</th>
+                                    <th>Pass Rate</th>
+                                    <th>Status Distribution</th>
+                                    <th>Trend</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="asmt-name-cell">
+                                            <div class="asmt-icon-box box-blue"><i class="fa-solid fa-code"></i></div>
+                                            <div>
+                                                <div style="font-weight:700; color:#111;">Leadership Skills Assessment</div>
+                                                <small style="color:#888; font-size:11px;">ID: ASMT-001</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Assessment</td>
+                                    <td><strong>245</strong></td>
+                                    <td><strong>82%</strong></td>
+                                    <td>
+                                        <span style="font-weight:700;">82%</span>
+                                        <div class="prog-bar-sm"><div class="prog-fill-sm" style="width:82%;"></div></div>
+                                    </td>
+                                    <td>
+                                        <div class="dist-chips">
+                                            <div class="chip"><div class="chip-dot" style="background:#00875a;"></div>200</div>
+                                            <div class="chip"><div class="chip-dot" style="background:#0052cc;"></div>35</div>
+                                            <div class="chip"><div class="chip-dot" style="background:#ff8b00;"></div>8</div>
+                                            <div class="chip"><div class="chip-dot" style="background:#e11d48;"></div>2</div>
+                                        </div>
+                                    </td>
+                                    <td><i class="fa-solid fa-chart-line" style="color:#00875a; font-size:16px;"></i></td>
+                                    <td><button class="action-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="asmt-name-cell">
+                                            <div class="asmt-icon-box box-purple"><i class="fa-regular fa-lightbulb"></i></div>
+                                            <div>
+                                                <div style="font-weight:700; color:#111;">Sales Knowledge Quiz</div>
+                                                <small style="color:#888; font-size:11px;">ID: QUIZ-012</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Quiz</td>
+                                    <td><strong>312</strong></td>
+                                    <td><strong>74%</strong></td>
+                                    <td>
+                                        <span style="font-weight:700;">74%</span>
+                                        <div class="prog-bar-sm"><div class="prog-fill-sm" style="width:74%;"></div></div>
+                                    </td>
+                                    <td>
+                                        <div class="dist-chips">
+                                            <div class="chip"><div class="chip-dot" style="background:#00875a;"></div>230</div>
+                                            <div class="chip"><div class="chip-dot" style="background:#0052cc;"></div>50</div>
+                                            <div class="chip"><div class="chip-dot" style="background:#ff8b00;"></div>22</div>
+                                            <div class="chip"><div class="chip-dot" style="background:#e11d48;"></div>10</div>
+                                        </div>
+                                    </td>
+                                    <td><i class="fa-solid fa-chart-line" style="color:#00875a; font-size:16px;"></i></td>
+                                    <td><button class="action-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="asmt-name-cell">
+                                            <div class="asmt-icon-box box-teal"><i class="fa-solid fa-file-lines"></i></div>
+                                            <div>
+                                                <div style="font-weight:700; color:#111;">Excel Advanced Test</div>
+                                                <small style="color:#888; font-size:11px;">ID: ASMT-018</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Assessment</td>
+                                    <td><strong>189</strong></td>
+                                    <td><strong>68%</strong></td>
+                                    <td>
+                                        <span style="font-weight:700;">68%</span>
+                                        <div class="prog-bar-sm"><div class="prog-fill-sm" style="width:68%;"></div></div>
+                                    </td>
+                                    <td>
+                                        <div class="dist-chips">
+                                            <div class="chip"><div class="chip-dot" style="background:#00875a;"></div>128</div>
+                                            <div class="chip"><div class="chip-dot" style="background:#0052cc;"></div>35</div>
+                                            <div class="chip"><div class="chip-dot" style="background:#ff8b00;"></div>18</div>
+                                            <div class="chip"><div class="chip-dot" style="background:#e11d48;"></div>8</div>
+                                        </div>
+                                    </td>
+                                    <td><i class="fa-solid fa-chart-line" style="color:#e11d48; font-size:16px; transform:scaleY(-1);"></i></td>
+                                    <td><button class="action-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-footer">
+                        <div>Showing 1 to 3 of 56 results</div>
+                        <div class="pagination">
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn">4</button>
+                            <button class="page-btn">5</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar Widgets for Results -->
+                <div>
+                    <!-- Pass Rate Trend Line Chart Card -->
+                    <div class="widget-card">
+                        <div class="widget-title"><span>Pass Rate Trend</span></div>
+                        <div style="height: 160px;">
+                            <canvas id="passRateTrendChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Top Performing Departments Card -->
+                    <div class="widget-card">
+                        <div class="widget-title"><span>Top Performing Departments</span></div>
+                        <div class="dept-rank-list">
+                            <div class="dept-rank-item">
+                                <div class="dept-name">Sales & Marketing</div>
+                                <div class="dept-part">312</div>
+                                <div class="dept-bar-wrap">
+                                    <div class="dept-bar" style="width:82%;"></div>
+                                    <div class="dept-pct">82%</div>
+                                </div>
+                            </div>
+                            <div class="dept-rank-item">
+                                <div class="dept-name">Leadership</div>
+                                <div class="dept-part">245</div>
+                                <div class="dept-bar-wrap">
+                                    <div class="dept-bar" style="width:79%;"></div>
+                                    <div class="dept-pct">79%</div>
+                                </div>
+                            </div>
+                            <div class="dept-rank-item">
+                                <div class="dept-name">Finance</div>
+                                <div class="dept-part">189</div>
+                                <div class="dept-bar-wrap">
+                                    <div class="dept-bar" style="width:76%;"></div>
+                                    <div class="dept-pct">76%</div>
+                                </div>
+                            </div>
+                            <div class="dept-rank-item">
+                                <div class="dept-name">Customer Support</div>
+                                <div class="dept-part">178</div>
+                                <div class="dept-bar-wrap">
+                                    <div class="dept-bar" style="width:72%; background:#ff8b00;"></div>
+                                    <div class="dept-pct">72%</div>
+                                </div>
+                            </div>
+                            <div class="dept-rank-item">
+                                <div class="dept-name">Human Resources</div>
+                                <div class="dept-part">156</div>
+                                <div class="dept-bar-wrap">
+                                    <div class="dept-bar" style="width:71%; background:#ff8b00;"></div>
+                                    <div class="dept-pct">71%</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align:center; margin-top:14px;">
+                            <a href="#" style="font-size:12px; color:#0052cc; text-decoration:none; font-weight:600;">View all departments</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Note Banner -->
+        <div class="note-banner">
+            <i class="fa-regular fa-circle-question"></i>
+            <div>
+                <strong>Note:</strong> Assessments and certifications are mapped to programs and learning paths. Certificates are issued automatically upon successful completion.
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Create New Assessment Multi-Step Modal -->
+<div class="modal-overlay" id="createAssessmentModal">
+    <div class="modal-wizard">
+        <div class="wizard-header">
+            <div class="wizard-title">
+                <h3>Create New Assessment</h3>
+                <p>Create an assessment or quiz to evaluate learner knowledge and skills.</p>
+            </div>
+            <button class="close-modal-btn" onclick="closeModal('createAssessmentModal')">&times;</button>
+        </div>
+
+        <!-- Stepper Bar -->
+        <div class="stepper-bar">
+            <div class="stepper-line"></div>
+            <div class="step-item active" id="stepIndicator1" onclick="goToStep(1)">
+                <div class="step-circle">1</div>
+                <div class="step-lbl">Basic Information</div>
+            </div>
+            <div class="step-item" id="stepIndicator2" onclick="goToStep(2)">
+                <div class="step-circle">2</div>
+                <div class="step-lbl">Assessment Details</div>
+            </div>
+            <div class="step-item" id="stepIndicator3" onclick="goToStep(3)">
+                <div class="step-circle">3</div>
+                <div class="step-lbl">Questions</div>
+            </div>
+            <div class="step-item" id="stepIndicator4" onclick="goToStep(4)">
+                <div class="step-circle">4</div>
+                <div class="step-lbl">Review & Publish</div>
+            </div>
+        </div>
+
+        <form action="/space/lnd/assessment/save" method="POST" id="asmtModalForm">
+            <div class="wizard-body">
+                <!-- Step 1: Basic Information -->
+                <div class="wizard-step-panel active" id="wizStep1">
+                    <div style="font-size:14px; font-weight:700; color:#111; margin-bottom:16px;">1. Basic Information</div>
+                    <div class="form-grid-2">
+                        <div class="form-group-modal"><label>Assessment Name <span class="req">*</span></label><input type="text" name="name" class="form-control-modal" placeholder="Enter assessment name" required></div>
+                        <div class="form-group-modal"><label>Assessment Type <span class="req">*</span></label><select name="type" class="form-control-modal" required><option value="">Select assessment type</option><option value="Assessment">Assessment</option><option value="Quiz">Quiz</option></select></div>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group-modal"><label>Description</label><textarea name="description" class="form-control-modal" rows="3" placeholder="Enter assessment description"></textarea></div>
+                        <div class="form-group-modal"><label>Associated Program (Optional)</label><select name="associatedProgram" class="form-control-modal"><option value="">Select program</option><option value="Full Stack Developer Mastery">Full Stack Developer Mastery</option></select></div>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group-modal"><label>Department <span class="req">*</span></label><select name="department" class="form-control-modal" required><option value="">Select department</option><option value="Leadership">Leadership</option><option value="Sales & Marketing">Sales & Marketing</option><option value="Finance">Finance</option></select></div>
+                        <div class="form-group-modal"><label>Target Audience <span class="req">*</span></label><select name="targetAudience" class="form-control-modal" required><option value="">Select target audience</option><option value="All Employees">All Employees</option></select></div>
+                    </div>
+                </div>
+                <!-- Step 2: Details -->
+                <div class="wizard-step-panel" id="wizStep2">
+                    <div style="font-size:14px; font-weight:700; color:#111; margin-bottom:16px;">2. Assessment Details</div>
+                    <div class="form-grid-2">
+                        <div class="form-group-modal"><label>Total Questions <span class="req">*</span></label><input type="number" name="totalQuestions" id="inpTotQ" class="form-control-modal" value="30" oninput="calcTotalMarks()"></div>
+                        <div class="form-group-modal"><label>Marks per Question <span class="req">*</span></label><input type="number" name="marksPerQuestion" id="inpMarksQ" class="form-control-modal" value="2" oninput="calcTotalMarks()"></div>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group-modal"><label>Total Marks <span class="req">*</span></label><input type="number" name="totalMarks" id="inpTotMarks" class="form-control-modal" value="60" readonly style="background:#f1f5f9;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="wizard-footer">
+                <button type="button" class="btn-wiz-back" id="btnWizBack" style="display:none;" onclick="prevStep()">Back</button>
+                <button type="button" class="btn-wiz-back" onclick="closeModal('createAssessmentModal')">Cancel</button>
+                <button type="button" class="btn-wiz-next" id="btnWizNext" onclick="nextStep()">Next: Assessment Details</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('collapsed');
+    }
+
+    function switchAsmtTab(tab) {
+        document.getElementById('tabAsmtBtn').classList.toggle('active', tab === 'assessments');
+        document.getElementById('tabCertBtn').classList.toggle('active', tab === 'certifications');
+        document.getElementById('tabAnalyticsBtn').classList.toggle('active', tab === 'analytics');
+
+        document.getElementById('tabAssessmentsPanel').classList.toggle('active', tab === 'assessments');
+        document.getElementById('tabCertificationsPanel').classList.toggle('active', tab === 'certifications');
+        document.getElementById('tabAnalyticsPanel').classList.toggle('active', tab === 'analytics');
+
+        const topBtn = document.getElementById('topActionBtn');
+        if (tab === 'analytics') {
+            topBtn.innerHTML = '<i class="fa-solid fa-download"></i> Export Report';
+            topBtn.setAttribute('onclick', "alert('Exporting Report...')");
+        } else {
+            topBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Create New <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:4px;"></i>';
+            topBtn.setAttribute('onclick', "openModal('createAssessmentModal')");
+        }
+    }
+
+    function filterAsmtTable() {
+        const input = document.getElementById("asmtSearchInput").value.toUpperCase();
+        const trs = document.querySelectorAll("#asmtTable tbody tr");
+        trs.forEach(tr => { tr.style.display = tr.innerText.toUpperCase().indexOf(input) > -1 ? "" : "none"; });
+    }
+
+    function filterCertTable() {
+        const input = document.getElementById("certSearchInput").value.toUpperCase();
+        const trs = document.querySelectorAll("#certTable tbody tr");
+        trs.forEach(tr => { tr.style.display = tr.innerText.toUpperCase().indexOf(input) > -1 ? "" : "none"; });
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    let currentStep = 1;
+    function goToStep(step) {
+        currentStep = step;
+        document.querySelectorAll('.wizard-step-panel').forEach((p, idx) => p.classList.toggle('active', idx + 1 === step));
+        document.querySelectorAll('.step-item').forEach((s, idx) => { s.classList.toggle('active', idx + 1 === step); s.classList.toggle('completed', idx + 1 < step); });
+        document.getElementById('btnWizBack').style.display = step > 1 ? 'block' : 'none';
+        const btnNext = document.getElementById('btnWizNext');
+        if (step === 1) btnNext.innerText = 'Next: Assessment Details';
+        else if (step === 2) btnNext.innerText = 'Next: Questions';
+        else if (step === 3) btnNext.innerText = 'Next: Review & Publish';
+        else if (step === 4) btnNext.innerText = 'Publish Assessment';
+    }
+    function nextStep() { if (currentStep < 4) goToStep(currentStep + 1); else document.getElementById('asmtModalForm').submit(); }
+    function prevStep() { if (currentStep > 1) goToStep(currentStep - 1); }
+    function calcTotalMarks() { document.getElementById('inpTotMarks').value = (parseInt(document.getElementById('inpTotQ').value)||0)*(parseInt(document.getElementById('inpMarksQ').value)||0); }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Assessment Status Donut
+        new Chart(document.getElementById('asmtStatusChart').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: ['Active', 'Draft', 'Closed', 'Expired'], datasets: [{ data: [32, 12, 8, 4], backgroundColor: ['#0052cc', '#ff8b00', '#888888', '#e11d48'], borderWidth: 0, cutout: '75%' }] },
+            options: { plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }
+        });
+
+        // Cert Status Donut
+        new Chart(document.getElementById('certStatusChart').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: ['Active', 'Expiring Soon', 'Draft', 'Expired'], datasets: [{ data: [28, 12, 3, 1], backgroundColor: ['#00875a', '#ff8b00', '#888888', '#e11d48'], borderWidth: 0, cutout: '75%' }] },
+            options: { plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }
+        });
+
+        // Pass Rate Trend Line Chart
+        new Chart(document.getElementById('passRateTrendChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Jan \'26', 'Feb \'26', 'Mar \'26', 'Apr \'26', 'May \'26', 'Jun \'26'],
+                datasets: [{
+                    label: 'Pass Rate %',
+                    data: [62, 65, 60, 68, 72, 76],
+                    borderColor: '#0052cc',
+                    backgroundColor: 'rgba(0, 82, 204, 0.05)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { min: 50, max: 90 } }
+            }
+        });
+    });
+</script>
+</body>
+</html>

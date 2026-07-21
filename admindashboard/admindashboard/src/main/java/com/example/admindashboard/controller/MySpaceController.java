@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import com.example.admindashboard.service.LearningDashboardService;
 import java.security.Principal;
 import java.util.List;
@@ -199,6 +200,18 @@ public class MySpaceController {
 
         @Autowired
         private EmployeeGoalRepository employeeGoalRepository;
+
+        @Autowired
+        private com.example.admindashboard.repository.LearningStrategyRepository learningStrategyRepository;
+
+        @Autowired
+        private com.example.admindashboard.repository.LearningProgramRepository learningProgramRepository;
+
+        @Autowired
+        private com.example.admindashboard.repository.AssessmentRepository assessmentRepository;
+
+        @Autowired
+        private com.example.admindashboard.repository.CertificationRepository certificationRepository;
 
     @GetMapping("/space/login")
     public String showLogin() {
@@ -4186,6 +4199,80 @@ public class MySpaceController {
                         .size());
 
         return "learning/learning-approvals";
+    }
+
+    @GetMapping("/space/lnd/strategy")
+    public String lndStrategy(Model model, Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (user != null) {
+            model.addAttribute("loggedInUserName", user.getFullName());
+            model.addAttribute("loggedInEmail", user.getEmail());
+        }
+        List<com.example.admindashboard.model.LearningStrategy> strategies = learningStrategyRepository.findAll();
+        List<com.example.admindashboard.model.LearningProgram> programs = learningProgramRepository.findAll();
+        model.addAttribute("strategies", strategies);
+        model.addAttribute("programs", programs);
+        model.addAttribute("activeProgramsCount", programs.stream().filter(p -> "Active".equalsIgnoreCase(p.getStatus())).count());
+        model.addAttribute("learningPathsCount", 16);
+        model.addAttribute("enrolledLearnersCount", 3842);
+        model.addAttribute("completionRatePct", 68);
+        return "learning/learning-strategy";
+    }
+
+    @GetMapping("/space/lnd/program/create")
+    public String lndProgramCreate(Model model, Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (user != null) {
+            model.addAttribute("loggedInUserName", user.getFullName());
+            model.addAttribute("loggedInEmail", user.getEmail());
+        }
+        return "learning/learning-create-program";
+    }
+
+    @PostMapping("/space/lnd/program/save")
+    public String lndProgramSave(@ModelAttribute com.example.admindashboard.model.LearningProgram program) {
+        if (program.getStatus() == null || program.getStatus().isEmpty()) {
+            program.setStatus("Active");
+        }
+        learningProgramRepository.save(program);
+        return "redirect:/space/lnd/strategy";
+    }
+
+    @GetMapping("/space/lnd/assessment")
+    public String lndAssessment(Model model, Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (user != null) {
+            model.addAttribute("loggedInUserName", user.getFullName());
+            model.addAttribute("loggedInEmail", user.getEmail());
+        }
+        List<com.example.admindashboard.model.Assessment> assessments = assessmentRepository.findAll();
+        List<com.example.admindashboard.model.Certification> certifications = certificationRepository.findAll();
+        model.addAttribute("assessments", assessments);
+        model.addAttribute("certifications", certifications);
+        model.addAttribute("totalAssessmentsCount", assessments.stream().filter(a -> "Assessment".equalsIgnoreCase(a.getType())).count());
+        model.addAttribute("totalQuizzesCount", assessments.stream().filter(a -> "Quiz".equalsIgnoreCase(a.getType())).count());
+        model.addAttribute("totalCertificationsCount", certifications.size());
+        model.addAttribute("completedCount", 1248);
+        model.addAttribute("avgPassRate", 76);
+        return "learning/learning-assessment";
+    }
+
+    @PostMapping("/space/lnd/assessment/save")
+    public String lndAssessmentSave(@ModelAttribute com.example.admindashboard.model.Assessment assessment) {
+        if (assessment.getCode() == null || assessment.getCode().isEmpty()) {
+            long count = assessmentRepository.count() + 1;
+            assessment.setCode("ASMT-" + String.format("%03d", count));
+        }
+        if (assessment.getStatus() == null || assessment.getStatus().isEmpty()) {
+            assessment.setStatus("Active");
+        }
+        if (assessment.getAttemptsCount() == null) assessment.setAttemptsCount(0);
+        if (assessment.getPassRate() == null) assessment.setPassRate(0.0);
+        if (assessment.getCreatedAt() == null || assessment.getCreatedAt().isEmpty()) {
+            assessment.setCreatedAt(java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy")));
+        }
+        assessmentRepository.save(assessment);
+        return "redirect:/space/lnd/assessment";
     }
     
     @GetMapping("/space/lnd/course-addition")

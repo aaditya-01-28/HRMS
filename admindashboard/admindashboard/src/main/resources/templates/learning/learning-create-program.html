@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Program - Learning Admin</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', Arial, sans-serif; }
+    body { background:#f4f7fb; color:#333; font-size:14px; overflow-x:hidden; }
+
+    /* Layout */
+    .learning-dashboard { display:flex; min-height:100vh; }
+    .sidebar { width:250px; background:#fff; border-right:1px solid #eaeaea; display:flex; flex-direction:column; transition: width 0.3s; position: relative; }
+    .dashboard-content { flex:1; padding:20px 30px; display:flex; flex-direction:column; position: relative; }
+
+    /* Sidebar */
+    .sidebar-header { padding:20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eaeaea; }
+    .company-logo { width:36px; height:36px; object-fit:contain; border-radius: 4px; }
+    .company-details h3 { font-size:16px; font-weight:700; color:#002D72; margin-bottom: 2px;}
+    .company-details span { font-size:12px; color:#888; }
+    .sidebar-menu { margin-top:15px; }
+    .menu-item { display:flex; align-items:center; gap:12px; text-decoration:none; color:#555; padding:12px 20px; font-size:14px; font-weight: 500; transition:.2s; border-left: 3px solid transparent;}
+    .menu-item:hover { background:#f8fafc; color: #002D72;}
+    .menu-item.active { background:#eef4ff; color:#002D72; border-left-color: #002D72; font-weight: 600;}
+    .menu-item i { width:18px; text-align: center; font-size: 16px;}
+
+    .toggle-sidebar-btn { 
+        position: absolute; right: -14px; top: 25px; background: #fff; border: 1px solid #eaeaea; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.3s; color: #555;
+    }
+    .toggle-sidebar-btn:hover { background: #f4f7fb; color: #0052cc; }
+    .sidebar.collapsed { width: 80px; }
+    .sidebar.collapsed .company-details, .sidebar.collapsed .menu-item span { display: none; }
+    .sidebar.collapsed .sidebar-header { justify-content: center; padding: 20px 0; }
+    .sidebar.collapsed .toggle-sidebar-btn { transform: rotate(180deg); }
+
+    /* Breadcrumb & Header */
+    .breadcrumb { font-size: 12px; color: #0052cc; font-weight: 500; margin-bottom: 8px; }
+    .breadcrumb a { color: #0052cc; text-decoration: none; }
+    .breadcrumb span { color: #888; margin: 0 4px; }
+    .dashboard-header { margin-bottom:25px; }
+    .page-title { font-size:24px; font-weight:700; color:#111; margin-bottom: 4px;}
+    .page-subtitle { font-size:13px; color:#666; }
+
+    /* Main Form Layout (Split) */
+    .create-grid { display: grid; grid-template-columns: 1fr 300px; gap: 25px; align-items: start; }
+    .form-sections { display: flex; flex-direction: column; gap: 20px; }
+
+    /* Section Card */
+    .section-card { background: #fff; border-radius: 10px; border: 1px solid #eaeaea; padding: 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+    .section-title { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 20px; }
+
+    /* Form Grid */
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 16px; }
+    .form-row-1 { margin-bottom: 16px; }
+    
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 12px; font-weight: 700; color: #444; }
+    .form-group label .req { color: #e11d48; margin-left: 2px; }
+    
+    .form-control { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; outline: none; background: #fff; transition: border-color 0.2s; }
+    .form-control:focus { border-color: #0052cc; }
+    textarea.form-control { resize: vertical; min-height: 80px; }
+
+    /* Dynamic Objectives */
+    .objective-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .btn-icon-danger { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 15px; transition: color 0.2s; }
+    .btn-icon-danger:hover { color: #e11d48; }
+    
+    .btn-dashed-add { background: #fff; border: 2px dashed #0052cc; color: #0052cc; padding: 9px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 200px; margin-top: 10px; }
+    .btn-dashed-add:hover { background: #eef4ff; }
+
+    /* Right Sidebar Summary Card */
+    .summary-card { background: #fff; border-radius: 10px; border: 1px solid #eaeaea; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); position: sticky; top: 20px; }
+    .summary-title { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 18px; }
+    
+    .summary-item { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+    .summary-icon { width: 32px; height: 32px; border-radius: 6px; background: #eef4ff; color: #0052cc; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .summary-text .lbl { font-size: 11px; font-weight: 700; color: #666; text-transform: uppercase; margin-bottom: 2px; }
+    .summary-text .val { font-size: 12px; color: #111; word-break: break-word; }
+
+    /* Form Footer Actions */
+    .form-footer-actions { position: fixed; bottom: 0; right: 0; left: 250px; background: #fff; border-top: 1px solid #eaeaea; padding: 14px 30px; display: flex; justify-content: flex-end; gap: 12px; z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
+    .btn-cancel { background: #fff; border: 1px solid #ddd; padding: 9px 20px; border-radius: 6px; font-size: 13px; color: #444; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .btn-cancel:hover { background: #f8fafc; }
+    .btn-submit { background: #0052cc; border: none; padding: 9px 24px; border-radius: 6px; font-size: 13px; color: #fff; font-weight: 600; cursor: pointer; }
+    .btn-submit:hover { background: #0043a6; }
+</style>
+</head>
+<body>
+
+<div class="learning-dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div style="display:flex; align-items:center; gap:12px;" class="logo-wrapper">
+                <img src="/images/wcg-logo.jpg" alt="WCG Logo" class="company-logo" onerror="this.src='https://ui-avatars.com/api/?name=WCG&background=0D8ABC&color=fff'">
+                <div class="company-details">
+                    <h3>WhiteCircle</h3>
+                    <span>Learning Admin L3</span>
+                </div>
+            </div>
+            <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="Collapse Sidebar"><i class="fa-solid fa-angle-left"></i></button>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="/space/lnd/dashboard" class="menu-item" id="nav-dashboard">
+                <i class="fa-solid fa-shapes"></i><span>Dashboard</span>
+            </a>
+            <a href="/space/lnd/approvals" class="menu-item" id="nav-approvals">
+                <i class="fa-regular fa-square-check"></i><span>Approvals</span>
+            </a>
+            <a href="/space/lnd/strategy" class="menu-item active" id="nav-strategy">
+                <i class="fa-solid fa-chart-line"></i><span>Strategy & Program Mgt</span>
+            </a>
+            <a href="/space/lnd/courses" class="menu-item" id="nav-courses">
+                <i class="fa-solid fa-book-open"></i><span>Course & Content Mgt</span>
+            </a>
+            <a href="/space/lnd/integrations" class="menu-item" id="nav-integrations">
+                <i class="fa-solid fa-link"></i><span>Performance & Learning Int</span>
+            </a>
+            <a href="/space/lnd/assessment" class="menu-item" id="nav-certification">
+                <i class="fa-solid fa-certificate"></i><span>Certification & Assessment</span>
+            </a>
+            <a href="/space/lnd/reports" class="menu-item" id="nav-analytics">
+                <i class="fa-solid fa-chart-simple"></i><span>Analytics & Evaluation</span>
+            </a>
+            <a href="/space/lnd/vendors" class="menu-item" id="nav-vendors">
+                <i class="fa-solid fa-users-gear"></i><span>Trainer & Vendor Mgt</span>
+            </a>
+            <a href="/space/lnd/budgets" class="menu-item" id="nav-budgets">
+                <i class="fa-solid fa-wallet"></i><span>Budget & Resource Planning</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-content" style="padding-bottom: 80px;">
+        <div class="breadcrumb">
+            <a href="/space/lnd/strategy">Learning Strategy & Program Management</a>
+            <span>/</span> Programs <span>/</span> Create Program
+        </div>
+        
+        <header class="dashboard-header">
+            <h1 class="page-title">Create Program</h1>
+            <p class="page-subtitle">Define program details to create a structured learning initiative.</p>
+        </header>
+
+        <form action="/space/lnd/program/save" method="POST" id="createProgramForm">
+            <div class="create-grid">
+                <!-- Form Sections -->
+                <div class="form-sections">
+                    
+                    <!-- 1. Program Information -->
+                    <div class="section-card">
+                        <div class="section-title">1. Program Information</div>
+                        
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Program Name <span class="req">*</span></label>
+                                <input type="text" name="name" id="inpName" class="form-control" placeholder="Enter program name" required oninput="updateSummary()">
+                            </div>
+                            <div class="form-group">
+                                <label>Program Type <span class="req">*</span></label>
+                                <select name="programType" id="inpType" class="form-control" required onchange="updateSummary()">
+                                    <option value="">Select program type</option>
+                                    <option value="Certification">Certification</option>
+                                    <option value="Workshop">Workshop</option>
+                                    <option value="Training">Training</option>
+                                    <option value="Executive">Executive</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row-1">
+                            <div class="form-group">
+                                <label>Description <span class="req">*</span></label>
+                                <textarea name="description" id="inpDesc" class="form-control" placeholder="Enter program description" required oninput="updateSummary()"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Department / Scope <span class="req">*</span></label>
+                                <select name="department" id="inpDept" class="form-control" required onchange="updateSummary()">
+                                    <option value="">Select department / scope</option>
+                                    <option value="Engineering">Engineering</option>
+                                    <option value="Sales & Marketing">Sales & Marketing</option>
+                                    <option value="Leadership">Leadership</option>
+                                    <option value="HR & Legal">HR & Legal</option>
+                                    <option value="All Departments">All Departments</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Target Audience <span class="req">*</span></label>
+                                <select name="targetAudience" id="inpAudience" class="form-control" required onchange="updateSummary()">
+                                    <option value="">Select target audience</option>
+                                    <option value="All Employees">All Employees</option>
+                                    <option value="Software Engineers">Software Engineers</option>
+                                    <option value="Managers & Above">Managers & Above</option>
+                                    <option value="Sales Executives">Sales Executives</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Business Goal <span class="req">*</span></label>
+                                <select name="businessGoal" id="inpGoal" class="form-control" required onchange="updateSummary()">
+                                    <option value="">Select or enter business goal</option>
+                                    <option value="Build digital capabilities">Build digital capabilities</option>
+                                    <option value="Strengthen leadership bench strength">Strengthen leadership bench strength</option>
+                                    <option value="Improve product & engineering performance">Improve product & engineering performance</option>
+                                    <option value="Increase customer satisfaction">Increase customer satisfaction</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Program Owner <span class="req">*</span></label>
+                                <select name="programOwner" id="inpOwner" class="form-control" required onchange="updateSummary()">
+                                    <option value="">Select program owner</option>
+                                    <option value="Rahul Mehta">Rahul Mehta</option>
+                                    <option value="Arjun Kapoor">Arjun Kapoor</option>
+                                    <option value="Sneha Patil">Sneha Patil</option>
+                                    <option value="Neha Verma">Neha Verma</option>
+                                    <option value="Vivek Nair">Vivek Nair</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Program Details -->
+                    <div class="section-card">
+                        <div class="section-title">2. Program Details</div>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Duration <span class="req">*</span></label>
+                                <select name="duration" id="inpDuration" class="form-control" required onchange="updateSummary()">
+                                    <option value="">Select duration</option>
+                                    <option value="1 Month">1 Month</option>
+                                    <option value="2 Months">2 Months</option>
+                                    <option value="3 Months">3 Months</option>
+                                    <option value="6 Months">6 Months</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Mode of Delivery <span class="req">*</span></label>
+                                <select name="modeOfDelivery" id="inpMode" class="form-control" required onchange="updateSummary()">
+                                    <option value="">Select mode</option>
+                                    <option value="Online">Online</option>
+                                    <option value="Offline">Offline</option>
+                                    <option value="Blended">Blended</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Start Date <span class="req">*</span></label>
+                                <input type="date" name="startDate" id="inpStartDate" class="form-control" required onchange="updateSummary()">
+                            </div>
+                            <div class="form-group">
+                                <label>End Date <span class="req">*</span></label>
+                                <input type="date" name="endDate" id="inpEndDate" class="form-control" required onchange="updateSummary()">
+                            </div>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Program Level</label>
+                                <select name="level" id="inpLevel" class="form-control">
+                                    <option value="">Select program level</option>
+                                    <option value="Basic">Basic</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tags</label>
+                                <select name="tags" id="inpTags" class="form-control">
+                                    <option value="">Enter tags (e.g. Leadership, Technical)</option>
+                                    <option value="Leadership">Leadership</option>
+                                    <option value="Technical">Technical</option>
+                                    <option value="Compliance">Compliance</option>
+                                    <option value="Behavioral">Behavioral</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Program Objectives -->
+                    <div class="section-card">
+                        <div class="section-title">3. Program Objectives</div>
+
+                        <div id="objectivesContainer">
+                            <div class="form-row-2 objective-row">
+                                <div class="form-group" style="flex:1;">
+                                    <label>Objective 1 <span class="req">*</span></label>
+                                    <input type="text" name="objectives" class="form-control" placeholder="Enter program objective" required>
+                                </div>
+                                <div class="form-group" style="flex:1;">
+                                    <label>Objective 2</label>
+                                    <input type="text" name="objectives" class="form-control" placeholder="Enter program objective">
+                                </div>
+                                <button type="button" class="btn-icon-danger" style="margin-top:18px;" onclick="removeObjective(this)"><i class="fa-regular fa-trash-can"></i></button>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-dashed-add" onclick="addObjective()"><i class="fa-solid fa-plus"></i> Add Objective</button>
+                    </div>
+
+                </div>
+
+                <!-- Right Sidebar: Program Summary -->
+                <div class="summary-card">
+                    <div class="summary-title">Program Summary</div>
+
+                    <div class="summary-item">
+                        <div class="summary-icon"><i class="fa-regular fa-file-lines"></i></div>
+                        <div class="summary-text">
+                            <div class="lbl">Program Name</div>
+                            <div class="val" id="sumName">-</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-icon"><div class="summary-icon"><i class="fa-solid fa-graduation-cap"></i></div></div>
+                        <div class="summary-text">
+                            <div class="lbl">Program Type</div>
+                            <div class="val" id="sumType">-</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-icon"><i class="fa-regular fa-building"></i></div>
+                        <div class="summary-text">
+                            <div class="lbl">Department / Scope</div>
+                            <div class="val" id="sumDept">-</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-icon"><i class="fa-solid fa-users"></i></div>
+                        <div class="summary-text">
+                            <div class="lbl">Target Audience</div>
+                            <div class="val" id="sumAudience">-</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-icon"><i class="fa-regular fa-clock"></i></div>
+                        <div class="summary-text">
+                            <div class="lbl">Duration</div>
+                            <div class="val" id="sumDuration">-</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-icon"><i class="fa-solid fa-compass"></i></div>
+                        <div class="summary-text">
+                            <div class="lbl">Mode of Delivery</div>
+                            <div class="val" id="sumMode">-</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-icon"><i class="fa-regular fa-calendar"></i></div>
+                        <div class="summary-text">
+                            <div class="lbl">Start Date</div>
+                            <div class="val" id="sumStartDate">-</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-icon"><i class="fa-regular fa-calendar-check"></i></div>
+                        <div class="summary-text">
+                            <div class="lbl">End Date</div>
+                            <div class="val" id="sumEndDate">-</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-icon"><i class="fa-solid fa-bullseye"></i></div>
+                        <div class="summary-text">
+                            <div class="lbl">Business Goal</div>
+                            <div class="val" id="sumGoal">-</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-item">
+                        <div class="summary-icon"><i class="fa-regular fa-user"></i></div>
+                        <div class="summary-text">
+                            <div class="lbl">Program Owner</div>
+                            <div class="val" id="sumOwner">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sticky Footer Actions -->
+            <div class="form-footer-actions">
+                <a href="/space/lnd/strategy" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-submit">Create Program</button>
+            </div>
+        </form>
+    </main>
+</div>
+
+<script>
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('collapsed');
+    }
+
+    function updateSummary() {
+        document.getElementById('sumName').innerText = document.getElementById('inpName').value || '-';
+        document.getElementById('sumType').innerText = document.getElementById('inpType').value || '-';
+        document.getElementById('sumDept').innerText = document.getElementById('inpDept').value || '-';
+        document.getElementById('sumAudience').innerText = document.getElementById('inpAudience').value || '-';
+        document.getElementById('sumDuration').innerText = document.getElementById('inpDuration').value || '-';
+        document.getElementById('sumMode').innerText = document.getElementById('inpMode').value || '-';
+        document.getElementById('sumStartDate').innerText = document.getElementById('inpStartDate').value || '-';
+        document.getElementById('sumEndDate').innerText = document.getElementById('inpEndDate').value || '-';
+        document.getElementById('sumGoal').innerText = document.getElementById('inpGoal').value || '-';
+        document.getElementById('sumOwner').innerText = document.getElementById('inpOwner').value || '-';
+    }
+
+    let objCount = 2;
+    function addObjective() {
+        objCount++;
+        const container = document.getElementById('objectivesContainer');
+        const div = document.createElement('div');
+        div.className = 'form-row-2 objective-row';
+        div.innerHTML = `
+            <div class="form-group" style="flex:1;">
+                <label>Objective ${objCount}</label>
+                <input type="text" name="objectives" class="form-control" placeholder="Enter program objective">
+            </div>
+            <button type="button" class="btn-icon-danger" style="margin-top:18px;" onclick="removeObjective(this)"><i class="fa-regular fa-trash-can"></i></button>
+        `;
+        container.appendChild(div);
+    }
+
+    function removeObjective(btn) {
+        btn.closest('.objective-row').remove();
+    }
+</script>
+</body>
+</html>

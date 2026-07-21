@@ -273,11 +273,17 @@ public class SeniorItController {
     @PostMapping("/roles/assign")
     public String assignRole(@RequestParam String username, 
                              @RequestParam String roleName,
+                             @RequestParam(required = false) String departmentId,
                              @RequestParam(defaultValue = "hierarchy") String tab) {
         User user = userRepository.findByUsername(username.toUpperCase()).orElse(null);
         Role role = roleRepository.findByRoleName(roleName).orElse(null);
-        if (user != null && role != null) {
-            user.setRole(role);
+        if (user != null) {
+            if (role != null) {
+                user.setRole(role);
+            }
+            if (departmentId != null && !departmentId.trim().isEmpty()) {
+                user.setDepartmentId(departmentId);
+            }
             userRepository.save(user);
         }
         return "redirect:/senior_it/my_space?tab=" + tab;

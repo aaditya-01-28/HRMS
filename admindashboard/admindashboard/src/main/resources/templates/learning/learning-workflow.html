@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -2213,7 +2213,7 @@
         // Summary bar
         const weekStart = row.getAttribute('data-weekstart');
         const weekEnd = row.getAttribute('data-weekend');
-        document.getElementById('detailTsWeek').innerText = weekStart + ' â€“ ' + weekEnd;
+        document.getElementById('detailTsWeek').innerText = weekStart + ' &mdash; ' + weekEnd;
         
         const submitted = row.getAttribute('data-submitted');
         if (submitted && submitted !== 'N/A') {
@@ -2247,8 +2247,8 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td class="fw-medium">${d.name}</td>
-                <td>${hrs > 0 ? hrs + ' hrs' : '<span class="text-muted">â€”</span>'}</td>
-                <td>${d.task || '<span class="text-muted">â€”</span>'}</td>
+                <td>${hrs > 0 ? hrs + ' hrs' : '<span class="text-muted">&mdash;</span>'}</td>
+                <td>${d.task || '<span class="text-muted">&mdash;</span>'}</td>
             `;
             breakdownBody.appendChild(tr);
         });
@@ -2273,8 +2273,8 @@
                 tr.innerHTML = `
                     <td><span class="fw-bold ${statusClass}">${ts.status || 'Pending'}</span></td>
                     <td class="fw-medium">${ts.userName}</td>
-                    <td>${ts.weekStart || 'â€”'}</td>
-                    <td>${ts.weekEnd || 'â€”'}</td>
+                    <td>${ts.weekStart || '&mdash;'}</td>
+                    <td>${ts.weekEnd || '&mdash;'}</td>
                     <td>${ts.totalHours ? ts.totalHours + ' hrs' : '0 hrs'}</td>
                 `;
                 recentBody.appendChild(tr);

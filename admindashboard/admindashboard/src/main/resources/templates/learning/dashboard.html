@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -19,7 +19,7 @@
         <div th:replace="fragments/learning-header :: learning-header"></div>
         
         <div class="page-container">
-            <h1 class="page-title">Welcome Back, <span th:text="${user != null and user.fullName != null and user.fullName.contains(' ') ? #strings.substringBefore(user.fullName, ' ') : (user != null ? user.fullName : 'Demo User')}">Rohit</span>! ðŸ‘‹</h1>
+            <h1 class="page-title">Welcome Back, <span th:text="${user != null and user.fullName != null and user.fullName.contains(' ') ? #strings.substringBefore(user.fullName, ' ') : (user != null ? user.fullName : 'Demo User')}">Rohit</span>! &#128075;</h1>
             
             <div class="dashboard-grid">
                 <!-- Upcoming Events -->
@@ -94,7 +94,3 @@
 </script>
 </body>
 </html>
-
-
-
-
