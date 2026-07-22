@@ -1182,7 +1182,7 @@
 
 	            const recordedMatch =
 	                day.recordedHours.match(
-	                    /(\d+)hr\s*(\d+)min/i
+	                    /(\d+)\s*h\s*r?\s*(\d+)\s*m/i
 	                );
 
 	            if (recordedMatch) {
@@ -1217,7 +1217,7 @@
 	                        ${day.recordings}
 
 	                        ${
-	                            day.plannedHours === '0hr 00min'
+	                            day.plannedHours === '0 hr 00 min'
 	                                ? ''
 	                                : `
 	                                <button
@@ -1339,6 +1339,11 @@
 	        }
 	    });
 
+	    // Reset form fields
+	    document.getElementById('timeType').selectedIndex = 0;
+	    document.getElementById('durationHours').value = '';
+	    document.getElementById('durationMinutes').value = '';
+
 	    const modal =
 	        new bootstrap.Modal(
 	            document.getElementById(
@@ -1391,11 +1396,11 @@
 	    try {
 
 			const todayStr = new Date().toISOString().split('T')[0];
-			if (selectedAttendanceDate < todayStr) {
+			if (selectedAttendanceDate > todayStr) {
 			    Swal.fire({
 			        icon: 'warning',
 			        title: 'Invalid Date',
-			        text: 'You cannot record attendance for past dates.'
+			        text: 'You cannot record attendance for future dates.'
 			    });
 			    return;
 			}
@@ -1436,7 +1441,7 @@
 			    ).innerText;
 
 			const extractMinutes = (text) => {
-			    const match = text.match(/(\d+)h?r?\s*(\d+)m?i?n?/i);
+			    const match = text.match(/(\d+)\s*h\s*r?\s*(\d+)\s*m/i);
 
 			    if (!match) {
 			        return 0;

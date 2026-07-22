@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WhiteCircle | Senior Accounts Head Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+            overflow-x: hidden;
+            position: relative;
+            font-family: Arial, sans-serif !important;
+        }
+
+        .sidebar {
+            width: 105px;
+            position: absolute !important;
+            left: 0;
+            top: 0;
+            bottom: 40px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            z-index: 1000;
+        }
+        .sidebar-link {
+            color: #6c757d;
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            transition: all 0.2s;
+            text-decoration: none;
+            position: relative;
+        }
+        .sidebar-link:hover, .sidebar-link.active { color: #0d6efd; transform: scale(1.1); }
+
+        .profile-btn { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .profile-btn:hover { transform: scale(1.15); box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4); border-radius: 50%; }
+
+        .main-content {
+            margin-left: 105px;
+            padding: 20px;
+            min-height: 120vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-navbar {
+            position: static !important;
+            z-index: 1020;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            margin-bottom: 23px !important;
+        }
+
+        .widget-card {
+            background: white;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .widget-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(30, 58, 138, 0.15);
+        }
+
+        .widget-header {
+            padding: 12px 20px;
+            border-bottom: 2px solid #cbd5e1;
+            font-weight: 700;
+            color: var(--bs-primary);
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .widget-body {
+            padding: 15px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .app-btn {
+            border: 0.8px solid var(--bs-primary);
+            border-radius: 10px;
+            padding: 16px 14px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.04);
+            cursor: pointer;
+            background: white;
+            text-decoration: none;
+            color: #343a40;
+            height: 100%;
+            position: relative;
+        }
+
+        .app-btn:hover {
+            border-color: var(--bs-primary);
+            background: #ffffff;
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(30, 58, 138, 0.15);
+        }
+
+        .app-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            line-height: 1.2;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cal-header-navy .holiday-link {
+            color: rgba(255, 255, 255, 0.75) !important;
+            transition: all 0.2s ease;
+            text-decoration: none !important;
+        }
+
+        .cal-header-navy .holiday-link:hover {
+            color: #ffffff !important;
+            opacity: 1 !important;
+            text-decoration: underline !important;
+            text-underline-offset: 4px;
+        }
+
+        .dash-calendar-card {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cal-header-navy {
+            background-color: #1e3a8a;
+            color: #ffffff;
+            padding: 14px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .cal-body {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cal-month-title {
+            text-align: center;
+            color: #1e3a8a;
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .cal-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .cal-navigation-wrapper {
+            padding-top: 2px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cal-days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            row-gap: 6px;
+            text-align: center;
+        }
+        .cal-day-cell {
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .day-number {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .day-today {
+            background-color: #1e3a8a;
+            color: #ffffff;
+            font-weight: 800;
+            box-shadow: 0 2px 4px rgba(30, 58, 138, 0.3);
+        }
+
+        .day-event {
+            background-color: #f3e8ff !important;
+            color: #7e22ce !important;
+            font-weight: 800;
+            border: 1px solid #e9d5ff !important;
+            cursor: pointer;
+        }
+
+        .day-major-event {
+            background-color: #fef3c7 !important;
+            color: #b45309 !important;
+            font-weight: 800;
+            border: 1px solid #fde68a !important;
+            cursor: pointer;
+        }
+
+        .dot-event { background: #7e22ce !important; }
+        .dot-major { background: #f59e0b !important; }
+
+        #prevMonthBtn:hover, #nextMonthBtn:hover {
+            transform: scale(1.1);
+            color: #0d6efd !important;
+        }
+
+        .cal-legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 15px;
+            margin-top: auto;
+        }
+        .legend-item { font-size: 0.75rem; color: #64748b; display: flex; align-items: center; gap: 5px; font-weight: 600;}
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        .dot-today { background: #1e3a8a; }
+        .dot-event { background: #cbd5e1; }
+
+        .milestone-banner {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-radius: 12px;
+            height: 100%;
+            min-height: 120px;
+        }
+        .parallel-col {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 100%;
+        }
+
+        :root {
+            --bs-primary: #1e3a8a;
+            --bs-primary-rgb: 30, 58, 138;
+        }
+
+        .sidebar-link:hover, .sidebar-link.active { color: #1e3a8a !important; }
+        .calendar-today { background-color: #1e3a8a !important; }
+        .app-btn:hover { border-color: #1e3a8a !important; background-color: #f0f4ff !important; }
+        .holiday-link:hover { color: #1e3a8a !important; }
+        .text-primary { color: #1e3a8a !important; }
+        .bg-primary { background-color: #1e3a8a !important; }
+
+        body {
+            animation: fadeInPage 0.6s ease-out forwards;
+        }
+        @keyframes fadeInPage {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .app-btn:active, .sidebar-link:active, .btn:active {
+            transform: scale(0.96) !important;
+            transition: transform 0.1s;
+        }
+
+        .top-navbar {
+            position: sticky;
+            top: 20px;
+            z-index: 1020;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .main-content .col-lg-6, .main-content .col-lg-4 {
+            opacity: 0;
+            animation: slideUpCard 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes slideUpCard {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-content .row:nth-of-type(2) .col-lg-6:nth-child(1) { animation-delay: 0.1s; }
+        .main-content .row:nth-of-type(2) .col-lg-6:nth-child(2) { animation-delay: 0.2s; }
+        .main-content .row:nth-of-type(3) .col-lg-4:nth-child(1) { animation-delay: 0.3s; }
+        .main-content .row:nth-of-type(3) .col-lg-4:nth-child(2) { animation-delay: 0.4s; }
+        .main-content .row:nth-of-type(3) .col-lg-4:nth-child(3) { animation-delay: 0.5s; }
+
+        .form-control:focus {
+            box-shadow: none;
+            border-color: transparent;
+        }
+
+        .input-group:focus-within {
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+            border-color: var(--bs-primary);
+            transform: scale(1.02);
+            transition: all 0.2s ease;
+        }
+
+        .input-group:focus-within .fa-search {
+            color: var(--bs-primary) !important;
+            transition: color 0.2s;
+        }
+
+        @keyframes swing {
+            20% { transform: rotate(15deg); }
+            40% { transform: rotate(-10deg); }
+            60% { transform: rotate(5deg); }
+            80% { transform: rotate(-5deg); }
+            100% { transform: rotate(0deg); }
+        }
+        .sidebar-link:hover i {
+            animation: swing 0.6s ease;
+            display: inline-block;
+        }
+
+        .app-btn {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .app-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.6) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: skewX(-25deg);
+            transition: none;
+        }
+        .app-btn:hover::after {
+            left: 200%;
+            transition: left 0.6s ease-in-out;
+        }
+
+        .widget-header a {
+            position: relative;
+            text-decoration: none !important;
+            display: inline-block;
+        }
+        .widget-header a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--bs-primary);
+            transition: width 0.3s ease-out;
+        }
+        .widget-header a:hover::after {
+            width: 100%;
+        }
+
+        .navy-header {
+            background-color: var(--bs-primary);
+            color: white !important;
+            border-radius: 12px 12px 0 0;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navy-header a,
+        .navy-header i {
+            color: #bfdbfe !important;
+            opacity: 0.9;
+            transition: all 0.2s ease;
+        }
+
+        .navy-header a:hover,
+        .navy-header i:hover {
+            color: #ffffff !important;
+            opacity: 1;
+            text-decoration: none;
+        }
+
+        .search-box-wrapper {
+            border-color: #cbd5e1 !important;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box-wrapper:focus-within {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2) !important;
+            transform: translateY(-2px);
+        }
+
+        .search-dropdown-card {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 12px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            z-index: 1050;
+        }
+
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        .search-result-item:hover {
+            background: #f8fafc;
+        }
+
+        .search-icon-wrapper {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #3b82f6;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .birthday-card-active {
+            background: linear-gradient(135deg, #ffffff 0%, #fdf4ff 100%);
+            border: 1px solid #f5d0fe !important;
+            transition: all 0.3s ease;
+        }
+        .birthday-cake-icon {
+            color: #d946ef;
+            animation: cakeFloat 2s ease-in-out infinite;
+        }
+        @keyframes cakeFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .btn-wish {
+            background-color: #fdf4ff;
+            color: #a21caf;
+            border: 1px solid #f5d0fe;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-wish:hover {
+            background-color: #a21caf;
+            color: white;
+            transform: scale(1.05);
+        }
+    </style>
+    <link href="/css/dark-mode.css" rel="stylesheet">
+    <script src="/js/theme-engine.js"></script>
+</head>
+<body>
+
+<div class="sidebar">
+    <a href="/senior_accounts/dashboard" class="sidebar-link active" title="Home"><i class="fas fa-home"></i></a>
+    <a href="/chat" class="sidebar-link" title="Chat"><i class="fas fa-comment-dots"></i></a>
+    <a href="#" class="sidebar-link" title="My Team"><i class="fas fa-user-friends"></i></a>
+    <a href="/my-thanks/login" target="_blank" class="sidebar-link" title="My Thanks"><i class="fas fa-gift"></i></a>
+
+    <div style="margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 25px; margin-bottom: 170px;">
+        <a href="/employee/profile" class="profile-btn" title="My Profile">
+            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px;">
+                <i class="fas fa-user fs-5"></i>
+            </div>
+        </a>
+        <a href="/" class="sidebar-link text-danger mb-0" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+</div>
+
+<div class="main-content">
+
+    <div class="top-navbar row align-items-center gx-0">
+        <div class="col-md-4 ps-4 d-flex align-items-center">
+            <img src="/images/wcg-logo.jpg" alt="Logo" style="height: 70px; width: auto; border-radius: 8px;">
+            <span class="ms-3 fw-bold text-dark" style="font-size: 1.8rem; letter-spacing: 1px; text-transform: uppercase;">
+                White Circle
+            </span>
+        </div>
+
+        <div class="col-md-4 position-relative z-3">
+            <div class="search-box-wrapper d-flex align-items-center bg-white border px-3 py-2 shadow-sm">
+                <i class="fas fa-search text-muted"></i>
+                <input type="text" class="form-control border-0 shadow-none bg-transparent ms-2 p-0" id="empSearchInput" placeholder="Search colleagues..." autocomplete="off">
+            </div>
+
+            <div id="searchResultsDropdown" class="search-dropdown-card d-none">
+                <div id="searchResultsList" class="d-flex flex-column mb-0">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 pe-4 text-end d-flex align-items-center justify-content-end gap-3">
+            <a href="/employee/notifications" class="btn btn-light border rounded-circle d-flex align-items-center justify-content-center position-relative" style="width: 40px; height: 40px;">
+                <i class="fa-solid fa-bell text-primary"></i>
+            </a>
+            <div class="d-inline-flex align-items-center bg-light rounded-pill px-3 py-1 border">
+                <div class="form-check form-switch d-flex align-items-center">
+                    <i class="fas fa-sun text-warning me-2 small"></i>
+                    <input class="form-check-input fs-5 m-0" type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" style="cursor: pointer;">
+                    <label class="form-check-label ms-2 text-dark" for="darkModeToggle">
+                        <i class="fas fa-moon"></i>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3" style="flex: 0 0 auto;">
+        <div class="col-lg-6">
+            <div class="widget-card">
+                <div class="widget-header navy-header">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-user-cog me-2"></i>Self Services
+                    </div>
+                    <a href="#" class="small fw-bold">View All</a>
+                </div>
+                <div class="widget-body">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <a th:href="${workflowUrl != null ? workflowUrl : '/space/accounts/dashboard'}" class="app-btn" style="border: 2px solid #1e3a8a; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
+                                <i class="fas fa-project-diagram text-primary me-2 fs-5"></i>
+                                <span class="app-text fw-bold">Manage Workflow</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/conference-room" class="app-btn">
+                                <i class="fas fa-handshake text-primary me-2 fs-5"></i>
+                                <span class="app-text">Conference Room</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/leave-management" class="app-btn">
+                                <i class="fas fa-calendar-minus text-primary me-2 fs-5"></i>
+                                <span class="app-text">Leave Management System (LMS)</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/attendance" class="app-btn">
+                                <i class="fas fa-user-clock text-primary me-2 fs-5"></i>
+                                <span class="app-text">Attendance Regulation</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/my-approvals" class="app-btn">
+                                <i class="fas fa-check-double text-primary me-2 fs-5"></i>
+                                <span class="app-text">My Approvals</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/email-signature" class="app-btn">
+                                <i class="fas fa-signature text-primary me-2 fs-5"></i>
+                                <span class="app-text">Email Signature</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/password-reset" class="app-btn">
+                                <i class="fas fa-unlock-alt text-primary me-2 fs-5"></i>
+                                <span class="app-text">Password Reset</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/employee/referral" class="app-btn">
+                                <i class="fas fa-user-plus text-primary me-2 fs-5"></i>
+                                <span class="app-text">Referral</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/employee/resignation" class="app-btn">
+                                <i class="fas fa-sign-out-alt text-primary me-2 fs-5"></i>
+                                <span class="app-text">Resignation</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/employee/performance/feedback" class="app-btn">
+                                <i class="fas fa-star-half-stroke text-primary me-2 fs-5"></i>
+                                <span class="app-text">Performance Feedback</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="widget-card">
+                <div class="widget-header navy-header">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-th me-2"></i>Applications
+                    </div>
+                    <a href="#expandedApps" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="expandedApps" class="small fw-bold text-white text-decoration-none" id="viewAllAppsBtn">View All</a>
+                </div>
+                <div class="widget-body">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <a href="/senior_accounts/login" target="_blank" class="app-btn" style="border: 2px solid #1e3a8a; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
+                                <i class="fas fa-user-shield text-primary me-2 fs-5"></i>
+                                <span class="app-text fw-bold">My Space</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/my-whitecircle/login" class="app-btn" target="_blank">
+                                <i class="fas fa-id-badge text-primary me-2 fs-5"></i>
+                                <span class="app-text">My WhiteCircle</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/erp/authenticate" class="app-btn" target="_blank">
+                                <i class="fas fa-business-time text-primary me-2 fs-5"></i>
+                                <span class="app-text">ERP and Time Sheet</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/tickets/authenticate" class="app-btn" target="_blank">
+                                <i class="fas fa-ticket-alt text-primary me-2 fs-5"></i>
+                                <span class="app-text">Log Tickets</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/payroll" class="app-btn" target="_blank">
+                                <i class="fas fa-file-invoice-dollar text-primary me-2 fs-5"></i>
+                                <span class="app-text">Pay Roll</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/learning/login" class="app-btn" target="_blank">
+                                <i class="fas fa-tasks text-primary me-2 fs-5"></i>
+                                <span class="app-text">My Learnings</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/my-thanks/login" class="app-btn" target="_blank">
+                                <i class="fas fa-gift text-primary me-2 fs-5"></i>
+                                <span class="app-text">My Thanks</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="collapse mt-2" id="expandedApps">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <a href="/employee/mediclaim/auth" class="app-btn" target="_blank">
+                                    <i class="fas fa-notes-medical text-primary me-2 fs-5"></i>
+                                    <span class="app-text">My Mediclaim</span>
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="/my-rides/login" class="app-btn" target="_blank">
+                                    <i class="fas fa-car text-primary me-2 fs-5"></i>
+                                    <span class="app-text">My Rides</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3" style="flex: 1; min-height: 0;">
+        <div class="col-lg-4 h-100">
+            <div th:replace="~{fragments/spiral-calendar :: spiralCalendar}"></div>
+        </div>
+
+        <div class="col-lg-4 h-100">
+            <div class="parallel-col">
+                <div class="widget-card d-flex flex-column" style="flex: 1; height: 100%;">
+                    <div class="widget-header d-flex justify-content-between align-items-center pb-2 border-bottom mb-2">
+                        <span class="fw-bold text-dark" style="font-size: 0.9rem; letter-spacing: 0.5px;">
+                            <i class="fas fa-ticket-alt text-primary me-2"></i> TICKET STATUS
+                        </span>
+                        <a th:href="@{/tickets/authenticate}" class="text-primary text-decoration-none" style="font-size: 0.8rem; font-weight: 700;">View All</a>
+                    </div>
+                    <div class="widget-body flex-grow-1 d-flex flex-column" th:classappend="${#lists.isEmpty(recentTickets)} ? 'justify-content-center' : 'justify-content-start'" style="overflow-y: auto;">
+                        <div class="text-center py-4" th:if="${#lists.isEmpty(recentTickets)}">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                                <i class="fas fa-inbox text-muted fs-5"></i>
+                            </div>
+                            <p class="text-dark fw-bold mb-0" style="font-size: 0.9rem;">No Active Tickets</p>
+                            <span class="text-muted" style="font-size: 0.8rem;">You haven't raised any requests yet.</span>
+                        </div>
+                        <div class="d-flex flex-column gap-2" th:if="${not #lists.isEmpty(recentTickets)}">
+                            <div th:each="ticket : ${recentTickets}" class="d-flex justify-content-between align-items-center py-2 px-3 border rounded-3 bg-light">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm"
+                                         th:classappend="${ticket.type == 'HARDWARE' ? 'bg-danger' : (ticket.type == 'INCIDENT' ? 'bg-warning text-dark' : 'bg-primary')}"
+                                         style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                        <i class="fas" th:classappend="${ticket.type == 'HARDWARE' ? 'fa-laptop' : (ticket.type == 'INCIDENT' ? 'fa-exclamation-triangle' : 'fa-cube')}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark mb-0" style="font-size: 0.85rem;" th:text="${ticket.ticketId}">#TCK-101</div>
+                                        <div class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;" th:text="${ticket.category ?: ticket.type}">Category</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="badge rounded-pill shadow-sm"
+                                          th:classappend="${ticket.status == 'Closed' or ticket.status == 'Resolved' ? 'bg-success' : (ticket.status == 'In Progress' ? 'bg-primary' : (ticket.status == 'Open' ? 'bg-danger' : 'bg-secondary'))}"
+                                          style="font-size: 0.65rem; padding: 4px 10px;"
+                                          th:text="${ticket.status}">Status
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget-card d-flex flex-column" style="flex: 1; height: 100%;">
+                    <div class="widget-header d-flex justify-content-between align-items-center pb-2 border-bottom mb-2">
+                        <span class="fw-bold text-dark" style="font-size: 0.9rem; letter-spacing: 0.5px;">
+                            <i class="fas fa-handshake text-primary me-2"></i> PENDING INVITES
+                        </span>
+                        <a th:href="@{/conference-room}" class="text-primary text-decoration-none" style="font-size: 0.8rem; font-weight: 700;">View Room</a>
+                    </div>
+                    <div class="widget-body flex-grow-1 d-flex flex-column justify-content-start" style="overflow-y: auto;">
+                        <div class="text-center py-4" th:if="${#lists.isEmpty(pendingMeetingInvites)}">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                                <i class="fas fa-calendar-check text-muted fs-5"></i>
+                            </div>
+                            <p class="text-dark fw-bold mb-0" style="font-size: 0.9rem;">No Pending Invites</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget-card p-0 border-0" style="flex: 1; overflow: hidden;">
+                    <div class="milestone-banner">
+                        <div>
+                            <h5 class="fw-bold mb-1">Milestone Journey</h5>
+                            <p class="small opacity-75 mb-0">#BetterTogether</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 h-100">
+            <div class="parallel-col">
+                <div class="widget-card" style="flex: 1;">
+                    <div class="widget-header"><span>BIRTHDAYS</span></div>
+                    <div class="widget-body">
+                        <div class="d-flex align-items-center mt-2">
+                            <i class="fas fa-birthday-cake text-primary fa-lg me-3"></i>
+                            <div>
+                                <h6 class="mb-0 small fw-bold" id="todayDateLabel">Loading...</h6>
+                                <div id="birthdayListContainer">
+                                    <small class="text-muted">Checking...</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="widget-card bg-dark text-white" style="flex: 1;">
+                    <div class="widget-header border-bottom-0 text-white"><span>LEARNING</span></div>
+                    <div class="widget-body d-flex align-items-center justify-content-center">
+                        <div class="text-center">
+                            <i class="fas fa-hand-holding-heart fa-2x text-info mb-2"></i>
+                            <h6 class="mb-0">H Fun</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let calendarMonth = new Date().getMonth();
+        let calendarYear = new Date().getFullYear();
+        let calendarData = { leaves: [], holidays: [] };
+        const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+        async function fetchCalendarData(month, year) {
+            try {
+                const res = await fetch('/api/leave/calendar-data?month=' + (month + 1) + '&year=' + year);
+                if (res.ok) {
+                    calendarData = await res.json();
+                } else {
+                    calendarData = { leaves: [], holidays: [] };
+                }
+            } catch (e) {
+                calendarData = { leaves: [], holidays: [] };
+            }
+            renderCalendar(month, year);
+        }
+
+        function renderCalendar(month, year) {
+            const grid = document.getElementById('calendarDaysGrid');
+            const title = document.getElementById('calendarMonthTitle');
+            if(!grid || !title) return;
+
+            title.textContent = monthNames[month] + ' ' + year;
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const totalDays = lastDay.getDate();
+            let startDay = firstDay.getDay() - 1;
+            if (startDay < 0) startDay = 6;
+
+            const today = new Date();
+            const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+
+            const leaveMap = {};
+            (calendarData.leaves || []).forEach(l => { leaveMap[l.date] = l; });
+            const holidayMap = {};
+            (calendarData.holidays || []).forEach(h => { holidayMap[h.date] = h; });
+
+            let html = '';
+            for (let i = 0; i < startDay; i++) {
+                html += '<div class="calendar-day cal-empty"></div>';
+            }
+
+            for (let d = 1; d <= totalDays; d++) {
+                const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+                const dayOfWeek = new Date(year, month, d).getDay();
+                const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+
+                let cssClass = '';
+                let tooltipText = '';
+
+                if (dateStr === todayStr) {
+                    cssClass = 'cal-today'; tooltipText = 'Today';
+                } else if (leaveMap[dateStr]) {
+                    const leave = leaveMap[dateStr];
+                    const st = (leave.status || '').toUpperCase();
+                    if (st === 'APPROVED' || st === 'AUTO_APPROVED' || st === 'AUTO APPROVED') {
+                        cssClass = 'cal-approved'; tooltipText = (leave.type || 'Leave') + ' — Approved';
+                    } else if (st === 'PENDING' || st === 'PENDING_APPROVAL') {
+                        cssClass = 'cal-pending'; tooltipText = (leave.type || 'Leave') + ' — Pending';
+                    } else if (st === 'REJECTED') {
+                        cssClass = 'cal-rejected'; tooltipText = (leave.type || 'Leave') + ' — Rejected';
+                    }
+                } else if (holidayMap[dateStr]) {
+                    const hol = holidayMap[dateStr];
+                    if ((hol.type || '').toLowerCase() === 'floater') {
+                        cssClass = 'cal-floater-holiday'; tooltipText = hol.name + ' (Floater)';
+                    } else {
+                        cssClass = 'cal-fixed-holiday'; tooltipText = hol.name;
+                    }
+                } else if (isWeekend) {
+                    cssClass = 'cal-weekend';
+                }
+
+                html += '<div class="calendar-day ' + cssClass + '">' + d + '</div>';
+            }
+            grid.innerHTML = html;
+        }
+
+        window.navigateMonth = function(dir) {
+            calendarMonth += dir;
+            if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
+            if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
+            fetchCalendarData(calendarMonth, calendarYear);
+        };
+
+        fetchCalendarData(calendarMonth, calendarYear);
+        updateBirthdayWidget();
+    });
+
+    async function updateBirthdayWidget() {
+        const container = document.getElementById('birthdayListContainer');
+        const dateLabel = document.getElementById('todayDateLabel');
+        if(!container || !dateLabel) return;
+
+        const today = new Date();
+        dateLabel.textContent = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
+
+        try {
+            const response = await fetch('/api/users/birthdays-today');
+            if (response.ok) {
+                const birthdays = await response.json();
+                container.innerHTML = '';
+                if (birthdays.length === 0) {
+                    container.innerHTML = `<small class="text-muted">No birthdays today</small>`;
+                    return;
+                }
+                birthdays.forEach(user => {
+                    const bdayDiv = document.createElement('div');
+                    bdayDiv.className = "mt-2 p-2 rounded-3 bg-white shadow-sm border border-light";
+                    bdayDiv.innerHTML = `<small class="text-dark fw-bold d-block">${user.fullName}</small>`;
+                    container.appendChild(bdayDiv);
+                });
+            } else {
+                container.innerHTML = `<small class="text-muted">No birthdays today</small>`;
+            }
+        } catch (error) {
+            container.innerHTML = `<small class="text-muted">No birthdays today</small>`;
+        }
+    }
+</script>
+</body>
+</html>

@@ -332,11 +332,11 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">First Name*</label>
-                            <input type="text" class="form-control" name="firstName" required>
+                            <input type="text" class="form-control" name="firstName" pattern="[A-Za-z\s]+" title="First name must contain only letters" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Last Name*</label>
-                            <input type="text" class="form-control" name="lastName" required>
+                            <input type="text" class="form-control" name="lastName" pattern="[A-Za-z\s]+" title="Last name must contain only letters" required>
                         </div>
                         
                         <div class="col-md-12">
@@ -356,7 +356,7 @@
                         </div>
                         <div class="col-md-8">
                             <label class="form-label fw-bold">Mobile Number*</label>
-                            <input type="text" class="form-control" name="mobileNumber" pattern="[0-9]{10,15}" required>
+                            <input type="text" class="form-control" name="mobileNumber" pattern="[0-9]{10}" maxlength="10" title="Mobile number must be exactly 10 digits" required>
                         </div>
                         
                         <div class="col-md-12">
@@ -431,14 +431,15 @@
         cards.forEach(card => {
             let title = card.querySelector('.job-title').innerText.toLowerCase();
             let meta = card.querySelector('.job-meta').innerText.toLowerCase();
+            let container = card.parentElement;
             
             if (title.includes(input) || meta.includes(input)) {
-                card.style.display = 'block';
+                container.style.display = '';
             } else {
-                card.style.display = 'none';
-                // Also hide its details pane if it's open
+                container.style.display = 'none';
                 let detailsPaneId = card.id.replace('card-', 'details-');
-                document.getElementById(detailsPaneId).style.display = 'none';
+                const detailsPane = document.getElementById(detailsPaneId);
+                if (detailsPane) detailsPane.style.display = 'none';
             }
         });
     }

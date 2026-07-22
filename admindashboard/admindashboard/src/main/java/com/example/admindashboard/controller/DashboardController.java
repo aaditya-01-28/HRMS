@@ -751,15 +751,21 @@ public class DashboardController {
         if (principal != null) {
             User l2Hr = userRepository.findByUsername(principal.getName()).orElse(null);
             ResignationRequest req = resignationRequestRepository.findById(id).orElse(null);
-            if (req != null && l2Hr != null && ("PENDING_MANAGER".equals(req.getStatus()) || "PENDING_HR".equals(req.getStatus()))) {
+            if (req != null && l2Hr != null) {
                 req.setNoticePeriodDays(noticePeriodDays);
-                req.setStatus("PENDING_HR");
-                req.setL2ApprovedBy(l2Hr);
+                req.setStatus("APPROVED");
+                if (req.getL2ApprovedBy() == null) {
+                    req.setL2ApprovedBy(l2Hr);
+                } else {
+                    req.setL3ApprovedBy(l2Hr);
+                }
                 resignationRequestRepository.save(req);
                 
                 User employee = req.getEmployee();
-                employee.setStatus("ON NOTICE");
-                userRepository.save(employee);
+                if (employee != null) {
+                    employee.setStatus("ON NOTICE");
+                    userRepository.save(employee);
+                }
             }
         }
         return "redirect:" + (request.getRequestURI().contains("senior_hr") ? "/senior_hr/workflow?tab=resignation" : (request.getRequestURI().contains("manager") ? "/manager/workflow?tab=resignation" : "/HR/workflow?tab=resignation"));
@@ -907,6 +913,19 @@ public class DashboardController {
             @RequestParam("resumeFile") org.springframework.web.multipart.MultipartFile resumeFile,
             Principal principal,
             RedirectAttributes redirectAttributes) {
+
+        if (firstName == null || !firstName.matches("^[a-zA-Z\\s]+$")) {
+            redirectAttributes.addFlashAttribute("errorMessage", "First Name must contain letters only.");
+            return "redirect:/employee/referral";
+        }
+        if (lastName == null || !lastName.matches("^[a-zA-Z\\s]+$")) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Last Name must contain letters only.");
+            return "redirect:/employee/referral";
+        }
+        if (mobileNumber == null || !mobileNumber.matches("^[0-9]{10}$")) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Mobile Number must be exactly 10 digits.");
+            return "redirect:/employee/referral";
+        }
 
         User currentUser = userRepository.findByUsername(principal.getName()).orElse(null);
         JobPosting job = jobPostingRepository.findById(jobPostingId).orElse(null);

@@ -665,9 +665,13 @@
             return;
         }
 
-        const todayStr = new Date().toISOString().split('T')[0];
-        if (fromDate < todayStr) {
-            Swal.fire({ icon: 'error', title: 'Submission Failed', text: 'You cannot select a past date for leave application.', confirmButtonColor: '#1e3a8a' });
+        const todayLocal = new Date();
+        const offset = todayLocal.getTimezoneOffset();
+        const localDate = new Date(todayLocal.getTime() - (offset*60*1000));
+        const todayStr = localDate.toISOString().split('T')[0];
+
+        if (fromDate <= todayStr) {
+            Swal.fire({ icon: 'error', title: 'Invalid Leave Date', text: 'You must apply for leave at least 1 day in advance. Same-day or past date leaves are not permitted.', confirmButtonColor: '#1e3a8a' });
             return;
         }
 

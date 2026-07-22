@@ -833,7 +833,7 @@
                 <div class="widget-body">
                     <div class="row g-2">
                         <div class="col-md-6">
-                            <a th:href="${workflowUrl != null ? workflowUrl : '/accounts/workflow'}" class="app-btn" style="border: 2px solid #1e3a8a; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
+                            <a th:href="${workflowUrl != null ? workflowUrl : '/space/accounts/dashboard'}" class="app-btn" style="border: 2px solid #1e3a8a; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
                                 <i class="fas fa-project-diagram text-primary me-2 fs-5"></i>
                                 <span class="app-text fw-bold">Manage Workflow</span>
                             </a>
@@ -908,6 +908,12 @@
                 <div class="widget-body">
 
                     <div class="row g-2">
+                        <div class="col-md-6">
+                            <a href="/senior_accounts/login" target="_blank" class="app-btn" style="border: 2px solid #1e3a8a; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
+                                <i class="fas fa-user-shield text-primary me-2 fs-5"></i>
+                                <span class="app-text fw-bold">My Space</span>
+                            </a>
+                        </div>
                         <div class="col-md-6">
                             <a href="/my-whitecircle/login" class="app-btn" target="_blank">
                                 <i class="fas fa-id-badge text-primary me-2 fs-5"></i>

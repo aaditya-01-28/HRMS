@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Note: In production, consider enabling CSRF for form endpoints
                 .authorizeHttpRequests(auth -> auth
                         // Publicly accessible assets and login
-                        .requestMatchers("/login", "/forgot-password", "/api/forgot-password", "/reset-password", "/api/reset-password", "/my-thanks/login", "/my-thanks/authenticate", "/my-rides/login", "/my-rides/logout", "/api/verify-user", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/login", "/forgot-password", "/api/forgot-password", "/reset-password", "/api/reset-password", "/my-thanks/login", "/my-thanks/authenticate", "/my-rides/login", "/my-rides/logout", "/api/verify-user", "/senior_accounts/login", "/senior_accounts/myspace/login", "/css/**", "/js/**", "/images/**").permitAll()
 
                         // All other requests MUST be authenticated.
                         // The actual granular permission checks will now happen inside the Controllers!

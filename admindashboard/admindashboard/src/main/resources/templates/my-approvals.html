@@ -638,7 +638,7 @@
             let visibleCount = 0;
             document.querySelectorAll('#leaveTable > tbody > tr').forEach(row => {
                 const type = row.getAttribute('data-type') ? row.getAttribute('data-type').toLowerCase() : '';
-                const status = row.getAttribute('data-status');
+                const status = row.getAttribute('data-status') ? row.getAttribute('data-status').toLowerCase() : '';
                 const text = row.innerText.toLowerCase();
                 
                 const typeMatch = (typeFilter === 'all' || type === typeFilter);
@@ -663,7 +663,7 @@
             
             let visibleCount = 0;
             document.querySelectorAll('#timesheetTable > tbody > tr').forEach(row => {
-                const status = row.getAttribute('data-status');
+                const status = row.getAttribute('data-status') ? row.getAttribute('data-status').toLowerCase() : '';
                 const text = row.innerText.toLowerCase();
                 
                 const statusMatch = (statusFilter === 'all' || status === statusFilter);
@@ -687,7 +687,7 @@
             
             let visibleCount = 0;
             document.querySelectorAll('#attendanceTable > tbody > tr').forEach(row => {
-                const status = row.getAttribute('data-status');
+                const status = row.getAttribute('data-status') ? row.getAttribute('data-status').toLowerCase() : '';
                 const text = row.innerText.toLowerCase();
                 
                 const statusMatch = (statusFilter === 'all' || status === statusFilter);

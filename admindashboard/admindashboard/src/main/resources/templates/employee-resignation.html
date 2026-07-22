@@ -194,7 +194,7 @@
                         <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.8rem;">Current Status</h6>
                         <span th:class="'status-badge status-' + ${resignation.status}">
                             <i class="fas fa-circle me-1" style="font-size: 0.6rem;"></i>
-                            <span th:text="${resignation.status == 'PENDING_MANAGER' ? 'Pending Manager Approval' : (resignation.status == 'PENDING_HR' ? 'Pending HR Approval' : resignation.status)}"></span>
+                            <span th:text="${resignation.status == 'PENDING_MANAGER' ? 'Pending Manager Approval' : (resignation.status == 'PENDING_HR' ? 'Pending HR Approval' : (resignation.status == 'APPROVED' ? 'Approved' : resignation.status))}"></span>
                         </span>
                     </div>
                     <div class="text-end">

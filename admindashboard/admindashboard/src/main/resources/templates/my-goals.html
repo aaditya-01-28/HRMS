@@ -1673,14 +1673,15 @@
 	const updateModal =
 	        document.getElementById("updateModal");
 	function openProgressModal(){
-
 	    updateModal.classList.add("show");
-
-	    document.getElementById("goalSelector")
-	            .value = "";
-
-	    document.getElementById("updateForm")
-	            .action = "";
+	    const goalSelector = document.getElementById("goalSelector");
+	    if (goalSelector && goalSelector.options.length > 1) {
+	        goalSelector.selectedIndex = 1;
+	        const goalId = goalSelector.value;
+	        if (goalId) {
+	            document.getElementById("updateForm").action = "/employee/my-goals/" + goalId + "/update";
+	        }
+	    }
 	}
 
 	const burnBtn = document.getElementById("burnChartUpdateBtn");

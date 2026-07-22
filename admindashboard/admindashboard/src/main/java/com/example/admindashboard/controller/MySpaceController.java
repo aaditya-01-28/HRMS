@@ -213,6 +213,12 @@ public class MySpaceController {
         @Autowired
         private com.example.admindashboard.repository.CertificationRepository certificationRepository;
 
+        @Autowired
+        private com.example.admindashboard.repository.PayslipRepository payslipRepository;
+
+        @Autowired
+        private com.example.admindashboard.repository.ClientRepository clientRepository;
+
     @GetMapping("/space/login")
     public String showLogin() {
         return "myspace-login";
@@ -4747,5 +4753,153 @@ public class MySpaceController {
                 }
             }
         }
+    }
+
+    // =========================================================================
+    // L3 ACCOUNTS MY SPACE PORTAL ENDPOINTS (/space/accounts/*)
+    // =========================================================================
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping({"/space/accounts/dashboard", "/senior_accounts/myspace", "/space/accounts"})
+    public String showSeniorAccountsMySpace(
+            @RequestParam(value = "tab", defaultValue = "dashboard") String tab,
+            Model model,
+            Principal principal) {
+
+        User currentUser = principal != null ? userRepository.findByUsername(principal.getName()).orElse(null) : null;
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("activeTab", tab);
+
+        // Real Data Metrics & Lists
+        List<User> allUsers = userRepository.findAll();
+        List<com.example.admindashboard.model.Payslip> allPayslips = payslipRepository.findAll();
+        List<ExpenseClaim> allExpenseClaims = expenseClaimRepository.findAll();
+        List<BudgetRequest> allBudgetRequests = budgetRequestRepository.findAll();
+        List<com.example.admindashboard.model.Client> allClients = clientRepository.findAll();
+
+        long totalEmployeesCount = allUsers.stream()
+                .filter(u -> u.getRole() != null && !"CLIENT".equalsIgnoreCase(u.getRole().getRoleName()))
+                .count();
+
+        model.addAttribute("totalEmployees", totalEmployeesCount);
+        model.addAttribute("allUsers", allUsers);
+        model.addAttribute("allPayslips", allPayslips);
+        model.addAttribute("allExpenseClaims", allExpenseClaims);
+        model.addAttribute("allBudgetRequests", allBudgetRequests);
+        model.addAttribute("allClients", allClients);
+
+        return "senior_accounts-myspace";
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/accounting")
+    public String showAccountsAccounting(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("accounting", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/payroll")
+    public String showAccountsPayroll(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("payroll", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/expenses")
+    public String showAccountsExpenses(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("expenses", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/budgeting")
+    public String showAccountsBudgeting(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("budgeting", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/invoicing")
+    public String showAccountsInvoicing(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("invoicing", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/taxation")
+    public String showAccountsTaxation(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("taxation", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/analytics")
+    public String showAccountsAnalytics(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("analytics", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/vendors")
+    public String showAccountsVendors(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("vendors", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @PostMapping("/space/accounts/payroll/action")
+    public String handlePayrollAction(
+            @RequestParam(required = false) Long payslipId,
+            @RequestParam(required = false) Long userId,
+            @RequestParam String action,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+
+        try {
+            if (payslipId != null) {
+                com.example.admindashboard.model.Payslip p = payslipRepository.findById(payslipId).orElse(null);
+                if (p != null) {
+                    if ("approve".equalsIgnoreCase(action)) {
+                        p.setStatus("Processed");
+                    } else if ("reject".equalsIgnoreCase(action)) {
+                        p.setStatus("Hold");
+                    }
+                    payslipRepository.save(p);
+                }
+            } else if (userId != null) {
+                User u = userRepository.findById(userId).orElse(null);
+                if (u != null) {
+                    List<com.example.admindashboard.model.Payslip> userPayslips = payslipRepository.findByUser(u);
+                    for (com.example.admindashboard.model.Payslip p : userPayslips) {
+                        if ("approve".equalsIgnoreCase(action)) {
+                            p.setStatus("Processed");
+                        } else if ("reject".equalsIgnoreCase(action)) {
+                            p.setStatus("Hold");
+                        }
+                        payslipRepository.save(p);
+                    }
+                }
+            }
+            redirectAttributes.addFlashAttribute("successMessage", "Payroll action (" + action.toUpperCase() + ") processed successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error updating payroll: " + e.getMessage());
+        }
+        return "redirect:/space/accounts/payroll";
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @PostMapping("/space/accounts/expenses/action")
+    public String handleExpenseAction(
+            @RequestParam Long claimId,
+            @RequestParam String action,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+
+        try {
+            ExpenseClaim claim = expenseClaimRepository.findById(claimId).orElse(null);
+            if (claim != null) {
+                if ("approve".equalsIgnoreCase(action)) {
+                    claim.setStatus("Approved");
+                } else if ("reject".equalsIgnoreCase(action)) {
+                    claim.setStatus("Rejected");
+                }
+                expenseClaimRepository.save(claim);
+            }
+            redirectAttributes.addFlashAttribute("successMessage", "Expense claim " + action.toUpperCase() + " successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error updating expense claim: " + e.getMessage());
+        }
+        return "redirect:/space/accounts/expenses";
     }
 }

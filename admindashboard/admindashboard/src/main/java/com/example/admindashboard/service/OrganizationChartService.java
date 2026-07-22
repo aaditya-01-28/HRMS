@@ -34,17 +34,35 @@ public class OrganizationChartService {
         java.util.Map<Long, OrganizationNode> nodeMap = new java.util.HashMap<>();
         nodeMap.put(rootUser.getId(), rootNode);
         
+        java.util.Map<String, OrganizationNode> nameToNodeMap = new java.util.HashMap<>();
+        if (rootUser.getFullName() != null) nameToNodeMap.put(rootUser.getFullName().toLowerCase(), rootNode);
+        if (rootUser.getUsername() != null) nameToNodeMap.put(rootUser.getUsername().toLowerCase(), rootNode);
+
         for (User user : allUsers) {
             if (user.getId().equals(rootUser.getId())) continue;
-            nodeMap.put(user.getId(), createNode(user));
+            OrganizationNode node = createNode(user);
+            nodeMap.put(user.getId(), node);
+            if (user.getFullName() != null) nameToNodeMap.put(user.getFullName().toLowerCase(), node);
+            if (user.getUsername() != null) nameToNodeMap.put(user.getUsername().toLowerCase(), node);
         }
         
         for (User user : allUsers) {
             if (user.getId().equals(rootUser.getId())) continue;
             OrganizationNode node = nodeMap.get(user.getId());
             User manager = user.getManager();
+            OrganizationNode parentNode = null;
+            
             if (manager != null && nodeMap.containsKey(manager.getId())) {
-                nodeMap.get(manager.getId()).getChildren().add(node);
+                parentNode = nodeMap.get(manager.getId());
+            } else if (user.getEmployeeProfile() != null && user.getEmployeeProfile().getReportingManager() != null) {
+                String repMgr = user.getEmployeeProfile().getReportingManager().trim().toLowerCase();
+                if (nameToNodeMap.containsKey(repMgr)) {
+                    parentNode = nameToNodeMap.get(repMgr);
+                }
+            }
+            
+            if (parentNode != null && parentNode != node) {
+                parentNode.getChildren().add(node);
             } else {
                 rootNode.getChildren().add(node);
             }

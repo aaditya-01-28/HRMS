@@ -42,7 +42,8 @@ public class UserApiController {
     // REMOVED LOCK: All authenticated users need to see the birthday widget.
     @GetMapping("/api/users/birthdays-today")
     public ResponseEntity<List<User>> getBirthdaysToday(Principal principal) {
-        User currentUser = userRepository.findByUsername(principal.getName()).orElse(null);
+        String username = principal != null ? principal.getName() : null;
+        User currentUser = username != null ? userRepository.findByUsername(username).orElse(null) : null;
         boolean isManager = currentUser != null && currentUser.getRole() != null && "MANAGER".equalsIgnoreCase(currentUser.getRole().getRoleName());
 
         List<User> users = userRepository.findByBirthdayToday();

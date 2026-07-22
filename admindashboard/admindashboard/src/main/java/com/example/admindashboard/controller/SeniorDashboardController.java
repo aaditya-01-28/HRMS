@@ -282,7 +282,7 @@ public class SeniorDashboardController {
 
     // --- DASHBOARD ROUTES ---
 
-    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @PreAuthorize("hasAnyRole('SENIOR_MANAGER', 'ADMIN') or hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_manager/dashboard")
     public String showSeniorManagerDashboard(Model model, Principal principal, HttpServletRequest request) {
     	loadDashboardData(model);
@@ -292,7 +292,7 @@ public class SeniorDashboardController {
     	return "employee-dashboard";
     }
 
-    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @PreAuthorize("hasAnyRole('SENIOR_HR', 'ADMIN') or hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_hr/dashboard")
     public String showSeniorHrDashboard(Model model, Principal principal, HttpServletRequest request) {
     	model.addAttribute("showMySpace", true);
@@ -301,7 +301,7 @@ public class SeniorDashboardController {
     	return "senior_hr-dashboard";
     }
 
-    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @PreAuthorize("hasAnyRole('SENIOR_LND_HEAD', 'ADMIN') or hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_lnd/dashboard")
     public String showSeniorLndDashboard(Model model, Principal principal, HttpServletRequest request) {
     	loadDashboardData(model);
@@ -310,16 +310,45 @@ public class SeniorDashboardController {
     	return "employee-dashboard";
     }
 
-    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'FINANCE') or hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_accounts/dashboard")
     public String showSeniorAccountsDashboard(Model model, Principal principal, HttpServletRequest request) {
     	loadDashboardData(model);
         model.addAttribute("isSeniorManager", true);
         model.addAttribute("workflowUrl", "/senior_accounts/workflow");
-    	return "employee-dashboard";
+    	return "senior_accounts-dashboard";
     }
 
-    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @GetMapping({"/senior_accounts/login", "/senior_accounts/myspace/login"})
+    public String showSeniorAccountsLogin() {
+        return "senior_accounts-login";
+    }
+
+    @PostMapping({"/senior_accounts/login", "/senior_accounts/myspace/login"})
+    public String processSeniorAccountsLogin(
+            @RequestParam String username,
+            @RequestParam String password,
+            Model model) {
+
+        User user = userRepository
+                .findByUsername(username.toUpperCase())
+                .orElse(null);
+
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+            model.addAttribute("authError", "Invalid username or password");
+            return "senior_accounts-login";
+        }
+
+        String role = user.getRole() != null ? user.getRole().getRoleName() : "";
+        if (!"SENIOR_ACCOUNTS_HEAD".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role) && !"FINANCE".equalsIgnoreCase(role)) {
+            model.addAttribute("authError", "Only Senior Accountant / Accounts Admin credentials can access this My Space");
+            return "senior_accounts-login";
+        }
+
+        return "redirect:/space/accounts/dashboard";
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_TRANSPORT_HEAD', 'ADMIN') or hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_transport/dashboard")
     public String showSeniorTransportDashboard(Model model, Principal principal, HttpServletRequest request) {
         String currentUserId = principal.getName();
@@ -332,7 +361,7 @@ public class SeniorDashboardController {
         return "senior_transport-dashboard";
     }
 
-    @PreAuthorize("hasAuthority('admin_dashboard_view')")
+    @PreAuthorize("hasAnyRole('SENIOR_REWARDS_HEAD', 'ADMIN') or hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_rewards/dashboard")
     public String showSeniorRewardsDashboard(Model model, Principal principal, HttpServletRequest request) {
         String currentUserId = principal.getName();

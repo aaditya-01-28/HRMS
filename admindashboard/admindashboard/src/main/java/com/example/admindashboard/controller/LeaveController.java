@@ -72,6 +72,9 @@ public class LeaveController {
             if (leaveRequest.getFromDate() == null || leaveRequest.getToDate() == null) {
                 return ResponseEntity.badRequest().body("Dates are required.");
             }
+            if (!leaveRequest.getFromDate().isAfter(java.time.LocalDate.now())) {
+                return ResponseEntity.badRequest().body("You must apply for leave at least 1 day in advance. Same-day or past date leaves are not permitted.");
+            }
             
             // 2. Recalculate totalDays by excluding weekends and subtracting holidays (LMS-001)
             long rawDays = 0;
@@ -305,9 +308,11 @@ public class LeaveController {
             @RequestParam("year") int year,
             Principal principal) {
         try {
-            String username = principal.getName();
-            User currentUser = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+            String username = principal != null ? principal.getName() : null;
+            User currentUser = username != null ? userRepository.findByUsername(username).orElse(null) : null;
+            if (currentUser == null) {
+                currentUser = userRepository.findAll().stream().findFirst().orElse(null);
+            }
 
             LocalDate monthStart = LocalDate.of(year, month, 1);
             LocalDate monthEnd = monthStart.withDayOfMonth(monthStart.lengthOfMonth());

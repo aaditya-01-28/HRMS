@@ -1,13 +1,18 @@
 /* =========================================
    1. GLOBAL & TYPOGRAPHY
    ========================================= */
+*:not(i):not(.fas):not(.far):not(.fab):not(.fa):not(.fa-solid):not(.fa-regular):not(.fa-brands):not(.fa-duotone):not(.fa-light):not(.fa-thin) {
+    font-family: Arial, Helvetica, sans-serif !important;
+}
+
 body, p, span, a, div, td, th, li, label, input, textarea, button, select, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
-    font-family: Arial, sans-serif !important;
+    font-family: Arial, Helvetica, sans-serif !important;
 }
 
 body {
     background-color: #f0f2f5; /* Modern, soft gray-blue background */
     color: #344767; /* Softer text color */
+    font-family: Arial, Helvetica, sans-serif !important;
 }
 
 i, .fas, .far, .fab, .fa, .fa-solid, .fa-regular {
