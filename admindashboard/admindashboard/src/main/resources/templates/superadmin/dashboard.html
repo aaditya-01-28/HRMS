@@ -95,6 +95,7 @@
                     <a href="#" class="sub-menu-item" onclick="switchTab('epf', 'EPF Setup', this)">EPF</a>
                     <a href="#" class="sub-menu-item" onclick="switchTab('esi', 'ESI Setup', this)">ESI</a>
                     <a href="#" class="sub-menu-item" onclick="switchTab('establishment', 'Establishment Detail', this)">Establishment detail</a>
+                    <a href="#" class="sub-menu-item" onclick="switchTab('employee', 'Employee Configuration', this)">Employee</a>
                 </div>
             </div>
             
@@ -379,6 +380,38 @@
                 </div>
                 <div style="display:flex; justify-content:flex-end; margin-top:20px;">
                     <button type="button" class="btn-primary" onclick="saveEstablishment()">Save Settings</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Employee Config Form -->
+        <div class="settings-form-area" id="employee-tab">
+            <h2 class="section-title">Employee Configuration</h2>
+            
+            <div style="display: flex; gap: 15px; margin-bottom: 25px; border-bottom: 1px solid #eaeaea; padding-bottom: 10px; overflow-x: auto; white-space: nowrap;">
+                <span style="color: #0052cc; font-weight: 600; cursor: pointer; border-bottom: 2px solid #0052cc; padding-bottom: 11px;">Employee Details</span>
+                <span style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Pending Approvals</span>
+                <span style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Classifications</span>
+                <span style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Statutory Details</span>
+                <span style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Address Setup</span>
+                <span style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">HR Categories</span>
+                <span style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Documents</span>
+            </div>
+
+            <form id="employeeConfigForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Employee Prefix Setup</label>
+                        <input type="text" id="empPrefix" placeholder="e.g. EMP, INT">
+                    </div>
+                    <div class="form-group">
+                        <label>Default Probation Period (Months)</label>
+                        <input type="number" id="defaultProbation">
+                    </div>
+                </div>
+                
+                <div style="display:flex; justify-content:flex-end; margin-top:20px;">
+                    <button type="button" class="btn-primary" onclick="showToast('Employee Configuration Saved!')">Save Configuration</button>
                 </div>
             </form>
         </div>
