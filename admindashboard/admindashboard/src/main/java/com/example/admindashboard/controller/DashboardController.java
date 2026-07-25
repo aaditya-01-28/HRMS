@@ -2234,11 +2234,11 @@ public class DashboardController {
 
         String employeeId = rawUsername.toUpperCase();
 
-        if (!(employeeId.startsWith("EMP") || employeeId.startsWith("INT"))) {
+        if (!(employeeId.startsWith("EMP") || employeeId.startsWith("INT") || employeeId.startsWith("ADM") || employeeId.startsWith("SADM"))) {
 
             model.addAttribute(
                 "errorMessage",
-                "Invalid ID Format! IDs must start with EMP or INT."
+                "Invalid ID Format! IDs must start with EMP, INT, ADM, or SADM."
             );
 
             return "add-employee";
@@ -2261,10 +2261,21 @@ public class DashboardController {
         user.setUsername(rawUsername.toUpperCase());
         user.setPassword(passwordEncoder.encode("welcome123"));
 
-        Role empRole = roleRepository.findByRoleName("EMPLOYEE")
-                .orElseThrow(() -> new RuntimeException("EMPLOYEE role not found"));
+        Role userRole;
+        if (employeeId.startsWith("SADM") || employeeId.startsWith("ADM")) {
+            userRole = roleRepository.findByRoleName("SUPER_ADMIN")
+                    .orElseGet(() -> {
+                        Role role = new Role();
+                        role.setRoleName("SUPER_ADMIN");
+                        role.setDescription("Super Administrator");
+                        return roleRepository.save(role);
+                    });
+        } else {
+            userRole = roleRepository.findByRoleName("EMPLOYEE")
+                    .orElseThrow(() -> new RuntimeException("EMPLOYEE role not found"));
+        }
 
-        user.setRole(empRole);
+        user.setRole(userRole);
         /*****************************************
          * EMPLOYEE PROFILE INITIALIZATION
          *****************************************/
