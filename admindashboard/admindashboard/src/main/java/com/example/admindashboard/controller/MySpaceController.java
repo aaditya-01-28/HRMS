@@ -4861,7 +4861,7 @@ public class MySpaceController {
             } else if (userId != null) {
                 User u = userRepository.findById(userId).orElse(null);
                 if (u != null) {
-                    List<com.example.admindashboard.model.Payslip> userPayslips = payslipRepository.findByUser(u);
+                    List<com.example.admindashboard.model.Payslip> userPayslips = payslipRepository.findByUserId(u.getId());
                     for (com.example.admindashboard.model.Payslip p : userPayslips) {
                         if ("approve".equalsIgnoreCase(action)) {
                             p.setStatus("Processed");

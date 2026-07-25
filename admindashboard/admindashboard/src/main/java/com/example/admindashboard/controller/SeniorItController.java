@@ -282,7 +282,11 @@ public class SeniorItController {
                 user.setRole(role);
             }
             if (departmentId != null && !departmentId.trim().isEmpty()) {
-                user.setDepartmentId(departmentId);
+                try {
+                    user.setDepartmentId(Long.valueOf(departmentId));
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
             }
             userRepository.save(user);
         }

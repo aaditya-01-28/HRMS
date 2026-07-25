@@ -1,4 +1,4 @@
-﻿package com.example.admindashboard.repository;
+package com.example.admindashboard.repository;
 
 import com.example.admindashboard.model.EstablishmentSettings;
 import org.springframework.data.jpa.repository.JpaRepository;
