@@ -10,14 +10,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('ROLE_SUPER ADMIN') or hasAuthority('SUPER_ADMIN')")
 public class SuperAdminController {
 
-    @GetMapping("/company")
-    public String companySettings() {
-        return "superadmin/settings-company";
-    }
-
-    @GetMapping("/statutory")
-    public String statutorySettings() {
-        return "superadmin/settings-statutory";
+    @GetMapping({"/dashboard", "/company", "/statutory"})
+    public String superAdminDashboard() {
+        return "superadmin/dashboard";
     }
 
 }

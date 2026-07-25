@@ -151,7 +151,9 @@ public class DashboardController {
             return "redirect:/senior_it/dashboard";
         } else if (request.isUserInRole("FACILITY_L2")) {
             return "redirect:/facility/dashboard";
-        } else if (request.isUserInRole("SUPER_ADMIN") || request.isUserInRole("HR_ADMIN") ||
+        } else if (request.isUserInRole("SUPER_ADMIN")) {
+            return "redirect:/superadmin/dashboard";
+        } else if (request.isUserInRole("HR_ADMIN") ||
             request.isUserInRole("IT_ADMIN") || request.isUserInRole("HR_MANAGER") ||
             request.isUserInRole("PROJECT_MANAGER") || request.isUserInRole("FINANCE")) {
             return "redirect:/admin/dashboard";
