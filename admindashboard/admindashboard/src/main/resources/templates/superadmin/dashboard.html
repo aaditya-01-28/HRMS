@@ -90,12 +90,12 @@
                     <i class="fa-solid fa-chevron-down arrow"></i>
                 </div>
                 <div class="accordion-content open">
-                    <a href="#" class="sub-menu-item active" onclick="switchTab('company', 'Company Setup', this)">Company</a>
-                    <a href="#" class="sub-menu-item" onclick="switchTab('branch', 'Branch Setup', this)">Branch</a>
-                    <a href="#" class="sub-menu-item" onclick="switchTab('epf', 'EPF Setup', this)">EPF</a>
-                    <a href="#" class="sub-menu-item" onclick="switchTab('esi', 'ESI Setup', this)">ESI</a>
-                    <a href="#" class="sub-menu-item" onclick="switchTab('establishment', 'Establishment Detail', this)">Establishment detail</a>
-                    <a href="#" class="sub-menu-item" onclick="switchTab('employee', 'Employee Configuration', this)">Employee</a>
+                    <a href="javascript:void(0);" class="sub-menu-item active" onclick="switchTab('company', 'Company Setup', this)">Company</a>
+                    <a href="javascript:void(0);" class="sub-menu-item" onclick="switchTab('branch', 'Branch Setup', this)">Branch</a>
+                    <a href="javascript:void(0);" class="sub-menu-item" onclick="switchTab('epf', 'EPF Setup', this)">EPF</a>
+                    <a href="javascript:void(0);" class="sub-menu-item" onclick="switchTab('esi', 'ESI Setup', this)">ESI</a>
+                    <a href="javascript:void(0);" class="sub-menu-item" onclick="switchTab('establishment', 'Establishment Detail', this)">Establishment detail</a>
+                    <a href="javascript:void(0);" class="sub-menu-item" onclick="switchTab('employee', 'Employee Configuration', this)">Employee</a>
                 </div>
             </div>
             
@@ -106,8 +106,8 @@
                     <i class="fa-solid fa-chevron-down arrow"></i>
                 </div>
                 <div class="accordion-content">
-                    <a href="#" class="sub-menu-item" onclick="switchTab('placeholder', 'Recruit', this)">Candidates</a>
-                    <a href="#" class="sub-menu-item" onclick="switchTab('placeholder', 'Recruit', this)">Job Postings</a>
+                    <a href="javascript:void(0);" class="sub-menu-item" onclick="switchTab('placeholder', 'Recruit', this)">Candidates</a>
+                    <a href="javascript:void(0);" class="sub-menu-item" onclick="switchTab('placeholder', 'Recruit', this)">Job Postings</a>
                 </div>
             </div>
             
@@ -118,11 +118,11 @@
                     <i class="fa-solid fa-chevron-down arrow"></i>
                 </div>
                 <div class="accordion-content">
-                    <a href="#" class="sub-menu-item" onclick="switchTab('placeholder', 'Pre Onboard', this)">Pre Onboard</a>
-                    <a href="#" class="sub-menu-item" onclick="switchTab('placeholder', 'Employee Details', this)">Employee Details</a>
-                    <a href="#" class="sub-menu-item" onclick="switchTab('placeholder', 'Bulk Update', this)">Bulk Update</a>
-                    <a href="#" class="sub-menu-item" onclick="switchTab('placeholder', 'Asset', this)">Asset</a>
-                    <a href="#" class="sub-menu-item" onclick="switchTab('placeholder', 'Separation', this)">Separation</a>
+                    <a href="javascript:void(0);" class="sub-menu-item" onclick="switchTab('placeholder', 'Pre Onboard', this)">Pre Onboard</a>
+                    <a href="javascript:void(0);" class="sub-menu-item" onclick="switchTab('placeholder', 'Employee Details', this)">Employee Details</a>
+                    <a href="javascript:void(0);" class="sub-menu-item" onclick="switchTab('placeholder', 'Bulk Update', this)">Bulk Update</a>
+                    <a href="javascript:void(0);" class="sub-menu-item" onclick="switchTab('placeholder', 'Asset', this)">Asset</a>
+                    <a href="javascript:void(0);" class="sub-menu-item" onclick="switchTab('placeholder', 'Separation', this)">Separation</a>
                 </div>
             </div>
             
@@ -578,14 +578,18 @@
     }
 
     function switchTab(tabId, title, element) {
-        if(event) event.preventDefault();
+        try {
+            if (typeof event !== 'undefined' && event) event.preventDefault();
+        } catch (e) {}
         
         // Remove active class from all links
         document.querySelectorAll('.sub-menu-item').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.accordion-header').forEach(el => el.classList.remove('active'));
         
         // Add active class to clicked
-        element.classList.add('active');
+        if (element) {
+            element.classList.add('active');
+        }
         
         // Hide all forms
         document.querySelectorAll('.settings-form-area').forEach(el => el.classList.remove('active'));
@@ -597,7 +601,10 @@
         }
         
         // Update Header
-        document.getElementById('main-header-title').innerHTML = '<i class="fa-solid fa-sliders"></i> ' + title;
+        const headerTitle = document.getElementById('main-header-title');
+        if (headerTitle) {
+            headerTitle.innerHTML = '<i class="fa-solid fa-sliders"></i> ' + title;
+        }
     }
     
     function showToast(message) {

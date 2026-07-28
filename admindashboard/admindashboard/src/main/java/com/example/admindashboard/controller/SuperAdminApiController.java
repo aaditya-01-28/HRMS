@@ -170,4 +170,40 @@ public class SuperAdminApiController {
         documentTypeRepo.deleteById(id);
         return ResponseEntity.ok().build();
     }
+    // --- Phase B: Employee Configuration ---
+
+    @Autowired private AddressSetupRepository addressSetupRepo;
+    @Autowired private StatutoryConfigRepository statutoryConfigRepo;
+
+    // 5. Address Setup
+    @GetMapping("/address-setup")
+    public ResponseEntity<List<AddressSetup>> getAddressSetups() {
+        return ResponseEntity.ok(addressSetupRepo.findAll());
+    }
+
+    @PostMapping("/address-setup")
+    public ResponseEntity<AddressSetup> saveAddressSetup(@RequestBody AddressSetup setup) {
+        return ResponseEntity.ok(addressSetupRepo.save(setup));
+    }
+
+    @DeleteMapping("/address-setup/{id}")
+    public ResponseEntity<Void> deleteAddressSetup(@PathVariable Long id) {
+        addressSetupRepo.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    // 6. Statutory Details (Toggle Settings)
+    @GetMapping("/statutory-config")
+    public ResponseEntity<StatutoryConfig> getStatutoryConfig() {
+        return ResponseEntity.ok(statutoryConfigRepo.findAll().stream().findFirst().orElse(new StatutoryConfig()));
+    }
+
+    @PostMapping("/statutory-config")
+    public ResponseEntity<StatutoryConfig> saveStatutoryConfig(@RequestBody StatutoryConfig config) {
+        StatutoryConfig existing = statutoryConfigRepo.findAll().stream().findFirst().orElse(null);
+        if (existing != null) {
+            config.setId(existing.getId());
+        }
+        return ResponseEntity.ok(statutoryConfigRepo.save(config));
+    }
 }
