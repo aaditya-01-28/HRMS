@@ -828,71 +828,74 @@
                     <div class="d-flex align-items-center">
                         <i class="fas fa-user-cog me-2"></i>Self Services
                     </div>
-                    <a href="#expandedSelfServices" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="expandedSelfServices" class="small fw-bold text-white text-decoration-none" id="viewAllSelfServicesBtn">View All</a>
+                    <div>
+                        <a href="#" class="small fw-bold text-white text-decoration-none me-3" onclick="openPrefModal('services', event)"><i class="fas fa-edit"></i> Edit</a>
+                        <a href="#expandedSelfServices" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="expandedSelfServices" class="small fw-bold text-white text-decoration-none" id="viewAllSelfServicesBtn">View All</a>
+                    </div>
                 </div>
                 <div class="widget-body">
-                    <div class="row g-2">
+                    <div class="row g-2" id="pinnedServicesContainer">
                         <div class="col-md-4">
                             <a th:href="${workflowUrl != null ? workflowUrl : '/senior_transport/workflow'}" class="app-btn" style="border: 2px solid #1e3a8a; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
                                 <i class="fas fa-project-diagram text-primary me-2 fs-5"></i>
-                                <span class="app-text fw-bold">Manage Workflow</span>
+                                <span class="app-text fw-bold" data-item-name="manage-workflow">Manage Workflow</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/conference-room" class="app-btn">
                                 <i class="fas fa-handshake text-primary me-2 fs-5"></i>
-                                <span class="app-text">Conference Room</span>
+                                <span class="app-text" data-item-name="conference-room">Conference Room</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/leave-management" class="app-btn">
                                 <i class="fas fa-calendar-minus text-primary me-2 fs-5"></i>
-                                <span class="app-text">Leave Management System (LMS)</span>
+                                <span class="app-text" data-item-name="leave-management-system-lms">Leave Management System (LMS)</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/attendance" class="app-btn">
                                 <i class="fas fa-user-clock text-primary me-2 fs-5"></i>
-                                <span class="app-text">Attendance Regulation</span>
+                                <span class="app-text" data-item-name="attendance-regulation">Attendance Regulation</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/my-approvals" class="app-btn">
                                 <i class="fas fa-check-double text-primary me-2 fs-5"></i>
-                                <span class="app-text">My Approvals</span>
+                                <span class="app-text" data-item-name="my-approvals">My Approvals</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/email-signature" class="app-btn">
                                 <i class="fas fa-signature text-primary me-2 fs-5"></i>
-                                <span class="app-text">Email Signature</span>
+                                <span class="app-text" data-item-name="email-signature">Email Signature</span>
                             </a>
                         </div>
                         </div>
                     <div class="collapse mt-2" id="expandedSelfServices">
-                        <div class="row g-2">
+                        <div class="row g-2" id="collapsedServicesContainer">
                             <div class="col-md-4">
                             <a href="/password-reset" class="app-btn">
                                 <i class="fas fa-unlock-alt text-primary me-2 fs-5"></i>
-                                <span class="app-text">Password Reset</span>
+                                <span class="app-text" data-item-name="password-reset">Password Reset</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/employee/referral" class="app-btn">
                                 <i class="fas fa-user-plus text-primary me-2 fs-5"></i>
-                                <span class="app-text">Referral</span>
+                                <span class="app-text" data-item-name="referral">Referral</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/employee/resignation" class="app-btn">
                                 <i class="fas fa-sign-out-alt text-primary me-2 fs-5"></i>
-                                <span class="app-text">Resignation</span>
+                                <span class="app-text" data-item-name="resignation">Resignation</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/employee/performance/feedback" class="app-btn">
                                 <i class="fas fa-star-half-stroke text-primary me-2 fs-5"></i>
-                                <span class="app-text">Performance Feedback</span>
+                                <span class="app-text" data-item-name="performance-feedback">Performance Feedback</span>
                             </a>
                                                 </div>
                     </div>
@@ -912,59 +915,59 @@
                 </div>
                 <div class="widget-body">
 
-                    <div class="row g-2">
+                    <div class="row g-2" id="pinnedAppsContainer">
                         <div class="col-md-6">
                             <a href="/senior_transport/my_space" class="app-btn" target="_blank">
                                 <i class="fas fa-shuttle-van text-primary me-2 fs-5"></i>
-                                <span class="app-text">My Space</span>
+                                <span class="app-text" data-item-name="my-space">My Space</span>
                             </a>
                         </div>
                         <div class="col-md-6">
                             <a href="/my-whitecircle/login" class="app-btn" target="_blank">
                                 <i class="fas fa-id-badge text-primary me-2 fs-5"></i>
-                                <span class="app-text">My WhiteCircle</span>
+                                <span class="app-text" data-item-name="my-whitecircle">My WhiteCircle</span>
                             </a>
                         </div>
 						<div class="col-md-6">
 						    <a href="/erp/authenticate" class="app-btn" style="cursor: pointer;" target="_blank">
 						        <i class="fas fa-business-time text-primary me-2 fs-5"></i>
-						        <span class="app-text">ERP and Time Sheet</span>
+						        <span class="app-text" data-item-name="erp-and-time-sheet">ERP and Time Sheet</span>
 						    </a>
 						</div>
                         <div class="col-md-6">
                             <a href="/tickets/authenticate" class="app-btn" target="_blank">
                                 <i class="fas fa-ticket-alt text-primary me-2 fs-5"></i>
-                                <span class="app-text">Log Tickets</span>
+                                <span class="app-text" data-item-name="log-tickets">Log Tickets</span>
                             </a>
                         </div>
                         <div class="col-md-6">
                             <a href="/payroll" class="app-btn" target="_blank">
                                 <i class="fas fa-file-invoice-dollar text-primary me-2 fs-5"></i>
-                                <span class="app-text">Pay Roll</span>
+                                <span class="app-text" data-item-name="pay-roll">Pay Roll</span>
                             </a>
                         </div>
                         <div class="col-md-6">
                             <a href="/learning/login" class="app-btn" target="_blank">
                                 <i class="fas fa-tasks text-primary me-2 fs-5"></i>
-                                <span class="app-text">My Learnings</span>
+                                <span class="app-text" data-item-name="my-learnings">My Learnings</span>
                             </a>
                         </div>
                         <div class="col-md-6">
                             <a href="/my-thanks/login" class="app-btn" target="_blank">
                                 <i class="fas fa-gift text-primary me-2 fs-5"></i>
-                                <span class="app-text">My Thanks</span>
+                                <span class="app-text" data-item-name="my-thanks">My Thanks</span>
                             </a>
                         </div>
                         <div class="col-md-6">
                             <a href="/employee/mediclaim/auth" class="app-btn" target="_blank">
                                 <i class="fas fa-notes-medical text-primary me-2 fs-5"></i>
-                                <span class="app-text">My Mediclaim</span>
+                                <span class="app-text" data-item-name="my-mediclaim">My Mediclaim</span>
                             </a>
                         </div>
                         <div class="col-md-6">
                             <a href="/my-rides/login" class="app-btn" target="_blank">
                                 <i class="fas fa-car text-primary me-2 fs-5"></i>
-                                <span class="app-text">My Rides</span>
+                                <span class="app-text" data-item-name="my-rides">My Rides</span>
                             </a>
                         </div>
                     </div>
@@ -1537,5 +1540,6 @@
         }
     }
 </script>
+    <div th:replace="~{fragments/dashboard-preferences :: preferences}"></div>
 </body>
 </html>
