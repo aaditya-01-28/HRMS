@@ -483,15 +483,73 @@
                 </table>
             </div>
 
-            <!-- Other placeholders -->
+            <!-- Pending Approvals Sub Tab -->
             <div id="emp-pending" class="emp-sub-content" style="display: none;">
-                <p style="color:#888; padding:20px;">Pending Approvals functionality coming in Phase B.</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="font-size:15px; font-weight:600;">Pending Approvals Workflow</h3>
+                </div>
+                <div style="padding: 30px; background: #fffdf5; border: 1px solid #ffeeba; border-radius: 6px;">
+                    <p style="color: #856404; font-weight: 500; margin-bottom: 15px;"><i class="fa-solid fa-triangle-exclamation"></i> Approval workflow policies will be configured here.</p>
+                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:10px;">
+                        <input type="checkbox" checked> Require HR Approval for Profile Updates
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:10px;">
+                        <input type="checkbox" checked> Require Manager Approval for Leaves
+                    </label>
+                    <button class="btn-primary" style="margin-top:15px;" onclick="showToast('Workflow Saved!')">Save Workflow Settings</button>
+                </div>
             </div>
+            
+            <!-- Statutory Details Sub Tab -->
             <div id="emp-statutory" class="emp-sub-content" style="display: none;">
-                <p style="color:#888; padding:20px;">Statutory Details functionality coming in Phase B.</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="font-size:15px; font-weight:600;">Statutory Compliance Settings</h3>
+                </div>
+                <form id="statutoryConfigForm" style="background: #f8fafc; padding: 20px; border-radius: 6px; border: 1px solid #eaeaea;">
+                    <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Enable or disable statutory components for employees by default.</p>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500;">
+                            <input type="checkbox" id="statPfEnabled"> Enable Provident Fund (PF)
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500;">
+                            <input type="checkbox" id="statEsiEnabled"> Enable Employee State Insurance (ESI)
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500;">
+                            <input type="checkbox" id="statPtEnabled"> Enable Professional Tax (PT)
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500;">
+                            <input type="checkbox" id="statLwfEnabled"> Enable Labour Welfare Fund (LWF)
+                        </label>
+                    </div>
+                    
+                    <div style="display:flex; justify-content:flex-end; margin-top:20px;">
+                        <button type="button" class="btn-primary" onclick="saveStatutoryConfig()">Save Statutory Config</button>
+                    </div>
+                </form>
             </div>
+            
+            <!-- Address Setup Sub Tab -->
             <div id="emp-address" class="emp-sub-content" style="display: none;">
-                <p style="color:#888; padding:20px;">Address Setup functionality coming in Phase B.</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="font-size:15px; font-weight:600;">Address Types Setup</h3>
+                </div>
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <input type="text" id="newAddressType" placeholder="e.g. Permanent, Current, Emergency" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; flex:1;">
+                    <label style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600;"><input type="checkbox" id="newAddressMandatory"> Mandatory</label>
+                    <button class="btn-primary" onclick="addAddressSetup()">Add</button>
+                </div>
+                <table style="width:100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr style="background:#f8fafc; border-bottom:1px solid #eaeaea;">
+                            <th style="padding:10px; text-align:left;">Address Type</th>
+                            <th style="padding:10px; text-align:left;">Mandatory</th>
+                            <th style="padding:10px; text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="addressSetupTableBody">
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -802,10 +860,69 @@
         .then(() => { loadDocuments(); showToast("Deleted"); });
     }
 
+    // 5. Address Setup
+    function loadAddressSetups() {
+        fetch('/api/superadmin/address-setup').then(res => res.json()).then(data => {
+            const tbody = document.getElementById('addressSetupTableBody');
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                tbody.innerHTML += `
+                    <tr style="border-bottom:1px solid #eaeaea;">
+                        <td style="padding:10px;">${item.addressType}</td>
+                        <td style="padding:10px;">${item.mandatory ? '<span style="color:#00875a; font-weight:600;">Yes</span>' : '<span style="color:#666;">No</span>'}</td>
+                        <td style="padding:10px; text-align:right;">
+                            <button onclick="deleteAddressSetup(${item.id})" style="background:none; border:none; color:#dc3545; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        });
+    }
+
+    function addAddressSetup() {
+        const addressType = document.getElementById('newAddressType').value;
+        const mandatory = document.getElementById('newAddressMandatory').checked;
+        if (!addressType) return;
+        fetch('/api/superadmin/address-setup', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({addressType, mandatory}) })
+        .then(() => { 
+            document.getElementById('newAddressType').value = ''; 
+            document.getElementById('newAddressMandatory').checked = false;
+            loadAddressSetups(); 
+            showToast("Added Address Type"); 
+        });
+    }
+
+    function deleteAddressSetup(id) {
+        fetch(`/api/superadmin/address-setup/${id}`, { method: 'DELETE' })
+        .then(() => { loadAddressSetups(); showToast("Deleted"); });
+    }
+
+    // 6. Statutory Config
+    fetch('/api/superadmin/statutory-config').then(res => res.json()).then(data => {
+        if (data && data.id) {
+            document.getElementById('statPfEnabled').checked = data.pfEnabled;
+            document.getElementById('statEsiEnabled').checked = data.esiEnabled;
+            document.getElementById('statPtEnabled').checked = data.ptEnabled;
+            document.getElementById('statLwfEnabled').checked = data.lwfEnabled;
+        }
+    });
+
+    function saveStatutoryConfig() {
+        const payload = {
+            pfEnabled: document.getElementById('statPfEnabled').checked,
+            esiEnabled: document.getElementById('statEsiEnabled').checked,
+            ptEnabled: document.getElementById('statPtEnabled').checked,
+            lwfEnabled: document.getElementById('statLwfEnabled').checked
+        };
+        fetch('/api/superadmin/statutory-config', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) })
+        .then(res => res.json()).then(() => showToast("Statutory Config Saved!"));
+    }
+
     // Initialize all tables
     loadClassifications();
     loadHrCategories();
     loadDocuments();
+    loadAddressSetups();
 
 </script>
 </body>
