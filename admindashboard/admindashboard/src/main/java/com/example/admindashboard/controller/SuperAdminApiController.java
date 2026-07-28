@@ -90,11 +90,84 @@ public class SuperAdminApiController {
     }
 
     @PostMapping("/establishment")
-    public ResponseEntity<EstablishmentSettings> saveEstablishmentSettings(@RequestBody EstablishmentSettings settings) {
+    public ResponseEntity<EstablishmentSettings> saveEstablishmentSettings(@RequestBody EstablishmentSettings details) {
         EstablishmentSettings existing = establishmentSettingsRepo.findAll().stream().findFirst().orElse(null);
         if (existing != null) {
-            settings.setId(existing.getId());
+            details.setId(existing.getId());
         }
-        return ResponseEntity.ok(establishmentSettingsRepo.save(settings));
+        return ResponseEntity.ok(establishmentSettingsRepo.save(details));
+    }
+
+    // --- Phase A: Employee Configuration ---
+
+    @Autowired private EmployeeConfigRepository employeeConfigRepo;
+    @Autowired private ClassificationConfigRepository classificationConfigRepo;
+    @Autowired private HrCategoryRepository hrCategoryRepo;
+    @Autowired private DocumentTypeRepository documentTypeRepo;
+
+    // 1. Employee Config Details
+    @GetMapping("/employee-config")
+    public ResponseEntity<EmployeeConfig> getEmployeeConfig() {
+        return ResponseEntity.ok(employeeConfigRepo.findAll().stream().findFirst().orElse(new EmployeeConfig()));
+    }
+
+    @PostMapping("/employee-config")
+    public ResponseEntity<EmployeeConfig> saveEmployeeConfig(@RequestBody EmployeeConfig config) {
+        EmployeeConfig existing = employeeConfigRepo.findAll().stream().findFirst().orElse(null);
+        if (existing != null) {
+            config.setId(existing.getId());
+        }
+        return ResponseEntity.ok(employeeConfigRepo.save(config));
+    }
+
+    // 2. Classifications
+    @GetMapping("/classifications")
+    public ResponseEntity<List<ClassificationConfig>> getClassifications() {
+        return ResponseEntity.ok(classificationConfigRepo.findAll());
+    }
+
+    @PostMapping("/classifications")
+    public ResponseEntity<ClassificationConfig> saveClassification(@RequestBody ClassificationConfig config) {
+        return ResponseEntity.ok(classificationConfigRepo.save(config));
+    }
+
+    @DeleteMapping("/classifications/{id}")
+    public ResponseEntity<Void> deleteClassification(@PathVariable Long id) {
+        classificationConfigRepo.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    // 3. HR Categories
+    @GetMapping("/hr-categories")
+    public ResponseEntity<List<HrCategory>> getHrCategories() {
+        return ResponseEntity.ok(hrCategoryRepo.findAll());
+    }
+
+    @PostMapping("/hr-categories")
+    public ResponseEntity<HrCategory> saveHrCategory(@RequestBody HrCategory category) {
+        return ResponseEntity.ok(hrCategoryRepo.save(category));
+    }
+
+    @DeleteMapping("/hr-categories/{id}")
+    public ResponseEntity<Void> deleteHrCategory(@PathVariable Long id) {
+        hrCategoryRepo.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    // 4. Document Types
+    @GetMapping("/document-types")
+    public ResponseEntity<List<DocumentType>> getDocumentTypes() {
+        return ResponseEntity.ok(documentTypeRepo.findAll());
+    }
+
+    @PostMapping("/document-types")
+    public ResponseEntity<DocumentType> saveDocumentType(@RequestBody DocumentType documentType) {
+        return ResponseEntity.ok(documentTypeRepo.save(documentType));
+    }
+
+    @DeleteMapping("/document-types/{id}")
+    public ResponseEntity<Void> deleteDocumentType(@PathVariable Long id) {
+        documentTypeRepo.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

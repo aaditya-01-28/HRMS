@@ -388,32 +388,111 @@
         <div class="settings-form-area" id="employee-tab">
             <h2 class="section-title">Employee Configuration</h2>
             
-            <div style="display: flex; gap: 15px; margin-bottom: 25px; border-bottom: 1px solid #eaeaea; padding-bottom: 10px; overflow-x: auto; white-space: nowrap;">
-                <span style="color: #0052cc; font-weight: 600; cursor: pointer; border-bottom: 2px solid #0052cc; padding-bottom: 11px;">Employee Details</span>
-                <span style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Pending Approvals</span>
-                <span style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Classifications</span>
-                <span style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Statutory Details</span>
-                <span style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Address Setup</span>
-                <span style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">HR Categories</span>
-                <span style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Documents</span>
+            <div style="display: flex; gap: 15px; margin-bottom: 25px; border-bottom: 1px solid #eaeaea; padding-bottom: 10px; overflow-x: auto; white-space: nowrap;" id="employee-sub-tabs">
+                <span class="emp-sub-tab active" onclick="switchEmployeeSubTab('emp-details', this)" style="color: #0052cc; font-weight: 600; cursor: pointer; border-bottom: 2px solid #0052cc; padding-bottom: 11px;">Employee Details</span>
+                <span class="emp-sub-tab" onclick="switchEmployeeSubTab('emp-pending', this)" style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Pending Approvals</span>
+                <span class="emp-sub-tab" onclick="switchEmployeeSubTab('emp-classifications', this)" style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Classifications</span>
+                <span class="emp-sub-tab" onclick="switchEmployeeSubTab('emp-statutory', this)" style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Statutory Details</span>
+                <span class="emp-sub-tab" onclick="switchEmployeeSubTab('emp-address', this)" style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Address Setup</span>
+                <span class="emp-sub-tab" onclick="switchEmployeeSubTab('emp-hr-categories', this)" style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">HR Categories</span>
+                <span class="emp-sub-tab" onclick="switchEmployeeSubTab('emp-documents', this)" style="color: #666; font-weight: 500; cursor: pointer; padding-bottom: 11px;">Documents</span>
             </div>
 
-            <form id="employeeConfigForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Employee Prefix Setup</label>
-                        <input type="text" id="empPrefix" placeholder="e.g. EMP, INT">
+            <!-- Employee Details Sub Tab -->
+            <div id="emp-details" class="emp-sub-content" style="display: block;">
+                <form id="employeeConfigForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Employee Prefix Setup</label>
+                            <input type="text" id="empPrefix" placeholder="e.g. EMP, INT">
+                        </div>
+                        <div class="form-group">
+                            <label>Default Probation Period (Months)</label>
+                            <input type="number" id="defaultProbation">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Default Probation Period (Months)</label>
-                        <input type="number" id="defaultProbation">
+                    
+                    <div style="display:flex; justify-content:flex-end; margin-top:20px;">
+                        <button type="button" class="btn-primary" onclick="saveEmployeeConfig()">Save Configuration</button>
                     </div>
+                </form>
+            </div>
+
+            <!-- Classifications Sub Tab -->
+            <div id="emp-classifications" class="emp-sub-content" style="display: none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="font-size:15px; font-weight:600;">Employee Classifications</h3>
                 </div>
-                
-                <div style="display:flex; justify-content:flex-end; margin-top:20px;">
-                    <button type="button" class="btn-primary" onclick="showToast('Employee Configuration Saved!')">Save Configuration</button>
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <input type="text" id="newClassificationName" placeholder="e.g. Full-Time, Part-Time" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; flex:1;">
+                    <button class="btn-primary" onclick="addClassification()">Add</button>
                 </div>
-            </form>
+                <table style="width:100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr style="background:#f8fafc; border-bottom:1px solid #eaeaea;">
+                            <th style="padding:10px; text-align:left;">Name</th>
+                            <th style="padding:10px; text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="classificationsTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- HR Categories Sub Tab -->
+            <div id="emp-hr-categories" class="emp-sub-content" style="display: none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="font-size:15px; font-weight:600;">HR Categories (Band/Grade)</h3>
+                </div>
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <input type="text" id="newHrCategoryName" placeholder="e.g. L1, M1, Senior Manager" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; flex:1;">
+                    <button class="btn-primary" onclick="addHrCategory()">Add</button>
+                </div>
+                <table style="width:100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr style="background:#f8fafc; border-bottom:1px solid #eaeaea;">
+                            <th style="padding:10px; text-align:left;">Category Name</th>
+                            <th style="padding:10px; text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hrCategoriesTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Documents Sub Tab -->
+            <div id="emp-documents" class="emp-sub-content" style="display: none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="font-size:15px; font-weight:600;">Required Documents Setup</h3>
+                </div>
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <input type="text" id="newDocumentName" placeholder="e.g. PAN Card, Aadhar" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; flex:1;">
+                    <label style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600;"><input type="checkbox" id="newDocumentMandatory"> Mandatory</label>
+                    <button class="btn-primary" onclick="addDocumentType()">Add</button>
+                </div>
+                <table style="width:100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr style="background:#f8fafc; border-bottom:1px solid #eaeaea;">
+                            <th style="padding:10px; text-align:left;">Document Name</th>
+                            <th style="padding:10px; text-align:left;">Mandatory</th>
+                            <th style="padding:10px; text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="documentsTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Other placeholders -->
+            <div id="emp-pending" class="emp-sub-content" style="display: none;">
+                <p style="color:#888; padding:20px;">Pending Approvals functionality coming in Phase B.</p>
+            </div>
+            <div id="emp-statutory" class="emp-sub-content" style="display: none;">
+                <p style="color:#888; padding:20px;">Statutory Details functionality coming in Phase B.</p>
+            </div>
+            <div id="emp-address" class="emp-sub-content" style="display: none;">
+                <p style="color:#888; padding:20px;">Address Setup functionality coming in Phase B.</p>
+            </div>
         </div>
 
         <!-- Placeholder Form -->
@@ -587,7 +666,147 @@
         };
         fetch('/api/superadmin/establishment', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) })
         .then(res => res.json()).then(() => showToast("Establishment Settings Saved!"));
+    // === Employee Config Logic ===
+
+    function switchEmployeeSubTab(tabId, element) {
+        // Reset sub tabs
+        document.querySelectorAll('.emp-sub-tab').forEach(el => {
+            el.style.color = '#666';
+            el.style.fontWeight = '500';
+            el.style.borderBottom = 'none';
+        });
+        
+        // Set active sub tab
+        element.style.color = '#0052cc';
+        element.style.fontWeight = '600';
+        element.style.borderBottom = '2px solid #0052cc';
+        
+        // Hide all sub contents
+        document.querySelectorAll('.emp-sub-content').forEach(el => el.style.display = 'none');
+        
+        // Show target
+        document.getElementById(tabId).style.display = 'block';
     }
+
+    // 1. Employee Details
+    fetch('/api/superadmin/employee-config').then(res => res.json()).then(data => {
+        if (data && data.id) {
+            document.getElementById('empPrefix').value = data.employeePrefix || '';
+            document.getElementById('defaultProbation').value = data.defaultProbationPeriod || '';
+        }
+    });
+
+    function saveEmployeeConfig() {
+        const payload = {
+            employeePrefix: document.getElementById('empPrefix').value,
+            defaultProbationPeriod: document.getElementById('defaultProbation').value
+        };
+        fetch('/api/superadmin/employee-config', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) })
+        .then(res => res.json()).then(() => showToast("Employee Config Saved!"));
+    }
+
+    // 2. Classifications
+    function loadClassifications() {
+        fetch('/api/superadmin/classifications').then(res => res.json()).then(data => {
+            const tbody = document.getElementById('classificationsTableBody');
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                tbody.innerHTML += `
+                    <tr style="border-bottom:1px solid #eaeaea;">
+                        <td style="padding:10px;">${item.name}</td>
+                        <td style="padding:10px; text-align:right;">
+                            <button onclick="deleteClassification(${item.id})" style="background:none; border:none; color:#dc3545; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        });
+    }
+
+    function addClassification() {
+        const name = document.getElementById('newClassificationName').value;
+        if (!name) return;
+        fetch('/api/superadmin/classifications', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name}) })
+        .then(() => { document.getElementById('newClassificationName').value = ''; loadClassifications(); showToast("Added Classification"); });
+    }
+
+    function deleteClassification(id) {
+        fetch(`/api/superadmin/classifications/${id}`, { method: 'DELETE' })
+        .then(() => { loadClassifications(); showToast("Deleted"); });
+    }
+
+    // 3. HR Categories
+    function loadHrCategories() {
+        fetch('/api/superadmin/hr-categories').then(res => res.json()).then(data => {
+            const tbody = document.getElementById('hrCategoriesTableBody');
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                tbody.innerHTML += `
+                    <tr style="border-bottom:1px solid #eaeaea;">
+                        <td style="padding:10px;">${item.name}</td>
+                        <td style="padding:10px; text-align:right;">
+                            <button onclick="deleteHrCategory(${item.id})" style="background:none; border:none; color:#dc3545; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        });
+    }
+
+    function addHrCategory() {
+        const name = document.getElementById('newHrCategoryName').value;
+        if (!name) return;
+        fetch('/api/superadmin/hr-categories', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name}) })
+        .then(() => { document.getElementById('newHrCategoryName').value = ''; loadHrCategories(); showToast("Added HR Category"); });
+    }
+
+    function deleteHrCategory(id) {
+        fetch(`/api/superadmin/hr-categories/${id}`, { method: 'DELETE' })
+        .then(() => { loadHrCategories(); showToast("Deleted"); });
+    }
+
+    // 4. Documents
+    function loadDocuments() {
+        fetch('/api/superadmin/document-types').then(res => res.json()).then(data => {
+            const tbody = document.getElementById('documentsTableBody');
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                tbody.innerHTML += `
+                    <tr style="border-bottom:1px solid #eaeaea;">
+                        <td style="padding:10px;">${item.name}</td>
+                        <td style="padding:10px;">${item.mandatory ? '<span style="color:#00875a; font-weight:600;">Yes</span>' : '<span style="color:#666;">No</span>'}</td>
+                        <td style="padding:10px; text-align:right;">
+                            <button onclick="deleteDocumentType(${item.id})" style="background:none; border:none; color:#dc3545; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        });
+    }
+
+    function addDocumentType() {
+        const name = document.getElementById('newDocumentName').value;
+        const mandatory = document.getElementById('newDocumentMandatory').checked;
+        if (!name) return;
+        fetch('/api/superadmin/document-types', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, mandatory}) })
+        .then(() => { 
+            document.getElementById('newDocumentName').value = ''; 
+            document.getElementById('newDocumentMandatory').checked = false;
+            loadDocuments(); 
+            showToast("Added Document Type"); 
+        });
+    }
+
+    function deleteDocumentType(id) {
+        fetch(`/api/superadmin/document-types/${id}`, { method: 'DELETE' })
+        .then(() => { loadDocuments(); showToast("Deleted"); });
+    }
+
+    // Initialize all tables
+    loadClassifications();
+    loadHrCategories();
+    loadDocuments();
+
 </script>
 </body>
 </html>
