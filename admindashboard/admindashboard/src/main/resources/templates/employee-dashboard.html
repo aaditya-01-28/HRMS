@@ -1572,9 +1572,9 @@
   </div>
 </div>
 
-<script th:inline="javascript">
-    const userPinnedServices = /*[[${pinnedServices}]]*/ "";
-    const userPinnedApps = /*[[${pinnedApplications}]]*/ "";
+<script>
+    let userPinnedServices = "";
+    let userPinnedApps = "";
     
     let currentPrefType = '';
 
@@ -1620,9 +1620,19 @@
         finalUnpinned.forEach(node => collapsedContainer.appendChild(node));
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-        rearrangeItems('services', userPinnedServices);
-        rearrangeItems('apps', userPinnedApps);
+    document.addEventListener("DOMContentLoaded", async function() {
+        try {
+            const res = await fetch('/api/user/preferences/dashboard');
+            if (res.ok) {
+                const data = await res.json();
+                userPinnedServices = data.pinnedServices || "";
+                userPinnedApps = data.pinnedApplications || "";
+                rearrangeItems('services', userPinnedServices);
+                rearrangeItems('apps', userPinnedApps);
+            }
+        } catch (e) {
+            console.error("Failed to fetch preferences", e);
+        }
     });
 
     function openPrefModal(type, event) {
