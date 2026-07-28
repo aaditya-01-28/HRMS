@@ -138,4 +138,14 @@ public class User {
     private String profileImage;
     public String getProfileImage() { return profileImage; }
     public void setProfileImage(String profileImage) { this.profileImage = profileImage; }
+
+    // DASHBOARD PREFERENCES
+    private String pinnedServices;
+    private String pinnedApplications;
+
+    public String getPinnedServices() { return pinnedServices; }
+    public void setPinnedServices(String pinnedServices) { this.pinnedServices = pinnedServices; }
+
+    public String getPinnedApplications() { return pinnedApplications; }
+    public void setPinnedApplications(String pinnedApplications) { this.pinnedApplications = pinnedApplications; }
 }

@@ -281,7 +281,16 @@ public class SeniorDashboardController {
     }
 
     // --- DASHBOARD ROUTES ---
-
+    @ModelAttribute
+    public void addUserPreferences(Model model, Principal principal) {
+        if (principal != null) {
+            com.example.admindashboard.model.User user = userRepository.findByUsername(principal.getName().toUpperCase()).orElse(null);
+            if (user != null) {
+                model.addAttribute("pinnedServices", user.getPinnedServices() != null ? user.getPinnedServices() : "");
+                model.addAttribute("pinnedApplications", user.getPinnedApplications() != null ? user.getPinnedApplications() : "");
+            }
+        }
+    }
     @PreAuthorize("hasAnyRole('SENIOR_MANAGER', 'ADMIN') or hasAuthority('admin_dashboard_view')")
     @GetMapping("/senior_manager/dashboard")
     public String showSeniorManagerDashboard(Model model, Principal principal, HttpServletRequest request) {

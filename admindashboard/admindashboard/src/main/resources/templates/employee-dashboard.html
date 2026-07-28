@@ -828,71 +828,74 @@
                     <div class="d-flex align-items-center">
                         <i class="fas fa-user-cog me-2"></i>Self Services
                     </div>
-                    <a href="#expandedSelfServices" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="expandedSelfServices" class="small fw-bold text-white text-decoration-none" id="viewAllSelfServicesBtn">View All</a>
+                    <div>
+                        <a href="#" class="small fw-bold text-white text-decoration-none me-3" onclick="openPrefModal('services', event)"><i class="fas fa-edit"></i> Edit</a>
+                        <a href="#expandedSelfServices" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="expandedSelfServices" class="small fw-bold text-white text-decoration-none" id="viewAllSelfServicesBtn">View All</a>
+                    </div>
                 </div>
                 <div class="widget-body">
-                    <div class="row g-2">
+                    <div class="row g-2" id="pinnedServicesContainer">
                         <div class="col-md-4">
                             <a th:href="${workflowUrl != null ? workflowUrl : '/manager/workflow'}" class="app-btn" style="border: 2px solid #1e3a8a; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
                                 <i class="fas fa-project-diagram text-primary me-2 fs-5"></i>
-                                <span class="app-text fw-bold">Manage Workflow</span>
+                                <span class="app-text fw-bold" data-item-name="manage-workflow">Manage Workflow</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/conference-room" class="app-btn">
                                 <i class="fas fa-handshake text-primary me-2 fs-5"></i>
-                                <span class="app-text">Conference Room</span>
+                                <span class="app-text" data-item-name="conference-room">Conference Room</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/leave-management" class="app-btn">
                                 <i class="fas fa-calendar-minus text-primary me-2 fs-5"></i>
-                                <span class="app-text">Leave Management System (LMS)</span>
+                                <span class="app-text" data-item-name="leave-management-system-lms">Leave Management System (LMS)</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/attendance" class="app-btn">
                                 <i class="fas fa-user-clock text-primary me-2 fs-5"></i>
-                                <span class="app-text">Attendance Regulation</span>
+                                <span class="app-text" data-item-name="attendance-regulation">Attendance Regulation</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/my-approvals" class="app-btn">
                                 <i class="fas fa-check-double text-primary me-2 fs-5"></i>
-                                <span class="app-text">My Approvals</span>
+                                <span class="app-text" data-item-name="my-approvals">My Approvals</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/email-signature" class="app-btn">
                                 <i class="fas fa-signature text-primary me-2 fs-5"></i>
-                                <span class="app-text">Email Signature</span>
+                                <span class="app-text" data-item-name="email-signature">Email Signature</span>
                             </a>
                         </div>
                     </div>
                     <div class="collapse mt-2" id="expandedSelfServices">
-                        <div class="row g-2">
+                        <div class="row g-2" id="collapsedServicesContainer">
                             <div class="col-md-4">
                                 <a href="/password-reset" class="app-btn">
                                     <i class="fas fa-unlock-alt text-primary me-2 fs-5"></i>
-                                    <span class="app-text">Password Reset</span>
+                                    <span class="app-text" data-item-name="password-reset">Password Reset</span>
                                 </a>
                             </div>
                             <div class="col-md-4">
                                 <a href="/employee/referral" class="app-btn">
                                     <i class="fas fa-user-plus text-primary me-2 fs-5"></i>
-                                    <span class="app-text">Referral</span>
+                                    <span class="app-text" data-item-name="referral">Referral</span>
                                 </a>
                             </div>
                             <div class="col-md-4">
                                 <a href="/employee/resignation" class="app-btn">
                                     <i class="fas fa-sign-out-alt text-primary me-2 fs-5"></i>
-                                    <span class="app-text">Resignation</span>
+                                    <span class="app-text" data-item-name="resignation">Resignation</span>
                                 </a>
                             </div>
                             <div class="col-md-4">
                                 <a href="/employee/performance/feedback" class="app-btn">
                                     <i class="fas fa-star-half-stroke text-primary me-2 fs-5"></i>
-                                    <span class="app-text">Performance Feedback</span>
+                                    <span class="app-text" data-item-name="performance-feedback">Performance Feedback</span>
                                 </a>
                             </div>
                         </div>
@@ -907,67 +910,70 @@
                     <div class="d-flex align-items-center">
                         <i class="fas fa-th me-2"></i>Applications
                     </div>
-                    <a href="#expandedApps" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="expandedApps" class="small fw-bold text-white text-decoration-none" id="viewAllAppsBtn">View All</a>
+                    <div>
+                        <a href="#" class="small fw-bold text-white text-decoration-none me-3" onclick="openPrefModal('apps', event)"><i class="fas fa-edit"></i> Edit</a>
+                        <a href="#expandedApps" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="expandedApps" class="small fw-bold text-white text-decoration-none" id="viewAllAppsBtn">View All</a>
+                    </div>
                 </div>
                 <div class="widget-body">
 
-                    <div class="row g-2">
+                    <div class="row g-2" id="pinnedAppsContainer">
                         <div class="col-md-4">
                             <a href="/my-whitecircle/login" class="app-btn" target="_blank">
                                 <i class="fas fa-id-badge text-primary me-2 fs-5"></i>
-                                <span class="app-text">My WhiteCircle</span>
+                                <span class="app-text" data-item-name="my-whitecircle">My WhiteCircle</span>
                             </a>
                         </div>
 						<div class="col-md-4">
 						    <a href="/erp/authenticate" class="app-btn" style="cursor: pointer;" target="_blank">
 						        <i class="fas fa-business-time text-primary me-2 fs-5"></i>
-						        <span class="app-text">ERP and Time Sheet</span>
+						        <span class="app-text" data-item-name="erp-and-time-sheet">ERP and Time Sheet</span>
 						    </a>
 						</div>
                         <div class="col-md-4">
                             <a href="/tickets/authenticate" class="app-btn" target="_blank">
                                 <i class="fas fa-ticket-alt text-primary me-2 fs-5"></i>
-                                <span class="app-text">Log Tickets</span>
+                                <span class="app-text" data-item-name="log-tickets">Log Tickets</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/payroll" class="app-btn" target="_blank">
                                 <i class="fas fa-file-invoice-dollar text-primary me-2 fs-5"></i>
-                                <span class="app-text">Pay Roll</span>
+                                <span class="app-text" data-item-name="pay-roll">Pay Roll</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/learning/login" class="app-btn" target="_blank">
                                 <i class="fas fa-tasks text-primary me-2 fs-5"></i>
-                                <span class="app-text">My Learnings</span>
+                                <span class="app-text" data-item-name="my-learnings">My Learnings</span>
                             </a>
                         </div>
                         <div class="col-md-4">
                             <a href="/my-thanks/login" class="app-btn" target="_blank">
                                 <i class="fas fa-gift text-primary me-2 fs-5"></i>
-                                <span class="app-text">My Thanks</span>
+                                <span class="app-text" data-item-name="my-thanks">My Thanks</span>
                             </a>
                         </div>
                     </div>
 
                     <div class="collapse mt-2" id="expandedApps">
-                        <div class="row g-2">
+                        <div class="row g-2" id="collapsedAppsContainer">
                             <div class="col-md-4" th:if="${showMySpace}">
                                 <a th:href="${mySpaceLoginUrl != null ? mySpaceLoginUrl : '/space/login'}" class="app-btn" target="_blank" rel="noopener noreferrer">
                                     <i class="fas fa-layer-group text-primary me-2 fs-5"></i>
-                                    <span class="app-text">My Space</span>
+                                    <span class="app-text" data-item-name="my-space">My Space</span>
                                 </a>
                             </div>
                             <div class="col-md-4">
                                 <a href="/employee/mediclaim/auth" class="app-btn" target="_blank">
                                     <i class="fas fa-notes-medical text-primary me-2 fs-5"></i>
-                                    <span class="app-text">My Mediclaim</span>
+                                    <span class="app-text" data-item-name="my-mediclaim">My Mediclaim</span>
                                 </a>
                             </div>
                             <div class="col-md-4">
                                 <a href="/my-rides/login" class="app-btn" target="_blank">
                                     <i class="fas fa-car text-primary me-2 fs-5"></i>
-                                    <span class="app-text">My Rides</span>
+                                    <span class="app-text" data-item-name="my-rides">My Rides</span>
                                 </a>
                             </div>
                         </div>
@@ -1542,6 +1548,168 @@
     }
 </script>
 
+<!-- Dashboard Preference Modal -->
+<div class="modal fade" id="prefModal" tabindex="-1" aria-labelledby="prefModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="prefModalLabel">Customize Dashboard</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small">Select up to 6 items to pin to your dashboard.</p>
+        <form id="prefForm">
+            <div id="prefCheckboxList" class="row">
+                <!-- checkboxes injected via JS -->
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="savePreferences()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+<script th:inline="javascript">
+    const userPinnedServices = /*[[${pinnedServices}]]*/ "";
+    const userPinnedApps = /*[[${pinnedApplications}]]*/ "";
+    
+    let currentPrefType = '';
+
+    function rearrangeItems(type, pinnedString) {
+        if (!pinnedString) return;
+        const pinnedList = pinnedString.split(',').map(s => s.trim()).filter(s => s);
+        if (pinnedList.length === 0) return;
+
+        const pinnedContainer = document.getElementById(type === 'services' ? 'pinnedServicesContainer' : 'pinnedAppsContainer');
+        const collapsedContainer = document.getElementById(type === 'services' ? 'collapsedServicesContainer' : 'collapsedAppsContainer');
+        
+        if (!pinnedContainer || !collapsedContainer) return;
+
+        const allItems = Array.from(pinnedContainer.children).concat(Array.from(collapsedContainer.children));
+        
+        pinnedContainer.innerHTML = '';
+        collapsedContainer.innerHTML = '';
+
+        const pinnedNodes = [];
+        const unpinnedNodes = [];
+
+        allItems.forEach(item => {
+            const span = item.querySelector('span[data-item-name]');
+            if (span) {
+                const name = span.getAttribute('data-item-name');
+                if (pinnedList.includes(name)) {
+                    pinnedNodes.push({item, index: pinnedList.indexOf(name)});
+                } else {
+                    unpinnedNodes.push(item);
+                }
+            } else {
+                unpinnedNodes.push(item);
+            }
+        });
+
+        pinnedNodes.sort((a, b) => a.index - b.index);
+        
+        const finalPinned = pinnedNodes.map(n => n.item).slice(0, 6);
+        const overflowPinned = pinnedNodes.map(n => n.item).slice(6);
+        const finalUnpinned = unpinnedNodes.concat(overflowPinned);
+
+        finalPinned.forEach(node => pinnedContainer.appendChild(node));
+        finalUnpinned.forEach(node => collapsedContainer.appendChild(node));
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        rearrangeItems('services', userPinnedServices);
+        rearrangeItems('apps', userPinnedApps);
+    });
+
+    function openPrefModal(type, event) {
+        event.preventDefault();
+        currentPrefType = type;
+        const isServices = type === 'services';
+        const pinnedContainer = document.getElementById(isServices ? 'pinnedServicesContainer' : 'pinnedAppsContainer');
+        const collapsedContainer = document.getElementById(isServices ? 'collapsedServicesContainer' : 'collapsedAppsContainer');
+        
+        const allItems = Array.from(pinnedContainer.children).concat(Array.from(collapsedContainer.children));
+        const listDiv = document.getElementById('prefCheckboxList');
+        listDiv.innerHTML = '';
+        
+        const savedPref = isServices ? userPinnedServices : userPinnedApps;
+        const pinnedList = savedPref ? savedPref.split(',').map(s => s.trim()) : [];
+        
+        let defaultPinned = [];
+        if (!savedPref || pinnedList.length === 0) {
+             defaultPinned = Array.from(pinnedContainer.children).map(node => {
+                  const span = node.querySelector('span[data-item-name]');
+                  return span ? span.getAttribute('data-item-name') : null;
+             }).filter(n => n);
+        }
+
+        allItems.forEach(item => {
+            const span = item.querySelector('span[data-item-name]');
+            if (span) {
+                const name = span.getAttribute('data-item-name');
+                const labelText = span.innerText;
+                
+                const isChecked = (pinnedList.length > 0 && pinnedList.includes(name)) || 
+                                  (pinnedList.length === 0 && defaultPinned.includes(name));
+                                  
+                listDiv.innerHTML += `
+                    <div class="col-md-6 mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input pref-checkbox" type="checkbox" value="${name}" id="chk_${name}" ${isChecked ? 'checked' : ''}>
+                            <label class="form-check-label small" for="chk_${name}">${labelText}</label>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        const checkboxes = document.querySelectorAll('.pref-checkbox');
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                const checkedCount = document.querySelectorAll('.pref-checkbox:checked').length;
+                if (checkedCount > 6) {
+                    this.checked = false;
+                    Swal.fire('Limit Reached', 'You can only pin up to 6 items.', 'warning');
+                }
+            });
+        });
+
+        const myModal = new bootstrap.Modal(document.getElementById('prefModal'));
+        myModal.show();
+    }
+
+    async function savePreferences() {
+        const checkedBoxes = Array.from(document.querySelectorAll('.pref-checkbox:checked')).map(cb => cb.value);
+        const joinedStr = checkedBoxes.join(',');
+        
+        const payload = {};
+        if (currentPrefType === 'services') {
+            payload.pinnedServices = joinedStr;
+        } else {
+            payload.pinnedApplications = joinedStr;
+        }
+
+        try {
+            const response = await fetch('/api/user/preferences/dashboard', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success', title: 'Saved!', timer: 1500, showConfirmButton: false
+                }).then(() => window.location.reload());
+            } else {
+                Swal.fire('Error', 'Failed to save preferences.', 'error');
+            }
+        } catch(e) {
+            Swal.fire('Error', 'Network error', 'error');
+        }
+    }
+</script>
 </body>
 </html>
