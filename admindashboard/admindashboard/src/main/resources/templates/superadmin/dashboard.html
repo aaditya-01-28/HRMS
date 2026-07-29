@@ -765,10 +765,24 @@
 
     function s(val) { return val || '-'; }
 
+    // Smart name resolver: tries firstName+lastName, falls back to user.fullName
+    function empName(e) {
+        var first = (e.firstName || '').trim();
+        var last = (e.lastName || '').trim();
+        if (first || last) {
+            return (first + ' ' + last).trim();
+        }
+        // Fallback to User.fullName
+        if (e.user && e.user.fullName) {
+            return e.user.fullName;
+        }
+        return '-';
+    }
+
     function filterEmployeeTable() {
         var q = document.getElementById('empSearchInput').value.toLowerCase();
         var filtered = allEmployees.filter(function(e) {
-            var name = ((e.firstName || '') + ' ' + (e.lastName || '')).toLowerCase();
+            var name = empName(e).toLowerCase();
             var code = (e.employeeCode || '').toLowerCase();
             return name.indexOf(q) >= 0 || code.indexOf(q) >= 0;
         });
@@ -782,7 +796,7 @@
         data.forEach(function(e) {
             html += '<tr style="border-bottom:1px solid #eaeaea; cursor:pointer;" onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'#fff\'">'
                 + '<td style="padding:10px; font-weight:600; color:#0052cc;">' + s(e.employeeCode) + '</td>'
-                + '<td style="padding:10px;">' + s(e.firstName) + ' ' + s(e.lastName) + '</td>'
+                + '<td style="padding:10px;">' + empName(e) + '</td>'
                 + '<td style="padding:10px;">' + s(e.designation) + '</td>'
                 + '<td style="padding:10px;">' + s(e.department) + '</td>'
                 + '<td style="padding:10px;">' + s(e.joiningDate) + '</td>'
@@ -800,7 +814,7 @@
         data.forEach(function(e) {
             html += '<tr style="border-bottom:1px solid #eaeaea;">'
                 + '<td style="padding:10px; font-weight:600; color:#0052cc;">' + s(e.employeeCode) + '</td>'
-                + '<td style="padding:10px;">' + s(e.firstName) + ' ' + s(e.lastName) + '</td>'
+                + '<td style="padding:10px;">' + empName(e) + '</td>'
                 + '<td style="padding:10px;">' + s(e.branch) + '</td>'
                 + '<td style="padding:10px;">' + s(e.salaryStructure) + '</td>'
                 + '<td style="padding:10px;">' + s(e.leavePolicy) + '</td>'
@@ -819,7 +833,7 @@
         data.forEach(function(e) {
             html += '<tr style="border-bottom:1px solid #eaeaea;">'
                 + '<td style="padding:10px; font-weight:600; color:#0052cc;">' + s(e.employeeCode) + '</td>'
-                + '<td style="padding:10px;">' + s(e.firstName) + ' ' + s(e.lastName) + '</td>'
+                + '<td style="padding:10px;">' + empName(e) + '</td>'
                 + '<td style="padding:10px;">' + s(e.pfNumber) + '</td>'
                 + '<td style="padding:10px;">' + s(e.passportNumber) + '</td>'
                 + '<td style="padding:10px;">' + s(e.esiNumber) + '</td>'
@@ -838,7 +852,7 @@
             var permanentAddr = [e.permanentResidentialName, e.permanentStreet, e.permanentArea].filter(Boolean).join(', ');
             html += '<tr style="border-bottom:1px solid #eaeaea;">'
                 + '<td style="padding:10px; font-weight:600; color:#0052cc;">' + s(e.employeeCode) + '</td>'
-                + '<td style="padding:10px;">' + s(e.firstName) + ' ' + s(e.lastName) + '</td>'
+                + '<td style="padding:10px;">' + empName(e) + '</td>'
                 + '<td style="padding:10px;">' + (presentAddr || '-') + '</td>'
                 + '<td style="padding:10px;">' + s(e.presentCity) + '</td>'
                 + '<td style="padding:10px;">' + s(e.presentState) + '</td>'
@@ -857,7 +871,7 @@
         data.forEach(function(e) {
             html += '<tr style="border-bottom:1px solid #eaeaea;">'
                 + '<td style="padding:10px; font-weight:600; color:#0052cc;">' + s(e.employeeCode) + '</td>'
-                + '<td style="padding:10px;">' + s(e.firstName) + ' ' + s(e.lastName) + '</td>'
+                + '<td style="padding:10px;">' + empName(e) + '</td>'
                 + '<td style="padding:10px;">' + s(e.bloodGroup) + '</td>'
                 + '<td style="padding:10px;">' + s(e.casteCategory) + '</td>'
                 + '<td style="padding:10px;">' + s(e.qualification) + '</td>'
@@ -876,7 +890,7 @@
         data.forEach(function(e) {
             html += '<tr style="border-bottom:1px solid #eaeaea;">'
                 + '<td style="padding:10px; font-weight:600; color:#0052cc;">' + s(e.employeeCode) + '</td>'
-                + '<td style="padding:10px;">' + s(e.firstName) + ' ' + s(e.lastName) + '</td>'
+                + '<td style="padding:10px;">' + empName(e) + '</td>'
                 + '<td style="padding:10px;">' + docLink(e.photoDocPath) + '</td>'
                 + '<td style="padding:10px;">' + docLink(e.resumeDocPath) + '</td>'
                 + '<td style="padding:10px;">' + docLink(e.aadhaarDocPath) + '</td>'
