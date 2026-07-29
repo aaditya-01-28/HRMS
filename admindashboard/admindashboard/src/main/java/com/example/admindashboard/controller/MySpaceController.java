@@ -141,6 +141,12 @@ public class MySpaceController {
         private BudgetRequestRepository budgetRequestRepository;
 
         @Autowired
+        private com.example.admindashboard.repository.StatutoryBonusRepository statutoryBonusRepository;
+
+        @Autowired
+        private com.example.admindashboard.repository.FinanceIntegrationRepository financeIntegrationRepository;
+
+        @Autowired
         private CandidateRepository candidateRepository;
 
         @Autowired
@@ -218,6 +224,15 @@ public class MySpaceController {
 
         @Autowired
         private com.example.admindashboard.repository.ClientRepository clientRepository;
+
+        @Autowired
+        private com.example.admindashboard.repository.SalaryRevisionRequestRepository salaryRevisionRequestRepository;
+
+        @Autowired
+        private com.example.admindashboard.repository.EmployeeLoanRepository employeeLoanRepository;
+
+        @Autowired
+        private com.example.admindashboard.repository.FinanceChecklistRepository financeChecklistRepository;
 
     @GetMapping("/space/login")
     public String showLogin() {
@@ -4776,6 +4791,12 @@ public class MySpaceController {
         List<ExpenseClaim> allExpenseClaims = expenseClaimRepository.findAll();
         List<BudgetRequest> allBudgetRequests = budgetRequestRepository.findAll();
         List<com.example.admindashboard.model.Client> allClients = clientRepository.findAll();
+        List<com.example.admindashboard.model.SalaryRevisionRequest> salaryRevisions = salaryRevisionRequestRepository.findAll();
+        List<com.example.admindashboard.model.EmployeeLoan> employeeLoans = employeeLoanRepository.findAll();
+        List<com.example.admindashboard.model.FinanceChecklist> financeChecklists = financeChecklistRepository.findAll();
+        List<com.example.admindashboard.model.StatutoryBonus> statutoryBonuses = statutoryBonusRepository.findAll();
+        List<com.example.admindashboard.model.FinanceIntegration> financeIntegrations = financeIntegrationRepository.findAll();
+        List<com.example.admindashboard.model.HrmsNotification> notificationsList = hrmsNotificationRepository.findAll();
 
         long totalEmployeesCount = allUsers.stream()
                 .filter(u -> u.getRole() != null && !"CLIENT".equalsIgnoreCase(u.getRole().getRoleName()))
@@ -4787,6 +4808,12 @@ public class MySpaceController {
         model.addAttribute("allExpenseClaims", allExpenseClaims);
         model.addAttribute("allBudgetRequests", allBudgetRequests);
         model.addAttribute("allClients", allClients);
+        model.addAttribute("salaryRevisions", salaryRevisions);
+        model.addAttribute("employeeLoans", employeeLoans);
+        model.addAttribute("financeChecklists", financeChecklists);
+        model.addAttribute("statutoryBonuses", statutoryBonuses);
+        model.addAttribute("financeIntegrations", financeIntegrations);
+        model.addAttribute("notificationsList", notificationsList);
 
         return "senior_accounts-myspace";
     }
@@ -4837,6 +4864,102 @@ public class MySpaceController {
     @GetMapping("/space/accounts/vendors")
     public String showAccountsVendors(Model model, Principal principal) {
         return showSeniorAccountsMySpace("vendors", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/hr_finance_matrix")
+    public String showAccountsHrFinanceMatrix(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("hr_finance_matrix", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/approval_workflow")
+    public String showAccountsApprovalWorkflow(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("approval_workflow", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/transaction_thresholds")
+    public String showAccountsTransactionThresholds(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("transaction_thresholds", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/compliance_calendar")
+    public String showAccountsComplianceCalendar(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("compliance_calendar", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/knowledge_base")
+    public String showAccountsKnowledgeBase(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("knowledge_base", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/notification_alert")
+    public String showAccountsNotificationAlert(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("notification_alert", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/report")
+    public String showAccountsReport(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("report", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/finance_checklist")
+    public String showAccountsFinanceChecklist(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("finance_checklist", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/additional_considerations")
+    public String showAccountsAdditionalConsiderations(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("additional_considerations", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/salary_revision")
+    public String showAccountsSalaryRevision(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("salary_revision", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/vendor_payment")
+    public String showAccountsVendorPayment(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("vendor_payment", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/onboarding")
+    public String showAccountsOnboarding(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("onboarding", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/tax_approvals")
+    public String showAccountsTaxApprovals(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("tax_approvals", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/notifications")
+    public String showAccountsNotifications(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("notifications", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/data_masking")
+    public String showAccountsDataMasking(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("data_masking", model, principal);
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @GetMapping("/space/accounts/employee_loans")
+    public String showAccountsEmployeeLoans(Model model, Principal principal) {
+        return showSeniorAccountsMySpace("employee_loans", model, principal);
     }
 
     @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
@@ -4901,5 +5024,53 @@ public class MySpaceController {
             redirectAttributes.addFlashAttribute("errorMessage", "Error updating expense claim: " + e.getMessage());
         }
         return "redirect:/space/accounts/expenses";
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @PostMapping("/space/accounts/salary-revision/action")
+    public String handleSalaryRevisionAction(
+            @RequestParam Long id,
+            @RequestParam String action,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+
+        try {
+            com.example.admindashboard.model.SalaryRevisionRequest rev = salaryRevisionRequestRepository.findById(id).orElse(null);
+            if (rev != null) {
+                if ("approve".equalsIgnoreCase(action)) {
+                    rev.setStatus("Approved");
+                } else if ("reject".equalsIgnoreCase(action)) {
+                    rev.setStatus("Rejected");
+                }
+                salaryRevisionRequestRepository.save(rev);
+            }
+            redirectAttributes.addFlashAttribute("successMessage", "Salary Revision request " + action.toUpperCase() + " successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error updating salary revision: " + e.getMessage());
+        }
+        return "redirect:/space/accounts/salary_revision";
+    }
+
+    @PreAuthorize("hasAnyRole('SENIOR_ACCOUNTS_HEAD', 'ADMIN', 'SENIOR_MANAGER', 'FINANCE')")
+    @PostMapping("/space/accounts/loan/action")
+    public String handleLoanAction(
+            @RequestParam Long id,
+            @RequestParam String action,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+
+        try {
+            com.example.admindashboard.model.EmployeeLoan loan = employeeLoanRepository.findById(id).orElse(null);
+            if (loan != null) {
+                if ("approve".equalsIgnoreCase(action)) {
+                    loan.setStatus("Approved");
+                } else if ("reject".equalsIgnoreCase(action)) {
+                    loan.setStatus("Rejected");
+                }
+                employeeLoanRepository.save(loan);
+            }
+            redirectAttributes.addFlashAttribute("successMessage", "Employee Loan " + action.toUpperCase() + " successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error updating employee loan: " + e.getMessage());
+        }
+        return "redirect:/space/accounts/employee_loans";
     }
 }

@@ -3,1011 +3,800 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteCircle | Accounts Admin - My Space</title>
+    <title>WhiteCircle | Finance Admin Portal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #1e3a8a;
-            --primary-light: #3b82f6;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --accent-orange: #f59e0b;
-            --sidebar-width: 220px;
+            --primary-blue: #2563eb;
+            --primary-navy: #0f172a;
+            --sidebar-width: 250px;
             --header-height: 65px;
-            --bg-body: #f8fafc;
+            --bg-canvas: #f8fafc;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
         }
 
         body {
-            background-color: var(--bg-body);
-            overflow-x: hidden;
+            background-color: var(--bg-canvas);
             margin: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            color: #1e293b;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: var(--text-dark);
+            overflow-x: hidden;
         }
 
-        /* --- SHARP EDGE DESIGN SYSTEM --- */
-        *, .btn, .form-control, .card, .stat-card, .panel-card, .status-badge, .search-box input, .myspace-sidebar, .myspace-header, .alert, .modal-content, .btn-outline-primary, .btn-outline-danger {
-            border-radius: 4px !important;
+        /* STRICT SHARP SQUARED EDGES EVERYWHERE - 0px BORDER RADIUS */
+        *, *::before, *::after,
+        .btn, .form-control, .form-select, .card, .stat-card, .panel-card, 
+        .badge, .modal-content, .nav-link, .metric-card, .metric-icon-box, 
+        .figma-table-card, .info-alert-banner, .sidebar, .sidebar-brand, 
+        .brand-logo-img, .emp-avatar, .badge-status, .dropdown-menu, .alert, .progress, .progress-bar {
+            border-radius: 0px !important;
         }
 
-        /* --- MINI SIDEBAR COLLAPSED STATE --- */
-        .myspace-sidebar, .myspace-header, .myspace-content {
-            transition: all 0.3s ease-in-out;
-        }
-        body.sidebar-collapsed .myspace-sidebar {
-            width: 65px;
-        }
-        body.sidebar-collapsed .myspace-header {
-            left: 65px;
-        }
-        body.sidebar-collapsed .myspace-content {
-            margin-left: 65px;
-        }
-        body.sidebar-collapsed .myspace-sidebar .brand-area {
-            padding: 12px 0;
-            justify-content: center;
-        }
-        body.sidebar-collapsed .myspace-sidebar .brand-text-wrapper {
-            display: none !important;
-        }
-        body.sidebar-collapsed .myspace-sidebar .nav-link-item {
-            padding: 14px 0;
-            justify-content: center;
-            gap: 0;
-            border-left: 3px solid transparent;
-        }
-        body.sidebar-collapsed .myspace-sidebar .nav-link-item span {
-            display: none !important;
-        }
-        body.sidebar-collapsed .myspace-sidebar .nav-link-item i {
-            width: auto;
-            font-size: 1.15rem;
-        }
-        body.sidebar-collapsed .myspace-sidebar .logout-text {
-            display: none !important;
-        }
-        body.sidebar-collapsed .myspace-sidebar .logout-btn-container {
-            padding: 10px 5px !important;
-        }
-        body.sidebar-collapsed .myspace-sidebar .logout-btn-container .btn {
-            padding: 10px 0 !important;
-        }
-
-        .myspace-sidebar {
+        .sidebar {
             width: var(--sidebar-width);
             position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
+            left: 0; top: 0; bottom: 0;
             background: #ffffff;
-            border-right: 1px solid #e2e8f0;
+            border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             z-index: 1001;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.02);
         }
 
-        .myspace-sidebar .brand-area {
-            padding: 16px 18px;
-            border-bottom: 1px solid #e2e8f0;
+        .sidebar-brand {
+            padding: 16px 20px;
             display: flex;
             align-items: center;
             gap: 12px;
-            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
         }
-        .myspace-sidebar .brand-area img {
-            width: 36px;
-            height: 36px;
+
+        .brand-logo-img {
+            width: 38px;
+            height: 38px;
             object-fit: contain;
         }
-        .myspace-sidebar .brand-area .brand-text {
-            font-size: 0.9rem;
+
+        .brand-info .company-name {
             font-weight: 800;
-            color: var(--primary);
+            font-size: 0.95rem;
+            color: #0f172a;
             line-height: 1.1;
-            letter-spacing: -0.2px;
-        }
-        .myspace-sidebar .brand-area .brand-sub {
-            font-size: 0.7rem;
-            color: #64748b;
-            font-weight: 500;
         }
 
-        .myspace-sidebar .nav-links {
-            padding: 12px 0;
+        .brand-info .role-name {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-menu {
+            padding: 16px 12px;
             flex: 1;
             overflow-y: auto;
-        }
-        .myspace-sidebar .nav-link-item {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 11px 18px;
-            color: #475569;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-        }
-        .myspace-sidebar .nav-link-item:hover {
-            background: #f1f5f9;
-            color: var(--primary);
-        }
-        .myspace-sidebar .nav-link-item.active {
-            background: #eff6ff;
-            color: var(--primary);
-            border-left-color: var(--primary);
-            font-weight: 700;
-        }
-        .myspace-sidebar .nav-link-item i {
-            width: 20px;
-            text-align: center;
-            font-size: 0.95rem;
+            flex-direction: column;
+            gap: 4px;
         }
 
-        /* --- TOP HEADER --- */
-        .myspace-header {
-            position: fixed;
-            top: 0;
-            left: var(--sidebar-width);
-            right: 0;
-            height: var(--header-height);
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 11px 16px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: all 0.15s ease-in-out;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background-color: #f1f5f9;
+            color: var(--primary-blue);
+        }
+
+        .menu-item.active {
+            background-color: #eff6ff;
+            color: var(--primary-blue);
+            font-weight: 700;
+            border-left-color: var(--primary-blue);
+        }
+
+        .menu-item i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-header {
+            padding: 24px 32px 16px 32px;
             background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 28px;
-            z-index: 1000;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         }
 
-        .myspace-header .page-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 0;
-        }
-
-        .myspace-header .search-box {
-            position: relative;
-            width: 380px;
-        }
-        .myspace-header .search-box input {
-            padding-left: 38px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            border: 1px solid #cbd5e1;
-            background: #f8fafc;
-        }
-        .myspace-header .search-box i {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-            font-size: 0.85rem;
-        }
-
-        .myspace-header .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .myspace-header .user-profile img {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #e2e8f0;
-        }
-        .myspace-header .user-profile .user-name {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #1e293b;
-            line-height: 1.1;
-        }
-        .myspace-header .user-profile .user-email {
-            font-size: 0.75rem;
-            color: #64748b;
-        }
-
-        /* --- CONTENT AREA --- */
-        .myspace-content {
-            margin-left: var(--sidebar-width);
-            margin-top: var(--header-height);
-            padding: 24px 28px;
-            min-height: calc(100vh - var(--header-height));
-        }
-
-        /* --- CARDS & PANELS --- */
-        .stat-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
-        }
-        .stat-card .stat-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #64748b;
-            margin-bottom: 6px;
-        }
-        .stat-card .stat-value {
-            font-size: 1.5rem;
+        .header-title-area h2 {
+            font-size: 1.35rem;
             font-weight: 800;
             color: #0f172a;
             margin: 0;
         }
-        .stat-card .stat-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
+
+        .header-title-area p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin: 4px 0 0 0;
+        }
+
+        .page-body {
+            padding: 24px 32px;
+            flex: 1;
+        }
+
+        .figma-subtabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+            padding-bottom: 0px;
+            overflow-x: auto;
+        }
+
+        .figma-tab-link {
+            padding: 12px 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+            text-decoration: none;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: transparent;
+            border-top: none; border-left: none; border-right: none;
+        }
+
+        .figma-tab-link:hover {
+            color: var(--primary-blue);
+            background: #f1f5f9;
+        }
+
+        .figma-tab-link.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+            font-weight: 700;
+            background: #ffffff;
+        }
+
+        .metric-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .metric-icon-box {
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.25rem;
+            flex-shrink: 0;
         }
 
-        .panel-card {
-            background: #ffffff;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-            padding: 22px;
+        .metric-info .metric-label {
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 4px;
+        }
+
+        .metric-info .metric-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1;
+        }
+
+        .info-alert-banner {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 14px 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 24px;
         }
 
-        /* --- TABLE STYLES --- */
-        .custom-table {
+        .btn-sync-hr {
+            white-space: nowrap !important;
+            font-size: 0.82rem !important;
+            padding: 7px 16px !important;
+            flex-shrink: 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            height: 38px !important;
+            border-radius: 0px !important;
+        }
+
+        .figma-table-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+
+        .figma-table-filter-bar {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .figma-table-filter-bar .form-select {
+            width: auto !important;
+            min-width: 140px;
+        }
+
+        .table-search-input {
+            width: 280px;
+            font-size: 0.84rem;
+            padding-left: 36px;
+            height: 38px;
+        }
+
+        .figma-table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
         }
-        .custom-table th {
+
+        .figma-table th {
             background: #f8fafc;
-            padding: 12px 16px;
-            font-size: 0.75rem;
-            font-weight: 700;
+            padding: 12px 18px;
+            font-size: 0.74rem;
+            font-weight: 800;
             color: #475569;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-color);
         }
-        .custom-table td {
-            padding: 14px 16px;
+
+        .figma-table td {
+            padding: 16px 18px;
             font-size: 0.85rem;
             color: #334155;
             border-bottom: 1px solid #f1f5f9;
             vertical-align: middle;
         }
-        .custom-table tr:last-child td {
-            border-bottom: none;
-        }
-        .custom-table tr:hover td {
-            background: #f8fafc;
+
+        .figma-table tr:hover td {
+            background-color: #f8fafc;
         }
 
-        /* BADGES */
-        .status-badge {
-            padding: 4px 10px;
-            border-radius: 20px;
+        .badge-status {
+            padding: 4px 12px;
             font-size: 0.75rem;
             font-weight: 700;
             display: inline-block;
         }
-        .status-badge.calculated, .status-badge.approved, .status-badge.paid, .status-badge.on-track {
-            background: #dcfce7;
-            color: #15803d;
-        }
-        .status-badge.on-hold, .status-badge.pending, .status-badge.warning {
-            background: #fef3c7;
-            color: #b45309;
-        }
-        .status-badge.processed, .status-badge.reimbursed, .status-badge.sent {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-        .status-badge.rejected, .status-badge.overdue {
-            background: #fee2e2;
-            color: #b91c1c;
+        .badge-status.pending, .badge-status.pending-review, .badge-status.pending-finance, .badge-status.due-soon, .badge-status.in-progress, .badge-status.pending-approval, .badge-status.pending-reprocess { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
+        .badge-status.under-review { background: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe; }
+        .badge-status.approved, .badge-status.settled, .badge-status.processed, .badge-status.active, .badge-status.compliant, .badge-status.within-budget, .badge-status.completed, .badge-status.eligible { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
+        .badge-status.rejected, .badge-status.overdue, .badge-status.over-budget, .badge-status.not-eligible { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
+        .badge-status.pending-super { background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+
+        .emp-avatar {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-right: 10px;
+            flex-shrink: 0;
         }
 
-        /* PAYSLIP & CLAIM MODAL STYLING */
-        .payslip-box {
-            border: 1px solid #cbd5e1;
-            padding: 24px;
+        .action-icon {
+            cursor: pointer;
+            padding: 6px 8px;
+            transition: background 0.2s;
+        }
+        .action-icon:hover {
+            background: #e2e8f0;
+            color: var(--primary-blue) !important;
+        }
+    
+        
+        /* Sidebar Toggle Styles & Responsiveness */
+        .sidebar {
+            transition: width 0.2s ease-in-out, transform 0.2s ease-in-out;
+        }
+        .main-wrapper {
+            transition: margin-left 0.2s ease-in-out;
+        }
+        
+        /* Hide scrollbar in sidebar for cleaner look */
+        .sidebar-menu::-webkit-scrollbar { width: 0; display: none; }
+        .sidebar-menu { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Desktop Collapsed State */
+        @media (min-width: 992px) {
+            body.sidebar-collapsed .sidebar { width: 70px; }
+            body.sidebar-collapsed .main-wrapper { margin-left: 70px; }
+            body.sidebar-collapsed .brand-info,
+            body.sidebar-collapsed .sidebar-footer { display: none !important; }
+            body.sidebar-collapsed .sidebar-brand { flex-direction: column; padding: 16px 0; gap: 12px; }
+            body.sidebar-collapsed .toggle-sidebar-btn { margin-left: 0 !important; }
+            
+            body.sidebar-collapsed .sidebar-menu { padding: 16px 8px; }
+            body.sidebar-collapsed .menu-item { justify-content: center; padding: 12px 0; font-size: 0; border-left-width: 3px; }
+            body.sidebar-collapsed .menu-item i { font-size: 1.3rem; margin: 0; }
+            body.sidebar-collapsed .menu-item.active { border-left-color: var(--primary-blue); }
+            
+            /* Fix Logout button when collapsed */
+            body.sidebar-collapsed .border-top.bg-white { padding: 15px 5px !important; }
+            body.sidebar-collapsed .border-top.bg-white a.btn { font-size: 0 !important; padding: 10px 0 !important; border: none; background: transparent; color: #ef4444; }
+            body.sidebar-collapsed .border-top.bg-white a.btn i { font-size: 1.3rem; margin: 0 !important; }
+            body.sidebar-collapsed .border-top.bg-white a.btn:hover { background: #fee2e2; }
+        }
+
+        /* Mobile Responsiveness */
+        .mobile-header {
+            display: none;
+            padding: 12px 20px;
             background: #ffffff;
-            border-radius: 8px;
-            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 999;
         }
-        .payslip-header {
-            border-bottom: 2px solid #0f172a;
-            padding-bottom: 12px;
-            margin-bottom: 16px;
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+            display: none; opacity: 0; transition: opacity 0.2s;
         }
-        .payslip-table th, .payslip-table td {
-            padding: 6px 12px;
-            font-size: 0.8rem;
-            border: 1px solid #e2e8f0;
+        
+        @media (max-width: 991px) {
+            .sidebar { transform: translateX(-100%); width: 250px !important; }
+            .main-wrapper { margin-left: 0 !important; }
+            .mobile-header { display: flex; }
+            
+            /* Open state */
+            body.sidebar-open .sidebar { transform: translateX(0); }
+            body.sidebar-open .sidebar-overlay { display: block; opacity: 1; }
+            
+            /* Adjust content */
+            .content-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .header-title-area h2 { font-size: 1.15rem; }
+            
+            /* Make chart cards responsive */
+            .row > div { width: 100%; margin-bottom: 15px; }
+            .metric-card { margin-bottom: 0; }
         }
+
+        .toggle-sidebar-btn {
+            cursor: pointer; color: #64748b; font-size: 1.2rem; transition: color 0.2s;
+        }
+        .toggle-sidebar-btn:hover { color: var(--primary-blue); }
+
     </style>
 </head>
 <body>
 
     <!-- SIDEBAR -->
-    <div class="myspace-sidebar">
-        <div class="brand-area d-flex align-items-center gap-2">
-            <img src="/images/wcg-logo.jpg" alt="White Circle" style="width: 38px; height: 38px; object-fit: contain; flex-shrink: 0; border-radius: 4px;">
-            <div class="brand-text-wrapper">
-                <div class="brand-text" style="font-size: 0.95rem; font-weight: 800; color: #1e3a8a;">WhiteCircle</div>
-                <div class="brand-sub" style="font-size: 0.7rem; color: #64748b; font-weight: 600;">Accounts Admin</div>
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="/images/wcg-logo.jpg" alt="WhiteCircle" class="brand-logo-img">
+            <div class="brand-info">
+                <div class="company-name">WhiteCircle</div>
+                <div class="role-name">Finance Admin</div>
             </div>
+            <i class="fas fa-bars toggle-sidebar-btn ms-auto" title="Toggle Sidebar" onclick="document.body.classList.toggle('sidebar-collapsed')"></i>
         </div>
-        <div class="nav-links">
-            <a href="/space/accounts/dashboard" class="nav-link-item" th:classappend="${activeTab == 'dashboard' or activeTab == null ? 'active' : ''}" title="Dashboard">
-                <i class="fas fa-th-large"></i> <span>Dashboard</span>
+        <div class="sidebar-menu">
+            <a href="/space/accounts/dashboard" class="menu-item" th:classappend="${activeTab == 'dashboard' or activeTab == null ? 'active' : ''}">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
             </a>
-            <a href="/space/accounts/accounting" class="nav-link-item" th:classappend="${activeTab == 'accounting' ? 'active' : ''}" title="Accounting">
-                <i class="fas fa-calculator"></i> <span>Accounting</span>
+            <a href="/space/accounts/hr_finance_matrix" class="menu-item" th:classappend="${activeTab == 'hr_finance_matrix' ? 'active' : ''}">
+                <i class="fas fa-users-cog"></i> <span>HR-Finance Matrix</span>
             </a>
-            <a href="/space/accounts/payroll" class="nav-link-item" th:classappend="${activeTab == 'payroll' ? 'active' : ''}" title="Payroll">
-                <i class="fas fa-wallet"></i> <span>Payroll</span>
+            <a href="/space/accounts/approval_workflow" class="menu-item" th:classappend="${activeTab == 'approval_workflow' ? 'active' : ''}">
+                <i class="fas fa-sync-alt"></i> <span>Approval Workflow</span>
             </a>
-            <a href="/space/accounts/expenses" class="nav-link-item" th:classappend="${activeTab == 'expenses' ? 'active' : ''}" title="Expenses & Reimbursement">
-                <i class="fas fa-receipt"></i> <span>Expenses & Reimbursement</span>
+            <a href="/space/accounts/transaction_thresholds" class="menu-item" th:classappend="${activeTab == 'transaction_thresholds' ? 'active' : ''}">
+                <i class="fas fa-chart-bar"></i> <span>Transaction Thresholds</span>
             </a>
-            <a href="/space/accounts/budgeting" class="nav-link-item" th:classappend="${activeTab == 'budgeting' ? 'active' : ''}" title="Budgeting & Forecasting">
-                <i class="fas fa-chart-line"></i> <span>Budgeting & Forecasting</span>
+            <a href="/space/accounts/compliance_calendar" class="menu-item" th:classappend="${activeTab == 'compliance_calendar' ? 'active' : ''}">
+                <i class="fas fa-calendar-alt"></i> <span>Compliance Calendar</span>
             </a>
-            <a href="/space/accounts/invoicing" class="nav-link-item" th:classappend="${activeTab == 'invoicing' ? 'active' : ''}" title="Invoicing & Billing">
-                <i class="fas fa-file-invoice-dollar"></i> <span>Invoicing & Billing</span>
+            <a href="/space/accounts/knowledge_base" class="menu-item" th:classappend="${activeTab == 'knowledge_base' ? 'active' : ''}">
+                <i class="fas fa-eye-slash"></i> <span>Knowledge Base</span>
             </a>
-            <a href="/space/accounts/taxation" class="nav-link-item" th:classappend="${activeTab == 'taxation' ? 'active' : ''}" title="Taxation & Compliance">
-                <i class="fas fa-balance-scale"></i> <span>Taxation & Compliance</span>
+            <a href="/space/accounts/notification_alert" class="menu-item" th:classappend="${activeTab == 'notification_alert' ? 'active' : ''}">
+                <i class="fas fa-bell"></i> <span>Notification / Alert</span>
             </a>
-            <a href="/space/accounts/analytics" class="nav-link-item" th:classappend="${activeTab == 'analytics' ? 'active' : ''}" title="Analytics">
-                <i class="fas fa-chart-pie"></i> <span>Analytics</span>
+            <a href="/space/accounts/report" class="menu-item" th:classappend="${activeTab == 'report' ? 'active' : ''}">
+                <i class="fas fa-file-alt"></i> <span>Report</span>
             </a>
-            <a href="/space/accounts/vendors" class="nav-link-item" th:classappend="${activeTab == 'vendors' ? 'active' : ''}" title="Vendor & Client Management">
-                <i class="fas fa-handshake"></i> <span>Vendor & Client Management</span>
+            <a href="/space/accounts/finance_checklist" class="menu-item" th:classappend="${activeTab == 'finance_checklist' ? 'active' : ''}">
+                <i class="fas fa-clipboard-check"></i> <span>Onboarding / Offboarding Finance Checklist</span>
+            </a>
+            <a href="/space/accounts/additional_considerations" class="menu-item" th:classappend="${activeTab == 'additional_considerations' ? 'active' : ''}">
+                <i class="fas fa-shopping-bag"></i> <span>Additional Considerations</span>
             </a>
         </div>
-        <div class="p-3 border-top mt-auto bg-white logout-btn-container">
-            <a href="/logout" class="btn btn-outline-danger w-100 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm" style="font-size: 0.85rem;" title="Logout">
-                <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Logout</span>
+        <div class="p-3 border-top bg-white">
+            <a href="/logout" class="btn btn-outline-danger w-100 fw-bold d-flex align-items-center justify-content-center gap-2">
+                <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </div>
     </div>
 
-    <!-- TOP HEADER -->
-    <div class="myspace-header d-flex align-items-center justify-content-between px-4">
-        <div class="d-flex align-items-center gap-3">
-            <button class="btn btn-light border rounded-circle shadow-sm d-flex align-items-center justify-content-center" id="sidebarToggleBtn" onclick="toggleAccountsSidebar()" title="Toggle Sidebar" style="width: 38px; height: 38px;">
-                <i class="fas fa-bars text-primary fs-6"></i>
-            </button>
-            <h1 class="page-title m-0" th:text="${activeTab == 'payroll' ? 'Payroll Review' : (activeTab == 'expenses' ? 'Expenses' : (activeTab == 'budgeting' ? 'Budgeting & Forecasting' : (activeTab == 'invoicing' ? 'Invoicing & Billing' : 'Dashboard')))}">Dashboard</h1>
-        </div>
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" class="form-control" id="globalSearchInput" placeholder="Search Employees or Invoices..." onkeyup="filterTableSearch()">
-        </div>
-        <div>
-            <a href="/senior_accounts/dashboard" class="btn btn-outline-primary rounded-pill fw-bold px-3 py-2 shadow-sm d-flex align-items-center gap-2" style="font-size: 0.85rem;">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
-        </div>
-    </div>
+    
+    <!-- SIDEBAR OVERLAY FOR MOBILE -->
+    <div class="sidebar-overlay" onclick="document.body.classList.remove('sidebar-open')"></div>
 
-    <!-- MAIN CONTENT AREA -->
-    <div class="myspace-content">
-
-        <!-- SUCCESS / ERROR ALERT MESSAGES -->
-        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i><span th:text="${successMessage}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+        <div class="mobile-header d-lg-none">
+            <img src="/images/wcg-logo.jpg" alt="WhiteCircle" style="height: 32px; border-radius: 0;">
+            <i class="fas fa-bars toggle-sidebar-btn" onclick="document.body.classList.toggle('sidebar-open')"></i>
         </div>
-        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+
+        <!-- ALERTS -->
+        <div id="toastNotificationAlert" class="alert alert-success alert-dismissible m-3 mb-0 d-none" role="alert">
+            <i class="fas fa-check-circle me-2"></i><span id="toastMessage">Action executed successfully.</span>
+            <button type="button" class="btn-close" onclick="closeToastAlert()"></button>
         </div>
 
         <!-- ========================================================================= -->
-        <!-- TAB 1: DASHBOARD (SCREENSHOT 1) -->
+        <!-- VIEW 1: DASHBOARD OVERVIEW -->
         <!-- ========================================================================= -->
-        <div th:if="${activeTab == 'dashboard' or activeTab == null}">
-            <!-- Top Stat Cards (4 Cards) -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <div class="stat-card d-flex align-items-center justify-content-between">
-                        <div>
-                            <div class="stat-label">Total Revenue</div>
-                            <div class="stat-value">₹ 2.85 Cr</div>
-                        </div>
-                        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
-                            <i class="fas fa-chart-line"></i>
+        <div th:if="${activeTab == 'dashboard' or activeTab == null or activeTab == 'accounting'}">
+            <div class="content-header">
+                <div class="header-title-area">
+                    <h2>Finance Admin Dashboard</h2>
+                    <p>Overview of organizational revenue, cashflow, and pending finance operations.</p>
+                </div>
+            </div>
+            <div class="page-body">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-chart-line"></i></div><div class="metric-info"><div class="metric-label">Total Revenue</div><div class="metric-value">₹ 2.85 Cr</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-danger bg-opacity-10 text-danger"><i class="fas fa-file-invoice"></i></div><div class="metric-info"><div class="metric-label">Total Expenses</div><div class="metric-value text-danger">₹ 1.62 Cr</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-success bg-opacity-10 text-success"><i class="fas fa-piggy-bank"></i></div><div class="metric-info"><div class="metric-label">Net Profit</div><div class="metric-value text-success">₹ 1.23 Cr</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-warning bg-opacity-10 text-warning"><i class="fas fa-clock"></i></div><div class="metric-info"><div class="metric-label">Outstanding Invoices</div><div class="metric-value text-warning">₹ 14.56 L</div></div></div></div>
+                </div>
+
+                <div class="figma-table-card p-4 mb-4">
+                    <h5 class="fw-bold text-dark mb-4"><i class="fas fa-chart-bar me-2 text-primary"></i>Revenue vs Expenses</h5>
+                    <div style="height: 280px;"><canvas id="revExpChart"></canvas></div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-8">
+                        <div class="figma-table-card p-4 h-100">
+                            <h5 class="fw-bold text-dark mb-4"><i class="fas fa-money-bill-wave me-2 text-primary"></i>Cashflow Overview</h5>
+                            <div class="row text-center mb-4">
+                                <div class="col-4"><div class="small text-muted fw-bold">Cash Inflow</div><div class="fs-4 fw-extrabold text-success">₹ 3.25 Cr</div></div>
+                                <div class="col-4"><div class="small text-muted fw-bold">Cash Outflow</div><div class="fs-4 fw-extrabold text-danger">₹ 2.10 Cr</div></div>
+                                <div class="col-4"><div class="small text-muted fw-bold">Net Position</div><div class="fs-4 fw-extrabold text-primary">₹ 1.15 Cr</div></div>
+                            </div>
+                            <div style="height: 120px;"><canvas id="cashflowSparkline"></canvas></div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-card d-flex align-items-center justify-content-between">
-                        <div>
-                            <div class="stat-label">Total Expenses</div>
-                            <div class="stat-value">₹ 1.62 Cr</div>
-                        </div>
-                        <div class="stat-icon bg-danger bg-opacity-10 text-danger">
-                            <i class="fas fa-file-invoice"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-card d-flex align-items-center justify-content-between">
-                        <div>
-                            <div class="stat-label">Net Profit</div>
-                            <div class="stat-value">₹ 1.23 Cr</div>
-                        </div>
-                        <div class="stat-icon bg-success bg-opacity-10 text-success">
-                            <i class="fas fa-piggy-bank"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-card d-flex align-items-center justify-content-between">
-                        <div>
-                            <div class="stat-label">Outstanding Invoices</div>
-                            <div class="stat-value">₹ 14.56 L</div>
-                        </div>
-                        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
-                            <i class="fas fa-clock"></i>
+                    <div class="col-md-4">
+                        <div class="figma-table-card p-4 h-100 text-center">
+                            <h5 class="fw-bold text-dark mb-4"><i class="fas fa-chart-pie me-2 text-primary"></i>Budget Utilization</h5>
+                            <div style="height: 180px; position: relative;" class="d-flex align-items-center justify-content-center">
+                                <canvas id="budgetDonutChart"></canvas>
+                                <div style="position: absolute; font-size: 1.8rem; font-weight: 800; color: #10b981;">78%</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Revenues vs Expenses Chart -->
-            <div class="panel-card">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h5 class="fw-bold m-0" style="color: #1e3a8a;">Revenues vs Expenses</h5>
-                    <select class="form-select form-select-sm w-auto fw-semibold">
-                        <option>This Year</option>
-                        <option>Last Year</option>
-                    </select>
+        <!-- ========================================================================= -->
+        <!-- VIEW 2: HR-FINANCE MATRIX -->
+        <!-- ========================================================================= -->
+        <div th:if="${activeTab == 'hr_finance_matrix'}">
+            <div class="content-header">
+                <div class="header-title-area">
+                    <h2>HR-Finance Overlap Matrix <i class="fas fa-history text-muted fs-6 ms-1"></i></h2>
+                    <p id="matrixSubtabDesc">Manage appraisal-linked payout requests received from HR.</p>
                 </div>
-                <div style="height: 280px;">
-                    <canvas id="revExpChart"></canvas>
-                </div>
+                
             </div>
+            <div class="page-body">
+                <div class="figma-subtabs-bar" id="matrixSubtabNav">
+                    <button type="button" class="figma-tab-link active" onclick="switchMatrixSubtab('appraisal')"><i class="fas fa-chart-line"></i> Appraisal-linked Payout</button>
+                    <button type="button" class="figma-tab-link" onclick="switchMatrixSubtab('increment')"><i class="fas fa-user-edit"></i> Increment Approval</button>
+                    <button type="button" class="figma-tab-link" onclick="switchMatrixSubtab('bonus')"><i class="fas fa-gift"></i> Bonus Disbursement</button>
+                    <button type="button" class="figma-tab-link" onclick="switchMatrixSubtab('fnf')"><i class="fas fa-file-signature"></i> Full & Final Settlement</button>
+                    <button type="button" class="figma-tab-link" onclick="switchMatrixSubtab('structure')"><i class="fas fa-layer-group"></i> Salary Structure Revision</button>
+                    <button type="button" class="figma-tab-link" onclick="switchMatrixSubtab('loan')"><i class="fas fa-hand-holding-usd"></i> Loan / Advance</button>
+                </div>
 
-            <!-- Bottom Row: CashFlow Overview & Budget Utilization -->
-            <div class="row g-4">
-                <div class="col-md-8">
-                    <div class="panel-card h-100 mb-0">
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <h5 class="fw-bold m-0" style="color: #1e3a8a;">CashFlow Overview</h5>
-                            <select class="form-select form-select-sm w-auto fw-semibold">
-                                <option>This Month</option>
-                                <option>Last Month</option>
+                <div class="row g-3 mb-4" id="matrixMetricCards">
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-users"></i></div><div class="metric-info"><div class="metric-label" id="mCardLabel1">Total Employees</div><div class="metric-value" id="mCardVal1">124</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-success bg-opacity-10 text-success"><i class="fas fa-user-clock"></i></div><div class="metric-info"><div class="metric-label" id="mCardLabel2">Pending from HR</div><div class="metric-value" id="mCardVal2">8</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-warning bg-opacity-10 text-warning"><i class="fas fa-hourglass-half"></i></div><div class="metric-info"><div class="metric-label" id="mCardLabel3">Under Review</div><div class="metric-value text-warning" id="mCardVal3">3</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-check-circle"></i></div><div class="metric-info"><div class="metric-label" id="mCardLabel4">Approved</div><div class="metric-value text-primary" id="mCardVal4">109</div></div></div></div>
+                </div>
+
+                <div class="figma-table-card">
+                    <div class="figma-table-filter-bar">
+                        <div class="position-relative">
+                            <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                            <input type="text" class="form-control table-search-input" id="matrixSearchInput" placeholder="Search by Employee name, ID..." onkeyup="filterMatrixTable()">
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <select class="form-select form-select-sm fw-semibold" id="matrixDeptFilter" onchange="filterMatrixTable()">
+                                <option value="">All Departments</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Product">Product</option>
+                                <option value="UI/UX">UI/UX</option>
+                                <option value="Marketing">Marketing</option>
                             </select>
-                        </div>
-                        <div class="row text-center mb-4">
-                            <div class="col-4">
-                                <div class="small text-muted fw-semibold">Cash Inflow</div>
-                                <div class="fs-4 fw-extrabold text-success">₹ 3.25 Cr</div>
-                            </div>
-                            <div class="col-4">
-                                <div class="small text-muted fw-semibold">Cash Outflow</div>
-                                <div class="fs-4 fw-extrabold text-danger">₹ 2.10 Cr</div>
-                            </div>
-                            <div class="col-4">
-                                <div class="small text-muted fw-semibold">Net Cash Position</div>
-                                <div class="fs-4 fw-extrabold text-primary">₹ 1.15 Cr</div>
-                            </div>
-                        </div>
-                        <div style="height: 120px;">
-                            <canvas id="cashflowSparkline"></canvas>
+                            <select class="form-select form-select-sm fw-semibold" id="matrixTypeFilter" onchange="filterMatrixTable()"><option value="">All Types</option></select>
+                            <select class="form-select form-select-sm fw-semibold" id="matrixStatusFilter" onchange="filterMatrixTable()">
+                                <option value="">All Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Under Review">Under Review</option>
+                                <option value="Approved">Approved</option>
+                            </select>
+                            <select class="form-select form-select-sm fw-semibold" style="height: 38px;"><option>Jul 2026</option></select>
+                            <button class="btn btn-primary btn-sync-hr fw-bold" onclick="syncDataFromHR()"><i class="fas fa-bolt"></i> Sync From HR</button>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="panel-card h-100 mb-0 text-center">
-                        <h5 class="fw-bold mb-4" style="color: #1e3a8a;">Budget Utilization</h5>
-                        <div style="height: 180px; position: relative;" class="d-flex align-items-center justify-content-center">
-                            <canvas id="budgetDonutChart"></canvas>
-                            <div style="position: absolute; font-size: 1.8rem; font-weight: 800; color: #10b981;">78%</div>
-                        </div>
+
+                    <div class="table-responsive">
+                        <table class="figma-table" id="matrixMainTable">
+                            <thead id="matrixTableHead"></thead>
+                            <tbody id="matrixTableBody"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- ========================================================================= -->
-        <!-- TAB 3: PAYROLL REVIEW (SCREENSHOT 2) -->
+        <!-- VIEW 3: APPROVAL WORKFLOW -->
         <!-- ========================================================================= -->
-        <div th:if="${activeTab == 'payroll'}">
-            <!-- Top Metrics Bar -->
-            <div class="panel-card mb-4">
-                <div class="row align-items-center text-center text-md-start">
-                    <div class="col-md-3 border-end">
-                        <label class="small fw-bold text-muted d-block mb-1">Payroll Cycle</label>
-                        <select class="form-select form-select-sm fw-bold border-0 bg-light">
-                            <option>June 2026</option>
-                            <option>May 2026</option>
-                            <option>April 2026</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 border-end">
-                        <div class="small text-muted fw-bold">Employees</div>
-                        <div class="fs-4 fw-extrabold text-dark" th:text="${totalEmployees ?: 210}">210</div>
-                    </div>
-                    <div class="col-md-2 border-end">
-                        <div class="small text-muted fw-bold">Gross Payroll</div>
-                        <div class="fs-5 fw-bold text-dark">₹ 4,20,00,000</div>
-                    </div>
-                    <div class="col-md-2 border-end">
-                        <div class="small text-muted fw-bold">Total Deductions</div>
-                        <div class="fs-5 fw-bold text-dark">₹ 52,10,000</div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="small text-muted fw-bold">Net Payroll</div>
-                        <div class="fs-5 fw-extrabold text-primary">₹ 3,67,90,000</div>
-                    </div>
+        <div th:if="${activeTab == 'approval_workflow' or activeTab == 'salary_revision' or activeTab == 'vendor_payment'}">
+            <div class="content-header">
+                <div class="header-title-area">
+                    <h2>Approval Workflow <i class="fas fa-history text-muted fs-6 ms-1"></i></h2>
+                    <p id="approvalSubtabDesc">Manage and take action on finance approval requests.</p>
                 </div>
             </div>
-
-            <!-- Sub Tabs & Filters -->
-            <div class="panel-card">
-                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-                    <ul class="nav nav-pills gap-2">
-                        <li class="nav-item">
-                            <a class="nav-link active fw-bold text-primary bg-primary bg-opacity-10 rounded-pill px-3 py-1" href="#">Employee Payroll List</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link fw-semibold text-muted px-3 py-1" href="#">Earnings Summary</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link fw-semibold text-muted px-3 py-1" href="#">Deductions Summary</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link fw-semibold text-muted px-3 py-1" href="#">Tax Summary</a>
-                        </li>
-                    </ul>
-                    <div class="d-flex align-items-center gap-2">
-                        <select class="form-select form-select-sm" style="width: 150px;" id="deptPayrollFilter">
-                            <option value="">All Departments</option>
-                            <option>Finance</option>
-                            <option>IT</option>
-                            <option>Marketing</option>
-                            <option>HR</option>
-                        </select>
-                        <select class="form-select form-select-sm" style="width: 130px;" id="statusPayrollFilter">
-                            <option value="">Status: All</option>
-                            <option value="Calculated">Calculated</option>
-                            <option value="On Hold">On Hold</option>
-                            <option value="Processed">Processed</option>
-                        </select>
-                    </div>
+            <div class="page-body">
+                <div class="figma-subtabs-bar" id="approvalSubtabNav">
+                    <button type="button" class="figma-tab-link active" onclick="switchApprovalSubtab('reimbursement')"><i class="fas fa-receipt"></i> Reimbursement Claim</button>
+                    <button type="button" class="figma-tab-link" onclick="switchApprovalSubtab('salary_revision')"><i class="fas fa-chart-line"></i> Salary Revision</button>
+                    <button type="button" class="figma-tab-link" onclick="switchApprovalSubtab('vendor_payment')"><i class="fas fa-file-invoice-dollar"></i> Vendor Payment</button>
+                    <button type="button" class="figma-tab-link" onclick="switchApprovalSubtab('payroll_setup')"><i class="fas fa-user-check"></i> New Employee Bank/Payroll Setup</button>
                 </div>
 
-                <!-- Payroll List Table -->
-                <div class="table-responsive">
-                    <table class="custom-table" id="payrollTable">
-                        <thead>
-                            <tr>
-                                <th>Employee ID</th>
-                                <th>Employee Name</th>
-                                <th>Dept</th>
-                                <th>Gross Pay</th>
-                                <th>Total Deductions</th>
-                                <th>Net Pay</th>
-                                <th>Status</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="user, stat : ${allUsers}" th:if="${user.role == null or user.role.roleName != 'CLIENT'}" th:slice="${stat.index < 10}">
-                                <td class="fw-bold" th:text="${user.username}">EMP001</td>
-                                <td>
-                                    <div class="fw-bold" th:text="${user.fullName}">Amit Kumar</div>
-                                </td>
-                                <td th:text="${user.employeeProfile != null ? user.employeeProfile.department : 'Finance'}">Finance</td>
-                                <td class="fw-semibold">₹ 55,000</td>
-                                <td class="text-danger fw-semibold">₹ 200</td>
-                                <td class="fw-bold text-success">₹ 54,800</td>
-                                <td>
-                                    <span class="status-badge" 
-                                          th:classappend="${stat.index % 3 == 0 ? 'calculated' : (stat.index % 3 == 1 ? 'on-hold' : 'processed')}"
-                                          th:text="${stat.index % 3 == 0 ? 'Calculated' : (stat.index % 3 == 1 ? 'On Hold' : 'Processed')}">Calculated</span>
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-light border rounded-circle shadow-sm" th:onclick="'openPayslipModal(\'' + ${user.fullName} + '\', \'' + ${user.username} + '\', \'' + ${user.employeeProfile != null ? user.employeeProfile.department : 'Finance'} + '\', ' + ${user.id} + ')'" title="View Payslip PDF">
-                                        <i class="fas fa-eye text-primary"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========================================================================= -->
-        <!-- TAB 4: EXPENSES & REIMBURSEMENT (SCREENSHOT 3) -->
-        <!-- ========================================================================= -->
-        <div th:if="${activeTab == 'expenses'}">
-            <!-- Top Metric Cards (5 Stats) -->
-            <div class="row g-3 mb-4">
-                <div class="col">
-                    <div class="stat-card text-center py-3">
-                        <div class="stat-label">Total Claims</div>
-                        <div class="fs-3 fw-bold">342</div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="stat-card text-center py-3">
-                        <div class="stat-label">Pending Approval</div>
-                        <div class="fs-3 fw-bold text-warning">28</div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="stat-card text-center py-3">
-                        <div class="stat-label">Approved</div>
-                        <div class="fs-3 fw-bold text-success">186</div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="stat-card text-center py-3">
-                        <div class="stat-label">Rejected</div>
-                        <div class="fs-3 fw-bold text-danger">12</div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="stat-card text-center py-3">
-                        <div class="stat-label">Reimbursed</div>
-                        <div class="fs-3 fw-bold text-primary">164</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Employee Claim Details Table -->
-            <div class="panel-card">
-                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-                    <h5 class="fw-bold m-0" style="color: #1e3a8a;">Employee Claim Details</h5>
-                    <div class="d-flex align-items-center gap-2">
-                        <select class="form-select form-select-sm" style="width: 150px;">
-                            <option>All Departments</option>
-                        </select>
-                        <select class="form-select form-select-sm" style="width: 130px;">
-                            <option>Status: All</option>
-                        </select>
-                        <button class="btn btn-sm btn-outline-primary fw-bold"><i class="fas fa-download me-1"></i> Export</button>
-                        <button class="btn btn-sm btn-primary fw-bold"><i class="fas fa-plus me-1"></i> New Claim</button>
-                    </div>
+                <div class="row g-3 mb-4" id="approvalMetricCards">
+                    <div class="col"><div class="metric-card"><div class="metric-icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-file-alt"></i></div><div class="metric-info"><div class="metric-label" id="apCardLabel1">Total Claims</div><div class="metric-value" id="apCardVal1">52</div></div></div></div>
+                    <div class="col"><div class="metric-card"><div class="metric-icon-box bg-success bg-opacity-10 text-success"><i class="fas fa-clock"></i></div><div class="metric-info"><div class="metric-label" id="apCardLabel2">Pending</div><div class="metric-value text-success" id="apCardVal2">18</div></div></div></div>
+                    <div class="col"><div class="metric-card"><div class="metric-icon-box bg-warning bg-opacity-10 text-warning"><i class="fas fa-hourglass-half"></i></div><div class="metric-info"><div class="metric-label" id="apCardLabel3">Under Review</div><div class="metric-value text-warning" id="apCardVal3">12</div></div></div></div>
+                    <div class="col"><div class="metric-card"><div class="metric-icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-check-circle"></i></div><div class="metric-info"><div class="metric-label" id="apCardLabel4">Approved</div><div class="metric-value text-primary" id="apCardVal4">16</div></div></div></div>
+                    <div class="col"><div class="metric-card"><div class="metric-icon-box bg-danger bg-opacity-10 text-danger"><i class="fas fa-times-circle"></i></div><div class="metric-info"><div class="metric-label" id="apCardLabel5">Rejected</div><div class="metric-value text-danger" id="apCardVal5">6</div></div></div></div>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th><input type="checkbox"></th>
-                                <th>Claim ID</th>
-                                <th>Employee Name</th>
-                                <th>Dept</th>
-                                <th>Claim date</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Submitted On</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="claim, stat : ${allExpenseClaims}" th:if="${stat.index < 8}">
-                                <td><input type="checkbox"></td>
-                                <td class="fw-bold" th:text="${'CLM00' + claim.id}">CLM001</td>
-                                <td class="fw-bold" th:text="${claim.user != null ? claim.user.fullName : 'Amit Kumar'}">Amit Kumar</td>
-                                <td th:text="${claim.user != null and claim.user.employeeProfile != null ? claim.user.employeeProfile.department : 'Finance'}">Finance</td>
-                                <td th:text="${claim.submissionDate != null ? claim.submissionDate : '16/06/2026'}">16/06/2026</td>
-                                <td class="fw-bold">₹ <span th:text="${claim.amount != null ? claim.amount : '5,950.00'}">5,950.00</span></td>
-                                <td>
-                                    <span class="status-badge" 
-                                          th:classappend="${claim.status == 'Approved' ? 'approved' : (claim.status == 'Rejected' ? 'rejected' : 'pending')}"
-                                          th:text="${claim.status != null ? claim.status : 'Pending'}">Pending</span>
-                                </td>
-                                <td>16/06/2026 10:24 AM</td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-light border rounded-circle shadow-sm" th:onclick="'openClaimModal(\'' + ${claim.user != null ? claim.user.fullName : 'Amit Kumar'} + '\', \'' + ${'CLM00' + claim.id} + '\', ' + ${claim.id} + ')'" title="View Expense Details">
-                                        <i class="fas fa-eye text-primary"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Expense Policies & Limits Card -->
-            <div class="panel-card">
-                <h6 class="fw-bold mb-3" style="color: #1e3a8a;">Expense policies & limits</h6>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="border rounded p-3 bg-light">
-                            <div class="fw-bold text-dark mb-1">Domestic Travel Policy</div>
-                            <div class="small text-muted mb-2">Applicable to: All employees</div>
-                            <div class="row g-2 small">
-                                <div class="col-6">Daily allowance limit: <strong>₹ 2500</strong></div>
-                                <div class="col-6">Hotel limit (per night): <strong>₹ 5000</strong></div>
-                                <div class="col-6">Meal limit (per day): <strong>₹ 1000</strong></div>
-                                <div class="col-6">Taxi limit (per day): <strong>₹ 1500</strong></div>
-                            </div>
-                            <div class="mt-2 pt-2 border-top d-flex justify-content-between small">
-                                <span>Effective from: <strong>01 Jan 2026</strong></span>
-                                <span class="badge bg-success bg-opacity-10 text-success">Active</span>
-                            </div>
+                <div class="figma-table-card">
+                    <div class="figma-table-filter-bar">
+                        <div class="position-relative">
+                            <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                            <input type="text" class="form-control table-search-input" id="approvalSearchInput" placeholder="Search..." onkeyup="filterApprovalTable()">
                         </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <select class="form-select form-select-sm fw-semibold" id="approvalDeptFilter" onchange="filterApprovalTable()"><option value="">All Departments</option></select>
+                            <select class="form-select form-select-sm fw-semibold" id="approvalTypeFilter" onchange="filterApprovalTable()"><option value="">All Types</option></select>
+                            <select class="form-select form-select-sm fw-semibold" id="approvalStatusFilter" onchange="filterApprovalTable()"><option value="">All Status</option></select>
+                            <button class="btn btn-primary btn-sync-hr fw-bold" id="approvalActionButton" onclick="syncDataFromHR()"><i class="fas fa-bolt"></i> Sync From HR</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="figma-table">
+                            <thead id="approvalTableHead"></thead>
+                            <tbody id="approvalTableBody"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- ========================================================================= -->
-        <!-- TAB 5: BUDGETING & FORECASTING (SCREENSHOT 4) -->
+        <!-- VIEW 4: TRANSACTION THRESHOLDS -->
         <!-- ========================================================================= -->
-        <div th:if="${activeTab == 'budgeting'}">
-            <!-- 4 Top Stat Cards -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <div class="stat-label">Total Budget</div>
-                        <div class="stat-value">₹ 25,00,00,000</div>
-                    </div>
+        <div th:if="${activeTab == 'transaction_thresholds' or activeTab == 'employee_loans'}">
+            <div class="content-header">
+                <div class="header-title-area">
+                    <h2>High-Value Transaction Thresholds <i class="fas fa-info-circle text-muted fs-6 ms-1"></i></h2>
+                    <p>Define, manage and monitor high-value transaction thresholds for approvals.</p>
                 </div>
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <div class="stat-label">Allocated Budget</div>
-                        <div class="stat-value text-primary">₹ 18,75,00,000</div>
-                    </div>
+            </div>
+            <div class="page-body">
+                <div class="figma-subtabs-bar" id="thresholdSubtabNav">
+                    <button type="button" class="figma-tab-link active" onclick="switchThresholdSubtab('reimbursement')"><i class="fas fa-receipt"></i> Employee Reimbursement</button>
+                    <button type="button" class="figma-tab-link" onclick="switchThresholdSubtab('vendor')"><i class="fas fa-file-invoice-dollar"></i> Vendor Payment</button>
+                    <button type="button" class="figma-tab-link" onclick="switchThresholdSubtab('loan')"><i class="fas fa-hand-holding-usd"></i> Advance/Loan to Employee</button>
+                    <button type="button" class="figma-tab-link" onclick="switchThresholdSubtab('bonus')"><i class="fas fa-gift"></i> Bonus/Incentive Payout</button>
                 </div>
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <div class="stat-label">Utilized Budget</div>
-                        <div class="stat-value text-success">₹ 9,45,00,000</div>
-                    </div>
+
+                <div class="row g-3 mb-4" id="thresholdMetricCards">
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-user-shield"></i></div><div class="metric-info"><div class="metric-label">FINANCE ADMIN APPROVAL LIMIT</div><div class="metric-value" style="font-size: 1.15rem;">10,001 - 1,00,000</div><div class="small text-muted">Per Transaction</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-shield-alt"></i></div><div class="metric-info"><div class="metric-label">ABOVE LIMIT REQUIRES</div><div class="metric-value text-primary" style="font-size: 1.1rem;">Super Admin Approval</div><div class="small text-muted">Auto routed for approval</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-success bg-opacity-10 text-success"><i class="fas fa-clipboard-list"></i></div><div class="metric-info"><div class="metric-label">TOTAL REQUESTS</div><div class="metric-value" id="tCardVal3">26</div><div class="small text-muted">This Month</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-warning bg-opacity-10 text-warning"><i class="fas fa-hourglass-half"></i></div><div class="metric-info"><div class="metric-label">PENDING (SUPER ADMIN)</div><div class="metric-value text-warning" id="tCardVal4">7</div><div class="small text-muted">Above Finance Admin Limit</div></div></div></div>
                 </div>
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <div class="stat-label">Remaining Budget</div>
-                        <div class="stat-value text-warning">₹ 9,30,00,000</div>
+
+                <div class="info-alert-banner">
+                    <div><i class="fas fa-info-circle me-2"></i> Finance Admin can approve transactions between 10,001 and 1,00,000. Transactions above 1,00,000 require Super Admin approval.</div>
+                    
+                </div>
+
+                <div class="figma-table-card">
+                    <div class="figma-table-filter-bar">
+                        <div class="position-relative">
+                            <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                            <input type="text" class="form-control table-search-input" id="thresholdSearchInput" placeholder="Search..." onkeyup="filterThresholdTable()">
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <select class="form-select form-select-sm fw-semibold" id="thresholdDeptFilter" onchange="filterThresholdTable()"><option value="">All Departments</option></select>
+                            <select class="form-select form-select-sm fw-semibold" id="thresholdStatusFilter" onchange="filterThresholdTable()"><option value="">All Status</option></select>
+                            <select class="form-select form-select-sm fw-semibold" style="height: 38px;"><option>Jul 2026</option></select>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="figma-table">
+                            <thead id="thresholdTableHead"></thead>
+                            <tbody id="thresholdTableBody"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Middle Row: Chart & Allocation Requests -->
-            <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                    <div class="panel-card h-100 mb-0">
-                        <h6 class="fw-bold mb-3" style="color: #1e3a8a;">Budget Utilization Trend</h6>
-                        <div style="height: 220px;">
-                            <canvas id="budgetTrendChart"></canvas>
-                        </div>
-                    </div>
+        <!-- ========================================================================= -->
+        <!-- VIEW 5: COMPLIANCE CALENDAR -->
+        <!-- ========================================================================= -->
+        <div th:if="${activeTab == 'compliance_calendar'}">
+            <div class="content-header">
+                <div class="header-title-area">
+                    <h2>Compliance Calendar</h2>
+                    <p>Track statutory filing deadlines, tax due dates and compliance schedules.</p>
                 </div>
-                <div class="col-md-6">
-                    <div class="panel-card h-100 mb-0">
-                        <h6 class="fw-bold mb-3" style="color: #1e3a8a;">Budget Allocation Request</h6>
-                        <table class="custom-table">
-                            <thead>
-                                <tr>
-                                    <th>Request ID</th>
-                                    <th>Dept.</th>
-                                    <th>Current Budget</th>
-                                    <th>Increase</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
+            </div>
+            <div class="page-body">
+                <div class="figma-table-card p-4">
+                    <h5 class="fw-bold text-dark mb-3"><i class="fas fa-calendar-alt me-2 text-primary"></i>Statutory Compliance Calendar - FY 2026-27</h5>
+                    <div class="table-responsive">
+                        <table class="figma-table">
+                            <thead><tr><th>DUE DATE</th><th>COMPLIANCE EVENT</th><th>CATEGORY</th><th>RESPONSIBLE DEPT</th><th>STATUS</th><th>ACTION</th></tr></thead>
                             <tbody>
-                                <tr>
-                                    <td class="fw-bold">BR - 1001</td>
-                                    <td>Finance</td>
-                                    <td>₹ 2,50,00,000</td>
-                                    <td class="text-success fw-bold">+ ₹ 25,00,000</td>
-                                    <td><span class="status-badge pending">Pending</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">BR - 1002</td>
-                                    <td>IT</td>
-                                    <td>₹ 4,00,00,000</td>
-                                    <td class="text-success fw-bold">+ ₹ 50,00,000</td>
-                                    <td><span class="status-badge approved">Approved</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">BR - 1003</td>
-                                    <td>Marketing</td>
-                                    <td>₹ 1,50,00,000</td>
-                                    <td class="text-success fw-bold">+ ₹ 15,00,000</td>
-                                    <td><span class="status-badge pending">Pending</span></td>
-                                </tr>
+                                <tr><td class="fw-bold text-danger">15 Jul 2026</td><td>PF Monthly Return & ESI Payment</td><td>Statutory</td><td>HR / Finance</td><td><span class="badge-status compliant">• COMPLIANT</span></td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showToastAlert('View filing receipt')">View Filing</button></td></tr>
+                                <tr><td class="fw-bold text-warning">31 Jul 2026</td><td>TDS Return Filing - Q1 FY26</td><td>Tax</td><td>Finance</td><td><span class="badge-status due-soon">• DUE SOON</span></td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showToastAlert('Initiating Filing...')">File Now</button></td></tr>
+                                <tr><td class="fw-bold text-danger">15 Aug 2026</td><td>Advance Tax Payment - Q2</td><td>Tax</td><td>Finance</td><td><span class="badge-status pending">• PENDING</span></td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showToastAlert('Calculate Tax')">Calculate Tax</button></td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
-            <!-- Bottom Row: Department Budget & Forecast Summary -->
-            <div class="row g-4">
-                <div class="col-md-8">
-                    <div class="panel-card mb-0">
-                        <h6 class="fw-bold mb-3" style="color: #1e3a8a;">Department Budget</h6>
-                        <table class="custom-table">
-                            <thead>
-                                <tr>
-                                    <th>Department</th>
-                                    <th>Allocated budget</th>
-                                    <th>Utilized</th>
-                                    <th>Remaining</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="fw-bold">Finance</td>
-                                    <td>₹ 6,00,00,000</td>
-                                    <td class="text-success">₹ 3,45,00,000</td>
-                                    <td>₹ 2,55,00,000</td>
-                                    <td><span class="status-badge on-track">On-track</span></td>
-                                    <td><i class="fas fa-eye text-primary me-2"></i><i class="fas fa-pen text-secondary"></i></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">IT</td>
-                                    <td>₹ 7,00,00,000</td>
-                                    <td class="text-success">₹ 4,50,00,000</td>
-                                    <td>₹ 2,50,00,000</td>
-                                    <td><span class="status-badge on-track">On-track</span></td>
-                                    <td><i class="fas fa-eye text-primary me-2"></i><i class="fas fa-pen text-secondary"></i></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Marketing</td>
-                                    <td>₹ 3,00,00,000</td>
-                                    <td class="text-danger">₹ 2,85,00,000</td>
-                                    <td>₹ 15,00,000</td>
-                                    <td><span class="status-badge warning">Warning</span></td>
-                                    <td><i class="fas fa-eye text-primary me-2"></i><i class="fas fa-pen text-secondary"></i></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="panel-card mb-0">
-                        <h6 class="fw-bold mb-3" style="color: #1e3a8a;">Forecast Summary</h6>
-                        <div class="mb-3">
-                            <div class="small text-muted">Forecasted Spend</div>
-                            <div class="fs-4 fw-extrabold text-dark">₹ 17,60,00,000</div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="small text-muted">Variance</div>
-                            <div class="fs-5 fw-bold text-danger">₹ 1,75,00,000</div>
-                        </div>
-                        <div class="mb-4">
-                            <div class="small text-muted mb-1">Risk Level</div>
-                            <span class="badge bg-warning text-dark px-3 py-2 fs-6">Medium</span>
-                        </div>
-                        <button class="btn btn-primary w-100 fw-bold rounded-pill">View Forecast</button>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- ========================================================================= -->
-        <!-- TAB 6: INVOICING & BILLING (SCREENSHOT 5) -->
+        <!-- VIEW 6: KNOWLEDGE BASE / DATA MASKING -->
         <!-- ========================================================================= -->
-        <div th:if="${activeTab == 'invoicing'}">
-            <!-- Invoice Details Table -->
-            <div class="panel-card mb-4">
-                <h6 class="fw-bold mb-3" style="color: #1e3a8a;">Invoice Details</h6>
-                <table class="custom-table">
-                    <thead>
-                        <tr>
-                            <th>Invoice ID</th>
-                            <th>Client</th>
-                            <th>Invoice Date</th>
-                            <th>Due Date</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="client, stat : ${allClients}" th:if="${stat.index < 5}">
-                            <td class="fw-bold" th:text="${'INV-10' + (stat.index + 21)}">INV-1025</td>
-                            <td class="fw-bold" th:text="${client.companyName}">Infosys</td>
-                            <td>01/06/2026</td>
-                            <td>30/06/2026</td>
-                            <td class="fw-bold">₹ 12,00,000</td>
-                            <td>
-                                <span class="status-badge" 
-                                      th:classappend="${stat.index == 0 ? 'pending' : (stat.index == 1 ? 'sent' : (stat.index == 2 ? 'overdue' : 'paid'))}"
-                                      th:text="${stat.index == 0 ? 'Pending' : (stat.index == 1 ? 'Sent' : (stat.index == 2 ? 'Overdue' : 'Paid'))}">Pending</span>
-                            </td>
-                            <td>
-                                <i class="fas fa-eye text-primary me-2"></i>
-                                <i class="fas fa-check text-success me-2"></i>
-                                <i class="fas fa-download text-secondary"></i>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Client Billing Cycles & Outstanding Payments -->
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="panel-card mb-0">
-                        <h6 class="fw-bold mb-3" style="color: #1e3a8a;">Client Billing Cycles</h6>
-                        <table class="custom-table">
-                            <thead>
-                                <tr>
-                                    <th>Client</th>
-                                    <th>Billing Frequency</th>
-                                    <th>Billing Type</th>
-                                    <th>Next Invoice Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="fw-bold">Infosys</td>
-                                    <td>Monthly</td>
-                                    <td>31/07/2026</td>
-                                    <td>30/06/2026</td>
-                                    <td><i class="fas fa-pen text-secondary"></i></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">TCS</td>
-                                    <td>Quarterly</td>
-                                    <td>28/09/2026</td>
-                                    <td>28/06/2026</td>
-                                    <td><i class="fas fa-pen text-secondary"></i></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+        <div th:if="${activeTab == 'knowledge_base' or activeTab == 'data_masking'}">
+            <div class="content-header">
+                <div class="header-title-area">
+                    <h2>Data Masking Rules <i class="fas fa-info-circle text-muted fs-6 ms-1"></i></h2>
+                    <p>Configure sensitive employee data fields. These fields will be masked as per role-based access when viewed by authorized users.</p>
                 </div>
-                <div class="col-md-6">
-                    <div class="panel-card mb-0">
-                        <h6 class="fw-bold mb-3" style="color: #1e3a8a;">Outstanding Payments</h6>
-                        <table class="custom-table">
+            </div>
+            <div class="page-body">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div class="figma-subtabs-bar m-0 border-0">
+                        <button type="button" class="figma-tab-link active"><i class="fas fa-table"></i> Data Fields</button>
+                        <button type="button" class="figma-tab-link"><i class="fas fa-sliders-h"></i> Rules</button>
+                        <button type="button" class="figma-tab-link"><i class="fas fa-history"></i> Access Audit</button>
+                    </div>
+                    
+                </div>
+
+                <div class="figma-table-card">
+                    <div class="figma-table-filter-bar">
+                        <div class="position-relative">
+                            <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                            <input type="text" class="form-control table-search-input" placeholder="Search by Employee Name / ID..." onkeyup="filterGenericTable(this, 'kbTableBody')">
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button class="btn btn-outline-primary btn-sm fw-bold"><i class="fas fa-filter me-1"></i> Filters</button>
+                            <button class="btn btn-outline-secondary btn-sm fw-bold"><i class="fas fa-undo me-1"></i> Clear Filters</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="figma-table">
                             <thead>
                                 <tr>
-                                    <th>Client</th>
-                                    <th>Invoice ID</th>
-                                    <th>Due Date</th>
-                                    <th>Outstanding Amt.</th>
-                                    <th>Days Overdue</th>
+                                    <th>Employee Name / ID</th>
+                                    <th>Aadhar Number</th>
+                                    <th>Bank Account Number</th>
+                                    <th>PAN Number</th>
+                                    <th>CTC (Annual)</th>
+                                    <th>Appraisal Rating</th>
+                                    <th>Last Updated</th>
+                                    <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="kbTableBody">
                                 <tr>
-                                    <td class="fw-bold">Wipro</td>
-                                    <td>INV-1024</td>
-                                    <td>15/06/2026</td>
-                                    <td class="fw-bold text-danger">₹ 1,50,000</td>
-                                    <td><span class="badge bg-danger">12 days</span></td>
+                                    <td><div class="d-flex align-items-center"><span class="emp-avatar bg-primary">RS</span><div><div class="fw-bold text-dark">Rahul Sharma</div><div class="small text-muted">EMP00123</div></div></div></td>
+                                    <td>9876 5432 1098</td>
+                                    <td>50200012345678</td>
+                                    <td class="fw-bold">ABCDE1234F</td>
+                                    <td class="fw-bold text-dark">18,50,000</td>
+                                    <td>4.2 / 5</td>
+                                    <td>21 Jul 2026</td>
+                                    <td class="text-end"><i class="fas fa-pencil-alt action-icon text-primary me-2"></i><i class="fas fa-trash action-icon text-danger me-2"></i></td>
                                 </tr>
                                 <tr>
-                                    <td class="fw-bold">HCL</td>
-                                    <td>INV-1023</td>
-                                    <td>25/06/2026</td>
-                                    <td class="fw-bold text-warning">₹ 80,000</td>
-                                    <td><span class="badge bg-warning text-dark">2 days</span></td>
+                                    <td><div class="d-flex align-items-center"><span class="emp-avatar bg-success">AP</span><div><div class="fw-bold text-dark">Anjali Patel</div><div class="small text-muted">EMP00126</div></div></div></td>
+                                    <td>8765 4321 0987</td>
+                                    <td>50100123456789</td>
+                                    <td class="fw-bold">ABCPP5678G</td>
+                                    <td class="fw-bold text-dark">12,00,000</td>
+                                    <td>4.0 / 5</td>
+                                    <td>21 Jul 2026</td>
+                                    <td class="text-end"><i class="fas fa-pencil-alt action-icon text-primary me-2"></i><i class="fas fa-trash action-icon text-danger me-2"></i></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1016,165 +805,849 @@
             </div>
         </div>
 
-        <!-- OTHER TABS (Accounting, Taxation, Analytics, Vendors) -->
-        <div th:if="${activeTab == 'accounting' or activeTab == 'taxation' or activeTab == 'analytics' or activeTab == 'vendors'}">
-            <div class="panel-card text-center py-5">
-                <i class="fas fa-calculator text-primary fs-1 mb-3"></i>
-                <h4 class="fw-bold text-dark" th:text="${#strings.capitalize(activeTab)}">Module Overview</h4>
-                <p class="text-muted">Live synchronization active with General Ledger and Statutory Accounts Repository.</p>
-                <a href="/space/accounts/dashboard" class="btn btn-outline-primary rounded-pill fw-bold">Return to Dashboard</a>
+        <!-- ========================================================================= -->
+        <!-- VIEW 7: NOTIFICATION / ALERT -->
+        <!-- ========================================================================= -->
+        <div th:if="${activeTab == 'notification_alert' or activeTab == 'notifications'}">
+            <div class="content-header">
+                <div class="header-title-area">
+                    <h2>Notification / Alert Rules <i class="fas fa-info-circle text-muted fs-6 ms-1"></i></h2>
+                    <p>Configure and manage alerts and notifications for important finance and compliance events.</p>
+                </div>
+                
+            </div>
+            <div class="page-body">
+                <div class="figma-table-card">
+                    <div class="figma-table-filter-bar">
+                        <div class="position-relative">
+                            <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                            <input type="text" class="form-control table-search-input" placeholder="Search by Trigger Name..." onkeyup="filterGenericTable(this, 'notifTableBody')">
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <select class="form-select form-select-sm fw-semibold"><option>All Status</option></select>
+                            <select class="form-select form-select-sm fw-semibold"><option>All Modules</option></select>
+                            <button class="btn btn-outline-secondary btn-sm fw-bold"><i class="fas fa-undo me-1"></i> Clear Filters</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="figma-table">
+                            <thead>
+                                <tr>
+                                    <th>TRIGGER (EVENT)</th>
+                                    <th>MODULE</th>
+                                    <th>CONDITION</th>
+                                    <th>NOTIFY TO</th>
+                                    <th>CHANNEL</th>
+                                    <th>STATUS</th>
+                                    <th>LAST UPDATED</th>
+                                    <th class="text-end">ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="notifTableBody">
+                                <tr>
+                                    <td><div class="d-flex align-items-center"><span class="emp-avatar bg-success bg-opacity-10 text-success me-3"><i class="fas fa-credit-card"></i></span><div><div class="fw-bold text-dark">Reimbursement crosses 10,000</div><div class="small text-muted">Alert when any reimbursement request exceeds 10,000.</div></div></div></td>
+                                    <td>Employee Reimbursement</td>
+                                    <td class="fw-bold">Amount > 10,000</td>
+                                    <td>Finance Admin, Super Admin</td>
+                                    <td><span class="badge bg-primary bg-opacity-10 text-primary px-3 py-1 fw-bold"><i class="fas fa-envelope me-1"></i> Email</span></td>
+                                    <td><span class="badge-status active">• Active</span></td>
+                                    <td><div class="fw-bold">21 Jul 2026</div><div class="small text-muted">by Arjun Mehta</div></td>
+                                    <td class="text-end"><i class="fas fa-pencil-alt action-icon text-primary me-2"></i><i class="fas fa-ellipsis-v action-icon text-secondary"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- VIEW 8: REPORT -->
+        <!-- ========================================================================= -->
+        <div th:if="${activeTab == 'report'}">
+            <div class="content-header">
+                <div class="header-title-area">
+                    <h2>Reports</h2>
+                    <p>View and analyze key finance and compliance reports.</p>
+                </div>
+            </div>
+            <div class="page-body">
+                <div class="figma-subtabs-bar" id="reportsSubtabNav">
+                    <button type="button" class="figma-tab-link active" onclick="switchReportSubtab('dept_cost')"><i class="fas fa-chart-bar"></i> Department Cost Report</button>
+                    <button type="button" class="figma-tab-link" onclick="switchReportSubtab('compliance')"><i class="fas fa-check-circle"></i> Compliance Status Report</button>
+                    <button type="button" class="figma-tab-link" onclick="switchReportSubtab('budget_actual')"><i class="fas fa-balance-scale"></i> Budget vs Actual</button>
+                    <button type="button" class="figma-tab-link" onclick="switchReportSubtab('approval_pending')"><i class="fas fa-clock"></i> Approval Pending Report</button>
+                </div>
+                <div id="reportContentArea"></div>
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- VIEW 9: FINANCE CHECKLIST -->
+        <!-- ========================================================================= -->
+        <div th:if="${activeTab == 'finance_checklist' or activeTab == 'onboarding'}">
+            <div class="content-header">
+                <div class="header-title-area">
+                    <h2>Onboarding / Offboarding Finance Checklist</h2>
+                    <p>Manage finance onboarding and offboarding activities for employees.</p>
+                </div>
+                
+            </div>
+            <div class="page-body">
+                <div class="figma-subtabs-bar" id="checklistSubtabNav">
+                    <button type="button" class="figma-tab-link active" onclick="switchChecklistSubtab('onboarding')"><i class="fas fa-user-plus"></i> Onboarding Checklist</button>
+                    <button type="button" class="figma-tab-link" onclick="switchChecklistSubtab('offboarding')"><i class="fas fa-user-minus"></i> Offboarding Checklist</button>
+                </div>
+                <div class="figma-table-card">
+                    <div class="figma-table-filter-bar">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <select class="form-select form-select-sm fw-semibold"><option>01 Jul 2026 - 21 Jul 2026</option></select>
+                            <select class="form-select form-select-sm fw-semibold"><option>All Departments</option></select>
+                            <select class="form-select form-select-sm fw-semibold"><option>All Branches</option></select>
+                            <select class="form-select form-select-sm fw-semibold"><option>All Statuses</option></select>
+                        </div>
+                        <div class="ms-auto"><button class="btn btn-primary btn-sm fw-bold px-3" onclick="showToastAlert('Opening Finance Onboard Form')"><i class="fas fa-plus me-1"></i> Finance Onboard</button></div>
+                    </div>
+                    <div class="p-3 bg-light border-bottom fw-bold text-dark" id="checklistTableTitle">New Onboarded Employees (Finance Onboarding Pending/Completed)</div>
+                    <div class="table-responsive">
+                        <table class="figma-table">
+                            <thead id="checklistTableHead"></thead>
+                            <tbody id="checklistTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- VIEW 10: ADDITIONAL CONSIDERATIONS -->
+        <!-- ========================================================================= -->
+        <div th:if="${activeTab == 'additional_considerations'}">
+            <div class="content-header">
+                <div class="header-title-area">
+                    <h2>Additional Considerations</h2>
+                    <p>Manage multi-entity policies, statutory bonus calculation, integration systems and payroll exceptions.</p>
+                </div>
+                
+            </div>
+            <div class="page-body">
+                <div class="figma-subtabs-bar" id="additionalSubtabNav">
+                    <button type="button" class="figma-tab-link active" onclick="switchAdditionalSubtab('multi_entity')"><i class="fas fa-globe"></i> Multi-Entity Handling</button>
+                    <button type="button" class="figma-tab-link" onclick="switchAdditionalSubtab('arrears')"><i class="fas fa-history"></i> Arrears Management</button>
+                    <button type="button" class="figma-tab-link" onclick="switchAdditionalSubtab('leave_gratuity')"><i class="fas fa-calculator"></i> Leave Encashment & Gratuity Rules</button>
+                    <button type="button" class="figma-tab-link" onclick="switchAdditionalSubtab('data_correction')"><i class="fas fa-wrench"></i> Data Correction & Failed Payment</button>
+                    <button type="button" class="figma-tab-link" onclick="switchAdditionalSubtab('ess_integration')"><i class="fas fa-user-check"></i> Employee Self-Service (ESS) Integration</button>
+                    <button type="button" class="figma-tab-link" onclick="switchAdditionalSubtab('statutory_bonus')"><i class="fas fa-gift"></i> Statutory Bonus Calculation (Bonus Act)</button>
+                    <button type="button" class="figma-tab-link" onclick="switchAdditionalSubtab('integration_system')"><i class="fas fa-network-wired"></i> Integration System</button>
+                </div>
+                <div id="additionalContentArea"></div>
             </div>
         </div>
 
     </div>
 
-    <!-- PAYSLIP PREVIEW MODAL (SCREENSHOT 2 RIGHT) -->
-    <div class="modal fade" id="payslipModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold text-primary">Hold Salary Payslip Preview</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="payslip-box">
-                        <div class="payslip-header d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="fw-extrabold m-0">Whitecircle Group - Shahdol</h6>
-                                <div class="small text-muted">Hold Salary Payslip for May 2026</div>
-                            </div>
-                            <div class="text-end">
-                                <div class="small text-muted">Print Date - 08/06/2026</div>
-                                <div class="fw-bold text-success fs-5">Net Pay: <span id="modalNetPay">₹ 54,800.00</span></div>
-                            </div>
-                        </div>
-
-                        <div class="row g-2 mb-3 small">
-                            <div class="col-6">Employee Name: <strong id="modalEmpName">Amit Kumar</strong></div>
-                            <div class="col-6">Employee ID: <strong id="modalEmpId">EMP129</strong></div>
-                            <div class="col-6">Department: <strong id="modalEmpDept">Finance</strong></div>
-                            <div class="col-6">Date of Joining: <strong>1 Dec 2024</strong></div>
-                            <div class="col-6">Pay Days: <strong>26.00</strong></div>
-                            <div class="col-6">Present Days: <strong>26.00</strong></div>
-                        </div>
-
-                        <table class="table table-bordered payslip-table mb-3">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Earning</th>
-                                    <th>Theoretical</th>
-                                    <th>Amount</th>
-                                    <th>Deductions</th>
-                                    <th>Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Basic</td><td>13750.00</td><td>13750.00</td><td>Professional Tax</td><td>200.00</td>
-                                </tr>
-                                <tr>
-                                    <td>DA</td><td>2750.00</td><td>2750.00</td><td>-</td><td>-</td>
-                                </tr>
-                                <tr>
-                                    <td>HRA</td><td>8250.00</td><td>8250.00</td><td>-</td><td>-</td>
-                                </tr>
-                                <tr>
-                                    <td>Conv. Allow.</td><td>5500.00</td><td>5500.00</td><td>-</td><td>-</td>
-                                </tr>
-                                <tr>
-                                    <td>Med. Allow.</td><td>11000.00</td><td>11000.00</td><td>-</td><td>-</td>
-                                </tr>
-                                <tr>
-                                    <td>Oth. Allow.</td><td>13750.00</td><td>13750.00</td><td>-</td><td>-</td>
-                                </tr>
-                                <tr class="fw-bold table-light">
-                                    <td>Total Earning</td><td>55000.00</td><td>55000.00</td><td>Total Deduction</td><td>200.00</td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <div class="d-flex justify-content-between align-items-center pt-2">
-                            <div>
-                                <strong>Net Payable Amount:</strong> ₹ 54,800.00<br>
-                                <small class="text-muted">Amount in words: Rupees Fifty Four Thousand Eight Hundred Only</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0 d-flex justify-content-center gap-3">
-                    <form th:action="@{/space/accounts/payroll/action}" method="POST" class="d-flex gap-3">
-                        <input type="hidden" id="formActionUserId" name="userId">
-                        <button type="submit" name="action" value="approve" class="btn btn-success px-4 fw-bold">Approve Payroll</button>
-                        <button type="submit" name="action" value="reject" class="btn btn-outline-danger px-4 fw-bold">Reject Payroll</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- CLAIM DETAILS MODAL (SCREENSHOT 3 RIGHT) -->
-    <div class="modal fade" id="claimModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold text-primary">Claim Details & Expense Breakdown</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="row g-3 mb-4 small">
-                        <div class="col-md-6 border-end">
-                            <div>Employee Name: <strong id="modalClaimEmpName">Amit Kumar</strong></div>
-                            <div>Employee ID: <strong>EMP001</strong></div>
-                            <div>Claim Date: <strong>16/06/2026</strong></div>
-                            <div>Submitted On: <strong>16/06/2026 10:24 AM</strong></div>
-                        </div>
-                        <div class="col-md-6">
-                            <div>Category: <strong>Medical</strong></div>
-                            <div>Total Amount: <strong>₹ 5950.00</strong></div>
-                            <div>Non Reimbursable: <strong>₹ 80.00</strong></div>
-                            <div>Reimbursable Amount: <strong class="text-success fs-6">₹ 5870.00</strong></div>
-                        </div>
-                    </div>
-
-                    <h6 class="fw-bold text-dark mb-2">Expense Breakdown</h6>
-                    <table class="table table-bordered small">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Expense Type</th>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Reimbursable</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Doctor Consultation</td><td>12 Jan 2026</td><td>₹ 800.00</td><td>₹ 800.00</td></tr>
-                            <tr><td>Pharmacy medicines</td><td>12 Jan 2026</td><td>₹ 1850.00</td><td>₹ 1850.00</td></tr>
-                            <tr><td>Lab Tests</td><td>15 Jan 2026</td><td>₹ 2200.00</td><td>₹ 2200.00</td></tr>
-                            <tr><td>Clinic parking</td><td>15 Jan 2026</td><td>₹ 80.00</td><td>₹ 0.00</td></tr>
-                            <tr><td>Medical consumables</td><td>15 Jan 2026</td><td>₹ 320.00</td><td>₹ 320.00</td></tr>
-                            <tr><td>Hospital Transit</td><td>15 Jan 2026</td><td>₹ 700.00</td><td>₹ 700.00</td></tr>
-                            <tr class="fw-bold table-light">
-                                <td colspan="2">Total</td><td>₹ 5950.00</td><td>₹ 5870.00</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer border-0 pt-0 d-flex justify-content-center gap-3">
-                    <form th:action="@{/space/accounts/expenses/action}" method="POST" class="d-flex gap-3">
-                        <input type="hidden" id="formActionClaimId" name="claimId">
-                        <button type="submit" name="action" value="approve" class="btn btn-success px-4 fw-bold">Approve</button>
-                        <button type="submit" name="action" value="reject" class="btn btn-outline-danger px-4 fw-bold">Reject</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SCRIPTS FOR CHARTS & MODALS -->
+    <!-- JAVASCRIPT LOGIC FOR ALL MODULES -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- THYMELEAF DATA INJECTION -->
     <script th:inline="javascript">
+        // Inject real data from Spring model attributes into JS variables
+        const DB_USERS = /*[[${allUsers}]]*/ [];
+        const DB_SALARY_REVISIONS = /*[[${salaryRevisions}]]*/ [];
+        const DB_EMPLOYEE_LOANS = /*[[${employeeLoans}]]*/ [];
+        const DB_FINANCE_CHECKLISTS = /*[[${financeChecklists}]]*/ [];
+        const DB_EXPENSE_CLAIMS = /*[[${allExpenseClaims}]]*/ [];
+        const DB_STATUTORY_BONUSES = /*[[${statutoryBonuses}]]*/ [];
+        const DB_FINANCE_INTEGRATIONS = /*[[${financeIntegrations}]]*/ [];
+        const DB_TOTAL_EMPLOYEES = /*[[${totalEmployees}]]*/ 0;
+    </script>
+
+    <script>
+        /* =========================================================================
+         * UTILITY FUNCTIONS
+         * ========================================================================= */
+        function showToastAlert(msg) {
+            document.getElementById("toastMessage").innerText = msg;
+            const a = document.getElementById("toastNotificationAlert");
+            a.classList.remove("d-none");
+            setTimeout(() => a.classList.add("d-none"), 4000);
+        }
+        function closeToastAlert() { document.getElementById("toastNotificationAlert").classList.add("d-none"); }
+        function syncDataFromHR() { showToastAlert("Syncing latest requests from HR database..."); }
+        function filterGenericTable(inputElem, tbodyId) {
+            const q = inputElem.value.toLowerCase();
+            document.querySelectorAll("#" + tbodyId + " tr").forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
+        }
+        function setActiveSubtab(navId, btn) {
+            document.querySelectorAll("#" + navId + " .figma-tab-link").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+        }
+        function statusBadge(s) {
+            const cls = s.toLowerCase().replace(/[\s\/]/g, '-');
+            return '<span class="badge-status ' + cls + '">• ' + s + '</span>';
+        }
+        function empCell(name, id, avatar, color) {
+            return '<div class="d-flex align-items-center"><span class="emp-avatar ' + color + '">' + avatar + '</span><div><div class="fw-bold text-dark">' + name + '</div><div class="small text-muted">' + id + '</div></div></div>';
+        }
+        function actionBtns(text, action) {
+            return '<button class="btn btn-sm btn-outline-primary fw-bold me-1" onclick="showToastAlert(\'' + (action||text) + ' action initiated...\')">' + text + '</button><i class="fas fa-ellipsis-v action-icon text-secondary ms-1" onclick="showToastAlert(\'More options...\')"></i>';
+        }
+
+        /* =========================================================================
+         * HR-FINANCE MATRIX — 6 SUB-TABS
+         * ========================================================================= */
+        const matrixSubtabData = {
+            appraisal: {
+                desc: "Manage appraisal-linked payout requests received from HR.",
+                cards: [{l:"Total Employees",v:"124"},{l:"Pending from HR",v:"8"},{l:"Under Review",v:"3"},{l:"Approved",v:"109"}],
+                headers: ["","Employee Name / ID","Department","Current CTC (LPA)","Proposed Increment %","Proposed CTC (LPA)","Effective Date","Status","Finance Action","Action"],
+                rows: [
+                    {emp:"Rahul Sharma",id:"EMP00123",av:"RS",co:"bg-primary",dept:"Engineering",c1:"8.50",c2:"12.0%",c3:"9.52",date:"01 Jul 2026",status:"Pending"},
+                    {emp:"Anjali Patel",id:"EMP00126",av:"AP",co:"bg-success",dept:"Product",c1:"10.20",c2:"10.0%",c3:"11.22",date:"01 Jul 2026",status:"Pending"},
+                    {emp:"Vikram Kumar",id:"EMP00130",av:"VK",co:"bg-warning",dept:"UI/UX",c1:"6.80",c2:"15.0%",c3:"7.82",date:"01 Jul 2026",status:"Under Review"},
+                    {emp:"Sneha Pandey",id:"EMP00134",av:"SP",co:"bg-info",dept:"Marketing",c1:"7.20",c2:"8.0%",c3:"7.78",date:"01 Jul 2026",status:"Approved"}
+                ]
+            },
+            increment: {
+                desc: "Review and approve salary increment requests forwarded by HR.",
+                cards: [{l:"Increment Requests",v:"36"},{l:"Pending Finance",v:"12"},{l:"Under Review",v:"5"},{l:"Processed",v:"19"}],
+                headers: ["","Employee Name / ID","Department","Current Salary (LPA)","Increment %","Revised Salary (LPA)","Effective Date","Status","Action"],
+                rows: [
+                    {emp:"Amit Verma",id:"EMP00140",av:"AV",co:"bg-danger",dept:"Engineering",c1:"9.00",c2:"10.0%",c3:"9.90",date:"01 Aug 2026",status:"Pending"},
+                    {emp:"Priya Singh",id:"EMP00145",av:"PS",co:"bg-success",dept:"Product",c1:"11.50",c2:"8.5%",c3:"12.48",date:"01 Aug 2026",status:"Under Review"},
+                    {emp:"Karan Mehra",id:"EMP00148",av:"KM",co:"bg-primary",dept:"Engineering",c1:"7.20",c2:"12.0%",c3:"8.06",date:"01 Aug 2026",status:"Approved"}
+                ]
+            },
+            bonus: {
+                desc: "Track and process bonus disbursement requests from HR.",
+                cards: [{l:"Bonus Requests",v:"48"},{l:"Pending Payout",v:"15"},{l:"Processing",v:"8"},{l:"Disbursed",v:"25"}],
+                headers: ["","Employee Name / ID","Department","Bonus Type","Base Salary (LPA)","Bonus Amount (₹)","Due Date","Status","Action"],
+                rows: [
+                    {emp:"Rahul Sharma",id:"EMP00123",av:"RS",co:"bg-primary",dept:"Engineering",c1:"Performance",c2:"8.50 LPA",c3:"85,000",date:"30 Nov 2026",status:"Pending"},
+                    {emp:"Anjali Patel",id:"EMP00126",av:"AP",co:"bg-success",dept:"Product",c1:"Festival",c2:"10.20 LPA",c3:"25,000",date:"15 Oct 2026",status:"Approved"},
+                    {emp:"Vikram Kumar",id:"EMP00130",av:"VK",co:"bg-warning",dept:"UI/UX",c1:"Statutory",c2:"6.80 LPA",c3:"56,667",date:"30 Nov 2026",status:"Pending"}
+                ]
+            },
+            fnf: {
+                desc: "Manage Full & Final Settlement calculations for exiting employees.",
+                cards: [{l:"F&F Cases",v:"6"},{l:"Pending Settlement",v:"3"},{l:"Under Calculation",v:"2"},{l:"Settled",v:"1"}],
+                headers: ["","Employee Name / ID","Department","Last Working Day","Pending Salary (₹)","Deductions (₹)","Net Payable (₹)","Status","Action"],
+                rows: [
+                    {emp:"Ravi Gupta",id:"EMP00102",av:"RG",co:"bg-danger",dept:"Marketing",c1:"31 Jul 2026",c2:"1,45,000",c3:"12,000",date:"1,33,000",status:"Pending"},
+                    {emp:"Meera Joshi",id:"EMP00115",av:"MJ",co:"bg-info",dept:"Engineering",c1:"15 Jul 2026",c2:"2,10,000",c3:"18,500",date:"1,91,500",status:"Settled"}
+                ]
+            },
+            structure: {
+                desc: "Review salary structure revisions proposed by HR department.",
+                cards: [{l:"Revision Requests",v:"18"},{l:"Pending Finance",v:"7"},{l:"Under Review",v:"4"},{l:"Approved",v:"7"}],
+                headers: ["","Employee Name / ID","Department","Old Structure","New Structure","Impact (₹/month)","Effective Date","Status","Action"],
+                rows: [
+                    {emp:"Rahul Sharma",id:"EMP00123",av:"RS",co:"bg-primary",dept:"Engineering",c1:"Basic 40% + HRA 20%",c2:"Basic 50% + HRA 25%",c3:"+8,500",date:"01 Aug 2026",status:"Pending"},
+                    {emp:"Anjali Patel",id:"EMP00126",av:"AP",co:"bg-success",dept:"Product",c1:"Basic 40% + HRA 20%",c2:"Basic 45% + HRA 22%",c3:"+5,100",date:"01 Aug 2026",status:"Under Review"}
+                ]
+            },
+            loan: {
+                desc: "Process employee loan and salary advance requests.",
+                cards: [{l:"Loan Applications",v:"14"},{l:"Pending Approval",v:"5"},{l:"Active Loans",v:"8"},{l:"Closed",v:"1"}],
+                headers: ["","Employee Name / ID","Department","Loan Type","Amount (₹)","EMI (₹)","Tenure","Status","Action"],
+                rows: [
+                    {emp:"Karan Mehra",id:"EMP00148",av:"KM",co:"bg-primary",dept:"Engineering",c1:"Salary Advance",c2:"50,000",c3:"12,500",date:"4 Months",status:"Pending"},
+                    {emp:"Sneha Pandey",id:"EMP00134",av:"SP",co:"bg-info",dept:"Marketing",c1:"Personal Loan",c2:"2,00,000",c3:"18,000",date:"12 Months",status:"Approved"},
+                    {emp:"Amit Verma",id:"EMP00140",av:"AV",co:"bg-danger",dept:"Engineering",c1:"Emergency Advance",c2:"30,000",c3:"15,000",date:"2 Months",status:"Pending"}
+                ]
+            }
+        };
+
+        let currentMatrixSubtab = 'appraisal';
+
+        function switchMatrixSubtab(key) {
+            currentMatrixSubtab = key;
+            const data = matrixSubtabData[key];
+            if (!data) return;
+            // Active tab styling
+            const btns = document.querySelectorAll("#matrixSubtabNav .figma-tab-link");
+            btns.forEach(b => { b.classList.remove("active"); if (b.textContent.trim().toLowerCase().includes(key.substring(0,4))) b.classList.add("active"); });
+            document.querySelector('#matrixSubtabNav .figma-tab-link[onclick*="' + key + '"]').classList.add("active");
+            btns.forEach(b => { if (b.getAttribute("onclick") && b.getAttribute("onclick").includes("'" + key + "'")) { b.classList.add("active"); } else { b.classList.remove("active"); } });
+            // Update description
+            document.getElementById("matrixSubtabDesc").innerText = data.desc;
+            // Update metric cards
+            const labels = ["mCardLabel1","mCardLabel2","mCardLabel3","mCardLabel4"];
+            const vals = ["mCardVal1","mCardVal2","mCardVal3","mCardVal4"];
+            data.cards.forEach((c, i) => { document.getElementById(labels[i]).innerText = c.l; document.getElementById(vals[i]).innerText = c.v; });
+            // Render table
+            renderMatrixTable(data);
+        }
+
+        function renderMatrixTable(data) {
+            const thead = document.getElementById("matrixTableHead");
+            const tbody = document.getElementById("matrixTableBody");
+            thead.innerHTML = "<tr>" + data.headers.map(h => "<th>" + (h === "" ? "<input type='checkbox'>" : h) + "</th>").join("") + "</tr>";
+            tbody.innerHTML = data.rows.map(r => {
+                let cols = "<td><input type='checkbox'></td>";
+                cols += "<td>" + empCell(r.emp, r.id, r.av, r.co) + "</td>";
+                cols += "<td>" + r.dept + "</td>";
+                cols += "<td class='fw-bold'>" + r.c1 + "</td>";
+                cols += "<td class='fw-bold'>" + r.c2 + "</td>";
+                cols += "<td class='fw-bold text-primary'>" + r.c3 + "</td>";
+                cols += "<td>" + r.date + "</td>";
+                cols += "<td>" + statusBadge(r.status) + "</td>";
+                if (data.headers.length > 9) cols += "<td>" + actionBtns("Review", "Review") + "</td>";
+                cols += "<td>" + actionBtns("Action", r.emp) + "</td>";
+                return "<tr data-dept='" + r.dept + "' data-status='" + r.status + "'>" + cols + "</tr>";
+            }).join("");
+        }
+
+        function filterMatrixTable() {
+            const q = (document.getElementById("matrixSearchInput").value || "").toLowerCase();
+            const dept = (document.getElementById("matrixDeptFilter").value || "");
+            const status = (document.getElementById("matrixStatusFilter").value || "");
+            document.querySelectorAll("#matrixTableBody tr").forEach(r => {
+                const text = r.innerText.toLowerCase();
+                const matchQ = !q || text.includes(q);
+                const matchD = !dept || r.dataset.dept === dept;
+                const matchS = !status || r.dataset.status === status;
+                r.style.display = (matchQ && matchD && matchS) ? "" : "none";
+            });
+        }
+
+        /* =========================================================================
+         * APPROVAL WORKFLOW — 4 SUB-TABS
+         * ========================================================================= */
+        const approvalSubtabData = {
+            reimbursement: {
+                desc: "Manage and take action on employee reimbursement claims.",
+                cards: [{l:"Total Claims",v:"52"},{l:"Pending",v:"18"},{l:"Under Review",v:"12"},{l:"Approved",v:"16"},{l:"Rejected",v:"6"}],
+                headers: ["","Employee Name / ID","Department","Claim Type","Amount (₹)","Submitted On","Status","Action"],
+                rows: [
+                    {emp:"Rahul Sharma",id:"EMP00123",av:"RS",co:"bg-primary",dept:"Engineering",c1:"Travel",c2:"12,500",date:"15 Jul 2026",status:"Pending"},
+                    {emp:"Anjali Patel",id:"EMP00126",av:"AP",co:"bg-success",dept:"Product",c1:"Medical",c2:"8,200",date:"18 Jul 2026",status:"Under Review"},
+                    {emp:"Vikram Kumar",id:"EMP00130",av:"VK",co:"bg-warning",dept:"UI/UX",c1:"Internet",c2:"1,500",date:"20 Jul 2026",status:"Approved"},
+                    {emp:"Karan Mehra",id:"EMP00148",av:"KM",co:"bg-primary",dept:"Engineering",c1:"Travel",c2:"22,800",date:"10 Jul 2026",status:"Pending"},
+                    {emp:"Sneha Pandey",id:"EMP00134",av:"SP",co:"bg-info",dept:"Marketing",c1:"Meals",c2:"3,400",date:"22 Jul 2026",status:"Rejected"}
+                ]
+            },
+            salary_revision: {
+                desc: "Review salary revision requests requiring finance approval.",
+                cards: [{l:"Total Revisions",v:"18"},{l:"Pending Finance",v:"7"},{l:"Under Review",v:"4"},{l:"Approved",v:"5"},{l:"Rejected",v:"2"}],
+                headers: ["","Employee Name / ID","Department","Current CTC (LPA)","Proposed CTC (LPA)","Increment %","Effective Date","Status","Action"],
+                rows: [
+                    {emp:"Amit Verma",id:"EMP00140",av:"AV",co:"bg-danger",dept:"Engineering",c1:"9.00",c2:"10.80",date:"01 Aug 2026",status:"Pending"},
+                    {emp:"Priya Singh",id:"EMP00145",av:"PS",co:"bg-success",dept:"Product",c1:"11.50",c2:"12.65",date:"01 Aug 2026",status:"Under Review"},
+                    {emp:"Rahul Sharma",id:"EMP00123",av:"RS",co:"bg-primary",dept:"Engineering",c1:"8.50",c2:"9.52",date:"01 Jul 2026",status:"Approved"}
+                ]
+            },
+            vendor_payment: {
+                desc: "Track and approve vendor payment requests.",
+                cards: [{l:"Total Invoices",v:"34"},{l:"Pending Payment",v:"11"},{l:"Under Verification",v:"6"},{l:"Paid",v:"14"},{l:"Rejected",v:"3"}],
+                headers: ["","Vendor Name","Invoice No.","Category","Amount (₹)","Due Date","Status","Action"],
+                rows: [
+                    {emp:"TechSoft Solutions",id:"INV-2026-0451",av:"TS",co:"bg-primary",dept:"IT Services",c1:"Software License",c2:"2,45,000",date:"31 Jul 2026",status:"Pending"},
+                    {emp:"CloudNet Infra",id:"INV-2026-0448",av:"CI",co:"bg-success",dept:"Infrastructure",c1:"Cloud Hosting",c2:"1,80,000",date:"28 Jul 2026",status:"Under Review"},
+                    {emp:"PrintMax India",id:"INV-2026-0442",av:"PM",co:"bg-warning",dept:"Office Supplies",c1:"Stationery",c2:"18,500",date:"25 Jul 2026",status:"Approved"}
+                ]
+            },
+            payroll_setup: {
+                desc: "Manage new employee bank account and payroll setup requests.",
+                cards: [{l:"Total Requests",v:"8"},{l:"Pending Setup",v:"4"},{l:"Bank Verification",v:"2"},{l:"Completed",v:"2"},{l:"Failed",v:"0"}],
+                headers: ["","Employee Name / ID","Department","Bank Name","Account Number","IFSC Code","Setup Date","Status","Action"],
+                rows: [
+                    {emp:"Neha Kapoor",id:"EMP00155",av:"NK",co:"bg-info",dept:"Product",c1:"ICICI Bank",c2:"****5678",date:"20 Jul 2026",status:"Pending"},
+                    {emp:"Rohit Malhotra",id:"EMP00158",av:"RM",co:"bg-primary",dept:"Engineering",c1:"HDFC Bank",c2:"****9012",date:"18 Jul 2026",status:"Completed"}
+                ]
+            }
+        };
+
+        let currentApprovalSubtab = 'reimbursement';
+
+        function switchApprovalSubtab(key) {
+            currentApprovalSubtab = key;
+            const data = approvalSubtabData[key];
+            if (!data) return;
+            document.querySelectorAll("#approvalSubtabNav .figma-tab-link").forEach(b => { b.classList.remove("active"); if (b.getAttribute("onclick") && b.getAttribute("onclick").includes("'" + key + "'")) b.classList.add("active"); });
+            document.getElementById("approvalSubtabDesc").innerText = data.desc;
+            const labels = ["apCardLabel1","apCardLabel2","apCardLabel3","apCardLabel4","apCardLabel5"];
+            const vals = ["apCardVal1","apCardVal2","apCardVal3","apCardVal4","apCardVal5"];
+            data.cards.forEach((c, i) => { document.getElementById(labels[i]).innerText = c.l; document.getElementById(vals[i]).innerText = c.v; });
+            renderApprovalTable(data);
+        }
+
+        function renderApprovalTable(data) {
+            const thead = document.getElementById("approvalTableHead");
+            const tbody = document.getElementById("approvalTableBody");
+            thead.innerHTML = "<tr>" + data.headers.map(h => "<th>" + (h === "" ? "<input type='checkbox'>" : h) + "</th>").join("") + "</tr>";
+            tbody.innerHTML = data.rows.map(r => {
+                let cols = "<td><input type='checkbox'></td>";
+                cols += "<td>" + empCell(r.emp, r.id, r.av, r.co) + "</td>";
+                cols += "<td>" + r.dept + "</td>";
+                cols += "<td>" + r.c1 + "</td>";
+                cols += "<td class='fw-bold'>₹ " + r.c2 + "</td>";
+                cols += "<td>" + r.date + "</td>";
+                cols += "<td>" + statusBadge(r.status) + "</td>";
+                cols += "<td>" + actionBtns("Review", r.emp) + "</td>";
+                return "<tr data-dept='" + r.dept + "' data-status='" + r.status + "'>" + cols + "</tr>";
+            }).join("");
+        }
+
+        function filterApprovalTable() {
+            const q = (document.getElementById("approvalSearchInput").value || "").toLowerCase();
+            document.querySelectorAll("#approvalTableBody tr").forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
+        }
+
+        /* =========================================================================
+         * TRANSACTION THRESHOLDS — 4 SUB-TABS
+         * ========================================================================= */
+        const thresholdSubtabData = {
+            reimbursement: {
+                cards3: "26", cards4: "7",
+                headers: ["","Employee Name / ID","Department","Claim Type","Amount (₹)","Threshold Level","Submitted On","Status","Action"],
+                rows: [
+                    {emp:"Rahul Sharma",id:"EMP00123",av:"RS",co:"bg-primary",dept:"Engineering",c1:"Travel Reimbursement",c2:"45,000",c3:"Finance Admin",date:"15 Jul 2026",status:"Pending"},
+                    {emp:"Karan Mehra",id:"EMP00148",av:"KM",co:"bg-primary",dept:"Engineering",c1:"Medical Reimbursement",c2:"1,25,000",c3:"Super Admin Required",date:"10 Jul 2026",status:"Pending Super"},
+                    {emp:"Anjali Patel",id:"EMP00126",av:"AP",co:"bg-success",dept:"Product",c1:"Training Expense",c2:"78,000",c3:"Finance Admin",date:"18 Jul 2026",status:"Approved"},
+                    {emp:"Sneha Pandey",id:"EMP00134",av:"SP",co:"bg-info",dept:"Marketing",c1:"Travel Reimbursement",c2:"2,10,000",c3:"Super Admin Required",date:"12 Jul 2026",status:"Pending Super"}
+                ]
+            },
+            vendor: {
+                cards3: "18", cards4: "5",
+                headers: ["","Vendor Name","Category","Invoice Amount (₹)","Threshold Level","Due Date","Status","Action"],
+                rows: [
+                    {emp:"TechSoft Solutions",id:"VND-001",av:"TS",co:"bg-primary",dept:"IT Services",c1:"Software License",c2:"2,45,000",c3:"Super Admin Required",date:"31 Jul 2026",status:"Pending Super"},
+                    {emp:"CloudNet Infra",id:"VND-002",av:"CI",co:"bg-success",dept:"Cloud",c1:"Cloud Hosting",c2:"85,000",c3:"Finance Admin",date:"28 Jul 2026",status:"Approved"},
+                    {emp:"PrintMax India",id:"VND-003",av:"PM",co:"bg-warning",dept:"Office",c1:"Stationery",c2:"18,500",c3:"Finance Admin",date:"25 Jul 2026",status:"Approved"}
+                ]
+            },
+            loan: {
+                cards3: "14", cards4: "4",
+                headers: ["","Employee Name / ID","Department","Loan Type","Amount (₹)","Threshold Level","Applied On","Status","Action"],
+                rows: [
+                    {emp:"Karan Mehra",id:"EMP00148",av:"KM",co:"bg-primary",dept:"Engineering",c1:"Salary Advance",c2:"50,000",c3:"Finance Admin",date:"20 Jul 2026",status:"Pending"},
+                    {emp:"Sneha Pandey",id:"EMP00134",av:"SP",co:"bg-info",dept:"Marketing",c1:"Personal Loan",c2:"2,00,000",c3:"Super Admin Required",date:"15 Jul 2026",status:"Pending Super"},
+                    {emp:"Amit Verma",id:"EMP00140",av:"AV",co:"bg-danger",dept:"Engineering",c1:"Emergency Advance",c2:"30,000",c3:"Finance Admin",date:"22 Jul 2026",status:"Approved"}
+                ]
+            },
+            bonus: {
+                cards3: "22", cards4: "6",
+                headers: ["","Employee Name / ID","Department","Bonus Type","Amount (₹)","Threshold Level","Disbursement Date","Status","Action"],
+                rows: [
+                    {emp:"Rahul Sharma",id:"EMP00123",av:"RS",co:"bg-primary",dept:"Engineering",c1:"Performance Bonus",c2:"85,000",c3:"Finance Admin",date:"30 Nov 2026",status:"Pending"},
+                    {emp:"Anjali Patel",id:"EMP00126",av:"AP",co:"bg-success",dept:"Product",c1:"Spot Award",c2:"1,50,000",c3:"Super Admin Required",date:"15 Oct 2026",status:"Pending Super"},
+                    {emp:"Vikram Kumar",id:"EMP00130",av:"VK",co:"bg-warning",dept:"UI/UX",c1:"Statutory Bonus",c2:"56,667",c3:"Finance Admin",date:"30 Nov 2026",status:"Approved"}
+                ]
+            }
+        };
+
+        let currentThresholdSubtab = 'reimbursement';
+
+        function switchThresholdSubtab(key) {
+            currentThresholdSubtab = key;
+            const data = thresholdSubtabData[key];
+            if (!data) return;
+            document.querySelectorAll("#thresholdSubtabNav .figma-tab-link").forEach(b => { b.classList.remove("active"); if (b.getAttribute("onclick") && b.getAttribute("onclick").includes("'" + key + "'")) b.classList.add("active"); });
+            document.getElementById("tCardVal3").innerText = data.cards3;
+            document.getElementById("tCardVal4").innerText = data.cards4;
+            renderThresholdTable(data);
+        }
+
+        function renderThresholdTable(data) {
+            const thead = document.getElementById("thresholdTableHead");
+            const tbody = document.getElementById("thresholdTableBody");
+            thead.innerHTML = "<tr>" + data.headers.map(h => "<th>" + (h === "" ? "<input type='checkbox'>" : h) + "</th>").join("") + "</tr>";
+            tbody.innerHTML = data.rows.map(r => {
+                let cols = "<td><input type='checkbox'></td>";
+                cols += "<td>" + empCell(r.emp, r.id, r.av, r.co) + "</td>";
+                cols += "<td>" + r.dept + "</td>";
+                cols += "<td>" + r.c1 + "</td>";
+                cols += "<td class='fw-bold'>₹ " + r.c2 + "</td>";
+                cols += "<td>" + (r.c3.includes("Super") ? '<span class="badge bg-danger bg-opacity-10 text-danger px-2 py-1 fw-bold">' + r.c3 + '</span>' : '<span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1 fw-bold">' + r.c3 + '</span>') + "</td>";
+                cols += "<td>" + r.date + "</td>";
+                cols += "<td>" + statusBadge(r.status) + "</td>";
+                cols += "<td>" + actionBtns("Review", r.emp) + "</td>";
+                return "<tr data-dept='" + r.dept + "' data-status='" + r.status + "'>" + cols + "</tr>";
+            }).join("");
+        }
+
+        function filterThresholdTable() {
+            const q = (document.getElementById("thresholdSearchInput").value || "").toLowerCase();
+            document.querySelectorAll("#thresholdTableBody tr").forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
+        }
+
+        /* =========================================================================
+         * REPORTS — 4 SUB-TABS
+         * ========================================================================= */
+        const reportsSubtabData = {
+            dept_cost: `
+                <div class="figma-table-card p-4 mb-4">
+                    <div class="row align-items-center g-3">
+                        <div class="col-md-4"><label class="small fw-bold text-muted mb-1">Department</label><select class="form-select form-select-sm fw-semibold"><option>All Departments</option><option>Engineering</option><option>Product</option><option>Marketing</option><option>Finance</option></select></div>
+                        <div class="col-md-4"><label class="small fw-bold text-muted mb-1">Date Range</label><select class="form-select form-select-sm fw-semibold"><option>Jul 2026</option><option>Jun 2026</option><option>May 2026</option></select></div>
+                        <div class="col-md-4 text-end pt-3"><button class="btn btn-primary btn-sm fw-bold px-4" onclick="showToastAlert('Generating Cost Report PDF...')"><i class="fas fa-file-pdf me-1"></i> Generate Report</button></div>
+                    </div>
+                </div>
+                <div class="figma-table-card"><div class="table-responsive"><table class="figma-table">
+                    <thead><tr><th>Department</th><th>Budget ( ₹ )</th><th>Actual Cost ( ₹ )</th><th>Variance ( ₹ )</th><th>Variance %</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr><td class="fw-bold">Engineering</td><td>15,00,000</td><td class="fw-bold text-dark">13,85,400</td><td class="text-success">1,14,600</td><td><span class="text-success fw-bold">7.64%</span></td><td><span class="badge-status within-budget">• Within Budget</span></td></tr>
+                        <tr><td class="fw-bold">Product</td><td>8,00,000</td><td class="fw-bold text-dark">7,22,150</td><td class="text-success">77,850</td><td><span class="text-success fw-bold">9.73%</span></td><td><span class="badge-status within-budget">• Within Budget</span></td></tr>
+                        <tr><td class="fw-bold">Marketing</td><td>5,00,000</td><td class="fw-bold text-danger">5,42,800</td><td class="text-danger">-42,800</td><td><span class="text-danger fw-bold">-8.56%</span></td><td><span class="badge-status over-budget">• Over Budget</span></td></tr>
+                        <tr><td class="fw-bold">Finance</td><td>7,50,000</td><td class="fw-bold text-dark">6,45,230</td><td class="text-success">1,04,770</td><td><span class="text-success fw-bold">13.96%</span></td><td><span class="badge-status within-budget">• Within Budget</span></td></tr>
+                        <tr><td class="fw-bold">UI/UX</td><td>4,00,000</td><td class="fw-bold text-dark">3,78,600</td><td class="text-success">21,400</td><td><span class="text-success fw-bold">5.35%</span></td><td><span class="badge-status within-budget">• Within Budget</span></td></tr>
+                    </tbody>
+                </table></div></div>`,
+
+            compliance: `
+                <div class="figma-table-card p-4 mb-4">
+                    <div class="row align-items-center g-3">
+                        <div class="col-md-4"><label class="small fw-bold text-muted mb-1">Compliance Type</label><select class="form-select form-select-sm fw-semibold"><option>All Types</option><option>Statutory</option><option>Tax</option><option>Regulatory</option></select></div>
+                        <div class="col-md-4"><label class="small fw-bold text-muted mb-1">Quarter</label><select class="form-select form-select-sm fw-semibold"><option>Q1 FY 2026-27</option><option>Q2 FY 2026-27</option></select></div>
+                        <div class="col-md-4 text-end pt-3"><button class="btn btn-primary btn-sm fw-bold px-4" onclick="showToastAlert('Generating Compliance Report...')"><i class="fas fa-file-pdf me-1"></i> Generate Report</button></div>
+                    </div>
+                </div>
+                <div class="figma-table-card"><div class="table-responsive"><table class="figma-table">
+                    <thead><tr><th>Compliance Event</th><th>Category</th><th>Due Date</th><th>Filed On</th><th>Responsible</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr><td class="fw-bold">PF Monthly Return (Apr)</td><td>Statutory</td><td>15 May 2026</td><td>14 May 2026</td><td>HR / Finance</td><td><span class="badge-status compliant">• Compliant</span></td></tr>
+                        <tr><td class="fw-bold">ESI Payment (Apr)</td><td>Statutory</td><td>15 May 2026</td><td>14 May 2026</td><td>HR / Finance</td><td><span class="badge-status compliant">• Compliant</span></td></tr>
+                        <tr><td class="fw-bold">TDS Return - Q4 FY25</td><td>Tax</td><td>31 May 2026</td><td>28 May 2026</td><td>Finance</td><td><span class="badge-status compliant">• Compliant</span></td></tr>
+                        <tr><td class="fw-bold">GST Return - Jun 2026</td><td>Tax</td><td>20 Jul 2026</td><td>18 Jul 2026</td><td>Finance</td><td><span class="badge-status compliant">• Compliant</span></td></tr>
+                        <tr><td class="fw-bold">TDS Return - Q1 FY26</td><td>Tax</td><td class="fw-bold text-danger">31 Jul 2026</td><td>-</td><td>Finance</td><td><span class="badge-status due-soon">• Due Soon</span></td></tr>
+                    </tbody>
+                </table></div></div>`,
+
+            budget_actual: `
+                <div class="figma-table-card p-4 mb-4">
+                    <div class="row align-items-center g-3">
+                        <div class="col-md-4"><label class="small fw-bold text-muted mb-1">Department</label><select class="form-select form-select-sm fw-semibold"><option>All Departments</option></select></div>
+                        <div class="col-md-4"><label class="small fw-bold text-muted mb-1">Period</label><select class="form-select form-select-sm fw-semibold"><option>Q1 FY 2026-27</option></select></div>
+                        <div class="col-md-4 text-end pt-3"><button class="btn btn-primary btn-sm fw-bold px-4" onclick="showToastAlert('Generating Budget vs Actual Report...')"><i class="fas fa-file-pdf me-1"></i> Generate Report</button></div>
+                    </div>
+                </div>
+                <div class="figma-table-card"><div class="table-responsive"><table class="figma-table">
+                    <thead><tr><th>Department</th><th>Budget ( ₹ )</th><th>Actual ( ₹ )</th><th>Utilization</th><th>Progress</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr><td class="fw-bold">Engineering</td><td>15,00,000</td><td>13,85,400</td><td>92.4%</td><td><div class="progress" style="height:8px;width:120px;"><div class="progress-bar bg-success" style="width:92%"></div></div></td><td><span class="badge-status within-budget">• Within Budget</span></td></tr>
+                        <tr><td class="fw-bold">Product</td><td>8,00,000</td><td>7,22,150</td><td>90.3%</td><td><div class="progress" style="height:8px;width:120px;"><div class="progress-bar bg-success" style="width:90%"></div></div></td><td><span class="badge-status within-budget">• Within Budget</span></td></tr>
+                        <tr><td class="fw-bold">Marketing</td><td>5,00,000</td><td>5,42,800</td><td>108.6%</td><td><div class="progress" style="height:8px;width:120px;"><div class="progress-bar bg-danger" style="width:100%"></div></div></td><td><span class="badge-status over-budget">• Over Budget</span></td></tr>
+                        <tr><td class="fw-bold">Finance</td><td>7,50,000</td><td>6,45,230</td><td>86.0%</td><td><div class="progress" style="height:8px;width:120px;"><div class="progress-bar bg-success" style="width:86%"></div></div></td><td><span class="badge-status within-budget">• Within Budget</span></td></tr>
+                    </tbody>
+                </table></div></div>`,
+
+            approval_pending: `
+                <div class="figma-table-card p-4 mb-4">
+                    <div class="row align-items-center g-3">
+                        <div class="col-md-4"><label class="small fw-bold text-muted mb-1">Request Type</label><select class="form-select form-select-sm fw-semibold"><option>All Types</option><option>Reimbursement</option><option>Vendor Payment</option><option>Salary Revision</option></select></div>
+                        <div class="col-md-4"><label class="small fw-bold text-muted mb-1">Priority</label><select class="form-select form-select-sm fw-semibold"><option>All Priorities</option><option>High</option><option>Medium</option><option>Low</option></select></div>
+                        <div class="col-md-4 text-end pt-3"><button class="btn btn-primary btn-sm fw-bold px-4" onclick="showToastAlert('Generating Pending Approvals Report...')"><i class="fas fa-file-pdf me-1"></i> Generate Report</button></div>
+                    </div>
+                </div>
+                <div class="figma-table-card"><div class="table-responsive"><table class="figma-table">
+                    <thead><tr><th>Request ID</th><th>Type</th><th>Requested By</th><th>Amount ( ₹ )</th><th>Pending Since</th><th>Priority</th><th>Assigned To</th><th>Action</th></tr></thead>
+                    <tbody>
+                        <tr><td class="fw-bold">REQ-2026-0451</td><td>Reimbursement</td><td>Rahul Sharma</td><td class="fw-bold">45,000</td><td class="text-danger fw-bold">5 days</td><td><span class="badge bg-danger bg-opacity-10 text-danger px-2 py-1 fw-bold">High</span></td><td>Finance Admin</td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showToastAlert('Processing approval...')">Approve</button></td></tr>
+                        <tr><td class="fw-bold">REQ-2026-0448</td><td>Vendor Payment</td><td>Procurement Dept</td><td class="fw-bold">2,45,000</td><td class="text-danger fw-bold">3 days</td><td><span class="badge bg-danger bg-opacity-10 text-danger px-2 py-1 fw-bold">High</span></td><td>Super Admin</td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showToastAlert('Escalating...')">Escalate</button></td></tr>
+                        <tr><td class="fw-bold">REQ-2026-0445</td><td>Salary Revision</td><td>HR Department</td><td class="fw-bold">1,02,000</td><td class="text-warning fw-bold">2 days</td><td><span class="badge bg-warning bg-opacity-10 text-warning px-2 py-1 fw-bold">Medium</span></td><td>Finance Admin</td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showToastAlert('Processing approval...')">Approve</button></td></tr>
+                    </tbody>
+                </table></div></div>`
+        };
+
+        function switchReportSubtab(key) {
+            const html = reportsSubtabData[key];
+            if (!html) return;
+            document.getElementById("reportContentArea").innerHTML = html;
+            document.querySelectorAll("#reportsSubtabNav .figma-tab-link").forEach(b => { b.classList.remove("active"); if (b.getAttribute("onclick") && b.getAttribute("onclick").includes("'" + key + "'")) b.classList.add("active"); });
+        }
+
+        /* =========================================================================
+         * FINANCE CHECKLIST — 2 SUB-TABS
+         * ========================================================================= */
+        const checklistSubtabData = {
+            onboarding: {
+                title: "New Onboarded Employees (Finance Onboarding Pending/Completed)",
+                headers: ["EMPLOYEE ID","EMPLOYEE NAME","DEPARTMENT","BRANCH","DATE OF JOINING","FINANCE ONBOARDING STATUS","ONBOARDED ON","ACTION"],
+                rows: [
+                    {id:"EMP1001",emp:"Rohit Sharma",av:"RS",co:"bg-primary",dept:"Engineering",branch:"Shahdol",date:"15 Jul 2026",status:"Completed",extra:"18 Jul 2026"},
+                    {id:"EMP1002",emp:"Neha Kapoor",av:"NK",co:"bg-info",dept:"Product",branch:"Bhopal",date:"18 Jul 2026",status:"Pending",extra:"-"},
+                    {id:"EMP1003",emp:"Arjun Mehta",av:"AM",co:"bg-success",dept:"Finance",branch:"Indore",date:"20 Jul 2026",status:"Pending",extra:"-"},
+                    {id:"EMP1004",emp:"Priya Verma",av:"PV",co:"bg-warning",dept:"Marketing",branch:"Jabalpur",date:"22 Jul 2026",status:"Completed",extra:"24 Jul 2026"}
+                ]
+            },
+            offboarding: {
+                title: "Offboarded Employees (Finance Exit Clearance Pending/Completed)",
+                headers: ["EMPLOYEE ID","EMPLOYEE NAME","DEPARTMENT","BRANCH","LAST WORKING DAY","F&F STATUS","CLEARED ON","ACTION"],
+                rows: [
+                    {id:"EMP00102",emp:"Ravi Gupta",av:"RG",co:"bg-danger",dept:"Marketing",branch:"Bhopal",date:"31 Jul 2026",status:"Pending",extra:"-"},
+                    {id:"EMP00115",emp:"Meera Joshi",av:"MJ",co:"bg-info",dept:"Engineering",branch:"Shahdol",date:"15 Jul 2026",status:"Completed",extra:"20 Jul 2026"}
+                ]
+            }
+        };
+
+        function switchChecklistSubtab(key) {
+            const data = checklistSubtabData[key];
+            if (!data) return;
+            document.querySelectorAll("#checklistSubtabNav .figma-tab-link").forEach(b => { b.classList.remove("active"); if (b.getAttribute("onclick") && b.getAttribute("onclick").includes("'" + key + "'")) b.classList.add("active"); });
+            document.getElementById("checklistTableTitle").innerText = data.title;
+            const thead = document.getElementById("checklistTableHead");
+            const tbody = document.getElementById("checklistTableBody");
+            thead.innerHTML = "<tr>" + data.headers.map(h => "<th>" + h + "</th>").join("") + "</tr>";
+            tbody.innerHTML = data.rows.map(r => {
+                const actionBtn = r.status === "Completed"
+                    ? '<button class="btn btn-sm btn-outline-success fw-bold" onclick="showToastAlert(\'View Details\')"><i class="fas fa-eye me-1"></i>View</button>'
+                    : '<button class="btn btn-sm btn-primary fw-bold" onclick="showToastAlert(\'Processing ' + r.emp + '...\')"><i class="fas fa-play me-1"></i>Process</button>';
+                return "<tr>" +
+                    "<td class='fw-bold'>" + r.id + "</td>" +
+                    "<td>" + empCell(r.emp, r.id, r.av, r.co) + "</td>" +
+                    "<td>" + r.dept + "</td>" +
+                    "<td>" + r.branch + "</td>" +
+                    "<td>" + r.date + "</td>" +
+                    "<td>" + statusBadge(r.status) + "</td>" +
+                    "<td>" + r.extra + "</td>" +
+                    "<td>" + actionBtn + "</td>" +
+                    "</tr>";
+            }).join("");
+        }
+
+        /* =========================================================================
+         * ADDITIONAL CONSIDERATIONS — 7 SUB-TABS
+         * ========================================================================= */
+        const additionalContentData = {
+            multi_entity: `
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-building"></i></div><div class="metric-info"><div class="metric-label">ENTITIES MANAGED</div><div class="metric-value">3</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-success bg-opacity-10 text-success"><i class="fas fa-map-marker-alt"></i></div><div class="metric-info"><div class="metric-label">STATES COVERED</div><div class="metric-value">5</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-warning bg-opacity-10 text-warning"><i class="fas fa-exclamation-triangle"></i></div><div class="metric-info"><div class="metric-label">POLICY UPDATES</div><div class="metric-value text-warning">2</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-danger bg-opacity-10 text-danger"><i class="fas fa-clock"></i></div><div class="metric-info"><div class="metric-label">NEXT REVIEW DUE</div><div class="metric-value" style="font-size:1rem;">15 Aug 2026</div></div></div></div>
+                </div>
+                <div class="figma-table-card p-4 mb-4"><h6 class="fw-bold mb-3"><i class="fas fa-globe me-2 text-primary"></i>Madhya Pradesh (MP) — Professional Tax Slabs</h6>
+                <div class="table-responsive"><table class="figma-table"><thead><tr><th>Monthly Salary Range</th><th>PT Amount (₹/month)</th><th>Annual PT</th></tr></thead>
+                <tbody><tr><td>Up to ₹ 15,000</td><td class="fw-bold">Nil</td><td>Nil</td></tr><tr><td>₹ 15,001 – ₹ 20,000</td><td class="fw-bold">₹ 150</td><td>₹ 1,800</td></tr><tr><td>₹ 20,001 – ₹ 25,000</td><td class="fw-bold">₹ 180</td><td>₹ 2,160</td></tr><tr><td>Above ₹ 25,000</td><td class="fw-bold">₹ 208 (max ₹ 2,500/yr)</td><td>₹ 2,500</td></tr></tbody></table></div></div>
+                <div class="figma-table-card p-4"><h6 class="fw-bold mb-3"><i class="fas fa-clipboard-list me-2 text-primary"></i>State-wise Policy Summary</h6>
+                <div class="table-responsive"><table class="figma-table"><thead><tr><th>State</th><th>PT Applicable</th><th>Max Annual PT</th><th>LWF Applicable</th><th>Shop & Est. Act</th><th>Status</th></tr></thead>
+                <tbody><tr><td class="fw-bold">Madhya Pradesh</td><td>Yes</td><td>₹ 2,500</td><td>Yes (₹ 20/yr)</td><td>MP S&E Act 1958</td><td><span class="badge-status active">• Active</span></td></tr>
+                <tr><td class="fw-bold">Maharashtra</td><td>Yes</td><td>₹ 2,500</td><td>Yes (₹ 75/yr)</td><td>MH S&E Act 2017</td><td><span class="badge-status active">• Active</span></td></tr>
+                <tr><td class="fw-bold">Karnataka</td><td>Yes</td><td>₹ 2,400</td><td>Yes (₹ 40/yr)</td><td>KA S&E Act 1961</td><td><span class="badge-status active">• Active</span></td></tr></tbody></table></div></div>`,
+
+            arrears: `
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-file-invoice-dollar"></i></div><div class="metric-info"><div class="metric-label">PENDING ARREARS</div><div class="metric-value">12</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-success bg-opacity-10 text-success"><i class="fas fa-check-circle"></i></div><div class="metric-info"><div class="metric-label">PROCESSED</div><div class="metric-value text-success">34</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-warning bg-opacity-10 text-warning"><i class="fas fa-rupee-sign"></i></div><div class="metric-info"><div class="metric-label">TOTAL ARREARS AMT</div><div class="metric-value">₹ 4,56,800</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-danger bg-opacity-10 text-danger"><i class="fas fa-calendar-times"></i></div><div class="metric-info"><div class="metric-label">OLDEST PENDING</div><div class="metric-value" style="font-size:1rem;">Apr 2026</div></div></div></div>
+                </div>
+                <div class="figma-table-card"><div class="p-3 bg-light border-bottom fw-bold text-dark">Salary Arrears — Pending Processing</div><div class="table-responsive"><table class="figma-table"><thead><tr><th>Employee Name / ID</th><th>Department</th><th>Arrears Period</th><th>Arrears Amount (₹)</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody><tr><td><div class="d-flex align-items-center"><span class="emp-avatar bg-primary">RS</span><div><div class="fw-bold">Rahul Sharma</div><div class="small text-muted">EMP00123</div></div></div></td><td>Engineering</td><td>Apr-Jun 2026</td><td class="fw-bold">₹ 25,500</td><td>Delayed Increment</td><td><span class="badge-status pending">• Pending</span></td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showToastAlert('Processing arrears...')">Process</button></td></tr>
+                <tr><td><div class="d-flex align-items-center"><span class="emp-avatar bg-success">AP</span><div><div class="fw-bold">Anjali Patel</div><div class="small text-muted">EMP00126</div></div></div></td><td>Product</td><td>May-Jun 2026</td><td class="fw-bold">₹ 18,200</td><td>Promotion Revision</td><td><span class="badge-status pending">• Pending</span></td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showToastAlert('Processing arrears...')">Process</button></td></tr></tbody></table></div></div>`,
+
+            leave_gratuity: `
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-calendar-check"></i></div><div class="metric-info"><div class="metric-label">ENCASHMENT REQUESTS</div><div class="metric-value">8</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-success bg-opacity-10 text-success"><i class="fas fa-hand-holding-usd"></i></div><div class="metric-info"><div class="metric-label">GRATUITY ELIGIBLE</div><div class="metric-value text-success">45</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-warning bg-opacity-10 text-warning"><i class="fas fa-rupee-sign"></i></div><div class="metric-info"><div class="metric-label">TOTAL ENCASHMENT AMT</div><div class="metric-value">₹ 3,24,000</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-danger bg-opacity-10 text-danger"><i class="fas fa-piggy-bank"></i></div><div class="metric-info"><div class="metric-label">GRATUITY PROVISION</div><div class="metric-value">₹ 18.5 L</div></div></div></div>
+                </div>
+                <div class="figma-table-card"><div class="p-3 bg-light border-bottom fw-bold text-dark">Leave Encashment Requests</div><div class="table-responsive"><table class="figma-table"><thead><tr><th>Employee Name / ID</th><th>Department</th><th>Leave Type</th><th>Days</th><th>Per Day Rate (₹)</th><th>Total Amount (₹)</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody><tr><td><div class="d-flex align-items-center"><span class="emp-avatar bg-primary">RS</span><div><div class="fw-bold">Rahul Sharma</div><div class="small text-muted">EMP00123</div></div></div></td><td>Engineering</td><td>Earned Leave</td><td class="fw-bold">15</td><td>2,200</td><td class="fw-bold text-primary">₹ 33,000</td><td><span class="badge-status pending">• Pending</span></td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showToastAlert('Processing encashment...')">Process</button></td></tr>
+                <tr><td><div class="d-flex align-items-center"><span class="emp-avatar bg-success">AP</span><div><div class="fw-bold">Anjali Patel</div><div class="small text-muted">EMP00126</div></div></div></td><td>Product</td><td>Earned Leave</td><td class="fw-bold">10</td><td>2,800</td><td class="fw-bold text-primary">₹ 28,000</td><td><span class="badge-status approved">• Approved</span></td><td><button class="btn btn-sm btn-outline-success fw-bold" onclick="showToastAlert('View details...')">View</button></td></tr></tbody></table></div></div>
+                <div class="figma-table-card p-4 mt-4"><h6 class="fw-bold mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Gratuity Calculation Rules</h6>
+                <div class="row"><div class="col-md-6"><ul class="list-unstyled"><li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong>Eligibility:</strong> 5+ years continuous service</li><li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong>Formula:</strong> (15 × Last Drawn Salary × Years) / 26</li><li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong>Max Limit:</strong> ₹ 20,00,000 (as per Payment of Gratuity Act)</li></ul></div><div class="col-md-6"><ul class="list-unstyled"><li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong>Tax Exemption:</strong> Up to ₹ 20 Lakhs</li><li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong>Payment Timeline:</strong> Within 30 days of eligibility</li></ul></div></div></div>`,
+
+            data_correction: `
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-danger bg-opacity-10 text-danger"><i class="fas fa-exclamation-circle"></i></div><div class="metric-info"><div class="metric-label">CORRECTIONS PENDING</div><div class="metric-value text-danger">5</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-warning bg-opacity-10 text-warning"><i class="fas fa-redo"></i></div><div class="metric-info"><div class="metric-label">FAILED PAYMENTS</div><div class="metric-value text-warning">3</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-success bg-opacity-10 text-success"><i class="fas fa-check-circle"></i></div><div class="metric-info"><div class="metric-label">RESOLVED THIS MONTH</div><div class="metric-value text-success">12</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-rupee-sign"></i></div><div class="metric-info"><div class="metric-label">TOTAL CORRECTION AMT</div><div class="metric-value">₹ 1,82,400</div></div></div></div>
+                </div>
+                <div class="figma-table-card mb-4"><div class="p-3 bg-light border-bottom fw-bold text-dark">Over/Under Payment Corrections</div><div class="table-responsive"><table class="figma-table"><thead><tr><th>Employee Name / ID</th><th>Department</th><th>Type</th><th>Period</th><th>Amount (₹)</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody><tr><td><div class="d-flex align-items-center"><span class="emp-avatar bg-danger">VK</span><div><div class="fw-bold">Vikram Kumar</div><div class="small text-muted">EMP00130</div></div></div></td><td>UI/UX</td><td><span class="badge bg-danger bg-opacity-10 text-danger px-2 py-1 fw-bold">Overpayment</span></td><td>Jun 2026</td><td class="fw-bold text-danger">₹ 8,500</td><td><span class="badge-status pending">• Pending</span></td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showToastAlert('Processing correction...')">Correct</button></td></tr>
+                <tr><td><div class="d-flex align-items-center"><span class="emp-avatar bg-warning">KM</span><div><div class="fw-bold">Karan Mehra</div><div class="small text-muted">EMP00148</div></div></div></td><td>Engineering</td><td><span class="badge bg-warning bg-opacity-10 text-warning px-2 py-1 fw-bold">Underpayment</span></td><td>Jun 2026</td><td class="fw-bold text-success">₹ 4,200</td><td><span class="badge-status pending">• Pending</span></td><td><button class="btn btn-sm btn-primary fw-bold" onclick="showToastAlert('Processing correction...')">Correct</button></td></tr></tbody></table></div></div>
+                <div class="figma-table-card"><div class="p-3 bg-light border-bottom fw-bold text-dark">Failed Payments — Reprocessing Queue</div><div class="table-responsive"><table class="figma-table"><thead><tr><th>Employee Name / ID</th><th>Payment Type</th><th>Amount (₹)</th><th>Failed On</th><th>Reason</th><th>SLA Remaining</th><th>Action</th></tr></thead>
+                <tbody><tr><td><div class="d-flex align-items-center"><span class="emp-avatar bg-info">SP</span><div><div class="fw-bold">Sneha Pandey</div><div class="small text-muted">EMP00134</div></div></div></td><td>Salary</td><td class="fw-bold">₹ 62,000</td><td>25 Jul 2026</td><td>Invalid IFSC</td><td><span class="badge bg-danger bg-opacity-10 text-danger px-2 py-1 fw-bold">2 days</span></td><td><button class="btn btn-sm btn-warning fw-bold" onclick="showToastAlert('Reprocessing payment...')">Reprocess</button></td></tr></tbody></table></div></div>`,
+
+            ess_integration: `
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-users"></i></div><div class="metric-info"><div class="metric-label">ESS ACTIVE USERS</div><div class="metric-value">286</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-success bg-opacity-10 text-success"><i class="fas fa-download"></i></div><div class="metric-info"><div class="metric-label">PAYSLIP DOWNLOADS</div><div class="metric-value text-success">1,245</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-warning bg-opacity-10 text-warning"><i class="fas fa-file-alt"></i></div><div class="metric-info"><div class="metric-label">FORM 16 REQUESTS</div><div class="metric-value text-warning">89</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-danger bg-opacity-10 text-danger"><i class="fas fa-headset"></i></div><div class="metric-info"><div class="metric-label">PENDING QUERIES</div><div class="metric-value text-danger">7</div></div></div></div>
+                </div>
+                <div class="figma-table-card mb-4"><div class="p-3 bg-light border-bottom fw-bold text-dark">Recent ESS Activity Log</div><div class="table-responsive"><table class="figma-table"><thead><tr><th>Employee Name / ID</th><th>Activity</th><th>Document</th><th>Timestamp</th><th>Status</th></tr></thead>
+                <tbody><tr><td><div class="d-flex align-items-center"><span class="emp-avatar bg-primary">RS</span><div><div class="fw-bold">Rahul Sharma</div><div class="small text-muted">EMP00123</div></div></div></td><td>Downloaded Payslip</td><td>Jul 2026 Payslip</td><td>29 Jul 2026, 10:30 AM</td><td><span class="badge-status completed">• Completed</span></td></tr>
+                <tr><td><div class="d-flex align-items-center"><span class="emp-avatar bg-success">AP</span><div><div class="fw-bold">Anjali Patel</div><div class="small text-muted">EMP00126</div></div></div></td><td>Requested Form 16</td><td>FY 2025-26</td><td>28 Jul 2026, 3:15 PM</td><td><span class="badge-status pending">• Pending</span></td></tr>
+                <tr><td><div class="d-flex align-items-center"><span class="emp-avatar bg-warning">VK</span><div><div class="fw-bold">Vikram Kumar</div><div class="small text-muted">EMP00130</div></div></div></td><td>Viewed Tax Declaration</td><td>FY 2026-27</td><td>28 Jul 2026, 11:45 AM</td><td><span class="badge-status completed">• Completed</span></td></tr></tbody></table></div></div>
+                <div class="figma-table-card p-4"><h6 class="fw-bold mb-3"><i class="fas fa-bolt me-2 text-primary"></i>Quick Actions</h6>
+                <div class="d-flex flex-wrap gap-2"><button class="btn btn-outline-primary btn-sm fw-bold" onclick="showToastAlert('Publishing payslips...')"><i class="fas fa-file-invoice me-1"></i> Publish Payslips</button><button class="btn btn-outline-primary btn-sm fw-bold" onclick="showToastAlert('Generating Form 16...')"><i class="fas fa-file-alt me-1"></i> Generate Form 16</button><button class="btn btn-outline-primary btn-sm fw-bold" onclick="showToastAlert('Sending tax declarations...')"><i class="fas fa-paper-plane me-1"></i> Send Tax Declarations</button><button class="btn btn-outline-primary btn-sm fw-bold" onclick="showToastAlert('Refreshing ESS portal...')"><i class="fas fa-sync me-1"></i> Refresh Portal</button></div></div>`,
+
+            statutory_bonus: `
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-users"></i></div><div class="metric-info"><div class="metric-label">ELIGIBLE EMPLOYEES</div><div class="metric-value">312</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-success bg-opacity-10 text-success"><i class="fas fa-rupee-sign"></i></div><div class="metric-info"><div class="metric-label">ESTIMATED BONUS PAYABLE</div><div class="metric-value text-success">₹ 18,74,560</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-warning bg-opacity-10 text-warning"><i class="fas fa-calendar-alt"></i></div><div class="metric-info"><div class="metric-label">DISBURSEMENT DUE BY</div><div class="metric-value" style="font-size:1rem;">30 Nov 2026</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-danger bg-opacity-10 text-danger"><i class="fas fa-user-tie"></i></div><div class="metric-info"><div class="metric-label">OWNED BY</div><div class="metric-value" style="font-size:1rem;">Finance Team</div></div></div></div>
+                </div>
+                <div class="row g-4 mb-4"><div class="col-md-6"><div class="figma-table-card p-4"><h6 class="fw-bold mb-3"><i class="fas fa-calculator me-2 text-primary"></i>Bonus Calculation Summary (Bonus Act, 1965)</h6>
+                <table class="figma-table"><tbody><tr><td>Total Salary/Wages Paid</td><td class="fw-bold text-end">₹ 3,12,45,600</td></tr><tr><td>Allocable Surplus / Available Profit</td><td class="fw-bold text-end">₹ 93,72,800</td></tr><tr><td>Maximum Bonus Payable @ 20%</td><td class="fw-bold text-end">₹ 62,49,120</td></tr><tr><td>Minimum Bonus Payable @ 8.33%</td><td class="fw-bold text-end">₹ 25,99,568</td></tr><tr class="bg-primary bg-opacity-10"><td class="fw-bold text-primary">Bonus Proposed to be Paid</td><td class="fw-bold text-primary text-end">₹ 18,74,560</td></tr></tbody></table></div></div>
+                <div class="col-md-6"><div class="figma-table-card p-4"><h6 class="fw-bold mb-3"><i class="fas fa-clock me-2 text-primary"></i>Disbursement Timeline</h6>
+                <div class="mb-3"><div class="small text-muted fw-bold">Financial Year End</div><div class="fw-bold">31 Mar 2026</div></div><div class="mb-3"><div class="small text-muted fw-bold">Payment Deadline</div><div class="fw-bold">30 Nov 2026</div></div><div><span class="badge bg-success bg-opacity-10 text-success px-3 py-2 fw-bold">129 Days Remaining</span></div>
+                <hr><h6 class="fw-bold mb-2">Workflow Ownership</h6><div class="small"><div class="mb-1"><strong>Owned by:</strong> Finance Team</div><div class="mb-1"><strong>Calculated by:</strong> Finance Admin</div><div class="mb-1"><strong>Approved by:</strong> Finance Head</div><div><strong>Disbursed by:</strong> Payroll Team</div></div></div></div></div>
+                <div class="figma-table-card"><div class="p-3 bg-light border-bottom fw-bold text-dark">Employee Bonus Summary</div><div class="table-responsive"><table class="figma-table"><thead><tr><th>Employee ID</th><th>Employee Name</th><th>Department</th><th>Designation</th><th>Bonusable Salary (₹)</th><th>Calculated Bonus (₹)</th><th>Eligibility</th><th>Action</th></tr></thead>
+                <tbody><tr><td class="fw-bold">EMP1001</td><td>Rahul Sharma</td><td>Engineering</td><td>Sr. Developer</td><td>6,00,000</td><td class="fw-bold text-primary">60,000</td><td><span class="badge-status eligible">• Eligible</span></td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showToastAlert('Calculating bonus...')">Calculate</button></td></tr>
+                <tr><td class="fw-bold">EMP1002</td><td>Anjali Patel</td><td>Product</td><td>Product Manager</td><td>7,20,000</td><td class="fw-bold text-primary">72,000</td><td><span class="badge-status eligible">• Eligible</span></td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showToastAlert('Calculating bonus...')">Calculate</button></td></tr>
+                <tr><td class="fw-bold">EMP1003</td><td>Vikram Kumar</td><td>UI/UX</td><td>UI Designer</td><td>4,80,000</td><td class="fw-bold text-primary">48,000</td><td><span class="badge-status eligible">• Eligible</span></td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showToastAlert('Calculating bonus...')">Calculate</button></td></tr>
+                <tr><td class="fw-bold">EMP1004</td><td>Sneha Pandey</td><td>Marketing</td><td>Intern</td><td>2,40,000</td><td class="text-muted">-</td><td><span class="badge-status not-eligible">• Not Eligible</span></td><td><button class="btn btn-sm btn-outline-secondary fw-bold" disabled>N/A</button></td></tr></tbody></table></div></div>`,
+
+            integration_system: `
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-primary bg-opacity-10 text-primary"><i class="fas fa-network-wired"></i></div><div class="metric-info"><div class="metric-label">TOTAL INTEGRATED SYSTEMS</div><div class="metric-value">8</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-success bg-opacity-10 text-success"><i class="fas fa-plug"></i></div><div class="metric-info"><div class="metric-label">ACTIVE INTEGRATIONS</div><div class="metric-value text-success">7</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-danger bg-opacity-10 text-danger"><i class="fas fa-exclamation-triangle"></i></div><div class="metric-info"><div class="metric-label">ISSUES / ALERTS</div><div class="metric-value text-danger">2</div></div></div></div>
+                    <div class="col-md-3"><div class="metric-card"><div class="metric-icon-box bg-warning bg-opacity-10 text-warning"><i class="fas fa-clock"></i></div><div class="metric-info"><div class="metric-label">LAST SYNC (OVERALL)</div><div class="metric-value" style="font-size:0.9rem;">20 Jul 2026, 10:45 AM</div></div></div></div>
+                </div>
+                <div class="row g-4"><div class="col-md-8">
+                <div class="figma-table-card mb-4"><div class="p-3 bg-light border-bottom fw-bold text-dark">Integrated Systems</div><div class="table-responsive"><table class="figma-table"><thead><tr><th>System Name</th><th>Vendor Details</th><th>Integration Method</th><th>Data Flow</th><th>Last Sync</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody><tr><td class="fw-bold">Banking / NEFT System</td><td>ICICI Bank Corporate</td><td><span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1 fw-bold">API</span></td><td>Bi-directional</td><td>20 Jul 2026</td><td><span class="badge-status active">• Active</span></td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showToastAlert('Syncing...')">Sync</button></td></tr>
+                <tr><td class="fw-bold">TallyPrime</td><td>Accounting Software</td><td><span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1 fw-bold">Tally API</span></td><td>One-way</td><td>19 Jul 2026</td><td><span class="badge-status active">• Active</span></td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showToastAlert('Syncing...')">Sync</button></td></tr>
+                <tr><td class="fw-bold">Biometric Attendance</td><td>ZKTeco</td><td><span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1 fw-bold">API</span></td><td>One-way</td><td>20 Jul 2026</td><td><span class="badge-status active">• Active</span></td><td><button class="btn btn-sm btn-outline-primary fw-bold" onclick="showToastAlert('Syncing...')">Sync</button></td></tr>
+                <tr><td class="fw-bold">Income Tax Portal</td><td>Govt. of India</td><td><span class="badge bg-warning bg-opacity-10 text-warning px-2 py-1 fw-bold">File Upload</span></td><td>One-way</td><td class="text-danger fw-bold">15 Jul 2026</td><td><span class="badge-status pending">• Timeout</span></td><td><button class="btn btn-sm btn-warning fw-bold" onclick="showToastAlert('Reconnecting...')">Reconnect</button></td></tr></tbody></table></div></div>
+                <div class="figma-table-card"><div class="p-3 bg-light border-bottom fw-bold text-dark">Recent Integration Logs</div><div class="table-responsive"><table class="figma-table"><thead><tr><th>Timestamp</th><th>System</th><th>Activity</th><th>Status</th><th>Remarks</th></tr></thead>
+                <tbody><tr><td class="small">20 Jul 2026, 10:45 AM</td><td>Banking / NEFT</td><td>Salary file pushed to bank</td><td><span class="badge-status completed">• Success</span></td><td class="small text-muted">312 records processed</td></tr>
+                <tr><td class="small">19 Jul 2026, 11:30 PM</td><td>TallyPrime</td><td>Journal entries synced</td><td><span class="badge-status completed">• Success</span></td><td class="small text-muted">45 entries</td></tr>
+                <tr><td class="small">18 Jul 2026, 6:00 AM</td><td>Income Tax Portal</td><td>Form 16 sync attempted</td><td><span class="badge-status rejected">• Failed</span></td><td class="small text-danger">Portal timeout after 120s</td></tr></tbody></table></div></div>
+                </div><div class="col-md-4">
+                <div class="figma-table-card p-4 mb-4"><h6 class="fw-bold mb-3"><i class="fas fa-bolt me-2 text-primary"></i>Quick Actions</h6>
+                <div class="d-grid gap-2"><button class="btn btn-outline-primary btn-sm fw-bold text-start" onclick="showToastAlert('Add New Integration...')"><i class="fas fa-plus me-2"></i>Add New Integration</button><button class="btn btn-outline-primary btn-sm fw-bold text-start" onclick="showToastAlert('Configure Integration...')"><i class="fas fa-cog me-2"></i>Configure Integration</button><button class="btn btn-outline-primary btn-sm fw-bold text-start" onclick="showToastAlert('Testing connection...')"><i class="fas fa-plug me-2"></i>Test Connection</button><button class="btn btn-primary btn-sm fw-bold text-start" onclick="showToastAlert('Syncing all systems...')"><i class="fas fa-sync me-2"></i>Sync Now</button><button class="btn btn-outline-secondary btn-sm fw-bold text-start" onclick="showToastAlert('Opening logs...')"><i class="fas fa-list me-2"></i>Integration Logs</button></div></div>
+                <div class="figma-table-card p-4"><h6 class="fw-bold mb-3"><i class="fas fa-exclamation-triangle me-2 text-warning"></i>Alerts & Notifications</h6>
+                <div class="alert alert-warning p-2 mb-2 small fw-bold"><i class="fas fa-exclamation-circle me-1"></i> Income Tax Portal: Connection timeout (5 days ago)</div>
+                <div class="alert alert-danger p-2 mb-0 small fw-bold"><i class="fas fa-times-circle me-1"></i> Banking System: Reconnect pending for batch processing</div></div>
+                </div></div>`
+        };
+
+        function switchAdditionalSubtab(key) {
+            const html = additionalContentData[key];
+            if (!html) return;
+            document.getElementById("additionalContentArea").innerHTML = html;
+            document.querySelectorAll("#additionalSubtabNav .figma-tab-link").forEach(b => { b.classList.remove("active"); if (b.getAttribute("onclick") && b.getAttribute("onclick").includes("'" + key + "'")) b.classList.add("active"); });
+        }
+
+        /* =========================================================================
+         * OVERRIDE HARDCODED DATA WITH REAL DB DATA
+         * ========================================================================= */
+        function getInitials(name) {
+            if(!name) return "U";
+            return name.split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2);
+        }
+        function getColor(status) {
+            if(!status) return "bg-primary";
+            const s = status.toLowerCase();
+            if(s.includes("appr") || s.includes("comp") || s.includes("settled")) return "bg-success";
+            if(s.includes("pend")) return "bg-warning";
+            if(s.includes("rej") || s.includes("fail")) return "bg-danger";
+            return "bg-info";
+        }
+
+        function overrideData() {
+            if (typeof DB_SALARY_REVISIONS !== 'undefined' && DB_SALARY_REVISIONS.length > 0) {
+                const revRows = DB_SALARY_REVISIONS.map(r => ({
+                    emp: r.employeeName, id: r.employeeCode, av: getInitials(r.employeeName), co: getColor(r.status), dept: r.department, 
+                    c1: r.currentCtc, c2: r.percentageIncrease, c3: r.revisedCtc, date: r.effectiveDate || 'TBD', status: r.status
+                }));
+                matrixSubtabData.appraisal.rows = revRows;
+                matrixSubtabData.increment.rows = revRows;
+                matrixSubtabData.structure.rows = revRows;
+                approvalSubtabData.salary_revision.rows = revRows;
+                
+                matrixSubtabData.increment.cards[0].v = revRows.length;
+                matrixSubtabData.increment.cards[1].v = revRows.filter(r=>r.status==='Pending').length;
+                matrixSubtabData.increment.cards[2].v = revRows.filter(r=>r.status==='Under Review').length;
+                matrixSubtabData.increment.cards[3].v = revRows.filter(r=>r.status==='Approved').length;
+            }
+
+            if (typeof DB_STATUTORY_BONUSES !== 'undefined' && DB_STATUTORY_BONUSES.length > 0) {
+                const bonusRows = DB_STATUTORY_BONUSES.map(r => ({
+                    emp: r.employeeName, id: r.empId, av: getInitials(r.employeeName), co: getColor(r.disbursementStatus), dept: r.department, 
+                    c1: "Statutory Bonus", c2: "₹ " + r.bonusableSalary.toLocaleString(), c3: r.bonusAmount.toLocaleString(), date: "30 Nov 2026", status: r.disbursementStatus
+                }));
+                matrixSubtabData.bonus.rows = bonusRows;
+                thresholdSubtabData.bonus.rows = bonusRows;
+
+                matrixSubtabData.bonus.cards[0].v = bonusRows.length;
+                matrixSubtabData.bonus.cards[1].v = bonusRows.filter(r=>r.status==='Pending').length;
+                matrixSubtabData.bonus.cards[2].v = 0;
+                matrixSubtabData.bonus.cards[3].v = bonusRows.filter(r=>r.status==='Approved').length;
+            }
+
+            if (typeof DB_EMPLOYEE_LOANS !== 'undefined' && DB_EMPLOYEE_LOANS.length > 0) {
+                const loanRows = DB_EMPLOYEE_LOANS.map(r => ({
+                    emp: r.employeeName, id: r.employeeCode, av: getInitials(r.employeeName), co: getColor(r.status), dept: "N/A", 
+                    c1: r.loanType, c2: r.principalAmount.toLocaleString(), c3: r.monthlyEmi.toLocaleString(), date: r.tenureMonths + " Months", status: r.status
+                }));
+                matrixSubtabData.loan.rows = loanRows;
+                thresholdSubtabData.loan.rows = loanRows;
+
+                matrixSubtabData.loan.cards[0].v = loanRows.length;
+                matrixSubtabData.loan.cards[1].v = loanRows.filter(r=>r.status==='Pending').length;
+                matrixSubtabData.loan.cards[2].v = loanRows.filter(r=>r.status==='Approved').length;
+                matrixSubtabData.loan.cards[3].v = loanRows.filter(r=>r.status==='Closed').length;
+            }
+
+            if (typeof DB_FINANCE_CHECKLISTS !== 'undefined' && DB_FINANCE_CHECKLISTS.length > 0) {
+                const onbRows = DB_FINANCE_CHECKLISTS.filter(r=>r.processType==='ONBOARDING').map(r => ({
+                    id: r.employeeCode, emp: r.employeeName, av: getInitials(r.employeeName), co: getColor(r.status), dept: r.department, 
+                    branch: "Head Office", date: r.processDate || "TBD", status: r.status, extra: r.status==='Completed' ? r.processDate : "-"
+                }));
+                checklistSubtabData.onboarding.rows = onbRows;
+
+                const offbRows = DB_FINANCE_CHECKLISTS.filter(r=>r.processType==='OFFBOARDING').map(r => ({
+                    id: r.employeeCode, emp: r.employeeName, av: getInitials(r.employeeName), co: getColor(r.status), dept: r.department, 
+                    branch: "Head Office", date: r.processDate || "TBD", status: r.status, extra: r.status==='Completed' ? r.processDate : "-"
+                }));
+                checklistSubtabData.offboarding.rows = offbRows;
+                matrixSubtabData.fnf.rows = offbRows.map(r => ({
+                    emp: r.emp, id: r.id, av: r.av, co: r.co, dept: r.dept, c1: r.date, c2: "Pending calculation", c3: "Pending calculation", date: "TBD", status: r.status
+                }));
+
+                approvalSubtabData.payroll_setup.rows = DB_FINANCE_CHECKLISTS.filter(r=>r.processType==='ONBOARDING').map(r => ({
+                    emp: r.employeeName, id: r.employeeCode, av: getInitials(r.employeeName), co: getColor(r.status), dept: r.department, 
+                    c1: r.bankName || "Pending", c2: r.accountNumber ? "****" + r.accountNumber.substring(Math.max(0, r.accountNumber.length-4)) : "Pending", date: r.processDate || "TBD", status: r.status
+                }));
+            }
+
+            if (typeof DB_EXPENSE_CLAIMS !== 'undefined' && DB_EXPENSE_CLAIMS.length > 0) {
+                const expRows = DB_EXPENSE_CLAIMS.map(r => ({
+                    emp: r.user ? r.user.fullName : "Unknown", id: r.user ? r.user.username : "N/A", av: getInitials(r.user ? r.user.fullName : ""), co: getColor(r.status), dept: r.user ? r.user.departmentId : "N/A", 
+                    c1: r.purpose, c2: r.amount ? r.amount.toLocaleString() : "0", date: r.submissionDate || "TBD", status: r.status
+                }));
+                approvalSubtabData.reimbursement.rows = expRows;
+                thresholdSubtabData.reimbursement.rows = expRows;
+
+                approvalSubtabData.reimbursement.cards[0].v = expRows.length;
+                approvalSubtabData.reimbursement.cards[1].v = expRows.filter(r=>r.status==='Pending').length;
+                approvalSubtabData.reimbursement.cards[2].v = expRows.filter(r=>r.status==='Under Review').length;
+                approvalSubtabData.reimbursement.cards[3].v = expRows.filter(r=>r.status==='Approved').length;
+                approvalSubtabData.reimbursement.cards[4].v = expRows.filter(r=>r.status==='Rejected').length;
+            }
+        }
+
+        /* =========================================================================
+         * INITIALIZATION — Render default sub-tabs on page load
+         * ========================================================================= */
         document.addEventListener("DOMContentLoaded", function() {
-            // Revenues vs Expenses Chart (Screenshot 1)
+            overrideData();
+
+            // HR-Finance Matrix
+            if (document.getElementById("matrixTableHead")) switchMatrixSubtab('appraisal');
+            // Approval Workflow
+            if (document.getElementById("approvalTableHead")) switchApprovalSubtab('reimbursement');
+            // Transaction Thresholds
+            if (document.getElementById("thresholdTableHead")) switchThresholdSubtab('reimbursement');
+            // Reports
+            if (document.getElementById("reportContentArea")) switchReportSubtab('dept_cost');
+            // Finance Checklist
+            if (document.getElementById("checklistTableHead")) switchChecklistSubtab('onboarding');
+            // Additional Considerations
+            if (document.getElementById("additionalContentArea")) switchAdditionalSubtab('multi_entity');
+
+            // Dashboard Charts
             const ctxRevExp = document.getElementById('revExpChart');
             if (ctxRevExp) {
                 new Chart(ctxRevExp, {
@@ -1182,130 +1655,30 @@
                     data: {
                         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                         datasets: [
-                            {
-                                label: 'Revenues',
-                                data: [35, 65, 100, 115, 110, 75],
-                                backgroundColor: '#3b82f6',
-                                borderRadius: 4
-                            },
-                            {
-                                label: 'Expenses',
-                                data: [20, 40, 65, 110, 45, 38],
-                                backgroundColor: '#ef4444',
-                                borderRadius: 4
-                            }
+                            { label: 'Revenues', data: [35, 65, 100, 115, 110, 75], backgroundColor: '#2563eb', borderRadius: 0 },
+                            { label: 'Expenses', data: [20, 40, 65, 110, 45, 38], backgroundColor: '#ef4444', borderRadius: 0 }
                         ]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'top' } }
-                    }
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
                 });
             }
-
-            // Cashflow Sparkline Chart (Screenshot 1)
             const ctxCashflow = document.getElementById('cashflowSparkline');
             if (ctxCashflow) {
                 new Chart(ctxCashflow, {
                     type: 'line',
-                    data: {
-                        labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'],
-                        datasets: [{
-                            data: [15, 25, 18, 28, 16, 22, 30, 20, 28, 18, 24, 38, 20, 26, 32],
-                            borderColor: '#3b82f6',
-                            tension: 0.4,
-                            fill: false
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { x: { display: false }, y: { display: false } }
-                    }
+                    data: { labels: ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'], datasets: [{ data: [15,25,18,28,16,22,30,20,28,18,24,38,20,26,32], borderColor: '#2563eb', tension: 0.4, fill: false }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
                 });
             }
-
-            // Budget Utilization Donut Chart (Screenshot 1)
             const ctxDonut = document.getElementById('budgetDonutChart');
             if (ctxDonut) {
                 new Chart(ctxDonut, {
                     type: 'doughnut',
-                    data: {
-                        datasets: [{
-                            data: [78, 22],
-                            backgroundColor: ['#10b981', '#e2e8f0'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        cutout: '75%',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } }
-                    }
-                });
-            }
-
-            // Budget Utilization Trend Line Chart (Screenshot 4)
-            const ctxBudgetTrend = document.getElementById('budgetTrendChart');
-            if (ctxBudgetTrend) {
-                new Chart(ctxBudgetTrend, {
-                    type: 'line',
-                    data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                        datasets: [
-                            {
-                                label: 'Actual Utilization %',
-                                data: [35, 45, 52, 60, 72, 85],
-                                borderColor: '#3b82f6',
-                                fill: false
-                            },
-                            {
-                                label: 'Forecasted %',
-                                data: [30, 40, 48, 55, 65, 75],
-                                borderColor: '#10b981',
-                                borderDash: [5, 5],
-                                fill: false
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'top' } }
-                    }
+                    data: { datasets: [{ data: [78, 22], backgroundColor: ['#10b981', '#e2e8f0'], borderWidth: 0 }] },
+                    options: { cutout: '75%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
                 });
             }
         });
-
-        function openPayslipModal(name, empId, dept, uId) {
-            document.getElementById('modalEmpName').innerText = name;
-            document.getElementById('modalEmpId').innerText = empId;
-            document.getElementById('modalEmpDept').innerText = dept;
-            document.getElementById('formActionUserId').value = uId;
-            new bootstrap.Modal(document.getElementById('payslipModal')).show();
-        }
-
-        function openClaimModal(name, claimCode, claimId) {
-            document.getElementById('modalClaimEmpName').innerText = name;
-            document.getElementById('formActionClaimId').value = claimId;
-            new bootstrap.Modal(document.getElementById('claimModal')).show();
-        }
-
-        function filterTableSearch() {
-            const input = document.getElementById("globalSearchInput").value.toLowerCase();
-            const rows = document.querySelectorAll("table tbody tr");
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(input) ? "" : "none";
-            });
-        }
-
-        function toggleAccountsSidebar() {
-            document.body.classList.toggle('sidebar-collapsed');
-        }
     </script>
 </body>
 </html>

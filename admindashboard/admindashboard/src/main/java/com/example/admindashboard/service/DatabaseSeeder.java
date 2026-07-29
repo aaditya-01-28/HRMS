@@ -105,6 +105,24 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Autowired
     private com.example.admindashboard.repository.CertificationRepository certificationRepository;
 
+    @Autowired
+    private com.example.admindashboard.repository.SalaryRevisionRequestRepository salaryRevisionRequestRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.EmployeeLoanRepository employeeLoanRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.FinanceChecklistRepository financeChecklistRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.ExpenseClaimRepository expenseClaimRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.StatutoryBonusRepository statutoryBonusRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.FinanceIntegrationRepository financeIntegrationRepository;
+
     @Override
     public void run(String... args) throws Exception {
                 // Always update existing seeded users to ensure they have correct employeeCode and department
@@ -2263,7 +2281,146 @@ public class DatabaseSeeder implements CommandLineRunner {
             System.out.println("✅ Seeded IT Service Requests.");
         }
 
-        seedLndData();
+            seedLndData();
+            seedAccountsFinanceData();
+    }
+
+    private void seedAccountsFinanceData() {
+        if (salaryRevisionRequestRepository.count() == 0) {
+            User u1 = userRepository.findByUsername("EMP129").orElse(null);
+            User u2 = userRepository.findByUsername("EMP114").orElse(null);
+            User u3 = userRepository.findByUsername("EMP187").orElse(null);
+            User u4 = userRepository.findByUsername("EMP201").orElse(null);
+            User u5 = userRepository.findByUsername("EMP601").orElse(null);
+            User u6 = userRepository.findByUsername("EMP701").orElse(null);
+
+            salaryRevisionRequestRepository.save(new com.example.admindashboard.model.SalaryRevisionRequest(
+                u1, "Saumya Katare", "EMP129", "Engineering", "₹ 8,50,000", "₹ 11,00,000", "+ 29.4%", LocalDate.now().plusDays(15), "Annual Performance Revision & Promotion", "Pending"
+            ));
+            salaryRevisionRequestRepository.save(new com.example.admindashboard.model.SalaryRevisionRequest(
+                u2, "Om Tripathi", "EMP114", "Marketing", "₹ 9,00,000", "₹ 11,50,000", "+ 27.7%", LocalDate.now().plusDays(10), "Market Benchmark Correction", "Approved"
+            ));
+            salaryRevisionRequestRepository.save(new com.example.admindashboard.model.SalaryRevisionRequest(
+                u3, "Om Singrore", "EMP187", "Product", "₹ 12,00,000", "₹ 14,50,000", "+ 20.8%", LocalDate.now().plusDays(20), "Role Expansion & PM Leadership", "Pending"
+            ));
+            salaryRevisionRequestRepository.save(new com.example.admindashboard.model.SalaryRevisionRequest(
+                u4, "Priya Sharma", "EMP201", "HR", "₹ 14,00,000", "₹ 16,50,000", "+ 17.8%", LocalDate.now().plusDays(15), "Leadership Role Expansion", "Under Review"
+            ));
+            salaryRevisionRequestRepository.save(new com.example.admindashboard.model.SalaryRevisionRequest(
+                u5, "Neha Verma", "EMP601", "HR", "₹ 7,50,000", "₹ 9,00,000", "+ 20.0%", LocalDate.now().plusDays(10), "Annual Performance Increment", "Pending"
+            ));
+            salaryRevisionRequestRepository.save(new com.example.admindashboard.model.SalaryRevisionRequest(
+                u6, "Amit Project", "EMP701", "Project Management", "₹ 11,00,000", "₹ 13,00,000", "+ 18.2%", LocalDate.now().plusDays(20), "Promotion to Senior PM", "Approved"
+            ));
+        }
+
+        if (employeeLoanRepository.count() == 0) {
+            User u1 = userRepository.findByUsername("EMP129").orElse(null);
+            User u2 = userRepository.findByUsername("EMP114").orElse(null);
+            User u3 = userRepository.findByUsername("EMP187").orElse(null);
+            User u4 = userRepository.findByUsername("EMP601").orElse(null);
+            User u5 = userRepository.findByUsername("EMP701").orElse(null);
+
+            employeeLoanRepository.save(new com.example.admindashboard.model.EmployeeLoan(
+                u1, "Saumya Katare", "EMP129", "Personal Loan", 150000.0, 12500.0, 12, 112500.0, LocalDate.now().minusMonths(3), "Approved"
+            ));
+            employeeLoanRepository.save(new com.example.admindashboard.model.EmployeeLoan(
+                u2, "Om Tripathi", "EMP114", "Salary Advance", 50000.0, 25000.0, 2, 25000.0, LocalDate.now().minusMonths(1), "Approved"
+            ));
+            employeeLoanRepository.save(new com.example.admindashboard.model.EmployeeLoan(
+                u3, "Om Singrore", "EMP187", "Emergency Loan", 75000.0, 25000.0, 3, 75000.0, LocalDate.now().minusWeeks(2), "Pending"
+            ));
+            employeeLoanRepository.save(new com.example.admindashboard.model.EmployeeLoan(
+                u4, "Neha Verma", "EMP601", "Salary Advance", 30000.0, 15000.0, 2, 30000.0, LocalDate.now().minusDays(5), "Pending"
+            ));
+            employeeLoanRepository.save(new com.example.admindashboard.model.EmployeeLoan(
+                u5, "Amit Project", "EMP701", "Personal Loan", 200000.0, 18000.0, 12, 180000.0, LocalDate.now().minusMonths(1), "Approved"
+            ));
+        }
+
+        if (financeChecklistRepository.count() == 0) {
+            User u1 = userRepository.findByUsername("EMP129").orElse(null);
+            User u2 = userRepository.findByUsername("EMP187").orElse(null);
+            User u3 = userRepository.findByUsername("EMP201").orElse(null);
+            User u4 = userRepository.findByUsername("EMP601").orElse(null);
+            User u5 = userRepository.findByUsername("EMP114").orElse(null);
+            User u6 = userRepository.findByUsername("EMP0001").orElse(null);
+
+            financeChecklistRepository.save(new com.example.admindashboard.model.FinanceChecklist(
+                u1, "Saumya Katare", "EMP129", "Engineering", "ONBOARDING", true, true, true, true, false, 
+                "HDFC Bank", "501002394812", "HDFC0001234", "New Regime", LocalDate.now().minusMonths(2), "Completed"
+            ));
+            financeChecklistRepository.save(new com.example.admindashboard.model.FinanceChecklist(
+                u2, "Om Singrore", "EMP187", "Product", "OFFBOARDING", true, true, true, true, true, 
+                "ICICI Bank", "000401583920", "ICIC0000004", "Old Regime", LocalDate.now().minusDays(5), "Completed"
+            ));
+            financeChecklistRepository.save(new com.example.admindashboard.model.FinanceChecklist(
+                u3, "Priya Sharma", "EMP201", "HR", "ONBOARDING", true, true, true, false, false, 
+                "SBI", "30291456789", "SBIN0001234", "New Regime", LocalDate.now().minusMonths(3), "In Progress"
+            ));
+            financeChecklistRepository.save(new com.example.admindashboard.model.FinanceChecklist(
+                u4, "Neha Verma", "EMP601", "HR", "ONBOARDING", true, true, false, false, false, 
+                "HDFC Bank", "50100234567", "HDFC0004321", "Old Regime", LocalDate.now().minusMonths(1), "Pending"
+            ));
+            financeChecklistRepository.save(new com.example.admindashboard.model.FinanceChecklist(
+                u5, "Om Tripathi", "EMP114", "Engineering", "OFFBOARDING", true, true, true, true, false, 
+                "ICICI Bank", "000401234567", "ICIC0000001", "New Regime", LocalDate.now().minusWeeks(1), "In Progress"
+            ));
+            financeChecklistRepository.save(new com.example.admindashboard.model.FinanceChecklist(
+                u6, "Rajesh Kumar", "EMP0001", "IT", "ONBOARDING", true, true, true, true, false, 
+                "Axis Bank", "91700123456", "UTIB0000001", "New Regime", LocalDate.now().minusMonths(2), "Completed"
+            ));
+        }
+
+        if (expenseClaimRepository.count() == 0) {
+            User emp129 = userRepository.findByUsername("EMP129").orElse(null);
+            User emp114 = userRepository.findByUsername("EMP114").orElse(null);
+            User emp187 = userRepository.findByUsername("EMP187").orElse(null);
+            User emp201 = userRepository.findByUsername("EMP201").orElse(null);
+            User emp601 = userRepository.findByUsername("EMP601").orElse(null);
+            User emp701 = userRepository.findByUsername("EMP701").orElse(null);
+            User emp0001 = userRepository.findByUsername("EMP0001").orElse(null);
+
+            saveExpenseClaim(emp129, "Travel - Client Visit Bangalore", 45000.0, "Pending", LocalDate.now().minusDays(5), "Finance Admin");
+            saveExpenseClaim(emp114, "Medical Reimbursement", 12500.0, "Pending", LocalDate.now().minusDays(3), "Finance Admin");
+            saveExpenseClaim(emp187, "Training Workshop Fee", 78000.0, "Under Review", LocalDate.now().minusDays(7), "Finance Admin");
+            saveExpenseClaim(emp201, "Internet Charges Q1", 4500.0, "Approved", LocalDate.now().minusDays(10), "Finance Admin");
+            saveExpenseClaim(emp601, "Travel - Conference Delhi", 125000.0, "Pending", LocalDate.now().minusDays(2), "Super Admin");
+            saveExpenseClaim(emp701, "Meals - Team Dinner", 8200.0, "Approved", LocalDate.now().minusDays(8), "Finance Admin");
+            saveExpenseClaim(emp0001, "Software License Renewal", 210000.0, "Under Review", LocalDate.now().minusDays(4), "Super Admin");
+        }
+
+        if (statutoryBonusRepository.count() == 0) {
+            statutoryBonusRepository.save(new com.example.admindashboard.model.StatutoryBonus("EMP129", "Saumya Katare", "Engineering", "IOS Developer", "Eligible", 510000.0, 51000.0, "Pending"));
+            statutoryBonusRepository.save(new com.example.admindashboard.model.StatutoryBonus("EMP114", "Om Tripathi", "Engineering", "Marketing Lead", "Eligible", 540000.0, 54000.0, "Pending"));
+            statutoryBonusRepository.save(new com.example.admindashboard.model.StatutoryBonus("EMP187", "Om Singrore", "Product", "Project Manager", "Eligible", 720000.0, 72000.0, "Pending"));
+            statutoryBonusRepository.save(new com.example.admindashboard.model.StatutoryBonus("EMP201", "Priya Sharma", "HR", "HR Director", "Eligible", 840000.0, 84000.0, "Pending"));
+            statutoryBonusRepository.save(new com.example.admindashboard.model.StatutoryBonus("EMP601", "Neha Verma", "HR", "HR Manager", "Eligible", 450000.0, 45000.0, "Pending"));
+            statutoryBonusRepository.save(new com.example.admindashboard.model.StatutoryBonus("EMP701", "Amit Project", "Project Management", "Project Manager", "Eligible", 660000.0, 66000.0, "Pending"));
+            statutoryBonusRepository.save(new com.example.admindashboard.model.StatutoryBonus("EMP401", "Sneha Gupta", "Head Office", "Lead Recruiter", "Not Eligible", 0.0, 0.0, "N/A"));
+        }
+
+        if (financeIntegrationRepository.count() == 0) {
+            financeIntegrationRepository.save(new com.example.admindashboard.model.FinanceIntegration("Banking / NEFT System", "ICICI Bank Corporate", "Banking", "Payroll Module", "API", "29 Jul 2026 10:45 AM", "Active", "Bi-directional"));
+            financeIntegrationRepository.save(new com.example.admindashboard.model.FinanceIntegration("TallyPrime", "Tally Solutions Pvt Ltd", "Accounting", "General Ledger", "Tally API", "28 Jul 2026 11:30 PM", "Active", "One-way"));
+            financeIntegrationRepository.save(new com.example.admindashboard.model.FinanceIntegration("Biometric Attendance", "ZKTeco", "Attendance", "HR Module", "API", "29 Jul 2026 06:00 AM", "Active", "One-way"));
+            financeIntegrationRepository.save(new com.example.admindashboard.model.FinanceIntegration("Income Tax Portal", "Govt. of India", "Tax", "Tax Module", "File Upload", "15 Jul 2026 09:00 AM", "Inactive", "One-way"));
+            financeIntegrationRepository.save(new com.example.admindashboard.model.FinanceIntegration("EPFO Portal", "EPFO Govt.", "Statutory", "PF Module", "Web Portal", "25 Jul 2026 02:00 PM", "Active", "Bi-directional"));
+            financeIntegrationRepository.save(new com.example.admindashboard.model.FinanceIntegration("ESI Portal", "ESIC Govt.", "Statutory", "ESI Module", "Web Portal", "20 Jul 2026 10:00 AM", "Active", "One-way"));
+        }
+    }
+
+    private void saveExpenseClaim(User user, String purpose, Double amount, String status, LocalDate submissionDate, String assignedTo) {
+        if (user != null) {
+            com.example.admindashboard.model.ExpenseClaim ec = new com.example.admindashboard.model.ExpenseClaim();
+            ec.setUser(user);
+            ec.setPurpose(purpose);
+            ec.setAmount(amount);
+            ec.setStatus(status);
+            ec.setSubmissionDate(submissionDate);
+            ec.setAssignedTo(assignedTo);
+            expenseClaimRepository.save(ec);
+        }
     }
 
 
