@@ -206,4 +206,29 @@ public class SuperAdminApiController {
         }
         return ResponseEntity.ok(statutoryConfigRepo.save(config));
     }
+
+    // --- Employee Profile Data Views ---
+
+    @Autowired private EmployeeProfileRepository employeeProfileRepo;
+
+    @GetMapping("/employees")
+    public ResponseEntity<List<EmployeeProfile>> getAllEmployees() {
+        return ResponseEntity.ok(employeeProfileRepo.findAll());
+    }
+
+    @GetMapping("/employees/{id}")
+    public ResponseEntity<EmployeeProfile> getEmployee(@PathVariable Long id) {
+        return ResponseEntity.ok(employeeProfileRepo.findById(id).orElse(null));
+    }
+
+    @PutMapping("/employees/{id}")
+    public ResponseEntity<EmployeeProfile> updateEmployee(@PathVariable Long id, @RequestBody EmployeeProfile updated) {
+        EmployeeProfile existing = employeeProfileRepo.findById(id).orElse(null);
+        if (existing == null) {
+            return ResponseEntity.notFound().build();
+        }
+        updated.setId(id);
+        updated.setUser(existing.getUser());
+        return ResponseEntity.ok(employeeProfileRepo.save(updated));
+    }
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name = "employee_profiles")
 public class EmployeeProfile {
@@ -13,6 +14,7 @@ public class EmployeeProfile {
 
     @OneToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"employeeProfile", "password", "role", "manager", "roleAssignments"})
     private User user;
 
     // SECTION 1: IDENTITY & JOB (Moved from User)
