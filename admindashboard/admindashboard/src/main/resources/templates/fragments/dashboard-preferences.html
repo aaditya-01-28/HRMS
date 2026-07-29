@@ -30,10 +30,6 @@
     let currentPrefType = '';
 
     function rearrangeItems(type, pinnedString) {
-        if (!pinnedString) return;
-        const pinnedList = pinnedString.split(',').map(s => s.trim()).filter(s => s);
-        if (pinnedList.length === 0) return;
-
         const pinnedContainer = document.getElementById(type === 'services' ? 'pinnedServicesContainer' : 'pinnedAppsContainer');
         const collapsedContainer = document.getElementById(type === 'services' ? 'collapsedServicesContainer' : 'collapsedAppsContainer');
         
@@ -44,28 +40,40 @@
         pinnedContainer.innerHTML = '';
         collapsedContainer.innerHTML = '';
 
-        const pinnedNodes = [];
-        const unpinnedNodes = [];
+        let finalPinned = [];
+        let finalUnpinned = [];
 
-        allItems.forEach(item => {
-            const span = item.querySelector('span[data-item-name]');
-            if (span) {
-                const name = span.getAttribute('data-item-name');
-                if (pinnedList.includes(name)) {
-                    pinnedNodes.push({item, index: pinnedList.indexOf(name)});
-                } else {
-                    unpinnedNodes.push(item);
-                }
-            } else {
-                unpinnedNodes.push(item);
+        if (pinnedString) {
+            const pinnedList = pinnedString.split(',').map(s => s.trim()).filter(s => s);
+            if (pinnedList.length > 0) {
+                const pinnedNodes = [];
+                const unpinnedNodes = [];
+
+                allItems.forEach(item => {
+                    const span = item.querySelector('span[data-item-name]');
+                    if (span) {
+                        const name = span.getAttribute('data-item-name');
+                        if (pinnedList.includes(name)) {
+                            pinnedNodes.push({item, index: pinnedList.indexOf(name)});
+                        } else {
+                            unpinnedNodes.push(item);
+                        }
+                    } else {
+                        unpinnedNodes.push(item);
+                    }
+                });
+
+                pinnedNodes.sort((a, b) => a.index - b.index);
+                finalPinned = pinnedNodes.map(n => n.item).slice(0, 6);
+                const overflowPinned = pinnedNodes.map(n => n.item).slice(6);
+                finalUnpinned = unpinnedNodes.concat(overflowPinned);
             }
-        });
+        }
 
-        pinnedNodes.sort((a, b) => a.index - b.index);
-        
-        const finalPinned = pinnedNodes.map(n => n.item).slice(0, 6);
-        const overflowPinned = pinnedNodes.map(n => n.item).slice(6);
-        const finalUnpinned = unpinnedNodes.concat(overflowPinned);
+        if (finalPinned.length === 0 && finalUnpinned.length === 0) {
+            finalPinned = allItems.slice(0, 6);
+            finalUnpinned = allItems.slice(6);
+        }
 
         finalPinned.forEach(node => pinnedContainer.appendChild(node));
         finalUnpinned.forEach(node => collapsedContainer.appendChild(node));
