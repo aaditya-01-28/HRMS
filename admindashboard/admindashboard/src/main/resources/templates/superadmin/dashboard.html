@@ -101,13 +101,8 @@
             
             <!-- Recruit -->
             <div class="accordion-item">
-                <div class="accordion-header" onclick="toggleAccordion(this)">
+                <div class="accordion-header" onclick="switchTab('recruit', 'Recruit', this)">
                     <div class="left-sec"><i class="fa-solid fa-user-plus icon"></i><span>Recruit</span></div>
-                    <i class="fa-solid fa-chevron-down arrow"></i>
-                </div>
-                <div class="accordion-content">
-                    <a href="javascript:void(0);" class="sub-menu-item" onclick="switchTab('placeholder', 'Recruit', this)">Candidates</a>
-                    <a href="javascript:void(0);" class="sub-menu-item" onclick="switchTab('placeholder', 'Recruit', this)">Job Postings</a>
                 </div>
             </div>
             
@@ -561,6 +556,361 @@
             </div>
         </div>
 
+
+        <!-- Recruit Module -->
+        <div class="settings-form-area" id="recruit-tab" style="padding: 0; background: #f4f7fb;">
+            <div style="background: #fff; padding: 20px 30px; border-bottom: 1px solid #eaeaea;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="font-size: 20px; font-weight: 700; color: #111;">WhiteCircle Group <span style="font-size:10px; color:#888; display:block; font-weight:500; margin-top:2px; text-transform:uppercase;">Super Admin Portal</span></h2>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <select style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 0px !important; font-size: 13px; color: #333; outline: none; background: #f4f7fb;">
+                            <option>Onboard</option>
+                            <option>Recruit</option>
+                        </select>
+                        <button class="btn-primary" onclick="openInitiateModal()" style="border-radius:0px !important;">+ Initiate BGV</button>
+                        <button style="background:none; border:1px solid #ddd; padding:8px; border-radius:0px !important; cursor:pointer;"><i class="fa-solid fa-filter"></i></button>
+                        <button style="background:none; border:1px solid #ddd; padding:8px; border-radius:0px !important; cursor:pointer;"><i class="fa-solid fa-rotate-right"></i></button>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 25px; border-bottom: 1px solid #eaeaea; margin-bottom: -1px;">
+                    <a href="javascript:void(0)" class="recruit-nav active" onclick="switchRecruitTab('dashboard', this)" style="padding-bottom:10px; color:#0052cc; font-weight:600; text-decoration:none; border-bottom:2px solid #0052cc; font-size:14px; margin-bottom:-1px;">Dashboard</a>
+                    <a href="javascript:void(0)" class="recruit-nav" onclick="switchRecruitTab('initiate', this)" style="padding-bottom:10px; color:#555; font-weight:500; text-decoration:none; border-bottom:2px solid transparent; font-size:14px; margin-bottom:-1px;">Initiate</a>
+                    <a href="javascript:void(0)" class="recruit-nav" onclick="switchRecruitTab('ongoing', this)" style="padding-bottom:10px; color:#555; font-weight:500; text-decoration:none; border-bottom:2px solid transparent; font-size:14px; margin-bottom:-1px;">Ongoing BGV</a>
+                    <a href="javascript:void(0)" class="recruit-nav" onclick="switchRecruitTab('completed', this)" style="padding-bottom:10px; color:#555; font-weight:500; text-decoration:none; border-bottom:2px solid transparent; font-size:14px; margin-bottom:-1px;">Completed BGV</a>
+                    <a href="javascript:void(0)" class="recruit-nav" onclick="switchRecruitTab('external', this)" style="padding-bottom:10px; color:#555; font-weight:500; text-decoration:none; border-bottom:2px solid transparent; font-size:14px; margin-bottom:-1px;">External Verifier</a>
+                    <a href="javascript:void(0)" class="recruit-nav" onclick="switchRecruitTab('settings', this)" style="padding-bottom:10px; color:#555; font-weight:500; text-decoration:none; border-bottom:2px solid transparent; font-size:14px; margin-bottom:-1px;">Settings</a>
+                </div>
+            </div>
+            
+            <div style="padding: 20px 30px; background: #fff; min-height: 500px;">
+                <!-- Ongoing BGV -->
+                <div id="recruit-ongoing" class="recruit-content-section" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <div style="position:relative; width: 250px;">
+                            <i class="fa-solid fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#888;"></i>
+                            <input type="text" placeholder="Search..." style="width:100%; padding:8px 12px 8px 35px; border:1px solid #ddd; border-radius:0px !important; outline:none; font-size:13px;">
+                        </div>
+                        <div style="display:flex; gap:15px; color:#555; font-size:13px; align-items:center;">
+                            <span style="color:#0052cc; font-weight:600; cursor:pointer;">+ Add Filter</span>
+                            <span style="cursor:pointer;">Query <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i></span>
+                            <span style="cursor:pointer;">Branch <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i></span>
+                            <span style="cursor:pointer;">Salary Structure <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i></span>
+                            <span style="cursor:pointer;">Leave <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i></span>
+                            <span style="cursor:pointer;">Attendance <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i></span>
+                            <span style="cursor:pointer;">Designation <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i></span>
+                            <span style="cursor:pointer;">Emp Source <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i></span>
+                            <span style="color:#de350b; cursor:pointer; font-size:14px;"><i class="fa-solid fa-xmark"></i></span>
+                        </div>
+                    </div>
+                    
+                    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                        <thead>
+                            <tr style="background:#f4f7fb; color:#555;">
+                                <th style="padding:12px; text-align:left; font-weight:600; border-radius:0px !important;">Candidate</th>
+                                <th style="padding:12px; text-align:left; font-weight:600;">Designation</th>
+                                <th style="padding:12px; text-align:left; font-weight:600;">Email</th>
+                                <th style="padding:12px; text-align:left; font-weight:600;">Overall Status</th>
+                                <th style="padding:12px; text-align:left; font-weight:600;">Action</th>
+                                <th style="padding:12px; text-align:center; font-weight:600; border-radius:0px !important;"><input type="checkbox"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c : ${candidates}" style="border-bottom: 1px solid #eaeaea;">
+                                <td style="padding:12px; display:flex; align-items:center; gap:10px;">
+                                    <div style="width:30px; height:30px; border-radius:50%; background:#eef4ff; color:#0052cc; display:flex; align-items:center; justify-content:center; font-weight:600;" th:text="${#strings.substring(c.name,0,1)}">Z</div>
+                                    <span style="font-weight:600; color:#111;" th:text="${c.name}">Zayn</span>
+                                </td>
+                                <td style="padding:12px; color:#555;" th:text="${c.jobTitle}">Software Engineer</td>
+                                <td style="padding:12px; color:#555;" th:text="${c.email}">zayn@gmail.com</td>
+                                <td style="padding:12px; color:#555;">
+                                    <select style="padding:6px; border:1px solid #ddd; border-radius:0px !important; outline:none; background:#fff; font-size:12px; cursor:pointer;">
+                                        <option th:selected="${c.bgvStatus == 'Select'}">Select...</option>
+                                        <option th:selected="${c.bgvStatus == 'Pending'}">Pending</option>
+                                        <option th:selected="${c.bgvStatus == 'Ongoing'}">Ongoing</option>
+                                        <option th:selected="${c.bgvStatus == 'Completed'}">Completed</option>
+                                    </select>
+                                </td>
+                                <td style="padding:12px; color:#0052cc; font-size:16px;">
+                                    <i class="fa-regular fa-circle-user" style="cursor:pointer; margin-right:5px;"></i>
+                                </td>
+                                <td style="padding:12px; text-align:center;"><input type="checkbox"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                
+                <!-- Completed BGV -->
+                <div id="recruit-completed" class="recruit-content-section" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <div style="position:relative; width: 250px;">
+                            <i class="fa-solid fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#888;"></i>
+                            <input type="text" placeholder="Search Completed BGV..." style="width:100%; padding:8px 12px 8px 35px; border:1px solid #ddd; border-radius:0px !important; outline:none; font-size:13px;">
+                        </div>
+                    </div>
+                    
+                    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                        <thead>
+                            <tr style="background:#f4f7fb; color:#555;">
+                                <th style="padding:12px; text-align:left; font-weight:600; border-radius:0px !important;">Candidate</th>
+                                <th style="padding:12px; text-align:left; font-weight:600;">Designation</th>
+                                <th style="padding:12px; text-align:left; font-weight:600;">Email</th>
+                                <th style="padding:12px; text-align:left; font-weight:600;">Overall Status</th>
+                                <th style="padding:12px; text-align:left; font-weight:600;">Action</th>
+                                <th style="padding:12px; text-align:center; font-weight:600; border-radius:0px !important;"><input type="checkbox"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c : ${candidates}" th:if="${c.bgvStatus == 'Completed'}" style="border-bottom: 1px solid #eaeaea;">
+                                <td style="padding:12px; display:flex; align-items:center; gap:10px;">
+                                    <div style="width:30px; height:30px; border-radius:50%; background:#eef4ff; color:#0052cc; display:flex; align-items:center; justify-content:center; font-weight:600;" th:text="${#strings.substring(c.name,0,1)}">Z</div>
+                                    <span style="font-weight:600; color:#111;" th:text="${c.name}">Zayn</span>
+                                </td>
+                                <td style="padding:12px; color:#555;" th:text="${c.jobTitle}">Software Engineer</td>
+                                <td style="padding:12px; color:#555;" th:text="${c.email}">zayn@gmail.com</td>
+                                <td style="padding:12px; color:#555;">
+                                    <span style="background:#ebfbf0; color:#219653; padding:5px 10px; border-radius:4px; font-weight:600; font-size:11px;">Completed</span>
+                                </td>
+                                <td style="padding:12px; color:#0052cc; font-size:16px;">
+                                    <i class="fa-regular fa-circle-user" style="cursor:pointer; margin-right:5px;"></i>
+                                </td>
+                                <td style="padding:12px; text-align:center;"><input type="checkbox"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <!-- Initiate -->
+                <div id="recruit-initiate" class="recruit-content-section" style="display:none;">
+                    <div style="max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border: 1px solid #eaeaea; border-radius: 8px; margin-top: 20px;">
+                        <h3 style="font-size: 18px; font-weight: 600; color: #111; margin-bottom: 20px;">Initiate New Background Verification</h3>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display:block; font-size:13px; font-weight:600; margin-bottom:8px; color:#333;">Select Candidate <span style="color:red">*</span></label>
+                            <select style="width:100%; padding:10px; border:1px solid #ddd; outline:none; font-size:13px; border-radius:4px;">
+                                <option>Select a candidate from Job Postings</option>
+                                <option th:each="c : ${candidates}" th:value="${c.id}" th:text="${c.name} + ' (' + ${c.jobTitle} + ')'"></option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display:block; font-size:13px; font-weight:600; margin-bottom:8px; color:#333;">Select Package <span style="color:red">*</span></label>
+                            <select style="width:100%; padding:10px; border:1px solid #ddd; outline:none; font-size:13px; border-radius:4px;">
+                                <option>Standard Verification (Criminal, Address, Education)</option>
+                                <option>Comprehensive (Standard + Past Employment)</option>
+                                <option>Executive (Comprehensive + Global Database Check)</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 25px;">
+                            <label style="display:block; font-size:13px; font-weight:600; margin-bottom:8px; color:#333;">External Verifier</label>
+                            <select style="width:100%; padding:10px; border:1px solid #ddd; outline:none; font-size:13px; border-radius:4px;">
+                                <option>KPMG</option>
+                                <option>EY</option>
+                                <option>PWC</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 15px;">
+                            <button style="padding: 10px 20px; border: 1px solid #ddd; background: #fff; border-radius: 4px; font-weight: 600; cursor: pointer;">Cancel</button>
+                            <button class="btn-primary" style="padding: 10px 20px; border-radius: 4px;">Initiate BGV</button>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <!-- External Verifier -->
+                <div id="recruit-external" class="recruit-content-section" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <div style="position:relative; width: 250px;">
+                            <i class="fa-solid fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#888;"></i>
+                            <input type="text" placeholder="Search Verifiers..." style="width:100%; padding:8px 12px 8px 35px; border:1px solid #ddd; border-radius:4px; outline:none; font-size:13px;">
+                        </div>
+                        <button class="btn-primary" style="padding: 8px 16px; border-radius: 4px;">+ Add Verifier</button>
+                    </div>
+                    
+                    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                        <thead>
+                            <tr style="background:#f4f7fb; color:#555;">
+                                <th style="padding:12px; text-align:left; font-weight:600; border-radius:4px 0 0 4px;">Agency Name</th>
+                                <th style="padding:12px; text-align:left; font-weight:600;">Contact Person</th>
+                                <th style="padding:12px; text-align:left; font-weight:600;">Email</th>
+                                <th style="padding:12px; text-align:left; font-weight:600;">Active Checks</th>
+                                <th style="padding:12px; text-align:left; font-weight:600;">Status</th>
+                                <th style="padding:12px; text-align:left; font-weight:600; border-radius:0 4px 4px 0;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #eaeaea;">
+                                <td style="padding:12px; font-weight:600; color:#111;">KPMG</td>
+                                <td style="padding:12px; color:#555;">Rajesh Kumar</td>
+                                <td style="padding:12px; color:#555;">rajesh.bgv@kpmg.com</td>
+                                <td style="padding:12px; color:#555;">4</td>
+                                <td style="padding:12px; color:#555;"><span style="background:#ebfbf0; color:#219653; padding:4px 8px; border-radius:4px; font-weight:600; font-size:11px;">Active</span></td>
+                                <td style="padding:12px; color:#0052cc;"><i class="fa-solid fa-pen-to-square" style="cursor:pointer; margin-right:10px;"></i><i class="fa-solid fa-trash-can" style="cursor:pointer; color:#de350b;"></i></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #eaeaea;">
+                                <td style="padding:12px; font-weight:600; color:#111;">EY (Ernst & Young)</td>
+                                <td style="padding:12px; color:#555;">Anita Sharma</td>
+                                <td style="padding:12px; color:#555;">anita@ey.com</td>
+                                <td style="padding:12px; color:#555;">2</td>
+                                <td style="padding:12px; color:#555;"><span style="background:#ebfbf0; color:#219653; padding:4px 8px; border-radius:4px; font-weight:600; font-size:11px;">Active</span></td>
+                                <td style="padding:12px; color:#0052cc;"><i class="fa-solid fa-pen-to-square" style="cursor:pointer; margin-right:10px;"></i><i class="fa-solid fa-trash-can" style="cursor:pointer; color:#de350b;"></i></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #eaeaea;">
+                                <td style="padding:12px; font-weight:600; color:#111;">PWC</td>
+                                <td style="padding:12px; color:#555;">Vikram Singh</td>
+                                <td style="padding:12px; color:#555;">vikram@pwc.com</td>
+                                <td style="padding:12px; color:#555;">1</td>
+                                <td style="padding:12px; color:#555;"><span style="background:#fff4e5; color:#f2994a; padding:4px 8px; border-radius:4px; font-weight:600; font-size:11px;">Inactive</span></td>
+                                <td style="padding:12px; color:#0052cc;"><i class="fa-solid fa-pen-to-square" style="cursor:pointer; margin-right:10px;"></i><i class="fa-solid fa-trash-can" style="cursor:pointer; color:#de350b;"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Settings -->
+                <div id="recruit-settings" class="recruit-content-section" style="display:none; background:#f4f7fb; margin:-20px -30px; padding:20px 30px;">
+                    <!-- Sub tabs -->
+                    <div style="display:flex; gap:25px; margin-bottom:20px;">
+                        <a href="javascript:void(0)" class="settings-sub-nav active" onclick="switchSettingsSubTab('general', this)" style="padding-bottom:5px; color:#0052cc; font-weight:600; text-decoration:none; border-bottom:2px solid #0052cc; font-size:13px;">Settings</a>
+                        <a href="javascript:void(0)" class="settings-sub-nav" onclick="switchSettingsSubTab('source', this)" style="padding-bottom:5px; color:#555; font-weight:500; text-decoration:none; border-bottom:2px solid transparent; font-size:13px;">Source</a>
+                    </div>
+                    
+                    <div id="settings-general" class="settings-sub-content" style="display:flex; gap:20px;">
+                        <div style="flex:2; background:#fff; padding:25px; border:1px solid #eaeaea; border-radius:0px !important;">
+                            <h3 style="font-size:16px; font-weight:600; color:#111; margin-bottom:5px;">Portal Design</h3>
+                            <p style="color:#888; font-size:12px; margin-bottom:20px;">Manage templates and content shown in the portal <i class="fa-solid fa-circle-info" style="color:#0052cc; float:right;"></i></p>
+                            
+                            <h4 style="font-size:14px; font-weight:600; color:#555; margin-bottom:15px;">Mail Templates</h4>
+                            <div style="display:flex; gap:10px; margin-bottom:25px; flex-wrap:wrap;">
+                                <button style="background:#eef4ff; color:#0052cc; border:none; padding:8px 16px; border-radius:0px !important; font-size:13px; font-weight:600;"><i class="fa-solid fa-users" style="margin-right:5px;"></i> Candidates</button>
+                                <button style="background:#f9f0ff; color:#9b51e0; border:none; padding:8px 16px; border-radius:0px !important; font-size:13px; font-weight:600;"><i class="fa-solid fa-user-tie" style="margin-right:5px;"></i> Interviewer</button>
+                                <button style="background:#e6f9f0; color:#219653; border:none; padding:8px 16px; border-radius:0px !important; font-size:13px; font-weight:600;"><i class="fa-solid fa-file-invoice" style="margin-right:5px;"></i> Offer Letter</button>
+                                <button style="background:#fff4e5; color:#f2994a; border:none; padding:8px 16px; border-radius:0px !important; font-size:13px; font-weight:600;"><i class="fa-solid fa-file-alt" style="margin-right:5px;"></i> Documents</button>
+                            </div>
+                            
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <h4 style="font-size:14px; font-weight:600; color:#555;">Offer Letters</h4>
+                                <i class="fa-solid fa-plus" style="color:#0052cc; cursor:pointer;"></i>
+                            </div>
+                            
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                                <div style="border:1px solid #eaeaea; padding:15px; border-left:3px solid #0052cc; display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-weight:600; font-size:13px; color:#333;">Offer Letter</span>
+                                    <div><i class="fa-solid fa-pen-to-square" style="color:#ccc; cursor:pointer; margin-right:8px;"></i><i class="fa-solid fa-trash-can" style="color:#ccc; cursor:pointer;"></i></div>
+                                </div>
+                                <div style="border:1px solid #eaeaea; padding:15px; border-left:3px solid #0052cc; display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-weight:600; font-size:13px; color:#333;">Offer Letter2</span>
+                                    <div><i class="fa-solid fa-pen-to-square" style="color:#ccc; cursor:pointer; margin-right:8px;"></i><i class="fa-solid fa-trash-can" style="color:#ccc; cursor:pointer;"></i></div>
+                                </div>
+                                <div style="border:1px solid #eaeaea; padding:15px; border-left:3px solid #0052cc; display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-weight:600; font-size:13px; color:#333;">Offer Lettertest</span>
+                                    <div><i class="fa-solid fa-pen-to-square" style="color:#ccc; cursor:pointer; margin-right:8px;"></i><i class="fa-solid fa-trash-can" style="color:#ccc; cursor:pointer;"></i></div>
+                                </div>
+                                <div style="border:1px solid #eaeaea; padding:15px; border-left:3px solid #0052cc; display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-weight:600; font-size:13px; color:#333;">Offer Letter05</span>
+                                    <div><i class="fa-solid fa-pen-to-square" style="color:#ccc; cursor:pointer; margin-right:8px;"></i><i class="fa-solid fa-trash-can" style="color:#ccc; cursor:pointer;"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="flex:1; background:#fff; padding:25px; border:1px solid #eaeaea; border-radius:0px !important;">
+                            <h3 style="font-size:16px; font-weight:600; color:#111; margin-bottom:5px;">Portal URL</h3>
+                            <p style="color:#888; font-size:12px; margin-bottom:20px;">Configure and manage the portal URL</p>
+                            
+                            <div style="background:#ebfbf0; color:#0052cc; padding:15px; border:1px solid #c7f2d3; font-size:13px; word-break:break-all; margin-bottom:20px;">
+                                http://demo.aaraloreloremokarereportal?id=5SYXmBelqPKiam7YCdRNWrkSPRNTczUve8
+                            </div>
+                            
+                            <h4 style="font-size:13px; font-weight:600; color:#555; margin-bottom:10px;">IFrame Embed Code <i class="fa-regular fa-copy" style="cursor:pointer; float:right;"></i></h4>
+                            <div style="background:#1a202c; color:#a0aec0; padding:15px; font-family:monospace; font-size:12px; border-radius:0px !important; line-height:1.5;">
+                                &lt;iframe<br>
+                                &nbsp;&nbsp;src="http://demo.aaraloreloremokarer<br>
+                                &nbsp;&nbsp;width="100%" height="100%"<br>
+                                &nbsp;&nbsp;frameborder="0" allowfullscreen<br>
+                                /&gt;
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="settings-source" class="settings-sub-content" style="display:none; background:#fff; padding:25px; border:1px solid #eaeaea;">
+                        <button class="btn-primary" onclick="document.getElementById('addSourceModal').style.display='flex'" style="border-radius:0px !important; margin-bottom:15px;">+ Add Source</button>
+                        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                            <thead>
+                                <tr style="background:#f4f7fb; color:#555;">
+                                    <th style="padding:12px; text-align:left; font-weight:600;">Source</th>
+                                    <th style="padding:12px; text-align:left; font-weight:600;">Type</th>
+                                    <th style="padding:12px; text-align:left; font-weight:600;">Mobile</th>
+                                    <th style="padding:12px; text-align:left; font-weight:600;">Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #eaeaea;">
+                                    <td style="padding:12px; color:#111; font-weight:600;">Naukri</td>
+                                    <td style="padding:12px; color:#555;">Job Board</td>
+                                    <td style="padding:12px; color:#555;">9876543210</td>
+                                    <td style="padding:12px; color:#555;">support@naukri.com</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #eaeaea;">
+                                    <td style="padding:12px; color:#111; font-weight:600;">LinkedIn</td>
+                                    <td style="padding:12px; color:#555;">Social</td>
+                                    <td style="padding:12px; color:#555;">-</td>
+                                    <td style="padding:12px; color:#555;">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Dashboard (Default open) -->
+                <div id="recruit-dashboard" class="recruit-content-section" style="display:block;">
+                    <h3 style="color:#555; margin-bottom:15px;">Recruitment Dashboard Overview</h3>
+                    <p style="color:#888;">Select a tab above to manage BGV, Settings, or External Verifiers.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add Source Modal -->
+        <div id="addSourceModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+            <div style="background:#fff; width:500px; padding:0; border-radius:0px !important; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+                <div style="padding:20px; border-bottom:1px solid #eaeaea; display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="font-size:18px; font-weight:700;">Add Source</h3>
+                    <i class="fa-solid fa-xmark" style="cursor:pointer; color:#888;" onclick="document.getElementById('addSourceModal').style.display='none'"></i>
+                </div>
+                <div style="padding:20px;">
+                    <div style="display:flex; gap:15px; margin-bottom:20px;">
+                        <div style="flex:1;">
+                            <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px;">Source <span style="color:red">*</span></label>
+                            <input type="text" placeholder="Enter source name" style="width:100%; padding:10px; border:1px solid #ddd; outline:none; font-size:13px; border-radius:0px !important;">
+                        </div>
+                        <div style="flex:1;">
+                            <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px;">Source Type <span style="color:red">*</span></label>
+                            <select style="width:100%; padding:10px; border:1px solid #ddd; outline:none; font-size:13px; border-radius:0px !important;">
+                                <option>Select source type</option>
+                                <option>Job Board</option>
+                                <option>Referral</option>
+                                <option>Social Media</option>
+                            </select>
+                        </div>
+                    </div>
+                    <h4 style="font-size:12px; font-weight:700; margin-bottom:15px; text-transform:uppercase;">Contact Details</h4>
+                    <div style="display:flex; gap:15px; margin-bottom:20px;">
+                        <div style="flex:1;">
+                            <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px;">Mobile</label>
+                            <input type="text" placeholder="eg: 9876543210" style="width:100%; padding:10px; border:1px solid #ddd; outline:none; font-size:13px; border-radius:0px !important;">
+                        </div>
+                        <div style="flex:1;">
+                            <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px;">Email</label>
+                            <input type="email" placeholder="eg: abc@example.com" style="width:100%; padding:10px; border:1px solid #ddd; outline:none; font-size:13px; border-radius:0px !important;">
+                        </div>
+                    </div>
+                </div>
+                <div style="padding:15px 20px; border-top:1px solid #eaeaea; display:flex; justify-content:flex-end; gap:15px;">
+                    <button style="padding:8px 20px; border:1px solid #ddd; background:#fff; cursor:pointer; font-weight:600; border-radius:0px !important;" onclick="document.getElementById('addSourceModal').style.display='none'"><i class="fa-solid fa-xmark" style="margin-right:5px;"></i> Cancel</button>
+                    <button class="btn-primary" onclick="document.getElementById('addSourceModal').style.display='none'" style="border-radius:0px !important;"><i class="fa-solid fa-download" style="margin-right:5px;"></i> Save</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 </div>
 
@@ -600,9 +950,15 @@
         }
         
         // Update Header
-        const headerTitle = document.getElementById('main-header-title');
-        if (headerTitle) {
-            headerTitle.innerHTML = '<i class="fa-solid fa-sliders"></i> ' + title;
+        const settingsHeader = document.querySelector('.settings-header');
+        if (tabId === 'recruit') {
+            if (settingsHeader) settingsHeader.style.display = 'none';
+        } else {
+            if (settingsHeader) settingsHeader.style.display = 'flex';
+            const headerTitle = document.getElementById('main-header-title');
+            if (headerTitle) {
+                headerTitle.innerHTML = '<i class="fa-solid fa-sliders"></i> ' + title;
+            }
         }
     }
     
@@ -908,6 +1264,39 @@
 
     // Initialize employee data
     loadEmployees();
+
+
+    function switchRecruitTab(tabId, element) {
+        document.querySelectorAll('.recruit-nav').forEach(el => {
+            el.style.color = '#555';
+            el.style.fontWeight = '500';
+            el.style.borderBottom = '2px solid transparent';
+        });
+        element.style.color = '#0052cc';
+        element.style.fontWeight = '600';
+        element.style.borderBottom = '2px solid #0052cc';
+        document.querySelectorAll('.recruit-content-section').forEach(el => el.style.display = 'none');
+        const target = document.getElementById('recruit-' + tabId);
+        if(target) target.style.display = 'block';
+    }
+    
+    function switchSettingsSubTab(tabId, element) {
+        document.querySelectorAll('.settings-sub-nav').forEach(el => {
+            el.style.color = '#555';
+            el.style.fontWeight = '500';
+            el.style.borderBottom = '2px solid transparent';
+        });
+        element.style.color = '#0052cc';
+        element.style.fontWeight = '600';
+        element.style.borderBottom = '2px solid #0052cc';
+        document.querySelectorAll('.settings-sub-content').forEach(el => el.style.display = 'none');
+        const target = document.getElementById('settings-' + tabId);
+        if(target) target.style.display = 'flex';
+    }
+    
+    function openInitiateModal() {
+        showToast("Initiate BGV Form logic goes here");
+    }
 
 </script>
 </body>

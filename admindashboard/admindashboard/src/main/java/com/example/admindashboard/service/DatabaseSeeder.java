@@ -5,6 +5,8 @@ import com.example.admindashboard.repository.ClientRepository;
 import com.example.admindashboard.repository.PermissionRepository;
 import com.example.admindashboard.repository.RoleRepository;
 import com.example.admindashboard.repository.UserRepository;
+import com.example.admindashboard.repository.CandidateRepository;
+import com.example.admindashboard.model.Candidate;
 import com.example.admindashboard.repository.FacilityVendorRepository;
 import com.example.admindashboard.repository.FacilityDeviceRepository;
 import com.example.admindashboard.repository.FacilityServiceRepository;
@@ -28,6 +30,8 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CandidateRepository candidateRepository;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -2645,5 +2649,36 @@ public class DatabaseSeeder implements CommandLineRunner {
                 certificationRepository.save(new com.example.admindashboard.model.Certification("CERT-0" + i, "Professional Competency Cert " + i, "WhiteCircle L&D", "General", "2 Years", 50 + i, "Active"));
             }
         }
+        // ==========================================
+        // SEED BGV CANDIDATES (USING EXISTING EMPLOYEES)
+        // ==========================================
+        if (candidateRepository.count() == 0) {
+            seedCandidate("EMP114", "Om Tripathi", "om.tripathi@example.com", "Marketing Lead", "Engineering", "12-08-2026", "Aman HR", "Bangalore", "9876543210", 1200000.0, "Ongoing", "KPMG", "Address Verification", "LinkedIn");
+            seedCandidate("EMP187", "Om Singrore", "om.singrore@example.com", "Project Manager", "Product", "15-08-2026", "Rohit HR", "Delhi", "9876543211", 1800000.0, "Ongoing", "EY", "Criminal Check", "Naukri");
+            seedCandidate("EMP129", "Saumya Katare", "saumya.katare@example.com", "IOS Developer", "Engineering", "20-08-2026", "Aman HR", "Mumbai", "9876543212", 1500000.0, "Pending", "PWC", "Education Verification", "Indeed");
+            seedCandidate("EMP201", "Priya Sharma", "priya.sharma@example.com", "HR Director", "HR", "22-08-2026", "Rohit HR", "Pune", "9876543213", 1400000.0, "Completed", "KPMG", "Address Verification", "Referral");
+            seedCandidate("EMP601", "Neha Verma", "neha.verma@example.com", "HR Manager", "HR", "01-09-2026", "Aman HR", "Hyderabad", "9876543214", 1100000.0, "Ongoing", "EY", "Past Employment", "LinkedIn");
+            seedCandidate("EMP701", "Amit Project", "amit.project@example.com", "Project Manager", "Project Management", "05-09-2026", "Rohit HR", "Bangalore", "9876543215", 2500000.0, "Completed", "PWC", "Criminal Check", "Naukri");
+            System.out.println("✅ Seeded BGV Candidates.");
+        }
+    }
+
+    private void seedCandidate(String code, String name, String email, String title, String dept, String joinDate, String recruiter, String address, String contact, Double pkg, String bgvStatus, String verifier, String activity, String empSource) {
+        Candidate c = new Candidate();
+        c.setCandidateCode(code);
+        c.setName(name);
+        c.setEmail(email);
+        c.setJobTitle(title);
+        c.setDepartment(dept);
+        c.setJoiningDate(joinDate);
+        c.setRecruiterName(recruiter);
+        c.setAddress(address);
+        c.setContactNumber(contact);
+        c.setPackageAmount(pkg);
+        c.setBgvStatus(bgvStatus);
+        c.setExternalVerifier(verifier);
+        c.setActivity(activity);
+        c.setEmpSource(empSource);
+        candidateRepository.save(c);
     }
 }

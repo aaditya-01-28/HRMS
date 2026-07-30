@@ -16,6 +16,16 @@ public class Candidate {
     private String jobTitle;
     private String department;
 
+    private String joiningDate;
+    private String recruiterName;
+    private String address;
+    private String contactNumber;
+    private Double packageAmount;
+    private String bgvStatus;
+    private String externalVerifier;
+    private String activity;
+    private String empSource;
+
     /* GETTERS AND SETTERS */
 
     public Long getId() {
@@ -64,5 +74,77 @@ public class Candidate {
 
     public void setDepartment(String department) {
         this.department = department;
+    }
+
+    public String getJoiningDate() {
+        return joiningDate;
+    }
+
+    public void setJoiningDate(String joiningDate) {
+        this.joiningDate = joiningDate;
+    }
+
+    public String getRecruiterName() {
+        return recruiterName;
+    }
+
+    public void setRecruiterName(String recruiterName) {
+        this.recruiterName = recruiterName;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
+
+    public Double getPackageAmount() {
+        return packageAmount;
+    }
+
+    public void setPackageAmount(Double packageAmount) {
+        this.packageAmount = packageAmount;
+    }
+
+    public String getBgvStatus() {
+        return bgvStatus;
+    }
+
+    public void setBgvStatus(String bgvStatus) {
+        this.bgvStatus = bgvStatus;
+    }
+
+    public String getExternalVerifier() {
+        return externalVerifier;
+    }
+
+    public void setExternalVerifier(String externalVerifier) {
+        this.externalVerifier = externalVerifier;
+    }
+
+    public String getActivity() {
+        return activity;
+    }
+
+    public void setActivity(String activity) {
+        this.activity = activity;
+    }
+
+    public String getEmpSource() {
+        return empSource;
+    }
+
+    public void setEmpSource(String empSource) {
+        this.empSource = empSource;
     }
 }
