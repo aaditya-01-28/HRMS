@@ -147,4 +147,42 @@ public class Candidate {
     public void setEmpSource(String empSource) {
         this.empSource = empSource;
     }
+
+    // Onboarding Fields
+    private String onboardingPolicy;
+    private String reportingAuthority;
+    private String grade;
+    private String contactPerson;
+    private String aadharNumber;
+    private String panNumber;
+    private String onboardStatus; // In Progress, Completed
+    private Boolean emailVerified;
+    private Boolean isRejoin;
+
+    public String getOnboardingPolicy() { return onboardingPolicy; }
+    public void setOnboardingPolicy(String onboardingPolicy) { this.onboardingPolicy = onboardingPolicy; }
+
+    public String getReportingAuthority() { return reportingAuthority; }
+    public void setReportingAuthority(String reportingAuthority) { this.reportingAuthority = reportingAuthority; }
+
+    public String getGrade() { return grade; }
+    public void setGrade(String grade) { this.grade = grade; }
+
+    public String getContactPerson() { return contactPerson; }
+    public void setContactPerson(String contactPerson) { this.contactPerson = contactPerson; }
+
+    public String getAadharNumber() { return aadharNumber; }
+    public void setAadharNumber(String aadharNumber) { this.aadharNumber = aadharNumber; }
+
+    public String getPanNumber() { return panNumber; }
+    public void setPanNumber(String panNumber) { this.panNumber = panNumber; }
+
+    public String getOnboardStatus() { return onboardStatus; }
+    public void setOnboardStatus(String onboardStatus) { this.onboardStatus = onboardStatus; }
+
+    public Boolean getEmailVerified() { return emailVerified; }
+    public void setEmailVerified(Boolean emailVerified) { this.emailVerified = emailVerified; }
+
+    public Boolean getIsRejoin() { return isRejoin; }
+    public void setIsRejoin(Boolean isRejoin) { this.isRejoin = isRejoin; }
 }

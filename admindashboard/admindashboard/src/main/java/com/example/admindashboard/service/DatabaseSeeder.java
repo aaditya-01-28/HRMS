@@ -2660,7 +2660,34 @@ public class DatabaseSeeder implements CommandLineRunner {
             seedCandidate("EMP601", "Neha Verma", "neha.verma@example.com", "HR Manager", "HR", "01-09-2026", "Aman HR", "Hyderabad", "9876543214", 1100000.0, "Ongoing", "EY", "Past Employment", "LinkedIn");
             seedCandidate("EMP701", "Amit Project", "amit.project@example.com", "Project Manager", "Project Management", "05-09-2026", "Rohit HR", "Bangalore", "9876543215", 2500000.0, "Completed", "PWC", "Criminal Check", "Naukri");
             System.out.println("✅ Seeded BGV Candidates.");
+
+        // SEED ONBOARDING CANDIDATES
+        seedOnboardCandidate("Jasmin Singh", "jasmin@gmail.com", "9727261825", "19/Apr/2026", "In Progress", false);
+        seedOnboardCandidate("Avinash Singh", "whitecircle768@gmail.com", "7509759872", "05/May/2026", "In Progress", true);
+        seedOnboardCandidate("Dhaval Pandya", "dhavalpandya22@gmail.com", "7573002702", "01/May/2026", "In Progress", true);
+        seedOnboardCandidate("Anurag Joshi", "anurag.csd@gmail.com", "7573002700", "16/Mar/2026", "In Progress", true);
+        seedOnboardCandidate("JAY PATEL", "aku.patel2112@gmail.com", "6352736136", "23/Feb/2026", "In Progress", true);
+        
+        seedOnboardCandidate("Tushar Shah", "tushar@gmail.com", "9876543216", "25/Nov/2024", "Completed", true);
+        seedOnboardCandidate("Avinash Singh", "avinash.singh@gmail.com", "7509759872", "18/Dec/2024", "Completed", true);
+        seedOnboardCandidate("Dhaval Pandya", "dhaval.pandya22@gmail.com", "7573002702", "05/Jan/2025", "Completed", true);
+        seedOnboardCandidate("Khushi Joshi", "khushi.joshi@gmail.com", "8210456789", "20/Jan/2025", "Completed", true);
+
         }
+    }
+
+
+    private void seedOnboardCandidate(String name, String email, String mobile, String joinDate, String onboardStatus, Boolean emailVerified) {
+        Candidate c = new Candidate();
+        c.setName(name);
+        c.setEmail(email);
+        c.setContactNumber(mobile);
+        c.setJoiningDate(joinDate);
+        c.setOnboardStatus(onboardStatus);
+        c.setEmailVerified(emailVerified);
+        c.setJobTitle("Software Engineer");
+        c.setDepartment("Engineering");
+        candidateRepository.save(c);
     }
 
     private void seedCandidate(String code, String name, String email, String title, String dept, String joinDate, String recruiter, String address, String contact, Double pkg, String bgvStatus, String verifier, String activity, String empSource) {
