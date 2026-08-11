@@ -20,10 +20,16 @@ public class SuperAdminController {
     @Autowired
     private CandidateRepository candidateRepository;
 
-    @GetMapping({"/dashboard", "/company", "/statutory", "/recruit", "/onboard", "/employee-details", "/bulk-update"})
+    @Autowired
+    private com.example.admindashboard.repository.ItAssetRepository itAssetRepository;
+
+    @GetMapping({"/dashboard", "/company", "/statutory", "/recruit", "/onboard", "/employee-details", "/bulk-update", "/asset", "/separation"})
     public String superAdminDashboard(Model model) {
         List<Candidate> candidates = candidateRepository.findAll();
         model.addAttribute("candidates", candidates);
+
+        List<com.example.admindashboard.model.ItAsset> assets = itAssetRepository.findAll();
+        model.addAttribute("assets", assets);
 
         List<Candidate> onboardCandidates = candidates.stream()
                 .filter(c -> c.getOnboardStatus() != null)
