@@ -1,451 +1,463 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track Claims | WhiteCircle Health</title>
+    <title>Track Claims | WhiteCircle Mediclaim</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
 
     <style>
         :root {
-            --med-primary: #1E88E5;
-            --med-green: #43A047;
-            --med-orange: #FB8C00;
-            --med-red: #E53935;
-            --bg-color: #f4f7fb;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
+            --med-primary: #1e3a8a;
+            --med-primary-light: #2563eb;
+            --med-success: #16a34a;
+            --med-warning: #f59e0b;
+            --med-danger: #dc2626;
+            --med-bg: #f8fafc;
+            --med-card-bg: #ffffff;
+            --med-border: #e2e8f0;
+            --med-text-main: #0f172a;
+            --med-text-muted: #64748b;
         }
 
-		*{
-		    margin:0;
-		    padding:0;
-		    box-sizing:border-box;
-		    
-		}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif !important;
+            border-radius: 0 !important;
+        }
 
-		body{
-		    background:#F3F4F6;
-		    font-size:14px;
-		    color:#111827;
-			font-family:Arial,sans-serif;
-		}
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, table, td, th {
+            font-family: Arial, sans-serif !important;
+        }
 
-		.dashboard-wrapper{
-		    display:flex;
-		    min-height:100vh;
-		}
+        .card, .track-card,
+        .btn, .btn-sm, .btn-claim-new, .back-home-btn,
+        .badge, .status-badge, .header-icon-badge, .sidebar-logo img, .menu-item,
+        .table, .form-control, .form-select, .modal-content, .alert {
+            border-radius: 0 !important;
+        }
 
-		/* SIDEBAR */
+        body {
+            background: var(--med-bg);
+            color: var(--med-text-main);
+            font-size: 14px;
+            min-height: 100vh;
+        }
 
-		.sidebar{
-		    width:250px;
-		    background:#001A57;
-		    color:white;
-		    flex-shrink:0;
-		    padding:24px 10px;
-		}
+        .dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
 
-		.sidebar-logo{
-		    text-align:center;
-		    margin-bottom:40px;
-		}
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            background: #001A57;
+            color: white;
+            padding: 24px 12px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
 
-		.sidebar-logo img{
-		    width:50px;
-		    height:50px;
-		    object-fit:contain;
-		}
+        .sidebar-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
 
-		.sidebar-menu{
-		    display:flex;
-		    flex-direction:column;
-		    gap:12px;
-		}
+        .sidebar-logo img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
 
-		.menu-item{
-		    display:flex;
-		    align-items:center;
-		    gap:8px;
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-		    color:white;
-		    text-decoration:none;
+        .menu-item {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            padding: 11px 14px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
 
-		    padding:10px 12px;
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
 
-		    border-radius:10px;
+        .menu-item:hover, .menu-item.active {
+            background: #2E63FF;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(46, 99, 255, 0.25);
+        }
 
-		    font-size:14px;
-		}
+        /* MAIN SECTION */
+        .main-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
 
-		.menu-item.active{
-		    background:#2E63FF;
-		}
+        /* TOP HEADER */
+        .top-header {
+            height: 75px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--med-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
 
-		.menu-item:hover{
-		    background:#2E63FF;
-		}
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-		/* MAIN */
+        .header-icon-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
 
-		.main-section{
-		    flex:1;
-		}
+        .header-left h1 {
+            font-size: 1.25rem;
+            color: #0B2E7A;
+            font-weight: 700;
+            margin: 0;
+        }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
+        /* MT030: Submit Claim Button */
+        .btn-claim-new {
+            background: #16a34a;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
 
-		.header-left{
-		    display:flex;
-		    align-items:center;
-		    gap:15px;
-		}
+        .btn-claim-new:hover {
+            background: #15803d;
+            color: #ffffff;
+        }
 
-		.header-icon{
-		    width:50px;
-		    height:50px;
-		}
+        .back-home-btn {
+            background: #2E63FF;
+            color: white;
+            text-decoration: none;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-		.header-left h1{
-		    font-size:20px;
-		    font-weight:700;
-		    color:#0B2E7A;
-		}
+        .back-home-btn:hover {
+            background: #1d4ed8;
+            color: white;
+        }
 
-		.back-home-btn{
-		    background:#2E63FF;
-		    color:white;
+        /* CONTENT */
+        .dashboard-content {
+            padding: 28px 32px;
+            flex: 1;
+        }
 
-		    text-decoration:none;
+        .track-card {
+            background: var(--med-card-bg);
+            border: 1px solid var(--med-border);
+            border-radius: 14px;
+            padding: 26px 28px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
 
-		    padding:14px 30px;
+        .track-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 18px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--med-border);
+        }
 
-		    border-radius:10px;
+        .track-header-bar h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0B2E7A;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-		    font-size:14px;
-		    font-weight:700;
-		}
+        .claims-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-		/* CONTENT */
+        .claims-table th {
+            background: #f8fafc;
+            color: var(--med-text-muted);
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--med-border);
+            text-align: left;
+        }
 
-		.dashboard-content{
-		    padding:35px 28px;
-		}
+        .claims-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.88rem;
+            color: var(--med-text-main);
+        }
 
-		.claims-header{
-		    display:flex;
-		    justify-content:space-between;
-		    align-items:center;
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+        }
 
-		    margin-bottom:22px;
-		}
+        .status-Approved { background: #dcfce7; color: #166534; }
+        .status-Pending { background: #fef3c7; color: #92400e; }
+        .status-Rejected { background: #fee2e2; color: #991b1b; }
 
-		.claims-header h2{
-		    font-size:20px;
-		    font-weight:700;
-		}
-
-		.hospital-btn{
-		    background:#F5F5F5;
-
-		    border:none;
-
-		    padding:14px 38px;
-
-		    border-radius:12px;
-
-		    font-size:14px;
-		    font-weight:700;
-
-		    box-shadow:0 2px 10px rgba(0,0,0,0.12);
-
-		    cursor:pointer;
-		}
-
-		/* TABLE */
-
-		.claims-table{
-		    width:100%;
-		    max-width:900px;
-
-		    border-collapse:collapse;
-
-		    background:white;
-		}
-
-		.claims-table th,
-		.claims-table td{
-		    border:1px solid black;
-
-		    padding:12px 14px;
-
-		    text-align:left;
-
-		    font-size:14px;
-		}
-
-		.claims-table th{
-		    font-size:20px;
-		    color:#0B2E7A;
-		    font-weight:700;
-		}
-
-		.empty-claims{
-		    text-align:center;
-		    padding:30px !important;
-		}
-
-		/* STATUS */
-
-		.status-approved{
-		    color:#16A34A;
-		    font-weight:700;
-		}
-
-		.status-pending{
-		    color:#F59E0B;
-		    font-weight:700;
-		}
-
-		.status-rejected{
-		    color:#EF4444;
-		    font-weight:700;
-		}
-
-		
+        /* RESPONSIVENESS (MT029) */
+        @media (max-width: 991px) {
+            .dashboard-wrapper {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                padding: 16px 20px;
+            }
+            .sidebar-logo {
+                margin-bottom: 14px;
+            }
+            .sidebar-menu {
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 8px;
+                padding-bottom: 4px;
+            }
+            .menu-item {
+                white-space: nowrap;
+                padding: 8px 12px;
+                font-size: 12.5px;
+            }
+            .dashboard-content {
+                padding: 20px 16px;
+            }
+            .top-header {
+                padding: 0 16px;
+                height: auto;
+                min-height: 65px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .track-header-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
     </style>
 </head>
 <body>
 
-	<div class="dashboard-wrapper">
+<div class="dashboard-wrapper">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div>
+            <div class="sidebar-logo">
+                <img th:src="@{/images/wcg-logo.jpg}" alt="WhiteCircle" onerror="this.src='https://ui-avatars.com/api/?name=WCG&background=2563eb&color=fff'">
+            </div>
+
+            <div class="sidebar-menu">
+                <a href="/employee/mediclaim/portal" class="menu-item">
+                    <i class="fa-solid fa-table-columns"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="/employee/mediclaim/policy" class="menu-item">
+                    <i class="fa-solid fa-file-shield"></i>
+                    <span>Coverage</span>
+                </a>
+
+                <a href="/employee/mediclaim/claim" class="menu-item">
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                    <span>Submit Claim</span>
+                </a>
+
+                <a href="/employee/mediclaim/track/list" class="menu-item active">
+                    <i class="fa-solid fa-file-medical"></i>
+                    <span>Claims Track</span>
+                </a>
+
+                <a href="/employee/mediclaim/dependents" class="menu-item">
+                    <i class="fa-solid fa-user-group"></i>
+                    <span>Dependents</span>
+                </a>
+
+                <a href="/employee/mediclaim/hospitals" class="menu-item">
+                    <i class="fa-solid fa-hospital"></i>
+                    <span>Hospitals</span>
+                </a>
+
+                <a href="/employee/mediclaim/helpdesk" class="menu-item">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>Help Center</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN SECTION -->
+    <div class="main-section">
+
+        <!-- HEADER -->
+        <header class="top-header">
+            <div class="header-left">
+                <div class="header-icon-badge">
+                    <i class="fa-solid fa-file-medical"></i>
+                </div>
+                <h1>Track Health Claims</h1>
+            </div>
+
+            <div class="header-actions">
+                <a href="/employee/mediclaim/claim" class="btn-claim-new">
+                    <i class="fa-solid fa-plus-circle"></i>
+                    <span>Submit New Claim</span>
+                </a>
+                <a href="/employee/mediclaim/portal" class="back-home-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back to Dashboard</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- DASHBOARD CONTENT -->
+        <main class="dashboard-content">
+
+            <div class="track-card">
+                <div class="track-header-bar">
+                    <div>
+                        <h2>
+                            <i class="fa-solid fa-list-check text-primary"></i>
+                            Reimbursement & Cashless Claims History
+                        </h2>
+                        <small class="text-muted">Real-time status updates from insurance TPA desk</small>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a href="/employee/mediclaim/claim" class="btn btn-primary" style="font-size: 0.85rem; font-weight: 600;">
+                            <i class="fas fa-plus-circle me-1"></i> New Claim
+                        </a>
+                        <a href="/employee/mediclaim/hospitals" class="btn btn-outline-primary" style="font-size: 0.85rem; font-weight: 600;">
+                            <i class="fas fa-hospital me-1"></i> Find Hospitals
+                        </a>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="claims-table">
+                        <thead>
+                            <tr>
+                                <th>Claim ID</th>
+                                <th>Hospital Name</th>
+                                <th>City</th>
+                                <th>Claim Type</th>
+                                <th>Diagnosis</th>
+                                <th>Total Bill (₹)</th>
+                                <th>Claimed (₹)</th>
+                                <th>Status</th>
+                                <th>Document</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${allClaims == null or allClaims.empty}">
+                                <td colspan="9" class="text-center text-muted py-5">
+                                    <i class="fas fa-file-medical fs-2 d-block mb-2 opacity-50"></i>
+                                    No claims submitted yet.<br>
+                                    <a href="/employee/mediclaim/claim" class="btn btn-sm btn-primary mt-2">
+                                        <i class="fas fa-plus-circle me-1"></i> Submit Your First Claim
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:each="claim : ${allClaims}">
+                                <td><strong th:text="${'CLM-' + claim.id}">CLM-101</strong></td>
+                                <td th:text="${claim.hospitalName}">Apollo Hospitals</td>
+                                <td th:text="${claim.city != null ? claim.city : 'Noida'}">Noida</td>
+                                <td>
+                                    <span class="badge bg-light text-dark border" th:text="${claim.claimType != null ? claim.claimType : 'Reimbursement'}">Reimbursement</span>
+                                </td>
+                                <td th:text="${claim.diagnosis != null ? claim.diagnosis : 'Viral Fever'}">Viral Fever</td>
+                                <td>₹<span th:text="${claim.totalBill != null ? #numbers.formatDecimal(claim.totalBill, 0, 'COMMA', 0, 'POINT') : '0'}">0</span></td>
+                                <td><strong>₹<span th:text="${claim.claimAmount != null ? #numbers.formatDecimal(claim.claimAmount, 0, 'COMMA', 0, 'POINT') : '0'}">0</span></strong></td>
+                                <td>
+                                    <span class="status-badge" th:classappend="${'status-' + (claim.status != null ? claim.status : 'Pending')}" th:text="${claim.status != null ? claim.status : 'Pending'}">Pending</span>
+                                </td>
+                                <td>
+                                    <a th:if="${claim.documentFilename != null && !claim.documentFilename.isEmpty()}" th:href="@{'/employee/mediclaim/document/download/' + ${claim.documentFilename}}" target="_blank" class="btn btn-sm btn-outline-primary" style="font-size: 0.75rem; padding: 2px 8px;">
+                                        <i class="fas fa-download me-1"></i> Bill
+                                    </a>
+                                    <span th:unless="${claim.documentFilename != null && !claim.documentFilename.isEmpty()}" class="text-muted" style="font-size: 0.75rem;">—</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
 
-	    <!-- SIDEBAR -->
-
-	    <div class="sidebar">
-
-	        <div class="sidebar-logo">
-
-	            <!-- Add WhiteCircle Logo -->
-				<img th:src="@{/images/wcg-logo.jpg}"
-				     alt="WhiteCircle"
-				     class="sidebar-logo">
-
-	        </div>
-
-	        <div class="sidebar-menu">
-
-	            <a href="/employee/mediclaim/portal"
-	               class="menu-item">
-
-	                <i class="fa-solid fa-table-columns"></i>
-
-	                Dashboard
-
-	            </a>
-				<a href="/employee/mediclaim/policy"
-				   class="menu-item">
-
-				    <i class="fa-solid fa-file-shield"></i>
-
-				    Coverage
-
-				</a>
-
-				<a href="/employee/mediclaim/track/list"
-				   class="menu-item active">
-
-				    <i class="fa-solid fa-file-medical"></i>
-				    Claims
-				</a>
-
-				<a href="/employee/mediclaim/helpdesk"
-				   class="menu-item">
-
-				    <i class="fa-solid fa-circle-question"></i>
-				    Help center
-				</a>
-
-	        </div>
-
-	    </div>
-
-	    <!-- MAIN -->
-
-	    <div class="main-section">
-
-	        <!-- HEADER -->
-
-	        <div class="top-header">
-
-	            <div class="header-left">
-
-	                <!-- Mediclaim Icon -->
-	                <img src=""
-	                     alt="Mediclaim"
-	                     class="header-icon">
-
-	                <h1>
-
-	                    My Mediclaims
-
-	                </h1>
-
-	            </div>
-
-	            <a href="/employee/mediclaim/portal"
-	               class="back-home-btn">
-
-	                Back to Dashboard
-
-	            </a>
-
-	        </div>
-
-	        <!-- CONTENT -->
-
-	        <div class="dashboard-content">
-
-	            <div class="claims-header">
-
-	                <h2>
-
-	                    Track your submitted claims
-
-	                </h2>
-
-					<a href="/employee/mediclaim/hospitals"
-					   class="hospital-btn">
-
-					    Find Hospitals
-
-					</a>
-
-	            </div>
-
-	            <table class="claims-table">
-
-	                <thead>
-
-	                <tr>
-
-	                    <th>Claim ID</th>
-
-	                    <th>Hospital Name</th>
-
-	                    <th>Claim type</th>
-
-	                    <th>Amount</th>
-
-	                    <th>Status</th>
-
-	                </tr>
-
-	                </thead>
-
-	                <tbody>
-
-	                <tr th:each="claim : ${allClaims}">
-
-	                    <td>
-
-	                        CLM<span th:text="${claim.id}">
-
-	                        </span>
-
-	                    </td>
-
-	                    <td th:text="${claim.hospitalName}">
-
-	                        Hospital
-
-	                    </td>
-
-	                    <td th:text="${claim.claimType}">
-
-	                        Type
-
-	                    </td>
-
-	                    <td>
-
-	                        ₹ <span th:text="${claim.claimAmount}">
-
-	                        </span>
-
-	                    </td>
-
-	                    <td>
-
-	                        <span th:text="${claim.status}"
-
-	                              th:classappend="
-	                              ${claim.status == 'Approved'} ? ' status-approved' :
-	                              (${claim.status == 'Pending'} ? ' status-pending' :
-	                              ' status-rejected')">
-
-	                            Status
-
-	                        </span>
-
-	                    </td>
-
-	                </tr>
-
-	                <tr th:if="${allClaims == null or allClaims.empty}">
-
-	                    <td colspan="5"
-	                        class="empty-claims">
-
-	                        No claims submitted yet.
-
-	                    </td>
-
-	                </tr>
-
-	                </tbody>
-
-	            </table>
-
-	        </div>
-
-	    </div>
-
-	</div>
-
-	</body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Expand Card Logic
-        document.querySelectorAll('.expand-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Close any currently expanded cards
-                document.querySelectorAll('.claim-card.expanded').forEach(card => card.classList.remove('expanded'));
-
-                // Expand the clicked card
-                const claimId = this.getAttribute('data-id');
-                const cardToExpand = document.getElementById('claim-card-' + claimId);
-                cardToExpand.classList.add('expanded');
-
-                // Smooth scroll to the expanded card
-                setTimeout(() => {
-                    cardToExpand.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 100);
-            });
-        });
-
-        // Shrink Card Logic
-        document.querySelectorAll('.shrink-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const claimId = this.getAttribute('data-id');
-                document.getElementById('claim-card-' + claimId).classList.remove('expanded');
-            });
-        });
-    });
-</script>
 </body>
 </html>

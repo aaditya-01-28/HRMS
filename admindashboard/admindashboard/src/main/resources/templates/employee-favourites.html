@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Favourites - WhiteCircle HRMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-hover: #172554;
+            --accent: #f59e0b;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+        }
+
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            z-index: 1000;
+        }
+
+        .header-title-text {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .btn-back-hub {
+            background-color: #f1f5f9;
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-back-hub:hover {
+            background-color: var(--primary);
+            color: #ffffff;
+        }
+
+        .main-canvas {
+            max-width: 1200px;
+            margin: 100px auto 40px;
+            padding: 0 20px;
+        }
+
+        .fav-header-card {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            border-radius: 16px;
+            color: #ffffff;
+            padding: 30px 36px;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .fav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .fav-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .fav-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            border-color: #93c5fd;
+            color: inherit;
+        }
+
+        .fav-icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #eff6ff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .fav-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        .fav-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .star-active {
+            color: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+
+<header class="top-header">
+    <div class="d-flex align-items-center gap-3">
+        <i class="fa-solid fa-star fs-4 text-warning"></i>
+        <div class="header-title-text">My Favourites & Bookmarks</div>
+    </div>
+    <a href="/my-whitecircle" class="btn-back-hub">
+        <i class="fa-solid fa-arrow-left"></i> Back to Hub
+    </a>
+</header>
+
+<main class="main-canvas">
+    <div class="fav-header-card">
+        <div>
+            <h2 class="fw-bold mb-1">Quick Access Favourites</h2>
+            <p class="mb-0 opacity-90">Easily launch your most frequent HR workflows, portals, and reports.</p>
+        </div>
+        <button class="btn btn-light fw-bold text-primary" onclick="alert('Module added to favourites!')">
+            <i class="fa-solid fa-plus me-1"></i> Add Custom Bookmark
+        </button>
+    </div>
+
+    <div class="fav-grid">
+        <a href="/leave-management?source=whitecircle" class="fav-card">
+            <div class="d-flex justify-content-between w-100 align-items-center">
+                <div class="fav-icon-box"><i class="fa-solid fa-calendar-check"></i></div>
+                <i class="fa-solid fa-star star-active"></i>
+            </div>
+            <div>
+                <h5 class="fav-title">Leave Request & Balances</h5>
+                <p class="fav-desc">Check leave quota, apply for PTO, Sick Leave, or Comp-off.</p>
+            </div>
+        </a>
+
+        <a href="/employee/my-goals" class="fav-card">
+            <div class="d-flex justify-content-between w-100 align-items-center">
+                <div class="fav-icon-box"><i class="fa-solid fa-bullseye"></i></div>
+                <i class="fa-solid fa-star star-active"></i>
+            </div>
+            <div>
+                <h5 class="fav-title">Goals & OKR Tracker</h5>
+                <p class="fav-desc">Track active quarterly deliverables and progress increments.</p>
+            </div>
+        </a>
+
+        <a href="/employee/timesheet-report?source=whitecircle" class="fav-card">
+            <div class="d-flex justify-content-between w-100 align-items-center">
+                <div class="fav-icon-box"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <i class="fa-solid fa-star star-active"></i>
+            </div>
+            <div>
+                <h5 class="fav-title">Timesheets & Hours</h5>
+                <p class="fav-desc">Weekly logged work hours, shift summaries, and regularization.</p>
+            </div>
+        </a>
+
+        <a href="/employee/profile?source=whitecircle" class="fav-card">
+            <div class="d-flex justify-content-between w-100 align-items-center">
+                <div class="fav-icon-box"><i class="fa-solid fa-user-gear"></i></div>
+                <i class="fa-solid fa-star star-active"></i>
+            </div>
+            <div>
+                <h5 class="fav-title">Employee Profile</h5>
+                <p class="fav-desc">Review personal contact details, address, and documentation.</p>
+            </div>
+        </a>
+
+        <a href="/my-approvals" class="fav-card">
+            <div class="d-flex justify-content-between w-100 align-items-center">
+                <div class="fav-icon-box"><i class="fa-solid fa-list-check"></i></div>
+                <i class="fa-solid fa-star star-active"></i>
+            </div>
+            <div>
+                <h5 class="fav-title">My Approvals</h5>
+                <p class="fav-desc">Approve or review pending team leave and workflow requests.</p>
+            </div>
+        </a>
+
+        <a href="/learning/dashboard" class="fav-card">
+            <div class="d-flex justify-content-between w-100 align-items-center">
+                <div class="fav-icon-box"><i class="fa-solid fa-graduation-cap"></i></div>
+                <i class="fa-solid fa-star star-active"></i>
+            </div>
+            <div>
+                <h5 class="fav-title">Learning Portal</h5>
+                <p class="fav-desc">Upskilling courses, technical certifications, and enrolled tracks.</p>
+            </div>
+        </a>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

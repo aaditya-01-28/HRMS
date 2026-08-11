@@ -41,6 +41,12 @@ public class RequestApiController {
     @PostMapping("/submit")
     public ResponseEntity<?> submitRequest(@RequestBody ServiceRequest request) {
 
+        if (request.getJustification() == null || request.getJustification().trim().isEmpty()) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Description / Justification is mandatory for submitting a ticket.");
+            return ResponseEntity.badRequest().body(error);
+        }
+
         String employeeEmail = "no-reply@whitecircle.com";
         String employeeName = request.getEmployeeName();
 

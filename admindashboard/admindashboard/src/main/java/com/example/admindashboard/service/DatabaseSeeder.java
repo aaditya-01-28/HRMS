@@ -1003,6 +1003,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             if (emp114Opt.isPresent()) {
                 InsurancePolicy policy1 = new InsurancePolicy();
                 policy1.setUser(emp114Opt.get());
+                policy1.setPolicyName("Star Health Premier Corporate Floater");
                 policy1.setPolicyNumber("WCG-2026-MED-114");
                 policy1.setProviderName("Star Health & Allied Insurance");
                 policy1.setTotalCoverage(500000.0);
@@ -1020,6 +1021,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             if (emp187Opt.isPresent()) {
                 InsurancePolicy policy2 = new InsurancePolicy();
                 policy2.setUser(emp187Opt.get());
+                policy2.setPolicyName("HDFC ERGO Enterprise Platinum Care");
                 policy2.setPolicyNumber("WCG-2026-MED-187");
                 policy2.setProviderName("HDFC ERGO General Insurance");
                 policy2.setTotalCoverage(750000.0);
@@ -1032,7 +1034,15 @@ public class DatabaseSeeder implements CommandLineRunner {
                 System.out.println("✅ Assigned Health Policy to EMP187");
             }
         } else {
-            System.out.println("⚡ Insurance Policies already exist. Skipping seed.");
+            // Ensure any existing policy with null policyName is populated
+            List<InsurancePolicy> existingPolicies = insurancePolicyRepository.findAll();
+            for (InsurancePolicy p : existingPolicies) {
+                if (p.getPolicyName() == null || p.getPolicyName().trim().isEmpty()) {
+                    p.setPolicyName("WhiteCircle Comprehensive Health Shield - Gold Plan");
+                    insurancePolicyRepository.save(p);
+                }
+            }
+            System.out.println("⚡ Insurance Policies already exist. Verified policy names.");
         }
 	
 	    /* ==========================================

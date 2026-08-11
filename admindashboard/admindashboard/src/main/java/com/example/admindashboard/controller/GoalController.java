@@ -155,6 +155,12 @@ public class GoalController {
             return "redirect:/login";
         }
 
+        if (goal.getStartDate() != null && goal.getTargetDate() != null) {
+            if (goal.getTargetDate().isBefore(goal.getStartDate())) {
+                return "redirect:/employee/my-goals?error=" + java.net.URLEncoder.encode("End date cannot be earlier than start date.", java.nio.charset.StandardCharsets.UTF_8);
+            }
+        }
+
         goal.setUser(user);
 
         goal.setGoalType("SELF");

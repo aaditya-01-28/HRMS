@@ -1,432 +1,563 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Insurance Policies | WhiteCircle Health</title>
+    <title>Policy Coverage & E-Card | WhiteCircle Mediclaim</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
 
     <style>
         :root {
-            --med-primary: #1E88E5;
-            --bg-color: #f4f7fb;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
-           
+            --med-primary: #1e3a8a;
+            --med-primary-light: #2563eb;
+            --med-accent: #0284c7;
+            --med-success: #16a34a;
+            --med-warning: #f59e0b;
+            --med-danger: #dc2626;
+            --med-bg: #f8fafc;
+            --med-card-bg: #ffffff;
+            --med-border: #e2e8f0;
+            --med-text-main: #0f172a;
+            --med-text-muted: #64748b;
         }
 
-		*{
-		    margin:0;
-		    padding:0;
-		    box-sizing:border-box;
-		    
-		}
-
-		body{
-		    background:#F3F4F6;
-		    font-size:14px;
-		    color:#111827;
-			font-family:Arial,sans-serif;
-		}
-
-		.dashboard-wrapper{
-		    display:flex;
-		    min-height:100vh;
-		}
-
-		/* SIDEBAR */
-
-		.sidebar{
-		    width:250px;
-		    background:#001A57;
-		    padding:24px 10px;
-		    flex-shrink:0;
-		}
-
-		.sidebar-logo{
-		    text-align:center;
-		    margin-bottom:40px;
-		}
-
-		.sidebar-logo img{
-		    width:50px;
-		    height:50px;
-		    object-fit:contain;
-		}
-
-		.sidebar-menu{
-		    display:flex;
-		    flex-direction:column;
-		    gap:12px;
-		}
-
-		.menu-item{
-		    display:flex;
-		    align-items:center;
-		    gap:8px;
-
-		    color:white;
-		    text-decoration:none;
-
-		    padding:10px 12px;
-
-		    border-radius:10px;
-
-		    font-size:14px;
-		}
-
-		.menu-item:hover,
-		.menu-item.active{
-		    background:#2E63FF;
-		}
-
-		/* MAIN */
-
-		.main-section{
-		    flex:1;
-		}
-
-
-
-		.header-left{
-		    display:flex;
-		    align-items:center;
-		    gap:12px;
-		}
-
-		.header-icon{
-		    width:42px;
-		    height:42px;
-		    object-fit:contain;
-		}
-
-		.header-left h1{
-		    font-size:20px;
-		    font-weight:700;
-		    color:#0B2E7A;
-		}
-
-		.back-home-btn{
-		    background:#2E63FF;
-		    color:white;
-
-		    text-decoration:none;
-
-		    padding:12px 24px;
-
-		    border-radius:8px;
-
-		    font-size:14px;
-		    font-weight:700;
-		}
-
-		.back-home-btn:hover{
-		    color:white;
-		}
-
-		/* CONTENT */
-
-		.dashboard-content{
-		    padding:28px 40px;
-		}
-
-		/* POLICY + ECARD */
-
-		.coverage-top{
-		    display:flex;
-		    justify-content:space-between;
-		    gap:40px;
-
-		    margin-bottom:35px;
-		}
-
-		.policy-section{
-		    flex:1;
-		}
-
-		.policy-section h3{
-		    font-size:14px;
-		    font-weight:700;
-		    margin-bottom:25px;
-		}
-
-		.info-row{
-		    display:flex;
-		    margin-bottom:14px;
-		}
-
-		.label{
-		    width:120px;
-		    font-size:14px;
-		}
-
-		.value{
-		    font-size:14px;
-		    font-weight:700;
-		}
-
-		/* ECARD */
-
-		.ecard-box{
-		    width:320px;
-
-		    border:1px solid #222;
-
-		    border-radius:6px;
-
-		    padding:16px;
-
-		    background:#DCE6F1;
-		}
-
-		.ecard-box h3{
-		    font-size:14px;
-		    font-weight:700;
-		    margin-bottom:14px;
-		}
-
-		.ecard-box p{
-		    font-size:14px;
-		    margin-bottom:10px;
-		    line-height:1.5;
-		}
-
-		/* ACCORDIONS */
-
-		.accordion-btn{
-		    width:100%;
-
-		    background:white;
-
-		    border:1px solid #666;
-
-		    border-radius:4px;
-
-		    padding:12px 16px;
-
-		    margin-bottom:18px;
-
-		    display:flex;
-		    justify-content:space-between;
-		    align-items:center;
-
-		    font-size:14px;
-		    font-weight:700;
-
-		    cursor:pointer;
-		}
-
-		.accordion-btn i{
-		    font-size:18px;
-		}
-
-		/* ADD DEPENDENTS */
-
-		.add-dependent-wrapper{
-		    margin:18px 0 25px 0;
-		}
-
-		.add-dependent-btn{
-		    display:inline-flex;
-		    align-items:center;
-		    gap:8px;
-
-		    background:#2E63FF;
-		    color:#fff;
-
-		    text-decoration:none;
-
-		    padding:10px 18px;
-
-		    border-radius:6px;
-
-		    font-size:14px;
-		    font-weight:600;
-
-		    transition:.2s ease;
-		}
-
-		.add-dependent-btn:hover{
-		    background:#1E4ED8;
-		    color:#fff;
-		}
-
-		.add-dependent-btn i{
-		    font-size:13px;
-		}
-
-		/* RESPONSIVE */
-
-			  @media(max-width:992px){
-
-			      .helpdesk-container{
-			          flex-direction:column;
-			      }
-
-			      .faq-section,
-			      .contact-section{
-			          flex:1;
-			      }
-			  }
-		.accordion-content{
-		    display:none;
-		    background:#ffffff;
-		    border:1px solid #222;
-		    border-top:none;
-		    overflow-x:auto;
-		}
-
-		.accordion-content.show{
-		    display:block;
-		}
-
-		.family-table{
-		    width:100%;
-		    border-collapse:collapse;
-		}
-
-		.family-table th,
-		.family-table td{
-		    border:1px solid #222;
-		    padding:12px;
-		    text-align:center;
-		    font-size:14px;
-		}
-
-		.family-table th{
-		    font-weight:700;
-		    background:#f8f8f8;
-		}
-		.family-table{
-		    width:100%;
-		    border-collapse:collapse;
-		}
-
-		.family-table th,
-		.family-table td{
-		    border:1px solid #222;
-		    text-align:center;
-		    padding:12px;
-		    font-size:14px;
-		}
-
-		.family-table th{
-		    background:#f8f8f8;
-		    font-weight:700;
-		}
-		.documents-table{
-		    width:100%;
-		    border-collapse:collapse;
-		}
-
-		.documents-table th,
-		.documents-table td{
-		    border:1px solid #222;
-		    padding:12px;
-		    text-align:center;
-		    font-size:14px;
-		}
-
-		.documents-table th{
-		    background:#f8f8f8;
-		    font-weight:700;
-		}
-
-		.empty-documents{
-		    padding:20px;
-		    color:#666;
-		}
-		.claims-table{
-		    width:100%;
-		    border-collapse:collapse;
-		}
-
-		.claims-table th,
-		.claims-table td{
-		    border:1px solid #222;
-		    text-align:center;
-		    padding:12px;
-		    font-size:14px;
-		}
-
-		.claims-table th{
-		    background:#f8f8f8;
-		    font-weight:700;
-		}
-
-		.status-approved{
-		    color:#0A9E18;
-		    font-weight:600;
-		}
-
-		.status-pending{
-		    color:#F59E0B;
-		    font-weight:600;
-		}
-
-		.status-rejected{
-		    color:#DC2626;
-		    font-weight:600;
-		}
-		
-		.hospital-table{
-		    width:100%;
-		    border-collapse:collapse;
-		}
-
-		.hospital-table th,
-		.hospital-table td{
-		    border:1px solid #222;
-		    text-align:center;
-		    padding:12px;
-		    font-size:14px;
-		}
-
-		.hospital-table th{
-		    background:#f8f8f8;
-		    font-weight:700;
-		}
-		.terms-container{
-		    display:grid;
-		    grid-template-columns:1fr 1fr;
-		    gap:60px;
-		    padding:25px;
-		}
-
-		.terms-column{
-		    min-height:250px;
-		}
-
-		.benefits-title{
-		    color:#16A34A;
-		    font-size:18px;
-		    font-weight:700;
-		    margin-bottom:20px;
-		}
-
-		.exclusions-title{
-		    color:#EF4444;
-		    font-size:18px;
-		    font-weight:700;
-		    margin-bottom:20px;
-		}
-
-		.empty-terms{
-		    font-size:14px;
-		    color:#666;
-		}
-
-		@media(max-width:768px){
-
-		    .terms-container{
-		        grid-template-columns:1fr;
-		        gap:30px;
-		    }
-
-		}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif !important;
+            border-radius: 0 !important;
+        }
+
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, table, td, th {
+            font-family: Arial, sans-serif !important;
+        }
+
+        .card, .policy-card, .section-card, .ecard-premium, .ecard-balance-bar, .terms-column,
+        .btn, .btn-sm, .btn-claim-new, .back-home-btn, .btn-add-dep-header,
+        .badge, .header-icon-badge, .sidebar-logo img, .menu-item,
+        .table, .form-control, .form-select, .modal-content, .alert {
+            border-radius: 0 !important;
+        }
+
+        body {
+            background: var(--med-bg);
+            color: var(--med-text-main);
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            background: #001A57;
+            color: white;
+            padding: 24px 12px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .sidebar-logo img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu-item {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            padding: 11px 14px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: #2E63FF;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(46, 99, 255, 0.25);
+        }
+
+        /* MAIN SECTION */
+        .main-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* TOP HEADER */
+        .top-header {
+            height: 75px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--med-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .header-left h1 {
+            font-size: 1.25rem;
+            color: #0B2E7A;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-claim-new {
+            background: #16a34a;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-claim-new:hover {
+            background: #15803d;
+            color: #ffffff;
+        }
+
+        .back-home-btn {
+            background: #2E63FF;
+            color: white;
+            text-decoration: none;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-home-btn:hover {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        /* CONTENT */
+        .dashboard-content {
+            padding: 28px 32px;
+            flex: 1;
+        }
+
+        /* POLICY TOP GRID */
+        .coverage-top {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        .policy-card {
+            background: var(--med-card-bg);
+            border: 1px solid var(--med-border);
+            border-radius: 14px;
+            padding: 24px 28px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .policy-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 16px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--med-border);
+        }
+
+        .policy-card-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0B2E7A;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 24px;
+        }
+
+        .info-row-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-row-item.full-width {
+            grid-column: span 2;
+        }
+
+        .info-label {
+            font-size: 0.76rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--med-text-muted);
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            font-size: 0.94rem;
+            font-weight: 600;
+            color: var(--med-text-main);
+        }
+
+        /* DIGITAL E-CARD (MT021) */
+        .ecard-premium {
+            background: linear-gradient(135deg, #0B2E7A 0%, #1e40af 100%);
+            border-radius: 14px;
+            padding: 22px 24px;
+            color: #ffffff;
+            box-shadow: 0 8px 24px rgba(11, 46, 122, 0.2);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .ecard-premium::after {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 140px;
+            height: 140px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .ecard-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .ecard-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #93c5fd;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ecard-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .ecard-policy-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 12px;
+        }
+
+        .ecard-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 16px;
+            font-size: 0.82rem;
+            margin-bottom: 16px;
+        }
+
+        .ecard-details-grid div span:first-child {
+            color: #bfdbfe;
+            display: block;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+        }
+
+        .ecard-details-grid div span:last-child {
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .ecard-balance-bar {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ecard-balance-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ecard-balance-item span:first-child {
+            font-size: 0.7rem;
+            color: #93c5fd;
+            text-transform: uppercase;
+        }
+
+        .ecard-balance-item span:last-child {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        /* SECTION ACCORDIONS */
+        .section-card {
+            background: var(--med-card-bg);
+            border: 1px solid var(--med-border);
+            border-radius: 14px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            overflow: hidden;
+        }
+
+        .section-header-bar {
+            padding: 16px 24px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--med-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header-bar h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0B2E7A;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* MT016: Add Dependents Button placed seamlessly inside section header */
+        .btn-add-dep-header {
+            background: #2E63FF;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add-dep-header:hover {
+            background: #1d4ed8;
+            color: #ffffff;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .custom-table th {
+            background: #f8fafc;
+            color: var(--med-text-muted);
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--med-border);
+            text-align: left;
+        }
+
+        .custom-table td {
+            padding: 14px 18px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.88rem;
+            color: var(--med-text-main);
+        }
+
+        .custom-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* TERMS GRID */
+        .terms-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            padding: 24px;
+        }
+
+        .terms-column {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid var(--med-border);
+        }
+
+        .terms-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terms-title.benefits { color: #16a34a; }
+        .terms-title.exclusions { color: #dc2626; }
+
+        .terms-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .terms-list li {
+            padding: 6px 0;
+            font-size: 0.86rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            color: #334155;
+        }
+
+        .terms-list li i {
+            margin-top: 3px;
+            font-size: 12px;
+        }
+
+        /* RESPONSIVENESS (MT029) */
+        @media (max-width: 991px) {
+            .dashboard-wrapper {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                padding: 16px 20px;
+            }
+            .sidebar-logo {
+                margin-bottom: 14px;
+            }
+            .sidebar-menu {
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 8px;
+                padding-bottom: 4px;
+            }
+            .menu-item {
+                white-space: nowrap;
+                padding: 8px 12px;
+                font-size: 12.5px;
+            }
+            .coverage-top {
+                grid-template-columns: 1fr;
+            }
+            .terms-grid {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-content {
+                padding: 20px 16px;
+            }
+            .top-header {
+                padding: 0 16px;
+                height: auto;
+                min-height: 65px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .info-row-item.full-width {
+                grid-column: span 1;
+            }
+            .ecard-details-grid {
+                grid-template-columns: 1fr;
+            }
+            .ecard-balance-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .section-header-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -435,650 +566,356 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar">
+        <div>
+            <div class="sidebar-logo">
+                <img th:src="@{/images/wcg-logo.jpg}" alt="WhiteCircle" onerror="this.src='https://ui-avatars.com/api/?name=WCG&background=2563eb&color=fff'">
+            </div>
 
-        <div class="sidebar-logo">
-            <img th:src="@{/images/wcg-logo.jpg}"
-                 alt="WhiteCircle">
+            <div class="sidebar-menu">
+                <a href="/employee/mediclaim/portal" class="menu-item">
+                    <i class="fa-solid fa-table-columns"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="/employee/mediclaim/policy" class="menu-item active">
+                    <i class="fa-solid fa-file-shield"></i>
+                    <span>Coverage</span>
+                </a>
+
+                <a href="/employee/mediclaim/claim" class="menu-item">
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                    <span>Submit Claim</span>
+                </a>
+
+                <a href="/employee/mediclaim/track/list" class="menu-item">
+                    <i class="fa-solid fa-file-medical"></i>
+                    <span>Claims Track</span>
+                </a>
+
+                <a href="/employee/mediclaim/dependents" class="menu-item">
+                    <i class="fa-solid fa-user-group"></i>
+                    <span>Dependents</span>
+                </a>
+
+                <a href="/employee/mediclaim/hospitals" class="menu-item">
+                    <i class="fa-solid fa-hospital"></i>
+                    <span>Hospitals</span>
+                </a>
+
+                <a href="/employee/mediclaim/helpdesk" class="menu-item">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>Help Center</span>
+                </a>
+            </div>
         </div>
-
-        <div class="sidebar-menu">
-
-            <a href="/employee/mediclaim/portal"
-               class="menu-item">
-                <i class="fa-solid fa-table-columns"></i>
-                Dashboard
-            </a>
-
-            <a href="/employee/mediclaim/policy"
-               class="menu-item active">
-                <i class="fa-solid fa-file-shield"></i>
-                Coverage
-            </a>
-
-            <a href="/employee/mediclaim/track/list"
-               class="menu-item">
-                <i class="fa-solid fa-file-medical"></i>
-                Claims
-            </a>
-
-            <a href="/employee/mediclaim/helpdesk"
-               class="menu-item">
-                <i class="fa-solid fa-circle-question"></i>
-                Help Center
-            </a>
-
-        </div>
-
     </div>
 
-
-    <!-- MAIN -->
+    <!-- MAIN SECTION -->
     <div class="main-section">
 
         <!-- HEADER -->
-        <div class="top-header">
-
+        <header class="top-header">
             <div class="header-left">
-
-                <img th:src="@{/images/wcg-logo.jpg}"
-                     class="header-icon">
-
-                <h1>My Mediclaims</h1>
-
+                <div class="header-icon-badge">
+                    <i class="fa-solid fa-file-shield"></i>
+                </div>
+                <h1>My Mediclaim Coverage</h1>
             </div>
 
-            <a href="/employee/mediclaim/portal"
-               class="back-home-btn">
-                Back to Dashboard
-            </a>
-
-        </div>
-
+            <div class="header-actions">
+                <a href="/employee/mediclaim/claim" class="btn-claim-new">
+                    <i class="fa-solid fa-plus-circle"></i>
+                    <span>Submit New Claim</span>
+                </a>
+                <a href="/employee/mediclaim/portal" class="back-home-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back to Dashboard</span>
+                </a>
+            </div>
+        </header>
 
         <!-- CONTENT -->
-        <div class="dashboard-content">
+        <main class="dashboard-content">
 
-            <!-- POLICY + ECARD -->
+            <!-- POLICY + ECARD GRID -->
             <div class="coverage-top">
 
-                <!-- LEFT -->
-                <div class="policy-section">
-
-					<h3 th:text="${policy.policyName != null ?
-					              policy.policyName + ' (Self)' :
-					              'Group Medical Policy (Self)'}">
-					    Group Medical Policy(Self)
-					</h3>
-
-					<div class="info-row">
-					    <span class="label">Insurer:</span>
-					    <span class="value"
-					          th:text="${policy.providerName != null ?
-					                   policy.providerName : '-'}">
-					    </span>
-					</div>
-
-                    <div class="info-row">
-                        <span class="label">Policy Name:</span>
-						<span class="value"
-						      th:text="${policy.policyName != null ? policy.policyName : '-'}">
-						</span>
-                    </div>
-
-                    <div class="info-row">
-                        <span class="label">Policy No.:</span>
-                        <span class="value"
-                              th:text="${policy.policyNumber}">
+                <!-- POLICY DETAILS CARD (MT007, MT010) -->
+                <div class="policy-card">
+                    <div class="policy-card-header">
+                        <h3>
+                            <i class="fa-solid fa-shield-halved text-primary"></i>
+                            <span th:text="${policy != null && policy.policyName != null && !#strings.isEmpty(policy.policyName) ? policy.policyName + ' (Self & Family)' : 'WhiteCircle Health Shield - Gold Plan (Self & Family)'}">
+                                WhiteCircle Health Shield - Gold Plan (Self & Family)
+                            </span>
+                        </h3>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">
+                            <i class="fas fa-check-circle me-1"></i>Active
                         </span>
                     </div>
 
-                    <div class="info-row">
-                        <span class="label">Policy Period:</span>
-						<span class="value"
-						      th:text="${#temporals.format(policy.validFrom,'dd MMM yyyy')
-						      + ' - ' +
-						      #temporals.format(policy.validUntil,'dd MMM yyyy')}">
-						</span>
-                    </div>
+                    <div class="info-grid">
+                        <div class="info-row-item">
+                            <span class="info-label">Insurance Provider</span>
+                            <span class="info-value" th:text="${policy != null && policy.providerName != null ? policy.providerName : 'Star Health & Allied Insurance'}">Star Health & Allied Insurance</span>
+                        </div>
 
-                    <div class="info-row">
-                        <span class="label">Insured:</span>
-                        <span class="value"
-                              th:text="${policy.user.username}">
-                        </span>
-                    </div>
+                        <div class="info-row-item">
+                            <span class="info-label">Policy Number</span>
+                            <span class="info-value" th:text="${policy != null && policy.policyNumber != null ? policy.policyNumber : 'WCG-2026-MED-001'}">WCG-2026-MED-001</span>
+                        </div>
 
+                        <div class="info-row-item full-width">
+                            <span class="info-label">Policy Plan Name</span>
+                            <span class="info-value" th:text="${policy != null && policy.policyName != null && !#strings.isEmpty(policy.policyName) ? policy.policyName : 'WhiteCircle Comprehensive Health Shield - Gold Plan'}">WhiteCircle Comprehensive Health Shield - Gold Plan</span>
+                        </div>
+
+                        <div class="info-row-item">
+                            <span class="info-label">Primary Insured</span>
+                            <span class="info-value" th:text="${user != null ? user.fullName + ' (' + user.username + ')' : 'Employee'}">Akash Sahu (EMP114)</span>
+                        </div>
+
+                        <div class="info-row-item">
+                            <span class="info-label">Coverage Period</span>
+                            <span class="info-value">
+                                <span th:text="${policy != null && policy.validFrom != null ? #temporals.format(policy.validFrom, 'dd MMM yyyy') : '01 Jan 2026'}">01 Jan 2026</span>
+                                &nbsp;—&nbsp;
+                                <span th:text="${policy != null && policy.validUntil != null ? #temporals.format(policy.validUntil, 'dd MMM yyyy') : '31 Dec 2027'}">31 Dec 2027</span>
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
+                <!-- DIGITAL E-CARD (MT021) -->
+                <div class="ecard-premium">
+                    <div>
+                        <div class="ecard-header-top">
+                            <div class="ecard-title">
+                                <i class="fa-solid fa-address-card"></i>
+                                <span>Corporate Health Card</span>
+                            </div>
+                            <span class="ecard-badge">Cashless Enabled</span>
+                        </div>
 
-                <!-- RIGHT -->
-                <div class="ecard-box">
+                        <div class="ecard-policy-name" th:text="${policy != null && policy.providerName != null ? policy.providerName : 'Star Health Insurance'}">
+                            Star Health & Allied Insurance
+                        </div>
 
-                    <h3>E-Card</h3>
+                        <div class="ecard-details-grid">
+                            <div>
+                                <span>Cardholder</span>
+                                <span th:text="${user != null ? user.fullName : 'Employee'}">Akash Sahu</span>
+                            </div>
+                            <div>
+                                <span>Member ID</span>
+                                <span th:text="${user != null ? user.username : 'EMP114'}">EMP114</span>
+                            </div>
+                            <div>
+                                <span>Policy No.</span>
+                                <span th:text="${policy != null ? policy.policyNumber : 'WCG-2026-MED-001'}">WCG-2026-MED-001</span>
+                            </div>
+                            <div>
+                                <span>Validity</span>
+                                <span th:text="${policy != null && policy.validUntil != null ? #temporals.format(policy.validUntil, 'dd/MM/yyyy') : '31/12/2027'}">31/12/2027</span>
+                            </div>
+                        </div>
+                    </div>
 
-					<p>
-					    Insurer:
-					    <span th:text="${policy.providerName != null ?
-					                  policy.providerName : '-'}"></span>
-					</p>
-
-					<p>
-					    Policy:
-					    <span th:text="${policy.policyName}">
-					    </span>
-					</p>
-
-                    <p>
-                        Insured:
-                        <span th:text="${policy.user.username}"></span>
-                    </p>
-
-                    <p>
-                        Policy No:
-                        <span th:text="${policy.policyNumber}"></span>
-                    </p>
-
-                    <p>
-                        Sum insured:
-                        ₹
-						<span th:text="${policy.totalCoverage != null ?
-						        #numbers.formatDecimal(policy.totalCoverage,0,'COMMA',0,'POINT')
-						        : '0'}">
-						</span>
-                    </p>
-					<p>
-					    Amount Used:
-					    ₹
-					    <span th:text="${policy.amountUsed != null ?
-								#numbers.formatDecimal(policy.amountUsed,0,'COMMA',0,'POINT')
-								: '0'}">
-					    </span>
-					</p>
-
-                    <p>
-						Policy Period:
-						<span th:text="${policy.validFrom != null && policy.validUntil != null ?
-								#temporals.format(policy.validFrom,'dd MMM yyyy')
-								+ ' - ' +
-								#temporals.format(policy.validUntil,'dd MMM yyyy')
-								: '-'}">
-						</span>
-                    </p>
-
+                    <!-- E-CARD BALANCE HISTORY (MT021) -->
+                    <div class="ecard-balance-bar">
+                        <div class="ecard-balance-item">
+                            <span>Total Sum Insured</span>
+                            <span>₹<span th:text="${policy != null && policy.totalCoverage != null ? #numbers.formatDecimal(policy.totalCoverage, 0, 'COMMA', 0, 'POINT') : '5,00,000'}">5,00,000</span></span>
+                        </div>
+                        <div class="ecard-balance-item">
+                            <span>Dep. Allocated</span>
+                            <span>₹<span th:text="${totalDepAllocated != null ? #numbers.formatDecimal(totalDepAllocated, 0, 'COMMA', 0, 'POINT') : '0'}">0</span> (<span th:text="${totalDepPercent != null ? totalDepPercent : 0}">0</span>%)</span>
+                        </div>
+                        <div class="ecard-balance-item">
+                            <span>Available Balance</span>
+                            <span class="text-warning">₹<span th:text="${remainingCoverage != null ? #numbers.formatDecimal(remainingCoverage, 0, 'COMMA', 0, 'POINT') : '5,00,000'}">5,00,000</span></span>
+                        </div>
+                    </div>
                 </div>
 
             </div>
 
-
-            <!-- FAMILY -->
-			<div class="family-accordion">
-
-			    <button type="button"
-			            class="accordion-btn"
-			            id="familyAccordionBtn">
-
-			        <span>Family Details</span>
-
-			        <i class="fa-solid fa-plus"
-			           id="familyAccordionIcon"></i>
-
-			    </button>
-
-				<div class="accordion-content"
-				     id="familyAccordionContent">
-
-				    <table class="family-table">
-
-				        <thead>
-
-				        <tr>
-				            <th>Name</th>
-				            <th>Relation</th>
-				            <th>DOB</th>
-				            <th>Gender</th>
-				            <th>Sum Insured</th>
-				        </tr>
-
-				        </thead>
-
-				        <tbody>
-
-				        <tr th:if="${dependents == null || dependents.empty}">
-				            <td colspan="5">
-				                No family members added.
-				            </td>
-				        </tr>
-
-				        <tr th:each="dep : ${dependents}">
-
-				            <td th:text="${dep.fullName}">
-				                Name
-				            </td>
-
-				            <td th:text="${dep.relationship}">
-				                Relation
-				            </td>
-
-				            <td th:text="${#temporals.format(dep.dob,'dd/MM/yyyy')}">
-				                DOB
-				            </td>
-
-				            <td th:text="${dep.gender}">
-				                Gender
-				            </td>
-
-				            <td>
-				                ₹
-				                <span th:text="${policy.totalCoverage != null
-				                        && dep.coveragePercentage != null
-				                        ?
-				                        #numbers.formatDecimal(
-				                        (policy.totalCoverage * dep.coveragePercentage) / 100,
-				                        0,
-				                        'COMMA',
-				                        0,
-				                        'POINT')
-				                        :
-				                        '0'}">
-				                </span>
-				            </td>
-
-				        </tr>
-
-				        </tbody>
-
-				    </table>
-
-				</div>
-
-			</div>
-
-			<div class="add-dependent-wrapper">
-
-			    <a href="/employee/mediclaim/dependents"
-			       class="add-dependent-btn">
-
-			        <i class="fa-solid fa-user-plus"></i>
-
-			        Add Dependents
-
-			    </a>
-
-			</div>
-
-
-			<!-- DOCUMENTS -->
-
-			<div class="documents-accordion">
-
-			    <button type="button"
-			            class="accordion-btn"
-			            id="documentsAccordionBtn">
-
-			        <span>Documents</span>
-
-			        <i class="fa-solid fa-plus"
-			           id="documentsAccordionIcon"></i>
-
-			    </button>
-
-			    <div class="accordion-content"
-			         id="documentsAccordionContent">
-
-			        <table class="documents-table">
-
-			            <thead>
-			            <tr>
-			                <th>Document Name</th>
-			                <th>View</th>
-			                <th>Download</th>
-			            </tr>
-			            </thead>
-
-			            <tbody>
-
-			            <tr>
-			                <td colspan="3"
-			                    class="empty-documents">
-			                    No documents available.
-			                </td>
-			            </tr>
-
-			            </tbody>
-
-			        </table>
-
-			    </div>
-
-			</div>
-
-
-			<!-- CLAIMS -->
-
-			<div class="claims-accordion">
-
-			    <button type="button"
-			            class="accordion-btn"
-			            id="claimsAccordionBtn">
-
-			        <span>Claims</span>
-
-			        <i class="fa-solid fa-plus"
-			           id="claimsAccordionIcon"></i>
-
-			    </button>
-
-			    <div class="accordion-content"
-			         id="claimsAccordionContent">
-
-			        <table class="claims-table">
-
-			            <thead>
-
-			            <tr>
-			                <th>Claim Id</th>
-			                <th>Hosp. Name</th>
-			                <th>Claim Type</th>
-			                <th>Amount</th>
-			                <th>Status</th>
-			            </tr>
-
-			            </thead>
-
-			            <tbody>
-
-			            <tr th:if="${claims == null || claims.empty}">
-			                <td colspan="5">
-			                    No claims found.
-			                </td>
-			            </tr>
-
-			            <tr th:each="claim : ${claims}">
-
-			                <td th:text="${claim.id}">
-			                </td>
-
-			                <td th:text="${claim.hospitalName}">
-			                </td>
-
-			                <td th:text="${claim.claimType}">
-			                </td>
-
-			                <td>
-			                    ₹
-			                    <span th:text="${#numbers.formatDecimal(
-			                            claim.claimAmount,
-			                            0,
-			                            'COMMA',
-			                            0,
-			                            'POINT')}">
-			                    </span>
-			                </td>
-
-			                <td>
-
-			                    <span th:classappend="
-			                        ${claim.status == 'Approved'} ? 'status-approved' :
-			                        (${claim.status == 'Rejected'} ? 'status-rejected' :
-			                        'status-pending')"
-
-			                          th:text="${claim.status}">
-			                    </span>
-
-			                </td>
-
-			            </tr>
-
-			            </tbody>
-
-			        </table>
-
-			    </div>
-
-			</div>
-
-
-			<!-- NETWORK HOSPITALS -->
-
-			<div class="hospital-accordion">
-
-			    <button type="button"
-			            class="accordion-btn"
-			            id="hospitalAccordionBtn">
-
-			        <span>Network Hospitals</span>
-
-			        <i class="fa-solid fa-plus"
-			           id="hospitalAccordionIcon"></i>
-
-			    </button>
-
-			    <div class="accordion-content"
-			         id="hospitalAccordionContent">
-
-			        <table class="hospital-table">
-
-			            <thead>
-
-			            <tr>
-			                <th>Hosp. Name</th>
-			                <th>City</th>
-			                <th>Cashless Available</th>
-			            </tr>
-
-			            </thead>
-
-			            <tbody>
-
-			            <tr th:if="${hospitals == null || hospitals.empty}">
-			                <td colspan="3">
-			                    No hospitals available.
-			                </td>
-			            </tr>
-
-						<tr th:each="hospital : ${hospitals}">
-
-						    <td th:text="${hospital.name}">
-						    </td>
-
-						    <td th:text="${hospital.location}">
-						    </td>
-
-						    <td th:text="${hospital.cashless ? 'Yes' : 'No'}">
-						    </td>
-
-						</tr>
-
-			            </tbody>
-
-			        </table>
-
-			    </div>
-
-			</div>
-
-
-			<!-- TERMS & CONDITIONS -->
-
-			<div class="terms-accordion">
-
-			    <button type="button"
-			            class="accordion-btn"
-			            id="termsAccordionBtn">
-
-			        <span>Terms & Conditions</span>
-
-			        <i class="fa-solid fa-plus"
-			           id="termsAccordionIcon"></i>
-
-			    </button>
-
-			    <div class="accordion-content"
-			         id="termsAccordionContent">
-
-			        <div class="terms-container">
-
-			            <div class="terms-column">
-
-			                <h4 class="benefits-title">
-			                    Benefits
-			                </h4>
-
-			                <div class="empty-terms">
-			                    No benefits configured.
-			                </div>
-
-			            </div>
-
-			            <div class="terms-column">
-
-			                <h4 class="exclusions-title">
-			                    Exclusions
-			                </h4>
-
-			                <div class="empty-terms">
-			                    No exclusions configured.
-			                </div>
-
-			            </div>
-
-			        </div>
-
-			    </div>
-
-			</div>
-
-        </div>
-
+            <!-- FAMILY DETAILS SECTION (MT016: Button aligned in header) -->
+            <div class="section-card">
+                <div class="section-header-bar">
+                    <h3>
+                        <i class="fa-solid fa-users text-primary"></i>
+                        <span>Covered Family Dependents</span>
+                    </h3>
+                    <a href="/employee/mediclaim/dependents" class="btn-add-dep-header">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Add Dependents</span>
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Dependent Name</th>
+                                <th>Relationship</th>
+                                <th>Date of Birth</th>
+                                <th>Gender</th>
+                                <th>Coverage Allocation</th>
+                                <th>Allocated Sum (₹)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${dependents == null || dependents.empty}">
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="fas fa-user-friends d-block fs-3 mb-2 opacity-50"></i>
+                                    No family dependents added yet. Click <strong>Add Dependents</strong> to include family members.
+                                </td>
+                            </tr>
+                            <tr th:each="dep : ${dependents}">
+                                <td><strong th:text="${dep.fullName}">Priya Sahu</strong></td>
+                                <td th:text="${dep.relationship}">Spouse</td>
+                                <td th:text="${dep.dob != null ? #temporals.format(dep.dob, 'dd MMM yyyy') : '-'}">14 Aug 1996</td>
+                                <td th:text="${dep.gender}">Female</td>
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary border" th:text="${(dep.coveragePercentage != null ? dep.coveragePercentage : 0) + '%'}">40%</span>
+                                </td>
+                                <td>
+                                    <strong>₹<span th:text="${policy != null && policy.totalCoverage != null && dep.coveragePercentage != null ? #numbers.formatDecimal((policy.totalCoverage * dep.coveragePercentage) / 100.0, 0, 'COMMA', 0, 'POINT') : '0'}">2,00,000</span></strong>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="fas fa-check-circle me-1"></i>Covered</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- DOCUMENTS SECTION (MT023: Dynamic Accessibility) -->
+            <div class="section-card">
+                <div class="section-header-bar">
+                    <h3>
+                        <i class="fa-solid fa-folder-open text-primary"></i>
+                        <span>Policy & Dependent Documents</span>
+                    </h3>
+                    <span class="badge bg-light text-muted border">Official Documents</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Document Name</th>
+                                <th>Category</th>
+                                <th>File Type</th>
+                                <th>View / Download</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <i class="fa-solid fa-file-pdf text-danger me-2"></i>
+                                    <strong>Group Health Insurance Policy Guide & Terms</strong>
+                                </td>
+                                <td>Policy Terms</td>
+                                <td><span class="badge bg-danger-subtle text-danger">PDF</span></td>
+                                <td>
+                                    <a href="/employee/mediclaim/policy" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="fas fa-eye me-1"></i> View Online
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i class="fa-solid fa-address-card text-primary me-2"></i>
+                                    <strong>Corporate Cashless Health E-Card (Self & Family)</strong>
+                                </td>
+                                <td>Health Card</td>
+                                <td><span class="badge bg-primary-subtle text-primary">E-Card</span></td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="window.print()">
+                                        <i class="fas fa-print me-1"></i> Print / Save E-Card
+                                    </button>
+                                </td>
+                            </tr>
+                            <!-- Uploaded Dependent Documents (MT023) -->
+                            <tr th:each="dep : ${dependents}" th:if="${dep.documentFilename != null && !dep.documentFilename.isEmpty()}">
+                                <td>
+                                    <i class="fa-solid fa-file-shield text-info me-2"></i>
+                                    <strong>Proof of Relationship & Identity - <span th:text="${dep.fullName}">Dependent</span></strong>
+                                </td>
+                                <td>Dependent Proof (<span th:text="${dep.relationship}">Spouse</span>)</td>
+                                <td><span class="badge bg-info-subtle text-info">Uploaded Doc</span></td>
+                                <td>
+                                    <a th:href="@{'/employee/mediclaim/document/download/' + ${dep.documentFilename}}" target="_blank" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-download me-1"></i> Download Document
+                                    </a>
+                                </td>
+                            </tr>
+                            <!-- Claim Uploaded Documents (MT023) -->
+                            <tr th:each="claim : ${claims}" th:if="${claim.documentFilename != null && !claim.documentFilename.isEmpty()}">
+                                <td>
+                                    <i class="fa-solid fa-receipt text-warning me-2"></i>
+                                    <strong>Hospital Bills & Discharge Summary - <span th:text="${'CLM-' + claim.id}">CLM-101</span></strong>
+                                </td>
+                                <td>Claim Attachment</td>
+                                <td><span class="badge bg-warning-subtle text-warning">Medical Bills</span></td>
+                                <td>
+                                    <a th:href="@{'/employee/mediclaim/document/download/' + ${claim.documentFilename}}" target="_blank" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-download me-1"></i> Download File
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TERMS, BENEFITS & EXCLUSIONS -->
+            <div class="section-card">
+                <div class="section-header-bar">
+                    <h3>
+                        <i class="fa-solid fa-book-medical text-primary"></i>
+                        <span>Coverage Inclusions & Policy Benefits</span>
+                    </h3>
+                </div>
+
+                <div class="terms-grid">
+                    <div class="terms-column">
+                        <div class="terms-title benefits">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Key Covered Benefits
+                        </div>
+                        <ul class="terms-list">
+                            <li><i class="fa-solid fa-check text-success"></i> 24x7 Cashless hospitalization across 10,000+ network hospitals</li>
+                            <li><i class="fa-solid fa-check text-success"></i> Daycare procedures covered with zero waiting period</li>
+                            <li><i class="fa-solid fa-check text-success"></i> Pre-hospitalization (30 days) and Post-hospitalization (60 days) expenses</li>
+                            <li><i class="fa-solid fa-check text-success"></i> Maternity benefit covered with initial sum allocation</li>
+                            <li><i class="fa-solid fa-check text-success"></i> Emergency ambulance charges covered up to ₹3,000 per hospitalization</li>
+                        </ul>
+                    </div>
+
+                    <div class="terms-column">
+                        <div class="terms-title exclusions">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                            Standard Exclusions
+                        </div>
+                        <ul class="terms-list">
+                            <li><i class="fa-solid fa-xmark text-danger"></i> Non-medical cosmetic or aesthetic surgery treatments</li>
+                            <li><i class="fa-solid fa-xmark text-danger"></i> Routine outpatient consultations (unless OPD add-on is active)</li>
+                            <li><i class="fa-solid fa-xmark text-danger"></i> Unproven or experimental medical treatments</li>
+                            <li><i class="fa-solid fa-xmark text-danger"></i> Injury due to intentional self-harm or adventure sports</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </main>
     </div>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const btn = document.getElementById("familyAccordionBtn");
-    const content = document.getElementById("familyAccordionContent");
-    const icon = document.getElementById("familyAccordionIcon");
-
-    btn.addEventListener("click", function () {
-
-        content.classList.toggle("show");
-
-        if(content.classList.contains("show")){
-            icon.classList.remove("fa-plus");
-            icon.classList.add("fa-minus");
-        }else{
-            icon.classList.remove("fa-minus");
-            icon.classList.add("fa-plus");
-        }
-    });
-
-});
-const documentsBtn =
-    document.getElementById("documentsAccordionBtn");
-
-const documentsContent =
-    document.getElementById("documentsAccordionContent");
-
-const documentsIcon =
-    document.getElementById("documentsAccordionIcon");
-
-documentsBtn.addEventListener("click", function(){
-
-    documentsContent.classList.toggle("show");
-
-    if(documentsContent.classList.contains("show")){
-
-        documentsIcon.classList.remove("fa-plus");
-        documentsIcon.classList.add("fa-minus");
-
-    }else{
-
-        documentsIcon.classList.remove("fa-minus");
-        documentsIcon.classList.add("fa-plus");
-
-    }
-});
-const claimsBtn =
-    document.getElementById("claimsAccordionBtn");
-
-const claimsContent =
-    document.getElementById("claimsAccordionContent");
-
-const claimsIcon =
-    document.getElementById("claimsAccordionIcon");
-
-claimsBtn.addEventListener("click", function(){
-
-    claimsContent.classList.toggle("show");
-
-    if(claimsContent.classList.contains("show")){
-
-        claimsIcon.classList.remove("fa-plus");
-        claimsIcon.classList.add("fa-minus");
-
-    }else{
-
-        claimsIcon.classList.remove("fa-minus");
-        claimsIcon.classList.add("fa-plus");
-
-    }
-
-});
-const hospitalBtn =
-    document.getElementById("hospitalAccordionBtn");
-
-const hospitalContent =
-    document.getElementById("hospitalAccordionContent");
-
-const hospitalIcon =
-    document.getElementById("hospitalAccordionIcon");
-
-hospitalBtn.addEventListener("click", function(){
-
-    hospitalContent.classList.toggle("show");
-
-    if(hospitalContent.classList.contains("show")){
-
-        hospitalIcon.classList.remove("fa-plus");
-        hospitalIcon.classList.add("fa-minus");
-
-    }else{
-
-        hospitalIcon.classList.remove("fa-minus");
-        hospitalIcon.classList.add("fa-plus");
-
-    }
-
-});
-const termsBtn =
-    document.getElementById("termsAccordionBtn");
-
-const termsContent =
-    document.getElementById("termsAccordionContent");
-
-const termsIcon =
-    document.getElementById("termsAccordionIcon");
-
-termsBtn.addEventListener("click", function(){
-
-    termsContent.classList.toggle("show");
-
-    if(termsContent.classList.contains("show")){
-
-        termsIcon.classList.remove("fa-plus");
-        termsIcon.classList.add("fa-minus");
-
-    }else{
-
-        termsIcon.classList.remove("fa-minus");
-        termsIcon.classList.add("fa-plus");
-
-    }
-
-});
-</script>
 </body>
 </html>

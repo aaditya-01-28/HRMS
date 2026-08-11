@@ -6,6 +6,9 @@ public class EmployeeRelationshipResponse {
     private String employeeName;
     private String employeeRole;
     private String employeeDesignation;
+    private String employeeEmail;
+    private String employeeDepartment;
+    private String employeeJoiningDate;
 
     private Long managerId;
     private String managerName;
@@ -42,6 +45,30 @@ public class EmployeeRelationshipResponse {
 
     public void setEmployeeDesignation(String employeeDesignation) {
         this.employeeDesignation = employeeDesignation;
+    }
+
+    public String getEmployeeEmail() {
+        return employeeEmail;
+    }
+
+    public void setEmployeeEmail(String employeeEmail) {
+        this.employeeEmail = employeeEmail;
+    }
+
+    public String getEmployeeDepartment() {
+        return employeeDepartment;
+    }
+
+    public void setEmployeeDepartment(String employeeDepartment) {
+        this.employeeDepartment = employeeDepartment;
+    }
+
+    public String getEmployeeJoiningDate() {
+        return employeeJoiningDate;
+    }
+
+    public void setEmployeeJoiningDate(String employeeJoiningDate) {
+        this.employeeJoiningDate = employeeJoiningDate;
     }
 
     public Long getManagerId() {

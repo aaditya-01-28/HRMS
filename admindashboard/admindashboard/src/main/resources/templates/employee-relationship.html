@@ -446,9 +446,14 @@
 	    document.getElementById("reportingManager").textContent =
 	        data.managerName || "System Administrator";
 
-	    document.getElementById("employeeEmail").textContent = "-";
-	    document.getElementById("employeeDepartment").textContent = "-";
-	    document.getElementById("employeeJoiningDate").textContent = "-";
+	    document.getElementById("employeeEmail").textContent =
+	        data.employeeEmail || "-";
+
+	    document.getElementById("employeeDepartment").textContent =
+	        data.employeeDepartment || "-";
+
+	    document.getElementById("employeeJoiningDate").textContent =
+	        data.employeeJoiningDate || "-";
 	}
 
 	function loadRelationship(data) {

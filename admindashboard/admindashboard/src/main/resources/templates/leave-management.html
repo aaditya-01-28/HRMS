@@ -427,8 +427,8 @@
         <span>LEAVE MANAGEMENT SYSTEM</span>
     </div>
     <div>
-        <a href="/default-redirect" class="btn-back-home">
-            <i class="fas fa-arrow-left me-2"></i> Back to Home
+        <a id="btnBackHome" href="/default-redirect" class="btn-back-home">
+            <i class="fas fa-arrow-left me-2"></i> <span id="btnBackHomeText">Back to Home</span>
         </a>
     </div>
 </header>
@@ -791,20 +791,11 @@
 
             walletData.forEach(w => { window.availableLeaveBalances[w.leaveCode] = w.balance || 0; });
 
-            // Color themes for each leave type
-            const themes = {
-                'CL':       { gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', icon: 'fa-sun',          iconBg: 'rgba(255,255,255,0.2)' },
-                'SL':       { gradient: 'linear-gradient(135deg, #10b981, #059669)', icon: 'fa-kit-medical',   iconBg: 'rgba(255,255,255,0.2)' },
-                'EL':       { gradient: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', icon: 'fa-star',          iconBg: 'rgba(255,255,255,0.2)' },
-                'COMP_OFF': { gradient: 'linear-gradient(135deg, #f59e0b, #d97706)', icon: 'fa-rotate',        iconBg: 'rgba(255,255,255,0.2)' },
-                'LOP':      { gradient: 'linear-gradient(135deg, #ef4444, #b91c1c)', icon: 'fa-circle-exclamation', iconBg: 'rgba(255,255,255,0.2)' }
-            };
-
-          const displayTypes = ['CL', 'SL', 'EL', 'COMP_OFF'];  
-          let totalAvailable = 0;
-          let clBalance = 0;
-          let slBalance = 0;
-          let elBalance = 0;
+            const displayTypes = ['CL', 'SL', 'EL', 'COMP_OFF'];  
+            let totalAvailable = 0;
+            let clBalance = 0;
+            let slBalance = 0;
+            let elBalance = 0;
             walletData.forEach(w => {
               if (displayTypes.includes(w.leaveCode)) {
                   totalAvailable += (w.balance || 0);
@@ -843,40 +834,48 @@
         }
     }
 
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• 3. WALLET DETAILS MODAL (SweetAlert) â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // ════════════════════════════════ 3. WALLET DETAILS MODAL (SweetAlert) ════════════════════════════════
     function showWalletDetailsModal() {
         if (!walletData || walletData.length === 0) {
-            Swal.fire({ icon: 'info', title: 'No Data', text: 'No leave wallet data available.', confirmButtonColor: '#1e3a8a' });
+            Swal.fire({ icon: 'info', title: 'No Data', text: 'No leave wallet data available.', confirmButtonColor: '#00236F' });
             return;
         }
 
-        let tableHTML = '<div style="font-size:0.72rem; color:#64748b; background:#f8fafc; border-radius:8px; padding:8px 12px; margin-bottom:10px; line-height:1.6;">' +
-            'Detailed summary of your leave balances.' +
+        let tableHTML = '<div style="font-size:0.8rem; color:#64748b; background:#f8fafc; border-radius:8px; padding:10px 14px; margin-bottom:12px; line-height:1.5; text-align:left;">' +
+            '<i class="fas fa-info-circle text-primary me-2"></i>Detailed breakdown of your leave entitlements, used leaves, available balances, and recent ledger activity.' +
             '</div>' +
-            '<div style="max-height:65vh; overflow-y:auto; overflow-x:hidden;">' +
-            '<table style="width:100%; border-collapse:collapse; font-size:0.78rem; font-family:Inter,sans-serif; margin-bottom:20px;">' +
+            '<div style="max-height:55vh; overflow-y:auto; overflow-x:auto; -webkit-overflow-scrolling:touch;">' +
+            '<table style="width:100%; min-width:550px; border-collapse:collapse; font-size:0.82rem; font-family:Inter,sans-serif; margin-bottom:10px;">' +
             '<thead>' +
-            '<tr style="background:#f8fafc; border-bottom:2px solid #e2e8f0; position:sticky; top:0;">' +
-            '<th style="padding:8px 6px; text-align:left; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f8fafc; white-space:nowrap;">Leave Type</th>' +
-            '<th style="padding:8px 6px; text-align:center; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f8fafc; white-space:nowrap;">Balance</th>' +
-            '<th style="padding:8px 6px; text-align:center; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f8fafc; white-space:nowrap;">Credit/Debit</th>' +
-            '<th style="padding:8px 6px; text-align:left; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f8fafc; white-space:nowrap;">Date</th>' +
+            '<tr style="background:#f1f5f9; border-bottom:2px solid #cbd5e1; position:sticky; top:0; z-index:2;">' +
+            '<th style="padding:10px 8px; text-align:left; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f1f5f9; white-space:nowrap;">Leave Type</th>' +
+            '<th style="padding:10px 8px; text-align:center; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f1f5f9; white-space:nowrap;">Used Leaves</th>' +
+            '<th style="padding:10px 8px; text-align:center; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f1f5f9; white-space:nowrap;">Available Balance</th>' +
+            '<th style="padding:10px 8px; text-align:center; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f1f5f9; white-space:nowrap;">Recent Transaction</th>' +
+            '<th style="padding:10px 8px; text-align:left; font-size:0.8rem; color:#1e3a8a; font-weight:bold; background:#f1f5f9; white-space:nowrap;">Date</th>' +
             '</tr></thead><tbody>';
 
         const displayTypes = ['CL', 'SL', 'EL', 'COMP_OFF', 'LOP'];
-
         let totalBalance = 0;
+        let totalUsed = 0;
 
         walletData.forEach(w => {
             if (!displayTypes.includes(w.leaveCode)) return;
             
-            totalBalance += parseFloat(w.balance || 0);
+            const bal = parseFloat(w.balance || 0);
+            totalBalance += bal;
             
-            let lastCreditDebit = '\u2014';
-            let lastDate = '\u2014';
+            let usedCount = 0;
+            let lastCreditDebit = '—';
+            let lastDate = '—';
             let color = '#475569';
             
             if (ledgerData && ledgerData.length > 0) {
+                // Calculate total debits for this leave type
+                ledgerData.filter(t => t.leaveType === w.leaveType && t.debit).forEach(t => {
+                    usedCount += parseFloat(t.debit || 0);
+                });
+                
                 const lastTransaction = ledgerData.find(t => t.leaveType === w.leaveType);
                 if (lastTransaction) {
                     if (lastTransaction.debit) {
@@ -894,29 +893,36 @@
                 }
             }
             
+            totalUsed += usedCount;
+            
             tableHTML += '<tr style="border-bottom:1px solid #f1f5f9;">' +
-                '<td style="padding:10px 6px; font-weight:700; color:#1e293b; white-space:nowrap; text-align:left;">' + w.leaveType + '</td>' +
-                '<td style="padding:10px 6px; text-align:center; font-weight:600; color:#475569;">' + (w.balance || 0) + '</td>' +
-                '<td style="padding:10px 6px; text-align:center; font-weight:700; color:' + color + ';">' + lastCreditDebit + '</td>' +
-                '<td style="padding:10px 6px; text-align:left; font-weight:500; color:#475569;">' + lastDate + '</td>' +
+                '<td style="padding:10px 8px; font-weight:700; color:#1e293b; white-space:nowrap; text-align:left;">' + w.leaveType + ' (' + w.leaveCode + ')</td>' +
+                '<td style="padding:10px 8px; text-align:center; font-weight:600; color:#dc2626;">' + usedCount + '</td>' +
+                '<td style="padding:10px 8px; text-align:center; font-weight:700; color:#1e3a8a;">' + bal + '</td>' +
+                '<td style="padding:10px 8px; text-align:center; font-weight:700; color:' + color + ';">' + lastCreditDebit + '</td>' +
+                '<td style="padding:10px 8px; text-align:left; font-weight:500; color:#475569;">' + lastDate + '</td>' +
                 '</tr>';
         });
 
-        
-        tableHTML += '<tr style="border-top:2px solid #e2e8f0; background:#f8f9fa;">' +
-            '<td style="padding:12px 6px; font-weight:800; color:#1e3a8a; text-align:left; font-size: 0.85rem;">Total Available Leaves</td>' +
-            '<td style="padding:12px 6px; text-align:center; font-weight:800; color:#1e3a8a; font-size: 0.85rem;">' + totalBalance + '</td>' +
+        tableHTML += '<tr style="border-top:2px solid #cbd5e1; background:#f8f9fa;">' +
+            '<td style="padding:12px 8px; font-weight:800; color:#1e3a8a; text-align:left; font-size: 0.85rem;">Total Leaves</td>' +
+            '<td style="padding:12px 8px; text-align:center; font-weight:800; color:#dc2626; font-size: 0.85rem;">' + totalUsed + '</td>' +
+            '<td style="padding:12px 8px; text-align:center; font-weight:800; color:#1e3a8a; font-size: 0.85rem;">' + totalBalance + '</td>' +
             '<td colspan="2"></td>' +
             '</tr>';
 
         tableHTML += '</tbody></table></div>';
 
         Swal.fire({
-            title: 'Leave Wallet Details',
+            title: 'Leave Wallet & Usage Details',
             html: tableHTML,
-            width: '850px',
-            confirmButtonColor: '#1e3a8a',
-            confirmButtonText: 'Close'
+            width: '820px',
+            confirmButtonColor: '#00236F',
+            confirmButtonText: 'Close',
+            showCloseButton: true,
+            allowOutsideClick: true,
+            allowEscapeKey: true,
+            focusConfirm: false
         });
     }
 
@@ -1511,6 +1517,19 @@
 
     // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• DOM CONTENT LOADED â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const returnTo = urlParams.get('returnTo');
+        if (returnTo) {
+            const btn = document.getElementById('btnBackHome');
+            const text = document.getElementById('btnBackHomeText');
+            if (btn) {
+                btn.href = returnTo;
+                if (returnTo.includes('attendance') && text) {
+                    text.innerText = 'Back to Attendance';
+                }
+            }
+        }
+
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const tomorrowStr = tomorrow.toISOString().split('T')[0];

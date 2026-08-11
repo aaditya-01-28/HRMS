@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -35,18 +35,22 @@
         }
         .logo-container {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         .logo-container img {
-            height: 80px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            height: 65px;
+            max-width: 200px;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            background: #ffffff;
+            padding: 4px 8px;
         }
         .welcome-text {
             font-size: 2rem;
             font-weight: 600;
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 35px;
             color: #000;
         }
         .form-label {
@@ -105,7 +109,7 @@
             padding: 12px;
             font-weight: 500;
             font-size: 1.1rem;
-            width: 50%;
+            width: 60%;
             margin: 0 auto;
             display: block;
             transition: all 0.3s;
@@ -119,7 +123,7 @@
             display: flex;
             justify-content: center;
             gap: 25px;
-            margin-top: 50px;
+            margin-top: 40px;
         }
         .social-icons a {
             color: #333;
@@ -130,28 +134,15 @@
             color: #2962ff;
             transform: scale(1.1);
         }
-        /* Mobile responsive */
-        @media (max-width: 991px) {
-            .login-wrapper {
-                flex-direction: column;
-            }
-            .login-image-section {
-                flex: none;
-                height: 30vh;
-            }
-            .login-form-section {
-                padding: 40px 5%;
-            }
-        }
         
         .btn-back {
             position: absolute;
             top: 30px;
             left: 30px;
             color: #333;
-            font-size: 1.2rem;
+            font-size: 1rem;
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -160,6 +151,37 @@
         .btn-back:hover {
             color: #2962ff;
             transform: translateX(-5px);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 991px) {
+            .login-wrapper {
+                flex-direction: column;
+                min-height: 100vh;
+            }
+            .login-image-section {
+                display: none;
+            }
+            .login-form-section {
+                padding: 30px 20px;
+                width: 100%;
+                min-height: 100vh;
+                justify-content: flex-start;
+            }
+            .btn-back {
+                position: static;
+                margin-bottom: 25px;
+            }
+            .welcome-text {
+                font-size: 1.6rem;
+                margin-bottom: 25px;
+            }
+            .btn-login {
+                width: 100%;
+            }
+            .social-icons {
+                margin-top: 30px;
+            }
         }
     </style>
 </head>

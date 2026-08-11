@@ -31,24 +31,29 @@ public class GoalUpdateController {
             @RequestParam(required = false) MultipartFile evidence,
             HttpSession session) {
 
-        if (progressPercentage < 0 || progressPercentage > 100) {
-            return "redirect:/employee/my-goals?error=invalid_progress";
-        }
-
         User user =
                 (User) session.getAttribute("loggedInUser");
 
-        Goal goal = goalService.getGoalById(goalId);
+        if (user == null) {
+            return "redirect:/login";
+        }
 
-        GoalUpdate update = new GoalUpdate();
+        try {
+            Goal goal = goalService.getGoalById(goalId);
 
-        update.setGoal(goal);
-        update.setUpdatedBy(user);
-        update.setProgressPercentage(progressPercentage);
-        update.setRemarks(remarks);
+            GoalUpdate update = new GoalUpdate();
 
-        goalUpdateService.saveUpdate(update);
+            update.setGoal(goal);
+            update.setUpdatedBy(user);
+            update.setProgressPercentage(progressPercentage);
+            update.setRemarks(remarks);
 
-        return "redirect:/employee/my-goals";
+            goalUpdateService.saveUpdate(update);
+
+            return "redirect:/employee/my-goals?success=progress_updated";
+        } catch (Exception e) {
+            String msg = e.getMessage() != null ? e.getMessage() : "Failed to update goal progress.";
+            return "redirect:/employee/my-goals?error=" + java.net.URLEncoder.encode(msg, java.nio.charset.StandardCharsets.UTF_8);
+        }
     }
 }

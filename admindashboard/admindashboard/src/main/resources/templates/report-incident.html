@@ -291,10 +291,10 @@
         <div class="description-section">
             <div class="row align-items-start">
                 <div class="col-md-1 pe-0">
-                    <label class="form-label-custom pt-1">Description</label>
+                    <label class="form-label-custom pt-1">Description*</label>
                 </div>
                 <div class="col-md-11 ps-0">
-                    <textarea class="form-control form-control-custom" id="incidentDescription" rows="5"></textarea>
+                    <textarea class="form-control form-control-custom" id="incidentDescription" rows="5" required placeholder="Please describe the incident / justification in detail..."></textarea>
                 </div>
             </div>
         </div>
@@ -351,8 +351,8 @@
         const itemVal = document.getElementById('incItemField').value.trim();
         const subcategoryVal = document.getElementById('incSubcategoryField').value.trim();
 
-        if (!category || !mobile || !email || !locationVal || !priority) {
-            Swal.fire({ icon: 'info', title: 'Missing Info', text: 'Please fill in all required fields.', confirmButtonColor: '#1e3a8a' });
+        if (!category || !mobile || !email || !locationVal || !priority || !description) {
+            Swal.fire({ icon: 'info', title: 'Missing Info', text: 'Please fill in all required fields marked with (*), including Description.', confirmButtonColor: '#1e3a8a' });
             return;
         }
 

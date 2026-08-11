@@ -291,55 +291,55 @@ public class GoalBurnChartService {
             return chart;
         }
 
-        DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("dd MMM HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM");
 
         List<GoalUpdate> updates =
                 goalUpdateRepository
                         .findByGoalOrderBySubmittedAtAsc(goal);
 
+        long totalDays = ChronoUnit.DAYS.between(goal.getStartDate(), goal.getTargetDate());
+        if (totalDays <= 0) totalDays = 1;
+
         /*
-         * START POINT
+         * 1. START POINT
          */
         chart.add(
                 new BurnChartPoint(
-                        goal.getStartDate().format(
-                                DateTimeFormatter.ofPattern("dd MMM")
-                        ),
+                        goal.getStartDate().format(formatter),
                         0,
                         0
                 )
         );
 
         /*
-         * ACTUAL FLUCTUATIONS
+         * 2. ACTUAL UPDATES WITH INTERPOLATED PLANNED PROGRESS
          */
         int cumulative = 0;
 
         for (GoalUpdate update : updates) {
 
             cumulative += update.getProgressPercentage();
-
             cumulative = Math.min(cumulative, 100);
+
+            long elapsed = ChronoUnit.DAYS.between(goal.getStartDate(), update.getSubmittedAt().toLocalDate());
+            elapsed = Math.max(0, Math.min(elapsed, totalDays));
+            int plannedAtUpdate = (int) Math.round(((double) elapsed / totalDays) * 100);
 
             chart.add(
                     new BurnChartPoint(
-                            update.getSubmittedAt()
-                                    .format(formatter),
-                            0,
+                            update.getSubmittedAt().format(formatter),
+                            plannedAtUpdate,
                             cumulative
                     )
             );
         }
 
         /*
-         * END POINT
+         * 3. TARGET END POINT
          */
         chart.add(
                 new BurnChartPoint(
-                        goal.getTargetDate().format(
-                                DateTimeFormatter.ofPattern("dd MMM")
-                        ),
+                        goal.getTargetDate().format(formatter),
                         100,
                         cumulative
                 )

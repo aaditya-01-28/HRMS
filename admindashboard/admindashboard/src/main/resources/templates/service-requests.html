@@ -446,14 +446,16 @@
 
                     <div class="col-md-1 pe-0">
                         <label class="form-label-custom pt-1">
-                            Description
+                            Description*
                         </label>
                     </div>
 
                     <div class="col-md-11 ps-0">
                         <textarea class="form-control form-control-custom"
                                   id="srvDescription"
-                                  rows="5"></textarea>
+                                  rows="5"
+                                  required
+                                  placeholder="Please describe your service request details / justification..."></textarea>
                     </div>
 
                 </div>
@@ -542,11 +544,11 @@
         
         const itemVal = document.getElementById('solItemField').value.trim();
 
-        if (!category || !locationVal || !mobile || !email ) {
+        if (!category || !locationVal || !mobile || !email || !description) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Required Fields Missing',
-                text: 'Please populate all mandatory items marked with (*)',
+                text: 'Please populate all mandatory items marked with (*), including Description.',
                 confirmButtonColor: '#1e3a8a'
             });
             return;

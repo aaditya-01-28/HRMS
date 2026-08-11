@@ -94,16 +94,21 @@ public class OrganizationChartService {
     ) {
         String designation = "";
 
-        if (user.getEmployeeProfile() != null) {
-            designation =
-                    user.getEmployeeProfile()
-                            .getDesignation();
+        if (user.getEmployeeProfile() != null && user.getEmployeeProfile().getDesignation() != null && !user.getEmployeeProfile().getDesignation().trim().isEmpty()) {
+            designation = user.getEmployeeProfile().getDesignation().trim();
+        } else if (user.getRole() != null && user.getRole().getRoleName() != null) {
+            String r = user.getRole().getRoleName().replace("ROLE_", "");
+            designation = java.util.Arrays.stream(r.split("_"))
+                    .map(word -> word.isEmpty() ? "" : Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase())
+                    .collect(java.util.stream.Collectors.joining(" "));
         }
+
+        String roleName = user.getRole() != null ? user.getRole().getRoleName() : "EMPLOYEE";
 
         return new OrganizationNode(
                 user.getId(),
                 user.getFullName(),
-                user.getRole().getRoleName(),
+                roleName,
                 designation
         );
     }
@@ -130,39 +135,57 @@ public class OrganizationChartService {
                         .orElseThrow();
 
         User manager = employee.getManager();
-        System.out.println(
-        	    "Employee = " + employee.getFullName()
-        	);
-
-        	if(employee.getManager() != null){
-        	    System.out.println(
-        	        "Manager = " +
-        	        employee.getManager().getFullName()
-        	    );
-        	}
 
         EmployeeRelationshipResponse response =
                 new EmployeeRelationshipResponse();
 
         response.setEmployeeId(employee.getId());
         response.setEmployeeName(employee.getFullName());
-        response.setEmployeeRole(employee.getRole().getRoleName());
+        response.setEmployeeRole(employee.getRole() != null ? employee.getRole().getRoleName() : "EMPLOYEE");
 
-        if (employee.getEmployeeProfile() != null) {
+        if (employee.getEmployeeProfile() != null && employee.getEmployeeProfile().getDesignation() != null && !employee.getEmployeeProfile().getDesignation().trim().isEmpty()) {
             response.setEmployeeDesignation(
-                    employee.getEmployeeProfile().getDesignation()
+                    employee.getEmployeeProfile().getDesignation().trim()
             );
+        } else {
+            String r = response.getEmployeeRole().replace("ROLE_", "");
+            response.setEmployeeDesignation(
+                    java.util.Arrays.stream(r.split("_"))
+                            .map(word -> word.isEmpty() ? "" : Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase())
+                            .collect(java.util.stream.Collectors.joining(" "))
+            );
+        }
+
+        response.setEmployeeEmail(employee.getEmail() != null && !employee.getEmail().trim().isEmpty() ? employee.getEmail() : "-");
+        
+        if (employee.getEmployeeProfile() != null) {
+            String dept = employee.getEmployeeProfile().getDepartment();
+            if (dept == null || dept.trim().isEmpty()) {
+                dept = employee.getEmployeeProfile().getBusinessUnit();
+            }
+            response.setEmployeeDepartment(dept != null && !dept.trim().isEmpty() ? dept : "-");
+            response.setEmployeeJoiningDate(employee.getEmployeeProfile().getJoiningDate() != null ? employee.getEmployeeProfile().getJoiningDate().toString() : "-");
+        } else {
+            response.setEmployeeDepartment("-");
+            response.setEmployeeJoiningDate("-");
         }
 
         if (manager != null) {
 
             response.setManagerId(manager.getId());
             response.setManagerName(manager.getFullName());
-            response.setManagerRole(manager.getRole().getRoleName());
+            response.setManagerRole(manager.getRole() != null ? manager.getRole().getRoleName() : "MANAGER");
 
-            if (manager.getEmployeeProfile() != null) {
+            if (manager.getEmployeeProfile() != null && manager.getEmployeeProfile().getDesignation() != null && !manager.getEmployeeProfile().getDesignation().trim().isEmpty()) {
                 response.setManagerDesignation(
-                        manager.getEmployeeProfile().getDesignation()
+                        manager.getEmployeeProfile().getDesignation().trim()
+                );
+            } else {
+                String r = response.getManagerRole().replace("ROLE_", "");
+                response.setManagerDesignation(
+                        java.util.Arrays.stream(r.split("_"))
+                                .map(word -> word.isEmpty() ? "" : Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase())
+                                .collect(java.util.stream.Collectors.joining(" "))
                 );
             }
         }

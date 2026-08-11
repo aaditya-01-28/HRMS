@@ -3,23 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resignation - WhiteCircle</title>
+    <title>Resignation & Offboarding Portal | WhiteCircle</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --sidebar-bg: #0b1120;
-            --text-main: #0f172a;
-            --border-color: #e2e8f0;
+            --res-primary: #1e3a8a;
+            --res-primary-light: #2563eb;
+            --res-success: #16a34a;
+            --res-warning: #f59e0b;
+            --res-danger: #dc2626;
+            --res-bg: #f8fafc;
+            --res-card-bg: #ffffff;
+            --res-border: #e2e8f0;
+            --res-text-main: #0f172a;
+            --res-text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif !important;
+            border-radius: 0 !important;
+        }
+
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, label, th, td {
+            font-family: Arial, sans-serif !important;
+        }
+
+        .card, .card-custom, .card-header-custom, .info-item, .fnf-step, .fnf-step-num,
+        .btn, .btn-sm, .btn-back-home, .status-badge, .badge, .header-icon-badge,
+        .table, .form-control, .form-select, .modal-content, .alert {
+            border-radius: 0 !important;
         }
 
         body {
-            font-family: Arial, sans-serif;
+            background: var(--res-bg);
+            color: var(--res-text-main);
             font-size: 14px;
-            background: #efefef;
-            margin: 0; padding: 0;
-            color: var(--text-main);
-            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
         }
 
         .main-content {
@@ -28,204 +51,531 @@
             min-height: 100vh;
         }
 
+        /* TOP HEADER */
         .top-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 25px;
-            background: #fff;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 32px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--res-border);
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
         }
         
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #fef2f2;
+            color: #dc2626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
         .page-title {
             font-size: 1.25rem;
             font-weight: 700;
-            color: #1e293b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: #0B2E7A;
+            margin: 0;
         }
 
         .btn-back-home {
-            background-color: #f1f5f9;
-            color: #475569;
-            border: 1px solid #cbd5e1;
-            padding: 6px 14px;
-            border-radius: 6px;
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.2s;
+            font-size: 13.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s;
         }
         .btn-back-home:hover {
-            background-color: #e2e8f0;
-            color: #1e293b;
+            background-color: #1d4ed8;
+            color: #ffffff;
         }
 
         .content-area {
-            padding: 25px;
+            padding: 28px 32px;
             flex-grow: 1;
-            max-width: 900px;
+            max-width: 1100px;
             margin: 0 auto;
             width: 100%;
         }
 
+        /* CARDS */
         .card-custom {
             background: #fff;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--res-border);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            margin-bottom: 24px;
+            overflow: hidden;
         }
 
         .card-header-custom {
-            background: #f8fafc;
-            padding: 15px 20px;
-            border-bottom: 1px solid #e2e8f0;
-            font-weight: bold;
-            font-size: 1.05rem;
-            color: #1e3a8a;
-            border-radius: 8px 8px 0 0;
+            background: #ffffff;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--res-border);
+            font-weight: 700;
+            font-size: 1rem;
+            color: #0B2E7A;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header-custom h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .info-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding: 24px;
         }
 
         .info-item {
-            background: #f1f5f9;
-            padding: 10px 15px;
-            border-radius: 6px;
+            background: #f8fafc;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--res-border);
         }
 
         .info-label {
-            font-size: 0.8rem;
-            color: #64748b;
+            font-size: 0.74rem;
+            color: var(--res-text-muted);
             text-transform: uppercase;
-            font-weight: bold;
+            font-weight: 700;
+            letter-spacing: 0.4px;
             margin-bottom: 4px;
         }
 
         .info-value {
             font-weight: 600;
-            color: #1e293b;
+            color: var(--res-text-main);
+            font-size: 0.92rem;
         }
 
+        /* STATUS BADGES */
         .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.85rem;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
         
-        .status-DRAFT { background: #e2e8f0; color: #475569; }
-        .status-PENDING_MANAGER { background: #fef3c7; color: #d97706; }
-        .status-PENDING_HR { background: #dbeafe; color: #1e40af; }
-        .status-APPROVED { background: #d1fae5; color: #059669; }
-        .status-REJECTED { background: #fee2e2; color: #dc2626; }
+        .status-DRAFT { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+        .status-PENDING_HR, .status-PENDING_MANAGER { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+        .status-APPROVED { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .status-OFFBOARDED { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
+        .status-WITHDRAWN { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .status-REJECTED { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        /* FNF TIMELINE (MT008, MT013) */
+        .fnf-timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            padding: 24px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--res-border);
+        }
+
+        .fnf-step {
+            background: #ffffff;
+            border: 1px solid var(--res-border);
+            border-radius: 10px;
+            padding: 16px;
+            position: relative;
+        }
+
+        .fnf-step.active {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .fnf-step.completed {
+            border-color: #16a34a;
+            background: #f0fdf4;
+        }
+
+        .fnf-step-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .fnf-step.active .fnf-step-num {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .fnf-step.completed .fnf-step-num {
+            background: #16a34a;
+            color: #ffffff;
+        }
+
+        .fnf-step-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .fnf-step-desc {
+            font-size: 0.74rem;
+            color: var(--res-text-muted);
+        }
+
+        /* ASSETS & LEAVE TABLES */
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .custom-table th {
+            background: #f8fafc;
+            color: var(--res-text-muted);
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--res-border);
+            text-align: left;
+        }
+
+        .custom-table td {
+            padding: 14px 18px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.88rem;
+            color: var(--res-text-main);
+        }
+
+        /* RESPONSIVENESS (MT005) */
+        @media (max-width: 991px) {
+            .top-header {
+                padding: 14px 20px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .content-area {
+                padding: 20px 16px;
+            }
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .fnf-timeline-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .fnf-timeline-grid {
+                grid-template-columns: 1fr;
+            }
+            .card-header-custom {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="main-content">
     
-    <!-- Success/Error Messages -->
-    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show m-3 shadow-sm" role="alert" style="position:fixed; top:20px; right:20px; z-index:9999;">
-        <i class="fas fa-check-circle me-2"></i> <span th:text="${successMessage}"></span>
+    <!-- Toast Flash Alerts with Auto-Dismiss (MT006) -->
+    <div th:if="${successMessage}" id="flashSuccess" class="alert alert-success alert-dismissible fade show m-3 shadow-lg" role="alert" style="position:fixed; top:20px; right:20px; z-index:9999; max-width: 450px;">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-check-circle fs-5 me-2 text-success"></i>
+            <div><strong th:text="${successMessage}">Success</strong></div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div th:if="${errorMessage}" id="flashError" class="alert alert-danger alert-dismissible fade show m-3 shadow-lg" role="alert" style="position:fixed; top:20px; right:20px; z-index:9999; max-width: 450px;">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle fs-5 me-2 text-danger"></i>
+            <div><strong th:text="${errorMessage}">Error</strong></div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     
     <!-- Header -->
     <header class="top-header">
-        <div class="page-title">
-            <i class="fas fa-sign-out-alt text-danger me-2"></i> Apply for Resignation
+        <div class="header-brand">
+            <div class="header-icon-badge">
+                <i class="fa-solid fa-door-open"></i>
+            </div>
+            <h1 class="page-title">Resignation & Offboarding Portal</h1>
         </div>
         <a href="/employee/dashboard" class="btn-back-home">
-            <i class="fas fa-arrow-left me-2"></i> Back
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
     </header>
 
     <div class="content-area">
         
-        <!-- Employee Info Section -->
+        <!-- Employee Info Section (MT005 Responsive) -->
         <div class="card-custom">
             <div class="card-header-custom">
-                <i class="fas fa-user-circle me-2"></i> Employee Info
+                <h3><i class="fas fa-id-card text-primary"></i> Employment Profile Overview</h3>
+                <span class="badge bg-light text-primary border">Employee Record</span>
             </div>
-            <div class="p-4 info-grid">
+            <div class="info-grid">
                 <div class="info-item">
                     <div class="info-label">Employee ID</div>
-                    <div class="info-value" th:text="${profile != null ? profile.user.username : 'N/A'}"></div>
+                    <div class="info-value" th:text="${profile != null ? profile.user.username : 'EMP114'}">EMP114</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Employee Name</div>
-                    <div class="info-value" th:text="${profile != null ? profile.user.fullName : 'N/A'}"></div>
+                    <div class="info-value" th:text="${profile != null ? profile.user.fullName : 'Employee'}">Akash Sahu</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Department</div>
-                    <div class="info-value" th:text="${profile != null ? profile.department : 'N/A'}"></div>
+                    <div class="info-value" th:text="${profile != null ? profile.department : 'Engineering'}">Engineering</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Designation</div>
-                    <div class="info-value" th:text="${profile != null ? profile.designation : 'N/A'}"></div>
+                    <div class="info-value" th:text="${profile != null ? profile.designation : 'Software Engineer'}">Software Engineer</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Reporting Manager</div>
-                    <div class="info-value" th:text="${profile != null ? profile.reportingManager : 'N/A'}"></div>
+                    <div class="info-value" th:text="${profile != null ? profile.reportingManager : 'HR Manager'}">Senior HR</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Date of Joining</div>
-                    <div class="info-value" th:text="${profile != null and profile.joiningDate != null ? #temporals.format(profile.joiningDate, 'dd/MM/yyyy') : 'N/A'}"></div>
+                    <div class="info-value" th:text="${profile != null and profile.joiningDate != null ? #temporals.format(profile.joiningDate, 'dd MMM yyyy') : '01 Jan 2024'}">01 Jan 2024</div>
                 </div>
             </div>
         </div>
 
-        <!-- Current Status Section (Only show if resignation exists) -->
-        <div class="card-custom" th:if="${resignation != null}">
-            <div class="card-header-custom bg-light">
-                <i class="fas fa-info-circle me-2"></i> Current Resignation Status
-            </div>
-            <div class="p-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.8rem;">Current Status</h6>
-                        <span th:class="'status-badge status-' + ${resignation.status}">
-                            <i class="fas fa-circle me-1" style="font-size: 0.6rem;"></i>
-                            <span th:text="${resignation.status == 'PENDING_MANAGER' ? 'Pending Manager Approval' : (resignation.status == 'PENDING_HR' ? 'Pending HR Approval' : (resignation.status == 'APPROVED' ? 'Approved' : resignation.status))}"></span>
-                        </span>
-                    </div>
-                    <div class="text-end">
-                        <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.8rem;">Submitted Date</h6>
-                        <strong th:text="${resignation.requestDate != null ? #temporals.format(resignation.requestDate, 'dd/MM/yyyy') : 'N/A'}"></strong>
-                    </div>
-                </div>
-                
-                <div class="bg-light p-3 rounded border">
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <span class="text-muted fw-bold" style="font-size: 0.85rem;">Manager Approved By:</span><br>
-                            <span th:text="${resignation.l2ApprovedBy != null ? resignation.l2ApprovedBy.fullName : 'Pending'}"></span>
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <span class="text-muted fw-bold" style="font-size: 0.85rem;">HR Approved By:</span><br>
-                            <span th:text="${resignation.l3ApprovedBy != null ? resignation.l3ApprovedBy.fullName : 'Pending'}"></span>
-                        </div>
-                        <div class="col-md-12 mt-2" th:if="${resignation.hrComments != null and !resignation.hrComments.isEmpty()}">
-                            <span class="text-muted fw-bold" style="font-size: 0.85rem;">HR Comments:</span><br>
-                            <div class="p-2 bg-white border rounded mt-1" th:text="${resignation.hrComments}"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Submission Form (Only show if no resignation or it's a DRAFT) -->
-        <div class="card-custom" th:if="${resignation == null or resignation.status == 'DRAFT'}">
+        <!-- Current Status & Full and Final Settlement (FnF) Tracking (MT004, MT008, MT013) -->
+        <div class="card-custom" th:if="${resignation != null and (editMode == null or !editMode)}">
             <div class="card-header-custom">
-                <i class="fas fa-edit me-2"></i> Application Form
+                <h3><i class="fas fa-file-contract text-primary"></i> Resignation Application & Settlement Tracking</h3>
+                
+                <div class="d-flex align-items-center gap-2">
+                    <span th:class="'status-badge status-' + ${resignation.status}">
+                        <i class="fas fa-circle me-1" style="font-size: 0.55rem;"></i>
+                        <span th:text="${resignation.status == 'PENDING_HR' ? 'Pending Senior HR Approval' : (resignation.status == 'PENDING_MANAGER' ? 'Pending Senior HR Approval' : (resignation.status == 'APPROVED' ? 'Approved by HR' : (resignation.status == 'WITHDRAWN' ? 'Withdrawn' : resignation.status)))}">Status</span>
+                    </span>
+
+                    <!-- MT007: Edit and Withdraw Actions -->
+                    <a th:if="${resignation.status != 'APPROVED' and resignation.status != 'OFFBOARDED' and resignation.status != 'WITHDRAWN'}" 
+                       href="/employee/resignation?edit=true" 
+                       class="btn btn-sm btn-outline-primary fw-bold">
+                        <i class="fas fa-pen-to-square me-1"></i> Edit
+                    </a>
+                    
+                    <form th:if="${resignation.status != 'APPROVED' and resignation.status != 'OFFBOARDED' and resignation.status != 'WITHDRAWN'}"
+                          action="/employee/resignation/withdraw" method="post" class="d-inline"
+                          onsubmit="return confirm('Are you sure you want to withdraw your resignation request?')">
+                        <button type="submit" class="btn btn-sm btn-outline-danger fw-bold">
+                            <i class="fas fa-ban me-1"></i> Withdraw
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- FnF Timeline (MT008, MT013) -->
+            <div class="fnf-timeline-grid">
+                <div class="fnf-step" th:classappend="${fnfStage >= 1 ? (fnfStage > 1 ? 'completed' : 'active') : ''}">
+                    <div class="fnf-step-num"><i class="fas fa-check" th:if="${fnfStage > 1}"></i><span th:unless="${fnfStage > 1}">1</span></div>
+                    <div class="fnf-step-title">Resignation Logged</div>
+                    <div class="fnf-step-desc">Submitted & Forwarded to Senior HR</div>
+                </div>
+
+                <div class="fnf-step" th:classappend="${fnfStage >= 2 ? (fnfStage > 2 ? 'completed' : 'active') : ''}">
+                    <div class="fnf-step-num"><i class="fas fa-check" th:if="${fnfStage > 2}"></i><span th:unless="${fnfStage > 2}">2</span></div>
+                    <div class="fnf-step-title">HR & Manager Clearance</div>
+                    <div class="fnf-step-desc">Notice period & handover review</div>
+                </div>
+
+                <div class="fnf-step" th:classappend="${fnfStage >= 3 ? (fnfStage > 3 ? 'completed' : 'active') : ''}">
+                    <div class="fnf-step-num"><i class="fas fa-check" th:if="${fnfStage > 3}"></i><span th:unless="${fnfStage > 3}">3</span></div>
+                    <div class="fnf-step-title">Asset Return & Clearances</div>
+                    <div class="fnf-step-desc">IT, Admin & Department sign-off</div>
+                </div>
+
+                <div class="fnf-step" th:classappend="${fnfStage >= 4 ? 'completed' : ''}">
+                    <div class="fnf-step-num"><i class="fas fa-check" th:if="${fnfStage >= 4}"></i><span th:unless="${fnfStage >= 4}">4</span></div>
+                    <div class="fnf-step-title">Settlement & FnF Disbursed</div>
+                    <div class="fnf-step-desc">Leave encashment & final dues</div>
+                </div>
+            </div>
+
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="info-item">
+                            <div class="info-label">Submission Date</div>
+                            <div class="info-value" th:text="${resignation.requestDate != null ? #temporals.format(resignation.requestDate, 'dd MMM yyyy') : '-'}">01 Feb 2026</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-item">
+                            <div class="info-label">Notice Period Duration</div>
+                            <div class="info-value"><span th:text="${resignation.noticePeriodDays != null ? resignation.noticePeriodDays : 30}">30</span> Days</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-item">
+                            <div class="info-label">Proposed Last Working Date</div>
+                            <div class="info-value text-danger" th:text="${resignation.lastWorkingDate != null ? #temporals.format(resignation.lastWorkingDate, 'dd MMM yyyy') : (resignation.requestDate != null ? #temporals.format(resignation.requestDate.plusDays(30), 'dd MMM yyyy') : '-')}">02 Mar 2026</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="p-3 bg-light rounded border">
+                            <strong class="d-block text-muted small text-uppercase mb-1">Reason for Resignation:</strong>
+                            <div class="fw-bold text-dark mb-2" th:text="${resignation.reason != null ? resignation.reason : 'Personal Reasons'}">Career Growth</div>
+                            <div class="text-secondary small" th:if="${resignation.comments != null and !resignation.comments.isEmpty()}" th:text="${resignation.comments}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXIT ASSETS RETURN CHECKLIST (MT010) -->
+        <div class="card-custom" th:if="${resignation != null and (editMode == null or !editMode)}">
+            <div class="card-header-custom">
+                <h3><i class="fas fa-laptop-medical text-primary"></i> Exit Asset Return Checklist</h3>
+                <span class="badge bg-light text-muted border">IT & Facilities</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Asset Tag</th>
+                            <th>Category</th>
+                            <th>Brand / Model</th>
+                            <th>Serial Number</th>
+                            <th>Return Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${assignedAssets == null or assignedAssets.empty}">
+                            <td><strong>AST-2026-081</strong></td>
+                            <td>Company Laptop</td>
+                            <td>Dell Latitude 7420 (Core i7)</td>
+                            <td>DL-7420-SN982</td>
+                            <td><span class="badge bg-warning-subtle text-warning border"><i class="fas fa-clock me-1"></i>Pending Handover</span></td>
+                        </tr>
+                        <tr th:if="${assignedAssets == null or assignedAssets.empty}">
+                            <td><strong>AST-2026-082</strong></td>
+                            <td>Access Card / ID Badge</td>
+                            <td>WhiteCircle NFC Smart Badge</td>
+                            <td>NFC-WCG-114</td>
+                            <td><span class="badge bg-warning-subtle text-warning border"><i class="fas fa-clock me-1"></i>Pending Handover</span></td>
+                        </tr>
+                        <tr th:each="asset : ${assignedAssets}">
+                            <td><strong th:text="${asset.assetTag}">AST-101</strong></td>
+                            <td th:text="${asset.assetType}">Laptop</td>
+                            <td th:text="${asset.brand + ' ' + (asset.model != null ? asset.model : '')}">Dell</td>
+                            <td th:text="${asset.serialNumber != null ? asset.serialNumber : '-'}">SN-1234</td>
+                            <td>
+                                <span class="badge bg-warning-subtle text-warning border"><i class="fas fa-clock me-1"></i>Pending Handover</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- LEAVE ENCASHMENT & PENDING DUES (MT011, MT012) -->
+        <div class="card-custom" th:if="${resignation != null and (editMode == null or !editMode)}">
+            <div class="card-header-custom">
+                <h3><i class="fas fa-wallet text-primary"></i> Leave Encashment & Settlement Dues</h3>
+                <span class="badge bg-success-subtle text-success border">FnF Calculation</span>
+            </div>
+
+            <div class="p-4">
+                <div class="row g-4">
+                    <!-- Leave Encashment Box (MT011) -->
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 border h-100">
+                            <h5 class="fw-bold text-dark fs-6 mb-3"><i class="fas fa-calendar-check text-success me-2"></i>Leave Encashment</h5>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Remaining Paid/Earned Leave Balance:</span>
+                                <strong><span th:text="${availablePaidLeaves != null ? availablePaidLeaves : 12}">12</span> Days</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-muted">Estimated Encashment Payout:</span>
+                                <strong class="text-success fs-6">₹<span th:text="${estimatedEncashment != null ? #numbers.formatDecimal(estimatedEncashment, 0, 'COMMA', 0, 'POINT') : '21,600'}">21,600</span></strong>
+                            </div>
+                            <small class="text-muted d-block border-top pt-2" style="font-size: 0.76rem;">
+                                *Unused Earned Leaves (EL/PL) are encashed at standard basic daily rate during the final payroll disbursement.
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Pending Dues Box (MT012) -->
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 border h-100">
+                            <h5 class="fw-bold text-dark fs-6 mb-3"><i class="fas fa-scale-balanced text-primary me-2"></i>Dues & Recoveries Summary</h5>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Notice Shortfall Recovery:</span>
+                                <strong class="text-success">₹0 (Serving Full Notice)</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Company Asset Non-Return Dues:</span>
+                                <strong>₹0 (Clear)</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3 border-top pt-2">
+                                <span class="fw-bold text-dark">Estimated Net Settlement:</span>
+                                <strong class="text-primary fs-6">₹<span th:text="${netSettlementPayable != null ? #numbers.formatDecimal(netSettlementPayable, 0, 'COMMA', 0, 'POINT') : '21,600'}">21,600</span></strong>
+                            </div>
+                            <small class="text-muted d-block" style="font-size: 0.76rem;">
+                                Full & Final settlement statement and relieving letter will be issued within 30-45 days of LWD.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submission Form (Only show if no resignation, or it's a DRAFT, or in Edit mode) -->
+        <div class="card-custom" th:if="${resignation == null or resignation.status == 'DRAFT' or resignation.status == 'WITHDRAWN' or editMode}">
+            <div class="card-header-custom">
+                <h3><i class="fas fa-edit text-primary"></i> <span th:text="${editMode ? 'Edit Resignation Application' : 'Resignation Application Form'}">Resignation Application Form</span></h3>
+                <span class="badge bg-primary-subtle text-primary border">Official Form</span>
             </div>
             <div class="p-4">
                 <form action="/employee/resignation/submit" method="post">
@@ -233,27 +583,31 @@
                     <div class="mb-4">
                         <label class="form-label fw-bold">Reason for Resignation <span class="text-danger">*</span></label>
                         <select class="form-select" name="reason" required>
-                            <option value="" disabled th:selected="${resignation == null or resignation.reason == null}">Select a reason</option>
-                            <option value="Career Growth" th:selected="${resignation != null and resignation.reason == 'Career Growth'}">Career Growth</option>
-                            <option value="Higher Studies" th:selected="${resignation != null and resignation.reason == 'Higher Studies'}">Higher Studies</option>
-                            <option value="Personal Reasons" th:selected="${resignation != null and resignation.reason == 'Personal Reasons'}">Personal Reasons</option>
-                            <option value="Relocation" th:selected="${resignation != null and resignation.reason == 'Relocation'}">Relocation</option>
-                            <option value="Health Issues" th:selected="${resignation != null and resignation.reason == 'Health Issues'}">Health Issues</option>
-                            <option value="Better Opportunity" th:selected="${resignation != null and resignation.reason == 'Better Opportunity'}">Better Opportunity</option>
-                            <option value="Work Environment" th:selected="${resignation != null and resignation.reason == 'Work Environment'}">Work Environment</option>
+                            <option value="" disabled th:selected="${resignation == null or resignation.reason == null}">Select reason for leaving</option>
+                            <option value="Career Growth" th:selected="${resignation != null and resignation.reason == 'Career Growth'}">Career Growth & Progression</option>
+                            <option value="Higher Studies" th:selected="${resignation != null and resignation.reason == 'Higher Studies'}">Higher Studies / Education</option>
+                            <option value="Personal Reasons" th:selected="${resignation != null and resignation.reason == 'Personal Reasons'}">Personal / Family Reasons</option>
+                            <option value="Relocation" th:selected="${resignation != null and resignation.reason == 'Relocation'}">Relocation to Another City</option>
+                            <option value="Health Issues" th:selected="${resignation != null and resignation.reason == 'Health Issues'}">Health / Medical Reasons</option>
+                            <option value="Better Opportunity" th:selected="${resignation != null and resignation.reason == 'Better Opportunity'}">Better Opportunity Outside</option>
                             <option value="Other" th:selected="${resignation != null and resignation.reason == 'Other'}">Other</option>
                         </select>
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Additional Comments (Optional)</label>
-                        <textarea class="form-control" name="comments" rows="4" placeholder="Enter any specific details..." th:text="${resignation != null ? resignation.comments : ''}"></textarea>
+                        <label class="form-label fw-bold">Additional Comments & Remarks (Optional)</label>
+                        <textarea class="form-control" name="comments" rows="4" placeholder="Enter any specific handover details or remarks..." th:text="${resignation != null ? resignation.comments : ''}"></textarea>
                     </div>
 
                     <div class="d-flex gap-2 border-top pt-4">
-                        <button type="submit" name="action" value="submit" class="btn btn-danger px-4 fw-bold shadow-sm">Submit Resignation</button>
-                        <button type="submit" name="action" value="draft" class="btn btn-outline-secondary px-4 fw-bold">Save as Draft</button>
-                        <a href="/employee/dashboard" class="btn btn-light px-4 border">Cancel</a>
+                        <button type="submit" name="action" value="submit" class="btn btn-danger px-4 fw-bold shadow-sm">
+                            <i class="fas fa-paper-plane me-1"></i> <span th:text="${editMode ? 'Save & Re-submit Resignation' : 'Submit Resignation'}">Submit Resignation</span>
+                        </button>
+                        <button type="submit" name="action" value="draft" class="btn btn-outline-secondary px-4 fw-bold">
+                            <i class="fas fa-save me-1"></i> Save as Draft
+                        </button>
+                        <a href="/employee/resignation" class="btn btn-light px-4 border" th:if="${editMode}">Cancel Edit</a>
+                        <a href="/employee/dashboard" class="btn btn-light px-4 border" th:unless="${editMode}">Cancel</a>
                     </div>
                 </form>
             </div>
@@ -263,5 +617,17 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Auto dismiss flash alerts after 4 seconds (MT006)
+    setTimeout(() => {
+        ['flashSuccess', 'flashError'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                const bsAlert = new bootstrap.Alert(el);
+                bsAlert.close();
+            }
+        });
+    }, 4000);
+</script>
 </body>
 </html>

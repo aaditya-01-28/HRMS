@@ -12,6 +12,8 @@
 
     <!-- Chart JS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
 
@@ -23,6 +25,16 @@
 		    margin:0;
 		    padding:0;
 		    box-sizing:border-box;
+		    font-family: Arial, sans-serif !important;
+		    border-radius: 0 !important;
+		}
+
+		body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, table, td, th {
+		    font-family: Arial, sans-serif !important;
+		}
+
+		.card, .goal-card, .burn-chart-container, .btn, .badge, .form-control, .form-select, .modal-content, .alert {
+		    border-radius: 0 !important;
 		}
 
 		body{
@@ -715,81 +727,104 @@
 		   RESPONSIVE
 		================================= */
 
-		@media(max-width:992px){
+		.goal-action-buttons {
+		    display: flex;
+		    gap: 10px;
+		    align-items: center;
+		}
 
+		@media(max-width:992px){
 		    .summary-wrapper{
-		        flex-wrap:wrap;
-		        row-gap:20px;
+		        display: grid;
+		        grid-template-columns: repeat(2, 1fr);
+		        gap: 15px;
 		    }
 
 		    .summary-card{
-		        flex:0 0 calc(50% - 15px);
+		        min-width: unset;
+		        width: 100%;
 		    }
 
 		    .charts-section{
-		        grid-template-columns:1fr;
+		        grid-template-columns: 1fr;
 		    }
 		}
 
 		@media(max-width:768px){
-
 		    body{
-		        padding:15px;
+		        padding: 12px;
+		    }
+
+		    .page-header {
+		        margin-bottom: 15px;
+		    }
+
+		    .summary-wrapper{
+		        grid-template-columns: 1fr;
+		        gap: 10px;
+		        margin-bottom: 20px;
 		    }
 
 		    .goal-tabs{
-		        flex-direction:column;
-		        align-items:flex-start;
-		        gap:15px;
+		        flex-direction: column;
+		        align-items: stretch;
+		        gap: 12px;
+		        margin-bottom: 15px;
 		    }
 
 		    .tabs-left{
-		        gap:25px;
-		        flex-wrap:wrap;
+		        gap: 8px;
+		        overflow-x: auto;
+		        white-space: nowrap;
+		        padding-bottom: 4px;
 		    }
 
-		    .summary-card{
-		        flex:0 0 100%;
+		    .tab-item {
+		        padding: 8px 12px;
+		        font-size: 13px;
 		    }
 
-		    .create-btn{
-		        width:100%;
-		        justify-content:center;
+		    .goal-action-buttons {
+		        flex-direction: column;
+		        width: 100%;
+		        gap: 8px;
+		    }
+
+		    .goal-action-buttons .create-btn{
+		        width: 100%;
+		        justify-content: center;
+		        padding: 10px;
 		    }
 
 		    .table-wrapper{
-		        overflow-x:auto;
+		        overflow-x: auto;
+		        -webkit-overflow-scrolling: touch;
+		        border: 1px solid #e2e8f0;
+		        border-radius: 8px;
 		    }
 
 		    table{
-		        min-width:850px;
+		        min-width: 700px;
 		    }
 
 		    .doughnut-container{
-		        width:130px;
-		        height:130px;
+		        width: 120px;
+		        height: 120px;
 		    }
+
 		    .goal-modal {
-		        width: 90% !important;
-		        max-width: 400px !important;
+		        width: 92% !important;
+		        max-width: 440px !important;
 		        padding: 15px !important;
+		        max-height: 90vh;
+		        overflow-y: auto;
+		    }
+
+		    .date-row {
+		        flex-direction: column;
+		        gap: 10px;
 		    }
 		}
-
-	        @media(max-width:992px){
-
-	            .charts-section{
-	                grid-template-columns:1fr;
-	            }
-
-	            .summary-wrapper{
-	                flex-direction:column;
-	            }
-
-	            .summary-card{
-	                min-width:100%;
-	            }
-	        }
 			
 	       
 	    </style>
@@ -896,7 +931,7 @@
 
 		    </div>
 
-		    <div style="display: flex; gap: 10px;">
+		    <div class="goal-action-buttons">
 			    <button class="create-btn" id="overallChartUpdateBtn" style="background: #10b981; border-color: #10b981;">
 			        <i class="fa-regular fa-pen-to-square"></i>
 			        Update Progress
@@ -1269,7 +1304,8 @@
 
 					  <option th:each="goal : ${goals}"
 					          th:value="${goal.goalId}"
-					          th:text="${goal.title}">
+					          th:data-progress="${goal.currentProgress != null ? goal.currentProgress : 0}"
+					          th:text="${goal.title + ' (' + (goal.currentProgress != null ? goal.currentProgress : 0) + '% completed)'}">
 					  </option>
 
 		          </select>
@@ -1280,13 +1316,17 @@
 
 		      <div class="form-group">
 
-		          <label>Progress (%)</label>
+		          <label>Progress Increment (%) <span class="required">*</span></label>
 
 				  <input type="number"
+				         id="progressInput"
 				         name="progressPercentage"
-				         min="0"
+				         min="1"
 				         max="100"
+				         placeholder="e.g. 15"
 				         required>
+
+				  <div id="progressHelperText" style="font-size: 12px; color: #4b5563; margin-top: 6px;"></div>
 
 		      </div>
 
@@ -1294,7 +1334,7 @@
 
 		          <label>Remarks</label>
 
-		          <textarea name="remarks"></textarea>
+		          <textarea name="remarks" placeholder="Add progress notes or updates..."></textarea>
 
 		      </div>
 			  <div class="modal-footer">
@@ -1636,35 +1676,147 @@
 
 	});
 
-	// Submit validation for Create Goal form (BUG-018 & BUG-019)
+	// URL Parameter Notification Handling
+	document.addEventListener("DOMContentLoaded", () => {
+		const urlParams = new URLSearchParams(window.location.search);
+		if (urlParams.has('error')) {
+			Swal.fire({
+				icon: 'error',
+				title: 'Validation Error',
+				text: urlParams.get('error'),
+				confirmButtonColor: '#0b2f84'
+			});
+		} else if (urlParams.has('success')) {
+			Swal.fire({
+				icon: 'success',
+				title: 'Success',
+				text: 'Goal progress updated successfully!',
+				confirmButtonColor: '#10b981',
+				timer: 2000
+			});
+		}
+
+		const startInput = document.getElementById("startDate");
+		const endInput = document.getElementById("endDate");
+		if (startInput && endInput) {
+			startInput.addEventListener("change", function() {
+				if (this.value) {
+					endInput.min = this.value;
+					if (endInput.value && new Date(endInput.value) < new Date(this.value)) {
+						endInput.value = this.value;
+					}
+				}
+			});
+		}
+	});
+
+	// Submit validation for Create Goal form (BUG-018, BUG-019, MT023)
 	const createGoalForm = document.getElementById("createGoalForm");
 	if (createGoalForm) {
 		createGoalForm.addEventListener("submit", function(e) {
 			const priority = document.getElementById("priorityInput").value;
 			if (!priority) {
 				e.preventDefault();
-				alert("Please select a Priority (High, Medium, or Low) before creating the goal.");
+				Swal.fire({
+					icon: 'warning',
+					title: 'Priority Required',
+					text: 'Please select a Priority (High, Medium, or Low) before creating the goal.',
+					confirmButtonColor: '#0b2f84'
+				});
 				return false;
 			}
-			const startVal = new Date(document.getElementById("startDate").value);
-			const endVal = new Date(document.getElementById("endDate").value);
-			if (endVal < startVal) {
+			const startVal = document.getElementById("startDate").value;
+			const endVal = document.getElementById("endDate").value;
+			if (!startVal || !endVal) {
 				e.preventDefault();
-				alert("End Date cannot be before Start Date.");
+				Swal.fire({
+					icon: 'warning',
+					title: 'Dates Required',
+					text: 'Please specify both Start Date and End Date.',
+					confirmButtonColor: '#0b2f84'
+				});
+				return false;
+			}
+			if (new Date(endVal) < new Date(startVal)) {
+				e.preventDefault();
+				Swal.fire({
+					icon: 'error',
+					title: 'Invalid Date Range',
+					text: 'End Date cannot be earlier than Start Date.',
+					confirmButtonColor: '#0b2f84'
+				});
 				return false;
 			}
 		});
 	}
 
-	// Submit validation for Update Progress form (BUG-020)
+	function updateProgressHelper() {
+		const goalSelector = document.getElementById("goalSelector");
+		const selectedOpt = goalSelector ? goalSelector.selectedOptions[0] : null;
+		const helper = document.getElementById("progressHelperText");
+		const progressInput = document.getElementById("progressInput");
+		if (!selectedOpt || !selectedOpt.value) {
+			if (helper) helper.textContent = "";
+			if (progressInput) progressInput.max = 100;
+			return;
+		}
+		const currentProgress = parseInt(selectedOpt.getAttribute("data-progress") || "0", 10);
+		const maxIncrement = Math.max(0, 100 - currentProgress);
+		if (progressInput) {
+			progressInput.max = maxIncrement;
+			progressInput.placeholder = `Max allowed: ${maxIncrement}%`;
+		}
+		if (helper) {
+			if (maxIncrement === 0) {
+				helper.innerHTML = `<span style="color:#ef4444; font-weight:600;"><i class="fa-solid fa-circle-check"></i> Goal is already 100% completed!</span>`;
+			} else {
+				helper.innerHTML = `Current: <strong>${currentProgress}%</strong>. Max allowed increment: <span style="color:#10b981; font-weight:600;">+${maxIncrement}%</span>`;
+			}
+		}
+	}
+
+	// Submit validation for Update Progress form (BUG-020, MT025)
 	const updateProgressForm = document.getElementById("updateForm");
 	if (updateProgressForm) {
 		updateProgressForm.addEventListener("submit", function(e) {
-			const progressInput = this.querySelector('input[name="progressPercentage"]');
-			const progressVal = parseInt(progressInput.value, 10);
-			if (isNaN(progressVal) || progressVal < 0 || progressVal > 100) {
+			const goalSelector = document.getElementById("goalSelector");
+			if (!goalSelector || !goalSelector.value) {
 				e.preventDefault();
-				alert("Progress must be between 0% and 100%.");
+				Swal.fire({
+					icon: 'warning',
+					title: 'Select Goal',
+					text: 'Please select a goal to update.',
+					confirmButtonColor: '#0b2f84'
+				});
+				return false;
+			}
+
+			const selectedOpt = goalSelector.selectedOptions[0];
+			const currentProgress = parseInt(selectedOpt.getAttribute("data-progress") || "0", 10);
+			const maxIncrement = Math.max(0, 100 - currentProgress);
+
+			const progressInput = document.getElementById("progressInput") || this.querySelector('input[name="progressPercentage"]');
+			const progressVal = parseInt(progressInput.value, 10);
+
+			if (isNaN(progressVal) || progressVal <= 0) {
+				e.preventDefault();
+				Swal.fire({
+					icon: 'warning',
+					title: 'Invalid Progress',
+					text: 'Please enter a valid progress increment percentage (at least 1%).',
+					confirmButtonColor: '#0b2f84'
+				});
+				return false;
+			}
+
+			if (currentProgress + progressVal > 100) {
+				e.preventDefault();
+				Swal.fire({
+					icon: 'error',
+					title: 'Progress Limit Exceeded',
+					text: `Total goal progress cannot exceed 100%. Current progress is ${currentProgress}%, maximum allowed increment is ${maxIncrement}%.`,
+					confirmButtonColor: '#0b2f84'
+				});
 				return false;
 			}
 		});
@@ -1682,6 +1834,7 @@
 	            document.getElementById("updateForm").action = "/employee/my-goals/" + goalId + "/update";
 	        }
 	    }
+	    updateProgressHelper();
 	}
 
 	const burnBtn = document.getElementById("burnChartUpdateBtn");
@@ -1716,6 +1869,7 @@
 	                    + goalId
 	                    + "/update";
 	        }
+	        updateProgressHelper();
 	    });
 		
 		function toggleMenu(button) {
@@ -1760,15 +1914,9 @@
 		            }
 
 		            // Prepare Data
-		            const labels = data.map(p => p.label); // Ensure these are date strings
+		            const labels = data.map(p => p.label);
 		            const actual = data.map(p => p.actual);
-		            
-		            // Create "Planned" line (Linear progression from 0 to 100)
-		            const totalPoints = labels.length;
-		            const planned = labels.map((_, index) => {
-		                if (totalPoints <= 1) return 100;
-		                return Math.round((index / (totalPoints - 1)) * 100);
-		            });
+		            const planned = data.map(p => p.planned !== undefined && p.planned !== null ? p.planned : 0);
 
 		            singleGoalChart = new Chart(ctx, {
 		                type: 'line',

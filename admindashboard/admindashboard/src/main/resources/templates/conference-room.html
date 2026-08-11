@@ -544,6 +544,22 @@
                                         <span th:text="${#temporals.format(meeting.meetingDate, 'dd MMMM yyyy')}">01 June 2026</span> &bull; 
                                         <span th:text="${#temporals.format(meeting.startTime, 'hh:mm a')}">10:00 AM</span> - <span th:text="${#temporals.format(meeting.endTime, 'hh:mm a')}">11:00 AM</span>
                                     </div>
+                                    <div class="mt-2 text-muted" style="font-size: 0.82rem;" th:if="${meeting.participantType == 'TEAM' and (meeting.specificEmployeeIds == null or meeting.specificEmployeeIds.trim().isEmpty())}">
+                                        <i class="fas fa-users me-1 text-primary"></i><strong>Attendees:</strong> <span class="badge bg-light text-primary border">My Team</span>
+                                    </div>
+                                    <div class="mt-2 text-muted" style="font-size: 0.82rem;" th:if="${meeting.specificEmployeeIds != null and !meeting.specificEmployeeIds.trim().isEmpty()}">
+                                        <i class="fas fa-user-friends me-1 text-primary"></i><strong>Attendees:</strong>
+                                        <div class="d-inline-flex flex-wrap gap-1 mt-1 ms-1">
+                                            <span th:each="empId : ${#strings.arraySplit(meeting.specificEmployeeIds, ',')}"
+                                                  class="badge bg-light text-dark border px-2 py-1" style="font-size: 0.75rem;">
+                                                <span th:text="${empId.trim()}">EMP001</span>
+                                                <i th:if="${meeting.approvedEmployeeIds != null and #strings.contains(meeting.approvedEmployeeIds, empId.trim())}"
+                                                   class="fas fa-check-circle text-success ms-1" title="Approved"></i>
+                                                <i th:unless="${meeting.approvedEmployeeIds != null and #strings.contains(meeting.approvedEmployeeIds, empId.trim())}"
+                                                   class="fas fa-clock text-warning ms-1" title="Pending Approval"></i>
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -819,8 +835,8 @@
                 // 4. Ultimate Success Modal with Auto-Refresh!
                 await Swal.fire({
                     icon: 'success',
-                    title: 'Meeting Confirmed!',
-                    text: 'Details have been successfully sent to all participants.',
+                    title: 'Meeting Booked!',
+                    text: 'Meeting request has been submitted and notifications sent to invited participants.',
                     confirmButtonColor: '#1e3a8a',
                     timer: 2500,
                     timerProgressBar: true,
@@ -976,7 +992,11 @@
     const allEmployees = [];
     /*[# th:each="u : ${allUsers}"]*/
     if ((/*[[${u.username}]]*/ "").toLowerCase() !== currentBookingUser) {
-        allEmployees.push({ id: /*[[${u.username}]]*/ "", name: /*[[${u.fullName}]]*/ "" });
+        allEmployees.push({
+            id: /*[[${u.username}]]*/ "",
+            name: /*[[${u.fullName}]]*/ "",
+            role: /*[[${u.role != null ? u.role.roleName : ''}]]*/ ""
+        });
     }
     /*[/]*/
 
@@ -995,14 +1015,15 @@
         }
         
         const matches = allEmployees.filter(emp => 
-            (emp.name.toLowerCase().includes(val) || emp.id.toLowerCase().includes(val)) && !selectedTags.has(emp.id)
+            (emp.name.toLowerCase().includes(val) || emp.id.toLowerCase().includes(val) || emp.role.toLowerCase().includes(val)) && !selectedTags.has(emp.id)
         );
         
         if (matches.length > 0) {
             matches.forEach(emp => {
                 const div = document.createElement("div");
                 div.className = "autocomplete-item";
-                div.innerHTML = `<i class="fas fa-user-circle fa-lg me-2"></i> <div><strong>${emp.name}</strong> <br><span class="text-muted" style="font-size: 0.75rem;">${emp.id}</span></div>`;
+                const roleBadge = emp.role ? `<span class="badge bg-secondary ms-2" style="font-size:0.65rem;">${emp.role.replace('ROLE_', '')}</span>` : '';
+                div.innerHTML = `<i class="fas fa-user-circle fa-lg me-2"></i> <div><strong>${emp.name}</strong> ${roleBadge} <br><span class="text-muted" style="font-size: 0.75rem;">${emp.id}</span></div>`;
                 div.onclick = function(e) {
                     e.stopPropagation();
                     addTag(emp.id, emp.name);

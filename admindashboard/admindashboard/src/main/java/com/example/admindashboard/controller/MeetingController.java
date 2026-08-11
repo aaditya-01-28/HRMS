@@ -26,9 +26,14 @@ public class MeetingController {
     @Autowired
     private UserRepository userRepository;
 
-    // INJECT THE EMAIL SERVICE
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private com.example.admindashboard.repository.TeamRepository teamRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.TeamMemberRepository teamMemberRepository;
 
     @PostMapping("/book")
     public ResponseEntity<?> bookMeeting(@RequestBody Meeting meeting, Principal principal) {
@@ -63,7 +68,84 @@ public class MeetingController {
                 }
             }
 
-            // 5. Validate specific employee IDs before saving meeting
+            // 5. Resolve Team Members if participantType is TEAM
+            if ("TEAM".equalsIgnoreCase(meeting.getParticipantType())) {
+                java.util.Set<String> teamMemberUsernames = new java.util.LinkedHashSet<>();
+                
+                // a. If organizer is a manager of Teams
+                try {
+                    List<com.example.admindashboard.model.Team> managedTeams = teamRepository.findByManager(organizer);
+                    if (managedTeams != null) {
+                        for (com.example.admindashboard.model.Team t : managedTeams) {
+                            if (t.getMembers() != null) {
+                                for (com.example.admindashboard.model.TeamMember tm : t.getMembers()) {
+                                    if (tm.getUser() != null && !tm.getUser().getUsername().equalsIgnoreCase(username)) {
+                                        teamMemberUsernames.add(tm.getUser().getUsername());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception ignored) {}
+
+                // b. If organizer is a member of Teams
+                try {
+                    List<com.example.admindashboard.model.TeamMember> memberships = teamMemberRepository.findByUser(organizer);
+                    if (memberships != null) {
+                        for (com.example.admindashboard.model.TeamMember tm : memberships) {
+                            if (tm.getTeam() != null) {
+                                if (tm.getTeam().getManager() != null && !tm.getTeam().getManager().getUsername().equalsIgnoreCase(username)) {
+                                    teamMemberUsernames.add(tm.getTeam().getManager().getUsername());
+                                }
+                                if (tm.getTeam().getMembers() != null) {
+                                    for (com.example.admindashboard.model.TeamMember peer : tm.getTeam().getMembers()) {
+                                        if (peer.getUser() != null && !peer.getUser().getUsername().equalsIgnoreCase(username)) {
+                                            teamMemberUsernames.add(peer.getUser().getUsername());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception ignored) {}
+
+                // c. Direct reports & reporting hierarchy
+                List<User> allUsers = userRepository.findAll();
+                String organizerFullName = organizer.getFullName();
+                EmployeeProfile organizerProfile = organizer.getEmployeeProfile();
+                String organizerReportingManager = organizerProfile != null ? organizerProfile.getReportingManager() : null;
+                String bu = organizerProfile != null ? organizerProfile.getBusinessUnit() : null;
+
+                for (User u : allUsers) {
+                    if (u.getUsername().equalsIgnoreCase(username)) continue;
+                    
+                    // Direct reports
+                    if (u.getManager() != null && u.getManager().getId().equals(organizer.getId())) {
+                        teamMemberUsernames.add(u.getUsername());
+                    } else if (u.getEmployeeProfile() != null && organizerFullName != null && organizerFullName.equalsIgnoreCase(u.getEmployeeProfile().getReportingManager())) {
+                        teamMemberUsernames.add(u.getUsername());
+                    }
+                    // Peers with same reporting manager
+                    else if (organizerReportingManager != null && u.getEmployeeProfile() != null && organizerReportingManager.equalsIgnoreCase(u.getEmployeeProfile().getReportingManager())) {
+                        teamMemberUsernames.add(u.getUsername());
+                    }
+                    // Same Business Unit fallback
+                    else if (bu != null && u.getEmployeeProfile() != null && bu.equalsIgnoreCase(u.getEmployeeProfile().getBusinessUnit())) {
+                        teamMemberUsernames.add(u.getUsername());
+                    }
+                }
+
+                // If organizer has a manager, include manager for notification/approval
+                if (organizer.getManager() != null && !organizer.getManager().getUsername().equalsIgnoreCase(username)) {
+                    teamMemberUsernames.add(organizer.getManager().getUsername());
+                }
+
+                if (!teamMemberUsernames.isEmpty()) {
+                    meeting.setSpecificEmployeeIds(String.join(",", teamMemberUsernames));
+                }
+            }
+
+            // 6. Validate specific employee/admin IDs
             if ("SPECIFIC_EMP".equalsIgnoreCase(meeting.getParticipantType()) || "SPECIFIC_ADM".equalsIgnoreCase(meeting.getParticipantType())) {
                 if (meeting.getSpecificEmployeeIds() == null || meeting.getSpecificEmployeeIds().trim().isEmpty()) {
                     return ResponseEntity.badRequest().body("Employee/Admin IDs are required when booking for specific participants.");
@@ -101,7 +183,10 @@ public class MeetingController {
                 }
             }
 
-            // 4. Save to the PostgreSQL database only after validation passes
+            // Status is PENDING approval by default
+            meeting.setStatus("PENDING");
+
+            // 7. Save to the database only after validation passes
             Meeting savedMeeting = meetingRepository.save(meeting);
 
             // --- ASYNC EMAIL TRIGGER START ---
@@ -117,16 +202,11 @@ public class MeetingController {
                 emailData.put("organizerName", organizer.getFullName());
                 emailData.put("meetingLink", savedMeeting.getMeetingLink());
 
-                // Check if specific employees were invited
+                // Send email invite to all invited IDs
                 if (savedMeeting.getSpecificEmployeeIds() != null && !savedMeeting.getSpecificEmployeeIds().trim().isEmpty()) {
-
-                    // Split the comma-separated string into an array (e.g., ["EMP001", "EMP002"])
                     String[] invitedIds = savedMeeting.getSpecificEmployeeIds().split(",");
-
-                    // Loop through each ID, find them in the DB, and send the invite
                     for (String empId : invitedIds) {
                         userRepository.findByUsername(empId.trim()).ifPresent(invitee -> {
-                            // Only send if they have a valid email setup
                             if (invitee.getEmail() != null && !invitee.getEmail().isEmpty()) {
                                 emailService.sendMeetingInvite(
                                         invitee.getEmail(),
@@ -136,27 +216,6 @@ public class MeetingController {
                                 );
                             }
                         });
-                    }
-                } else if ("TEAM".equalsIgnoreCase(savedMeeting.getParticipantType())) {
-                    EmployeeProfile organizerProfile = organizer.getEmployeeProfile();
-                    if (organizerProfile != null && organizerProfile.getBusinessUnit() != null) {
-                        String bu = organizerProfile.getBusinessUnit();
-                        List<User> allUsers = userRepository.findAll();
-                        for (User invitee : allUsers) {
-                            if (invitee.getUsername().equalsIgnoreCase(organizer.getUsername())) {
-                                continue;
-                            }
-                            if (invitee.getEmployeeProfile() != null && bu.equalsIgnoreCase(invitee.getEmployeeProfile().getBusinessUnit())) {
-                                if (invitee.getEmail() != null && !invitee.getEmail().isEmpty()) {
-                                    emailService.sendMeetingInvite(
-                                            invitee.getEmail(),
-                                            invitee.getFullName(),
-                                            savedMeeting.getMeetingTitle(),
-                                            emailData
-                                    );
-                                }
-                            }
-                        }
                     }
                 }
 

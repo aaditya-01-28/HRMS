@@ -37,21 +37,25 @@ public class GoalUpdateService {
                         : goal.getCurrentProgress();
 
         int requestedIncrement =
-                goalUpdate.getProgressPercentage();
+                goalUpdate.getProgressPercentage() == null
+                        ? 0
+                        : goalUpdate.getProgressPercentage();
 
-        int appliedIncrement =
-                Math.min(requestedIncrement,
-                         100 - current);
+        if (requestedIncrement <= 0 || requestedIncrement > 100) {
+            throw new IllegalArgumentException("Progress value must be between 1% and 100%.");
+        }
+
+        if (current + requestedIncrement > 100) {
+            int maxAllowed = 100 - current;
+            throw new IllegalArgumentException("Total goal progress cannot exceed 100%. Current progress is " + current + "%, maximum allowed increment is " + maxAllowed + "%.");
+        }
 
         int updatedProgress =
-                current + appliedIncrement;
+                current + requestedIncrement;
 
         goal.setCurrentProgress(updatedProgress);
 
-        /*
-         * Save only what was actually applied
-         */
-        goalUpdate.setProgressPercentage(appliedIncrement);
+        goalUpdate.setProgressPercentage(requestedIncrement);
 
         if (updatedProgress >= 100) {
 

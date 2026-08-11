@@ -24,8 +24,13 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         System.out.println("Attempting login for user: " + username);
 
-        User user = userRepository.findByUsername(username.toUpperCase())
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+        // Enforce case-sensitivity: entered username must match registered format exactly (e.g. EMP123 vs emp123)
+        if (!user.getUsername().equals(username)) {
+            throw new UsernameNotFoundException("Invalid Employee ID format or case mismatch: " + username);
+        }
 
         Set<GrantedAuthority> authorities = new HashSet<>();
 
@@ -50,7 +55,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         System.out.println("User FOUND! Loaded Authorities: " + authorities);
 
-        boolean enabled = user.getStatus() == null || (!user.getStatus().equalsIgnoreCase("EXITED") && !user.getStatus().equalsIgnoreCase("INACTIVE"));
+        boolean enabled = true;
+        if (user.getStatus() != null) {
+            String s = user.getStatus().trim();
+            if (s.equalsIgnoreCase("EXITED") || s.equalsIgnoreCase("INACTIVE") 
+                    || s.equalsIgnoreCase("OFFBOARDED") || s.equalsIgnoreCase("TERMINATED") 
+                    || s.equalsIgnoreCase("RESIGNED_EXITED") || s.equalsIgnoreCase("SUSPENDED")) {
+                enabled = false;
+            }
+        }
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),

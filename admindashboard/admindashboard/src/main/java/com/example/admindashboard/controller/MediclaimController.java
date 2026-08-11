@@ -25,6 +25,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import com.example.admindashboard.model.Hospital;
+import com.example.admindashboard.model.InsurancePolicy;
+import com.example.admindashboard.model.Mediclaim;
+import com.example.admindashboard.model.MediclaimDependent;
+import com.example.admindashboard.model.User;
+import com.example.admindashboard.repository.EmployeeProfileRepository;
+import com.example.admindashboard.repository.HospitalRepository;
+import com.example.admindashboard.repository.InsurancePolicyRepository;
+import com.example.admindashboard.repository.MediclaimDependentRepository;
+import com.example.admindashboard.repository.MediclaimRepository;
+import com.example.admindashboard.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.Principal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 @Controller
 @RequestMapping("/employee/mediclaim")
 public class MediclaimController {
@@ -45,29 +76,36 @@ public class MediclaimController {
     private MediclaimRepository mediclaimRepository;
 
     @Autowired
-    private com.example.admindashboard.repository.HospitalRepository hospitalRepository;
+    private HospitalRepository hospitalRepository;
+
+    private InsurancePolicy getOrCreatePolicy(User user) {
+        return policyRepository.findByUser(user).orElseGet(() -> {
+            InsurancePolicy p = new InsurancePolicy();
+            p.setUser(user);
+            p.setPolicyName("WhiteCircle Health Shield - Gold Plan");
+            p.setPolicyNumber("WCG-2026-MED-" + user.getId());
+            p.setProviderName("Star Health & Allied Insurance");
+            p.setTotalCoverage(500000.0);
+            p.setAmountUsed(0.0);
+            p.setValidFrom(LocalDate.of(2026, 1, 1));
+            p.setValidUntil(LocalDate.of(2027, 12, 31));
+            p.setStatus("Active");
+            return policyRepository.save(p);
+        });
+    }
 
     @GetMapping("/auth")
     public String mediclaimAuth(Model model, Principal principal) {
-
         if (principal != null) {
-
             String loginId = principal.getName();
-
-            User currentUser = userRepository
-                    .findByUsername(loginId)
-                    .orElse(new User());
-
+            User currentUser = userRepository.findByUsername(loginId).orElse(new User());
             model.addAttribute("user", currentUser);
-
         } else {
-
             model.addAttribute("user", new User());
         }
-
         return "mediclaim-login";
     }
-    
+
     @PostMapping("/login")
     public String processMediclaimAuthentication(
             @RequestParam("username") String typedUsername,
@@ -76,119 +114,137 @@ public class MediclaimController {
             Principal principal) {
 
         if (principal != null) {
-
             String loginId = principal.getName();
-
-            User currentUser = userRepository
-                    .findByUsername(loginId)
-                    .orElse(new User());
-
+            User currentUser = userRepository.findByUsername(loginId).orElse(new User());
             String dbPassword = currentUser.getPassword();
+            String cleanDbPassword = dbPassword != null ? dbPassword.replace("{noop}", "") : "";
 
-            String cleanDbPassword =
-                    dbPassword != null
-                            ? dbPassword.replace("{noop}", "")
-                            : "";
-
-            if (!typedUsername.equalsIgnoreCase(loginId)
-                    || !typedPassword.equals(cleanDbPassword)) {
-
+            if (!typedUsername.equalsIgnoreCase(loginId) || !typedPassword.equals(cleanDbPassword)) {
                 model.addAttribute("user", currentUser);
                 model.addAttribute("authError", "Invalid credentials");
-
                 return "mediclaim-login";
             }
-
             return "redirect:/employee/mediclaim/portal";
         }
-
         return "redirect:/login";
     }
+
     @GetMapping("/portal")
     public String mediclaimPortal(Principal principal, Model model) {
-
         if (principal == null) {
             return "redirect:/employee/mediclaim/auth";
         }
 
-        Optional<User> userOpt =
-                userRepository.findByUsername(principal.getName());
-
+        Optional<User> userOpt = userRepository.findByUsername(principal.getName());
         if (userOpt.isPresent()) {
-
             User user = userOpt.get();
-
             model.addAttribute("user", user);
 
-            /* ADD THESE TWO BLOCKS HERE */
-
             profileRepository.findByUser_Username(principal.getName())
-                    .ifPresent(profile ->
-                            model.addAttribute("profile", profile));
+                    .ifPresent(profile -> model.addAttribute("profile", profile));
 
-            policyRepository.findByUser(user)
-                    .ifPresent(policy ->
-                            model.addAttribute("policy", policy));
+            InsurancePolicy policy = getOrCreatePolicy(user);
+            if (policy.getPolicyName() == null || policy.getPolicyName().trim().isEmpty()) {
+                policy.setPolicyName("WhiteCircle Health Shield - Gold Plan");
+                policyRepository.save(policy);
+            }
+            model.addAttribute("policy", policy);
 
-            /* EXISTING LOGIC */
+            List<MediclaimDependent> dependents = dependentRepository.findByUser(user);
+            model.addAttribute("dependents", dependents);
 
-            List<Mediclaim> claims =
-                    mediclaimRepository.findByUserOrderBySubmissionDateDesc(user);
+            double totalDepAllocated = dependents.stream()
+                    .mapToDouble(d -> (d.getCoveragePercentage() != null ? (policy.getTotalCoverage() * d.getCoveragePercentage()) / 100.0 : 0.0))
+                    .sum();
+            int totalDepPercent = dependents.stream()
+                    .mapToInt(d -> d.getCoveragePercentage() != null ? d.getCoveragePercentage() : 0)
+                    .sum();
+            double remainingCoverage = Math.max(0.0, policy.getTotalCoverage() - (policy.getAmountUsed() != null ? policy.getAmountUsed() : 0.0));
 
+            model.addAttribute("totalDepAllocated", totalDepAllocated);
+            model.addAttribute("totalDepPercent", totalDepPercent);
+            model.addAttribute("remainingCoverage", remainingCoverage);
+
+            List<Mediclaim> claims = mediclaimRepository.findByUserOrderBySubmissionDateDesc(user);
             model.addAttribute("claims", claims);
 
-            long pendingCount = claims.stream()
-                    .filter(c -> "Pending".equals(c.getStatus()))
-                    .count();
-
+            long pendingCount = claims.stream().filter(c -> "Pending".equalsIgnoreCase(c.getStatus())).count();
             model.addAttribute("pendingCount", pendingCount);
         }
 
         return "mediclaim-dashboard";
     }
 
-        
-
     @GetMapping("/policy")
     public String mediclaimPolicy(Principal principal, Model model) {
-
         if (principal == null) {
             return "redirect:/employee/mediclaim/auth";
         }
 
-        Optional<User> userOpt =
-                userRepository.findByUsername(principal.getName());
-
+        Optional<User> userOpt = userRepository.findByUsername(principal.getName());
         if (userOpt.isPresent()) {
-
             User user = userOpt.get();
+            model.addAttribute("user", user);
 
-            policyRepository.findByUser(user)
-                    .ifPresent(policy ->
-                            model.addAttribute("policy", policy));
+            profileRepository.findByUser_Username(principal.getName())
+                    .ifPresent(profile -> model.addAttribute("profile", profile));
 
-            List<MediclaimDependent> dependents =
-                    dependentRepository.findByUser(user);
+            InsurancePolicy policy = getOrCreatePolicy(user);
+            if (policy.getPolicyName() == null || policy.getPolicyName().trim().isEmpty()) {
+                policy.setPolicyName("WhiteCircle Health Shield - Gold Plan");
+                policyRepository.save(policy);
+            }
+            model.addAttribute("policy", policy);
 
+            List<MediclaimDependent> dependents = dependentRepository.findByUser(user);
             model.addAttribute("dependents", dependents);
-            
-            List<Mediclaim> claims =
-                    mediclaimRepository
-                            .findByUserOrderBySubmissionDateDesc(user);
 
+            double totalDepAllocated = dependents.stream()
+                    .mapToDouble(d -> (d.getCoveragePercentage() != null ? (policy.getTotalCoverage() * d.getCoveragePercentage()) / 100.0 : 0.0))
+                    .sum();
+            int totalDepPercent = dependents.stream()
+                    .mapToInt(d -> d.getCoveragePercentage() != null ? d.getCoveragePercentage() : 0)
+                    .sum();
+            double remainingCoverage = Math.max(0.0, policy.getTotalCoverage() - (policy.getAmountUsed() != null ? policy.getAmountUsed() : 0.0));
+
+            model.addAttribute("totalDepAllocated", totalDepAllocated);
+            model.addAttribute("totalDepPercent", totalDepPercent);
+            model.addAttribute("remainingCoverage", remainingCoverage);
+
+            List<Mediclaim> claims = mediclaimRepository.findByUserOrderBySubmissionDateDesc(user);
             model.addAttribute("claims", claims);
-            
-            List<Hospital> hospitals =
-                    hospitalRepository.findAll();
 
+            List<Hospital> hospitals = hospitalRepository.findAll();
+            model.addAttribute("hospitals", hospitals);
         }
 
         return "mediclaim-policy";
     }
 
-    
+    @GetMapping("/claim")
+    public String showClaimSubmissionForm(Principal principal, Model model) {
+        if (principal == null) return "redirect:/employee/mediclaim/auth";
 
-    // 4. UPDATE THIS GET MAPPING FOR TRACKING
+        Optional<User> userOpt = userRepository.findByUsername(principal.getName());
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            model.addAttribute("user", user);
+
+            InsurancePolicy policy = getOrCreatePolicy(user);
+            model.addAttribute("policy", policy);
+
+            List<MediclaimDependent> dependents = dependentRepository.findByUser(user);
+            model.addAttribute("dependents", dependents);
+
+            List<Hospital> hospitals = hospitalRepository.findAll();
+            model.addAttribute("hospitals", hospitals);
+
+            List<Mediclaim> claims = mediclaimRepository.findByUserOrderBySubmissionDateDesc(user);
+            model.addAttribute("claims", claims);
+        }
+        return "mediclaim-claim";
+    }
+
     @GetMapping("/track/list")
     public String listAllClaims(Principal principal, Model model) {
         if (principal == null) return "redirect:/employee/mediclaim/auth";
@@ -196,14 +252,13 @@ public class MediclaimController {
         Optional<User> userOpt = userRepository.findByUsername(principal.getName());
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            // Fetch all claims for this user to display in the grid
+            model.addAttribute("user", user);
             List<Mediclaim> allClaims = mediclaimRepository.findByUserOrderBySubmissionDateDesc(user);
             model.addAttribute("allClaims", allClaims);
         }
         return "mediclaim-track";
     }
 
-    // 4.1. THIS HANDLES THE REDIRECT FROM THE "VIEW DETAILS" BUTTON
     @GetMapping("/track/{claimId}")
     public String trackSpecificClaim(@PathVariable Long claimId, Principal principal, Model model) {
         if (principal == null) return "redirect:/employee/mediclaim/auth";
@@ -211,12 +266,10 @@ public class MediclaimController {
         Optional<User> userOpt = userRepository.findByUsername(principal.getName());
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-
-            // Add all claims so the list remains visible in the background
+            model.addAttribute("user", user);
             List<Mediclaim> allClaims = mediclaimRepository.findByUserOrderBySubmissionDateDesc(user);
             model.addAttribute("allClaims", allClaims);
 
-            // Set the specific claim to be "active" (which triggers the expanded view)
             Optional<Mediclaim> activeClaimOpt = mediclaimRepository.findById(claimId);
             activeClaimOpt.ifPresent(claim -> model.addAttribute("activeClaim", claim));
         }
@@ -224,9 +277,10 @@ public class MediclaimController {
     }
 
     @GetMapping("/notifications")
-    public String mediclaimNotifications() { return "mediclaim-notifications"; }
+    public String mediclaimNotifications() {
+        return "mediclaim-notifications";
+    }
 
-    // UPDATED: Profile mapping to fetch dynamic data
     @GetMapping("/profile")
     public String mediclaimProfile(Principal principal, Model model) {
         if (principal == null) {
@@ -240,17 +294,13 @@ public class MediclaimController {
             User user = userOpt.get();
             model.addAttribute("user", user);
 
-            // Fetch Employee Profile using the smart repository method
             profileRepository.findByUser_Username(username).ifPresent(profile -> {
                 model.addAttribute("profile", profile);
             });
 
-            // Fetch Insurance Policy
-            policyRepository.findByUser(user).ifPresent(policy -> {
-                model.addAttribute("policy", policy);
-            });
+            InsurancePolicy policy = getOrCreatePolicy(user);
+            model.addAttribute("policy", policy);
 
-            // Fetch Dependents
             List<MediclaimDependent> dependents = dependentRepository.findByUser(user);
             model.addAttribute("dependents", dependents);
         }
@@ -264,8 +314,6 @@ public class MediclaimController {
         return "mediclaim-hospitals";
     }
 
-    
-    // 1. UPDATE THIS GET MAPPING
     @GetMapping("/dependents")
     public String mediclaimDependents(Principal principal, Model model) {
         if (principal == null) {
@@ -276,56 +324,121 @@ public class MediclaimController {
         Optional<User> userOpt = userRepository.findByUsername(username);
 
         if (userOpt.isPresent()) {
-            // Fetch real dependents from the database and send to the UI
-            List<MediclaimDependent> dependents = dependentRepository.findByUser(userOpt.get());
+            User user = userOpt.get();
+            model.addAttribute("user", user);
+
+            InsurancePolicy policy = getOrCreatePolicy(user);
+            model.addAttribute("policy", policy);
+
+            List<MediclaimDependent> dependents = dependentRepository.findByUser(user);
             model.addAttribute("dependents", dependents);
+
+            int totalDepPercent = dependents.stream()
+                    .mapToInt(d -> d.getCoveragePercentage() != null ? d.getCoveragePercentage() : 0)
+                    .sum();
+            int availablePercent = Math.max(0, 100 - totalDepPercent);
+            model.addAttribute("totalDepPercent", totalDepPercent);
+            model.addAttribute("availablePercent", availablePercent);
+
+            double totalDepAllocated = dependents.stream()
+                    .mapToDouble(d -> (d.getCoveragePercentage() != null ? (policy.getTotalCoverage() * d.getCoveragePercentage()) / 100.0 : 0.0))
+                    .sum();
+            model.addAttribute("totalDepAllocated", totalDepAllocated);
         }
 
         return "mediclaim-dependents";
     }
 
-    // 2. ADD THIS NEW POST MAPPING
     @PostMapping("/dependents/add")
     public String addDependent(
             @RequestParam String fullName,
             @RequestParam String relationship,
             @RequestParam String dob,
             @RequestParam(required = false) String gender,
-            @RequestParam Integer coveragePercentage,
+            @RequestParam(required = false) Integer coveragePercentage,
             @RequestParam(required = false) Boolean isCovered,
-            @RequestParam(required = false) MultipartFile document,
+            @RequestParam(value = "document", required = false) MultipartFile document,
+            RedirectAttributes redirectAttributes,
             Principal principal) {
 
         if (principal == null) return "redirect:/employee/mediclaim/auth";
 
         Optional<User> userOpt = userRepository.findByUsername(principal.getName());
+        if (userOpt.isEmpty()) return "redirect:/employee/mediclaim/auth";
 
-        if (userOpt.isPresent()) {
-            MediclaimDependent dependent = new MediclaimDependent();
-            dependent.setUser(userOpt.get());
-            dependent.setFullName(fullName);
-            dependent.setRelationship(relationship);
-            dependent.setDob(java.time.LocalDate.parse(dob));
+        User user = userOpt.get();
+        InsurancePolicy policy = getOrCreatePolicy(user);
 
-            dependent.setGender(gender);
-            dependent.setCoveragePercentage(coveragePercentage);
-
-            dependent.setCovered(isCovered != null);
-
-            dependentRepository.save(dependent);
+        // MT019: Mandatory document validation
+        if (document == null || document.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Proof of Relationship / Identity document upload is mandatory.");
+            return "redirect:/employee/mediclaim/dependents";
         }
 
-        // Refresh the page to show the newly added dependent
+        // MT020: Valid coverage percentage (1-100)
+        if (coveragePercentage == null || coveragePercentage < 1 || coveragePercentage > 100) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Coverage percentage must be between 1% and 100%.");
+            return "redirect:/employee/mediclaim/dependents";
+        }
+
+        // MT022: Total coverage allocation cannot exceed 100%
+        List<MediclaimDependent> existingDeps = dependentRepository.findByUser(user);
+        int existingCoverageSum = existingDeps.stream()
+                .mapToInt(d -> d.getCoveragePercentage() != null ? d.getCoveragePercentage() : 0)
+                .sum();
+
+        if (existingCoverageSum + coveragePercentage > 100) {
+            int availablePercent = Math.max(0, 100 - existingCoverageSum);
+            redirectAttributes.addFlashAttribute("errorMessage", "Cannot add dependent: Total allocated coverage exceeds 100%. Available coverage balance is " + availablePercent + "%.");
+            return "redirect:/employee/mediclaim/dependents";
+        }
+
+        try {
+            String savedFileName = null;
+            if (!document.isEmpty()) {
+                String originalFilename = document.getOriginalFilename();
+                String cleanName = originalFilename != null ? originalFilename.replaceAll("[^a-zA-Z0-9.-]", "_") : "doc.pdf";
+                savedFileName = UUID.randomUUID().toString() + "_" + cleanName;
+                Path uploadDir = Paths.get("uploads/mediclaim/");
+                if (!Files.exists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                }
+                Files.copy(document.getInputStream(), uploadDir.resolve(savedFileName));
+            }
+
+            MediclaimDependent dependent = new MediclaimDependent();
+            dependent.setUser(user);
+            dependent.setFullName(fullName);
+            dependent.setRelationship(relationship);
+            dependent.setDob(LocalDate.parse(dob));
+            dependent.setGender(gender != null && !gender.isEmpty() ? gender : "Other");
+            dependent.setCoveragePercentage(coveragePercentage);
+            dependent.setCovered(isCovered != null ? isCovered : true);
+            dependent.setDocumentFilename(savedFileName);
+
+            // MT021: Calculate allocated sum from total policy coverage
+            double allocatedAmount = (policy.getTotalCoverage() * coveragePercentage) / 100.0;
+            dependent.setAllocatedAmount(allocatedAmount);
+
+            dependentRepository.save(dependent);
+            redirectAttributes.addFlashAttribute("successMessage", "Dependent " + fullName + " added successfully with " + coveragePercentage + "% coverage (₹" + String.format("%,.0f", allocatedAmount) + ").");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to save dependent: " + e.getMessage());
+        }
+
         return "redirect:/employee/mediclaim/dependents";
     }
-    
-    @GetMapping("/helpdesk")
-    public String mediclaimHelpdesk() {
 
+    @GetMapping("/helpdesk")
+    public String mediclaimHelpdesk(Model model, Principal principal) {
+        if (principal != null) {
+            userRepository.findByUsername(principal.getName()).ifPresent(user -> model.addAttribute("user", user));
+        }
         return "mediclaim-helpdesk";
     }
 
-    // 3. ADD THIS POST MAPPING FOR CLAIM SUBMISSION
     @PostMapping("/claim/submit")
     @ResponseBody
     public ResponseEntity<String> submitClaim(
@@ -354,26 +467,19 @@ public class MediclaimController {
             claim.setClaimType(claimType);
             claim.setDiagnosis(diagnosis);
 
-            // Convert Strings to LocalDate
-            claim.setDateOfAdmission(java.time.LocalDate.parse(dateOfAdmission));
-            claim.setDateOfDischarge(java.time.LocalDate.parse(dateOfDischarge));
+            claim.setDateOfAdmission(LocalDate.parse(dateOfAdmission));
+            claim.setDateOfDischarge(LocalDate.parse(dateOfDischarge));
 
             claim.setTotalBill(totalBill);
             claim.setClaimAmount(claimAmount);
             claim.setRemarks(remarks);
 
-            // Handle the file upload (Saves to a local 'uploads' directory)
             if (file != null && !file.isEmpty()) {
-                // Generate a unique filename to prevent overwriting
-                String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-                Path uploadPath = Paths.get("uploads/");
-
-                // Create directory if it doesn't exist
+                String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename().replaceAll("[^a-zA-Z0-9.-]", "_");
+                Path uploadPath = Paths.get("uploads/mediclaim/");
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
                 }
-
-                // Save the file and attach the filename to the database record
                 Files.copy(file.getInputStream(), uploadPath.resolve(fileName));
                 claim.setDocumentFilename(fileName);
             }
@@ -387,5 +493,22 @@ public class MediclaimController {
         }
     }
 
-
+    @GetMapping("/document/download/{filename:.+}")
+    public ResponseEntity<Resource> downloadDocument(@PathVariable String filename) {
+        try {
+            Path filePath = Paths.get("uploads/mediclaim/").resolve(filename).normalize();
+            if (!Files.exists(filePath)) {
+                filePath = Paths.get("uploads/").resolve(filename).normalize();
+            }
+            if (Files.exists(filePath)) {
+                Resource resource = new UrlResource(filePath.toUri());
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.notFound().build();
+    }
 }

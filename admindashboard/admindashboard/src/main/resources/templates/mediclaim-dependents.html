@@ -1,289 +1,373 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Dependents | WhiteCircle Health</title>
+    <title>Manage Dependents | WhiteCircle Mediclaim</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
 
     <style>
         :root {
-            --med-primary: #1E88E5;
-            --med-primary-dark: #1565C0;
-            --med-green: #43A047;
-            --bg-color: #f4f7fb;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.6);
+            --med-primary: #1e3a8a;
+            --med-primary-light: #2563eb;
+            --med-success: #16a34a;
+            --med-warning: #f59e0b;
+            --med-danger: #dc2626;
+            --med-bg: #f8fafc;
+            --med-card-bg: #ffffff;
+            --med-border: #e2e8f0;
+            --med-text-main: #0f172a;
+            --med-text-muted: #64748b;
         }
 
-		*{
-		    margin:0;
-		    padding:0;
-		    box-sizing:border-box;
-		}
-
-
-		body{
-		    background:#F3F4F6;
-		    font-size:14px;
-		    color:#111827;
-			font-family:Arial,sans-serif;
-		}
-
-		.dashboard-wrapper{
-		    display:flex;
-		    min-height:100vh;
-		}
-
-		/* SIDEBAR */
-
-		.sidebar{
-		    width:250px;
-		    background:#001A57;
-		    padding:24px 10px;
-		    flex-shrink:0;
-		}
-
-		.sidebar-logo{
-		    text-align:center;
-		    margin-bottom:40px;
-		}
-
-		.sidebar-logo img{
-		    width:50px;
-		    height:50px;
-		    object-fit:contain;
-		}
-
-		.sidebar-menu{
-		    display:flex;
-		    flex-direction:column;
-		    gap:12px;
-		}
-
-		.menu-item{
-		    display:flex;
-		    align-items:center;
-		    gap:8px;
-		    color:white;
-		    text-decoration:none;
-		    padding:10px 12px;
-		    border-radius:10px;
-		    font-size:14px;
-		}
-
-		.menu-item:hover,
-		.menu-item.active{
-		    background:#2E63FF;
-		}
-
-		/* MAIN */
-
-		.main-section{
-		    flex:1;
-		    display:flex;
-		    flex-direction:column;
-		}
-
-
-
-		.header-left{
-		    display:flex;
-		    align-items:center;
-		    gap:12px;
-		}
-
-		.header-icon{
-		    width:42px;
-		    height:42px;
-		    object-fit:contain;
-		}
-
-		.header-left h1{
-		    font-size:20px;
-		    font-weight:700;
-		    color:#0B2E7A;
-		    margin:0;
-		}
-
-		.back-home-btn{
-		    background:#2E63FF;
-		    color:white;
-
-		    text-decoration:none;
-
-		    padding:12px 35px;
-
-		    border-radius:8px;
-
-		    font-size:14px;
-		    font-weight:700;
-		}
-
-		.back-home-btn:hover{
-		    color:white;
-		}
-
-		/* CONTENT */
-
-		.dashboard-content{
-		    padding:35px 40px;
-		}
-
-		/* PAGE TITLE */
-
-		.page-title{
-		    font-size:20px;
-		    font-weight:700;
-		    margin-bottom:25px;
-		}
-
-		/* FORM */
-
-		.form-group{
-		    margin-bottom:30px;
-		    width:350px;
-		}
-
-		.form-group label{
-		    display:block;
-		    margin-bottom:10px;
-		    font-size:14px;
-		    font-weight:700;
-		    color:#111827;
-		}
-
-		.custom-input{
-		    width:100%;
-		    height:44px;
-
-		    border:1px solid #333;
-		    border-radius:6px;
-
-		    background:white;
-
-		    padding:0 12px;
-
-		    font-size:14px;
-		}
-
-		.custom-input:focus{
-		    outline:none;
-		}
-
-		/* UPLOAD BOX */
-
-		.upload-box{
-		    width:350px;
-		    height:150px;
-
-		    border:1px dashed #444;
-
-		    background:white;
-
-		    display:flex;
-		    flex-direction:column;
-		    justify-content:center;
-		    align-items:center;
-
-		    position:relative;
-		}
-
-		.upload-box i{
-		    font-size:42px;
-		    color:#777;
-		    margin-bottom:10px;
-		}
-
-		.upload-box p{
-		    margin:0;
-		    font-size:14px;
-		    font-weight:700;
-		}
-
-		.upload-box span{
-		    color:#2E63FF;
-		    font-weight:700;
-		}
-
-		.upload-box input{
-		    position:absolute;
-		    inset:0;
-		    opacity:0;
-		    cursor:pointer;
-		}
-
-		/* BUTTON */
-
-		.submit-btn{
-		    width:150px;
-		    height:42px;
-
-		    border:none;
-		    border-radius:8px;
-
-		    background:#2E63FF;
-		    color:white;
-
-		    font-size:18px;
-		    font-weight:700;
-
-		    cursor:pointer;
-		}
-
-		.submit-btn:hover{
-		    opacity:.95;
-		}
-
-		/* RESPONSIVE */
-
-		@media(max-width:992px){
-
-		    .dashboard-content{
-		        padding:25px;
-		    }
-
-		    .form-group,
-		    .upload-box{
-		        width:100%;
-		        max-width:450px;
-		    }
-		}
-
-		@media(max-width:768px){
-
-		    .dashboard-wrapper{
-		        flex-direction:column;
-		    }
-
-		    .sidebar{
-		        width:100%;
-		    }
-
-
-
-		    .back-home-btn{
-		        width:100%;
-		        text-align:center;
-		    }
-
-		    .dashboard-content{
-		        padding:20px;
-		    }
-
-		    .form-group{
-		        width:100%;
-		    }
-
-		    .upload-box{
-		        width:100%;
-		    }
-		}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif !important;
+            border-radius: 0 !important;
+        }
+
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, table, td, th {
+            font-family: Arial, sans-serif !important;
+        }
+
+        .card, .form-card, .list-card, .allocation-card, .upload-dropzone-box,
+        .btn, .btn-sm, .btn-submit-dep, .back-home-btn,
+        .badge, .header-icon-badge, .sidebar-logo img, .menu-item,
+        .table, .form-control, .form-select, .form-control-custom, .form-select-custom, .modal-content, .alert {
+            border-radius: 0 !important;
+        }
+
+        body {
+            background: var(--med-bg);
+            color: var(--med-text-main);
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            background: #001A57;
+            color: white;
+            padding: 24px 12px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .sidebar-logo img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu-item {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            padding: 11px 14px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: #2E63FF;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(46, 99, 255, 0.25);
+        }
+
+        /* MAIN SECTION */
+        .main-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* TOP HEADER */
+        .top-header {
+            height: 75px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--med-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .header-left h1 {
+            font-size: 1.25rem;
+            color: #0B2E7A;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .back-home-btn {
+            background: #2E63FF;
+            color: white;
+            text-decoration: none;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-home-btn:hover {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        /* CONTENT */
+        .dashboard-content {
+            padding: 28px 32px;
+            flex: 1;
+        }
+
+        .dependent-layout-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 28px;
+        }
+
+        .form-card, .list-card {
+            background: var(--med-card-bg);
+            border: 1px solid var(--med-border);
+            border-radius: 14px;
+            padding: 26px 28px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .card-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--med-border);
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0B2E7A;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-label-custom {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--med-text-muted);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-control-custom, .form-select-custom {
+            width: 100%;
+            height: 44px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            padding: 0 14px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: #f8fafc;
+            color: var(--med-text-main);
+            transition: border-color 0.2s ease;
+        }
+
+        .form-control-custom:focus, .form-select-custom:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* UPLOAD ZONE (MT019) */
+        .upload-dropzone-box {
+            border: 2px dashed #94a3b8;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 22px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .upload-dropzone-box:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .upload-dropzone-box i {
+            font-size: 32px;
+            color: #2563eb;
+            margin-bottom: 8px;
+        }
+
+        .upload-dropzone-box input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .btn-submit-dep {
+            background: #2E63FF;
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-submit-dep:hover {
+            background: #1d4ed8;
+            box-shadow: 0 4px 12px rgba(46, 99, 255, 0.25);
+        }
+
+        /* DEPENDENTS TABLE */
+        .dep-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dep-table th {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--med-text-muted);
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--med-border);
+            text-align: left;
+        }
+
+        .dep-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.88rem;
+        }
+
+        /* ALLOCATION SUMMARY (MT021, MT022) */
+        .allocation-card {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .allocation-card.warning {
+            background: #fffbeb;
+            border-color: #fde68a;
+        }
+
+        /* RESPONSIVENESS (MT029) */
+        @media (max-width: 991px) {
+            .dashboard-wrapper {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                padding: 16px 20px;
+            }
+            .sidebar-logo {
+                margin-bottom: 14px;
+            }
+            .sidebar-menu {
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 8px;
+                padding-bottom: 4px;
+            }
+            .menu-item {
+                white-space: nowrap;
+                padding: 8px 12px;
+                font-size: 12.5px;
+            }
+            .dependent-layout-grid {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-content {
+                padding: 20px 16px;
+            }
+            .top-header {
+                padding: 0 16px;
+                height: auto;
+                min-height: 65px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -292,269 +376,267 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar">
+        <div>
+            <div class="sidebar-logo">
+                <img th:src="@{/images/wcg-logo.jpg}" alt="WhiteCircle" onerror="this.src='https://ui-avatars.com/api/?name=WCG&background=2563eb&color=fff'">
+            </div>
 
-        <div class="sidebar-logo">
-            <img th:src="@{/images/wcg-logo.jpg}" alt="WhiteCircle">
+            <div class="sidebar-menu">
+                <a href="/employee/mediclaim/portal" class="menu-item">
+                    <i class="fa-solid fa-table-columns"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="/employee/mediclaim/policy" class="menu-item">
+                    <i class="fa-solid fa-file-shield"></i>
+                    <span>Coverage</span>
+                </a>
+
+                <a href="/employee/mediclaim/claim" class="menu-item">
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                    <span>Submit Claim</span>
+                </a>
+
+                <a href="/employee/mediclaim/track/list" class="menu-item">
+                    <i class="fa-solid fa-file-medical"></i>
+                    <span>Claims Track</span>
+                </a>
+
+                <a href="/employee/mediclaim/dependents" class="menu-item active">
+                    <i class="fa-solid fa-user-group"></i>
+                    <span>Dependents</span>
+                </a>
+
+                <a href="/employee/mediclaim/hospitals" class="menu-item">
+                    <i class="fa-solid fa-hospital"></i>
+                    <span>Hospitals</span>
+                </a>
+
+                <a href="/employee/mediclaim/helpdesk" class="menu-item">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>Help Center</span>
+                </a>
+            </div>
         </div>
-
-        <div class="sidebar-menu">
-
-            <a href="/employee/mediclaim/portal"
-               class="menu-item">
-                <i class="fa-solid fa-table-columns"></i>
-                Dashboard
-            </a>
-
-            <a href="/employee/mediclaim/policy"
-               class="menu-item active">
-                <i class="fa-solid fa-file-shield"></i>
-                Coverage
-            </a>
-
-            <a href="/employee/mediclaim/track/list"
-               class="menu-item">
-                <i class="fa-solid fa-file-medical"></i>
-                Claims
-            </a>
-
-            <a href="/employee/mediclaim/helpdesk"
-               class="menu-item">
-                <i class="fa-solid fa-circle-question"></i>
-                Help Center
-            </a>
-
-        </div>
-
     </div>
 
-    <!-- MAIN -->
+    <!-- MAIN SECTION -->
     <div class="main-section">
 
-        <div class="top-header">
-
+        <!-- HEADER -->
+        <header class="top-header">
             <div class="header-left">
+                <div class="header-icon-badge">
+                    <i class="fa-solid fa-user-group"></i>
+                </div>
+                <h1>Manage Family Dependents</h1>
+            </div>
 
-                <img th:src="@{/images/wcg-logo.jpg}"
-                     class="header-icon">
+            <a href="/employee/mediclaim/policy" class="back-home-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Coverage</span>
+            </a>
+        </header>
 
-                <h1>My Mediclaims</h1>
+        <!-- DASHBOARD CONTENT -->
+        <main class="dashboard-content">
+
+            <!-- FLASH ALERTS -->
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${errorMessage}">Error</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${successMessage}">Success</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div class="dependent-layout-grid">
+
+                <!-- ADD DEPENDENT FORM CARD (MT019, MT020, MT022) -->
+                <div class="form-card">
+                    <div class="card-header-bar">
+                        <h2 class="card-title">
+                            <i class="fa-solid fa-user-plus text-primary"></i>
+                            Add New Dependent
+                        </h2>
+                        <span class="badge bg-primary-subtle text-primary border">Policy Add-on</span>
+                    </div>
+
+                    <!-- ALLOCATION SUMMARY (MT021, MT022) -->
+                    <div class="allocation-card" th:classappend="${availablePercent <= 0 ? 'warning' : ''}">
+                        <div>
+                            <div class="fw-bold" style="font-size: 0.85rem; color: #166534;">
+                                <i class="fas fa-chart-pie me-1"></i> Available Coverage Allocation
+                            </div>
+                            <small class="text-muted">Total Sum: ₹<span th:text="${policy != null && policy.totalCoverage != null ? #numbers.formatDecimal(policy.totalCoverage, 0, 'COMMA', 0, 'POINT') : '5,00,000'}">5,00,000</span></small>
+                        </div>
+                        <div class="text-end">
+                            <span class="fs-5 fw-bold" style="color: #15803d;" th:text="${(availablePercent != null ? availablePercent : 100) + '%'}">100%</span>
+                            <small class="d-block text-muted">Remaining</small>
+                        </div>
+                    </div>
+
+                    <form id="dependentForm" th:action="@{/employee/mediclaim/dependents/add}" method="post" enctype="multipart/form-data" onsubmit="return validateDependentSubmission()">
+
+                        <div class="mb-3">
+                            <label class="form-label-custom">Full Legal Name*</label>
+                            <input type="text" name="fullName" class="form-control-custom" placeholder="e.g. Priya Sahu" required>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label-custom">Relationship*</label>
+                                <select name="relationship" class="form-select-custom" required>
+                                    <option value="" selected disabled hidden>Select Relationship</option>
+                                    <option value="Spouse">Spouse</option>
+                                    <option value="Child">Child</option>
+                                    <option value="Parent">Parent</option>
+                                    <option value="Parent-in-law">Parent-in-law</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-custom">Date of Birth*</label>
+                                <input type="date" name="dob" id="dobInput" class="form-control-custom" required>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label-custom">Gender*</label>
+                                <select name="gender" class="form-select-custom" required>
+                                    <option value="" selected disabled hidden>Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- MT020: Valid Coverage Percentage (min 1, max 100) -->
+                                <label class="form-label-custom">Coverage Allocation (%)*</label>
+                                <input type="number" name="coveragePercentage" id="coveragePercentage" class="form-control-custom" min="1" max="100" placeholder="e.g. 40" required>
+                                <small class="text-muted" style="font-size: 0.72rem;">Must be between 1% and <span id="maxAvailableNotice" th:text="${availablePercent != null ? availablePercent : 100}">100</span>%</small>
+                            </div>
+                        </div>
+
+                        <!-- MT019: Mandatory Proof Document Upload -->
+                        <div class="mb-4">
+                            <label class="form-label-custom">Proof of Relationship / ID Document*</label>
+                            <div class="upload-dropzone-box" id="dropzoneContainer" onclick="document.getElementById('docInputHidden').click()">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <p class="mb-1 fw-bold" id="docUploadLabel" style="font-size: 0.88rem;">Click to browse or drag document here</p>
+                                <span class="text-muted" style="font-size: 0.75rem;">Supported formats: PDF, JPG, PNG (Max 5MB)</span>
+                                <input type="file" name="document" id="docInputHidden" accept=".pdf,.jpg,.jpeg,.png" required onchange="handleFileSelected(this)">
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="isCovered" value="true">
+
+                        <button type="submit" class="btn-submit-dep">
+                            <i class="fa-solid fa-user-check"></i>
+                            <span>Save & Add Dependent to Policy</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- EXISTING DEPENDENTS LIST (MT021) -->
+                <div class="list-card">
+                    <div class="card-header-bar">
+                        <h2 class="card-title">
+                            <i class="fa-solid fa-users-viewfinder text-primary"></i>
+                            Existing Covered Dependents
+                        </h2>
+                        <span class="badge bg-light text-primary border" th:text="${(dependents != null ? dependents.size() : 0) + ' Added'}">0 Added</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="dep-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Relation</th>
+                                    <th>DOB</th>
+                                    <th>Coverage (%)</th>
+                                    <th>Document</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${dependents == null || dependents.empty}">
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        <i class="fas fa-user-plus d-block fs-3 mb-2 opacity-50"></i>
+                                        No dependents added yet. Fill the form to enroll family members.
+                                    </td>
+                                </tr>
+                                <tr th:each="dep : ${dependents}">
+                                    <td><strong th:text="${dep.fullName}">Priya Sahu</strong></td>
+                                    <td><span class="badge bg-light text-dark border" th:text="${dep.relationship}">Spouse</span></td>
+                                    <td th:text="${dep.dob != null ? #temporals.format(dep.dob, 'dd MMM yyyy') : '-'}">14 Aug 1996</td>
+                                    <td>
+                                        <span class="badge bg-primary-subtle text-primary border" th:text="${(dep.coveragePercentage != null ? dep.coveragePercentage : 0) + '%'}">40%</span>
+                                    </td>
+                                    <td>
+                                        <a th:if="${dep.documentFilename != null && !dep.documentFilename.isEmpty()}" th:href="@{'/employee/mediclaim/document/download/' + ${dep.documentFilename}}" target="_blank" class="btn btn-sm btn-outline-success" style="font-size: 0.75rem; padding: 3px 8px;">
+                                            <i class="fas fa-file-arrow-down"></i>
+                                        </a>
+                                        <span th:unless="${dep.documentFilename != null && !dep.documentFilename.isEmpty()}" class="text-muted" style="font-size: 0.75rem;">Verified</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
             </div>
 
-            <a href="/employee/mediclaim/policy"
-               class="back-home-btn">
-                Back
-            </a>
-
-        </div>
-
-        <div class="dashboard-content">
-			<h2 class="page-title">
-			    Add Dependents
-			</h2>
-
-			<form id="dependentForm"
-			      th:action="@{/employee/mediclaim/dependents/add}"
-			      method="post"
-			      enctype="multipart/form-data">
-
-			    <div class="form-group">
-
-			        <label>Full Name</label>
-
-			        <input type="text"
-			               name="fullName"
-			               class="custom-input"
-			               required>
-
-			    </div>
-
-			    <div class="form-group">
-
-			        <label>Relationship</label>
-
-			        <select name="relationship"
-			                class="custom-input"
-			                required>
-
-			            <option value="">Select</option>
-			            <option value="Spouse">Spouse</option>
-			            <option value="Child">Child</option>
-			            <option value="Parent">Parent</option>
-
-			        </select>
-
-			    </div>
-
-			    <div class="form-group">
-
-			        <label>Date Of Birth</label>
-
-			        <input type="date"
-			               name="dob"
-			               id="dobInput"
-			               class="custom-input"
-			               required>
-
-			    </div>
-
-			    <div class="form-group">
-
-			        <label>Gender</label>
-
-			        <select name="gender"
-			                class="custom-input">
-
-			            <option value="">Select Gender</option>
-			            <option value="Male">Male</option>
-			            <option value="Female">Female</option>
-			            <option value="Other">Other</option>
-
-			        </select>
-
-			    </div>
-
-			    <div class="form-group">
-
-			        <label>Coverage Percentage</label>
-
-			        <input type="number"
-			               name="coveragePercentage"
-			               min="0"
-			               max="100"
-			               class="custom-input"
-			               required>
-
-			    </div>
-
-			    <div class="form-group">
-
-			        <label>Upload Documents</label>
-
-			        <div class="upload-box">
-
-			            <i class="fa-solid fa-cloud-arrow-up"></i>
-
-			            <p>Upload files here</p>
-
-			            <span>or Browse</span>
-
-						<input type="file"
-						       name="document"
-						       id="document"
-						       accept=".pdf,.jpg,.jpeg,.png">
-					   <p id="selectedFileName"
-					      style="margin-top:10px;font-size:13px;">
-					       No file selected
-					   </p>
-
-			        </div>
-
-			    </div>
-
-			    <button type="submit"
-			            class="submit-btn">
-			        Add
-			    </button>
-
-			</form>
-
-        </div>
-
+        </main>
     </div>
-
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
 
-        // 1. DATE VALIDATION: Restrict future dates & cap the year limits
-        const dobInput = document.getElementById('dobInput');
-        if(dobInput) {
-            // Get today's date in YYYY-MM-DD format
-            const today = new Date().toISOString().split('T')[0];
-            dobInput.setAttribute('max', today); // Automatically blocks future dates and years > 9999
+<script th:inline="javascript">
+    const availableCoverageLimit = /*[[${availablePercent != null ? availablePercent : 100}]]*/ 100;
+
+    function handleFileSelected(input) {
+        if (input.files && input.files[0]) {
+            const fileName = input.files[0].name;
+            document.getElementById('docUploadLabel').innerHTML = `<i class="fas fa-check-circle text-success me-1"></i> Selected: <strong>${fileName}</strong>`;
+            document.getElementById('dropzoneContainer').style.borderColor = '#16a34a';
+            document.getElementById('dropzoneContainer').style.background = '#f0fdf4';
+        }
+    }
+
+    function validateDependentSubmission() {
+        const fileInput = document.getElementById('docInputHidden');
+        const coverageInput = document.getElementById('coveragePercentage');
+
+        // MT019: Mandatory document check
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert('Proof of Relationship / Identity document is required to enroll a dependent.');
+            fileInput.focus();
+            return false;
         }
 
-        // 2. AUTO-AVATAR GENERATOR
-        const colors = ['#1E88E5', '#43A047', '#FB8C00', '#8E24AA', '#E53935', '#00ACC1'];
-        document.querySelectorAll('.avatar-circle').forEach(avatar => {
-            if(!avatar.innerHTML) {
-                const name = avatar.getAttribute('data-name');
-                if(name) {
-                    const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                    const colorIndex = name.length % colors.length;
-                    avatar.innerHTML = initials;
-                    avatar.style.background = `linear-gradient(135deg, ${colors[colorIndex]}, #111)`;
-                }
-            }
-        });
+        // MT020: Percentage validation (1-100)
+        const covVal = parseInt(coverageInput.value, 10);
+        if (isNaN(covVal) || covVal < 1 || covVal > 100) {
+            alert('Please enter a valid coverage percentage between 1% and 100%.');
+            coverageInput.focus();
+            return false;
+        }
 
-        // 3. MODAL & FORM LOGIC
-        const form = document.getElementById('dependentForm');
-        const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        // MT022: Total balance allocation check
+        if (covVal > availableCoverageLimit) {
+            alert(`Allocated coverage (${covVal}%) exceeds available balance (${availableCoverageLimit}%). Please allocate a percentage up to ${availableCoverageLimit}%.`);
+            coverageInput.focus();
+            return false;
+        }
 
-        // Intercept form submission
-        form.addEventListener('submit', function(e) {
-            e.preventDefault(); // Stop normal redirect
-
-            // Validate form natively before showing modal
-            if(form.checkValidity()) {
-                confirmationModal.show();
-            } else {
-                form.reportValidity();
-            }
-        });
-
-        // Cancel Button Logic - Hides modal AND resets the form details
-        document.getElementById('cancelConfirmBtn').addEventListener('click', function() {
-            confirmationModal.hide();
-            form.reset(); // Clears all form values as requested
-        });
-
-        // Proceed Button Logic - Send data via Fetch API
-        document.getElementById('proceedRegisterBtn').addEventListener('click', function() {
-            confirmationModal.hide();
-
-            // Format form data for Spring Boot processing
-            const formData = new URLSearchParams(new FormData(form));
-
-            fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            }).then(response => {
-                if (response.ok) {
-                    successModal.show();
-                } else {
-                    alert("Error processing request. Please try again.");
-                }
-            }).catch(error => {
-                console.error("Error:", error);
-            });
-        });
-
-        // Close Success Modal & Refresh page to show new dynamic data
-        document.getElementById('closeSuccessBtn').addEventListener('click', function() {
-            successModal.hide();
-            window.location.reload();
-        });
-    });
-	
-	document.getElementById("document")
-	        .addEventListener("change", function () {
-
-	    const fileName =
-	        this.files.length > 0
-	            ? this.files[0].name
-	            : "No file selected";
-
-	    document.getElementById("selectedFileName")
-	            .textContent = fileName;
-	});
+        return true;
+    }
 </script>
 </body>
 </html>

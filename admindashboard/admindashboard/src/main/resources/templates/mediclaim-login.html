@@ -19,6 +19,20 @@
 		    font-family: Arial, sans-serif;
 		}
 
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif !important;
+            border-radius: 0 !important;
+        }
+
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, label {
+            font-family: Arial, sans-serif !important;
+        }
+
+        .login-wrapper, .login-form-box, .sso-input-field, .btn-continue-sso, .back-btn, .alert {
+            border-radius: 0 !important;
+        }
+
         body {
             min-height: 100vh;
             display: flex;
@@ -99,29 +113,32 @@
             color: white;
         }
 
-        /* LOGO */
-
         .logo-section {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .logo-section img {
-            width: 250px;
-            margin-bottom: 20px;
+            height: 75px;
+            width: auto;
+            max-width: 200px;
+            object-fit: contain;
+            margin-bottom: 16px;
+            display: inline-block;
         }
 
         .logo-section h1 {
-			font-size: 20px;
+			font-size: 22px;
 			font-family: Arial, sans-serif;
             font-weight: 700;
             color: #111827;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
 
         .logo-section p {
             color: #6b7280;
-            font-size: 15px;
+            font-size: 14px;
+            margin-bottom: 0;
         }
 		
 		.input-label-caption,
@@ -441,15 +458,11 @@
         <div class="login-wrapper">
 
             <div class="logo-section">
-
-                <img src="/images/wcg-logo.jpg" alt="White Circle">
-
+                <img src="/images/white_bg_logo.png" alt="WhiteCircle Group" onerror="this.src='/images/white-logo.png'">
                 <h1>Welcome Back!</h1>
-
                 <p>
                     Please enter your details to sign in.
                 </p>
-
             </div>
 
 			<div class="login-form-box">

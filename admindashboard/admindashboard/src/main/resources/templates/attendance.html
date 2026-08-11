@@ -154,40 +154,51 @@
 		}
 
 		/* =====================================================
-		   SUMMARY SECTION
+		   SUMMARY SECTION (ALIGNED CARDS)
 		===================================================== */
 
 		.summary-section {
 		    width:95%;
 		    max-width:1400px;
-
-		    margin:0 auto 30px auto;
-
-		    display:flex;
-		    gap:90px;
+		    margin:0 auto 25px auto;
+		    display: grid;
+		    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		    gap: 20px;
 		}
 
 		.summary-item {
+		    background: #ffffff;
+		    border: 1px solid #e2e8f0;
+		    border-radius: 12px;
+		    padding: 18px 24px;
 		    display: flex;
 		    flex-direction: column;
+		    justify-content: center;
+		    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+		    min-height: 95px;
 		}
 
 		.summary-label {
-		    color: #666;
-		    font-size: 13px;
-		    margin-bottom: 5px;
+		    color: #64748b;
+		    font-size: 0.8rem;
+		    font-weight: 700;
+		    text-transform: uppercase;
+		    letter-spacing: 0.5px;
+		    margin-bottom: 6px;
 		}
 
 		.summary-value {
-		    font-size: 24px;
-		    font-weight: 700;
+		    font-size: 1.5rem;
+		    font-weight: 800;
 		    color: #1e3a8a;
+		    line-height: 1.2;
 		}
 
 		.summary-status {
-		    font-size: 32px;
+		    font-size: 1rem;
 		    font-weight: 700;
-		    color: #18a118;
+		    display: flex;
+		    align-items: center;
 		}
 
 		/* =====================================================
@@ -644,7 +655,7 @@
 
     <!-- Week Navigation -->
 
-    <div class="week-navigation" style="margin-top: 140px;">
+    <div class="week-navigation" style="margin-top: 100px;">
 
         <button id="previousWeekBtn"  onclick="previousWeek()">
             <i class="fas fa-chevron-left"></i>
@@ -1272,29 +1283,41 @@
 	                .padStart(2, '0') +
 	            'm';
 
-	        document.getElementById(
-	            'weeklyStatus'
-	        ).innerText =
-	            status;
+	        const statusEl = document.getElementById('weeklyStatus');
+	        let badgeClass = 'bg-secondary text-white';
+	        let displayStatus = status || 'Not Submitted';
 
-			let disableBottomActions =
-				    !isCurrentWeek();
+	        if (status === 'Approved') {
+	            badgeClass = 'bg-success text-white';
+	        } else if (status === 'Pending') {
+	            badgeClass = 'bg-warning text-dark';
+	        } else if (status === 'Rejected') {
+	            badgeClass = 'bg-danger text-white';
+	            displayStatus = 'Rejected (Re-submission Allowed)';
+	        } else {
+	            badgeClass = 'bg-light text-dark border';
+	        }
+	        statusEl.innerHTML = `<span class="badge ${badgeClass} px-3 py-2" style="font-size: 0.95rem; font-weight: 700; border-radius: 8px;">${displayStatus}</span>`;
 
-	        document.getElementById(
-	            'submitAttendanceBtn'
-	        ).disabled =
-	            disableBottomActions;
+			let disableBottomActions = !isCurrentWeek();
+			const submitBtn = document.getElementById('submitAttendanceBtn');
 
-	        document.getElementById(
-	            'saveDraftBtn'
-	        ).disabled =
-	            disableBottomActions;
+	        if (status === 'Approved' || status === 'Pending') {
+	            submitBtn.disabled = true;
+	            submitBtn.innerText = status === 'Approved' ? 'Approved' : 'Pending Approval';
+	            submitBtn.className = 'submit-btn bg-secondary border-0';
+	        } else if (status === 'Rejected') {
+	            submitBtn.disabled = disableBottomActions;
+	            submitBtn.innerText = 'Re-submit for Approval';
+	            submitBtn.className = 'submit-btn bg-danger border-0';
+	        } else {
+	            submitBtn.disabled = disableBottomActions;
+	            submitBtn.innerText = 'Submit';
+	            submitBtn.className = 'submit-btn';
+	        }
 
-	        document.getElementById(
-	            'discardAttendanceBtn'
-	        ).disabled =
-	            disableBottomActions;
-
+	        document.getElementById('saveDraftBtn').disabled = disableBottomActions || (status === 'Approved' || status === 'Pending');
+	        document.getElementById('discardAttendanceBtn').disabled = disableBottomActions || (status === 'Approved' || status === 'Pending');
 	    } catch (error) {
 
 	        console.error(
@@ -1539,6 +1562,19 @@
 	    }
 	}
 	async function submitWeeklyAttendance() {
+	    const recordedText = document.getElementById('recordedWorkingHours').innerText || '';
+	    const match = recordedText.match(/(\d+)\s*h\s*(\d+)\s*m/i);
+	    const totalRecordedMins = match ? (parseInt(match[1]) * 60 + parseInt(match[2])) : 0;
+
+	    if (totalRecordedMins === 0) {
+	        Swal.fire({
+	            icon: 'warning',
+	            title: 'Empty Attendance Submission',
+	            text: 'You cannot submit attendance without entering any recorded hours. Please record working time first.',
+	            confirmButtonColor: '#1e3a8a'
+	        });
+	        return;
+	    }
 
 	    Swal.fire({
 	        icon: 'info',
@@ -1548,7 +1584,6 @@
 	    });
 
 	    try {
-
 	        const response =
 	            await fetch(
 	                '/api/attendance/submit-current-week',

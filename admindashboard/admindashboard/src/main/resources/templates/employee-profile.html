@@ -29,8 +29,18 @@
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02);
         }
 
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif !important;
+            border-radius: 0 !important;
+        }
+
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, label, th, td {
+            font-family: Arial, sans-serif !important;
+        }
+
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: Arial, sans-serif !important;
             background-color: var(--bg-body);
             color: var(--text-dark);
             font-size: 0.9rem;
@@ -525,18 +535,24 @@
                 flex-direction: row;
                 overflow-x: auto;
                 white-space: nowrap;
-                padding: 10px;
+                padding: 8px 12px;
+                gap: 8px;
+                -webkit-overflow-scrolling: touch;
             }
             .nav-tab-btn {
                 flex: 0 0 auto;
-                padding: 10px 14px;
+                padding: 8px 14px;
+                font-size: 0.82rem;
             }
         }
 
         @media (max-width: 767px) {
+            .profile-container {
+                padding: 12px 10px;
+            }
             .form-grid-2, .form-grid-3 {
                 grid-template-columns: 1fr;
-                gap: 16px;
+                gap: 14px;
             }
             .full-width-cell, .form-grid-3 .full-width-cell {
                 grid-column: span 1;
@@ -545,6 +561,8 @@
                 flex-direction: column;
                 align-items: stretch;
                 text-align: center;
+                padding: 16px;
+                gap: 14px;
             }
             .profile-title-block {
                 flex-direction: column;
@@ -553,7 +571,7 @@
                 justify-content: center;
             }
             .profile-content-card {
-                padding: 20px;
+                padding: 16px;
             }
         }
     </style>
@@ -769,37 +787,23 @@
 
                         <div class="profile-field-card">
                             <div class="field-label">Caste Category</div>
-                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.casteCategory)} ? 'empty-val'">
-                                <span th:text="${!#strings.isEmpty(employeeProfile.casteCategory) ? employeeProfile.casteCategory : 'Not Provided'}">General</span>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.casteCategory) ? employeeProfile.casteCategory : 'General'}">General</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
                             </div>
                             <div class="edit-state edit-state-box">
-                                <select name="casteCategory">
-                                    <option value="">Select Category</option>
-                                    <option value="General" th:selected="${employeeProfile.casteCategory == 'General'}">General</option>
-                                    <option value="OBC" th:selected="${employeeProfile.casteCategory == 'OBC'}">OBC</option>
-                                    <option value="SC" th:selected="${employeeProfile.casteCategory == 'SC'}">SC</option>
-                                    <option value="ST" th:selected="${employeeProfile.casteCategory == 'ST'}">ST</option>
-                                </select>
+                                <input type="text" name="casteCategory" th:value="${!#strings.isEmpty(employeeProfile.casteCategory) ? employeeProfile.casteCategory : 'General'}" readonly class="bg-light text-muted">
                             </div>
                         </div>
 
                         <div class="profile-field-card">
                             <div class="field-label">Blood Group</div>
-                            <div class="view-state view-state-box" th:classappend="${#strings.isEmpty(employeeProfile.bloodGroup)} ? 'empty-val'">
-                                <span th:text="${!#strings.isEmpty(employeeProfile.bloodGroup) ? employeeProfile.bloodGroup : 'Not Provided'}">O+</span>
+                            <div class="view-state view-state-box readonly-field">
+                                <span th:text="${!#strings.isEmpty(employeeProfile.bloodGroup) ? employeeProfile.bloodGroup : 'O+'}">O+</span>
+                                <span class="lock-badge"><i class="fas fa-lock"></i> Locked</span>
                             </div>
                             <div class="edit-state edit-state-box">
-                                <select name="bloodGroup" class="tracked-field">
-                                    <option value="">Select Blood Group</option>
-                                    <option value="A+" th:selected="${employeeProfile.bloodGroup == 'A+'}">A+</option>
-                                    <option value="A-" th:selected="${employeeProfile.bloodGroup == 'A-'}">A-</option>
-                                    <option value="B+" th:selected="${employeeProfile.bloodGroup == 'B+'}">B+</option>
-                                    <option value="B-" th:selected="${employeeProfile.bloodGroup == 'B-'}">B-</option>
-                                    <option value="AB+" th:selected="${employeeProfile.bloodGroup == 'AB+'}">AB+</option>
-                                    <option value="AB-" th:selected="${employeeProfile.bloodGroup == 'AB-'}">AB-</option>
-                                    <option value="O+" th:selected="${employeeProfile.bloodGroup == 'O+'}">O+</option>
-                                    <option value="O-" th:selected="${employeeProfile.bloodGroup == 'O-'}">O-</option>
-                                </select>
+                                <input type="text" name="bloodGroup" th:value="${!#strings.isEmpty(employeeProfile.bloodGroup) ? employeeProfile.bloodGroup : 'O+'}" readonly class="bg-light text-muted">
                             </div>
                         </div>
                     </div>
@@ -1400,7 +1404,15 @@
 
                         <!-- Permanent Address -->
                         <div class="profile-field-card">
-                            <div class="section-separator mt-0"><i class="fas fa-building"></i> Permanent Address</div>
+                            <div class="section-separator mt-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div><i class="fas fa-building"></i> Permanent Address</div>
+                            </div>
+                            <div class="form-check mb-3 mt-2 edit-state edit-state-box">
+                                <input class="form-check-input" type="checkbox" id="sameAsPresentAddress" onchange="copyPresentToPermanent(this)" style="cursor: pointer;">
+                                <label class="form-check-label fw-bold" for="sameAsPresentAddress" style="font-size: 0.85rem; color: var(--primary); cursor: pointer;">
+                                    <i class="fas fa-copy me-1"></i> Permanent address same as Present address
+                                </label>
+                            </div>
 
                             <div class="mb-3">
                                 <div class="field-label mb-1">Residential Name</div>
@@ -1473,7 +1485,7 @@
                                     <span th:text="${!#strings.isEmpty(employeeProfile.mobileNumber) ? employeeProfile.mobileNumber : 'Not Provided'}">—</span>
                                 </div>
                                 <div class="edit-state edit-state-box">
-                                    <input type="text" name="mobileNumber" th:value="${employeeProfile.mobileNumber}" placeholder="Primary Phone" maxlength="10" class="tracked-field">
+                                    <input type="text" name="mobileNumber" th:value="${employeeProfile.mobileNumber}" placeholder="Primary Phone (10 Digits)" maxlength="10" pattern="[6-9][0-9]{9}" title="10-digit mobile number starting with 6-9" class="tracked-field">
                                 </div>
                             </div>
 
@@ -1802,8 +1814,41 @@
         window.location.reload();
     });
 
+    function copyPresentToPermanent(cb) {
+        const form = document.getElementById('masterProfileForm');
+        if (!form) return;
+        const fields = ['ResidentialName', 'Street', 'City', 'State', 'Pincode', 'Country'];
+        fields.forEach(field => {
+            const presentInput = form.querySelector(`[name="present${field}"]`);
+            const permInput = form.querySelector(`[name="permanent${field}"]`);
+            if (presentInput && permInput) {
+                if (cb.checked) {
+                    permInput.value = presentInput.value;
+                }
+            }
+        });
+    }
+
     saveBtn.addEventListener('click', function(e) {
         const form = document.getElementById('masterProfileForm');
+        
+        // Strict 10-digit mobile number validation (MT011)
+        const mobileInput = form.querySelector('input[name="mobileNumber"]');
+        if (mobileInput && mobileInput.value.trim()) {
+            const cleanMobile = mobileInput.value.trim();
+            if (!/^[6-9]\d{9}$/.test(cleanMobile)) {
+                e.preventDefault();
+                alert('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.');
+                const pane = mobileInput.closest('.tab-pane');
+                if (pane) {
+                    const tabBtn = document.querySelector(`.nav-tab-btn[onclick*="${pane.id}"]`);
+                    if (tabBtn) showProfileTab(pane.id, tabBtn);
+                }
+                mobileInput.focus();
+                return false;
+            }
+        }
+
         if (!form.checkValidity()) {
             e.preventDefault();
             const invalidEl = form.querySelector(':invalid');

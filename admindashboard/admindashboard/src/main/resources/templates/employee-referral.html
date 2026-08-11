@@ -3,23 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Referral - WhiteCircle</title>
+    <title>Employee Referral Portal | WhiteCircle</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --sidebar-bg: #0b1120;
-            --text-main: #0f172a;
-            --border-color: #e2e8f0;
+            --ref-primary: #1e3a8a;
+            --ref-primary-light: #2563eb;
+            --ref-bg: #f8fafc;
+            --ref-card-bg: #ffffff;
+            --ref-border: #e2e8f0;
+            --ref-text-main: #0f172a;
+            --ref-text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif !important;
+            border-radius: 0 !important;
+        }
+
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, label, th, td {
+            font-family: Arial, sans-serif !important;
+        }
+
+        .job-card, .job-details-pane, .quota-banner, .quota-pill, .search-box input,
+        .btn, .btn-sm, .btn-back-home, .custom-tab, .badge, .header-icon-badge,
+        .modal-content, .modal-header, .modal-footer, .form-control, .form-select, .alert {
+            border-radius: 0 !important;
         }
 
         body {
-            font-family: Arial, sans-serif;
+            background: var(--ref-bg);
+            color: var(--ref-text-main);
             font-size: 14px;
-            background: #efefef;
-            margin: 0; padding: 0;
-            color: var(--text-main);
-            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
         }
 
         .main-content {
@@ -28,146 +48,283 @@
             min-height: 100vh;
         }
 
+        /* TOP HEADER */
         .top-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 25px;
-            background: #fff;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 32px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--ref-border);
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
         }
         
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
         .page-title {
             font-size: 1.25rem;
             font-weight: 700;
-            color: #1e293b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: #0B2E7A;
+            margin: 0;
         }
 
         .btn-back-home {
-            background-color: #f1f5f9;
-            color: #475569;
-            border: 1px solid #cbd5e1;
-            padding: 6px 14px;
-            border-radius: 6px;
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.2s;
+            font-size: 13.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s;
         }
         .btn-back-home:hover {
-            background-color: #e2e8f0;
-            color: #1e293b;
+            background-color: #1d4ed8;
+            color: #ffffff;
         }
 
-        /* TABS */
+        /* TABS (MT010) */
         .tabs-container {
             display: flex;
-            background: #dfe8f2;
-            border-bottom: 1px solid #cfd8e3;
+            background: #ffffff;
+            border-bottom: 1px solid var(--ref-border);
+            padding: 0 32px;
+            gap: 8px;
             position: sticky;
-            top: 61px;
+            top: 75px;
             z-index: 999;
         }
 
         .custom-tab {
-            padding: 12px 25px;
+            padding: 14px 20px;
             font-weight: 600;
-            color: #475569;
+            color: var(--ref-text-muted);
             cursor: pointer;
             border-bottom: 3px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             transition: all 0.2s ease;
         }
         
         .custom-tab:hover {
-            color: #1e3a8a;
-            background: rgba(255,255,255,0.5);
+            color: var(--ref-primary-light);
         }
 
         .custom-tab.active {
-            color: #1e3a8a;
-            border-bottom: 3px solid #1e3a8a;
-            background: #fff;
+            color: var(--ref-primary-light);
+            border-bottom-color: var(--ref-primary-light);
         }
 
         .content-area {
-            padding: 25px;
+            padding: 28px 32px;
             flex-grow: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
         }
 
-        /* JOB CARDS */
+        /* QUOTA BANNER (MT013) */
+        .quota-banner {
+            background: linear-gradient(135deg, #0B2E7A 0%, #1e40af 100%);
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(11, 46, 122, 0.15);
+        }
+
+        .quota-info h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .quota-info p {
+            font-size: 0.85rem;
+            color: #bfdbfe;
+            margin: 0;
+        }
+
+        .quota-badges {
+            display: flex;
+            gap: 16px;
+        }
+
+        .quota-pill {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .quota-pill span:first-child {
+            display: block;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            color: #93c5fd;
+        }
+
+        .quota-pill span:last-child {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        /* SEARCH BAR */
+        .search-box {
+            position: relative;
+            max-width: 450px;
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            padding-left: 38px;
+            height: 42px;
+            border-radius: 10px;
+            border: 1px solid var(--ref-border);
+            font-size: 0.9rem;
+        }
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 13px;
+            color: #94a3b8;
+        }
+
+        /* JOB CARDS (MT010 Responsive Grid) */
         .job-card {
             background: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            border: 1px solid var(--ref-border);
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .job-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+            border-color: #93c5fd;
         }
         
         .job-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #1e3a8a;
-            margin-bottom: 5px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0B2E7A;
+            margin-bottom: 6px;
         }
         
         .job-meta {
-            color: #64748b;
-            font-size: 0.9rem;
+            color: var(--ref-text-muted);
+            font-size: 0.85rem;
             display: flex;
-            gap: 15px;
-            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .job-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
         
         /* JOB DETAILS PANE */
         .job-details-pane {
             background: #ffffff;
             color: #334155;
-            padding: 25px;
-            border-radius: 8px;
-            margin-top: 15px;
+            padding: 24px 28px;
+            border-radius: 12px;
+            margin-top: -8px;
+            margin-bottom: 16px;
             display: none;
-            border: 1px solid #e2e8f0;
-            border-left: 4px solid #1e3a8a;
+            border: 1px solid var(--ref-border);
+            border-left: 4px solid var(--ref-primary-light);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
         }
         
         .job-details-pane h5 {
-            color: #1e3a8a;
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-            margin-top: 15px;
-            font-weight: 600;
+            color: #0B2E7A;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            margin-top: 14px;
+            font-weight: 700;
         }
         .job-details-pane p {
             margin-bottom: 10px;
-            line-height: 1.6;
+            line-height: 1.5;
+            font-size: 0.88rem;
+            color: #475569;
         }
-        
-        /* Search bar */
-        .search-box {
-            position: relative;
-            max-width: 400px;
-            margin-bottom: 25px;
+
+        /* RESPONSIVE DESIGN (MT010) */
+        @media (max-width: 991px) {
+            .top-header {
+                padding: 14px 20px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .tabs-container {
+                padding: 0 20px;
+                overflow-x: auto;
+            }
+            .content-area {
+                padding: 20px 16px;
+            }
+            .quota-banner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            .quota-badges {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .job-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
         }
-        .search-box input {
-            padding-left: 35px;
-            border-radius: 20px;
-            border: 1px solid #cbd5e1;
-        }
-        .search-box i {
-            position: absolute;
-            left: 12px;
-            top: 10px;
-            color: #94a3b8;
+
+        @media (max-width: 576px) {
+            .quota-badges {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .job-meta {
+                flex-direction: column;
+                gap: 6px;
+            }
         }
     </style>
 </head>
@@ -175,111 +332,139 @@
 
 <div class="main-content">
     
-    <!-- Success/Error Messages -->
-    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show m-3 shadow-sm" role="alert" style="position:fixed; top:20px; right:20px; z-index:9999;">
-        <i class="fas fa-check-circle me-2"></i> <span th:text="${successMessage}"></span>
+    <!-- Toast Flash Alerts with Auto-Dismiss (MT006) -->
+    <div th:if="${successMessage}" id="flashSuccess" class="alert alert-success alert-dismissible fade show m-3 shadow-lg" role="alert" style="position:fixed; top:20px; right:20px; z-index:9999; max-width: 450px;">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-check-circle fs-5 me-2 text-success"></i>
+            <div><strong th:text="${successMessage}">Success</strong></div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show m-3 shadow-sm" role="alert" style="position:fixed; top:20px; right:20px; z-index:9999;">
-        <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${errorMessage}"></span>
+
+    <div th:if="${errorMessage}" id="flashError" class="alert alert-danger alert-dismissible fade show m-3 shadow-lg" role="alert" style="position:fixed; top:20px; right:20px; z-index:9999; max-width: 450px;">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle fs-5 me-2 text-danger"></i>
+            <div><strong th:text="${errorMessage}">Error</strong></div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
     <!-- Header -->
     <header class="top-header">
-        <div class="page-title">
-            <i class="fas fa-user-plus text-primary me-2"></i> Referral
+        <div class="header-brand">
+            <div class="header-icon-badge">
+                <i class="fa-solid fa-users-viewfinder"></i>
+            </div>
+            <h1 class="page-title">Employee Referral Portal</h1>
         </div>
-        <a th:href="${backUrl}" class="btn-back-home">
-            <i class="fas fa-arrow-left me-2"></i> Back
+        <a th:href="${backUrl != null ? backUrl : '/default-redirect'}" class="btn-back-home">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
     </header>
 
-    <!-- Tabs -->
+    <!-- Tabs (MT010) -->
     <div class="tabs-container">
         <div class="custom-tab active" id="tab-refer" onclick="switchTab('refer')">
-            <img src="/images/referal.png" alt="All Opportunities" style="width: 16px; height: 16px; margin-right: 4px; margin-bottom: 2px;"> All Opportunities
+            <i class="fa-solid fa-briefcase"></i> Open Opportunities
         </div>
         <div class="custom-tab" id="tab-myrefer" onclick="switchTab('myrefer')">
-            <i class="fas fa-list me-1"></i> My Referral
+            <i class="fa-solid fa-list-check"></i> My Referrals (<span th:text="${myReferrals != null ? myReferrals.size() : 0}">0</span>)
         </div>
     </div>
 
     <!-- Content Area -->
     <div class="content-area">
         
-        <!-- REFER TAB -->
+        <!-- REFERRAL QUOTA & POLICY BANNER (MT013, MT014, MT015) -->
+        <div class="quota-banner">
+            <div class="quota-info">
+                <h4><i class="fas fa-gift me-2 text-warning"></i> WhiteCircle Employee Referral Program</h4>
+                <p>Refer top talent and earn reward bonuses upon successful joining & probation clearance.</p>
+            </div>
+            <div class="quota-badges">
+                <div class="quota-pill">
+                    <span>Yearly Quota</span>
+                    <span th:text="${maxReferralsPerYear != null ? maxReferralsPerYear : 10}">10</span>
+                </div>
+                <div class="quota-pill">
+                    <span>Used in <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}">2026</span></span>
+                    <span th:text="${usedThisYear != null ? usedThisYear : 0}">0</span>
+                </div>
+                <div class="quota-pill">
+                    <span>Remaining</span>
+                    <span class="text-warning" th:text="${remainingQuota != null ? remainingQuota : 10}">10</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- OPEN OPPORTUNITIES TAB -->
         <div id="view-refer">
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" class="form-control" id="jobSearch" placeholder="Search for job postings..." onkeyup="filterJobs()">
+                <input type="text" class="form-control" id="jobSearch" placeholder="Search by job title, department, or location..." onkeyup="filterJobs()">
             </div>
             
-            <div th:if="${activeJobs == null or activeJobs.empty}" class="text-center p-5 bg-white rounded border">
+            <div th:if="${activeJobs == null or activeJobs.empty}" class="text-center p-5 bg-white rounded-3 border">
                 <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">No active job postings available at the moment.</h5>
+                <h5 class="text-muted">No active job openings available at the moment.</h5>
             </div>
 
             <div th:each="job : ${activeJobs}">
-                <!-- Job Card -->
-                <div class="job-card d-flex justify-content-between align-items-center" th:onclick="'toggleDetails(' + ${job.id} + ')'" th:id="'card-' + ${job.id}">
+                <!-- Job Card (MT010) -->
+                <div class="job-card" th:onclick="'toggleDetails(' + ${job.id} + ')'" th:id="'card-' + ${job.id}">
                     <div>
-                        <div class="job-title mb-1" th:text="${job.jobId} + ' - ' + ${job.title}">Job Title</div>
-                        <div class="text-muted small">
-                            <span><i class="fas fa-building me-1"></i> <span th:text="${job.department}"></span></span>
+                        <div class="job-title" th:text="${job.jobId + ' — ' + job.title}">Job Title</div>
+                        <div class="job-meta">
+                            <span><i class="fas fa-building text-primary"></i> <span th:text="${job.department}">Dept</span></span>
+                            <span><i class="fas fa-briefcase text-secondary"></i> <span th:text="${job.experienceRequired}">Exp</span></span>
+                            <span><i class="fas fa-location-dot text-danger"></i> <span th:text="${job.location}">Loc</span></span>
                         </div>
                     </div>
-                    <div class="job-meta mb-0 justify-content-end">
-                        <span><i class="fas fa-briefcase"></i> <span th:text="${job.experienceRequired}"></span></span>
-                        <span><i class="fas fa-map-marker-alt"></i> <span th:text="${job.location}"></span></span>
-                        <span><i class="far fa-calendar-alt"></i> <span th:text="${#temporals.format(job.postingDate, 'dd/MM/yyyy')}"></span></span>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="badge bg-light text-muted border"><i class="far fa-calendar-alt me-1"></i> <span th:text="${#temporals.format(job.postingDate, 'dd MMM yyyy')}">Date</span></span>
+                        <button class="btn btn-sm btn-primary fw-bold px-3" th:onclick="'event.stopPropagation(); openReferralForm(' + ${job.id} + ')'">
+                            <i class="fas fa-user-plus me-1"></i> Refer Candidate
+                        </button>
                     </div>
                 </div>
 
                 <!-- Job Details Pane (Hidden by default) -->
                 <div class="job-details-pane" th:id="'details-' + ${job.id}">
-                    <h5 class="mt-0">Job Details</h5>
-                    <p>
-                        <span th:text="${job.title}"></span><br>
-                        <span th:text="${job.department}"></span><br>
-                        <span th:text="${job.experienceRequired}"></span><br>
-                        <span th:text="${job.location}"></span><br>
-                        <span th:text="${#temporals.format(job.postingDate, 'dd/MM/yyyy')}"></span>
-                    </p>
+                    <h5 class="mt-0"><i class="fas fa-circle-info text-primary me-2"></i>Job Description</h5>
+                    <p th:text="${job.description}">Description</p>
                     
-                    <h5>Job Description</h5>
-                    <p th:text="${job.description}"></p>
+                    <h5><i class="fas fa-code text-primary me-2"></i>Primary Skills</h5>
+                    <p th:text="${job.primarySkills}">Skills</p>
                     
-                    <h5>Primary Skills</h5>
-                    <p th:text="${job.primarySkills}"></p>
+                    <h5><i class="fas fa-layer-group text-primary me-2"></i>Secondary Skills</h5>
+                    <p th:text="${job.secondarySkills}">Secondary Skills</p>
                     
-                    <h5>Secondary Skills</h5>
-                    <p th:text="${job.secondarySkills}"></p>
+                    <h5><i class="fas fa-graduation-cap text-primary me-2"></i>Eligibility Criteria</h5>
+                    <p th:text="${job.eligibilityCriteria}">Criteria</p>
                     
-                    <h5>Job Overview</h5>
-                    <p th:text="${job.jobOverview}"></p>
-                    
-                    <h5>Eligibility Criteria</h5>
-                    <p th:text="${job.eligibilityCriteria}"></p>
-                    
-                    <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
-                        <button class="btn btn-outline-secondary px-4" th:onclick="'toggleDetails(' + ${job.id} + ')'">Cancel</button>
-                        <button class="btn btn-primary fw-bold px-4" th:onclick="'openReferralForm(' + ${job.id} + ')'">Refer</button>
+                    <div class="mt-3 pt-3 border-top d-flex justify-content-end gap-2">
+                        <button class="btn btn-sm btn-outline-secondary px-3" th:onclick="'toggleDetails(' + ${job.id} + ')'">Close</button>
+                        <button class="btn btn-sm btn-primary fw-bold px-4" th:onclick="'openReferralForm(' + ${job.id} + ')'">
+                            <i class="fas fa-user-plus me-1"></i> Refer Candidate Now
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- MY REFER TAB -->
+        <!-- MY REFERRALS TAB -->
         <div id="view-myrefer" style="display:none;">
-            <div class="bg-white rounded border p-3">
-                <h5 class="mb-3 fw-bold"><i class="fas fa-list text-primary me-2"></i>My Referral</h5>
+            <div class="bg-white rounded-3 border p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-list-check text-primary me-2"></i>My Submitted Referrals</h5>
+                    <span class="badge bg-light text-primary border" th:text="${(myReferrals != null ? myReferrals.size() : 0) + ' Total'}">0 Total</span>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead class="table-light text-muted small">
                             <tr>
                                 <th>Candidate Name</th>
-                                <th>Job Applied For</th>
+                                <th>Position</th>
                                 <th>Email</th>
                                 <th>Mobile</th>
                                 <th>Referral Date</th>
@@ -288,24 +473,27 @@
                         </thead>
                         <tbody>
                             <tr th:each="ref : ${myReferrals}">
-                                <td th:text="${ref.firstName + ' ' + ref.lastName}">Name</td>
+                                <td><strong th:text="${ref.firstName + ' ' + ref.lastName}">Candidate Name</strong></td>
                                 <td>
-                                    <span th:text="${ref.jobPosting.title}" class="fw-bold d-block"></span>
-                                    <span class="text-muted small" th:text="${ref.jobPosting.jobId}"></span>
+                                    <span th:text="${ref.jobPosting != null ? ref.jobPosting.title : 'General'}" class="fw-bold d-block text-primary"></span>
+                                    <span class="text-muted small" th:text="${ref.jobPosting != null ? ref.jobPosting.jobId : '-'}"></span>
                                 </td>
                                 <td th:text="${ref.email}">Email</td>
                                 <td th:text="${ref.countryCode + ' ' + ref.mobileNumber}">Mobile</td>
-                                <td th:text="${#temporals.format(ref.referralDate, 'dd/MM/yyyy HH:mm')}">Date</td>
+                                <td th:text="${ref.referralDate != null ? #temporals.format(ref.referralDate, 'dd MMM yyyy HH:mm') : '-'}">Date</td>
                                 <td>
-                                    <span class="badge bg-primary" th:if="${ref.status == 'SUBMITTED'}">Submitted</span>
-                                    <span class="badge bg-info text-dark" th:if="${ref.status == 'IN_REVIEW'}">In Review</span>
-                                    <span class="badge bg-warning text-dark" th:if="${ref.status == 'INTERVIEWING'}">Interviewing</span>
-                                    <span class="badge bg-success" th:if="${ref.status == 'HIRED'}">Hired</span>
-                                    <span class="badge bg-danger" th:if="${ref.status == 'REJECTED'}">Rejected</span>
+                                    <span class="badge bg-primary-subtle text-primary border" th:if="${ref.status == 'SUBMITTED'}">Submitted</span>
+                                    <span class="badge bg-info-subtle text-info border" th:if="${ref.status == 'IN_REVIEW'}">In Review</span>
+                                    <span class="badge bg-warning-subtle text-warning border" th:if="${ref.status == 'INTERVIEWING'}">Interviewing</span>
+                                    <span class="badge bg-success-subtle text-success border" th:if="${ref.status == 'HIRED' or ref.status == 'OFFERED'}">Hired</span>
+                                    <span class="badge bg-danger-subtle text-danger border" th:if="${ref.status == 'REJECTED'}">Rejected</span>
                                 </td>
                             </tr>
                             <tr th:if="${myReferrals == null or myReferrals.empty}">
-                                <td colspan="6" class="text-center text-muted py-4">You have not made any referrals yet.</td>
+                                <td colspan="6" class="text-center text-muted py-5">
+                                    <i class="fas fa-users fa-2x d-block mb-2 opacity-50"></i>
+                                    You have not submitted any referrals yet.
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -316,79 +504,85 @@
     </div>
 </div>
 
-<!-- REFERRAL FORM MODAL -->
+<!-- REFERRAL FORM MODAL (MT011, MT012, MT014, MT015, MT019) -->
 <div class="modal fade" id="referralModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form action="/employee/referral/submit" method="post" enctype="multipart/form-data">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <form action="/employee/referral/submit" method="post" enctype="multipart/form-data" onsubmit="return validateReferralForm()">
                 <div class="modal-header bg-light">
-                    <h5 class="modal-title fw-bold text-primary"><i class="fas fa-user-plus me-2"></i>Fill the details to refer a friend</h5>
+                    <h5 class="modal-title fw-bold text-primary"><i class="fas fa-user-plus me-2"></i>Refer a Candidate</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
                     
                     <input type="hidden" name="jobPostingId" id="modalJobPostingId">
                     
+                    <div class="alert alert-info py-2 small mb-3">
+                        <i class="fas fa-info-circle me-1"></i> Note: Please ensure the candidate is not currently an active WhiteCircle employee and has not been referred within the last 90 days.
+                    </div>
+
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">First Name*</label>
-                            <input type="text" class="form-control" name="firstName" pattern="[A-Za-z\s]+" title="First name must contain only letters" required>
+                            <input type="text" class="form-control" name="firstName" id="refFirstName" pattern="[A-Za-z\s]+" title="First name must contain only letters" placeholder="e.g. Rahul" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Last Name*</label>
-                            <input type="text" class="form-control" name="lastName" pattern="[A-Za-z\s]+" title="Last name must contain only letters" required>
+                            <input type="text" class="form-control" name="lastName" id="refLastName" pattern="[A-Za-z\s]+" title="Last name must contain only letters" placeholder="e.g. Sharma" required>
                         </div>
                         
                         <div class="col-md-12">
-                            <label class="form-label fw-bold">Referral Email-id*</label>
-                            <input type="email" class="form-control" name="email" required>
+                            <label class="form-label fw-bold">Candidate Email Address*</label>
+                            <input type="email" class="form-control" name="email" id="refEmail" placeholder="e.g. rahul.sharma@example.com" required>
                         </div>
                         
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Country Code*</label>
                             <select class="form-select" name="countryCode" required>
-                                <option value="+91">+91 (India)</option>
+                                <option value="+91" selected>+91 (India)</option>
                                 <option value="+1">+1 (USA/Canada)</option>
                                 <option value="+44">+44 (UK)</option>
                                 <option value="+61">+61 (Australia)</option>
-                                <!-- Add more as needed -->
+                                <option value="+65">+65 (Singapore)</option>
+                                <option value="+971">+971 (UAE)</option>
                             </select>
                         </div>
                         <div class="col-md-8">
                             <label class="form-label fw-bold">Mobile Number*</label>
-                            <input type="text" class="form-control" name="mobileNumber" pattern="[0-9]{10}" maxlength="10" title="Mobile number must be exactly 10 digits" required>
+                            <input type="text" class="form-control" name="mobileNumber" id="refMobile" pattern="[0-9]{10}" maxlength="10" title="Mobile number must be exactly 10 digits" placeholder="10-digit phone number" required>
                         </div>
                         
                         <div class="col-md-12">
-                            <label class="form-label fw-bold">How do you know the individual</label>
+                            <label class="form-label fw-bold">Relationship / How do you know the candidate?*</label>
                             <input type="hidden" name="relationship" id="actualRelationship">
                             <select class="form-select" id="relationshipSelect" required onchange="handleRelationshipChange()">
-                                <option value="" disabled selected>Select an option</option>
-                                <option value="friends">Friends</option>
-                                <option value="relative">Relative</option>
-                                <option value="ex colleague">Ex Colleague</option>
-                                <option value="others">Others</option>
+                                <option value="" disabled selected>Select Relationship</option>
+                                <option value="Ex Colleague">Ex-Colleague</option>
+                                <option value="Friends">Friend / Acquaintance</option>
+                                <option value="Relative">Family / Relative</option>
+                                <option value="College Alum">College Alumni</option>
+                                <option value="others">Other (Specify)</option>
                             </select>
                         </div>
-                        <div class="col-md-12 mt-3" id="relationshipDetailsContainer" style="display: none;">
-                            <textarea class="form-control" id="relationshipDetails" rows="2" placeholder="Please lets us know how you know the candidate" oninput="handleRelationshipChange()"></textarea>
+                        <div class="col-md-12" id="relationshipDetailsContainer" style="display: none;">
+                            <textarea class="form-control" id="relationshipDetails" rows="2" placeholder="Please specify your connection with the candidate..." oninput="handleRelationshipChange()"></textarea>
                         </div>
                         
-                        <div class="col-md-12 mt-4">
-                            <label class="form-label fw-bold">Referral Resume *</label>
-                            <div class="border rounded p-4 text-center bg-light" style="border-style: dashed !important;">
-                                <i class="fas fa-cloud-upload-alt fa-2x text-primary mb-2"></i>
-                                <div>Click Browse to upload resume</div>
-                                <div class="text-muted small mb-3">Max. 2 MB, Supported formats: PDF, Doc, Docx</div>
-                                <input type="file" class="form-control w-50 mx-auto" name="resumeFile" accept=".pdf,.doc,.docx" required>
+                        <div class="col-md-12 mt-3">
+                            <label class="form-label fw-bold">Candidate Resume / CV*</label>
+                            <div class="border rounded-3 p-3 text-center bg-light" style="border-style: dashed !important;">
+                                <i class="fas fa-file-arrow-up fa-2x text-primary mb-2"></i>
+                                <div class="fw-bold small mb-1">Click to browse and upload resume</div>
+                                <div class="text-muted small mb-2">Accepted formats: PDF, DOC, DOCX (Max 5MB)</div>
+                                <input type="file" class="form-control w-75 mx-auto" name="resumeFile" accept=".pdf,.doc,.docx" required>
                             </div>
                         </div>
                     </div>
                     
                 </div>
                 <div class="modal-footer bg-light d-flex justify-content-between">
-                    <button type="button" class="btn btn-secondary px-4 fw-bold" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary px-4 fw-bold">Refer</button>
+                    <button type="button" class="btn btn-outline-secondary px-4 fw-bold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold"><i class="fas fa-paper-plane me-1"></i> Submit Referral</button>
                 </div>
             </form>
         </div>
@@ -397,6 +591,17 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Auto dismiss flash alerts after 4 seconds (MT006)
+    setTimeout(() => {
+        ['flashSuccess', 'flashError'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                const bsAlert = new bootstrap.Alert(el);
+                bsAlert.close();
+            }
+        });
+    }, 4000);
+
     function switchTab(tabId) {
         document.querySelectorAll('.custom-tab').forEach(t => t.classList.remove('active'));
         document.getElementById('tab-' + tabId).classList.add('active');
@@ -412,8 +617,6 @@
         if (detailsPane.style.display === 'block') {
             detailsPane.style.display = 'none';
         } else {
-            // Optional: Hide all others
-            // document.querySelectorAll('.job-details-pane').forEach(p => p.style.display = 'none');
             detailsPane.style.display = 'block';
         }
     }
@@ -453,12 +656,21 @@
         if (select.value === 'others') {
             detailsContainer.style.display = 'block';
             detailsInput.required = true;
-            hiddenInput.value = detailsInput.value;
+            hiddenInput.value = detailsInput.value || 'Other';
         } else {
             detailsContainer.style.display = 'none';
             detailsInput.required = false;
             hiddenInput.value = select.value;
         }
+    }
+
+    function validateReferralForm() {
+        const mobile = document.getElementById('refMobile').value.trim();
+        if (!/^[0-9]{10}$/.test(mobile)) {
+            alert('Mobile number must be exactly 10 digits.');
+            return false;
+        }
+        return true;
     }
 </script>
 </body>

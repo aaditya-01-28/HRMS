@@ -268,6 +268,21 @@ public class AttendanceService {
                 hrs + "." + mins
         );*/
 
+        // Validate that recorded hours are entered
+        double totalHours = 0.0;
+        try {
+            if (attendance.getTotalHours() != null) {
+                String cleanHours = attendance.getTotalHours().replaceAll("[^0-9.]", "").trim();
+                if (!cleanHours.isEmpty()) {
+                    totalHours = Double.parseDouble(cleanHours);
+                }
+            }
+        } catch (Exception ignored) {}
+
+        if (totalHours <= 0 && (attendance.getPresentDays() == null || attendance.getPresentDays() == 0)) {
+            throw new RuntimeException("Cannot submit attendance without entering any recorded hours. Please record working time first.");
+        }
+
         // 3. Update status to Pending so the Manager sees it in My Approvals
         attendance.setApprovalStatus("Pending");
         attendance.setSubmittedOn(LocalDate.now());
@@ -679,9 +694,13 @@ public class AttendanceService {
             attendance.setWeekEndDate(weekEnd);
         }
         if ("Pending".equalsIgnoreCase(attendance.getApprovalStatus())) {
-
             throw new RuntimeException(
-                    "Attendance for this week has already been submitted."
+                    "Attendance for this week has already been submitted and is pending approval."
+            );
+        }
+        if ("Approved".equalsIgnoreCase(attendance.getApprovalStatus())) {
+            throw new RuntimeException(
+                    "Attendance for this week has already been approved."
             );
         }
         
@@ -745,10 +764,12 @@ public class AttendanceService {
                 case 3 -> thursdayHours = dayHours;
                 case 4 -> fridayHours = dayHours;
                 case 5 -> saturdayHours = dayHours;
-                
             }
         }
-        
+
+        if (totalMinutes == 0 && presentDays == 0) {
+            throw new RuntimeException("Cannot submit attendance without entering any recorded hours. Please record working time first.");
+        }
 
         attendance.setPresentDays(
                 presentDays
@@ -801,7 +822,7 @@ public class AttendanceService {
                 monday.plusDays(6);
 
         /*
-         * Find current week attendance record
+         * Find and delete current week attendance records
          */
         List<Attendance> attendanceList =
                 attendanceRepository
@@ -812,29 +833,15 @@ public class AttendanceService {
                         );
 
         if (!attendanceList.isEmpty()) {
-
-            Attendance latestAttendance =
-                    attendanceList.stream()
-                            .max((a, b) ->
-                                    Long.compare(
-                                            a.getId(),
-                                            b.getId()
-                                    ))
-                            .orElseThrow();
-
-            
-
-            attendanceRepository.delete(latestAttendance);
+            attendanceRepository.deleteAll(attendanceList);
         }
 
         /*
-         * Delete ALL attendance regularizations
+         * Delete ALL attendance regularizations and reset daily attendance hours
          * for the current week
          */
         for (int i = 0; i < 7; i++) {
-
-            LocalDate currentDate =
-                    monday.plusDays(i);
+            LocalDate currentDate = monday.plusDays(i);
 
             List<AttendanceRegularization> records =
                     attendanceRegularizationRepository
@@ -844,10 +851,18 @@ public class AttendanceService {
                             );
 
             if (!records.isEmpty()) {
-
                 attendanceRegularizationRepository
                         .deleteAll(records);
             }
+
+            // Also reset daily Attendance record hours if any exist
+            Optional<Attendance> dailyAttendanceOpt = attendanceRepository.findByUserAndDate(user, currentDate);
+            dailyAttendanceOpt.ifPresent(dailyAtt -> {
+                dailyAtt.setTotalHours("0h 00m");
+                dailyAtt.setCheckInTime(null);
+                dailyAtt.setCheckOutTime(null);
+                attendanceRepository.save(dailyAtt);
+            });
         }
 
         attendanceRegularizationRepository.flush();

@@ -1,527 +1,622 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Mediclaim Helpdesk</title>
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-	<style>
-
-		  *{
-		      margin:0;
-		      padding:0;
-		      box-sizing:border-box;
-		      
-		  }
-
-		  body{
-		      background:#F3F4F6;
-		      font-size:14px;
-		      color:#111827;
-			  font-family:Arial,sans-serif;
-		  }
-
-		  .dashboard-wrapper{
-		      display:flex;
-		      min-height:100vh;
-		  }
-
-		  /* SIDEBAR */
-
-		  .sidebar{
-		      width:250px;
-		      background:#001A57;
-		      padding:24px 10px;
-		      flex-shrink:0;
-		  }
-
-		  .sidebar-logo{
-		      text-align:center;
-		      margin-bottom:40px;
-		  }
-
-		  .sidebar-logo img{
-		      width:50px;
-		      height:50px;
-		      object-fit:contain;
-		  }
-
-		  .sidebar-menu{
-		      display:flex;
-		      flex-direction:column;
-		      gap:12px;
-		  }
-
-		  .menu-item{
-		      display:flex;
-		      align-items:center;
-		      gap:8px;
-
-		      color:white;
-		      text-decoration:none;
-
-		      padding:10px 12px;
-
-		      border-radius:10px;
-
-		      font-size:14px;
-		  }
-
-		  .menu-item:hover,
-		  .menu-item.active{
-		      background:#2E63FF;
-		  }
-
-		  /* MAIN */
-
-		  .main-section{
-		      flex:1;
-		      padding:24px 40px;
-		  }
-
-		  /* HEADER */
-
-		  .helpdesk-header{
-		      display:flex;
-		      align-items:center;
-		      gap:12px;
-
-		      margin-bottom:40px;
-		  }
-
-		  .helpdesk-header i{
-		      font-size:28px;
-		      color:#333;
-		  }
-
-		  .helpdesk-header h1{
-		      font-size:20px;
-		      color:#0B2E7A;
-		      font-weight:700;
-		  }
-
-		  /* BODY LAYOUT */
-
-		  .helpdesk-container{
-		      display:flex;
-		      justify-content:space-between;
-		      gap:50px;
-		  }
-
-		  /* FAQ SECTION */
-
-		  .faq-section{
-		      flex:0 0 58%;
-		  }
-
-		  .faq-card{
-		      margin-bottom:25px;
-		  }
-
-		  .faq-question{
-		      width:100%;
-
-		      background:white;
-
-		      border:1px solid #8F8F8F;
-		      border-radius:12px;
-
-		      padding:22px 20px;
-
-		      display:flex;
-		      justify-content:space-between;
-		      align-items:center;
-
-		      cursor:pointer;
-
-		      font-size:14px;
-		      font-weight:700;
-
-		      text-align:left;
-		  }
-
-		  .faq-question span{
-		      font-size:14px;
-		      font-weight:700;
-		  }
-
-		  .faq-question i{
-		      font-size:24px;
-		      color:#333;
-		  }
-
-		  .faq-answer{
-		      display:none;
-
-		      background:white;
-
-		      border:1px solid #D1D5DB;
-		      border-top:none;
-
-		      padding:18px 20px;
-
-		      border-radius:0 0 12px 12px;
-
-		      line-height:1.7;
-		  }
-
-		  .faq-answer p{
-		      font-size:14px;
-		  }
-
-		  /* CONTACT SECTION */
-
-		  .contact-section{
-		      flex:0 0 32%;
-		  }
-
-		  .contact-section h2{
-		      font-size:20px;
-		      color:#0B2E7A;
-		      font-weight:700;
-
-		      margin-bottom:24px;
-		  }
-
-		  .contact-card{
-		      margin-bottom:30px;
-		  }
-
-		  .contact-name{
-		      display:flex;
-		      align-items:center;
-		      gap:10px;
-
-		      margin-bottom:16px;
-
-		      font-size:14px;
-		      font-weight:700;
-		  }
-
-		  .contact-detail{
-		      display:flex;
-		      align-items:center;
-		      gap:10px;
-
-		      margin-bottom:14px;
-
-		      font-size:14px;
-		  }
-
-		  .contact-detail i{
-		      width:18px;
-		  }
-
-		  .contact-section hr{
-		      margin:20px 0 30px 0;
-		      border:none;
-		      border-top:2px solid #BDBDBD;
-		  }
-
-		  /* COMPANY */
-
-		  .company-card{
-		      margin-top:20px;
-		  }
-
-		  .company-name{
-		      font-size:14px;
-		      font-weight:700;
-
-		      margin-bottom:12px;
-		  }
-
-		  .company-message{
-		      font-size:14px;
-
-		      margin-bottom:22px;
-
-		      color:#444;
-
-		      line-height:1.6;
-		  }
-
-		  /* RESPONSIVE */
-
-		  @media(max-width:992px){
-
-		      .helpdesk-container{
-		          flex-direction:column;
-		      }
-
-		      .faq-section,
-		      .contact-section{
-		          flex:1;
-		      }
-		  }
-
-	  </style>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mediclaim Helpdesk & FAQ | WhiteCircle</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --med-primary: #1e3a8a;
+            --med-primary-light: #2563eb;
+            --med-success: #16a34a;
+            --med-bg: #f8fafc;
+            --med-card-bg: #ffffff;
+            --med-border: #e2e8f0;
+            --med-text-main: #0f172a;
+            --med-text-muted: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif !important;
+            border-radius: 0 !important;
+        }
+
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, table, td, th {
+            font-family: Arial, sans-serif !important;
+        }
+
+        .card, .faq-card, .contact-card, .faq-item, .contact-box, .faq-toggle-icon,
+        .btn, .btn-sm, .back-home-btn, .faq-question-btn,
+        .badge, .header-icon-badge, .sidebar-logo img, .menu-item,
+        .table, .form-control, .form-select, .modal-content, .alert {
+            border-radius: 0 !important;
+        }
+
+        body {
+            background: var(--med-bg);
+            color: var(--med-text-main);
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            background: #001A57;
+            color: white;
+            padding: 24px 12px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .sidebar-logo img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu-item {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            padding: 11px 14px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: #2E63FF;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(46, 99, 255, 0.25);
+        }
+
+        /* MAIN SECTION */
+        .main-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* TOP HEADER */
+        .top-header {
+            height: 75px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--med-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .header-left h1 {
+            font-size: 1.25rem;
+            color: #0B2E7A;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .back-home-btn {
+            background: #2E63FF;
+            color: white;
+            text-decoration: none;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-home-btn:hover {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        /* CONTENT */
+        .dashboard-content {
+            padding: 28px 32px;
+            flex: 1;
+        }
+
+        .helpdesk-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 0.7fr;
+            gap: 28px;
+        }
+
+        /* FAQ SECTION (MT031) */
+        .faq-card {
+            background: var(--med-card-bg);
+            border: 1px solid var(--med-border);
+            border-radius: 14px;
+            padding: 26px 28px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .faq-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--med-border);
+        }
+
+        .faq-header-bar h2 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0B2E7A;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .faq-item {
+            border: 1px solid var(--med-border);
+            border-radius: 10px;
+            margin-bottom: 14px;
+            overflow: hidden;
+            background: #ffffff;
+            transition: all 0.2s ease;
+        }
+
+        .faq-item:hover {
+            border-color: #93c5fd;
+        }
+
+        .faq-question-btn {
+            width: 100%;
+            background: #ffffff;
+            border: none;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #1e293b;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .faq-question-btn:hover {
+            background: #f8fafc;
+        }
+
+        .faq-toggle-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .faq-answer-body {
+            display: none;
+            padding: 16px 20px;
+            background: #f8fafc;
+            border-top: 1px solid var(--med-border);
+            color: #334155;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        .faq-answer-body.show {
+            display: block;
+        }
+
+        /* CONTACT CARDS */
+        .contact-card {
+            background: var(--med-card-bg);
+            border: 1px solid var(--med-border);
+            border-radius: 14px;
+            padding: 26px 28px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .contact-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--med-border);
+        }
+
+        .contact-card-header h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0B2E7A;
+            margin: 0;
+        }
+
+        .contact-box {
+            background: #f8fafc;
+            border: 1px solid var(--med-border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .contact-box h4 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .contact-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.86rem;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .contact-line:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-line i {
+            color: #2563eb;
+            width: 16px;
+            text-align: center;
+        }
+
+        /* RESPONSIVENESS */
+        @media (max-width: 991px) {
+            .dashboard-wrapper {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                padding: 16px 20px;
+            }
+            .sidebar-logo {
+                margin-bottom: 14px;
+            }
+            .sidebar-menu {
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 8px;
+                padding-bottom: 4px;
+            }
+            .menu-item {
+                white-space: nowrap;
+                padding: 8px 12px;
+                font-size: 12.5px;
+            }
+            .helpdesk-grid {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-content {
+                padding: 20px 16px;
+            }
+            .top-header {
+                padding: 0 16px;
+                height: auto;
+                min-height: 65px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
 <div class="dashboard-wrapper">
 
     <!-- SIDEBAR -->
-
     <div class="sidebar">
+        <div>
+            <div class="sidebar-logo">
+                <img th:src="@{/images/wcg-logo.jpg}" alt="WhiteCircle" onerror="this.src='https://ui-avatars.com/api/?name=WCG&background=2563eb&color=fff'">
+            </div>
 
-        <div class="sidebar-logo">
+            <div class="sidebar-menu">
+                <a href="/employee/mediclaim/portal" class="menu-item">
+                    <i class="fa-solid fa-table-columns"></i>
+                    <span>Dashboard</span>
+                </a>
 
-            <!-- Add WhiteCircle logo later -->
+                <a href="/employee/mediclaim/policy" class="menu-item">
+                    <i class="fa-solid fa-file-shield"></i>
+                    <span>Coverage</span>
+                </a>
 
-			<img th:src="@{/images/wcg-logo.jpg}"
-			     alt="WhiteCircle"
-			     class="sidebar-logo">
+                <a href="/employee/mediclaim/claim" class="menu-item">
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                    <span>Submit Claim</span>
+                </a>
 
+                <a href="/employee/mediclaim/track/list" class="menu-item">
+                    <i class="fa-solid fa-file-medical"></i>
+                    <span>Claims Track</span>
+                </a>
+
+                <a href="/employee/mediclaim/dependents" class="menu-item">
+                    <i class="fa-solid fa-user-group"></i>
+                    <span>Dependents</span>
+                </a>
+
+                <a href="/employee/mediclaim/hospitals" class="menu-item">
+                    <i class="fa-solid fa-hospital"></i>
+                    <span>Hospitals</span>
+                </a>
+
+                <a href="/employee/mediclaim/helpdesk" class="menu-item active">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>Help Center</span>
+                </a>
+            </div>
         </div>
-
-        <div class="sidebar-menu">
-
-            <a href="/employee/mediclaim/portal"
-               class="menu-item">
-
-                <i class="fa-solid fa-table-columns"></i>
-
-                Dashboard
-
-            </a>
-
-			<a href="/employee/mediclaim/policy"
-			   class="menu-item">
-
-                <i class="fa-solid fa-file-shield"></i>
-
-                Coverage
-
-            </a>
-
-            <a href="/employee/mediclaim/track/list"
-               class="menu-item">
-
-                <i class="fa-solid fa-file-medical"></i>
-
-                Claims
-
-            </a>
-
-            <a href="/employee/mediclaim/helpdesk"
-               class="menu-item active">
-
-                <i class="fa-solid fa-circle-question"></i>
-
-                Help center
-
-            </a>
-
-        </div>
-
     </div>
 
-    <!-- MAIN CONTENT -->
-
+    <!-- MAIN SECTION -->
     <div class="main-section">
 
         <!-- HEADER -->
+        <header class="top-header">
+            <div class="header-left">
+                <div class="header-icon-badge">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <h1>Mediclaim Helpdesk & FAQ</h1>
+            </div>
 
-        <div class="helpdesk-header">
+            <a href="/employee/mediclaim/portal" class="back-home-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Dashboard</span>
+            </a>
+        </header>
 
-            <i class="fa-solid fa-headset"></i>
+        <!-- DASHBOARD CONTENT -->
+        <main class="dashboard-content">
 
-            <h1>
+            <div class="helpdesk-grid">
 
-                Helpdesk
-
-            </h1>
-
-        </div>
-
-        <div class="helpdesk-container">
-
-            <!-- LEFT -->
-
-            <div class="faq-section">
-
+                <!-- FAQ ACCORDION (MT031: Click expands and shows answer) -->
                 <div class="faq-card">
-
-                    <button type="button"
-                            class="faq-question">
-
-							<span>
-							    FAQ Question
-							</span>
-
-                        <i class="fa-solid fa-plus"></i>
-
-                    </button>
-
-                    <div class="faq-answer">
-
-						<p>
-						    FAQ Answer
-						</p>
-
+                    <div class="faq-header-bar">
+                        <h2>
+                            <i class="fa-solid fa-circle-question text-primary"></i>
+                            Frequently Asked Questions
+                        </h2>
+                        <span class="badge bg-light text-primary border">Policy FAQs</span>
                     </div>
 
+                    <div class="faq-list">
+
+                        <!-- FAQ 1 -->
+                        <div class="faq-item">
+                            <button type="button" class="faq-question-btn" onclick="toggleFaq(this)">
+                                <span>1. How does the cashless hospitalization claim process work?</span>
+                                <div class="faq-toggle-icon"><i class="fa-solid fa-plus"></i></div>
+                            </button>
+                            <div class="faq-answer-body">
+                                <p class="mb-2">For planned hospitalization, notify the hospital's TPA / Insurance desk at least 48 hours in advance with your Digital E-Card and Employee ID. For emergency admissions, notify within 24 hours.</p>
+                                <p class="mb-0">The hospital submits a pre-authorization request to Star Health / HDFC ERGO, which is typically approved within 2-4 hours, allowing you cashless treatment.</p>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 2 -->
+                        <div class="faq-item">
+                            <button type="button" class="faq-question-btn" onclick="toggleFaq(this)">
+                                <span>2. How do I add my spouse, children, or parents as dependents?</span>
+                                <div class="faq-toggle-icon"><i class="fa-solid fa-plus"></i></div>
+                            </button>
+                            <div class="faq-answer-body">
+                                <p class="mb-2">Navigate to the <strong>Manage Dependents</strong> section from the left sidebar or Coverage page. Provide the dependent's full name, relationship, date of birth, gender, and allocated coverage percentage (e.g., 40%).</p>
+                                <p class="mb-0">You must upload a valid proof of relationship document (Marriage Certificate, Birth Certificate, or Aadhaar). Once verified, the dependent is covered under your corporate health card.</p>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 3 -->
+                        <div class="faq-item">
+                            <button type="button" class="faq-question-btn" onclick="toggleFaq(this)">
+                                <span>3. How can I submit a post-hospitalization reimbursement claim?</span>
+                                <div class="faq-toggle-icon"><i class="fa-solid fa-plus"></i></div>
+                            </button>
+                            <div class="faq-answer-body">
+                                <p class="mb-2">Click on <strong>Submit Claim</strong> in the top header or sidebar. Complete the 5-step reimbursement wizard with hospital details, admission & discharge dates, diagnosis, and total bill amount.</p>
+                                <p class="mb-0">Attach digitized copies of original hospital bills, payment receipts, diagnostic lab reports, and doctor's discharge summary. Claims are reviewed within 5-7 business days.</p>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 4 -->
+                        <div class="faq-item">
+                            <button type="button" class="faq-question-btn" onclick="toggleFaq(this)">
+                                <span>4. Are pre-existing diseases and maternity expenses covered?</span>
+                                <div class="faq-toggle-icon"><i class="fa-solid fa-plus"></i></div>
+                            </button>
+                            <div class="faq-answer-body">
+                                <p class="mb-2">Yes. Under WhiteCircle Corporate Group Floater Insurance, pre-existing diseases (PED) are covered from Day 1 without the standard 2-4 year retail waiting period.</p>
+                                <p class="mb-0">Maternity coverage is included for female employees and covered spouses up to the specified plan limit (₹50,000 for normal delivery and ₹75,000 for C-section).</p>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 5 -->
+                        <div class="faq-item">
+                            <button type="button" class="faq-question-btn" onclick="toggleFaq(this)">
+                                <span>5. What is the deadline for submitting reimbursement claims?</span>
+                                <div class="faq-toggle-icon"><i class="fa-solid fa-plus"></i></div>
+                            </button>
+                            <div class="faq-answer-body">
+                                <p class="mb-0">Hospitalization reimbursement claims must be submitted within <strong>30 days</strong> from the date of discharge. Post-hospitalization medical bills (prescriptions, followup tests) can be submitted up to <strong>60 days</strong> post discharge.</p>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 6 -->
+                        <div class="faq-item">
+                            <button type="button" class="faq-question-btn" onclick="toggleFaq(this)">
+                                <span>6. Where can I find the list of network cashless hospitals?</span>
+                                <div class="faq-toggle-icon"><i class="fa-solid fa-plus"></i></div>
+                            </button>
+                            <div class="faq-answer-body">
+                                <p class="mb-0">Visit the <strong>Hospitals</strong> page from the navigation menu to browse or search 10,000+ empaneled hospitals across Noida, Pune, Bangalore, Mumbai, and all major metro cities with direct cashless admission desks.</p>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
 
-            </div>
-
-            <!-- RIGHT -->
-
-            <div class="contact-section">
-
-                <h2>
-
-                    Helpdesk Contact
-
-                </h2>
-
+                <!-- CONTACT CHANNELS -->
                 <div class="contact-card">
-
-                    <div class="contact-name">
-
-                        <i class="fa-solid fa-headset"></i>
-
-                        <span>
-
-                            Name
-
-                        </span>
-
+                    <div class="contact-card-header">
+                        <i class="fa-solid fa-headset text-primary fs-5"></i>
+                        <h3>Emergency & TPA Desk</h3>
                     </div>
 
-                    <div class="contact-detail">
-
-                        <i class="fa-solid fa-phone"></i>
-
-						<span>
-						    Phone
-						</span>
-
+                    <!-- TPA HELPLINE -->
+                    <div class="contact-box">
+                        <h4><i class="fa-solid fa-shield-heart text-danger"></i> 24x7 Cashless Helpdesk</h4>
+                        <div class="contact-line">
+                            <i class="fa-solid fa-phone"></i>
+                            <span>Toll Free: <strong>1800-102-4477 / 1800-425-2255</strong></span>
+                        </div>
+                        <div class="contact-line">
+                            <i class="fa-solid fa-envelope"></i>
+                            <span>Email: <strong>claims@starhealth.in</strong></span>
+                        </div>
+                        <div class="contact-line">
+                            <i class="fa-solid fa-clock"></i>
+                            <span>Availability: <strong>24 Hours / 7 Days</strong></span>
+                        </div>
                     </div>
 
-                    <div class="contact-detail">
-
-                        <i class="fa-solid fa-envelope"></i>
-
-						<span>
-						    Email
-						</span>
-
+                    <!-- CORPORATE HR DESK -->
+                    <div class="contact-box">
+                        <h4><i class="fa-solid fa-building-user text-primary"></i> WhiteCircle Benefits HR Desk</h4>
+                        <div class="contact-line">
+                            <i class="fa-solid fa-user-tie"></i>
+                            <span>Coordinator: <strong>Sneha Verma (HR Benefits)</strong></span>
+                        </div>
+                        <div class="contact-line">
+                            <i class="fa-solid fa-phone"></i>
+                            <span>Direct: <strong>+91 98765 43210 (Ext. 402)</strong></span>
+                        </div>
+                        <div class="contact-line">
+                            <i class="fa-solid fa-envelope"></i>
+                            <span>Email: <strong>mediclaim-support@whitecircle.com</strong></span>
+                        </div>
                     </div>
 
-                </div>
-
-                <hr>
-
-                <h2>
-
-                    Transport Company
-
-                </h2>
-
-                <div class="company-card">
-
-                   <div class="company-name">
-
-                        Company Name
-
-                    </div>
-
-					<div class="company-message">
-
-                        Message
-
-                    </div>
-
-                    <div class="contact-detail">
-
-                        <i class="fa-solid fa-phone"></i>
-
-                        <span>
-
-                            Phone
-
-                        </span>
-
-                    </div>
-
-                    <div class="contact-detail">
-
-                        <i class="fa-solid fa-envelope"></i>
-
-                        <span>
-
-                            Email
-
-                        </span>
-
+                    <!-- ESCALATIONS -->
+                    <div class="contact-box mb-0">
+                        <h4><i class="fa-solid fa-triangle-exclamation text-warning"></i> Level 2 Escalation</h4>
+                        <div class="contact-line">
+                            <i class="fa-solid fa-envelope"></i>
+                            <span>Email: <strong>hr-head@whitecircle.com</strong></span>
+                        </div>
+                        <div class="contact-line">
+                            <i class="fa-solid fa-building"></i>
+                            <span>Office: <strong>Corporate Tower B, Noida Sector 62</strong></span>
+                        </div>
                     </div>
 
                 </div>
 
             </div>
 
-        </div>
-
+        </main>
     </div>
-
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
+    // MT031: FAQ toggle functionality with smooth animation and icon toggle
+    function toggleFaq(button) {
+        const item = button.closest('.faq-item');
+        const answer = item.querySelector('.faq-answer-body');
+        const icon = button.querySelector('.faq-toggle-icon i');
 
-	document.addEventListener("DOMContentLoaded", function () {
-	
-	    const faqButtons = document.querySelectorAll(".faq-question");
-	
-	    faqButtons.forEach(button => {
-	
-	        button.addEventListener("click", function () {
-	
-	            const answer = this.nextElementSibling;
-	            const icon = this.querySelector("i");
-	
-	            const isOpen = answer.style.display === "block";
-	
-	            /* Close all FAQs */
-	
-	            document.querySelectorAll(".faq-answer").forEach(item => {
-	                item.style.display = "none";
-	            });
-	
-	            document.querySelectorAll(".faq-question i").forEach(item => {
-	                item.classList.remove("fa-minus");
-	                item.classList.add("fa-plus");
-	            });
-	
-	            /* Open selected FAQ */
-	
-	            if (!isOpen) {
-	
-	                answer.style.display = "block";
-	
-	                icon.classList.remove("fa-plus");
-	                icon.classList.add("fa-minus");
-	            }
-	
-	        });
-	
-	    });
-	
-	});
+        const isOpen = answer.classList.contains('show');
 
+        // Close all other FAQs
+        document.querySelectorAll('.faq-answer-body').forEach(el => {
+            el.classList.remove('show');
+        });
+        document.querySelectorAll('.faq-toggle-icon i').forEach(ic => {
+            ic.classList.remove('fa-minus');
+            ic.classList.add('fa-plus');
+        });
+
+        if (!isOpen) {
+            answer.classList.add('show');
+            icon.classList.remove('fa-plus');
+            icon.classList.add('fa-minus');
+        }
+    }
 </script>
-
 </body>
-
 </html>

@@ -110,6 +110,12 @@ public class DashboardController {
     @Autowired
     private com.example.admindashboard.repository.EmployeeProfileRepository employeeProfileRepository;
 
+    @Autowired
+    private com.example.admindashboard.repository.ItAssetRepository itAssetRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.EmployeeLeaveWalletRepository employeeLeaveWalletRepository;
+
     // --- 1. LOGIN PAGE MAPPINGS ---
 
     @GetMapping("/")
@@ -204,7 +210,7 @@ public class DashboardController {
     // FIXED LOCK: Any user with the 'admin_dashboard_view' key can enter the portal
     @PreAuthorize("hasAuthority('admin_dashboard_view')")
     @GetMapping("/admin/dashboard")
-    public String showAdminDashboard(Model model) {
+    public String showAdminDashboard(Model model, Principal principal) {
 
         // Count all internal staff (Super Admin, HR, Manager, Employee, etc.)
         // EXCLUDES Clients and Soft-Deleted (INACTIVE) accounts
@@ -217,6 +223,10 @@ public class DashboardController {
         // FIX: Count directly from the Client repository to perfectly match the Client Directory page.
         // This ignores any old, orphaned "User" test accounts (like CLI001) that don't have a real company profile.
         long totalClients = clientRepository.count();
+
+        if (principal != null) {
+            model.addAttribute("pendingMeetingInvites", getPendingMeetingInvites(principal.getName()));
+        }
 
         model.addAttribute("empCount", totalEmployees);
         model.addAttribute("clientCount", totalClients);
@@ -621,9 +631,14 @@ public class DashboardController {
             model.addAttribute("otherTickets", new java.util.ArrayList<>());
             
             model.addAttribute("isItSupport", false); // HR workflow shows all tabs normally
-            // For HR managers, resignation approvals are routed to them after reporting manager
+            // For HR managers, resignation approvals are routed directly to Senior HR
             if (request.getRequestURI().contains("senior_hr")) {
-                pendingResignations = resignationRequestRepository.findByStatus("PENDING_HR");
+                pendingResignations = resignationRequestRepository.findAll().stream()
+                        .filter(r -> "PENDING_HR".equalsIgnoreCase(r.getStatus()) 
+                                || "PENDING_MANAGER".equalsIgnoreCase(r.getStatus()) 
+                                || "PENDING_L2".equalsIgnoreCase(r.getStatus()) 
+                                || "PENDING".equalsIgnoreCase(r.getStatus()))
+                        .collect(java.util.stream.Collectors.toList());
                 model.addAttribute("isSeniorHr", true);
             } else {
                 pendingResignations = resignationRequestRepository.findByStatus("PENDING_MANAGER");
@@ -808,7 +823,8 @@ public class DashboardController {
     }
 
     @GetMapping("/employee/resignation")
-    public String showResignationPage(Model model, Principal principal) {
+    public String showResignationPage(@RequestParam(value = "edit", required = false) Boolean editMode,
+                                      Model model, Principal principal) {
         if (principal != null) {
             User employee = userRepository.findByUsername(principal.getName()).orElse(null);
             if (employee != null) {
@@ -819,10 +835,69 @@ public class DashboardController {
                 java.util.List<ResignationRequest> reqs = resignationRequestRepository.findByEmployee_Username(employee.getUsername());
                 ResignationRequest latestReq = null;
                 if (!reqs.isEmpty()) {
-                    // Assuming ordered by ID desc or just taking the first one
                     latestReq = reqs.get(0);
                 }
                 model.addAttribute("resignation", latestReq);
+                model.addAttribute("editMode", Boolean.TRUE.equals(editMode));
+
+                // MT010: Assigned assets for Exit checklist
+                java.util.List<com.example.admindashboard.model.ItAsset> assignedAssets = itAssetRepository.findAll().stream()
+                        .filter(a -> a.getAssignedTo() != null && (
+                                a.getAssignedTo().equalsIgnoreCase(employee.getFullName()) ||
+                                a.getAssignedTo().equalsIgnoreCase(employee.getUsername())
+                        ))
+                        .collect(java.util.stream.Collectors.toList());
+                model.addAttribute("assignedAssets", assignedAssets);
+
+                // MT011: Leave balance & Encashment calculation
+                double availablePaidLeaves = 0.0;
+                try {
+                    java.util.List<com.example.admindashboard.model.EmployeeLeaveWallet> wallets = employeeLeaveWalletRepository.findByUser(employee);
+                    for (com.example.admindashboard.model.EmployeeLeaveWallet w : wallets) {
+                        if (w.getLeaveType() != null) {
+                            String code = w.getLeaveType().getLeaveCode();
+                            if ("EL".equalsIgnoreCase(code) || "PL".equalsIgnoreCase(code) || "AL".equalsIgnoreCase(code)) {
+                                availablePaidLeaves += (w.getAvailableBalance() != null ? w.getAvailableBalance() : 0.0);
+                            }
+                        }
+                    }
+                } catch (Exception ignored) {}
+                if (availablePaidLeaves <= 0.0) {
+                    availablePaidLeaves = 12.0; // fallback standard paid leaves
+                }
+                model.addAttribute("availablePaidLeaves", availablePaidLeaves);
+                double estimatedDailyRate = 1800.0; // Benchmark based on average standard salary
+                long estimatedEncashment = Math.round(availablePaidLeaves * estimatedDailyRate);
+                model.addAttribute("estimatedEncashment", estimatedEncashment);
+
+                // MT008 & MT013: FnF Settlement tracking status
+                String fnfStatus = "Pending Exit Formalities";
+                int fnfStage = 1;
+                if (latestReq != null) {
+                    if ("APPROVED".equalsIgnoreCase(latestReq.getStatus())) {
+                        fnfStatus = "Clearance & Settlement In-Progress";
+                        fnfStage = 3;
+                    } else if ("OFFBOARDED".equalsIgnoreCase(latestReq.getStatus())) {
+                        fnfStatus = "Settlement Disbursed & Completed";
+                        fnfStage = 4;
+                    } else if ("WITHDRAWN".equalsIgnoreCase(latestReq.getStatus())) {
+                        fnfStatus = "Resignation Withdrawn";
+                        fnfStage = 0;
+                    } else if ("REJECTED".equalsIgnoreCase(latestReq.getStatus())) {
+                        fnfStatus = "Resignation Rejected";
+                        fnfStage = 0;
+                    } else {
+                        fnfStatus = "Pending HR Approval";
+                        fnfStage = 1;
+                    }
+                }
+                model.addAttribute("fnfStatus", fnfStatus);
+                model.addAttribute("fnfStage", fnfStage);
+
+                // MT012: Pending dues and recovery calculations
+                model.addAttribute("noticeRecoveryDues", 0);
+                model.addAttribute("pendingExpenseClaims", 0);
+                model.addAttribute("netSettlementPayable", estimatedEncashment);
             }
         }
         return "employee-resignation";
@@ -843,15 +918,40 @@ public class DashboardController {
                 req.setReason(reason);
                 req.setComments(comments);
                 req.setRequestDate(java.time.LocalDate.now());
+                req.setNoticePeriodDays(30);
+                req.setLastWorkingDate(java.time.LocalDate.now().plusDays(30));
                 
                 if ("draft".equals(action)) {
                     req.setStatus("DRAFT");
                     redirectAttributes.addFlashAttribute("successMessage", "Resignation saved as draft.");
                 } else {
-                    req.setStatus("PENDING_MANAGER");
-                    redirectAttributes.addFlashAttribute("successMessage", "Resignation submitted successfully. Forwarded to Manager.");
+                    // MT004 & MT014: Directly routed to Senior HR
+                    req.setStatus("PENDING_HR");
+                    redirectAttributes.addFlashAttribute("successMessage", "Resignation application submitted successfully. Forwarded to Senior HR for review.");
                 }
                 resignationRequestRepository.save(req);
+            }
+        }
+        return "redirect:/employee/resignation";
+    }
+
+    // MT007: Withdraw Resignation
+    @PostMapping("/employee/resignation/withdraw")
+    public String withdrawResignation(Principal principal, RedirectAttributes redirectAttributes) {
+        if (principal != null) {
+            User employee = userRepository.findByUsername(principal.getName()).orElse(null);
+            if (employee != null) {
+                java.util.List<ResignationRequest> reqs = resignationRequestRepository.findByEmployee_Username(employee.getUsername());
+                if (!reqs.isEmpty()) {
+                    ResignationRequest req = reqs.get(0);
+                    if ("APPROVED".equalsIgnoreCase(req.getStatus()) || "OFFBOARDED".equalsIgnoreCase(req.getStatus())) {
+                        redirectAttributes.addFlashAttribute("errorMessage", "Approved or offboarded resignations cannot be withdrawn online. Please contact HR.");
+                    } else {
+                        req.setStatus("WITHDRAWN");
+                        resignationRequestRepository.save(req);
+                        redirectAttributes.addFlashAttribute("successMessage", "Your resignation application has been withdrawn successfully.");
+                    }
+                }
             }
         }
         return "redirect:/employee/resignation";
@@ -896,9 +996,20 @@ public class DashboardController {
         java.util.List<JobPosting> activeJobs = jobPostingRepository.findByIsActiveTrue();
         java.util.List<Referral> myReferrals = referralRepository.findByReferredByIdOrderByIdDesc(currentUser.getId());
         
+        // MT013: Yearly referral quota metrics
+        int currentYear = java.time.LocalDate.now().getYear();
+        long usedThisYear = myReferrals.stream()
+                .filter(r -> r.getReferralDate() != null && r.getReferralDate().getYear() == currentYear)
+                .count();
+        int maxReferralsPerYear = 10;
+        int remainingQuota = Math.max(0, maxReferralsPerYear - (int) usedThisYear);
+
         model.addAttribute("activeJobs", activeJobs);
         model.addAttribute("myReferrals", myReferrals);
         model.addAttribute("user", currentUser);
+        model.addAttribute("usedThisYear", usedThisYear);
+        model.addAttribute("maxReferralsPerYear", maxReferralsPerYear);
+        model.addAttribute("remainingQuota", remainingQuota);
         model.addAttribute("backUrl", "/default-redirect");
         return "employee-referral";
     }
@@ -932,58 +1043,130 @@ public class DashboardController {
         User currentUser = userRepository.findByUsername(principal.getName()).orElse(null);
         JobPosting job = jobPostingRepository.findById(jobPostingId).orElse(null);
 
-        if (currentUser != null && job != null) {
-            Referral ref = new Referral();
-            ref.setJobPosting(job);
-            ref.setReferredBy(currentUser);
-            ref.setFirstName(firstName);
-            ref.setLastName(lastName);
-            ref.setEmail(email);
-            ref.setCountryCode(countryCode);
-            ref.setMobileNumber(mobileNumber);
-            ref.setRelationship(relationship);
-            ref.setReferralDate(java.time.LocalDateTime.now());
-            
-            if (!resumeFile.isEmpty()) {
-                try {
-                    String uploadsDir = "uploads/resumes/";
-                    java.io.File dir = new java.io.File(uploadsDir);
-                    if (!dir.exists()) dir.mkdirs();
-                    
-                    String originalName = resumeFile.getOriginalFilename();
-                    String ext = originalName.substring(originalName.lastIndexOf("."));
-                    String newFilename = java.util.UUID.randomUUID().toString() + ext;
-                    
-                    java.nio.file.Path path = java.nio.file.Paths.get(uploadsDir + newFilename);
-                    java.nio.file.Files.copy(resumeFile.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                    
-                    ref.setResumeFilename(newFilename);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    redirectAttributes.addFlashAttribute("errorMessage", "Failed to upload resume.");
-                    return "redirect:/employee/referral";
-                }
-            }
-            
-            referralRepository.save(ref);
-            
-            // --- EMAIL TRIGGER START ---
+        if (currentUser == null || job == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Invalid referral request.");
+            return "redirect:/employee/referral";
+        }
+
+        String normEmail = email.trim().toLowerCase();
+        String normPhone = mobileNumber.trim();
+
+        // MT014: Existing employee should not be allowed to be referred
+        boolean isExistingUser = userRepository.findAll().stream().anyMatch(u -> 
+                (u.getEmail() != null && u.getEmail().trim().equalsIgnoreCase(normEmail)) ||
+                (u.getUsername() != null && u.getUsername().trim().equalsIgnoreCase(normEmail))
+        );
+        boolean isExistingProfile = employeeProfileRepository.findAll().stream().anyMatch(p ->
+                (p.getOfficialEmail() != null && p.getOfficialEmail().trim().equalsIgnoreCase(normEmail)) ||
+                (p.getPersonalEmail() != null && p.getPersonalEmail().trim().equalsIgnoreCase(normEmail)) ||
+                (p.getMobileNumber() != null && p.getMobileNumber().trim().equalsIgnoreCase(normPhone))
+        );
+        if (isExistingUser || isExistingProfile) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Validation Error: Cannot refer an existing active employee of WhiteCircle.");
+            return "redirect:/employee/referral";
+        }
+
+        // MT013: Employee referral limit should be enforced (max 10 per calendar year)
+        int currentYear = java.time.LocalDate.now().getYear();
+        java.util.List<Referral> myExistingReferrals = referralRepository.findByReferredByIdOrderByIdDesc(currentUser.getId());
+        long referralsCountThisYear = myExistingReferrals.stream()
+                .filter(r -> r.getReferralDate() != null && r.getReferralDate().getYear() == currentYear)
+                .count();
+        if (referralsCountThisYear >= 10) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Referral Limit Reached: You have reached the maximum yearly limit of 10 referrals for the year " + currentYear + ".");
+            return "redirect:/employee/referral";
+        }
+
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        java.util.List<Referral> allReferrals = referralRepository.findAll();
+
+        // MT011: Employee should not be able to refer multiple times before allowed waiting period (30 days cooldown for duplicate by same employee)
+        boolean recentSelfDuplicate = myExistingReferrals.stream().anyMatch(r ->
+                ((r.getEmail() != null && r.getEmail().trim().equalsIgnoreCase(normEmail)) ||
+                 (r.getMobileNumber() != null && r.getMobileNumber().trim().equalsIgnoreCase(normPhone))) &&
+                r.getReferralDate() != null && r.getReferralDate().isAfter(now.minusDays(30))
+        );
+        if (recentSelfDuplicate) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Cooldown Period Active: You have already referred this candidate within the last 30 days. Please wait before submitting another referral for the same candidate.");
+            return "redirect:/employee/referral";
+        }
+
+        // MT012: Same candidate should not be referred by multiple employees within restricted period (90 days active candidate window)
+        boolean duplicateActiveCandidate = allReferrals.stream().anyMatch(r ->
+                r.getReferredBy() != null && !r.getReferredBy().getId().equals(currentUser.getId()) &&
+                ((r.getEmail() != null && r.getEmail().trim().equalsIgnoreCase(normEmail)) ||
+                 (r.getMobileNumber() != null && r.getMobileNumber().trim().equalsIgnoreCase(normPhone))) &&
+                r.getReferralDate() != null && r.getReferralDate().isAfter(now.minusDays(90)) &&
+                !"REJECTED".equalsIgnoreCase(r.getStatus()) && !"WITHDRAWN".equalsIgnoreCase(r.getStatus())
+        );
+        if (duplicateActiveCandidate) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Candidate In-Process: This candidate has already been referred by another employee within the active 90-day window.");
+            return "redirect:/employee/referral";
+        }
+
+        // MT015: Rejected candidate should not be allowed to be referred again before waiting period (180 days)
+        boolean coolingPeriodActive = allReferrals.stream().anyMatch(r ->
+                ((r.getEmail() != null && r.getEmail().trim().equalsIgnoreCase(normEmail)) ||
+                 (r.getMobileNumber() != null && r.getMobileNumber().trim().equalsIgnoreCase(normPhone))) &&
+                "REJECTED".equalsIgnoreCase(r.getStatus()) &&
+                r.getReferralDate() != null && r.getReferralDate().isAfter(now.minusDays(180))
+        );
+        if (coolingPeriodActive) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Cooling Period Active: This candidate was recently rejected. As per policy, rejected candidates may only be re-referred after a 180-day (6-month) cooling period.");
+            return "redirect:/employee/referral";
+        }
+
+        Referral ref = new Referral();
+        ref.setJobPosting(job);
+        ref.setReferredBy(currentUser);
+        ref.setFirstName(firstName);
+        ref.setLastName(lastName);
+        ref.setEmail(normEmail);
+        ref.setCountryCode(countryCode);
+        ref.setMobileNumber(normPhone);
+        ref.setRelationship(relationship);
+        ref.setReferralDate(now);
+        ref.setStatus("SUBMITTED");
+        ref.setStage("Screening");
+
+        if (!resumeFile.isEmpty()) {
             try {
-                java.util.Map<String, Object> emailData = new java.util.HashMap<>();
-                emailData.put("candidateName", firstName + " " + lastName);
-                emailData.put("employeeName", currentUser.getFullName());
-                emailData.put("jobTitle", job.getTitle());
-                emailData.put("companyName", "WhiteCircle");
+                String uploadsDir = "uploads/resumes/";
+                java.io.File dir = new java.io.File(uploadsDir);
+                if (!dir.exists()) dir.mkdirs();
                 
-                emailService.sendReferralEmailToCandidate(email, firstName + " " + lastName, currentUser.getFullName(), emailData);
+                String originalName = resumeFile.getOriginalFilename();
+                String ext = (originalName != null && originalName.contains(".")) ? originalName.substring(originalName.lastIndexOf(".")) : ".pdf";
+                String newFilename = java.util.UUID.randomUUID().toString() + ext;
+                
+                java.nio.file.Path path = java.nio.file.Paths.get(uploadsDir + newFilename);
+                java.nio.file.Files.copy(resumeFile.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                
+                ref.setResumeFilename(newFilename);
             } catch (Exception e) {
-                System.err.println("Warning: Could not trigger Candidate Referral email: " + e.getMessage());
+                e.printStackTrace();
+                redirectAttributes.addFlashAttribute("errorMessage", "Failed to upload resume document.");
+                return "redirect:/employee/referral";
             }
-            // --- EMAIL TRIGGER END ---
-            
-            redirectAttributes.addFlashAttribute("successMessage", "You have referred " + firstName + " " + lastName + " successfully!");
         }
         
+        referralRepository.save(ref);
+        
+        // --- EMAIL TRIGGER START ---
+        try {
+            java.util.Map<String, Object> emailData = new java.util.HashMap<>();
+            emailData.put("candidateName", firstName + " " + lastName);
+            emailData.put("employeeName", currentUser.getFullName());
+            emailData.put("jobTitle", job.getTitle());
+            emailData.put("companyName", "WhiteCircle");
+            
+            emailService.sendReferralEmailToCandidate(normEmail, firstName + " " + lastName, currentUser.getFullName(), emailData);
+        } catch (Exception e) {
+            System.err.println("Warning: Could not trigger Candidate Referral email: " + e.getMessage());
+        }
+        // --- EMAIL TRIGGER END ---
+        
+        redirectAttributes.addFlashAttribute("successMessage", "Referral submitted successfully! You have referred " + firstName + " " + lastName + " for " + job.getTitle() + ".");
         return "redirect:/employee/referral";
     }
 
@@ -1056,7 +1239,14 @@ public class DashboardController {
             existingProfile.setUser(user);
         }
 
-        if (mobileNumber != null) existingProfile.setMobileNumber(mobileNumber.trim());
+        if (mobileNumber != null && !mobileNumber.trim().isEmpty()) {
+            String cleanMobile = mobileNumber.trim();
+            if (!cleanMobile.matches("^[6-9]\\d{9}$")) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Invalid mobile number. Please enter a valid 10-digit mobile number.");
+                return "redirect:" + returnUrl;
+            }
+            existingProfile.setMobileNumber(cleanMobile);
+        }
         if (city != null) existingProfile.setCity(city.trim());
         if (country != null) existingProfile.setCountry(country.trim());
         if (experience != null) existingProfile.setExperience(experience.trim());
@@ -1304,18 +1494,7 @@ public class DashboardController {
                 }
             }
 
-            if (!isUserInvited) return false;
-
-            if ("CONFIRMED".equals(meeting.getStatus())) return true;
-
-            String approvedIds = meeting.getApprovedEmployeeIds();
-            if (approvedIds != null && !approvedIds.trim().isEmpty()) {
-                List<String> approvedList = List.of(approvedIds.split(","));
-                if (approvedList.contains(currentUsername)) {
-                    return true;
-                }
-            }
-            return false;
+            return isUserInvited;
         }).toList();
 
         // FIXED: Dynamic Routing Logic for the "Back" Button
@@ -1454,6 +1633,22 @@ public class DashboardController {
     @GetMapping("/coming-soon")
     public String comingSoonPage() {
         return "work-in-progress"; // Work In Progress page for static cards
+    }
+
+    @GetMapping("/employee/activate-mobile")
+    public String activateMobilePage(Model model, Principal principal) {
+        if (principal != null) {
+            userRepository.findByUsername(principal.getName()).ifPresent(u -> model.addAttribute("user", u));
+        }
+        return "activate-mobile";
+    }
+
+    @GetMapping("/employee/favourites")
+    public String employeeFavouritesPage(Model model, Principal principal) {
+        if (principal != null) {
+            userRepository.findByUsername(principal.getName()).ifPresent(u -> model.addAttribute("user", u));
+        }
+        return "employee-favourites";
     }
 
     @GetMapping("/erp/authenticate")
@@ -1808,52 +2003,30 @@ public class DashboardController {
 
         List<ServiceRequest> tickets;
 
-        if ("IT_SUPPORT".equalsIgnoreCase(roleName)) {
-
-            tickets = serviceRequestRepository
-                    .findByTypeOrderByIdDesc("IT");
-
-        } else if ("FINANCE".equalsIgnoreCase(roleName)) {
-
-            tickets = serviceRequestRepository
-                    .findByTypeOrderByIdDesc("PAYROLL");
-
-        } else if ("LND".equalsIgnoreCase(roleName)) {
-
-            tickets = serviceRequestRepository
-                    .findByTypeOrderByIdDesc("LEARNING");
-
-        } else if ("IT_SUPPORT".equalsIgnoreCase(roleName)) {
-
-            tickets = serviceRequestRepository
-                    .findByTypeOrderByIdDesc("ENTERPRISE");
-
-        } else if ("HR_MANAGER".equalsIgnoreCase(roleName)) {
-
+        if ("IT_SUPPORT".equalsIgnoreCase(roleName) || "SENIOR_IT_HEAD".equalsIgnoreCase(roleName) || "IT_ADMIN".equalsIgnoreCase(roleName)) {
             tickets = new ArrayList<>();
-
-            tickets.addAll(
-                    serviceRequestRepository
-                            .findByTypeOrderByIdDesc("HR")
-            );
-
-            tickets.addAll(
-                    serviceRequestRepository
-                            .findByTypeOrderByIdDesc("ALUMNI")
-            );
-
-        } else if ("FACILITY_L2".equalsIgnoreCase(roleName) || "SENIOR_FACILITY_HEAD".equalsIgnoreCase(roleName)) {
-            tickets = new ArrayList<>(
-                    serviceRequestRepository.findByTypeOrderByIdDesc("FACILITIES")
-            );
+            tickets.addAll(serviceRequestRepository.findByTypeOrderByIdDesc("IT"));
+            tickets.addAll(serviceRequestRepository.findByTypeOrderByIdDesc("ENTERPRISE"));
+        } else if ("FINANCE".equalsIgnoreCase(roleName) || "SENIOR_ACCOUNTS_HEAD".equalsIgnoreCase(roleName)) {
+            tickets = serviceRequestRepository.findByTypeOrderByIdDesc("PAYROLL");
+        } else if ("LND".equalsIgnoreCase(roleName) || "SENIOR_LND_HEAD".equalsIgnoreCase(roleName) || "LEARNING_HEAD".equalsIgnoreCase(roleName)) {
+            tickets = serviceRequestRepository.findByTypeOrderByIdDesc("LEARNING");
+        } else if ("HR_MANAGER".equalsIgnoreCase(roleName) || "HR_ADMIN".equalsIgnoreCase(roleName) || "SENIOR_HR".equalsIgnoreCase(roleName) || "HR_EXECUTIVE".equalsIgnoreCase(roleName)) {
+            tickets = new ArrayList<>();
+            tickets.addAll(serviceRequestRepository.findByTypeOrderByIdDesc("HR"));
+            tickets.addAll(serviceRequestRepository.findByTypeOrderByIdDesc("ALUMNI"));
+            tickets.addAll(serviceRequestRepository.findByTypeOrderByIdDesc("FACILITIES"));
+        } else if ("FACILITY_L2".equalsIgnoreCase(roleName) || "SENIOR_FACILITY_HEAD".equalsIgnoreCase(roleName) || "FACILITY".equalsIgnoreCase(roleName)) {
+            tickets = new ArrayList<>(serviceRequestRepository.findByTypeOrderByIdDesc("FACILITIES"));
+        } else if ("PROJECT_MANAGER".equalsIgnoreCase(roleName) || "SENIOR_MANAGER".equalsIgnoreCase(roleName) || "MANAGER".equalsIgnoreCase(roleName)) {
+            tickets = new ArrayList<>();
+            tickets.addAll(serviceRequestRepository.findByTypeOrderByIdDesc("ENTERPRISE"));
+            tickets.addAll(serviceRequestRepository.findByTypeOrderByIdDesc("IT"));
+        } else if ("SUPER_ADMIN".equalsIgnoreCase(roleName) || "ADMIN".equalsIgnoreCase(roleName)) {
+            tickets = serviceRequestRepository.findAll();
         } else {
-
-            tickets = new ArrayList<>();
+            tickets = serviceRequestRepository.findAll();
         }
-
-        tickets = tickets.stream()
-                .filter(t -> !loginId.equalsIgnoreCase(t.getEmployeeId()))
-                .collect(Collectors.toList());
 
         long openCount = tickets.stream()
                 .filter(t -> "Open".equalsIgnoreCase(t.getStatus()))

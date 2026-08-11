@@ -17,8 +17,21 @@
 		    --card-border: #666666;
 		}
 
+		* {
+			box-sizing: border-box;
+			font-family: Arial, sans-serif !important;
+			border-radius: 0 !important;
+		}
+
+		body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a {
+			font-family: Arial, sans-serif !important;
+		}
+
+		.card, .btn, .btn-back-hub, .btn-circular-back-hub, .modal-content, .alert {
+			border-radius: 0 !important;
+		}
+
 		body {
-			
 			font-family: Arial, sans-serif;
 			font-size: 14px;
 		    background-color: var(--bg-color);
@@ -211,7 +224,7 @@
         @media (max-width: 991px) {
             .top-header {
                 padding: 10px 15px !important;
-                height: 70px !important;
+                height: 64px !important;
             }
             .btn-circular-back-hub { width: 30px !important; height: 30px !important; font-size: 0.85rem !important; margin-right: 8px !important; }
             .btn-back-hub {
@@ -223,13 +236,28 @@
             .mockup-icon-card { font-size: 1rem !important; }
             .header-separator { margin-right: 10px !important; height: 20px !important; }
             .header-title-text { font-size: 1.1rem !important; }
-            .main-content-canvas { margin-top: 90px !important; padding: 0 15px !important; }
-            .section-headline-title { font-size: 1.2rem !important; margin-bottom: 20px !important; }
-            .action-box { height: 100px !important; border-radius: 12px !important; padding: 10px 5px !important; gap: 6px !important; }
-            .icon-wrapper-flat { font-size: 1.5rem !important; }
-            .box-title { font-size: 0.75rem !important; }
+            .main-content-canvas { margin-top: 80px !important; padding: 0 16px !important; }
+            .section-headline-title { font-size: 1.1rem !important; margin-bottom: 16px !important; }
+            .action-box { height: 110px !important; border-radius: 12px !important; padding: 12px 6px !important; gap: 8px !important; }
+            .icon-wrapper-flat { font-size: 1.6rem !important; }
+            .box-title { font-size: 0.8rem !important; }
             .custom-grid-row {
-                row-gap: 20px !important;
+                row-gap: 16px !important;
+            }
+        }
+        @media (max-width: 576px) {
+            .custom-grid-row {
+                row-gap: 12px !important;
+            }
+            .action-box {
+                height: 100px !important;
+                padding: 10px 4px !important;
+            }
+            .icon-wrapper-flat {
+                font-size: 1.4rem !important;
+            }
+            .box-title {
+                font-size: 0.72rem !important;
             }
         }
     </style>
@@ -287,7 +315,7 @@
 
 		<div class="col">
 		    <div class="action-box"
-		         th:onclick="|window.location.href='@{/employee/my-goals}'|">
+		         onclick="window.location.href='/employee/my-goals'">
 
 		        <div class="icon-wrapper-flat">
 		            <i class="fa-solid fa-bullseye"></i>
@@ -308,7 +336,7 @@
         </div>
 
         <div class="col">
-            <div class="action-box" onclick="window.location.href='/coming-soon'">
+            <div class="action-box" onclick="window.location.href='/employee/activate-mobile'">
                 <div class="icon-wrapper-flat"><i class="fa-solid fa-mobile-screen-button"></i></div>
                 <div class="box-title">Activate Mobile</div>
             </div>
@@ -329,7 +357,7 @@
         </div>
 
         <div class="col">
-            <div class="action-box" onclick="window.location.href='/coming-soon'">
+            <div class="action-box" onclick="window.location.href='/employee/favourites'">
                 <div class="icon-wrapper-flat"><i class="fa-solid fa-star"></i></div>
                 <div class="box-title">View Favourite</div>
             </div>

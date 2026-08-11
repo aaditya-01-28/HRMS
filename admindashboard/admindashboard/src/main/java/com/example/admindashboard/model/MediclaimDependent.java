@@ -20,7 +20,8 @@ public class MediclaimDependent {
     private String gender;
     private boolean isCovered; // true if added to the policy
     private Integer coveragePercentage;
-
+    private String documentFilename;
+    private Double allocatedAmount;
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -46,4 +47,10 @@ public class MediclaimDependent {
 
     public Integer getCoveragePercentage() { return coveragePercentage; }
     public void setCoveragePercentage(Integer coveragePercentage) { this.coveragePercentage = coveragePercentage; }
+
+    public String getDocumentFilename() { return documentFilename; }
+    public void setDocumentFilename(String documentFilename) { this.documentFilename = documentFilename; }
+
+    public Double getAllocatedAmount() { return allocatedAmount; }
+    public void setAllocatedAmount(Double allocatedAmount) { this.allocatedAmount = allocatedAmount; }
 }

@@ -191,18 +191,26 @@
         }
 
         @media (max-width: 768px) {
+            .table-responsive {
+                border-radius: 8px;
+                border: 1px solid #e2e8f0;
+                background: #fff;
+                margin-top: 10px;
+            }
             .approval-table {
-                display: block;
                 width: 100%;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+                min-width: 600px;
+            }
+            .approval-table th, .approval-table td {
+                padding: 10px 12px !important;
+                font-size: 0.82rem !important;
             }
             .top-header {
-                padding: 0 12px !important;
+                padding: 10px 14px !important;
                 height: auto !important;
-                min-height: 62px;
+                min-height: 56px;
                 flex-direction: row !important;
-                flex-wrap: wrap !important;
+                flex-wrap: nowrap !important;
                 gap: 8px !important;
             }
             .approval-title span {
@@ -211,19 +219,28 @@
             .home-btn {
                 padding: 6px 12px !important;
                 font-size: 12px !important;
+                white-space: nowrap;
             }
             .page-content {
-                margin-top: 70px !important;
-                padding: 10px !important;
+                margin-top: 65px !important;
+                padding: 12px !important;
             }
             .custom-tabs {
                 overflow-x: auto;
                 white-space: nowrap;
+                padding: 0 4px;
+                gap: 4px;
+            }
+            .custom-tab {
+                padding: 10px 14px !important;
+                font-size: 13px !important;
             }
             .filter-row {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 10px;
+                gap: 8px;
+                margin-top: 10px !important;
+                margin-bottom: 10px !important;
             }
             .search-input {
                 width: 100%;
@@ -297,11 +314,17 @@
                                 <span th:if="${req.leaveType == 'Sick'}" class="text-danger"><i class="fas fa-plus-square me-1"></i> Sick</span>
                                 <span th:if="${req.leaveType == 'Casual'}" class="text-primary"><i class="fas fa-umbrella-beach me-1"></i> Casual</span>
                                 <span th:if="${req.leaveType == 'Earned'}" class="text-success"><i class="fas fa-star me-1"></i> Earned</span>
+                                <span th:if="${req.leaveType != 'Sick' and req.leaveType != 'Casual' and req.leaveType != 'Earned'}" th:text="${req.leaveType}">Leave</span>
                             </td>
                             <td>
-                                <div th:if="${req.leaveMode == 'Full Day'}" th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(req.fromDate, req.toDate) + 1} + ' Days'"></div>
-                                <div th:if="${req.leaveMode == 'Half Day'}">0.5 Days</div>
-                                <div th:if="${req.leaveMode == 'Short Leave'}">Short Leave</div>
+                                <span th:if="${req.totalDays != null and req.totalDays > 0}" th:text="${req.totalDays == 1 ? '1 Day' : (req.totalDays + ' Days')}"></span>
+                                <span th:unless="${req.totalDays != null and req.totalDays > 0}">
+                                    <span th:if="${req.leaveMode == 'Half Day' or req.leaveMode == 'HALF_DAY'}">0.5 Day</span>
+                                    <span th:if="${req.leaveMode == 'Short Leave' or req.leaveMode == 'SHORT_LEAVE'}">Short Leave</span>
+                                    <span th:if="${(req.leaveMode == null or (req.leaveMode != 'Half Day' and req.leaveMode != 'HALF_DAY' and req.leaveMode != 'Short Leave' and req.leaveMode != 'SHORT_LEAVE')) and req.fromDate != null and req.toDate != null}"
+                                          th:text="${(T(java.time.temporal.ChronoUnit).DAYS.between(req.fromDate, req.toDate) + 1) + ((T(java.time.temporal.ChronoUnit).DAYS.between(req.fromDate, req.toDate) + 1) == 1 ? ' Day' : ' Days')}"></span>
+                                    <span th:if="${(req.fromDate == null or req.toDate == null) and (req.leaveMode == null or req.leaveMode == 'Full Day' or req.leaveMode == 'FULL_DAY')}">1 Day</span>
+                                </span>
                             </td>
                             <td>
                                 <div th:text="${#temporals.format(req.fromDate, 'MMM dd, yyyy')} + ' - ' + ${#temporals.format(req.toDate, 'MMM dd, yyyy')}"></div>
@@ -331,11 +354,17 @@
                                 <span th:if="${req.leaveType == 'Sick'}" class="text-danger"><i class="fas fa-plus-square me-1"></i> Sick</span>
                                 <span th:if="${req.leaveType == 'Casual'}" class="text-primary"><i class="fas fa-umbrella-beach me-1"></i> Casual</span>
                                 <span th:if="${req.leaveType == 'Earned'}" class="text-success"><i class="fas fa-star me-1"></i> Earned</span>
+                                <span th:if="${req.leaveType != 'Sick' and req.leaveType != 'Casual' and req.leaveType != 'Earned'}" th:text="${req.leaveType}">Leave</span>
                             </td>
                             <td>
-                                <div th:if="${req.leaveMode == 'Full Day'}" th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(req.fromDate, req.toDate) + 1} + ' Days'"></div>
-                                <div th:if="${req.leaveMode == 'Half Day'}">0.5 Days</div>
-                                <div th:if="${req.leaveMode == 'Short Leave'}">Short Leave</div>
+                                <span th:if="${req.totalDays != null and req.totalDays > 0}" th:text="${req.totalDays == 1 ? '1 Day' : (req.totalDays + ' Days')}"></span>
+                                <span th:unless="${req.totalDays != null and req.totalDays > 0}">
+                                    <span th:if="${req.leaveMode == 'Half Day' or req.leaveMode == 'HALF_DAY'}">0.5 Day</span>
+                                    <span th:if="${req.leaveMode == 'Short Leave' or req.leaveMode == 'SHORT_LEAVE'}">Short Leave</span>
+                                    <span th:if="${(req.leaveMode == null or (req.leaveMode != 'Half Day' and req.leaveMode != 'HALF_DAY' and req.leaveMode != 'Short Leave' and req.leaveMode != 'SHORT_LEAVE')) and req.fromDate != null and req.toDate != null}"
+                                          th:text="${(T(java.time.temporal.ChronoUnit).DAYS.between(req.fromDate, req.toDate) + 1) + ((T(java.time.temporal.ChronoUnit).DAYS.between(req.fromDate, req.toDate) + 1) == 1 ? ' Day' : ' Days')}"></span>
+                                    <span th:if="${(req.fromDate == null or req.toDate == null) and (req.leaveMode == null or req.leaveMode == 'Full Day' or req.leaveMode == 'FULL_DAY')}">1 Day</span>
+                                </span>
                             </td>
                             <td><div th:text="${#temporals.format(req.fromDate, 'MMM dd, yyyy')} + ' - ' + ${#temporals.format(req.toDate, 'MMM dd, yyyy')}"></div></td>
                             <td th:text="${req.reason}"></td>
@@ -363,11 +392,17 @@
                                 <span th:if="${req.leaveType == 'Sick'}" class="text-danger"><i class="fas fa-plus-square me-1"></i> Sick</span>
                                 <span th:if="${req.leaveType == 'Casual'}" class="text-primary"><i class="fas fa-umbrella-beach me-1"></i> Casual</span>
                                 <span th:if="${req.leaveType == 'Earned'}" class="text-success"><i class="fas fa-star me-1"></i> Earned</span>
+                                <span th:if="${req.leaveType != 'Sick' and req.leaveType != 'Casual' and req.leaveType != 'Earned'}" th:text="${req.leaveType}">Leave</span>
                             </td>
                             <td>
-                                <div th:if="${req.leaveMode == 'Full Day'}" th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(req.fromDate, req.toDate) + 1} + ' Days'"></div>
-                                <div th:if="${req.leaveMode == 'Half Day'}">0.5 Days</div>
-                                <div th:if="${req.leaveMode == 'Short Leave'}">Short Leave</div>
+                                <span th:if="${req.totalDays != null and req.totalDays > 0}" th:text="${req.totalDays == 1 ? '1 Day' : (req.totalDays + ' Days')}"></span>
+                                <span th:unless="${req.totalDays != null and req.totalDays > 0}">
+                                    <span th:if="${req.leaveMode == 'Half Day' or req.leaveMode == 'HALF_DAY'}">0.5 Day</span>
+                                    <span th:if="${req.leaveMode == 'Short Leave' or req.leaveMode == 'SHORT_LEAVE'}">Short Leave</span>
+                                    <span th:if="${(req.leaveMode == null or (req.leaveMode != 'Half Day' and req.leaveMode != 'HALF_DAY' and req.leaveMode != 'Short Leave' and req.leaveMode != 'SHORT_LEAVE')) and req.fromDate != null and req.toDate != null}"
+                                          th:text="${(T(java.time.temporal.ChronoUnit).DAYS.between(req.fromDate, req.toDate) + 1) + ((T(java.time.temporal.ChronoUnit).DAYS.between(req.fromDate, req.toDate) + 1) == 1 ? ' Day' : ' Days')}"></span>
+                                    <span th:if="${(req.fromDate == null or req.toDate == null) and (req.leaveMode == null or req.leaveMode == 'Full Day' or req.leaveMode == 'FULL_DAY')}">1 Day</span>
+                                </span>
                             </td>
                             <td><div th:text="${#temporals.format(req.fromDate, 'MMM dd, yyyy')} + ' - ' + ${#temporals.format(req.toDate, 'MMM dd, yyyy')}"></div></td>
                             <td th:text="${req.reason}"></td>
