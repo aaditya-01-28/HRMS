@@ -1,4 +1,4 @@
-# 🏢 White Circle Group HRMS (Human Resource Management System)
+# 🏢 Enterprise HRMS (Human Resource Management System)
 
 > An enterprise-grade, comprehensive Human Resource Management & Operations Platform designed to streamline the entire employee lifecycle—from recruitment and onboarding to attendance, payroll, mediclaim, project workflows, and separation.
 
@@ -12,7 +12,7 @@
 ## 📖 About Us & Project Overview
 
 ### 🌟 About the Project
-**WCG HRMS** is an all-in-one digital workplace and enterprise resource management solution crafted to unify HR operations, management workflows, and employee self-service into a seamless, high-performance ecosystem. 
+**Enterprise HRMS** is an all-in-one digital workplace and operations management solution crafted to unify HR operations, management workflows, and employee self-service into a seamless, high-performance ecosystem. 
 
 Designed with modern enterprise governance standards, role-based access control (RBAC), and automated approval chains, the system eliminates administrative friction, enhances transparency, and delivers real-time analytics across all organizational tiers.
 
@@ -158,9 +158,8 @@ HRMS/
 ## 👥 Contributors & Maintainers
 
 - **Aaditya Prabhakar** — *Lead Developer & Maintainer* ([@aaditya-01-28](https://github.com/aaditya-01-28))
-- **White Circle Group (WCG)**
 
 ---
 
 ## 📄 License
-This project is proprietary and confidential. All rights reserved by **White Circle Group (WCG)**.
+This project is proprietary and confidential. All rights reserved.
