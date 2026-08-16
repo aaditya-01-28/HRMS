@@ -14,6 +14,9 @@ on:
   pull_request:
     branches: [ "bugfix/aaditya-hrms-bug-fixes" ]
 
+permissions:
+  contents: write
+
 jobs:
   build:
 
