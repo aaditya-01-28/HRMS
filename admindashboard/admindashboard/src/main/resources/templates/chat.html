@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat & Support | White Circle HRMS</title>
+    <title>Chat & Support | Textora HRMS</title>
+    <link rel="icon" type="image/png" href="/images/textoratech2-logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
@@ -881,7 +882,7 @@
 
         // 2. HR BOT LOGIC (Bypasses database)
         if (contactId == 0) {
-            displayMessage({content: "Hello! I am the White Circle HR Assistant. Please type your query, and I will assist you.", senderId: 0, timestamp: new Date().toISOString()}, 'received');
+            displayMessage({content: "Hello! I am the Textora Technology HR Assistant. Please type your query, and I will assist you.", senderId: 0, timestamp: new Date().toISOString()}, 'received');
             return;
         }
 

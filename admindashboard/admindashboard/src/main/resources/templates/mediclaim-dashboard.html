@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Control Center | WhiteCircle Mediclaim</title>
+    <title>Health Control Center | Textora Technology Mediclaim</title>
+    <link rel="icon" type="image/png" href="/images/textoratech2-logo.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -27,12 +28,12 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif !important;
+            font-family: Arial, sans-serif;
             border-radius: 0 !important;
         }
 
         body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, table, td, th {
-            font-family: Arial, sans-serif !important;
+            font-family: Arial, sans-serif;
         }
 
         .card, .stat-card, .info-card, .quick-card, .recent-claims-card,
@@ -538,6 +539,20 @@
                 padding: 8px 10px;
             }
         }
+    
+        /* Protect FontAwesome webfont icons from Arial overrides */
+        .fa, .fas, .fa-solid, [class^="fa-"], [class*=" fa-"] {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 900;
+        }
+        .far, .fa-regular {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 400;
+        }
+        .fab, .fa-brands {
+            font-family: 'Font Awesome 6 Brands' !important;
+            font-weight: 400;
+        }
     </style>
 </head>
 <body>
@@ -548,7 +563,7 @@
     <div class="sidebar">
         <div>
             <div class="sidebar-logo">
-                <img th:src="@{/images/wcg-logo.jpg}" alt="WhiteCircle" onerror="this.src='https://ui-avatars.com/api/?name=WCG&background=2563eb&color=fff'">
+                <img th:src="@{/images/textora-logo.png}" alt="Textora Technology" onerror="this.src='https://ui-avatars.com/api/?name=Textora&background=2563eb&color=fff'">
             </div>
 
             <div class="sidebar-menu">
@@ -705,7 +720,7 @@
 
                         <div class="info-item">
                             <span class="info-item-label">Official Email</span>
-                            <span class="info-item-value" th:text="${profile != null && profile.officialEmail != null ? profile.officialEmail : (user != null ? user.email : 'employee@whitecircle.com')}">employee@whitecircle.com</span>
+                            <span class="info-item-value" th:text="${profile != null && profile.officialEmail != null ? profile.officialEmail : (user != null ? user.email : 'employee@Textora Technology.com')}">employee@Textora Technology.com</span>
                         </div>
 
                         <div class="info-item">
@@ -715,7 +730,7 @@
 
                         <div class="info-item full-width">
                             <span class="info-item-label">Company / Business Unit</span>
-                            <span class="info-item-value" th:text="${profile != null && profile.businessUnit != null ? profile.businessUnit : 'WhiteCircle Technologies Private Limited'}">WhiteCircle Technologies Private Limited</span>
+                            <span class="info-item-value" th:text="${profile != null && profile.businessUnit != null ? profile.businessUnit : 'Textora Technology Technologies Private Limited'}">Textora Technology Technologies Private Limited</span>
                         </div>
                     </div>
                 </div>
@@ -740,12 +755,12 @@
 
                         <div class="info-item">
                             <span class="info-item-label">Policy Number</span>
-                            <span class="info-item-value" th:text="${policy != null && policy.policyNumber != null ? policy.policyNumber : 'WCG-2026-MED-001'}">WCG-2026-MED-001</span>
+                            <span class="info-item-value" th:text="${policy != null && policy.policyNumber != null ? policy.policyNumber : 'TXT-2026-MED-001'}">TXT-2026-MED-001</span>
                         </div>
 
                         <div class="info-item full-width">
                             <span class="info-item-label">Policy Name</span>
-                            <span class="info-item-value" th:text="${policy != null && policy.policyName != null && !#strings.isEmpty(policy.policyName) ? policy.policyName : 'WhiteCircle Comprehensive Health Shield - Gold Plan'}">WhiteCircle Comprehensive Health Shield - Gold Plan</span>
+                            <span class="info-item-value" th:text="${policy != null && policy.policyName != null && !#strings.isEmpty(policy.policyName) ? policy.policyName : 'Textora Technology Comprehensive Health Shield - Gold Plan'}">Textora Technology Comprehensive Health Shield - Gold Plan</span>
                         </div>
 
                         <div class="info-item full-width">

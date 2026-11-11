@@ -145,7 +145,7 @@ public class TimesheetService {
 
         // Send email notification
         String emailBody = "Employee " + sheet.getUser().getUsername() + " has submitted a timesheet for week: " + sheet.getWeekStartDate();
-        emailService.sendSimpleEmail("hr-admin@whitecircle.com", "New Timesheet Submission", emailBody);
+        emailService.sendSimpleEmail("hr-admin@textoratechnologies.com", "New Timesheet Submission", emailBody);
 
         return "Timesheet Submitted Successfully!";
     }

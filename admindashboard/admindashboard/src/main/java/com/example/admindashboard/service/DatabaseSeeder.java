@@ -5,6 +5,7 @@ import com.example.admindashboard.repository.ClientRepository;
 import com.example.admindashboard.repository.PermissionRepository;
 import com.example.admindashboard.repository.RoleRepository;
 import com.example.admindashboard.repository.UserRepository;
+import com.example.admindashboard.repository.EmployeeRoleAssignmentRepository;
 import com.example.admindashboard.repository.CandidateRepository;
 import com.example.admindashboard.model.Candidate;
 import com.example.admindashboard.repository.FacilityVendorRepository;
@@ -30,11 +31,18 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private EmployeeRoleAssignmentRepository employeeRoleAssignmentRepository;
+
     @Autowired
     private CandidateRepository candidateRepository;
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.CompanyDetailsRepository companyDetailsRepository;
 
     @Autowired
     private PermissionRepository permissionRepository;
@@ -87,6 +95,15 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Autowired
     private com.example.admindashboard.repository.ItAssetRepository itAssetRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.DepartmentEntityRepository departmentEntityRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.EmployeeGroupRepository employeeGroupRepository;
+
+    @Autowired
+    private com.example.admindashboard.repository.TeamRepository teamRepository;
 
     @Autowired
     private com.example.admindashboard.repository.SecurityPolicyRepository securityPolicyRepository;
@@ -545,7 +562,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             User admin = new User();
             admin.setUsername("ADM001");
             admin.setFullName("System Administrator");
-            admin.setEmail("admin@whitecirclegroup.com");
+            admin.setEmail("admin@textorasms.com");
             admin.setRole(superAdminRole);
             admin.setPassword("{noop}admin123");
 
@@ -591,101 +608,9 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
 
         // ==========================================
-        // REAL EMPLOYEE DATA SEEDING
+        // TEXTORA SMS COMPANY USERS SEEDING (@textorasms.com)
         // ==========================================
-
-        // Employee 1: Om Tripathi
-        if (userRepository.findByUsername("EMP114").isEmpty()) {
-            User emp1 = new User();
-            emp1.setUsername("EMP114");
-            emp1.setPassword("{noop}welcome123");
-            emp1.setRole(employeeRole);
-            emp1.setFullName("Om Tripathi");
-            emp1.setEmail("om.whitecirclegroup@gmail.com");
-
-            EmployeeProfile profile1 = new EmployeeProfile();
-            profile1.setDesignation("Marketing Lead");
-            profile1.setEmployeeCode("EMP114");
-            profile1.setMobileNumber("6265147016");
-            profile1.setExperience("05 Years");
-            profile1.setJoiningDate(LocalDate.of(2023, 3, 5));
-            profile1.setBusinessUnit("Bhopal");
-            profile1.setProjectName("Saller");
-            profile1.setProjectCode("S65");
-            profile1.setReportingManager("Virendra Tiwari");
-            profile1.setCustomerName("Manish Rastogi");
-            profile1.setWorkLocation("Bhopal");
-            profile1.setCity("Bhopal");
-            profile1.setBuHrContact("7509759872");
-            profile1.setDob(LocalDate.of(1992, 8, 24));
-
-            profile1.setUser(emp1);
-            emp1.setEmployeeProfile(profile1);
-            userRepository.save(emp1);
-            System.out.println("✅ Created Employee -> ID: EMP114 | Name: Om Tripathi");
-        }
-
-        // Employee 2: Om Singrore
-        if (userRepository.findByUsername("EMP187").isEmpty()) {
-            User emp2 = new User();
-            emp2.setUsername("EMP187");
-            emp2.setPassword("{noop}welcome123");
-            emp2.setRole(employeeRole);
-            emp2.setFullName("Om Singrore");
-            emp2.setEmail("omsingrorewhitecirclegroup@gmail.com");
-
-            EmployeeProfile profile2 = new EmployeeProfile();
-            profile2.setDesignation("Project Manager");
-            profile2.setDepartment("Product");
-            profile2.setMobileNumber("+91 75879 57916");
-            profile2.setExperience("3.5 Years");
-            profile2.setJoiningDate(LocalDate.of(2022, 5, 7));
-            profile2.setBusinessUnit("Bhopal");
-            profile2.setProjectName("Index");
-            profile2.setProjectCode("IX47");
-            profile2.setReportingManager("Sudeep Radhakrishnan");
-            profile2.setCustomerName("Neha Tabbu");
-            profile2.setWorkLocation("Bhopal");
-            profile2.setCity("Bhopal");
-            profile2.setBuHrContact("7509759872");
-            profile2.setDob(LocalDate.of(1989, 4, 16));
-
-            profile2.setUser(emp2);
-            emp2.setEmployeeProfile(profile2);
-            userRepository.save(emp2);
-            System.out.println("✅ Created Employee -> ID: EMP187 | Name: Om Singrore");
-        }
-
-        // Employee 3: Saumya Katare
-        if (userRepository.findByUsername("EMP129").isEmpty()) {
-            User emp3 = new User();
-            emp3.setUsername("EMP129");
-            emp3.setPassword("{noop}welcome123");
-            emp3.setRole(employeeRole);
-            emp3.setFullName("Saumya Katare");
-            emp3.setEmail("saumyawhitecirclegroup@gmail.com");
-
-            EmployeeProfile profile3 = new EmployeeProfile();
-            profile3.setDesignation("IOS Developer");
-            profile3.setEmployeeCode("EMP129");
-            profile3.setMobileNumber("+91 7724051300");
-            profile3.setExperience("4.8 Years");
-            profile3.setJoiningDate(LocalDate.of(2022, 5, 7));
-            profile3.setBusinessUnit("Bhopal");
-            profile3.setProjectName("Sald");
-            profile3.setProjectCode("SD09");
-            profile3.setReportingManager("Manikanata");
-            profile3.setCustomerName("Gairy Singh Nahar");
-            profile3.setWorkLocation("Raipur");
-            profile3.setCity("Raipur");
-            profile3.setBuHrContact("7509759872");
-            profile3.setDob(LocalDate.of(1995, 5, 8));
-
-            profile3.setUser(emp3);
-            emp3.setEmployeeProfile(profile3);
-            userRepository.save(emp3);
-            System.out.println("✅ Created Employee -> ID: EMP129 | Name: Saumya Katare");
-        }
+        seedCompanyUsers(superAdminRole, seniorManagerRole, managerRole, employeeRole);
 
         // ==========================================
         // RBAC TESTING ACCOUNTS
@@ -2472,6 +2397,174 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
 
+    private void seedCompanyUsers(Role superAdminRole, Role seniorManagerRole, Role managerRole, Role employeeRole) {
+        System.out.println("🏢 Seeding Textora SMS Company Users (@textorasms.com)...");
+
+        // 1. Toshi - Level 1
+        seedOrUpdateCompanyUser(
+                "toshi@textorasms.com",
+                "toshi@textorasms.com",
+                "Toshi",
+                "toshi@123",
+                employeeRole,
+                "L1",
+                "Software Engineer",
+                "TXT001",
+                null
+        );
+
+        // 2. Sandeep - Level 3 2
+        seedOrUpdateCompanyUser(
+                "sandeep@textorasms.com",
+                "sandeep@textorasms.com",
+                "Sandeep",
+                "Sandeep@1234",
+                seniorManagerRole,
+                "L3",
+                "Senior Manager",
+                "TXT002",
+                List.of(managerRole)
+        );
+
+        // 3. Sahana - Level 1
+        seedOrUpdateCompanyUser(
+                "sahana@textorasms.com",
+                "sahana@textorasms.com",
+                "Sahana",
+                "Sahana@123",
+                employeeRole,
+                "L1",
+                "Software Engineer",
+                "TXT003",
+                null
+        );
+
+        // 4. Krati - Level 1
+        seedOrUpdateCompanyUser(
+                "krati@textorasms.com",
+                "krati@textorasms.com",
+                "Krati",
+                "Krati@123",
+                employeeRole,
+                "L1",
+                "Software Engineer",
+                "TXT004",
+                null
+        );
+
+        // 5. Harsh - Level 1
+        seedOrUpdateCompanyUser(
+                "harsh@textorasms.com",
+                "harsh@textorasms.com",
+                "Harsh",
+                "Harsh@123",
+                employeeRole,
+                "L1",
+                "Software Engineer",
+                "TXT005",
+                null
+        );
+
+        // 6. Abhilasha - Level 4 3 2
+        seedOrUpdateCompanyUser(
+                "abhilasha@textorasms.com",
+                "abhilasha@textorasms.com",
+                "Abhilasha",
+                "Abhi@123",
+                superAdminRole,
+                "L4",
+                "Director / Administrator",
+                "TXT006",
+                List.of(seniorManagerRole, managerRole)
+        );
+
+        // 7. Aaditya - Level 1 2
+        seedOrUpdateCompanyUser(
+                "aaditya@textorasms.com",
+                "aaditya@textorasms.com",
+                "Aaditya",
+                "Aaditya@01",
+                managerRole,
+                "L2",
+                "Team Lead / Manager",
+                "TXT007",
+                List.of(employeeRole)
+        );
+
+        // 8. Praveen - Level 4 3 2
+        seedOrUpdateCompanyUser(
+                "praveen@textorasms.com",
+                "praveen@textorasms.com",
+                "Praveen",
+                "Praveen@123",
+                superAdminRole,
+                "L4",
+                "Director / Administrator",
+                "TXT008",
+                List.of(seniorManagerRole, managerRole)
+        );
+
+        System.out.println("✅ All 8 Textora SMS Company Users successfully seeded/updated!");
+    }
+
+    private void seedOrUpdateCompanyUser(String username, String email, String fullName, String rawPassword,
+                                         Role primaryRole, String gradeLevel, String designation, String empCode,
+                                         List<Role> extraRoles) {
+        User user = userRepository.findByUsername(username)
+                .or(() -> userRepository.findByEmail(email))
+                .orElse(null);
+
+        if (user == null) {
+            user = new User();
+            user.setUsername(username);
+        }
+
+        user.setFullName(fullName);
+        user.setEmail(email);
+        user.setRole(primaryRole);
+        user.setPassword("{noop}" + rawPassword);
+        user.setStatus("ACTIVE");
+        user.setDesignation(designation);
+
+        EmployeeProfile profile = user.getEmployeeProfile();
+        if (profile == null) {
+            profile = new EmployeeProfile();
+            profile.setUser(user);
+            profile.setJoiningDate(LocalDate.now());
+        }
+        profile.setGradeLevel(gradeLevel);
+        profile.setDesignation(designation);
+        if (profile.getEmployeeCode() == null || profile.getEmployeeCode().isBlank()) {
+            profile.setEmployeeCode(empCode != null ? empCode : username);
+        }
+        if (profile.getFirstName() == null || profile.getFirstName().isBlank()) {
+            profile.setFirstName(fullName);
+        }
+        // Basic details updated, other details (phone, address, qualification, bank info) will be filled by user
+        user.setEmployeeProfile(profile);
+
+        User savedUser = userRepository.save(user);
+
+        // Assign additional roles if specified (e.g. for Level 4 3 2, Level 3 2, Level 1 2)
+        if (extraRoles != null && !extraRoles.isEmpty() && employeeRoleAssignmentRepository != null) {
+            List<EmployeeRoleAssignment> existing = employeeRoleAssignmentRepository.findByUser(savedUser);
+            for (Role extraRole : extraRoles) {
+                if (extraRole == null || extraRole.getId() == null) continue;
+                boolean alreadyAssigned = existing.stream().anyMatch(a -> a.getRole() != null && a.getRole().getId().equals(extraRole.getId()));
+                if (!alreadyAssigned) {
+                    EmployeeRoleAssignment assignment = new EmployeeRoleAssignment();
+                    assignment.setUser(savedUser);
+                    assignment.setRole(extraRole);
+                    assignment.setAssignedOn(LocalDate.now());
+                    assignment.setEffectiveFrom(LocalDate.now());
+                    assignment.setStatus("Active");
+                    employeeRoleAssignmentRepository.save(assignment);
+                }
+            }
+        }
+        System.out.println("✅ Seeded/Updated: " + fullName + " <" + email + "> | Level/Grade: " + gradeLevel + " | Role: " + primaryRole.getRoleName());
+    }
+
     private void updateSeededEmployee(String username, String department, String designation) {
         User u = userRepository.findByUsername(username).orElse(null);
         if (u != null) {
@@ -2684,6 +2777,134 @@ public class DatabaseSeeder implements CommandLineRunner {
         seedOnboardCandidate("Khushi Joshi", "khushi.joshi@gmail.com", "8210456789", "20/Jan/2025", "Completed", true);
 
         }
+
+        // ==========================================
+        // SEED DEPARTMENTS (ORGANIZATION CHART)
+        // ==========================================
+        if (departmentEntityRepository.count() == 0) {
+            seedDepartment("Top Management", "System Administrator", 5, 2, "Head Office", "Active");
+            seedDepartment("Human Resources", "Priya Sharma", 24, 2, "Pune, India", "Active");
+            seedDepartment("Information Technology", "Vikrant Sharma", 50, 3, "Raipur, India", "Active");
+            seedDepartment("Finance", "Kavita Iyer", 34, 2, "Delhi, India", "Active");
+            seedDepartment("Operations", "Rajesh Varma", 55, 2, "Bangalore, India", "Active");
+            seedDepartment("Customer Support", "Neha Singh", 22, 2, "Noida, India", "Active");
+            seedDepartment("Sales", "Aditya Patel", 0, 1, "Mumbai, India", "Active");
+            seedDepartment("Engineering", "Vikrant Sharma", 45, 3, "Raipur, India", "Active");
+            seedDepartment("Product", "Ananya Sen", 20, 2, "Bangalore, India", "Active");
+            seedDepartment("Design", "Rohan Roy", 12, 2, "Mumbai, India", "Active");
+            System.out.println("✅ Seeded Org Chart Departments.");
+        }
+
+        // ==========================================
+        // SEED TEAMS (ORGANIZATION CHART SUB-TEAMS)
+        // ==========================================
+        if (teamRepository.count() == 0) {
+            seedTeam("Backend Team", "Engineering", "Core backend microservices and database architecture");
+            seedTeam("Frontend Team", "Engineering", "Web, UI/UX portal, responsive frontends");
+            seedTeam("QA Team", "Engineering", "Quality assurance, automated CI/CD and testing");
+            seedTeam("Product Strategy", "Product", "Roadmap planning and user analytics");
+            seedTeam("Growth Team", "Product", "Acquisition and product funnel");
+            seedTeam("UI Design", "Design", "Design system, Figma libraries and branding");
+            seedTeam("UX Research", "Design", "User testing and accessibility standards");
+            seedTeam("Talent Acquisition", "Human Resources", "Sourcing, screening and interview pipelines");
+            seedTeam("HR Operations", "Human Resources", "Employee lifecycle, policy compliance and onboarding");
+            seedTeam("Corporate Payroll", "Finance", "Monthly payroll processing, tax declarations and statutory PF/ESI");
+            seedTeam("Accounts & Audit", "Finance", "Ledger management and financial compliance");
+            System.out.println("✅ Seeded Org Chart Teams.");
+        }
+        if (departmentEntityRepository.findByDepartmentNameIgnoreCase("Sales").isEmpty()) {
+            seedDepartment("Sales", "Aditya Patel", 0, 1, "Mumbai, India", "Active");
+        }
+        if (teamRepository.findByTeamName("Enterprise Sales").isEmpty()) {
+            seedTeam("Enterprise Sales", "Sales", "B2B client acquisitions and large accounts");
+        }
+
+
+        // ==========================================
+        // SEED EMPLOYEE GROUPS
+        // ==========================================
+        if (employeeGroupRepository.count() == 0) {
+            seedGroup("Core Engineering", "ENG-CORE", "Core software development, backend, frontend, DevOps and QA", 45, "Active", "CODE_ACCESS,DEPLOY_PROD,INFRA_ACCESS");
+            seedGroup("Product & Design", "PRD-DSN", "Product management, UI/UX designers and user researchers", 32, "Active", "ROADMAP_WRITE,DESIGN_SYSTEM,ANALYTICS_VIEW");
+            seedGroup("Leadership & Executive", "LDR-EXEC", "Senior management, department heads and directors", 10, "Active", "FULL_ADMIN,APPROVAL_SIGN,BUDGET_APPROVE");
+            seedGroup("Operations & HR", "OPS-HR", "People operations, talent acquisition, workplace services", 23, "Active", "ONBOARD_WRITE,EMPLOYEE_EDIT,BGV_MANAGE");
+            seedGroup("Contractual Staff", "CNT-TEMP", "External contractors, temporary staff and fixed-term consultants", 10, "Active", "PORTAL_VIEW_ONLY,TIMESHEET_SUBMIT");
+
+            // Seed Pending Approval Employee Profiles (Real DB Records)
+            Role pendingEmpRole = getOrCreateRole("EMPLOYEE");
+            if (userRepository.findByUsername("EMP000319").isEmpty()) {
+                User pEmp1 = new User();
+                pEmp1.setUsername("EMP000319");
+                pEmp1.setPassword("{noop}welcome123");
+                pEmp1.setRole(pendingEmpRole);
+                pEmp1.setFullName("Ram Sharma");
+                pEmp1.setEmail("ram.sharma@textoratech.com");
+                pEmp1.setStatus("PENDING");
+
+                EmployeeProfile pProfile1 = new EmployeeProfile();
+                pProfile1.setPrefix("Mr.");
+                pProfile1.setFirstName("Ram");
+                pProfile1.setMiddleName("Kapoor");
+                pProfile1.setLastName("Sharma");
+                pProfile1.setEmployeeCode("EMP000319");
+                pProfile1.setDesignation("Software Engineer");
+                pProfile1.setDepartment("Engineering");
+                pProfile1.setFatherName("Ramesh Sharma");
+                pProfile1.setMaritalStatus("Unmarried");
+                pProfile1.setSpouseName("Khushboo Sharma");
+                pProfile1.setJoiningDate(LocalDate.of(2026, 4, 1));
+                pProfile1.setSalaryDate(LocalDate.of(2026, 4, 1));
+                pProfile1.setUser(pEmp1);
+                pEmp1.setEmployeeProfile(pProfile1);
+                userRepository.save(pEmp1);
+            }
+
+            if (userRepository.findByUsername("EMP000320").isEmpty()) {
+                User pEmp2 = new User();
+                pEmp2.setUsername("EMP000320");
+                pEmp2.setPassword("{noop}welcome123");
+                pEmp2.setRole(pendingEmpRole);
+                pEmp2.setFullName("Raj K Sinha");
+                pEmp2.setEmail("raj.sinha@textoratech.com");
+                pEmp2.setStatus("PENDING");
+
+                EmployeeProfile pProfile2 = new EmployeeProfile();
+                pProfile2.setPrefix("Mr.");
+                pProfile2.setFirstName("Raj");
+                pProfile2.setMiddleName("Kumar");
+                pProfile2.setLastName("Sinha");
+                pProfile2.setEmployeeCode("EMP000320");
+                pProfile2.setDesignation("Product Manager");
+                pProfile2.setDepartment("Product");
+                pProfile2.setFatherName("Suresh Sinha");
+                pProfile2.setMaritalStatus("Married");
+                pProfile2.setSpouseName("Pooja Sinha");
+                pProfile2.setJoiningDate(LocalDate.of(2026, 4, 15));
+                pProfile2.setSalaryDate(LocalDate.of(2026, 4, 1));
+                pProfile2.setUser(pEmp2);
+                pEmp2.setEmployeeProfile(pProfile2);
+                userRepository.save(pEmp2);
+            }
+
+            // Seed Default Company Details if not already present
+            if (companyDetailsRepository.count() == 0) {
+                CompanyDetails cd = new CompanyDetails();
+                cd.setCompanyName("Textora Technology Pvt. Ltd.");
+                cd.setWebsite("https://textorasms.com/");
+                cd.setTelephone("+91 80 1234 5678");
+                cd.setPanNo("AAMCT5123G");
+                cd.setGstNo("29AAMCT5123G1Z5");
+                cd.setAddressLine1("5a, 1A Cross Rd");
+                cd.setAddressLine2("Dollar Scheme Colony, 1st Stage, BTM 1st Stage");
+                cd.setCity("Bengaluru");
+                cd.setState("Karnataka");
+                cd.setPincode("560068");
+                cd.setAuthorizedSignatory("Vikrant Sharma");
+                cd.setDirectorName("Vikrant Sharma");
+                companyDetailsRepository.save(cd);
+            }
+            System.out.println("✅ Seeded Employee Groups.");
+        }
     }
 
 
@@ -2717,5 +2938,34 @@ public class DatabaseSeeder implements CommandLineRunner {
         c.setActivity(activity);
         c.setEmpSource(empSource);
         candidateRepository.save(c);
+    }
+    private void seedDepartment(String name, String headName, int count, int teams, String loc, String status) {
+        DepartmentEntity d = new DepartmentEntity();
+        d.setDepartmentName(name);
+        d.setHeadName(headName);
+        d.setEmployeesCount(count);
+        d.setTotalTeams(teams);
+        d.setLocations(loc);
+        d.setStatus(status);
+        departmentEntityRepository.save(d);
+    }
+
+    private void seedTeam(String name, String dept, String desc) {
+        Team t = new Team();
+        t.setTeamName(name);
+        t.setDepartmentName(dept);
+        t.setDescription(desc);
+        teamRepository.save(t);
+    }
+
+    private void seedGroup(String name, String code, String desc, int count, String status, String perms) {
+        EmployeeGroup g = new EmployeeGroup();
+        g.setGroupName(name);
+        g.setGroupCode(code);
+        g.setDescription(desc);
+        g.setTotalEmployees(count);
+        g.setStatus(status);
+        g.setPermissions(perms);
+        employeeGroupRepository.save(g);
     }
 }

@@ -76,4 +76,49 @@ public class CompanyDetails {
 
     public String getDirectorName() { return directorName; }
     public void setDirectorName(String directorName) { this.directorName = directorName; }
+
+    @Transient
+    public String getFullAddress() {
+        StringBuilder sb = new StringBuilder();
+        if (addressLine1 != null && !addressLine1.trim().isEmpty()) {
+            sb.append(addressLine1.trim());
+        }
+        if (addressLine2 != null && !addressLine2.trim().isEmpty()) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append(addressLine2.trim());
+        }
+        if (city != null && !city.trim().isEmpty()) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append(city.trim());
+        }
+        if (state != null && !state.trim().isEmpty()) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append(state.trim());
+        }
+        if (pincode != null && !pincode.trim().isEmpty()) {
+            if (sb.length() > 0) sb.append(" - ");
+            sb.append(pincode.trim());
+        }
+        return sb.length() > 0 ? sb.toString() : "5a, 1A Cross Rd, Dollar Scheme Colony, 1st Stage, BTM 1st Stage, Bengaluru, Karnataka - 560068";
+    }
+
+    @Transient
+    public String getCleanWebsiteUrl() {
+        if (website == null || website.trim().isEmpty()) {
+            return "https://textoratechnologies.com";
+        }
+        String w = website.trim();
+        if (!w.startsWith("http://") && !w.startsWith("https://")) {
+            return "https://" + w;
+        }
+        return w;
+    }
+
+    @Transient
+    public String getDisplayWebsite() {
+        if (website == null || website.trim().isEmpty()) {
+            return "www.textoratechnologies.com";
+        }
+        return website.trim().replaceAll("^https?://", "").replaceAll("/$", "");
+    }
 }

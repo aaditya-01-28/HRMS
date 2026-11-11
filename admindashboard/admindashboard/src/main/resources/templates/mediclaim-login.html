@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mediclaim Login</title>
+    <link rel="icon" type="image/png" href="/images/textoratech2-logo.png">
 
     <meta name="_csrf" th:content="${_csrf?.token}" />
     <meta name="_csrf_header" th:content="${_csrf?.headerName}" />
@@ -19,14 +20,31 @@
 		    font-family: Arial, sans-serif;
 		}
 
-        * {
+                * {
             box-sizing: border-box;
-            font-family: Arial, sans-serif !important;
             border-radius: 0 !important;
         }
 
-        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, label {
-            font-family: Arial, sans-serif !important;
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, label, th, td {
+            font-family: Arial, sans-serif;
+        }
+
+        span:not([class*="fa-"]), a:not([class*="fa-"]) {
+            font-family: Arial, sans-serif;
+        }
+
+        /* Protect FontAwesome webfont icons from Arial overrides */
+        .fa, .fas, .fa-solid, [class^="fa-"], [class*=" fa-"] {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 900;
+        }
+        .far, .fa-regular {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 400;
+        }
+        .fab, .fa-brands {
+            font-family: 'Font Awesome 6 Brands' !important;
+            font-weight: 400;
         }
 
         .login-wrapper, .login-form-box, .sso-input-field, .btn-continue-sso, .back-btn, .alert {
@@ -458,7 +476,7 @@
         <div class="login-wrapper">
 
             <div class="logo-section">
-                <img src="/images/white_bg_logo.png" alt="WhiteCircle Group" onerror="this.src='/images/white-logo.png'">
+                <img src="/images/textora-brand-light.png" alt="Textora Technologies" style="height: 55px; width: auto; object-fit: contain; margin-bottom: 16px;">
                 <h1>Welcome Back!</h1>
                 <p>
                     Please enter your details to sign in.

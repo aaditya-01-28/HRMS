@@ -38,7 +38,7 @@ public class SuperAdminInitializer {
                 sadm.setUsername("SADM001");
                 sadm.setPassword("{noop}welcome123");
                 sadm.setFullName("Rohit Singh");
-                sadm.setEmail("s.admin@wcg.com");
+                sadm.setEmail("s.admin@textorasms.com");
                 sadm.setRole(superAdminRole);
                 sadm.setStatus("ACTIVE");
                 

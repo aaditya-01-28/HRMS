@@ -24,13 +24,22 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         System.out.println("Attempting login for user: " + username);
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-
-        // Enforce case-sensitivity: entered username must match registered format exactly (e.g. EMP123 vs emp123)
-        if (!user.getUsername().equals(username)) {
-            throw new UsernameNotFoundException("Invalid Employee ID format or case mismatch: " + username);
+        if (username == null || username.trim().isEmpty()) {
+            throw new UsernameNotFoundException("Username cannot be empty");
         }
+        String trimmed = username.trim();
+
+        User user = userRepository.findByUsername(trimmed)
+                .or(() -> userRepository.findByEmail(trimmed))
+                .or(() -> userRepository.findByUsername(trimmed.toLowerCase()))
+                .or(() -> userRepository.findByEmail(trimmed.toLowerCase()))
+                .or(() -> {
+                    if (!trimmed.contains("@")) {
+                        return userRepository.findByEmail(trimmed.toLowerCase() + "@textorasms.com");
+                    }
+                    return java.util.Optional.empty();
+                })
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         Set<GrantedAuthority> authorities = new HashSet<>();
 

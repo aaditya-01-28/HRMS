@@ -1,7 +1,7 @@
-// === UNIVERSAL THEME ENGINE (State-Based Fix) ===
+﻿// === UNIVERSAL THEME ENGINE (State-Based Fix) ===
 
 // 1. Apply theme immediately on load
-const savedTheme = localStorage.getItem('whitecircle-theme') || 'light';
+const savedTheme = localStorage.getItem('Textora Technology-theme') || 'light';
 document.documentElement.setAttribute('data-bs-theme', savedTheme);
 
 // 2. Updated Function: Now it's "Double-Trigger Proof"
@@ -21,7 +21,7 @@ function toggleDarkMode() {
     }
 
     document.documentElement.setAttribute('data-bs-theme', newTheme);
-    localStorage.setItem('whitecircle-theme', newTheme);
+    localStorage.setItem('Textora Technology-theme', newTheme);
 
     // Sync any other UI elements if needed
     updateToggleUI(newTheme);

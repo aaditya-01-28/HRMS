@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Referral Portal | WhiteCircle</title>
+    <title>Employee Referral Portal | Textora Technology</title>
+    <link rel="icon" type="image/png" href="/images/textoratech2-logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -17,14 +18,31 @@
             --ref-text-muted: #64748b;
         }
 
-        * {
+                * {
             box-sizing: border-box;
-            font-family: Arial, sans-serif !important;
             border-radius: 0 !important;
         }
 
-        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, label, th, td {
-            font-family: Arial, sans-serif !important;
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, label, th, td {
+            font-family: Arial, sans-serif;
+        }
+
+        span:not([class*="fa-"]), a:not([class*="fa-"]) {
+            font-family: Arial, sans-serif;
+        }
+
+        /* Protect FontAwesome webfont icons from Arial overrides */
+        .fa, .fas, .fa-solid, [class^="fa-"], [class*=" fa-"] {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 900;
+        }
+        .far, .fa-regular {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 400;
+        }
+        .fab, .fa-brands {
+            font-family: 'Font Awesome 6 Brands' !important;
+            font-weight: 400;
         }
 
         .job-card, .job-details-pane, .quota-banner, .quota-pill, .search-box input,
@@ -378,7 +396,7 @@
         <!-- REFERRAL QUOTA & POLICY BANNER (MT013, MT014, MT015) -->
         <div class="quota-banner">
             <div class="quota-info">
-                <h4><i class="fas fa-gift me-2 text-warning"></i> WhiteCircle Employee Referral Program</h4>
+                <h4><i class="fas fa-gift me-2 text-warning"></i> Textora Technology Employee Referral Program</h4>
                 <p>Refer top talent and earn reward bonuses upon successful joining & probation clearance.</p>
             </div>
             <div class="quota-badges">
@@ -518,7 +536,7 @@
                     <input type="hidden" name="jobPostingId" id="modalJobPostingId">
                     
                     <div class="alert alert-info py-2 small mb-3">
-                        <i class="fas fa-info-circle me-1"></i> Note: Please ensure the candidate is not currently an active WhiteCircle employee and has not been referred within the last 90 days.
+                        <i class="fas fa-info-circle me-1"></i> Note: Please ensure the candidate is not currently an active Textora Technology employee and has not been referred within the last 90 days.
                     </div>
 
                     <div class="row g-3">

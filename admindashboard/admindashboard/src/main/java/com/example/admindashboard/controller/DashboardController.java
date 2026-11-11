@@ -33,6 +33,9 @@ public class DashboardController {
     private UserRepository userRepository;
 
     @Autowired
+    private CompanyDetailsRepository companyDetailsRepository;
+
+    @Autowired
     private TimesheetRepository timesheetRepository;
     
     @Autowired
@@ -1062,7 +1065,7 @@ public class DashboardController {
                 (p.getMobileNumber() != null && p.getMobileNumber().trim().equalsIgnoreCase(normPhone))
         );
         if (isExistingUser || isExistingProfile) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Validation Error: Cannot refer an existing active employee of WhiteCircle.");
+            redirectAttributes.addFlashAttribute("errorMessage", "Validation Error: Cannot refer an existing active employee of Textora Technology.");
             return "redirect:/employee/referral";
         }
 
@@ -1158,7 +1161,7 @@ public class DashboardController {
             emailData.put("candidateName", firstName + " " + lastName);
             emailData.put("employeeName", currentUser.getFullName());
             emailData.put("jobTitle", job.getTitle());
-            emailData.put("companyName", "WhiteCircle");
+            emailData.put("companyName", "Textora Technology");
             
             emailService.sendReferralEmailToCandidate(normEmail, firstName + " " + lastName, currentUser.getFullName(), emailData);
         } catch (Exception e) {
@@ -1547,9 +1550,13 @@ public class DashboardController {
 
     @GetMapping("/email-signature")
     public String showEmailSignaturePage(Model model, Principal principal) {
-        String username = principal.getName();
+        String username = principal != null ? principal.getName() : "";
         User currentUser = userRepository.findByUsername(username).orElse(new User());
         model.addAttribute("user", currentUser);
+
+        CompanyDetails companyDetails = companyDetailsRepository.findAll().stream().findFirst().orElse(null);
+        model.addAttribute("companyDetails", companyDetails);
+
         return "email-signature";
     }
 

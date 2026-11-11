@@ -3,86 +3,218 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Login &mdash; WhiteCircle Group</title>
-    
-    
-    
+    <title>Payroll & Tax Login &mdash; Textora Technology</title>
+    <link rel="icon" type="image/png" href="/images/textoratech2-logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        .login-page { display: flex; height: 100vh; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border-radius: 0 !important;
+        }
+
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, label, th, td {
+            font-family: Arial, sans-serif;
+        }
+
+        span:not([class*="fa-"]), a:not([class*="fa-"]) {
+            font-family: Arial, sans-serif;
+        }
+
+        /* Protect FontAwesome webfont icons from Arial overrides */
+        .fa, .fas, .far, .fab, .fa-solid, .fa-regular, .fa-brands, [class^="fa-"], [class*=" fa-"] {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 900;
+        }
+        .far, .fa-regular {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 400;
+        }
+        .fab, .fa-brands {
+            font-family: 'Font Awesome 6 Brands' !important;
+            font-weight: 400;
+        }
+
+        .login-page {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f1f5f9;
+        }
         
         /* Left Panel */
-        .login-left { flex: 1; position: relative; overflow: hidden; }
-        .login-left img { width: 100%; height: 100%; object-fit: cover; }
+        .login-left {
+            flex: 1.2;
+            position: relative;
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.90) 0%, rgba(30, 58, 138, 0.88) 100%),
+                        url('/images/wcg-building.png') center center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 56px;
+            color: #ffffff;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #93c5fd;
+            width: fit-content;
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1.25;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 32px;
+            max-width: 480px;
+        }
+
+        .payroll-features {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .payroll-feat-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 12px 18px;
+        }
+
+        .feat-icon-box {
+            width: 36px;
+            height: 36px;
+            background: #2563eb;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .feat-text-main {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .feat-text-sub {
+            font-size: 0.78rem;
+            color: #94a3b8;
+        }
+
+        .hero-foot {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
         
         /* Right Panel */
         .login-right {
-            width: 480px;
-            background-color: #e2e2e2;
+            width: 500px;
+            background-color: #ffffff;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
             position: relative;
-            padding: 40px;
+            padding: 48px;
+            border-left: 1px solid #e2e8f0;
+            box-shadow: -10px 0 25px rgba(0,0,0,0.03);
         }
         
         /* Back Button */
         .back-btn {
             position: absolute;
-            top: 40px;
-            left: 40px;
-            width: 48px;
-            height: 48px;
-            background-color: #0d6efd;
-            color: white;
-            border-radius: 50%;
+            top: 36px;
+            left: 36px;
+            width: 42px;
+            height: 42px;
+            background-color: #0f172a;
+            color: #ffffff !important;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 16px;
             text-decoration: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
-        .back-btn:hover { transform: scale(1.05); }
+        .back-btn:hover {
+            background-color: #2563eb;
+            transform: translateX(-2px);
+        }
         
         .login-content {
             margin: auto;
             width: 100%;
-            max-width: 320px;
+            max-width: 360px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding-top: 40px;
         }
         
         .logo-img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 12px;
-            margin-bottom: 32px;
+            height: 52px;
+            width: auto;
+            max-width: 260px;
+            object-fit: contain;
+            margin-bottom: 24px;
         }
         
         .welcome-text {
-            font-size: 28px;
-            font-weight: 600;
-            color: #000;
-            margin-bottom: 40px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .welcome-sub {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 28px;
+            text-align: center;
         }
         
         .form-group {
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             text-align: left;
         }
         
         .form-group label {
             display: block;
-            font-size: 15px;
-            font-weight: 500;
-            color: #000;
-            margin-bottom: 8px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 6px;
         }
         
         .input-wrapper {
@@ -90,76 +222,96 @@
             width: 100%;
         }
         
-        .input-wrapper i {
+        .input-wrapper i.input-icon {
             position: absolute;
-            left: 16px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: #666;
+            color: #64748b;
             font-size: 14px;
         }
         
         .form-input {
             width: 100%;
-            background-color: #d1d1d1;
-            border: 1px solid #a0a0a0;
-            border-radius: 8px;
-            padding: 12px 16px 12px 40px;
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            padding: 11px 16px 11px 40px;
             font-size: 14px;
-            color: #333;
+            color: #0f172a;
             outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
         }
         
         .form-input::placeholder {
-            color: #777;
+            color: #94a3b8;
         }
         
         .forgot-pass {
             display: block;
-            font-size: 13px;
+            font-size: 0.8rem;
             font-weight: 700;
-            color: #e53935;
+            color: #dc2626;
             text-decoration: none;
             margin-top: 8px;
+            text-align: right;
+        }
+        .forgot-pass:hover {
+            text-decoration: underline;
         }
         
         .login-btn {
-            width: auto;
-            min-width: 160px;
-            background-color: #2b5dff;
-            color: white;
+            width: 100%;
+            background-color: #0f172a;
+            color: #ffffff;
             border: none;
-            border-radius: 8px;
-            padding: 12px 32px;
-            font-size: 18px;
-            font-weight: 600;
-            margin-top: 24px;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-top: 20px;
             cursor: pointer;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+        .login-btn:hover {
+            background-color: #1e3a8a;
+            transform: translateY(-1px);
         }
         
         .social-footer {
             display: flex;
             justify-content: center;
-            gap: 32px;
-            margin-top: 64px;
-            margin-bottom: 20px;
+            gap: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #f1f5f9;
         }
         
         .social-footer a {
-            color: #111;
-            font-size: 28px;
+            color: #64748b;
+            font-size: 18px;
             text-decoration: none;
-            transition: transform 0.2s;
+            transition: all 0.2s ease;
         }
-        .social-footer a:hover { transform: translateY(-3px); }
+        .social-footer a:hover {
+            color: #1e3a8a;
+            transform: translateY(-2px);
+        }
         
         .error-msg {
-            color: #e53935;
-            font-size: 14px;
-            margin-bottom: 16px;
+            color: #b91c1c;
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            font-size: 0.85rem;
+            margin-bottom: 18px;
+            padding: 10px 14px;
+            width: 100%;
             text-align: center;
             font-weight: 600;
         }
@@ -167,7 +319,11 @@
         @media (max-width: 900px) {
             .login-page { flex-direction: column; }
             .login-left { display: none; }
-            .login-right { width: 100%; }
+            .login-right {
+                width: 100%;
+                min-height: 100vh;
+                padding: 32px 20px;
+            }
         }
     </style>
 </head>
@@ -175,55 +331,120 @@
 
 <div class="login-page">
 
+    <!-- Left Hero -->
     <div class="login-left">
-        <img th:src="@{/images/wcg-building.png}" alt="Building"/>
+        <div>
+            <div class="hero-badge">
+                <i class="fa-solid fa-calculator"></i> Payroll & Finance Portal
+            </div>
+
+            <div style="margin-top: 40px;">
+                <h1 class="hero-title">Textora Technology<br/>Payroll & Tax Operations</h1>
+                <p class="hero-subtitle">Access your monthly pay slips, view statutory PF/ESI contributions, submit expense reimbursements, and plan your tax declarations securely.</p>
+
+                <div class="payroll-features">
+                    <div class="payroll-feat-item">
+                        <div class="feat-icon-box">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+                        <div>
+                            <div class="feat-text-main">Instant Salary Slips</div>
+                            <div class="feat-text-sub">Download digitally verified pay slips & tax computation sheets</div>
+                        </div>
+                    </div>
+                    <div class="payroll-feat-item">
+                        <div class="feat-icon-box">
+                            <i class="fa-solid fa-piggy-bank"></i>
+                        </div>
+                        <div>
+                            <div class="feat-text-main">Statutory & Provident Fund</div>
+                            <div class="feat-text-sub">Real-time breakdown of employee & employer contributions</div>
+                        </div>
+                    </div>
+                    <div class="payroll-feat-item">
+                        <div class="feat-icon-box">
+                            <i class="fa-solid fa-plane-departure"></i>
+                        </div>
+                        <div>
+                            <div class="feat-text-main">Travel & Expense Claims</div>
+                            <div class="feat-text-sub">Rapid submission, approval workflows, and reimbursement tracking</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-foot">
+            <span>&copy; 2026 Textora Technologies &bull; Finance & Compensation Division</span>
+            <span>Secured SSL 256-Bit</span>
+        </div>
     </div>
 
+    <!-- Right Login Form -->
     <div class="login-right">
-        <a href="/default-redirect" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <a href="/default-redirect" class="back-btn" title="Back to Home"><i class="fa-solid fa-arrow-left"></i></a>
         
         <div class="login-content">
-            <img th:src="@{/images/wcg-logo.jpg}" alt="Logo" class="logo-img"/>
+            <a href="/payroll-login">
+                <img th:src="@{/images/textora-brand-light.png}" src="/images/textora-brand-light.png" alt="Textora Technologies" onerror="this.onerror=null; this.src='/images/textora-logo.png';" class="logo-img"/>
+            </a>
             
-            <h1 class="welcome-text">Welcome Back!</h1>
+            <h1 class="welcome-text">Payroll Sign In</h1>
+            <p class="welcome-sub">Sign in with your employee email or user ID</p>
             
             <div th:if="${error}" class="error-msg">
+                <i class="fa-solid fa-circle-exclamation me-1"></i>
                 <span th:text="${error}"></span>
             </div>
             
             <form method="post" th:action="@{/payroll-login}" style="width: 100%;">
                 <div class="form-group">
-                    <label>Username or email address</label>
+                    <label>Username or Email Address</label>
                     <div class="input-wrapper">
-                        <i class="fa-solid fa-user"></i>
-                        <input type="text" name="loginId" class="form-input" placeholder="eg. abc123@gmail.com" required/>
+                        <i class="fa-solid fa-user input-icon"></i>
+                        <input type="text" name="loginId" class="form-input" placeholder="e.g. EMP114 or name@company.com" required autofocus/>
                     </div>
                 </div>
                 
                 <div class="form-group" style="margin-bottom: 8px;">
                     <label>Password</label>
                     <div class="input-wrapper">
-                        <i class="fa-solid fa-lock"></i>
-                        <input type="password" name="password" id="payrollPassword" class="form-input" placeholder="enter your password" style="padding-right: 40px;" required/>
-                        <i class="fa-solid fa-eye" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #666; font-size: 14px; z-index: 10; left: auto;" onclick="const p = document.getElementById('payrollPassword'); if(p.type==='password'){p.type='text'; this.classList.replace('fa-eye', 'fa-eye-slash');}else{p.type='password'; this.classList.replace('fa-eye-slash', 'fa-eye');}"></i>
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" name="password" id="payrollPassword" class="form-input" placeholder="Enter your password" style="padding-right: 42px;" required/>
+                        <i class="fa-solid fa-eye-slash" id="toggleEyePayroll" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b; font-size: 14px; z-index: 10;" onclick="togglePayrollPass()"></i>
                     </div>
                     <a href="/forgot-password" class="forgot-pass">Forgot Password?</a>
                 </div>
                 
-                <button type="submit" class="login-btn">Login</button>
+                <button type="submit" class="login-btn">
+                    <span>Sign In to Payroll</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
             </form>
         </div>
         
         <div class="social-footer">
-            <a href="#"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#"><i class="fa-brands fa-linkedin"></i></a>
-            <a href="#"><i class="fa-regular fa-envelope"></i></a>
-            <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+            <a href="mailto:support@textoratechnologies.com" title="Support Email"><i class="fa-regular fa-envelope"></i></a>
+            <a href="#" title="WhatsApp Helpdesk"><i class="fa-brands fa-whatsapp"></i></a>
         </div>
     </div>
 
 </div>
 
+<script>
+    function togglePayrollPass() {
+        const p = document.getElementById('payrollPassword');
+        const eye = document.getElementById('toggleEyePayroll');
+        if (p.type === 'password') {
+            p.type = 'text';
+            eye.classList.replace('fa-eye-slash', 'fa-eye');
+        } else {
+            p.type = 'password';
+            eye.classList.replace('fa-eye', 'fa-eye-slash');
+        }
+    }
+</script>
 </body>
 </html>
-
