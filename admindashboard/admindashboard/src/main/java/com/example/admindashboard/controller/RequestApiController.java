@@ -47,7 +47,7 @@ public class RequestApiController {
             return ResponseEntity.badRequest().body(error);
         }
 
-        String employeeEmail = "no-reply@whitecircle.com";
+        String employeeEmail = "no-reply@textoratechnologies.com";
         String employeeName = request.getEmployeeName();
 
         // 1. NEW: Fetch current user to attach contact details to the ticket BEFORE saving
@@ -173,7 +173,7 @@ public class RequestApiController {
         // --- EMAIL TRIGGER START ---
         try {
             Optional<User> userOpt = userRepository.findByUsername(request.getEmployeeId());
-            String employeeEmail = "no-reply@whitecircle.com";
+            String employeeEmail = "no-reply@textoratechnologies.com";
 
             if (userOpt.isPresent() && userOpt.get().getEmail() != null) {
                 employeeEmail = userOpt.get().getEmail();

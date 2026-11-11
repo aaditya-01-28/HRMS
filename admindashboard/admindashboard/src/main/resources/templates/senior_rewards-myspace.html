@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteCircle | Rewards Admin - My Space</title>
+    <title>Textora Technology | Rewards Admin - My Space</title>
+    <link rel="icon" type="image/png" href="/images/textoratech2-logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
@@ -330,9 +331,9 @@
     <!-- SIDEBAR -->
     <div class="myspace-sidebar">
         <div class="brand-area">
-            <img src="/images/white-logo.png" alt="WhiteCircle" onerror="this.src='/images/white_bg_logo.png'">
+            <img src="/images/textoratech2-logo.png" alt="Textora Technology" onerror="this.src='/images/textora-logo.png'" style="object-fit: contain;">
             <div>
-                <div class="brand-title">WhiteCircle</div>
+                <div class="brand-title">Textora Technology</div>
                 <div class="brand-sub">Rewards Admin Portal</div>
             </div>
         </div>
@@ -580,7 +581,7 @@
                                 <td>
                                     <img th:src="${m.imagePath}" alt="Merchandise" class="rounded border" style="width: 45px; height: 45px; object-fit: cover;" onerror="this.src='https://placehold.co/45x45?text=Img'">
                                 </td>
-                                <td class="fw-bold" th:text="${m.itemName}">WCG T-Shirt</td>
+                                <td class="fw-bold" th:text="${m.itemName}">Textora T-Shirt</td>
                                 <td th:text="${m.category}">Apparel</td>
                                 <td th:text="${m.brand}">WCG Custom</td>
                                 <td class="fw-bold text-primary" th:text="${m.redemptionPoints + ' Pts'}">600 Pts</td>
@@ -1266,7 +1267,7 @@
         </div>
         
         <div class="mb-4 text-center">
-            <img src="/images/wcg-tshirt.png" id="detailItemImage" alt="Item Image" class="rounded border p-2" style="max-height: 150px; max-width: 100%; object-fit: contain;" onerror="this.src='https://placehold.co/200x150?text=WCG+Merchandise'">
+            <img src="/images/wcg-tshirt.png" id="detailItemImage" alt="Item Image" class="rounded border p-2" style="max-height: 150px; max-width: 100%; object-fit: contain;" onerror="this.src='https://placehold.co/200x150?text=Textora+Merchandise'">
         </div>
 
         <div class="d-flex flex-column gap-3">
@@ -2158,7 +2159,7 @@
                 'Points Transfer': 'https://placehold.co/200x150?text=Points+Transfer',
                 'Certificate Rewards': '/images/aws-voucher.png'
             };
-            document.getElementById('detailItemImage').src = imageMap[category] || 'https://placehold.co/200x150?text=WCG+Merchandise';
+            document.getElementById('detailItemImage').src = imageMap[category] || 'https://placehold.co/200x150?text=Textora+Merchandise';
 
             // Configure Take Action Button
             const takeActionBtn = document.getElementById('takeActionBtn');

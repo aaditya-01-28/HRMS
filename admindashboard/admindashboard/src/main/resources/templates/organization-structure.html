@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Organization Structure</title>
+    <link rel="icon" type="image/png" href="/images/textoratech2-logo.png">
 
     
 
@@ -438,14 +439,14 @@
 
             // Redirect Persistence Check (BUG-024)
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('source') === 'whitecircle') {
-                sessionStorage.setItem('backRedirectSource', 'whitecircle');
+            if (urlParams.get('source') === 'Textora Technology') {
+                sessionStorage.setItem('backRedirectSource', 'Textora Technology');
             } else if (urlParams.has('source')) {
                 sessionStorage.removeItem('backRedirectSource');
             }
             
             const redirectSource = sessionStorage.getItem('backRedirectSource');
-            if (redirectSource === 'whitecircle') {
+            if (redirectSource === 'Textora Technology') {
                 const backBtn = document.querySelector('.dashboard-btn');
                 if (backBtn) backBtn.href = '/my-whitecircle';
             }

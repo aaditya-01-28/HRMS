@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile - WhiteCircle</title>
+    <title>My Profile - Textora Technology</title>
+    <link rel="icon" type="image/png" href="/images/textoratech2-logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -29,18 +30,35 @@
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02);
         }
 
-        * {
+                * {
             box-sizing: border-box;
-            font-family: Arial, sans-serif !important;
             border-radius: 0 !important;
         }
 
-        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, label, th, td {
-            font-family: Arial, sans-serif !important;
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, label, th, td {
+            font-family: Arial, sans-serif;
+        }
+
+        span:not([class*="fa-"]), a:not([class*="fa-"]) {
+            font-family: Arial, sans-serif;
+        }
+
+        /* Protect FontAwesome webfont icons from Arial overrides */
+        .fa, .fas, .fa-solid, [class^="fa-"], [class*=" fa-"] {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 900;
+        }
+        .far, .fa-regular {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 400;
+        }
+        .fab, .fa-brands {
+            font-family: 'Font Awesome 6 Brands' !important;
+            font-weight: 400;
         }
 
         body {
-            font-family: Arial, sans-serif !important;
+            font-family: Arial, sans-serif;
             background-color: var(--bg-body);
             color: var(--text-dark);
             font-size: 0.9rem;
@@ -578,14 +596,34 @@
 </head>
 <body>
 
+<!-- TOP BRANDING NAVBAR -->
+<nav class="bg-white border-bottom shadow-sm px-4 py-2 d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+        <a href="/default-redirect" class="text-decoration-none d-flex align-items-center">
+            <img src="/images/textora-brand-light.png" onerror="this.onerror=null; this.src='/images/textora-logo.png';" alt="Textora Technology" style="height: 42px; width: auto; object-fit: contain;">
+        </a>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <a href="/default-redirect" class="btn btn-outline-primary btn-sm px-3 py-2 fw-semibold d-flex align-items-center gap-2" style="border-radius: 6px !important;">
+            <i class="fas fa-th-large"></i> Dashboard
+        </a>
+    </div>
+</nav>
+
 <div class="profile-container">
     <!-- TOP HEADER -->
     <header class="profile-header">
         <div class="profile-title-block">
-            <img th:src="${employeeProfile.photoDocPath != null && !employeeProfile.photoDocPath.isEmpty() ? employeeProfile.photoDocPath : 'https://ui-avatars.com/api/?name=' + user.fullName + '&background=1e3a8a&color=fff&size=100'}" alt="User Avatar">
+            <img th:src="${employeeProfile.photoDocPath != null && !employeeProfile.photoDocPath.isEmpty() ? employeeProfile.photoDocPath : 'https://ui-avatars.com/api/?name=' + user.fullName + '&background=1e3a8a&color=fff&size=100'}" alt="User Avatar" style="border-radius: 50% !important;">
             <div>
                 <h1 th:text="${user.fullName}">Akash Sahu</h1>
-                <p th:text="${employeeProfile.designation != null ? employeeProfile.designation : 'Employee'}">Software Engineer</p>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                    <p class="mb-0 text-muted" th:text="${employeeProfile.designation != null ? employeeProfile.designation : 'Employee'}">Software Engineer</p>
+                    <span class="badge bg-light text-dark border d-flex align-items-center gap-1 py-1 px-2" style="font-size: 0.75rem; border-radius: 4px !important;">
+                        <img src="/images/textora-icon.png" onerror="this.onerror=null; this.src='/images/textora-app-icon.png';" alt="Textora" style="height: 14px; width: 14px; object-fit: contain; border: none; border-radius: 0 !important;">
+                        <span>Textora Technology</span>
+                    </span>
+                </div>
             </div>
         </div>
 
@@ -926,10 +964,10 @@
                         <div class="profile-field-card">
                             <div class="field-label">Company Name</div>
                             <div class="view-state view-state-box">
-                                <span th:text="${employeeProfile.companyName != null && !employeeProfile.companyName.isEmpty() ? employeeProfile.companyName : 'WhiteCircle Group(WCG)'}">WhiteCircle Group(WCG)</span>
+                                <span th:text="${employeeProfile.companyName != null && !employeeProfile.companyName.isEmpty() ? employeeProfile.companyName : 'Textora Technology'}">Textora Technology</span>
                             </div>
                             <div class="edit-state edit-state-box">
-                                <input type="text" name="companyName" th:value="${employeeProfile.companyName != null && !employeeProfile.companyName.isEmpty() ? employeeProfile.companyName : 'WhiteCircle Group(WCG)'}" placeholder="Company Name">
+                                <input type="text" name="companyName" th:value="${employeeProfile.companyName != null && !employeeProfile.companyName.isEmpty() ? employeeProfile.companyName : 'Textora Technology'}" placeholder="Company Name">
                             </div>
                         </div>
 
@@ -2014,14 +2052,14 @@
         });
 
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('source') === 'whitecircle') {
-            sessionStorage.setItem('backRedirectSource', 'whitecircle');
+        if (urlParams.get('source') === 'Textora Technology') {
+            sessionStorage.setItem('backRedirectSource', 'Textora Technology');
         } else if (urlParams.has('source')) {
             sessionStorage.removeItem('backRedirectSource');
         }
         
         const redirectSource = sessionStorage.getItem('backRedirectSource');
-        if (redirectSource === 'whitecircle') {
+        if (redirectSource === 'Textora Technology') {
             const homeBtn = document.getElementById('backHomeBtn');
             if (homeBtn) homeBtn.href = '/my-whitecircle';
         }

@@ -49,10 +49,10 @@ public class ChatController {
                     currentUser.getEmployeeProfile().getDesignation());
         }
 
-        // Fetch EMP only colleagues
+        // Fetch internal colleagues (exclude self and external clients)
         List<User> empUsers = userRepository.findAll().stream()
                 .filter(u -> !u.getId().equals(currentUser.getId()))
-                .filter(u -> u.getUsername() != null && u.getUsername().startsWith("EMP"))
+                .filter(u -> u.getUsername() != null && (u.getRole() == null || !"CLIENT".equalsIgnoreCase(u.getRole().getRoleName())))
                 .collect(Collectors.toList());
 
         List<ContactInfo> colleagues = new ArrayList<>();
@@ -80,62 +80,65 @@ public class ChatController {
                         lastMsg.getContent();
             }
 
+            lastTimestamps.put(u.getId(), rawTime);
             String formattedTime = formatLastMessageTime(rawTime);
 
-            lastTimestamps.put(u.getId(), rawTime);
-
-            colleagues.add(new ContactInfo(u.getId(), u.getUsername(), u.getFullName(), unread, snippet, formattedTime));
+            colleagues.add(new ContactInfo(
+                    u.getId(),
+                    u.getUsername(),
+                    u.getFullName(),
+                    unread,
+                    snippet,
+                    formattedTime
+            ));
         }
 
-        // SORT SIDEBAR by most recent message (newest first)
+        // Sort colleagues by most recent message timestamp descending
         colleagues.sort((c1, c2) -> {
             LocalDateTime t1 = lastTimestamps.get(c1.getId());
             LocalDateTime t2 = lastTimestamps.get(c2.getId());
+
             if (t1 == null && t2 == null) return 0;
-            if (t1 == null) return 1; // t1 has no messages, push down
-            if (t2 == null) return -1; // t2 has no messages, push down
-            return t2.compareTo(t1); // Sort descending
+            if (t1 == null) return 1;
+            if (t2 == null) return -1;
+            return t2.compareTo(t1);
         });
 
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("colleagues", colleagues);
+
         return "chat";
     }
 
-    // 2. HANDLE LIVE INCOMING MESSAGES
-    @MessageMapping("/chat.send")
-    public void processMessage(@Payload Map<String, Object> payload) {
-
-        // 1. Extract raw data manually to prevent strict parsing crashes
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setSenderId(Long.valueOf(payload.get("senderId").toString()));
-        chatMessage.setRecipientId(Long.valueOf(payload.get("recipientId").toString()));
-        chatMessage.setContent(payload.get("content").toString());
-
-        // 2. Auto-stamp the exact server time securely
+    // 2. RECEIVE AND ROUTE WEBSOCKET MESSAGES
+    @MessageMapping("/chat.sendMessage")
+    public void sendMessage(@Payload ChatMessage chatMessage) {
         chatMessage.setTimestamp(LocalDateTime.now());
-        chatMessage.setDate(LocalDate.now());
+        chatMessage.setRead(false);
 
-        // 3. Save the message permanently to the database
-        ChatMessage savedMsg = chatMessageRepository.save(chatMessage);
+        ChatMessage saved = chatMessageRepository.save(chatMessage);
 
-        // 4. Forward the message directly to the exact queue the frontend is subscribed to!
-        messagingTemplate.convertAndSend(
-                "/user/" + chatMessage.getRecipientId() + "/queue/messages",
-                savedMsg
+        // Forward to recipient
+        messagingTemplate.convertAndSendToUser(
+                String.valueOf(saved.getRecipientId()),
+                "/queue/messages",
+                saved
         );
     }
 
-    // 3. FETCH CHAT HISTORY & MARK AS READ
-    @GetMapping("/messages/{currentUserId}/{contactId}")
+    // 3. FETCH HISTORICAL MESSAGES VIA REST
+    @GetMapping("/chat/history/{contactId}")
     @ResponseBody
-    public ResponseEntity<List<ChatMessage>> getChatHistory(@PathVariable Long currentUserId, @PathVariable Long contactId) {
-        List<ChatMessage> history = chatMessageRepository.findConversationHistory(currentUserId, contactId);
+    public ResponseEntity<List<ChatMessage>> getChatHistory(@PathVariable Long contactId, Principal principal) {
+        String username = principal.getName();
+        User currentUser = userRepository.findByUsername(username).orElseThrow();
 
-        // Mark any unread messages sent TO the current user as "Read" now that they opened the chat
+        List<ChatMessage> history = chatMessageRepository.findConversationHistory(currentUser.getId(), contactId);
+
+        // Mark incoming messages as read
         boolean needsSave = false;
         for (ChatMessage msg : history) {
-            if (msg.getRecipientId().equals(currentUserId) && !msg.isRead()) {
+            if (msg.getRecipientId().equals(currentUser.getId()) && !msg.isRead()) {
                 msg.setRead(true);
                 needsSave = true;
             }
@@ -146,17 +149,17 @@ public class ChatController {
         return ResponseEntity.ok(history);
     }
 
-    // 4. SEARCH FOR COLLEAGUES (EMP ONLY)
+    // 4. SEARCH FOR COLLEAGUES
     @GetMapping("/chat/search")
     @ResponseBody
     public ResponseEntity<List<User>> searchColleagues(@RequestParam String query, Principal principal) {
         String username = principal.getName();
         User currentUser = userRepository.findByUsername(username).orElseThrow();
 
-        // Search only applies to EMPs
+        // Search applies to internal colleagues
         List<User> searchResults = userRepository.findAll().stream()
                 .filter(u -> !u.getId().equals(currentUser.getId()))
-                .filter(u -> u.getUsername() != null && u.getUsername().startsWith("EMP"))
+                .filter(u -> u.getUsername() != null && (u.getRole() == null || !"CLIENT".equalsIgnoreCase(u.getRole().getRoleName())))
                 .filter(u -> {
 
                     String searchText = query.toLowerCase();

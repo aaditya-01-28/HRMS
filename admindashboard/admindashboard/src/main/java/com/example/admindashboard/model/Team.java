@@ -20,8 +20,10 @@ public class Team {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    private String departmentName;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "manager_id", nullable = false)
+    @JoinColumn(name = "manager_id", nullable = true)
     @JsonIgnore
     private User manager;
 
@@ -44,6 +46,9 @@ public class Team {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public String getDepartmentName() { return departmentName; }
+    public void setDepartmentName(String departmentName) { this.departmentName = departmentName; }
 
     public User getManager() { return manager; }
     public void setManager(User manager) { this.manager = manager; }

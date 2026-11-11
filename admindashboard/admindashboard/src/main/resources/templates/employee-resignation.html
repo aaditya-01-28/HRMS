@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resignation & Offboarding Portal | WhiteCircle</title>
+    <title>Resignation & Offboarding Portal | Textora Technology</title>
+    <link rel="icon" type="image/png" href="/images/textoratech2-logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -20,14 +21,31 @@
             --res-text-muted: #64748b;
         }
 
-        * {
+                * {
             box-sizing: border-box;
-            font-family: Arial, sans-serif !important;
             border-radius: 0 !important;
         }
 
-        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, span, a, label, th, td {
-            font-family: Arial, sans-serif !important;
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, label, th, td {
+            font-family: Arial, sans-serif;
+        }
+
+        span:not([class*="fa-"]), a:not([class*="fa-"]) {
+            font-family: Arial, sans-serif;
+        }
+
+        /* Protect FontAwesome webfont icons from Arial overrides */
+        .fa, .fas, .fa-solid, [class^="fa-"], [class*=" fa-"] {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 900;
+        }
+        .far, .fa-regular {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 400;
+        }
+        .fab, .fa-brands {
+            font-family: 'Font Awesome 6 Brands' !important;
+            font-weight: 400;
         }
 
         .card, .card-custom, .card-header-custom, .info-item, .fnf-step, .fnf-step-num,
@@ -501,8 +519,8 @@
                         <tr th:if="${assignedAssets == null or assignedAssets.empty}">
                             <td><strong>AST-2026-082</strong></td>
                             <td>Access Card / ID Badge</td>
-                            <td>WhiteCircle NFC Smart Badge</td>
-                            <td>NFC-WCG-114</td>
+                            <td>Textora Technology NFC Smart Badge</td>
+                            <td>NFC-TXT-114</td>
                             <td><span class="badge bg-warning-subtle text-warning border"><i class="fas fa-clock me-1"></i>Pending Handover</span></td>
                         </tr>
                         <tr th:each="asset : ${assignedAssets}">

@@ -2,6 +2,8 @@ package com.example.admindashboard.service;
 
 import jakarta.mail.MessagingException;
 import com.example.admindashboard.model.User;
+import com.example.admindashboard.model.CompanyDetails;
+import com.example.admindashboard.repository.CompanyDetailsRepository;
 import com.example.admindashboard.repository.UserRepository;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,20 @@ public class EmailService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CompanyDetailsRepository companyDetailsRepository;
+
+    public String getCompanyName() {
+        if (companyDetailsRepository != null) {
+            return companyDetailsRepository.findAll().stream()
+                    .findFirst()
+                    .map(CompanyDetails::getCompanyName)
+                    .filter(s -> s != null && !s.trim().isEmpty())
+                    .orElse("Textora Technology");
+        }
+        return "Textora Technology";
+    }
+
     // Pulls the email address from your application.properties
     @Value("${spring.mail.username}")
     private String systemEmail;
@@ -41,7 +57,7 @@ public class EmailService {
 
             // 1. Setup Email Routing & Headers
             helper.setTo(adminEmail);
-            helper.setFrom(systemEmail, "WhiteCircle HRMS"); // Looks professional in the inbox
+            helper.setFrom(systemEmail, "Textora HRMS"); // Looks professional in the inbox
             helper.setReplyTo(employeeEmail, employeeName);  // Clicking 'Reply' goes to the employee
             helper.setSubject("New Leave Request: " + employeeName);
 
@@ -71,11 +87,11 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(toEmail);
-            helper.setFrom(systemEmail, "WhiteCircle HRMS");
-            helper.setSubject("Welcome to WhiteCircle HRMS - Your Account Details");
+            helper.setFrom(systemEmail, "Textora HRMS");
+            helper.setSubject("Welcome to Textora HRMS - Your Account Details");
 
             Context thymeleafContext = new Context();
-            thymeleafContext.setVariable("companyName", "WhiteCircle");
+            thymeleafContext.setVariable("companyName", getCompanyName());
             thymeleafContext.setVariable("candidateName", fullName);
             thymeleafContext.setVariable("empId", username);
             thymeleafContext.setVariable("officeEmail", toEmail);
@@ -99,7 +115,7 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(adminEmail);
-            helper.setFrom(systemEmail, "WhiteCircle HRMS");
+            helper.setFrom(systemEmail, "Textora HRMS");
             helper.setReplyTo(employeeEmail, employeeName);
             helper.setSubject("Timesheet Submitted: " + employeeName);
 
@@ -127,7 +143,7 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(adminEmail);
-            helper.setFrom(systemEmail, "WhiteCircle IT Helpdesk");
+            helper.setFrom(systemEmail, "Textora IT Helpdesk");
             helper.setReplyTo(employeeEmail, employeeName);
             // Dynamic Subject: "New HARDWARE Ticket: John Doe"
             helper.setSubject("New " + ticketType.toUpperCase() + " Ticket: " + employeeName);
@@ -156,7 +172,7 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(adminEmail);
-            helper.setFrom(systemEmail, "WhiteCircle HRMS");
+            helper.setFrom(systemEmail, "Textora HRMS");
             helper.setReplyTo(employeeEmail, employeeName);
             helper.setSubject("Attendance Regularization: " + employeeName);
 
@@ -203,7 +219,7 @@ public class EmailService {
 
             // 1. Setup Email Routing
             helper.setTo(employeeEmail);
-            helper.setFrom(systemEmail, "WhiteCircle HRMS");
+            helper.setFrom(systemEmail, "Textora HRMS");
 
             // 2. Dynamic Subject Line (e.g., "Update on your Leave Request: Approved")
             helper.setSubject("Update on your " + requestType + " Request: " + status.toUpperCase());
@@ -239,7 +255,7 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(participantEmail);
-            helper.setFrom(systemEmail, "WhiteCircle HRMS");
+            helper.setFrom(systemEmail, "Textora HRMS");
             helper.setSubject("Meeting Invite: " + meetingTitle);
 
             Context thymeleafContext = new Context();
@@ -265,22 +281,22 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(to);
-            helper.setFrom(systemEmail, "WhiteCircle Security");
-            helper.setSubject("WhiteCircle - Password Reset Request");
+            helper.setFrom(systemEmail, "Textora Security");
+            helper.setSubject("Textora Technology - Password Reset Request");
 
             String htmlContent = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;'>"
                 + "<div style='text-align: center; margin-bottom: 20px;'>"
                 + "  <h2 style='color: #1e3a8a; margin: 0;'>Password Reset Request</h2>"
                 + "</div>"
                 + "<p style='color: #334155; font-size: 16px;'>Hello,</p>"
-                + "<p style='color: #334155; font-size: 16px;'>We received a request to reset the password for your WhiteCircle account.</p>"
+                + "<p style='color: #334155; font-size: 16px;'>We received a request to reset the password for your Textora Technology account.</p>"
                 + "<p style='color: #334155; font-size: 16px;'>Click the secure button below to set a new password. This link will safely expire in 1 hour.</p>"
                 + "<div style='text-align: center; margin: 35px 0;'>"
                 + "  <a href='" + resetUrl + "' style='background-color: #2563eb; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;'>Reset My Password</a>"
                 + "</div>"
                 + "<p style='color: #64748b; font-size: 14px;'>If you didn't request a password reset, you can safely ignore this email. Your account remains secure.</p>"
                 + "<hr style='border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;'/>"
-                + "<p style='color: #94a3b8; font-size: 12px; text-align: center;'>Best regards,<br>The WhiteCircle Team</p>"
+                + "<p style='color: #94a3b8; font-size: 12px; text-align: center;'>Best regards,<br>The Textora Technologies Team</p>"
                 + "</div>";
 
             helper.setText(htmlContent, true);
@@ -347,7 +363,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(systemEmail, "WhiteCircle Helpdesk");
+            helper.setFrom(systemEmail, "Textora Helpdesk");
             helper.setReplyTo(employeeEmail, employeeName);
             helper.setSubject("New Helpdesk Submission [" + cleanDept + "]: " + formSubject);
 
@@ -360,7 +376,7 @@ public class EmailService {
             MimeMessage deptMessage = mailSender.createMimeMessage();
             MimeMessageHelper deptHelper = new MimeMessageHelper(deptMessage, true, "UTF-8");
 
-            deptHelper.setFrom(systemEmail, "WhiteCircle Helpdesk");
+            deptHelper.setFrom(systemEmail, "Textora Helpdesk");
             deptHelper.setReplyTo(employeeEmail, employeeName);
             deptHelper.setTo(deptHeadEmail);
             deptHelper.setSubject("New Helpdesk Submission [" + cleanDept + "]: " + formSubject);
@@ -372,7 +388,7 @@ public class EmailService {
             MimeMessage adminMessage = mailSender.createMimeMessage();
             MimeMessageHelper adminHelper = new MimeMessageHelper(adminMessage, true, "UTF-8");
 
-            adminHelper.setFrom(systemEmail, "WhiteCircle Helpdesk");
+            adminHelper.setFrom(systemEmail, "Textora Helpdesk");
             adminHelper.setReplyTo(employeeEmail, employeeName);
             adminHelper.setTo(adminEmail);
             adminHelper.setSubject("New Helpdesk Submission [" + cleanDept + "]: " + formSubject);
@@ -394,8 +410,8 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(candidateEmail);
-            helper.setFrom(systemEmail, "WhiteCircle HRMS");
-            helper.setSubject(employeeName + " referred you for a role at WhiteCircle!");
+            helper.setFrom(systemEmail, "Textora HRMS");
+            helper.setSubject(employeeName + " referred you for a role at Textora Technology!");
 
             Context thymeleafContext = new Context();
             thymeleafContext.setVariables(templateModel);
@@ -419,15 +435,15 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(personalEmail);
-            helper.setFrom(systemEmail, "WhiteCircle HRMS");
-            helper.setSubject("Welcome to WhiteCircle! Your Onboarding Details");
+            helper.setFrom(systemEmail, "Textora HRMS");
+            helper.setSubject("Welcome to Textora Technology! Your Onboarding Details");
 
             Context thymeleafContext = new Context();
             thymeleafContext.setVariable("candidateName", candidateName);
             thymeleafContext.setVariable("empId", empId);
             thymeleafContext.setVariable("password", password);
             thymeleafContext.setVariable("officeEmail", officeEmail);
-            thymeleafContext.setVariable("companyName", "WhiteCircle");
+            thymeleafContext.setVariable("companyName", getCompanyName());
 
             String htmlBody = templateEngine.process("emails/onboarding-email", thymeleafContext);
 
@@ -448,7 +464,7 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(toEmail);
-            helper.setFrom(systemEmail != null ? systemEmail : "no-reply@whitecircle.com", "WhiteCircle HRMS");
+            helper.setFrom(systemEmail != null ? systemEmail : "no-reply@textoratechnologies.com", "Textora HRMS");
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
 

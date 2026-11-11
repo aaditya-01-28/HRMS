@@ -3,14 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteCircle Group | Login</title>
+    <title>Textora Technology | Employee Login</title>
+    <link rel="icon" type="image/png" href="/images/textoratech2-logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+            border-radius: 0 !important;
+        }
+
+        body, button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, label, th, td {
+            font-family: Arial, sans-serif;
+        }
+
+        span:not([class*="fa-"]), a:not([class*="fa-"]) {
+            font-family: Arial, sans-serif;
+        }
+
+        /* Protect FontAwesome webfont icons from Arial overrides */
+        .fa, .fas, .far, .fab, .fa-solid, .fa-regular, .fa-brands, [class^="fa-"], [class*=" fa-"] {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 900;
+        }
+        .far, .fa-regular {
+            font-family: 'Font Awesome 6 Free' !important;
+            font-weight: 400;
+        }
+        .fab, .fa-brands {
+            font-family: 'Font Awesome 6 Brands' !important;
+            font-weight: 400;
+        }
+
         body {
-            background-color: #f8f9fa;
+            background-color: #f1f5f9;
             min-height: 100vh;
-            font-family: 'Poppins', sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -20,180 +47,384 @@
 
         #login-container {
             width: 100%;
-            max-width: 1200px;
-            height: 80vh;
-            min-height: 600px;
-            background-color: white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            /* Fine edge square shape */
-            border-radius: 0;
-            border: 1px solid #dee2e6;
+            max-width: 1100px;
+            min-height: 620px;
+            background-color: #ffffff;
+            box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.15), 0 0 1px 1px rgba(15, 23, 42, 0.05);
+            border: 1px solid #cbd5e1;
+            overflow: hidden;
+            display: flex;
         }
 
-        .left-side {
-            height: 100%;
-            padding: 0;
-        }
-        
-        .left-side img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
+        /* LEFT HERO PANEL */
+        .left-hero {
+            flex: 1.1;
+            background: linear-gradient(145deg, rgba(10, 25, 47, 0.94) 0%, rgba(15, 52, 96, 0.92) 100%),
+                        url('/images/Reception.png') center center/cover no-repeat;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 48px;
+            position: relative;
         }
 
+        .left-hero-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .left-hero-brand img {
+            height: 38px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .left-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #93c5fd;
+            margin-bottom: 24px;
+            width: fit-content;
+        }
+
+        .left-hero-content h1 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            line-height: 1.25;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }
+
+        .left-hero-content p {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 32px;
+            max-width: 440px;
+        }
+
+        .hero-features {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 16px;
+            transition: background 0.2s;
+        }
+
+        .feature-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .feature-icon {
+            width: 36px;
+            height: 36px;
+            background: #2563eb;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .feature-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .feature-desc {
+            font-size: 0.76rem;
+            color: #94a3b8;
+        }
+
+        .left-hero-footer {
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 0.78rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* RIGHT FORM PANEL */
         .right-side {
-            height: 100%;
+            flex: 1;
+            padding: 48px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 50px;
-            background-color: white;
+            background-color: #ffffff;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .form-header img {
+            height: 48px;
+            max-width: 240px;
+            width: auto;
+            object-fit: contain;
+            margin-bottom: 12px;
+        }
+
+        .form-header h2 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 6px 0;
+        }
+
+        .form-header p {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .input-group-text {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-right: none;
+            color: #64748b;
+            font-size: 14px;
+            padding: 10px 14px;
+        }
+
+        .form-control {
+            border: 1px solid #cbd5e1;
+            background-color: #ffffff;
+            color: #0f172a;
+            font-size: 0.9rem;
+            padding: 10px 14px;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: #1e3a8a;
+            box-shadow: none;
+            background-color: #ffffff;
         }
 
         .form-control::placeholder {
-            color: #adb5bd !important;
-            opacity: 0.8;
-            font-weight: 400;
+            color: #94a3b8 !important;
+            font-size: 0.85rem;
+            letter-spacing: normal;
         }
-        
-        .form-control {
-            letter-spacing: 2px;
-        }
-        
-        .input-group > .input-group-text, .input-group > .form-control, .input-group > .btn {
-            border-color: #6c757d;
-            padding-top: 0.75rem;
-            padding-bottom: 0.75rem;
-            border-radius: 0 !important; /* Square edges */
-        }
-        
-        .form-control:focus {
-            box-shadow: none;
-            border-color: #0f172a;
-        }
-        
+
         .btn-toggle-password {
-            color: #6c757d;
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: none;
+            color: #64748b;
+            padding: 10px 14px;
+            cursor: pointer;
         }
+
         .btn-toggle-password:hover {
-            background-color: #e9ecef;
-            color: #343a40;
+            color: #0f172a;
+            background-color: #f1f5f9;
         }
 
         .login-btn {
             background-color: #0f172a;
-            color: white;
-            border-radius: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 12px 24px;
             border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            width: 100%;
         }
-        
+
         .login-btn:hover {
-            background-color: #1e293b;
-            color: white;
+            background-color: #1e3a8a;
+            color: #ffffff;
+            transform: translateY(-1px);
         }
 
-        .logo-img {
-            height: 120px; 
-            width: auto;
+        .form-footer {
+            text-align: center;
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid #f1f5f9;
+            font-size: 0.8rem;
+            color: #64748b;
         }
 
-        hr.divider {
-            width: 40%;
-            margin: 25px auto;
-            border-top: 1px solid #000;
-            opacity: 0.3;
+        .form-footer a {
+            color: #1e3a8a;
+            font-weight: 600;
+            text-decoration: none;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-                display: block;
-            }
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
             #login-container {
-                height: auto !important;
-                min-height: unset !important;
-                margin-top: 20px;
+                flex-direction: column;
+                max-width: 500px;
+                min-height: auto;
+            }
+            .left-hero {
+                display: none;
             }
             .right-side {
-                padding: 30px 15px !important;
-                height: auto !important;
-            }
-            .logo-img {
-                height: 80px !important;
+                padding: 36px 24px;
             }
         }
     </style>
 </head>
 <body>
 
-<div id="login-container" class="row g-0">
-    <!-- LEFT SIDE: RECEPTION IMAGE -->
-    <div class="col-lg-6 d-none d-lg-block left-side p-3 pe-0">
-        <img src="/images/Reception.png" alt="Reception">
+<div id="login-container">
+    <!-- LEFT HERO PANEL (Premium Enterprise HRMS Banner) -->
+    <div class="left-hero">
+        <div>
+            <div class="left-hero-badge">
+                <i class="fa-solid fa-shield-halved"></i> Enterprise Portal
+            </div>
+            
+            <div class="left-hero-content">
+                <h1>Textora Technology</h1>
+                <p>Welcome to the unified workforce platform. Manage your attendance, leave, payroll, performance, and enterprise services in one secure workspace.</p>
+                
+                <div class="hero-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+                        <div class="feature-text">
+                            <span class="feature-title">Employee Self-Service</span>
+                            <span class="feature-desc">Profile, timecards, documents, and referrals</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <div class="feature-text">
+                            <span class="feature-title">Payroll & Compensation</span>
+                            <span class="feature-desc">Salary slips, tax computation, and expense claims</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <div class="feature-text">
+                            <span class="feature-title">Enterprise Security</span>
+                            <span class="feature-desc">Encrypted sessions with role-based access control</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="left-hero-footer">
+            <span>&copy; 2026 Textora Technologies</span>
+            <span>Version 2.4.0</span>
+        </div>
     </div>
 
     <!-- RIGHT SIDE: LOGIN FORM -->
-    <div class="col-12 col-lg-6 right-side">
-        
+    <div class="right-side">
+        <!-- Brand Header & Logo -->
+        <div class="form-header">
+            <a href="/login" class="text-decoration-none">
+                <img th:src="@{/images/textora-brand-light.png}" src="/images/textora-brand-light.png" alt="Textora Technologies" onerror="this.onerror=null; this.src='/images/textora-logo.png';">
+            </a>
+            <h2>Welcome Back!</h2>
+            <p>Please enter your credentials to access your account</p>
+        </div>
+
         <!-- Flash Messages -->
-        <div th:if="${param.error}" class="alert alert-danger rounded-0 border-0 mb-4" style="background-color: #fee2e2; color: #b91c1c;">
-            <i class="fas fa-exclamation-circle me-2"></i> Invalid credentials.
+        <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center mb-4 py-2 px-3" style="background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; font-size: 0.85rem;">
+            <i class="fa-solid fa-circle-exclamation me-2"></i>
+            <span>Invalid User ID or Password. Please try again.</span>
         </div>
-        <div th:if="${param.logout}" class="alert alert-success rounded-0 border-0 mb-4" style="background-color: #dcfce7; color: #15803d;">
-            <i class="fas fa-check-circle me-2"></i> Logged out successfully.
-        </div>
-
-        <div class="text-center mb-4">
-            <img src="/images/white_bg_logo.png" alt="WhiteCircle Group" class="logo-img">
-            <hr class="divider">
+        <div th:if="${param.logout}" class="alert alert-success d-flex align-items-center mb-4 py-2 px-3" style="background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; font-size: 0.85rem;">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <span>You have been safely logged out.</span>
         </div>
 
-        <div class="px-xl-5 px-md-4">
-            <form action="/perform_login" method="post">
-                <input type="hidden" name="portalType" value="employee">
-                
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-dark fs-6">User ID</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-dark border-end-0"><i class="fas fa-user text-muted"></i></span>
-                        <input type="text" name="username" class="form-control border-dark border-start-0 ps-2 fw-semibold" placeholder="e.g. EMP114 or EMP002" required>
-                    </div>
+        <!-- Login Form -->
+        <form action="/perform_login" method="post">
+            <input type="hidden" name="portalType" value="employee">
+            
+            <div class="mb-3">
+                <label class="form-label fw-bold text-dark small mb-1">User ID / Employee Code</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" name="username" class="form-control" placeholder="e.g. EMP114 or EMP002" required autofocus>
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-dark fs-6">Password</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-dark border-end-0"><i class="fas fa-lock text-muted"></i></span>
-                        <input type="password" name="password" id="employeePassword" class="form-control border-dark border-start-0 border-end-0 ps-2 fw-semibold" placeholder="••••••••••" required>
-                        <button class="btn border-dark border-start-0 bg-white text-muted btn-toggle-password" type="button" onclick="togglePassword('employeePassword', 'eyeIconEmp')">
-                            <i class="fas fa-eye-slash" id="eyeIconEmp"></i>
-                        </button>
-                    </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold text-dark small mb-1">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" name="password" id="employeePassword" class="form-control" placeholder="Enter your password" required>
+                    <button class="btn btn-toggle-password" type="button" onclick="togglePassword('employeePassword', 'eyeIconEmp')" title="Toggle password visibility">
+                        <i class="fa-solid fa-eye-slash" id="eyeIconEmp"></i>
+                    </button>
                 </div>
-                
-                <div class="d-flex justify-content-between align-items-center mb-5 mt-3">
-                    <div class="form-check">
-                        <input class="form-check-input border-dark rounded-0" type="checkbox" id="rememberMe" name="remember-me">
-                        <label class="form-check-label text-dark fw-semibold small" for="rememberMe">
-                            Remember me
-                        </label>
-                    </div>
-                    <a href="/forgot-password" class="text-decoration-none small" style="color: #ef4444;">Forgot Password?</a>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="rememberMe" name="remember-me">
+                    <label class="form-check-label text-muted small" for="rememberMe">
+                        Remember me
+                    </label>
                 </div>
+                <a href="/forgot-password" class="text-decoration-none small fw-semibold" style="color: #dc2626;">Forgot Password?</a>
+            </div>
 
-                <button type="submit" class="btn w-100 py-2 fw-bold fs-5 shadow-sm login-btn">
-                    Login <i class="fas fa-arrow-right"></i>
-                </button>
-            </form>
-        </div>
+            <button type="submit" class="login-btn shadow-sm">
+                <span>Sign In to Portal</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </form>
 
-        <div class="text-center mt-5">
-            <small class="text-muted">Need help? Contact <a href="mailto:itsupport@wcg.com" class="text-decoration-none" style="color: #002D72; font-weight: 600;">itsupport@wcg.com</a></small>
+        <!-- Footer -->
+        <div class="form-footer">
+            <span>Need assistance? Contact <a href="mailto:support@textoratechnologies.com">IT Support Desk</a></span>
         </div>
     </div>
 </div>

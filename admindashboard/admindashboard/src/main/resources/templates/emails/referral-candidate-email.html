@@ -1,8 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>You have been referred!</title>
+    <link rel="icon" type="image/png" href="/images/textoratech2-logo.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -63,7 +64,7 @@
 <body>
     <div class="email-container">
         <div class="header">
-            <h1 th:text="'Opportunity at ' + ${companyName}">Opportunity at WhiteCircle</h1>
+            <h1 th:text="'Opportunity at ' + ${companyName}">Opportunity at Textora Technology</h1>
         </div>
         <div class="content">
             <p>Dear <span th:text="${candidateName}">Candidate</span>,</p>
@@ -71,15 +72,15 @@
             
             <div class="highlight-box">
                 <p>Role: <span th:text="${jobTitle}">Job Title</span></p>
-                <p>Company: <span th:text="${companyName}">WhiteCircle</span></p>
+                <p>Company: <span th:text="${companyName}">Textora Technology</span></p>
             </div>
             
             <p>Our Talent Acquisition team will review your profile and reach out to you if your qualifications match our requirements. In the meantime, you don't need to take any action.</p>
             <p>We appreciate your interest in joining us and wish you the best!</p>
-            <p>Best regards,<br>The <span th:text="${companyName}">WhiteCircle</span> Talent Team</p>
+            <p>Best regards,<br>The <span th:text="${companyName}">Textora Technology</span> Talent Team</p>
         </div>
         <div class="footer">
-            <p>&copy; <span th:text="${#dates.year(#dates.createNow())}">2026</span> <span th:text="${companyName}">WhiteCircle</span>. All rights reserved.</p>
+            <p>&copy; <span th:text="${#dates.year(#dates.createNow())}">2026</span> <span th:text="${companyName}">Textora Technology</span>. All rights reserved.</p>
             <p>This is an automated message, please do not reply directly to this email.</p>
         </div>
     </div>

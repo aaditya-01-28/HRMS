@@ -82,8 +82,8 @@ public class MediclaimController {
         return policyRepository.findByUser(user).orElseGet(() -> {
             InsurancePolicy p = new InsurancePolicy();
             p.setUser(user);
-            p.setPolicyName("WhiteCircle Health Shield - Gold Plan");
-            p.setPolicyNumber("WCG-2026-MED-" + user.getId());
+            p.setPolicyName("Textora Health Shield - Gold Plan");
+            p.setPolicyNumber("TXT-2026-MED-" + user.getId());
             p.setProviderName("Star Health & Allied Insurance");
             p.setTotalCoverage(500000.0);
             p.setAmountUsed(0.0);
@@ -145,7 +145,7 @@ public class MediclaimController {
 
             InsurancePolicy policy = getOrCreatePolicy(user);
             if (policy.getPolicyName() == null || policy.getPolicyName().trim().isEmpty()) {
-                policy.setPolicyName("WhiteCircle Health Shield - Gold Plan");
+                policy.setPolicyName("Textora Health Shield - Gold Plan");
                 policyRepository.save(policy);
             }
             model.addAttribute("policy", policy);
@@ -191,7 +191,7 @@ public class MediclaimController {
 
             InsurancePolicy policy = getOrCreatePolicy(user);
             if (policy.getPolicyName() == null || policy.getPolicyName().trim().isEmpty()) {
-                policy.setPolicyName("WhiteCircle Health Shield - Gold Plan");
+                policy.setPolicyName("Textora Health Shield - Gold Plan");
                 policyRepository.save(policy);
             }
             model.addAttribute("policy", policy);

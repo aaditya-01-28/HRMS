@@ -15,6 +15,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // 1. AUTHENTICATION
     Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
 
     // 2. Count by looking inside the Role object
     long countByRole_RoleName(String roleName);

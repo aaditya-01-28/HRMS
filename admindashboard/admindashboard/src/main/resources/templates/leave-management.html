@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leave Management System - WhiteCircle</title>
+    <title>Leave Management System - Textora Technology</title>
+    <link rel="icon" type="image/png" href="/images/textoratech2-logo.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -665,14 +666,14 @@
 
     document.addEventListener("DOMContentLoaded", function() {
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('source') === 'whitecircle') {
-            sessionStorage.setItem('backRedirectSource', 'whitecircle');
+        if (urlParams.get('source') === 'Textora Technology') {
+            sessionStorage.setItem('backRedirectSource', 'Textora Technology');
         } else if (urlParams.has('source')) {
             sessionStorage.removeItem('backRedirectSource');
         }
         
         const redirectSource = sessionStorage.getItem('backRedirectSource');
-        if (redirectSource === 'whitecircle') {
+        if (redirectSource === 'Textora Technology') {
             const backBtn = document.querySelector('.btn-back-home');
             if (backBtn) backBtn.href = '/my-whitecircle';
         }
